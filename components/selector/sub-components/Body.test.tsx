@@ -88,7 +88,10 @@ describe("Selector list from the keyboard", () => {
     }
     await waitFor(() => expect(document.getElementById(optionId)).toBeNull());
 
+    // The keyup too: the list swallows it, and one left waiting would eat the
+    // next test's.
     fireEvent.keyDown(list, { key: "Enter" });
+    fireEvent.keyUp(list, { key: "Enter" });
 
     await waitFor(() => expect(props.onSelect).toHaveBeenCalledTimes(1));
     expect(vi.mocked(props.onSelect!).mock.calls[0][0]).toMatchObject({
@@ -120,5 +123,95 @@ describe("Selector list from the keyboard", () => {
     rerender(<Selector {...props} items={next} totalItems={next.length} />);
 
     await waitFor(() => expect(activeOptionText()).toContain("Next 2"));
+  });
+
+  // The list takes the focus as it mounts, and the keyboard's row with it. A
+  // row picked with the pointer then left Enter to that other row: it was
+  // picked in place of the user's, and the choice never submitted.
+  describe("after a pointer pick", () => {
+    const pickWithPointer = (label: string) => {
+      const row = screen
+        .getByText(label)
+        .closest<HTMLElement>('[role="option"]')!;
+      fireEvent.pointerDown(row);
+      fireEvent.click(row);
+    };
+    const pressEnter = () => {
+      fireEvent.keyDown(getList(), { key: "Enter" });
+      fireEvent.keyUp(getList(), { key: "Enter" });
+    };
+    const pickedIds = (onSelect: SelectorProps["onSelect"]) =>
+      vi.mocked(onSelect!).mock.calls.map(([item]) => item.id);
+
+    it("submits the row picked in single select on Enter", async () => {
+      const { props } = await renderList();
+      expect(document.activeElement).toBe(getList());
+
+      pickWithPointer("Item 3");
+      pressEnter();
+
+      expect(pickedIds(props.onSelect)).toEqual(["Item-3"]);
+      expect(props.onSubmit).toHaveBeenCalledOnce();
+    });
+
+    it("submits the rows ticked in multi select on Enter", async () => {
+      const { props } = await renderList({ isMultiSelect: true });
+
+      pickWithPointer("Item 3");
+      pressEnter();
+
+      expect(pickedIds(props.onSelect)).toEqual(["Item-3"]);
+      expect(props.onSubmit).toHaveBeenCalledOnce();
+    });
+
+    // The click focuses a list that did not have the focus: that focus is
+    // the pointer's, not the keyboard's.
+    it("leaves the keyboard off a list the pointer focused", async () => {
+      const { props } = await renderList();
+      act(() => getList().blur());
+      expect(activeOptionText()).toBeNull();
+
+      const row = screen
+        .getByText("Item 3")
+        .closest<HTMLElement>('[role="option"]')!;
+      fireEvent.pointerDown(row);
+      act(() => getList().focus());
+      fireEvent.click(row);
+
+      expect(activeOptionText()).toBeNull();
+      pressEnter();
+      expect(pickedIds(props.onSelect)).toEqual(["Item-3"]);
+      expect(props.onSubmit).toHaveBeenCalledOnce();
+    });
+
+    // The keyboard's row from the mount was the first: ArrowUp stayed on it.
+    it("lets the arrows go on from the row picked", async () => {
+      await renderList();
+
+      pickWithPointer("Item 2");
+      fireEvent.keyDown(getList(), { key: "ArrowUp" });
+      fireEvent.keyUp(getList(), { key: "ArrowUp" });
+
+      await waitFor(() => expect(activeOptionText()).toContain("Item 2"));
+    });
+  });
+
+  // A refresh dims the list and the pointer cannot reach it, but the keyboard
+  // could: Enter picked a row of the list that was on its way out.
+  it("keeps Enter and Space off a dimmed list, and the arrows on it", async () => {
+    const { props, rerender } = await renderList();
+    const list = getList();
+    act(() => list.focus());
+    fireEvent.keyDown(list, { key: "ArrowDown" });
+    await waitFor(() => expect(activeOptionText()).toContain("Item 2"));
+
+    rerender(<Selector {...props} isContentLoading />);
+    for (const key of ["Enter", " ", "ArrowDown"]) {
+      fireEvent.keyDown(getList(), { key });
+      fireEvent.keyUp(getList(), { key });
+    }
+
+    await waitFor(() => expect(activeOptionText()).toContain("Item 3"));
+    expect(props.onSelect).not.toHaveBeenCalled();
   });
 });

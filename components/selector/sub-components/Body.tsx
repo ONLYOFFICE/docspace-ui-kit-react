@@ -481,6 +481,13 @@ const Body = ({
       : stepFrom(-1, 1);
   };
 
+  // The pointer took over the list: the keyboard leaves its row, and Enter
+  // goes to the Selector's submit again, as for a row picked with the pointer
+  // it should. A focus that press brings is the pointer's too. The next key
+  // gives the list back to the keyboard, from the row the pointer pressed.
+  const pointerRef = React.useRef(false);
+  const pointerRowRef = React.useRef(-1);
+
   // Focused, the list shows where the keyboard is: on the selected row on
   // screen, or else the first one. Enter there picks that row - except on
   // the row already picked in single select, where it submits the choice
@@ -489,8 +496,20 @@ const Body = ({
     label: listLabel,
     activeOptionId:
       activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined,
+    onPointerDown: (e: PointerEvent) => {
+      const optionPrefix = `${listboxId}-option-`;
+      const option =
+        e.target instanceof Element
+          ? e.target.closest('[role="option"]')
+          : null;
+      pointerRef.current = true;
+      pointerRowRef.current = option?.id.startsWith(optionPrefix)
+        ? Number(option.id.slice(optionPrefix.length))
+        : -1;
+      setActiveIndex(-1);
+    },
     onFocus: () => {
-      if (activeIndexRef.current >= 0) return;
+      if (pointerRef.current || activeIndexRef.current >= 0) return;
       const index = getStartIndex();
       if (index >= 0) setActiveIndex(index);
     },
@@ -504,14 +523,21 @@ const Body = ({
     },
     onKeyDown: (e: KeyboardEvent) => {
       if (e.target !== e.currentTarget) return;
+      const pointerRow = pointerRowRef.current;
+      pointerRef.current = false;
+      pointerRowRef.current = -1;
       const last = stepFrom(listItems.length, -1);
+      const startIndex =
+        pointerRow >= 0 && isPickable(pointerRow)
+          ? pointerRow
+          : getStartIndex();
 
       switch (e.key) {
         case "ArrowDown":
-          moveTo(activeIndex < 0 ? getStartIndex() : stepFrom(activeIndex, 1));
+          moveTo(activeIndex < 0 ? startIndex : stepFrom(activeIndex, 1));
           break;
         case "ArrowUp":
-          moveTo(activeIndex < 0 ? getStartIndex() : stepFrom(activeIndex, -1));
+          moveTo(activeIndex < 0 ? startIndex : stepFrom(activeIndex, -1));
           break;
         case "Home":
           moveTo(stepFrom(-1, 1));
@@ -521,6 +547,9 @@ const Body = ({
           break;
         case "Enter":
         case " ": {
+          // A dimmed list is on its way out: the pointer cannot reach it, and
+          // neither can the keys, which would pick a row of the list before.
+          if (isDimmed) break;
           if (activeIndex < 0 || !isPickable(activeIndex)) return;
           // Enter on the row already picked in single select is the Selector's
           // submit: the choice stands.

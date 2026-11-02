@@ -6,7 +6,7 @@ import { ListboxContext } from "../contexts/Listbox";
 
 export const VirtualScroll = (props: ScrollbarProps) => {
   const scrollContentRef = useRef<HTMLDivElement | null>(null);
-  const { label, activeOptionId, onKeyDown, onFocus, onBlur } =
+  const { label, activeOptionId, onKeyDown, onFocus, onBlur, onPointerDown } =
     useContext(ListboxContext);
 
   // The scroll container is the list's one Tab stop, a listbox whose options
@@ -30,6 +30,9 @@ export const VirtualScroll = (props: ScrollbarProps) => {
 
   const handleFocus = useEffectEvent(() => onFocus?.());
   const handleBlur = useEffectEvent((e: FocusEvent) => onBlur?.(e));
+  const handlePointerDown = useEffectEvent((e: PointerEvent) =>
+    onPointerDown?.(e),
+  );
 
   useEffect(() => {
     const list = scrollContentRef.current;
@@ -38,11 +41,13 @@ export const VirtualScroll = (props: ScrollbarProps) => {
     list.addEventListener("keydown", handleKeyDown);
     list.addEventListener("focus", handleFocus);
     list.addEventListener("blur", handleBlur);
+    list.addEventListener("pointerdown", handlePointerDown);
 
     return () => {
       list.removeEventListener("keydown", handleKeyDown);
       list.removeEventListener("focus", handleFocus);
       list.removeEventListener("blur", handleBlur);
+      list.removeEventListener("pointerdown", handlePointerDown);
     };
   }, []);
 

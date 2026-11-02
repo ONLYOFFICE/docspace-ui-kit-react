@@ -9,6 +9,7 @@ export type TListboxContext = {
   onKeyDown?: (e: KeyboardEvent) => void;
   onFocus?: () => void;
   onBlur?: (e: FocusEvent) => void;
+  onPointerDown?: (e: PointerEvent) => void;
 };
 
 export const ListboxContext = createContext<TListboxContext>({});
