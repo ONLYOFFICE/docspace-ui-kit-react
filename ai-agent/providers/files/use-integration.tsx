@@ -83,10 +83,11 @@ export const useFilesIntegration = ({
   const onOpenContextRoom = React.useCallback(
     (cloud: string, room: { id: string; name: string }) => {
       if (cloud !== CONTEXT_ROOM_CLOUD) return;
-      // The address Files opens a room by: the bare `/rooms/shared/{id}`
-      // carries no `folder` and lands on `/rooms/shared/undefined`.
+      // The context and knowledge rooms are Instructions and Knowledge
+      // rooms, which Files opens in the AI rooms section. The address needs
+      // `folder`: without it Files lands on `.../undefined`.
       window.DocSpace?.navigate(
-        `/rooms/shared/${room.id}/filter?folder=${room.id}`,
+        `/ai-rooms/${room.id}/filter?folder=${room.id}`,
       );
     },
     [],

@@ -204,6 +204,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **An AI project opens on its own model, not on the default.** `AiChatStoresBridge` looked the
+  project's model up among the assigned profiles only (`init`); a model outside them missed and
+  the chat fell back to the default. It now waits for the whole list (`ensureProfiles`) first.
+- The composer's link to a context or knowledge room opens it in the AI rooms section
+  (`/ai-rooms/{id}`), not in Rooms
 - `ContextRoomWatcher` refreshes the picker's room list right after it connects an offered room
   that gained its first skill (the scheduled refresh was cancelled by the effect rerun)
 - `ContextRoomSync` no longer reads the skills a second time when the store already did

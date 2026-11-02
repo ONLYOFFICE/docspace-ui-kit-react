@@ -84,13 +84,13 @@ describe("useFilesIntegration: the composer's source pickers", () => {
     expect(screen.queryByTestId("rooms-dialog")).toBeNull();
   });
 
-  it("opens a room of this portal in Files, by the address Files expects", () => {
+  it("opens a room of this portal in the AI rooms section of Files", () => {
     render(<Host />);
     integration().onOpenContextRoom(CONTEXT_ROOM_CLOUD, {
       id: "12",
       name: "Skills",
     });
-    expect(navigate).toHaveBeenCalledWith("/rooms/shared/12/filter?folder=12");
+    expect(navigate).toHaveBeenCalledWith("/ai-rooms/12/filter?folder=12");
   });
 
   it("leaves a room of another cloud alone", () => {
