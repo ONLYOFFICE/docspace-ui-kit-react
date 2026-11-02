@@ -15,6 +15,10 @@ import { ComboBoxSize, ComboBoxDisplayType } from "./ComboBox.enums";
 import type { TComboboxProps, TOption } from "./ComboBox.types";
 import styles from "./ComboBox.module.scss";
 
+// A caller that loads its options asynchronously can render before they
+// arrive. One shared empty list keeps the memoised lists below stable.
+const NO_OPTIONS: TOption[] = [];
+
 const compare = (prevProps: TComboboxProps, nextProps: TComboboxProps) => {
   return equal(prevProps, nextProps);
 };
@@ -215,7 +219,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     directionY,
     size = ComboBoxSize.base,
     type,
-    options,
+    options: optionsProp,
     advancedOptions,
     isDisabled,
     children,
@@ -267,6 +271,8 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     withoutArrow = false,
     id,
   } = props;
+
+  const options = optionsProp ?? NO_OPTIONS;
 
   React.useEffect(() => {
     setIsOpen(opened || false);
@@ -341,10 +347,14 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     // The same exclusion comboBoxClick makes: the optional children block
     // (`children`) keeps its own keys while disableIconClick is on.
     if (disableIconClick && isInOptionalBlock(target, e.currentTarget)) return;
+    // disableItemClick hands the opening to the caller, which then drives
+    // `opened` through onToggle (the sort button and the overflow "..." do).
+    // The keys still open the list through that same onToggle; with no
+    // onToggle nobody would open it, so they stay off too.
     if (
       isDisabled ||
       isLoading ||
-      props.disableItemClick ||
+      (props.disableItemClick && !onToggle) ||
       displayType === ComboBoxDisplayType.toggle
     )
       return;

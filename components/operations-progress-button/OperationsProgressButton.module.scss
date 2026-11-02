@@ -187,7 +187,9 @@
     bottom 0.3s ease-in-out;
 
   &.infoPanelVisible {
-    inset-inline-end: 424px;
+    inset-inline-end: calc(
+      var(--operations-progress-info-panel-width, 400px) + 24px
+    );
   }
 
   @keyframes hideButton {

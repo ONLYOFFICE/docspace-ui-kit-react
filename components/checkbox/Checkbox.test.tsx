@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import type { CheckboxProps } from "./Checkbox.types";
@@ -121,25 +121,46 @@ describe("<Checkbox />", () => {
     expect(checkbox).not.toBeChecked();
   });
 
-  it("toggles once while Space is held, ignoring its auto-repeats", () => {
+  it("toggles once while Space is held, ignoring its auto-repeats", async () => {
+    const user = userEvent.setup();
     const handleChange = vi.fn();
-    const { container } = render(
-      <Checkbox {...defaultProps} onChange={handleChange} />,
+    render(
+      <Checkbox {...defaultProps} label="Saved" onChange={handleChange} />,
     );
-    // The icon is swapped for the checked one on toggle, so look it up anew.
-    const icon = () => {
-      const svg = container.querySelector("svg");
-      if (!svg) throw new Error("checkbox icon not rendered");
-      return svg;
-    };
 
-    fireEvent.keyDown(icon(), { key: " " });
-    const repeat = fireEvent.keyDown(icon(), { key: " ", repeat: true });
-    fireEvent.keyDown(icon(), { key: " ", repeat: true });
+    await user.tab();
+    await user.keyboard("[Space>3/]");
 
     expect(handleChange).toHaveBeenCalledTimes(1);
-    expect(screen.getByRole("checkbox")).toBeChecked();
-    // A repeat is still kept from scrolling the page.
-    expect(repeat).toBe(false);
+    expect(screen.getByRole("checkbox", { name: "Saved" })).toBeChecked();
+  });
+
+  it("keeps the focus on the checkbox when Space toggles it", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <Checkbox {...defaultProps} label="Saved" />
+        <button type="button">Continue</button>
+      </>,
+    );
+    const checkbox = screen.getByRole("checkbox", { name: "Saved" });
+
+    await user.tab();
+    expect(checkbox).toHaveFocus();
+    await user.keyboard(" ");
+
+    expect(checkbox).toBeChecked();
+    expect(checkbox).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Continue" })).toHaveFocus();
+  });
+
+  it("is no tab stop while disabled", async () => {
+    const user = userEvent.setup();
+    render(<Checkbox {...defaultProps} label="Saved" isDisabled />);
+
+    await user.tab();
+
+    expect(document.body).toHaveFocus();
   });
 });

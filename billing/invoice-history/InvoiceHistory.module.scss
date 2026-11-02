@@ -53,6 +53,10 @@
   }
 }
 
+.rowContainer {
+  overflow-x: clip;
+}
+
 .row {
   min-height: 58px;
   box-sizing: border-box;

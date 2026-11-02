@@ -70,6 +70,11 @@ export enum SocketEvents {
   WalletLowBalance = "s:wallet-low-balance",
   UpdateExternalShareSettings = "s:change-external-sharing-settings",
   FormSuggestedQuestions = "s:form-suggested-questions",
+  AddWebhook = "s:add-webhook",
+  UpdateWebhook = "s:update-webhook",
+  DeleteWebhook = "s:delete-webhook",
+  AddWebhookLog = "s:add-webhook-log",
+  UpdateWebhookLog = "s:update-webhook-log",
 }
 
 /**
@@ -290,6 +295,23 @@ export type TFormSuggestedQuestionsData = {
   questions: { question: string; prompt: string }[];
 };
 
+/**
+ * A webhook subscription changed. Carries the id only: the subscriptions are
+ * re-read through `GET settings/webhook`.
+ */
+export type TWebhookData = {
+  id: number;
+};
+
+/**
+ * A record of a webhook delivery journal changed. Carries the ids only: the
+ * record is re-read through `GET settings/webhooks/log`.
+ */
+export type TWebhookLogData = {
+  id: number;
+  configId: number;
+};
+
 export type TListenEventCallbackMap = {
   [SocketEvents.LogoutSession]: (data: {
     loginEventId: unknown;
@@ -389,6 +411,11 @@ export type TListenEventCallbackMap = {
   [SocketEvents.FormSuggestedQuestions]: (
     data: TFormSuggestedQuestionsData,
   ) => void;
+  [SocketEvents.AddWebhook]: (data: TWebhookData) => void;
+  [SocketEvents.UpdateWebhook]: (data: TWebhookData) => void;
+  [SocketEvents.DeleteWebhook]: (data: TWebhookData) => void;
+  [SocketEvents.AddWebhookLog]: (data: TWebhookLogData) => void;
+  [SocketEvents.UpdateWebhookLog]: (data: TWebhookLogData) => void;
 };
 
 /**

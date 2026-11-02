@@ -1,4 +1,5 @@
 @use "../../styles/mixins";
+@use "../../styles/variables/colors";
 
 .text {
   --text-font-size: var(--text-size, 13px);
@@ -8,6 +9,22 @@
   margin: 0;
   font-weight: var(--text-font-weight);
   font-size: var(--text-font-size);
+
+  // A Text rendered as a link or given a tabIndex (Link renders through it)
+  // still shows where the keyboard is; the pointer gets no ring. Inset: a
+  // link usually fills a table cell or a row that clips its overflow.
+  &:focus-visible {
+    outline: 2px solid
+      var(
+        --text-focus-color,
+        var(
+          --accent-main,
+          var(--color-scheme-main-accent, #{colors.$light-blue-main})
+        )
+      );
+    outline-offset: -2px;
+    border-radius: 2px;
+  }
 
   &.inline {
     display: inline-block;

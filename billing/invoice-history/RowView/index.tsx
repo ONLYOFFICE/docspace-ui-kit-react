@@ -6,6 +6,7 @@ import type { TInvoice } from "../../types";
 
 import { getCorrectDate } from "../../../utils/date/getCorrectDate";
 import InvoiceRow from "./RowBody";
+import styles from "../InvoiceHistory.module.scss";
 
 type InvoiceHistoryRowViewProps = {
   sectionWidth: number;
@@ -28,6 +29,7 @@ const RowView = ({
 
   return (
     <RowContainer
+      className={styles.rowContainer}
       useReactWindow
       fetchMoreFiles={fetchMoreInvoices}
       hasMoreFiles={hasMoreInvoices}

@@ -68,18 +68,18 @@ describe("ChatPanel resizer", () => {
     const onResize = vi.fn();
     renderPanel({ onResize });
 
-    fireEvent.mouseDown(screen.getByTestId("chat-panel-resizer"), {
+    fireEvent.pointerDown(screen.getByTestId("chat-panel-resizer"), {
       clientX: 800,
       button: 0,
     });
-    fireEvent.mouseMove(window, { clientX: 700 });
+    fireEvent.pointerMove(window, { clientX: 700 });
 
     // Applied straight to the DOM while dragging, committed once on mouse up.
     const panel = document.getElementById("ChatPanelWrapper");
     expect(panel?.style.getPropertyValue("--chat-panel-width")).toBe("500px");
     expect(onResize).not.toHaveBeenCalled();
 
-    fireEvent.mouseUp(window);
+    fireEvent.pointerUp(window);
     expect(onResize).toHaveBeenCalledWith(500);
   });
 
@@ -87,23 +87,29 @@ describe("ChatPanel resizer", () => {
     // The panel is content-box with a 1px inline-start border: its rect is
     // 401px for a `--chat-panel-width` of 400px.
     layout.panel = 401;
+    vi.spyOn(window, "getComputedStyle").mockReturnValue({
+      direction: "ltr",
+      boxSizing: "content-box",
+      borderLeftWidth: "1px",
+      borderRightWidth: "0px",
+      paddingLeft: "0px",
+      paddingRight: "0px",
+    } as CSSStyleDeclaration);
     const onResize = vi.fn();
     renderPanel({ onResize });
     const panel = document.getElementById("ChatPanelWrapper") as HTMLElement;
-    Object.defineProperty(panel, "offsetWidth", { value: 401 });
-    Object.defineProperty(panel, "clientWidth", { value: 400 });
     const resizer = screen.getByTestId("chat-panel-resizer");
 
-    // A grab released without moving commits the width the panel has.
-    fireEvent.mouseDown(resizer, { clientX: 800, button: 0 });
-    fireEvent.mouseUp(window);
-    expect(onResize).toHaveBeenLastCalledWith(400);
+    // A grab released without moving leaves the width alone.
+    fireEvent.pointerDown(resizer, { clientX: 800, button: 0 });
+    fireEvent.pointerUp(window);
+    expect(onResize).not.toHaveBeenCalled();
 
     // A 40px drag widens it by 40px, not 41.
-    fireEvent.mouseDown(resizer, { clientX: 800, button: 0 });
-    fireEvent.mouseMove(window, { clientX: 760 });
+    fireEvent.pointerDown(resizer, { clientX: 800, button: 0 });
+    fireEvent.pointerMove(window, { clientX: 760 });
     expect(panel.style.getPropertyValue("--chat-panel-width")).toBe("440px");
-    fireEvent.mouseUp(window);
+    fireEvent.pointerUp(window);
     expect(onResize).toHaveBeenLastCalledWith(440);
   });
 
@@ -112,14 +118,14 @@ describe("ChatPanel resizer", () => {
     renderPanel({ onResize });
     const resizer = screen.getByTestId("chat-panel-resizer");
 
-    fireEvent.mouseDown(resizer, { clientX: 800, button: 0 });
-    fireEvent.mouseMove(window, { clientX: 1600 });
-    fireEvent.mouseUp(window);
+    fireEvent.pointerDown(resizer, { clientX: 800, button: 0 });
+    fireEvent.pointerMove(window, { clientX: 1600 });
+    fireEvent.pointerUp(window);
     expect(onResize).toHaveBeenLastCalledWith(360);
 
-    fireEvent.mouseDown(resizer, { clientX: 800, button: 0 });
-    fireEvent.mouseMove(window, { clientX: -1600 });
-    fireEvent.mouseUp(window);
+    fireEvent.pointerDown(resizer, { clientX: 800, button: 0 });
+    fireEvent.pointerMove(window, { clientX: -1600 });
+    fireEvent.pointerUp(window);
     expect(onResize).toHaveBeenLastCalledWith(984);
   });
 
@@ -128,13 +134,13 @@ describe("ChatPanel resizer", () => {
     const onRequestFullscreen = vi.fn();
     renderPanel({ onResize, onRequestFullscreen });
 
-    fireEvent.mouseDown(screen.getByTestId("chat-panel-resizer"), {
+    fireEvent.pointerDown(screen.getByTestId("chat-panel-resizer"), {
       clientX: 800,
       button: 0,
     });
     // 584px of slack takes the panel to its 984px limit; 80px more is the
     // overshoot that asks for fullscreen.
-    fireEvent.mouseMove(window, { clientX: 800 - 584 - 80 });
+    fireEvent.pointerMove(window, { clientX: 800 - 584 - 80 });
 
     expect(onRequestFullscreen).toHaveBeenCalledTimes(1);
     // The width the panel reached is committed, so leaving fullscreen restores
@@ -144,7 +150,7 @@ describe("ChatPanel resizer", () => {
     // The drag is over: later pointer movement neither resizes the panel (the
     // width now belongs to the fullscreen layout) nor asks again.
     const panel = document.getElementById("ChatPanelWrapper");
-    fireEvent.mouseMove(window, { clientX: 900 });
+    fireEvent.pointerMove(window, { clientX: 900 });
     expect(panel?.style.getPropertyValue("--chat-panel-width")).toBe("400px");
     expect(onRequestFullscreen).toHaveBeenCalledTimes(1);
   });
@@ -153,34 +159,42 @@ describe("ChatPanel resizer", () => {
     const onResize = vi.fn();
     renderPanel({ onResize });
 
-    fireEvent.mouseDown(screen.getByTestId("chat-panel-resizer"), {
+    fireEvent.pointerDown(screen.getByTestId("chat-panel-resizer"), {
       clientX: 800,
       button: 0,
     });
-    fireEvent.mouseMove(window, { clientX: -1600 });
-    fireEvent.mouseUp(window);
+    fireEvent.pointerMove(window, { clientX: -1600 });
+    fireEvent.pointerUp(window);
 
     expect(onResize).toHaveBeenCalledWith(984);
   });
 
-  it("hands width back when the row shrinks below the section minimum", async () => {
-    // The section is 300px — 116px short of its 416px minimum — so a panel the
-    // user had dragged out to 900px has to give that much back.
+  it("narrows when the row shrinks below the section minimum, without saving it", async () => {
     vi.restoreAllMocks();
     mockLayout(300, 900);
     const onResize = vi.fn();
-    renderPanel({ width: 900, onResize });
+    const onShownWidthChange = vi.fn();
+    renderPanel({ width: 900, onResize, onShownWidthChange });
+    const panel = document.getElementById("ChatPanelWrapper");
 
-    await vi.waitFor(() => expect(onResize).toHaveBeenCalledWith(784));
+    await vi.waitFor(() =>
+      expect(panel?.style.getPropertyValue("--chat-panel-width")).toBe("784px"),
+    );
+    await vi.waitFor(() =>
+      expect(onShownWidthChange).toHaveBeenLastCalledWith(784),
+    );
+    expect(onResize).not.toHaveBeenCalled();
   });
 
-  it("never gives back more than the panel's own minimum", async () => {
+  it("never narrows past the panel's own minimum", async () => {
     vi.restoreAllMocks();
     mockLayout(0, 400);
-    const onResize = vi.fn();
-    renderPanel({ width: 400, onResize });
+    renderPanel({ width: 400 });
+    const panel = document.getElementById("ChatPanelWrapper");
 
-    await vi.waitFor(() => expect(onResize).toHaveBeenCalledWith(360));
+    await vi.waitFor(() =>
+      expect(panel?.style.getPropertyValue("--chat-panel-width")).toBe("360px"),
+    );
   });
 
   it("leaves an in-flight drag alone when the row reflows under it", async () => {
@@ -192,7 +206,7 @@ describe("ChatPanel resizer", () => {
     await nextFrames();
     onResize.mockClear();
 
-    fireEvent.mouseDown(screen.getByTestId("chat-panel-resizer"), {
+    fireEvent.pointerDown(screen.getByTestId("chat-panel-resizer"), {
       clientX: 800,
       button: 0,
     });
@@ -203,7 +217,7 @@ describe("ChatPanel resizer", () => {
 
     expect(onResize).not.toHaveBeenCalled();
 
-    fireEvent.mouseUp(window);
+    fireEvent.pointerUp(window);
   });
 
   it("leaves fullscreen when the drag comes back inwards, and keeps resizing", () => {
@@ -223,25 +237,25 @@ describe("ChatPanel resizer", () => {
     // The width belongs to the layout while fullscreen, not to the host value.
     expect(panel?.style.getPropertyValue("--chat-panel-width")).toBe("");
 
-    fireEvent.mouseDown(screen.getByTestId("chat-panel-resizer"), {
+    fireEvent.pointerDown(screen.getByTestId("chat-panel-resizer"), {
       clientX: 100,
       button: 0,
     });
 
     // Not far enough in yet — still fullscreen, still no width of its own.
-    fireEvent.mouseMove(window, { clientX: 140 });
+    fireEvent.pointerMove(window, { clientX: 140 });
     expect(onExitFullscreen).not.toHaveBeenCalled();
     expect(panel?.style.getPropertyValue("--chat-panel-width")).toBe("");
 
-    fireEvent.mouseMove(window, { clientX: 180 });
+    fireEvent.pointerMove(window, { clientX: 180 });
     expect(onExitFullscreen).toHaveBeenCalledTimes(1);
     expect(onResize).toHaveBeenCalledWith(984);
 
     // The same drag carries on docked, re-anchored to that limit.
-    fireEvent.mouseMove(window, { clientX: 280 });
+    fireEvent.pointerMove(window, { clientX: 280 });
     expect(panel?.style.getPropertyValue("--chat-panel-width")).toBe("884px");
 
-    fireEvent.mouseUp(window);
+    fireEvent.pointerUp(window);
     expect(onResize).toHaveBeenLastCalledWith(884);
     expect(onExitFullscreen).toHaveBeenCalledTimes(1);
   });
@@ -258,11 +272,11 @@ describe("ChatPanel resizer", () => {
     });
 
     const resizer = screen.getByTestId("chat-panel-resizer");
-    fireEvent.mouseDown(resizer, { clientX: 100, button: 0 });
-    fireEvent.mouseMove(window, { clientX: 140 });
+    fireEvent.pointerDown(resizer, { clientX: 100, button: 0 });
+    fireEvent.pointerMove(window, { clientX: 140 });
     // Outwards there is nowhere left to go either.
-    fireEvent.mouseMove(window, { clientX: -400 });
-    fireEvent.mouseUp(window);
+    fireEvent.pointerMove(window, { clientX: -400 });
+    fireEvent.pointerUp(window);
 
     expect(onExitFullscreen).not.toHaveBeenCalled();
     expect(onResize).not.toHaveBeenCalled();

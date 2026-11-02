@@ -152,6 +152,16 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `FieldContainer`, which describes radios through the group around them, put `aria-invalid`,
   `aria-required` and the error's `aria-describedby` on nothing. A query for the group by role now
   finds it; it still has no accessible name of its own.
+- **`Checkbox` focuses its input, not its icon.** `tabIndex` now goes on the visually hidden
+  `<input type="checkbox">`, which takes the keyboard focus; the box icon is decorative,
+  `aria-hidden` and no tab stop. A test that focused the `svg` or waited for it to be focused
+  must use the input (`getByRole("checkbox")`) instead. The focused box still draws its border
+  in the focus colour.
+- **The AI chat panel keeps its width.** A dragged docked width used to last until the panel
+  closed; `AiChatStore` now saves it in `localStorage` under `chatPanelWidth` and starts every
+  open and every visit from it. The new `utils/panel-width` holds that storage
+  (`createPanelWidthStorage`), so a host keeps the info panel's width the same way, and
+  `CHAT_PANEL_MIN_WIDTH`, the 360px the chat cannot be dragged below.
 
 ### Added
 
@@ -171,13 +181,22 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `aria-label` / `aria-labelledby` make it a named form landmark. Without `onSubmit` it is a
   `<div>` as before. The README now states that `--form-wrapper-min-width` /
   `--form-wrapper-max-width` size the content, so the card is that width plus twice the padding.
+- **`IconButton` takes `role` and `ariaLabel`.** Its element is a `<div>` with no role, and its
+  props had none to give it, so an icon button could be made keyboard-operable with `tabIndex`
+  and `onKeyDown` but not announced as a button without a cast. Both props are rendered on the
+  element, as `Link`'s are; nothing changes for a button that passes neither.
+- Section: the info panel can be resized from its inline-start edge on a desktop. `isInfoPanelResizable` turns it on, with the host's width in `infoPanelWidth` and a setter in `setInfoPanelWidth`. The edge drags from 400px to 800px (`INFO_PANEL_WIDTH`, and the new `INFO_PANEL_MAX_WIDTH` in `utils/device`) while the section keeps 416px, narrows to fit a narrower window without saving it, and a double click restores 400px. It shares its resizer with the chat panel, whose edge now also takes a finger or a pen and narrows the panel to a narrower window, a chat opened after mount included, without calling `setChatPanelWidth` for it. `onShownInfoPanelWidthChange` reports the width the open info panel, or the chat open in its place, takes on screen (`0` when neither does), for floating buttons a host draws itself; it follows a resize drag once per frame, and below a desktop the info panel counts as 400px and the chat as `0`
+- Article: `infoPanelWidth`, and the same prop on `ArticleLiveChat`, sets how far the live chat launcher moves clear of the open info panel, or of the AI chat open in its place, for a host whose panels are resizable; `0` when neither is. Unset, `isInfoPanelVisible` still assumes `INFO_PANEL_WIDTH`. The `isInfoPanelVisible` docs no longer call it unread: the launcher has moved clear of the info panel again since the switch to the Zendesk messaging API
+- `OperationsProgressButton` takes `infoPanelWidth`. Inside `Section` the button gets the width through `--operations-progress-info-panel-width` on the section container instead: the width the open info panel, or the chat open in its place, takes on a desktop, updated on every frame of a resize drag, so the button stays 24px clear of the panel instead of sitting 424px in, under it
 
 ### Fixed
 
 - `ContextRoomWatcher` refreshes the picker's room list right after it connects an offered room
   that gained its first skill (the scheduled refresh was cancelled by the effect rerun)
 - `ContextRoomSync` no longer reads the skills a second time when the store already did
-
+- **`ComboBox` no longer throws when `options` is missing.** A caller that renders it before
+  its options are loaded passed `undefined`, and reading its length threw "Cannot read
+  properties of undefined (reading 'length')". A missing list is now treated as an empty one.
 - **`FileTile`'s `--tile-height` sizes the whole tile.** The thumbnail area kept its 156px and
   the name row its 64px, so a taller tile ended in an empty band under the name row, outside the
   hover and checked background. The thumbnail area now takes whatever the name row leaves; at
@@ -225,16 +244,23 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   generated one. An advanced row keeps the `id` its caller gave it, and Enter looks the row up
   inside the open list only, so two lists whose rows share an id (two Filters' sort items) each
   pick their own
-- `Checkbox` toggles from the keyboard. Focus lands on the box icon rather than the hidden
-  input, and the icon answered no key, so Tab reached the checkbox and Space did nothing — a
-  form could not be filled in without a pointer. Space on the focused icon now clicks the input,
-  which fires the same `onChange` a pointer does; Enter still does nothing, as on a native
-  checkbox
+- `Checkbox` toggles from the keyboard and keeps the focus. Tab reached the box icon, which
+  answered no key, so Space did nothing — a form could not be filled in without a pointer. And
+  each state is drawn by its own icon, so a toggle replaced the focused icon: the focus fell to
+  the page and the next Tab did not move on from the checkbox. The input now takes the focus
+  (see _Changed_): Space toggles it as on any native checkbox, firing the same `onChange` a
+  pointer does, Enter does nothing, the focus stays put, and a screen reader announces the
+  focused control with its label and state
 - `Button`'s `tooltipText` opens only its own tooltip. A button with no `id` named its tooltip
   `button-tooltip`, the same as every other such button, and each tooltip opens for any anchor
   carrying its name — so hovering one of three buttons opened three tooltips, and the page held
   three elements with one `id`. A button without an `id` now gets a generated one; a button
   with an `id` is unchanged
+- **A click under a `Tabs` label selects the tab.** When the underlined row overflows, its
+  horizontal scroll track — 16px tall, at the bottom of the 32px bar — lay over the lower half
+  of every tab, so a click on the bottom of a label or just under it reached the track, which
+  scrolled the row instead of selecting the tab. The track now lets the pointer through; the
+  wheel and the trackpad still scroll the row
 - **A disabled `Tabs` item cannot be selected.** The click handlers of both bars, the segmented
   keyboard and the overflow arrows now refuse it; before, only CSS `pointer-events: none` kept
   the pointer off it, and the arrows selected it
@@ -246,7 +272,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   page behind an open dialog, so the keyboard kept acting there. The dialog's surface
   (`#modal-dialog`, now `tabindex="-1"`) takes the focus unless a field inside it is autofocused,
   and on close the focus returns to the element that had it, also when `hideContent` recreated
-  the content while the dialog was open
+  the content while the dialog was open. A dialog whose field takes the focus as it mounts
+  (`autoFocus`, or a focus in the content's own effect) hands it back too: the opener is read
+  before the commit that shows the dialog touches the DOM, where that field used to pass for it
 - **`TwoStateToggle`'s default strings name the product through `getBrandName("ProductName")`.**
   `title`, `confirmBody` and `ariaLabel` said "DocSpace"; they now follow the portal's branding,
   and say "ONLYOFFICE Apps" when no brand lookup is registered. Explicit props are unaffected
@@ -491,7 +519,12 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **The `Section` chat panel resizer no longer grows the panel by 1px per grab.** It measured the
   panel with its border and wrote that to `--chat-panel-width`, which sets the content box: a click
   on the edge committed 401 for a 400px panel. `setChatPanelWidth` now receives the content width,
-  and a grab released without moving commits the width unchanged.
+  and a grab released without moving commits nothing.
+- **A `Section` panel resize no longer outlives its mouse button.** A drag whose button was
+  released where the page could not see it, in another window after Alt+Tab or over the Start
+  menu, went on moving the panel with the pointer and kept the resize cursor until the next click.
+  The drag now ends, committing the width it reached, as soon as the window loses focus or the
+  pointer moves without the button.
 - **A late search result no longer overwrites a newer edit in `Filter`'s search box.** A query the
   host applied after the user had already changed or cleared the box came back into it and was
   searched again. Such a stale value, or a new `getSelectedInputValue` returning the value already
@@ -567,6 +600,7 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   elsewhere — a sign-in redirect, a link followed in the tab — would have received them. Both
   windows open the portal's `/doceditor`, so the calls are now addressed to
   `window.location.origin` and the browser drops one whose window holds any other page.
+- Table: a column reset no longer squeezes the name column below its own minimum. With many columns on and a narrow list, for instance beside the AI chat, the reset took every other column's minimum out of the name column's share, down to a negative width that broke the grid: the header lost its title and the rows came out empty. The name column now keeps its minimum, and when the other columns cannot fit next to it the table shows the name column alone, as a resize already does
 
 ## 4.1.0
 

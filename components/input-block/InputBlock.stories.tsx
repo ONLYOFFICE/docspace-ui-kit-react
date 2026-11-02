@@ -143,10 +143,7 @@ const meta = {
     tabIndex: {
       control: "number",
       description:
-        "Place of the inner `<input>` in the keyboard tab order; at the default the Tab key skips the field",
-      table: {
-        defaultValue: { summary: "-1" },
-      },
+        "Place of the inner `<input>` in the keyboard tab order; unset, the field keeps its natural place, and `-1` makes the Tab key skip it",
     },
     isAutoFocussed: {
       control: "boolean",
@@ -298,8 +295,8 @@ export const Default: Story = {
     const input = within(block).getByPlaceholderText("Enter text here");
     await userEvent.type(input, "hello");
     await expect(input).toHaveValue("hello");
-    // Out of the tab order unless tabIndex is passed.
-    await expect(input).toHaveAttribute("tabindex", "-1");
+    // In the tab order when no tabIndex is passed.
+    await expect(input).not.toHaveAttribute("tabindex");
     // Without onIconClick the icon is drawn disabled.
     await expect(within(block).getByTestId("icon-button")).toHaveAttribute(
       "aria-disabled",
