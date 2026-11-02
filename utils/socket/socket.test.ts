@@ -245,6 +245,89 @@ describe("SocketHelper", () => {
     });
   });
 
+  // ── onReconnect() ────────────────────────────────────────────────────────
+
+  describe("onReconnect()", () => {
+    it("is not called on the first connect", async () => {
+      const instance = await freshInstance();
+      const cb = vi.fn();
+      instance.connect("/socket", "");
+      instance.onReconnect(cb);
+
+      fire("connect");
+
+      expect(cb).not.toHaveBeenCalled();
+    });
+
+    it("is called once on every next connect, after the re-subscribe", async () => {
+      const instance = await freshInstance();
+      const cb = vi.fn();
+      instance.connect("/socket", "");
+      fire("connect");
+      fire("connection-init");
+      instance.emit(SocketCommands.Subscribe, { roomParts: "room-1" });
+      instance.onReconnect(cb);
+      mockSocket.emit.mockClear();
+
+      fire("connect");
+
+      expect(cb).toHaveBeenCalledTimes(1);
+      expect(mockSocket.emit.mock.invocationCallOrder[0]).toBeLessThan(
+        cb.mock.invocationCallOrder[0],
+      );
+
+      fire("connect");
+
+      expect(cb).toHaveBeenCalledTimes(2);
+    });
+
+    it("keeps a callback registered before connect()", async () => {
+      const instance = await freshInstance();
+      const cb = vi.fn();
+      instance.onReconnect(cb);
+      instance.connect("/socket", "");
+
+      fire("connect");
+      fire("connect");
+
+      expect(cb).toHaveBeenCalledTimes(1);
+    });
+
+    it("is not called after offReconnect()", async () => {
+      const instance = await freshInstance();
+      const cb = vi.fn();
+      instance.onReconnect(cb);
+      instance.connect("/socket", "");
+      fire("connect");
+      instance.offReconnect(cb);
+
+      fire("connect");
+
+      expect(cb).not.toHaveBeenCalled();
+    });
+
+    it("calls the next callback when one throws", async () => {
+      const consoleError = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      const instance = await freshInstance();
+      const failing = vi.fn(() => {
+        throw new Error("boom");
+      });
+      const cb = vi.fn();
+      instance.onReconnect(failing);
+      instance.onReconnect(cb);
+      instance.connect("/socket", "");
+      fire("connect");
+
+      fire("connect");
+
+      expect(cb).toHaveBeenCalledTimes(1);
+      expect(consoleError).toHaveBeenCalled();
+      consoleError.mockRestore();
+    });
+  });
+
   // ── isEmitDataValid / emit() ─────────────────────────────────────────────
 
   describe("emit()", () => {

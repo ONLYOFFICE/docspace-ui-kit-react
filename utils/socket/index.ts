@@ -514,6 +514,9 @@ const isEmitDataValid = (
  * @method public connect - Establishes a WebSocket connection using the provided URL and public room key.
  * @method public emit - Emits a command with associated data to a specified room or globally.
  * @method public on - Registers an event listener for the specified event name.
+ * @method public off - Removes an event listener for the specified event name.
+ * @method public onReconnect - Registers a callback fired after the socket reconnects.
+ * @method public offReconnect - Removes a callback registered with `onReconnect`.
  */
 class SocketHelper {
   private static instance: SocketHelper;
@@ -535,6 +538,8 @@ class SocketHelper {
   private emits: TEmit[] = [];
 
   private subscribeEmits = new Map<string, boolean | undefined>();
+
+  private reconnectCallbacks = new Set<() => void>();
 
   private constructor() {
     this.client = null;
@@ -633,6 +638,10 @@ class SocketHelper {
 
       this.client = io(connectionUrl, config);
 
+      // Per client: a second client created while the first one is still
+      // connecting must not report its first connect as a reconnect.
+      let wasConnected = false;
+
       this.client.on("connect", () => {
         clearInterval(this.reconnectIntervalId);
         this.currentReconnectRetries = 0;
@@ -643,6 +652,19 @@ class SocketHelper {
             individual,
           });
         });
+
+        if (wasConnected) {
+          addLog("[WS] socket is reconnected", "socket");
+          this.reconnectCallbacks.forEach((callback) => {
+            try {
+              callback();
+            } catch (e) {
+              console.error("[WS] reconnect callback error", e);
+            }
+          });
+        }
+
+        wasConnected = true;
       });
 
       this.client.on("connect_error", (err) =>
@@ -856,6 +878,29 @@ class SocketHelper {
     addLog(`[WS] off event: ${eventName}`, "socket");
 
     this.client.off(eventName satisfies string, callback);
+  };
+
+  /**
+   * Registers a callback fired on every connect of the client except its
+   * first one, after the subscriptions are re-sent. The server does not replay
+   * events emitted while the socket was down, so use it to re-read the state
+   * whose events could have been missed.
+   *
+   * Can be called before `connect()`.
+   *
+   * @param callback - The function to be called after a reconnect.
+   */
+  public onReconnect = (callback: () => void) => {
+    this.reconnectCallbacks.add(callback);
+  };
+
+  /**
+   * Removes a callback registered with `onReconnect`.
+   *
+   * @param callback - The function passed to `onReconnect`.
+   */
+  public offReconnect = (callback: () => void) => {
+    this.reconnectCallbacks.delete(callback);
   };
 }
 
