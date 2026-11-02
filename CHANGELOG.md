@@ -8,6 +8,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **`FileTile`'s `--tile-option-button-padding-end` is now `--tile-option-button-margin-end`,
+  default `8px`.** The actions button pads its icon alike on every side, so its keyboard focus
+  ring sits around the icon, and the room to the tile's edge is a margin after it. The space to
+  the edge is the same as before: an old padding of `X` is a margin of `X - 8px` (`8px` was
+  `16px`, `0px` was `8px`). A consumer still setting the old name sets nothing
 - **React and React DOM 19.2 are required.** The peer range moves from `^19.0.0` to `^19.2.0`:
   the kit calls `useEffectEvent` (Selector's list, `useUnmount`, `useCloseOnAnchorCovered`, the
   AI agent's platform provider), which React 19.0 and 19.1 do not export. A consumer on those

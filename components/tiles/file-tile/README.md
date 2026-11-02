@@ -252,33 +252,33 @@ export function BadgedFileTile() {
 
 ## CSS variables
 
-| Variable                           | Default                          | Effect                                                                                                                 |
-| ---------------------------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `--tile-bg`                        | the theme's tile background      | Background of the tile                                                                                                 |
-| `--tile-hover-bg`                  | the checked background           | Background of the name row on hover and under `isActive`, and of the whole tile when `checked`                         |
-| `--tile-thumbnail-image-hover-bg`  | `--tile-bg`                      | Background of the thumbnail area on hover and under `isActive`; a `checked` tile takes `--tile-hover-bg` there instead |
-| `--tile-thumbnail-transition`      | `background 0.2s`                | Transition of the thumbnail area's background                                                                          |
-| `--tile-border-style`              | the theme's border               | Border of the tile, shared with the other tiles                                                                        |
-| `--file-tile-border-style`         | `--tile-border-style`            | Border of a file tile only; wins over `--tile-border-style`                                                            |
-| `--tile-radius`                    | `12px`                           | Corner radius                                                                                                          |
-| `--tile-height`                    | `222px`                          | Height of the whole tile                                                                                               |
-| `--tile-thumbnail-height`          | `100%`                           | Height of the preview image                                                                                            |
-| `--tile-thumbnail-padding-inline`  | `0`                              | Side inset of the preview image                                                                                        |
-| `--tile-thumbnail-image-radius`    | the tile's top corners           | Corner radius of the preview image                                                                                     |
-| `--tile-bottom-padding-inline`     | `0`                              | Side padding of the name row                                                                                           |
-| `--tile-text-size`                 | `14px`                           | Font size of the name                                                                                                  |
-| `--tile-text-weight`               | `normal`                         | Font weight of the name                                                                                                |
-| `--tile-text-color`                | inherited                        | Colour of the name                                                                                                     |
-| `--tile-text-line-height`          | `16px`                           | Line height of the name                                                                                                |
-| `--tile-hover-text-decoration`     | the page link's hover decoration | Decoration of the name on hover and under `isActive`                                                                   |
-| `--tile-icon-display`              | `flex`                           | `display` of the box holding the icon and the checkbox; `none` hides both                                              |
-| `--tile-badge-bg`                  | the theme's badge background     | Background of each badge and quick action over the thumbnail                                                           |
-| `--tile-badge-radius`              | `3px`                            | Corner radius of each badge and quick action                                                                           |
-| `--tile-badge-box-shadow`          | the theme's badge shadow         | Shadow of each badge and quick action                                                                                  |
-| `--tile-icon-color`                | the theme's icon colour          | Fill of a `.is-pinned` badge inside the content's `.badges`; the three-dot button does not read it                     |
-| `--tile-option-button-padding-end` | `16px`                           | End padding of the three-dot button                                                                                    |
-| `--tile-hotkey-color`              | the theme's hotkey colour        | Border colour under `showHotkeyBorder`                                                                                 |
-| `--highlightColor`                 | none                             | Colour that fades out of the name row while `isHighlight` plays                                                        |
+| Variable                          | Default                          | Effect                                                                                                                 |
+| --------------------------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `--tile-bg`                       | the theme's tile background      | Background of the tile                                                                                                 |
+| `--tile-hover-bg`                 | the checked background           | Background of the name row on hover and under `isActive`, and of the whole tile when `checked`                         |
+| `--tile-thumbnail-image-hover-bg` | `--tile-bg`                      | Background of the thumbnail area on hover and under `isActive`; a `checked` tile takes `--tile-hover-bg` there instead |
+| `--tile-thumbnail-transition`     | `background 0.2s`                | Transition of the thumbnail area's background                                                                          |
+| `--tile-border-style`             | the theme's border               | Border of the tile, shared with the other tiles                                                                        |
+| `--file-tile-border-style`        | `--tile-border-style`            | Border of a file tile only; wins over `--tile-border-style`                                                            |
+| `--tile-radius`                   | `12px`                           | Corner radius                                                                                                          |
+| `--tile-height`                   | `222px`                          | Height of the whole tile                                                                                               |
+| `--tile-thumbnail-height`         | `100%`                           | Height of the preview image                                                                                            |
+| `--tile-thumbnail-padding-inline` | `0`                              | Side inset of the preview image                                                                                        |
+| `--tile-thumbnail-image-radius`   | the tile's top corners           | Corner radius of the preview image                                                                                     |
+| `--tile-bottom-padding-inline`    | `0`                              | Side padding of the name row                                                                                           |
+| `--tile-text-size`                | `14px`                           | Font size of the name                                                                                                  |
+| `--tile-text-weight`              | `normal`                         | Font weight of the name                                                                                                |
+| `--tile-text-color`               | inherited                        | Colour of the name                                                                                                     |
+| `--tile-text-line-height`         | `16px`                           | Line height of the name                                                                                                |
+| `--tile-hover-text-decoration`    | the page link's hover decoration | Decoration of the name on hover and under `isActive`                                                                   |
+| `--tile-icon-display`             | `flex`                           | `display` of the box holding the icon and the checkbox; `none` hides both                                              |
+| `--tile-badge-bg`                 | the theme's badge background     | Background of each badge and quick action over the thumbnail                                                           |
+| `--tile-badge-radius`             | `3px`                            | Corner radius of each badge and quick action                                                                           |
+| `--tile-badge-box-shadow`         | the theme's badge shadow         | Shadow of each badge and quick action                                                                                  |
+| `--tile-icon-color`               | the theme's icon colour          | Fill of a `.is-pinned` badge inside the content's `.badges`; the three-dot button does not read it                     |
+| `--tile-option-button-margin-end` | `8px`                            | End margin of the three-dot button                                                                                     |
+| `--tile-hotkey-color`             | the theme's hotkey colour        | Border colour under `showHotkeyBorder`                                                                                 |
+| `--highlightColor`                | none                             | Colour that fades out of the name row while `isHighlight` plays                                                        |
 
 **`isHighlight` shows nothing on its own.** The kit sets no `--highlightColor`; set one on the tile
 or an ancestor, and the fade plays once, for two seconds, when the tile mounts.

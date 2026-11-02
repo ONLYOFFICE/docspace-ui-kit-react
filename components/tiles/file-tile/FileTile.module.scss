@@ -306,8 +306,8 @@
     --icon-button-focus-offset: -2px;
 
     .expandButton > div:first-child {
-      padding-block: 8px;
-      padding-inline: 8px var(--tile-option-button-padding-end, 16px);
+      padding: 8px;
+      margin-inline-end: var(--tile-option-button-margin-end, 8px);
     }
   }
 
