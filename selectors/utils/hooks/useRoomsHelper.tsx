@@ -9,7 +9,9 @@ import {
   type SearchArea,
 } from "@onlyoffice/docspace-api-sdk";
 import { useApi } from "../../../providers/api";
+import type { TRoomTypeValue } from "../../../types";
 import { RoomsTypeValues } from "../../../utils/common";
+import { RoomsType } from "../../../enums";
 import RoomType from "../../../components/room-type";
 import { Tooltip } from "../../../components/tooltip";
 import type { TSelectorItem, TBreadCrumb } from "../../../components/selector";
@@ -20,6 +22,7 @@ import { LoadersContext } from "../contexts/Loaders";
 import {
   PAGE_COUNT,
   FORMS_SEARCH_AREA,
+  AI_HUB_SEARCH_AREA,
   ROOMS_SECTION_FOLDER_TYPES,
 } from "../constants";
 import type { UseRoomsHelperProps } from "../types";
@@ -44,6 +47,8 @@ const useRoomsHelper = ({
   searchArea,
   roomType,
   formsSection,
+  roomsSectionTypes,
+  aiRoomsSectionTypes,
   isRoomsOnly,
 
   isInit,
@@ -60,6 +65,7 @@ const useRoomsHelper = ({
   setSelectedItemSecurity,
   setSelectedTreeNode,
   isRoomDisabled,
+  getRoomDisabledText,
 
   recentFolder,
   favoritesFolder,
@@ -163,7 +169,7 @@ const useRoomsHelper = ({
         let typeFilter: RoomTypeEnum[] | undefined;
 
         if (roomType || createDefineRoomType) {
-          const types: RoomTypeEnum[] = roomType
+          const types: TRoomTypeValue[] = roomType
             ? Array.isArray(roomType)
               ? [...roomType]
               : [roomType]
@@ -171,17 +177,34 @@ const useRoomsHelper = ({
           if (createDefineRoomType && !types.includes(createDefineRoomType)) {
             types.push(createDefineRoomType);
           }
-          typeFilter = types.length > 0 ? types : undefined;
+          // The server takes every room type; only the SDK enum lags behind.
+          typeFilter = types.length > 0 ? (types as RoomTypeEnum[]) : undefined;
+        }
+
+        // The "AI rooms" section: its types make the listing ask for the AiHub
+        // search area below.
+        if (!typeFilter && aiRoomsSectionTypes) {
+          typeFilter = aiRoomsSectionTypes as RoomTypeEnum[];
         }
 
         if (!typeFilter && formsSection !== undefined) {
+          // The Rooms section lists the ordinary rooms unless the host names
+          // the types itself (it adds Instructions or Knowledge rooms when its
+          // selection can land there). Form filling rooms live in the Forms
+          // section, an Instructions room takes Markdown only, a Knowledge
+          // room takes the vectorized formats only and an AI project holds no
+          // files. The list comes from our own enum: the SDK's lacks the AI
+          // types.
           typeFilter = formsSection
             ? [ApiRoomType.FillingFormsRoom]
-            : Object.values(ApiRoomType).filter(
-                (value) =>
-                  value !== ApiRoomType.FillingFormsRoom &&
-                  value !== ApiRoomType.AiRoom,
-              );
+            : ((roomsSectionTypes ??
+                RoomsTypeValues.filter(
+                  (value) =>
+                    value !== RoomsType.FormRoom &&
+                    value !== RoomsType.InstructionsRoom &&
+                    value !== RoomsType.KnowledgeRoom &&
+                    value !== RoomsType.AiProjectRoom,
+                )) as RoomTypeEnum[]);
         }
 
         // Form filling rooms live only in the Forms section, so a listing scoped
@@ -192,11 +215,24 @@ const useRoomsHelper = ({
           typeFilter.length > 0 &&
           typeFilter.every((value) => value === ApiRoomType.FillingFormsRoom);
 
+        // Instructions and Knowledge rooms live under their own root ("AI
+        // rooms"), so a listing scoped to them asks for that search area too.
+        const isAiHubOnlyFilter =
+          !!typeFilter &&
+          typeFilter.length > 0 &&
+          typeFilter.every(
+            (value) =>
+              (value as number) === RoomsType.InstructionsRoom ||
+              (value as number) === RoomsType.KnowledgeRoom,
+          );
+
         const effectiveSearchArea = searchArea
           ? (searchArea as SearchArea)
           : formsSection || isFormRoomOnlyFilter
             ? (FORMS_SEARCH_AREA as unknown as SearchArea)
-            : undefined;
+            : isAiHubOnlyFilter
+              ? (AI_HUB_SEARCH_AREA as unknown as SearchArea)
+              : undefined;
 
         const res = await roomsApi.getRoomsFolder({
           type: typeFilter,
@@ -235,6 +271,7 @@ const useRoomsHelper = ({
           folders ?? [],
           t,
           isRoomDisabled,
+          getRoomDisabledText,
         ).filter((x) => (excludeItems ? !excludeItems.includes(x.id) : true));
 
         setHasNextPage(count === PAGE_COUNT);
@@ -249,7 +286,7 @@ const useRoomsHelper = ({
         if (firstLoadRef.current || startIndex === 0) {
           const { security } = current!;
 
-          if (withCreate && security?.Create) {
+          if (withCreate && security?.Create && !aiRoomsSectionTypes) {
             setTotal(total + 1);
             const createRoomType =
               createDefineRoomType ??
@@ -293,6 +330,7 @@ const useRoomsHelper = ({
           if (
             startIndex === 0 &&
             !searchValue &&
+            !aiRoomsSectionTypes &&
             (withRecentTreeFolder || withFavoritesTreeFolder)
           ) {
             const specialItems = buildSpecialFolderItems({
@@ -315,7 +353,10 @@ const useRoomsHelper = ({
             if (specialItems.length) {
               itemList.unshift(...specialItems);
               specialItemsCountRef.current = specialItems.length;
-              const base = withCreate && security?.Create ? total + 1 : total;
+              const base =
+                withCreate && security?.Create && !aiRoomsSectionTypes
+                  ? total + 1
+                  : total;
               setTotal(base + specialItems.length);
             }
           }
@@ -353,6 +394,8 @@ const useRoomsHelper = ({
       setIsNextPageLoading,
       roomType,
       formsSection,
+      roomsSectionTypes,
+      aiRoomsSectionTypes,
       isRoomsOnly,
       subscribe,
       onSetBaseFolderPath,
@@ -376,6 +419,7 @@ const useRoomsHelper = ({
       withRecentTreeFolder,
       withFavoritesTreeFolder,
       isRoomDisabled,
+      getRoomDisabledText,
       finishFullLoad,
     ],
   );

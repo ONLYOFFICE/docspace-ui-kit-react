@@ -8,6 +8,37 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **`FilesSelector` lists AI rooms instead of AI agents at its root.** `withAIAgentsTreeFolder`
+  is gone; `withAIRoomsTreeFolder` (on by default) lists the AI rooms root (`FolderType.AiHub`)
+  after Forms, whenever the portal serves it. The section holds the Instructions and Knowledge
+  rooms, never the AI projects, which hold no files, and offers no room creation or Recent /
+  Favorites rows. With `roomsSectionTypes` it keeps only the AI types named there, moves them
+  out of the Rooms section, and is left out when it names neither. A host that passed
+  `withAIAgentsTreeFolder` drops it. The chat's save dialog turns the section off: neither room
+  type takes a chat export.
+- **`FilesSelector` has no AI agents list any more.** `onCreateAIAgent` and
+  `agentsEmptyDescription` are gone, and `getIsDisabled`, `initSelectedItemType` and
+  `setSelectedItemType` take `"rooms" | "files"` only: the `"agents"` item type could only be
+  reached from the AI agents root. A host that compared against `"agents"` drops that check.
+  `AIAgentSelector` keeps its own agents list.
+- **`FolderType.AiHub` is 41 and `FolderType.AiProjects` is gone**, after the server moved the AI
+  projects under the AI rooms root: one root now keeps the Instructions rooms, the Knowledge rooms
+  and the AI projects
+- **Several context and knowledge rooms per chat**, on `@onlyoffice/ai-chat` 1.0.2:
+  `AiChatPresetSettings` carries `contextRooms` and `knowledgeRooms` (arrays) in place of
+  `contextRoom` / `knowledgeRoom`; `AiChatPanelSave` hands the host every connected room;
+  `ContextRoomSync` connects each offered room that holds skills and `ContextRoomWatcher`
+  follows every connected room on its own (one losing its skills is disconnected alone)
+- `@onlyoffice/ai-chat` peer requirement raised to `^1.0.2`
+- **`AiAgentProviders`' `entityId` is the AI project the chat is open in, `contextEntityId` the
+  location.** With the AI agents gone, threads are global per user and nothing but a project
+  scopes the chat; the folder or room the user is in goes in `contextEntityId`, which the AI
+  service uses for the prompt's location line and for generated files, and device uploads and
+  drops follow it too (`contextEntityId ?? entityId`, else My documents). A connected
+  Instructions room no longer becomes the round's scope (`contextRoomScopesRounds` off): it
+  contributes its skills only. `AiChatStore.folderContextPickerEnabled` and the composer's
+  empty Context slot are removed; the context folder is picked in the AI project itself
+
 - **`Uploader`'s progress bar moves while a chunk is being sent.** The percentage used to grow
   only when a whole chunk (5 MB by default) had been answered, so a file under one chunk went
   from 0 to done in a single step; it now also counts the bytes of chunks still on their way,
@@ -160,6 +191,17 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   virtualises long lists, loads the next page on scroll with skeleton rows, and works with the
   keyboard and in right-to-left. This adds **`@tanstack/react-virtual`** (MIT) to
   `dependencies`; only `components/data-table` imports it
+- **`RoomType`'s `isDisabled`** greys out any room type, marks it `aria-disabled` and stops its
+  `onClick`, as `disabledFormRoom` and `disabledPublicRoom` do for their own types
+- `AiAgentProviders` takes `chatIntro`: what an empty chat shows above the suggestion chips in place of the default illustration and tagline (an AI project puts its logo, name and sources there).
+- `RoomsType.AiProjectRoom` (12), `FolderType.AiProjectRoom` (40) and `FolderType.AiProjects`
+  (41) for the AI projects of the DocSpace client; `RoomLogo` and the room type title /
+  description helpers know the new type (the AI room icon stands in until a dedicated one lands)
+- `AiChatStore.openProject` and `AiChatProjectSettings`: a project opens the chat with its model
+  and the lists of its Instructions / Knowledge rooms, every one of them connected
+- `AiAgentProviders` takes `contextRoom` as one room or a list; `ContextRoomProvider` gets a
+  `rooms` prop and `useContextRooms`
+
 - **`FormWrapper` can be the form.** A new `onSubmit` prop renders the card as a `<form>` that
   calls the handler with the browser's navigation prevented, so Enter in a field submits it;
   `aria-label` / `aria-labelledby` make it a named form landmark. Without `onSubmit` it is a
@@ -175,6 +217,17 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **An AI project opens on its own model, not on the default.** `AiChatStoresBridge` looked the
+  project's model up among the assigned profiles only (`init`); a model outside them missed and
+  the chat fell back to the default. It now waits for the whole list (`ensureProfiles`) first.
+- The composer's link to a context or knowledge room opens it in the AI rooms section
+  (`/ai-rooms/{id}`), not in Rooms
+- `ContextRoomWatcher` refreshes the picker's room list right after it connects an offered room
+  that gained its first skill (the scheduled refresh was cancelled by the effect rerun)
+- `ContextRoomSync` no longer reads the skills a second time when the store already did
+- **`ComboBox` no longer throws when `options` is missing.** A caller that renders it before
+  its options are loaded passed `undefined`, and reading its length threw "Cannot read
+  properties of undefined (reading 'length')". A missing list is now treated as an empty one.
 - **`FileTile`'s `--tile-height` sizes the whole tile.** The thumbnail area kept its 156px and
   the name row its 64px, so a taller tile ended in an empty band under the name row, outside the
   hover and checked background. The thumbnail area now takes whatever the name row leaves; at

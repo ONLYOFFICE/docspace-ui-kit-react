@@ -1,8 +1,7 @@
 import type {
   FileDtoInteger,
   FolderDtoInteger,
-  FolderType,
-  RoomType,
+  FolderType as SdkFolderType,
   FileType,
   FilesSettingsDto,
   FileEntryDtoIntegerAllOfSecurity,
@@ -10,7 +9,7 @@ import type {
 export type {
   FilesSettingsDto,
   FolderDtoInteger,
-  FolderType as SdkFolderType,
+  SdkFolderType,
   FileEntryDtoIntegerAllOfSecurity,
 };
 
@@ -21,13 +20,19 @@ import type {
   TSelectorHeader,
   SpecialFolderScope,
 } from "../../components/selector";
-import type { WithFlag, Nullable } from "../../types";
+import type {
+  WithFlag,
+  Nullable,
+  TFolderTypeValue as FolderType,
+  TRoomTypeValue as RoomType,
+} from "../../types";
 import type {
   ApplyFilterOption,
   SearchArea,
 } from "@onlyoffice/docspace-api-sdk";
 import type { DeviceType } from "../../enums";
 import type { TGetIcon } from "../utils/types";
+import type { TRoomTypeValue } from "../../types";
 
 /** A file of the list, as `resolveItemTitle` and `onFilesLoaded` see it. */
 export type TFilesSelectorFile = {
@@ -73,7 +78,7 @@ export interface UseRootHelperProps {
   treeFolders?: FolderDtoInteger[];
   withRecentTreeFolder?: boolean;
   withFavoritesTreeFolder?: boolean;
-  withAIAgentsTreeFolder?: boolean;
+  withAIRoomsTreeFolder?: boolean;
   withRoomsTreeFolder?: boolean;
   withFormsTreeFolder?: boolean;
   isUserOnly?: boolean;
@@ -113,7 +118,7 @@ export type UseRoomsHelperProps = TUseInputItemHelper & {
   setTotal: (value: number) => void;
   setIsRoot?: (value: boolean) => void;
   setSelectedItemType?: React.Dispatch<
-    React.SetStateAction<"rooms" | "files" | "agents" | undefined>
+    React.SetStateAction<"rooms" | "files" | undefined>
   >;
   setSelectedItemSecurity?: React.Dispatch<
     React.SetStateAction<
@@ -166,7 +171,7 @@ export type UseFilesHelpersProps = {
   withCreate: boolean;
   shareKey?: string;
   setSelectedItemId: (value: number | string) => void;
-  setSelectedItemType: (value?: "rooms" | "files" | "agents") => void;
+  setSelectedItemType: (value?: "rooms" | "files") => void;
 
   withInit?: boolean;
 
@@ -214,7 +219,7 @@ export type TFilesSelectorInit = WithFlag<
     initHasNextPage: boolean;
     initItems: FolderDtoInteger[] | (FolderDtoInteger | FileDtoInteger)[];
     initBreadCrumbs: TBreadCrumb[];
-    initSelectedItemType: "rooms" | "files" | "agents";
+    initSelectedItemType: "rooms" | "files";
     initSelectedItemId: string | number;
     initSearchValue?: Nullable<string>;
   }
@@ -245,9 +250,21 @@ export type FilesSelectorProps = TInfoBar &
     treeFolders?: FolderDtoInteger[];
     withRecentTreeFolder?: boolean;
     withFavoritesTreeFolder?: boolean;
-    withAIAgentsTreeFolder?: boolean;
+    /**
+     * Lists the "AI rooms" section (Instructions and Knowledge rooms, never AI
+     * projects) at the root, when the portal serves it. On by default; with
+     * `roomsSectionTypes` it keeps only the AI types named there and moves
+     * them out of the Rooms section.
+     */
+    withAIRoomsTreeFolder?: boolean;
     withRoomsTreeFolder?: boolean;
     withFormsTreeFolder?: boolean;
+    /**
+     * The room types the Rooms section lists when no `roomType` is given.
+     * Defaults to the ordinary rooms; pass Instructions or Knowledge rooms
+     * too when the selection can land there.
+     */
+    roomsSectionTypes?: TRoomTypeValue[];
 
     onSetBaseFolderPath?: (
       value: number | string | undefined | TBreadCrumb[],
@@ -281,7 +298,7 @@ export type FilesSelectorProps = TInfoBar &
       isLoading: boolean,
       isSelectedParentFolder: boolean,
       selectedItemId: string | number | undefined,
-      selectedItemType: "rooms" | "files" | "agents" | undefined,
+      selectedItemType: "rooms" | "files" | undefined,
       isRoot: boolean,
       selectedItemSecurity:
         | FileEntryDtoIntegerAllOfSecurity
@@ -315,17 +332,6 @@ export type FilesSelectorProps = TInfoBar &
     createDefineRoomType?: RoomType;
     /** Disables the Public room type in the create-room dropdown */
     disabledCreatePublicRoom?: boolean;
-    /**
-     * Shows a "New agent" item in the AI agents list, and on its empty screen,
-     * when the user may create agents there. The selector cannot create one
-     * itself -- an agent needs the host's create dialog -- so this opens it.
-     */
-    onCreateAIAgent?: () => void;
-    /**
-     * Description of the empty AI agents list when it offers no "New agent",
-     * e.g. why agents cannot be created yet. Empty by default.
-     */
-    agentsEmptyDescription?: string;
     formProps?: FormPropsType;
     withPadding?: boolean;
     checkCreating?: boolean;

@@ -125,7 +125,7 @@ const useSelectorState = ({
       : [],
   );
   const [selectedItemType, setSelectedItemType] = React.useState<
-    "rooms" | "files" | "agents" | undefined
+    "rooms" | "files" | undefined
   >(withInit ? initSelectedItemType : undefined);
   const [selectedItemId, setSelectedItemId] = React.useState<
     number | string | undefined

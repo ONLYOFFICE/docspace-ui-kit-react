@@ -6,6 +6,8 @@ import type {
 } from "@onlyoffice/docspace-api-sdk";
 import { FolderType, RoomType } from "@onlyoffice/docspace-api-sdk";
 
+import type { TFolderTypeValue } from "../../types";
+
 import CatalogFavoritesSvg from "../../assets/icons/16/catalog.favorites.react.svg";
 import CatalogRecentSvg from "../../assets/icons/16/catalog-settings-restore.svg";
 
@@ -29,6 +31,7 @@ export const convertRoomsToItems = (
   rooms: FolderDtoInteger[],
   t?: (key: string, interpolation?: Record<string, string | number>) => string,
   isRoomDisabled?: (room: FolderDtoInteger) => boolean,
+  getRoomDisabledText?: (room: FolderDtoInteger) => string | undefined,
 ): TSelectorItem[] => {
   const translate = t ?? getCommonTranslation;
   const items = rooms.map((room) => {
@@ -76,6 +79,7 @@ export const convertRoomsToItems = (
       cover,
       disableMultiSelect: true,
       isDisabled: isRoomDisabled ? isRoomDisabled(room) : false,
+      disabledText: getRoomDisabledText?.(room),
       private: isPrivate ?? false,
 
       quotaLimit,
@@ -167,12 +171,12 @@ export const convertFoldersToItems: (
   folders: FolderDtoInteger[],
   disabledItems: (number | string)[],
   filterParam?: string | number,
-  disabledFolderType?: FolderType,
+  disabledFolderType?: TFolderTypeValue,
 ) => TSelectorItem[] = (
   folders: FolderDtoInteger[],
   disabledItems: (number | string)[],
   filterParam?: string | number,
-  disabledFolderType?: FolderType,
+  disabledFolderType?: TFolderTypeValue,
 ) => {
   const items = folders.map((folder: FolderDtoInteger) => {
     const {
