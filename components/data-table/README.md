@@ -10,7 +10,7 @@
   "exports": ["DataTable", "DataTableRow", "DataTableProps", "DataTableRowProps", "DataTableRowState", "DataTableRenderRowProps", "DataTableRowContextMenu", "DataTableCellProps", "DataTableColumn", "DataTableSort", "DataTableCellContext", "DataTableHeaderContext", "ColumnWidth", "WidthStorage", "createLocalStorageWidths", "createMemoryWidths", "settingsColumn", "contextMenuColumn", "ColumnSettings", "DataTableApi", "DataTableVirtualize", "DataTableLoadMore", "DATA_TABLE_MIN_FILL_WIDTH", "DATA_TABLE_MIN_COLUMN_WIDTH", "DATA_TABLE_ROW_HEIGHT", "DATA_TABLE_SETTINGS_WIDTH"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
-  "related": ["table", "rows"],
+  "related": ["table", "rows", "context-menu"],
   "subComponents": [],
   "testIds": ["data-table", "data-table-header", "data-table-header-<columnId>", "data-table-sort-<columnId>", "data-table-resize-<columnId>", "data-table-settings", "data-table-settings-button", "data-table-settings-<columnId>", "data-table-body", "data-table-row", "data-table-context-menu-button", "data-table-skeleton-row"]
 } -->
@@ -493,6 +493,100 @@ export function DroppableItems({
 }
 ```
 
+### Moving from `Table`
+
+The old table is a kit of parts the consumer assembles and keeps in step; this one is one
+component given every column. What each part becomes:
+
+| `Table`                                                                      | `DataTable`                                                                     |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `TableContainer` + `TableHeader` + `TableBody`                               | one `DataTable`                                                                 |
+| `TableHeader.columns` (`key`, `title`, `enable`, `minWidth`)                 | `columns` (`id`, `title`, `visible`, `width`), with a `cell` renderer each      |
+| `enable: false` column still in the grid                                     | `visible: false`, which renders nothing                                         |
+| `columnStorageName` + `columnInfoPanelStorageName` (required)                | `widthStorage` (optional), one record whatever the info panel does              |
+| `sortBy` + `sorted` + a column's `onClick`                                   | `sort` + `onSortChange`                                                         |
+| a column's `onChange` in the settings menu                                   | `hideable` + `onColumnVisibilityChange`                                         |
+| `showSettings`, `settingsTitle`                                              | `settingsColumn({ title })` in `columns`                                        |
+| `setHideColumns`                                                             | `onCompactChange`                                                               |
+| `TableRow` + `TableCell`s per row, `*RowData` components                     | the columns' `cell` renderers; `getRowProps` or `renderRow` for the row         |
+| `TableRow.contextOptions`, `getContextModel`, `fileContextClick`             | the row's `contextMenu` (`options`, `getModel`, `onOpen`) + `contextMenuColumn` |
+| `selectionProp` on every cell                                                | the row's `cellProps`                                                           |
+| `isIndexEditingMode`                                                         | another set of columns                                                          |
+| `TableBody` `useReactWindow`, `fetchMoreFiles`, `hasMoreFiles`, `itemHeight` | `virtualize`, `loadMore.onLoadMore`, `loadMore.hasMore`, `rowHeight`            |
+| `tagRef` + `withTagRef`                                                      | the column's `headerRef`                                                        |
+| reading the last column out of `localStorage`                                | `isLast` in the cell context                                                    |
+
+Old pixel records are not migrated: the first visit after the switch starts from 40/60.
+
+```tsx
+import { useMemo } from "react";
+import {
+  DataTable,
+  type DataTableColumn,
+  createLocalStorageWidths,
+  settingsColumn,
+} from "@onlyoffice/apps-ui-kit/components/data-table";
+
+type File = {
+  id: number;
+  title: string;
+  updated: string;
+  contextOptions: string[];
+};
+
+export function FilesTable({
+  files,
+  userId,
+  hasMore,
+  fetchMoreFiles,
+}: {
+  files: File[];
+  userId: string;
+  hasMore: boolean;
+  fetchMoreFiles: () => Promise<void>;
+}) {
+  // What used to be TableHeader's columns and a RowData component, in one place.
+  const columns = useMemo<DataTableColumn<File>[]>(
+    () => [
+      {
+        id: "Name",
+        title: "Name",
+        width: { type: "fill" },
+        sortKey: "title",
+        cell: (file) => file.title,
+      },
+      {
+        id: "Modified",
+        title: "Modified",
+        width: { type: "flex" },
+        sortKey: "modified",
+        hideable: true,
+        cell: (file) => file.updated,
+      },
+      settingsColumn<File>({ title: "Choose columns", withContextMenu: true }),
+    ],
+    [],
+  );
+
+  // One record per table and user, instead of a key and its info-panel twin.
+  const widthStorage = useMemo(
+    () => createLocalStorageWidths(`filesColumnsWidths=${userId}`),
+    [userId],
+  );
+
+  return (
+    <DataTable
+      columns={columns}
+      rows={files}
+      getRowKey={(file) => file.id}
+      widthStorage={widthStorage}
+      virtualize
+      loadMore={{ hasMore, onLoadMore: fetchMoreFiles }}
+    />
+  );
+}
+```
+
 ## Behaviour the types don't state
 
 - The header and the rows read one `grid-template-columns` from the `--data-table-grid` custom
@@ -643,9 +737,11 @@ With `virtualize`, only some rows exist in the DOM, so the table states the full
 `aria-rowcount` and each row its position in `aria-rowindex`; a screen reader then announces
 "row 5 002 of 10 001" rather than a count of what happens to be rendered.
 
+A row given `checked` reports it as `aria-selected`; a row without `checked` carries no
+`aria-selected` at all.
+
 Skeleton rows are `aria-hidden`, so they are not announced as empty rows; while a page loads the
-body carries `aria-busy="true"` instead. A row given `checked` reports it as
-`aria-selected`; a row without `checked` carries no `aria-selected` at all.
+body carries `aria-busy="true"` instead.
 
 ## Test ids
 
@@ -668,6 +764,8 @@ Header and body cells also carry `data-column-id="<columnId>"`.
 
 ## Related
 
-- [`Table`](../table/README.md) — the table this one replaces; it virtualises and has a settings
-  menu today.
+- [`Table`](../table/README.md) — the table this one replaces, unchanged; the portal's lists stay
+  on it until each moves over. "Moving from `Table`" above maps one onto the other.
+- [`ContextMenu`](../context-menu/README.md) — the menu a row's `contextMenu` opens, for its
+  model and keyboard use.
 - [`Rows`](../rows/README.md) — a one-line-per-item list instead of columns.

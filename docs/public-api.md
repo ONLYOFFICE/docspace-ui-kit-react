@@ -41,7 +41,7 @@ still be breaking. `docs/plugin-surface.json` records that surface name by name;
 
 | Module                        | Contents                                    | Notes                                                                                                                                                                                                        |
 | ----------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `components`                  | 98 component folders                        | The bulk of the value. Includes the generic `selector` component (distinct from `selectors/`)                                                                                                                |
+| `components`                  | 99 component folders                        | The bulk of the value. Includes the generic `selector` component (distinct from `selectors/`). `data-table` is public by subpath only, for now — see below                                                   |
 | `utils`                       | Helpers re-exported from `utils/index.ts`   | The barrel only. `utils/socket` is **not** public — see below                                                                                                                                                |
 | `hooks`                       | 11 hooks                                    | Barrelled in `hooks/index.ts` and exported from the root. `useViewEffect` is a default export, re-exported by name                                                                                           |
 | `context`                     | `ThemeContext`, `InterfaceDirectionContext` |                                                                                                                                                                                                              |
@@ -88,6 +88,26 @@ Two things fell out of closing it:
   a plugin author found it, not a check. They are re-exported by name now (663 → 668), and
   `components/barrel.test.ts` fails when a folder's default export is not reachable from the
   barrel under some name.
+
+### Public, but out of the barrel while it is trialled — `components/data-table`
+
+`DataTable`, the successor of `Table`, is public: it has no portal coupling, its README is on
+the template and `components/data-table` resolves through the `./*` wildcard like any other
+folder. It is left out of `components/index.ts` on purpose, because the barrel is the plugin
+API and a name added there cannot be taken back without breaking plugins. The portal trials
+the table on the Files list first; its API may still move with what that trial finds, and a
+change to a subpath-only module reaches the client, which updates with it, rather than every
+plugin built against the old shape.
+
+Concretely: no `DataTable` name is in `docs/plugin-surface.json`, `surface:check` is
+unchanged, and the README's metadata says `"barrel": false`. `barrel.test.ts` does not object,
+because the folder has no default export. Adding it to the barrel is the decision to make once
+the trial ends — one `export * from "./data-table"` line, then `pnpm surface` in the same
+commit.
+
+Its one dependency of its own, `@tanstack/react-virtual` (MIT, with `@tanstack/virtual-core`),
+is in `dependencies` and stays external in `dist`: only
+`components/data-table/hooks/useRowVirtualizer` imports it.
 
 ### Not public, and why — the two that look like they should be
 

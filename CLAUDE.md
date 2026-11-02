@@ -67,7 +67,7 @@ Path-scoped detail that does not belong here, loaded when the matching files are
 ## Repository Structure
 
 ```
-components/          — 98 UI components, each in its own folder:
+components/          — 99 UI components, each in its own folder:
                         <name>/
                           index.ts
                           <Name>.tsx

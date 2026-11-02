@@ -147,6 +147,19 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Added
 
+- **`DataTable`, the successor of `Table`, at `components/data-table`.** It is built beside the
+  old table, which is unchanged, and is **not in the root barrel** while the portal trials it, so
+  it is not plugin API yet; import it by subpath. The header and every row lay out from one CSS
+  grid, so they cannot disagree. Widths are shares of the table rather than pixels, so two
+  windows of different widths and an open info panel no longer overwrite each other's layout;
+  they are remembered only when a `widthStorage` is given (`createLocalStorageWidths(key)`), in
+  a versioned record that an old pixel string reads as nothing stored. Columns are declared
+  with a `cell` renderer each, system columns included (`settingsColumn`, `contextMenuColumn`),
+  and the table follows the design's rules for resizing (cascading to 210 / 110 px minimums,
+  never wider than the table), hiding, showing and the compact layout of a narrow screen. It
+  virtualises long lists, loads the next page on scroll with skeleton rows, and works with the
+  keyboard and in right-to-left. This adds **`@tanstack/react-virtual`** (MIT) to
+  `dependencies`; only `components/data-table` imports it
 - **`FormWrapper` can be the form.** A new `onSubmit` prop renders the card as a `<form>` that
   calls the handler with the browser's navigation prevented, so Enter in a field submits it;
   `aria-label` / `aria-labelledby` make it a named form landmark. Without `onSubmit` it is a
