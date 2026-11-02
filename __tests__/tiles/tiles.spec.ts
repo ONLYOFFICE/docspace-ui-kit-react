@@ -147,3 +147,54 @@ for (const { id, name, stories = [] } of COMPONENTS) {
     }
   });
 }
+
+// The actions button sits against the tile's edge, in a part of the tile that
+// clips what overflows it: the icon button's ring, drawn outside it, ran past
+// the tile and was cut off there. Each tile draws it inside the button.
+const TILES_WITH_ACTIONS = [
+  "ui-tiles-basetile",
+  "ui-tiles-filetile",
+  "ui-tiles-foldertile",
+  "ui-tiles-roomtile",
+  "ui-tiles-templatetile",
+];
+
+for (const id of TILES_WITH_ACTIONS) {
+  test(`${id}: the actions button's focus ring stays inside the tile`, async ({
+    page,
+  }) => {
+    await gotoStory(page, id, "default");
+
+    const ring = await page.evaluate(() => {
+      const button = document.querySelector<HTMLElement>(
+        "#storybook-root .expandButton [role='button']",
+      );
+      // The tile is the card around the button: the nearest box that draws
+      // a border of its own.
+      let tile = button?.parentElement ?? null;
+      while (tile && getComputedStyle(tile).borderTopStyle === "none")
+        tile = tile.parentElement;
+      if (!button || !tile) return null;
+      button.focus({ focusVisible: true });
+      const style = getComputedStyle(button);
+      const reach =
+        parseFloat(style.outlineOffset) + parseFloat(style.outlineWidth);
+      const box = button.getBoundingClientRect();
+      const edge = tile.getBoundingClientRect();
+      return {
+        focusVisible: button.matches(":focus-visible"),
+        outline: style.outlineStyle,
+        inside:
+          box.left - reach >= edge.left &&
+          box.right + reach <= edge.right &&
+          box.top - reach >= edge.top &&
+          box.bottom + reach <= edge.bottom,
+      };
+    });
+
+    expect(ring).not.toBeNull();
+    expect(ring?.focusVisible).toBe(true);
+    expect(ring?.outline).toBe("solid");
+    expect(ring?.inside).toBe(true);
+  });
+}
