@@ -305,11 +305,11 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
   }, [isBusy, hasPaymentParams]);
 
-  const onGoToBillingClick = () => {
+  const onSuccessRedirectClick = () => {
     window.location.href = pageContent.redirectUrl;
   };
 
-  const onRetryClick = () => {
+  const onErrorRedirectClick = () => {
     window.location.href =
       pageContent.errorRedirectUrl ?? pageContent.redirectUrl;
   };
@@ -359,7 +359,7 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
             title={pageContent.successTitle}
             hint={pageContent.successHint}
             buttonLabel={pageContent.successButtonLabel}
-            onGoToServiceClick={onGoToBillingClick}
+            onGoToServiceClick={onSuccessRedirectClick}
             amount={amount}
             currency={currency}
             language={language}
@@ -378,14 +378,14 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
               title={t("AddonActivationFailed")}
               hint={t("AddonActivationFailedHint")}
               buttonLabel={t("TryAgainInAddon")}
-              onGoToServiceClick={onRetryClick}
+              onGoToServiceClick={onErrorRedirectClick}
             />
           ) : (
             <ErrorCard
               title={pageContent.errorTitle ?? t("WalletTopUpErrorTitle")}
               hint={pageContent.errorHint ?? t("WalletTopUpCallbackErrorHint")}
               buttonLabel={t("WalletTopUpErrorRetry")}
-              onGoToServiceClick={onRetryClick}
+              onGoToServiceClick={onErrorRedirectClick}
             />
           )
         ) : null}
