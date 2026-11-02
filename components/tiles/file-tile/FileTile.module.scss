@@ -191,7 +191,8 @@
 
     .checkbox,
     .checkbox:active {
-      padding-top: 8px;
+      // Above and below alike, or the mark sits low in its box.
+      padding-block: 8px;
       padding-inline-start: 8px;
 
       svg {
@@ -217,7 +218,7 @@
     display: none;
     flex: 0 0 16px;
 
-    padding-top: 8px;
+    padding-block: 8px;
     padding-inline-start: 7px;
 
     @include mixins.tablet {

@@ -198,3 +198,31 @@ for (const id of TILES_WITH_ACTIONS) {
     expect(ring?.inside).toBe(true);
   });
 }
+
+// A checked tile shows its checkbox in place of the icon. The file tile padded
+// the checkbox above it but not below, and its mark sat 4px low in the box.
+for (const id of TILES_WITH_ACTIONS) {
+  test(`${id}: a checked tile's checkbox sits in the middle of its box`, async ({
+    page,
+  }) => {
+    await gotoStory(page, id, "checked");
+
+    const offset = await page.evaluate(() => {
+      const mark = document.querySelector<SVGElement>(
+        "#storybook-root label:has(input[type='checkbox']) svg",
+      );
+      const box = mark?.closest("label")?.parentElement;
+      if (!mark || !box) return null;
+      const m = mark.getBoundingClientRect();
+      const b = box.getBoundingClientRect();
+      return {
+        x: m.left + m.width / 2 - (b.left + b.width / 2),
+        y: m.top + m.height / 2 - (b.top + b.height / 2),
+      };
+    });
+
+    expect(offset).not.toBeNull();
+    expect(Math.abs(offset?.x ?? Infinity)).toBeLessThanOrEqual(0.5);
+    expect(Math.abs(offset?.y ?? Infinity)).toBeLessThanOrEqual(0.5);
+  });
+}
