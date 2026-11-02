@@ -30,7 +30,7 @@ export type LinkProps = TextProps & {
   enableUserSelect?: boolean;
   /** `page` for navigation, `action` for a link that runs code. An action link
    * carries no `href`; with an `onClick` it is a button to the keyboard by
-   * itself, unless `role`, `tabIndex` or `onKeyDown` is passed.
+   * itself, unless `role`, `onKeyDown` or a negative `tabIndex` is passed.
    * @default LinkType.page */
   type?: LinkType;
   /** Sets the target attribute */
