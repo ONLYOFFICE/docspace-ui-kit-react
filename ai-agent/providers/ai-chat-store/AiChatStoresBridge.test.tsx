@@ -15,7 +15,9 @@ const { clouds, profiles, threads } = vi.hoisted(() => ({
   profiles: {
     profiles: [] as { id: string; name: string }[],
     initialized: false,
+    profilesLoaded: false,
     init: vi.fn(),
+    ensureProfiles: vi.fn(),
     getProfileById: vi.fn(),
     setSessionChatProfile: vi.fn(),
   },
@@ -65,6 +67,7 @@ describe("AiChatStoresBridge", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     profiles.initialized = false;
+    profiles.profilesLoaded = false;
     profiles.getProfileById.mockImplementation((id: string) =>
       profiles.initialized ? { id, name: "Claude" } : null,
     );
@@ -86,6 +89,28 @@ describe("AiChatStoresBridge", () => {
       name: "Claude",
     });
     expect(store.pendingPreset).toBeNull();
+  });
+
+  it("reads the whole list for a model outside the assigned ones", async () => {
+    // init reads the assigned profiles only; the project's model is another.
+    profiles.initialized = true;
+    profiles.getProfileById.mockImplementation((id: string) =>
+      profiles.profilesLoaded ? { id, name: "Other" } : null,
+    );
+    profiles.ensureProfiles.mockImplementation(async () => {
+      profiles.profilesLoaded = true;
+    });
+    const store = new AiChatStore();
+    renderBridge(store);
+    await act(async () => {
+      store.openPreset(PRESET);
+    });
+    expect(profiles.ensureProfiles).toHaveBeenCalledTimes(1);
+    expect(profiles.setSessionChatProfile).toHaveBeenCalledTimes(1);
+    expect(profiles.setSessionChatProfile).toHaveBeenCalledWith({
+      id: "p1",
+      name: "Other",
+    });
   });
 
   it("picks the model at once when the models are loaded", () => {

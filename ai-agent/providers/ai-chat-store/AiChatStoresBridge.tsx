@@ -134,12 +134,26 @@ const AiChatStoresBridge = () => {
           // The model is looked up among the loaded profiles: opened before
           // they arrive (a deep link to the projects page), the lookup would
           // miss and the chat would fall back to the default model, so the
-          // load is awaited first. `init` shares one request in flight.
+          // load is awaited first. `init` reads the assigned profiles only;
+          // a model outside them waits for the whole list (`ensureProfiles`).
+          // Both share one request in flight.
           const applyProfile = () => {
             const profiles = stores.useProfilesStore.getState();
             const profile = preset.profileId
               ? profiles.getProfileById(preset.profileId)
               : null;
+            if (preset.profileId && !profile && !profiles.profilesLoaded) {
+              void profiles
+                .ensureProfiles()
+                .then(() =>
+                  profiles.setSessionChatProfile(
+                    stores.useProfilesStore
+                      .getState()
+                      .getProfileById(preset.profileId!),
+                  ),
+                );
+              return;
+            }
             profiles.setSessionChatProfile(profile);
           };
           const { initialized, init } = stores.useProfilesStore.getState();
