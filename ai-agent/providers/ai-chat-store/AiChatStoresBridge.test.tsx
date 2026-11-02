@@ -113,6 +113,40 @@ describe("AiChatStoresBridge", () => {
     });
   });
 
+  it("keeps a newer project's model when an older lookup resolves late", async () => {
+    // Project A's model needs the whole list; project B's is assigned.
+    profiles.initialized = true;
+    profiles.getProfileById.mockImplementation((id: string) =>
+      id === "p2" || profiles.profilesLoaded ? { id, name: id } : null,
+    );
+    let finishLoad = () => {};
+    profiles.ensureProfiles.mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          finishLoad = () => {
+            profiles.profilesLoaded = true;
+            resolve();
+          };
+        }),
+    );
+    const store = new AiChatStore();
+    renderBridge(store);
+    act(() => {
+      store.openPreset(PRESET);
+    });
+    act(() => {
+      store.openPreset({ ...PRESET, profileId: "p2" });
+    });
+    await act(async () => {
+      finishLoad();
+    });
+    expect(profiles.setSessionChatProfile).toHaveBeenCalledTimes(1);
+    expect(profiles.setSessionChatProfile).toHaveBeenCalledWith({
+      id: "p2",
+      name: "p2",
+    });
+  });
+
   it("picks the model at once when the models are loaded", () => {
     profiles.initialized = true;
     const store = new AiChatStore();
