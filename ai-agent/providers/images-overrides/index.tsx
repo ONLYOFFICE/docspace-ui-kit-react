@@ -20,6 +20,7 @@ import DropdownIcon from "../../../assets/triangle.down.react.svg";
 import ArrowDownIcon from "../../../assets/icons/16/output-tokens.svg";
 import CodeIcon from "../../../assets/icons/16/code.react.svg";
 import RoomsIcon from "../../../assets/icons/16/catalog.rooms.react.svg";
+import FolderIcon from "../../../assets/icons/16/catalog.folder.react.svg";
 import EyeIcon from "../../../assets/eye.react.svg";
 import EyeOffIcon from "../../../assets/eye.off.react.svg";
 
@@ -85,6 +86,10 @@ export const imageOverrides: ImageOverrides = {
   // draws it as a room) and the room rows inside it: the rooms glyph of the
   // DocSpace catalog.
   "btn-room": makeIcon(RoomsIcon),
+  // The connected knowledge base chip: a knowledge room, so the same glyph.
+  documents: makeIcon(RoomsIcon),
+  // The connected context folder chip: the folder glyph of the catalog.
+  folder: makeIcon(FolderIcon),
   eye: makeIcon(EyeIcon),
   "eye.closed": makeIcon(EyeOffIcon),
 };

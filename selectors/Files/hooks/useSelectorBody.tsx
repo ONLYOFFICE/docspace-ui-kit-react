@@ -104,7 +104,6 @@ const useSelectorBody = ({
 
   selectedItemType,
   selectedTreeNode,
-  agentsEmptyDescription,
 }: Omit<FilesSelectorProps, "withSearch" | "onSubmit"> &
   PickedSearchProps &
   PickedSubmitButtonProps &
@@ -199,8 +198,6 @@ const useSelectorBody = ({
   } = useEmptyScreenProps({
     selectedItemType,
     selectedTreeNode,
-    canCreateAgent: items.some((item) => item.isCreateNewItem),
-    agentsEmptyDescription,
   });
 
   const SelectorBody = (

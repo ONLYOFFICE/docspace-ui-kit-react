@@ -6,6 +6,8 @@ export const PORTAL_BASE_THEME_ID = "theme-portal-base";
 export const PORTAL_DARK_THEME_ID = "theme-portal-dark";
 
 type BasePalette = {
+  // hover of the composer source pills
+  sourceHoverBrightness: string;
   backgroundNormal: string;
   backgroundNormalElement: string;
   backgroundNormalElementLight: string;
@@ -326,6 +328,24 @@ const buildTokens = (
   "--chat-composer-room-border-color": "var(--chat-input-file-border-color)",
   "--chat-composer-room-hover-background-color":
     "var(--chat-input-tools-button-hover-background)",
+  // The composer's source slots: every role is a plain pill in the paint of
+  // the blocks inside the chat input (the Context one included), told apart
+  // by its glyph only; a dashed placeholder while empty.
+  "--chat-source-skills-background-color":
+    "var(--chat-input-file-background-color)",
+  "--chat-source-skills-color": "var(--text-normal)",
+  "--chat-source-skills-icon-color": "var(--icon-normal)",
+  "--chat-source-knowledge-background-color":
+    "var(--chat-input-file-background-color)",
+  "--chat-source-knowledge-color": "var(--text-normal)",
+  "--chat-source-knowledge-icon-color": "var(--icon-normal)",
+  "--chat-source-context-background-color":
+    "var(--chat-input-file-background-color)",
+  "--chat-source-context-color": "var(--text-normal)",
+  "--chat-source-context-icon-color": "var(--icon-normal)",
+  "--chat-source-empty-color": "var(--text-secondary)",
+  "--chat-source-empty-border-color": "var(--chat-input-file-border-color)",
+  "--chat-source-hover-brightness": p.sourceHoverBrightness,
   "--file-items-chat-hover-background-color": "var(--highlight-button-hover)",
   "--file-items-chat-pressed-background-color":
     "var(--highlight-button-pressed)",
@@ -436,6 +456,7 @@ const buildTokens = (
 // component tokens used in the DocSpace base theme (see providers/theme/
 // themes/base.ts — input/modalDialog/scrollbar/checkbox/toggleButton).
 const portalBasePalette: BasePalette = {
+  sourceHoverBrightness: "0.97",
   // surfaces — matches base.ts modalDialog/input/aside backgrounds
   backgroundNormal: globalColors.white,
   backgroundNormalElement: globalColors.grayLight,
@@ -527,6 +548,7 @@ const portalBasePalette: BasePalette = {
 // recessed surface for inputs. `lightDarkGrayHover` (#3D3D3D) is the hover
 // state for buttons/file items.
 const portalDarkPalette: BasePalette = {
+  sourceHoverBrightness: "1.15",
   backgroundNormal: globalColors.black,
   backgroundNormalElement: globalColors.darkGrayLight,
   backgroundNormalElementLight: globalColors.lightDarkGrayHover,
