@@ -216,6 +216,10 @@ const SaveDialog = ({
       // never produce, so a save target inside it does not exist (Bug 83486).
       // The attach dialog keeps the section — reading forms is legitimate.
       withFormsTreeFolder={false}
+      // An Instructions room only accepts skill files with a frontmatter and
+      // a Knowledge room is a RAG source, not a place for chat exports, so
+      // the AI rooms section is no save target either.
+      withAIRoomsTreeFolder={false}
       // Form-filling rooms are still reachable through the Rooms section and
       // pass the security.Create check, but the export into them dies
       // silently in the AI Worker. Block entering them with the selector's

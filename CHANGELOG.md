@@ -14,7 +14,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   rooms, never the AI projects, which hold no files, and offers no room creation or Recent /
   Favorites rows. With `roomsSectionTypes` it keeps only the AI types named there, moves them
   out of the Rooms section, and is left out when it names neither. A host that passed
-  `withAIAgentsTreeFolder` drops it.
+  `withAIAgentsTreeFolder` drops it. The chat's save dialog turns the section off: neither room
+  type takes a chat export.
 - **`FolderType.AiHub` is 41 and `FolderType.AiProjects` is gone**, after the server moved the AI
   projects under the AI rooms root: one root now keeps the Instructions rooms, the Knowledge rooms
   and the AI projects
