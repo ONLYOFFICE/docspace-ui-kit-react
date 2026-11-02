@@ -10,6 +10,7 @@ import {
   DataTableRow,
   type DataTableRowState,
   type DataTableSort,
+  createLocalStorageWidths,
   createMemoryWidths,
   settingsColumn,
 } from ".";
@@ -65,7 +66,9 @@ const COLUMNS: DataTableColumn<FileRow>[] = [
     width: { type: "flex" },
     sortKey: "size",
     hideable: true,
-    cell: (row) => row.size,
+    // <bdi>, as user data in a table should be: in right-to-left "0 KB" stays
+    // "0 KB" instead of turning into "KB 0".
+    cell: (row) => <bdi>{row.size}</bdi>,
   },
   {
     id: "Type",
@@ -303,7 +306,11 @@ export const Compact: Story = {
 
 const InfoPanelTemplate = (args: React.ComponentProps<typeof FilesTable>) => {
   const visibility = useColumnVisibility(args.columns);
-  const widthStorage = useMemo(() => createMemoryWidths(), []);
+  // A real record, so that what the panel does not write can be checked.
+  const widthStorage = useMemo(
+    () => createLocalStorageWidths("storybook-data-table-info-panel"),
+    [],
+  );
   const [panel, setPanel] = useState(false);
 
   return (
@@ -395,6 +402,60 @@ export const SavedWidths: Story = {
       },
     },
   },
+};
+
+const RememberedWidthsTemplate = (
+  args: React.ComponentProps<typeof FilesTable>,
+) => {
+  const files = useMemo(
+    () => createLocalStorageWidths("storybook-data-table-files"),
+    [],
+  );
+  const trash = useMemo(
+    () => createLocalStorageWidths("storybook-data-table-trash"),
+    [],
+  );
+
+  return (
+    <div style={{ display: "grid", gap: 32 }}>
+      <FilesTable
+        {...args}
+        rows={args.rows.slice(0, 4)}
+        widthStorage={files}
+        ariaLabel="Files"
+        testId="data-table-files"
+      />
+      <FilesTable
+        {...args}
+        rows={args.rows.slice(4, 8)}
+        widthStorage={trash}
+        ariaLabel="Trash"
+        testId="data-table-trash"
+      />
+    </div>
+  );
+};
+
+export const RememberedWidths: Story = {
+  render: (args) => <RememberedWidthsTemplate {...args} />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Two tables on one page, each remembering its widths in `localStorage` under its own key. Resize one and reload: each comes back as it was, and neither reads the other's record. A window of another width shows the same proportions.",
+      },
+      source: {
+        code: `const files = useMemo(() => createLocalStorageWidths(\`filesColumnsWidths=\${userId}\`), [userId]);
+const trash = useMemo(() => createLocalStorageWidths(\`trashColumnsWidths=\${userId}\`), [userId]);
+
+<DataTable columns={columns} rows={files} getRowKey={(row) => row.id} widthStorage={files} />
+<DataTable columns={columns} rows={trash} getRowKey={(row) => row.id} widthStorage={trash} />`,
+      },
+    },
+  },
+  // No play function: anything it did would be stored, and the story is about
+  // what a visit finds. __tests__/data-table/data-table-storage.spec.ts drives
+  // it across reloads and windows.
 };
 
 const ResizingTemplate = (args: React.ComponentProps<typeof FilesTable>) => {
@@ -996,6 +1057,8 @@ export const RightToLeft: Story = {
         before,
       ),
     );
+    // Leave the table at rest, without the edge's focus ring.
+    edge.blur();
   },
 };
 

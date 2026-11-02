@@ -132,8 +132,10 @@ still true, and all still unenforced.
 - Seven components have no test; that is tolerated, an untested _change_ to interactive logic is
   not. `node .claude/scripts/component-docs/gaps.mjs` lists them and the one missing story; no
   README is missing any more, and the gates keep it that way.
-- `__tests__/` holds 94 Playwright visual-regression specs that run against a built Storybook
-  and are **not in CI**. Nothing you push will run them.
+- `__tests__/` holds 107 Playwright specs that run against Storybook and are **not in CI**.
+  Nothing you push will run them. Most are visual regression; `data-table`'s also assert
+  geometry, storage and loading. Screenshot baselines come from the Docker image
+  (`pnpm test:e2e:docker:dev`), whose fonts differ from any desktop's.
 
 ## Missing documentation, as of today
 

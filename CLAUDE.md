@@ -106,8 +106,8 @@ scripts/             — copy-locales, copy-images, verify-package, and the
                        build pipeline steps (normalize-types, finalize-dist, check-dist)
 .storybook/          — Storybook configuration
 test/                — Test setup and mocks
-__tests__/           — Playwright visual-regression specs (94, run against Storybook);
-                       not run in CI
+__tests__/           — Playwright specs (107, run against Storybook), visual regression
+                       plus a few functional ones (data-table); not run in CI
 locales/en/          — COMMITTED, so the package builds standalone. Other languages are
                        gitignored and produced on demand by `pnpm sync-locales`
 index.ts             — Main library entry point
