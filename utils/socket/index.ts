@@ -888,6 +888,10 @@ class SocketHelper {
    *
    * Can be called before `connect()`.
    *
+   * The first connect is counted per client: when `connect()` replaces a
+   * disconnected client with a new one, the new client's first connect does
+   * not fire the callback.
+   *
    * @param callback - The function to be called after a reconnect.
    */
   public onReconnect = (callback: () => void) => {
