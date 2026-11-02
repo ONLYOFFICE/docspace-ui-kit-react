@@ -4,27 +4,35 @@
 // custom property, --data-table-grid, which DataTable sets on its root; the
 // header row and every body row read it, so they cannot disagree.
 
+// A colour a consumer may set on any ancestor of the table: their value if
+// there is one, else the theme's. The theme's values are private
+// `-default` properties, so declaring them on the table cannot shadow a
+// value inherited from above.
+@function token($name) {
+  @return var(--data-table-#{$name}, var(--data-table-#{$name}-default));
+}
+
 .dataTable {
   :global(.light) & {
-    --data-table-background: #{colors.$white};
-    --data-table-border-color: #{colors.$gray-light-mid};
-    --data-table-header-text-color: #{colors.$gray};
-    --data-table-header-text-hover-color: #{colors.$light-gray-dark};
-    --data-table-resize-color: #{colors.$gray-strong};
-    --data-table-resize-active-color: #{colors.$light-gray-dark};
-    --data-table-row-selected-background: #{colors.$light-gray-hover};
-    --data-table-row-drag-background: #{colors.$dnd-hover-color};
+    --data-table-background-default: #{colors.$white};
+    --data-table-border-color-default: #{colors.$gray-light-mid};
+    --data-table-header-text-color-default: #{colors.$gray};
+    --data-table-header-text-hover-color-default: #{colors.$light-gray-dark};
+    --data-table-resize-color-default: #{colors.$gray-strong};
+    --data-table-resize-active-color-default: #{colors.$light-gray-dark};
+    --data-table-row-selected-background-default: #{colors.$light-gray-hover};
+    --data-table-row-drag-background-default: #{colors.$dnd-hover-color};
   }
 
   :global(.dark) & {
-    --data-table-background: #{colors.$black};
-    --data-table-border-color: #{colors.$gray-dark-strong};
-    --data-table-header-text-color: #{colors.$gray-dark};
-    --data-table-header-text-hover-color: #{colors.$white};
-    --data-table-resize-color: #{colors.$gray-dark-strong};
-    --data-table-resize-active-color: #{colors.$gray-dark};
-    --data-table-row-selected-background: #{colors.$light-dark-gray-hover};
-    --data-table-row-drag-background: #{colors.$dnd-dark-hover};
+    --data-table-background-default: #{colors.$black};
+    --data-table-border-color-default: #{colors.$gray-dark-strong};
+    --data-table-header-text-color-default: #{colors.$gray-dark};
+    --data-table-header-text-hover-color-default: #{colors.$white};
+    --data-table-resize-color-default: #{colors.$gray-dark-strong};
+    --data-table-resize-active-color-default: #{colors.$gray-dark};
+    --data-table-row-selected-background-default: #{colors.$light-dark-gray-hover};
+    --data-table-row-drag-background-default: #{colors.$dnd-dark-hover};
   }
 
   position: relative;
@@ -47,8 +55,8 @@
   top: 0;
   z-index: 1;
 
-  background: var(--data-table-background);
-  border-bottom: 1px solid var(--data-table-border-color);
+  background: token(background);
+  border-bottom: 1px solid token(border-color);
 }
 
 .headerRow {
@@ -97,17 +105,17 @@
     top: 14px;
     inset-inline-end: 8px;
     height: 10px;
-    border-inline-end: 2px solid var(--data-table-resize-color);
+    border-inline-end: 2px solid token(resize-color);
   }
 
   &:hover::after,
   &.isActive::after,
   &:focus-visible::after {
-    border-color: var(--data-table-resize-active-color);
+    border-color: token(resize-active-color);
   }
 
   &:focus-visible {
-    outline: 1px solid var(--data-table-header-text-hover-color);
+    outline: 1px solid token(header-text-hover-color);
     outline-offset: -1px;
   }
 }
@@ -120,7 +128,7 @@
   font-size: 13px;
   font-weight: 600;
   line-height: 38px;
-  color: var(--data-table-header-text-color);
+  color: token(header-text-color);
 }
 
 .sortButton {
@@ -138,11 +146,11 @@
   cursor: pointer;
 
   &:hover .headerText {
-    color: var(--data-table-header-text-hover-color);
+    color: token(header-text-hover-color);
   }
 
   &:focus-visible {
-    outline: 1px solid var(--data-table-header-text-hover-color);
+    outline: 1px solid token(header-text-hover-color);
     outline-offset: -1px;
   }
 }
@@ -157,7 +165,7 @@
   visibility: hidden;
 
   path {
-    fill: var(--data-table-header-text-color);
+    fill: token(header-text-color);
   }
 
   .sortButton:hover &,
@@ -167,7 +175,7 @@
   }
 
   .sortButton:hover & path {
-    fill: var(--data-table-header-text-hover-color);
+    fill: token(header-text-hover-color);
   }
 
   .isAscending & {
@@ -204,22 +212,22 @@
   }
 
   svg path {
-    fill: var(--data-table-header-text-color);
+    fill: token(header-text-color);
   }
 
   &:hover:not(:disabled) svg path {
-    fill: var(--data-table-header-text-hover-color);
+    fill: token(header-text-hover-color);
   }
 
   &:focus-visible {
-    outline: 1px solid var(--data-table-header-text-hover-color);
+    outline: 1px solid token(header-text-hover-color);
   }
 
   &:disabled {
     cursor: default;
 
     svg path {
-      fill: var(--data-table-resize-color);
+      fill: token(resize-color);
     }
   }
 }
@@ -241,11 +249,11 @@
   // the old table, so a consumer's per-cell styles (drag and drop) still win.
   &.isChecked .cell,
   &.isActive .cell {
-    background: var(--data-table-row-selected-background);
+    background: token(row-selected-background);
   }
 
   &.isDragging .cell {
-    background: var(--data-table-row-drag-background);
+    background: token(row-drag-background);
   }
 }
 
@@ -257,7 +265,7 @@
   height: var(--data-table-row-height, 48px);
   overflow: hidden;
 
-  border-bottom: 1px solid var(--data-table-border-color);
+  border-bottom: 1px solid token(border-color);
 }
 
 // ===== Virtual list =====

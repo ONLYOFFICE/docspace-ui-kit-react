@@ -891,3 +891,166 @@ export const HiddenColumns: Story = {
     },
   },
 };
+
+/** The brightest channel of a computed colour, 0-255. */
+const brightness = (color: string) =>
+  Math.max(...(color.match(/\d+/g) ?? ["0"]).slice(0, 3).map(Number));
+
+export const DarkTheme: Story = {
+  args: { columns: ROW_COLUMNS, rows: ROWS.slice(0, 8) },
+  render: (args) => <RowsTemplate {...args} />,
+  decorators: [
+    (Story) => (
+      <div
+        className="dark"
+        style={{ background: "#333333", color: "#ffffff", padding: 16 }}
+      >
+        <Story />
+      </div>
+    ),
+  ],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The table inside an element with the `dark` class: the header, the borders, the resize edges and a selected row take the dark palette. Click a row to see its tint. The settings and row menus open in a portal on the page, so they follow the page's theme rather than this wrapper: switch the toolbar to dark to see them dark as well.",
+      },
+      source: {
+        code: `<div className="dark">
+  <DataTable columns={columns} rows={rows} getRowKey={(row) => row.id} getRowProps={getRowProps} />
+</div>`,
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const header = canvas.getByTestId("data-table-header");
+
+    await expect(brightness(getComputedStyle(header).backgroundColor)).toBe(51);
+    await expect(
+      brightness(getComputedStyle(canvas.getByText("Author")).color),
+    ).toBeGreaterThan(100);
+
+    const row = canvas.getAllByTestId("data-table-row")[0];
+    await userEvent.click(within(row).getByText(ROWS[0].name));
+    await waitFor(() => expect(row).toHaveClass("checked"));
+    await expect(
+      brightness(
+        getComputedStyle(row.querySelector('[role="cell"]') as Element)
+          .backgroundColor,
+      ),
+    ).toBeLessThan(80);
+  },
+};
+
+const RightToLeftTemplate = (args: React.ComponentProps<typeof FilesTable>) => {
+  const widthStorage = useMemo(() => createMemoryWidths(), []);
+  return (
+    <div dir="rtl">
+      <RowsTemplate {...args} widthStorage={widthStorage} />
+    </div>
+  );
+};
+
+export const RightToLeft: Story = {
+  args: { columns: ROW_COLUMNS, rows: ROWS.slice(0, 8) },
+  render: (args) => <RightToLeftTemplate {...args} />,
+  globals: { direction: "rtl" },
+  parameters: {
+    docs: {
+      // Framed: an inline RTL story would flip the whole Docs page.
+      story: { inline: false, height: "520px" },
+      description: {
+        story:
+          "The table in a right-to-left layout: Name starts on the right, each resize edge sits on the left of its header, and the settings and row menus are on the left end. Dragging an edge follows the pointer; ArrowLeft on Name's edge widens it. The wrapper carries `dir=\"rtl\"` for the layout; the resize direction comes from the theme's `interfaceDirection` (the Direction toolbar).",
+      },
+      source: {
+        code: `<div dir="rtl">
+  <DataTable columns={columns} rows={rows} getRowKey={(row) => row.id} />
+</div>`,
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const box = (id: string) =>
+      (
+        canvas.getByTestId(`data-table-header-${id}`) as HTMLElement
+      ).getBoundingClientRect();
+
+    // Name is the rightmost column, the settings the leftmost.
+    await expect(box("Name").left).toBeGreaterThan(box("Author").left);
+    await expect(box("Settings").left).toBeLessThan(box("Type").left);
+
+    // The edge is on the left of the header; ArrowLeft moves it left,
+    // widening Name.
+    const edge = canvas.getByTestId("data-table-resize-Name");
+    await expect(edge.getBoundingClientRect().left).toBeLessThan(
+      box("Name").left + 20,
+    );
+    const before = Number(edge.getAttribute("aria-valuenow"));
+    edge.focus();
+    await userEvent.keyboard("{Shift>}{ArrowLeft}{/Shift}");
+    await waitFor(() =>
+      expect(Number(edge.getAttribute("aria-valuenow"))).toBeGreaterThan(
+        before,
+      ),
+    );
+  },
+};
+
+export const CssCustomization: Story = {
+  args: { columns: ROW_COLUMNS, rows: ROWS.slice(0, 8) },
+  render: (args) => (
+    <div
+      style={
+        {
+          "--data-table-border-color": "#c5cae9",
+          "--data-table-header-text-color": "#3949ab",
+          "--data-table-header-text-hover-color": "#1a237e",
+          "--data-table-resize-color": "#9fa8da",
+          "--data-table-row-selected-background": "#e8eaf6",
+        } as React.CSSProperties
+      }
+    >
+      <RowsTemplate {...args} />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "An indigo table: the borders, the header text and its hover, the resize edges and the selected row's tint set on a wrapper. Click a row to see the tint.",
+      },
+      source: {
+        code: `<div style={{
+  "--data-table-border-color": "#c5cae9",
+  "--data-table-header-text-color": "#3949ab",
+  "--data-table-header-text-hover-color": "#1a237e",
+  "--data-table-resize-color": "#9fa8da",
+  "--data-table-row-selected-background": "#e8eaf6",
+}}>
+  <DataTable columns={columns} rows={rows} getRowKey={(row) => row.id} />
+</div>`,
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(canvas.getByText("Author")).toHaveStyle({
+      color: "rgb(57, 73, 171)",
+    });
+    await expect(canvas.getByTestId("data-table-header")).toHaveStyle({
+      borderBottomColor: "rgb(197, 202, 233)",
+    });
+
+    const row = canvas.getAllByTestId("data-table-row")[0];
+    await userEvent.click(within(row).getByText(ROWS[0].name));
+    await waitFor(() =>
+      expect(row.querySelector('[role="cell"]')).toHaveStyle({
+        backgroundColor: "rgb(232, 234, 246)",
+      }),
+    );
+  },
+};

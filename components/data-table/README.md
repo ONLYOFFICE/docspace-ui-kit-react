@@ -521,6 +521,9 @@ export function DroppableItems({
   does not re-render. The widths are committed and stored once, when the pointer is released. A
   cancelled pointer (`pointercancel`) puts the grid back and stores nothing.
 - A double click on any edge resets every column to 40/60 and clears the stored record.
+- The table's colours follow the nearest `.light` or `.dark` ancestor, so a `dark` wrapper turns
+  the table dark on a light page. The settings and row menus open in a portal on `<body>` and
+  follow the theme there, which is where `ThemeProvider` puts it.
 - In right-to-left the edges sit on the left of each header and both the pointer and the arrow
   keys are mirrored: the edge follows the pointer and the key's visual direction.
 - When the columns no longer fit at their minimums — `fixed` sizes plus 210 px for each `fill`
@@ -593,6 +596,24 @@ export function DroppableItems({
   column with buttons, `settingsColumn({ disabled: true })` and no row menu.
 - There is no slot for a group menu over the header: the portal renders it in the section header,
   outside the table.
+
+## CSS variables
+
+Set them on any ancestor of the table. Each default has a light and a dark value, picked by the
+`.light` / `.dark` class `ThemeProvider` sets.
+
+| Variable                               | Default (light / dark) | Effect                                                                  |
+| -------------------------------------- | ---------------------- | ----------------------------------------------------------------------- |
+| `--data-table-background`              | `#ffffff` / `#333333`  | Background of the sticky header, so rows scroll under it unseen         |
+| `--data-table-border-color`            | `#eceef1` / `#474747`  | Line under the header and under every row                               |
+| `--data-table-header-text-color`       | `#a3a9ae` / `#858585`  | Header titles, the sort arrow and the settings button                   |
+| `--data-table-header-text-hover-color` | `#657077` / `#ffffff`  | The same under the pointer, and the focus ring of the header's controls |
+| `--data-table-resize-color`            | `#d0d5da` / `#474747`  | The resize edges, and the settings button while it is disabled          |
+| `--data-table-resize-active-color`     | `#657077` / `#858585`  | A resize edge under the pointer, focused or being dragged               |
+| `--data-table-row-selected-background` | `#f3f4f4` / `#3d3d3d`  | Cells of a `checked` or `active` row                                    |
+| `--data-table-row-drag-background`     | `#ffefaf` / `#a88f56`  | Cells of a `dragging` row                                               |
+
+Row height is the `rowHeight` prop, not a variable: the virtualiser has to know it too.
 
 ## Accessibility
 
