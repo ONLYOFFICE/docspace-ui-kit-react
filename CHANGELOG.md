@@ -43,7 +43,12 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   submits. The row's checkbox and the "New" row's button are no Tab stops of their own, the
   "New" row's menu takes the arrows and Escape, and the new-name field gives the focus back to
   the list when it goes. The search box lost its `tabIndex={1}`. A consumer test that pressed
-  Enter in the focused list to submit now picks the marked row unless it is the picked one
+  Enter in the focused list to submit now picks the marked row unless it is the picked one. A
+  row pressed with the pointer takes the keyboard off its row: Enter submits that pick, as it
+  did before, and the next arrow goes on from the row pressed. A dimmed list (a refresh under
+  way) takes the arrows but not Enter or Space, as the pointer cannot reach it. Enter and Escape
+  in the new-name row are consumed with their keyup, so the row no longer closes the dialog
+  around the selector or submits the selector along with it
 - **`Tabs` ties each tab to its panel.** The body is `role="tabpanel"`, labelled by the selected
   tab, which points at it with `aria-controls`; a panel with nothing to tab to is a Tab stop
   (`tabIndex={0}`). The segmented bar's scroll arrows left the Tab order, so Tab goes from the
@@ -59,7 +64,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   reach; it now takes `tabIndex={0}` and a key handler. An `action` link is `role="button"`,
   pressed by Enter and Space, and a `page` link `role="link"`, followed by Enter. Every such link
   a consumer renders gains a Tab stop: pass `tabIndex={-1}` where something around the link is
-  the control already, or `role`, `tabIndex` or `onKeyDown` to wire the keyboard yourself
+  the control already, or `role` or `onKeyDown` to wire the keyboard yourself. A `tabIndex` of 0
+  or more only places the stop: the keys still press the link
 - **`Uploader`'s progress bar moves while a chunk is being sent.** The percentage used to grow
   only when a whole chunk (5 MB by default) had been answered, so a file under one chunk went
   from 0 to done in a single step; it now also counts the bytes of chunks still on their way,
