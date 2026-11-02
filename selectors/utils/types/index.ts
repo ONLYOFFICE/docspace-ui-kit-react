@@ -22,7 +22,6 @@ export type TGetIcon = (
 ) => React.FC<React.SVGProps<SVGSVGElement>> | string | null;
 
 export type UseRoomsHelperProps = TUseInputItemHelper & {
-  isAgent?: boolean;
   searchValue?: string;
   searchArea?: SearchArea | string;
   disableThirdParty?: boolean;
@@ -58,7 +57,7 @@ export type UseRoomsHelperProps = TUseInputItemHelper & {
   setTotal: (value: number) => void;
   setIsRoot?: (value: boolean) => void;
   setSelectedItemType?: React.Dispatch<
-    React.SetStateAction<"rooms" | "files" | "agents" | undefined>
+    React.SetStateAction<"rooms" | "files" | undefined>
   >;
   setSelectedItemSecurity?: React.Dispatch<
     React.SetStateAction<FileEntryDtoIntegerAllOfSecurity | undefined>
@@ -92,7 +91,7 @@ export type UseAgentsHelperProps = TUseInputItemHelper & {
   setTotal: (value: number) => void;
   setIsRoot?: (value: boolean) => void;
   setSelectedItemType?: React.Dispatch<
-    React.SetStateAction<"rooms" | "files" | "agents" | undefined>
+    React.SetStateAction<"rooms" | "files" | undefined>
   >;
   setSelectedItemSecurity?: React.Dispatch<
     React.SetStateAction<FileEntryDtoIntegerAllOfSecurity | undefined>

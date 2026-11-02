@@ -16,6 +16,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   out of the Rooms section, and is left out when it names neither. A host that passed
   `withAIAgentsTreeFolder` drops it. The chat's save dialog turns the section off: neither room
   type takes a chat export.
+- **`FilesSelector` has no AI agents list any more.** `onCreateAIAgent` and
+  `agentsEmptyDescription` are gone, and `getIsDisabled`, `initSelectedItemType` and
+  `setSelectedItemType` take `"rooms" | "files"` only: the `"agents"` item type could only be
+  reached from the AI agents root. A host that compared against `"agents"` drops that check.
+  `AIAgentSelector` keeps its own agents list.
 - **`FolderType.AiHub` is 41 and `FolderType.AiProjects` is gone**, after the server moved the AI
   projects under the AI rooms root: one root now keeps the Instructions rooms, the Knowledge rooms
   and the AI projects

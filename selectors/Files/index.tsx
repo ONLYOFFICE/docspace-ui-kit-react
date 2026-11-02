@@ -23,7 +23,6 @@ import { toastr } from "../../components/toast";
 
 import useRoomsHelper from "../utils/hooks/useRoomsHelper";
 import useSocketHelper from "../utils/hooks/useSocketHelper";
-import useAgentsHelper from "../utils/hooks/useAgentsHelper";
 
 import useFilesHelper from "./hooks/useFilesHelper";
 import useRootHelper from "./hooks/useRootHelper";
@@ -92,8 +91,6 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     createDefineRoomLabel,
     createDefineRoomType,
     disabledCreatePublicRoom,
-    onCreateAIAgent,
-    agentsEmptyDescription,
 
     shareKey,
     formProps,
@@ -286,33 +283,6 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     searchArea = "Templates";
   }
 
-  const { getAgentList } = useAgentsHelper({
-    isInit,
-    setIsInit,
-    setBreadCrumbs,
-    setHasNextPage,
-    setTotal,
-    setItems,
-    setIsRoot,
-    onSetBaseFolderPath,
-    setSelectedItemType,
-    subscribe,
-    setSelectedItemSecurity,
-    setSelectedTreeNode,
-    searchValue,
-    withCreate: withCreateState,
-    onCreateAIAgent,
-    getRootData,
-    disableBySecurity,
-
-    recentFolder,
-    favoritesFolder,
-    withRecentTreeFolder,
-    withFavoritesTreeFolder,
-
-    withInit,
-  });
-
   const { getRoomList } = useRoomsHelper({
     setBreadCrumbs,
     setHasNextPage,
@@ -461,8 +431,6 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
             setIsFormsSection(false);
             setIsAiRoomsSection(false);
             setSelectedItemType("files");
-          } else if (item.isAgent) {
-            setSelectedItemType("agents");
           } else if (item.isRoom) {
             setIsFormsSection(
               Number(item.rootFolderType) === FORMS_ROOT_FOLDER_TYPE,
@@ -538,9 +506,6 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
         if (isFormRoom && formProps?.isRoomFormAccessible === false)
           return toastr.warning(formProps.message);
 
-        const isAgent =
-          item.parentId === 0 && item.rootFolderType === FolderType.AiAgents;
-
         navigatingRef.current = true;
 
         startFullLoad();
@@ -552,12 +517,10 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
             label: item.label,
             id: item.id,
             isRoom:
-              !isAgent &&
               item.parentId === 0 &&
               (item.rootFolderType === FolderType.VirtualRooms ||
                 Number(item.rootFolderType) === FORMS_ROOT_FOLDER_TYPE ||
                 Number(item.rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE),
-            isAgent: isAgent,
             roomType: item.roomType,
             shared: item.shared,
             rootFolderType: item.rootFolderType,
@@ -572,8 +535,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
           item.parentId === 0 &&
           (item.rootFolderType === FolderType.VirtualRooms ||
             Number(item.rootFolderType) === FORMS_ROOT_FOLDER_TYPE ||
-            Number(item.rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE ||
-            item.rootFolderType === FolderType.AiAgents)
+            Number(item.rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE)
         ) {
           setIsFormsSection(
             Number(item.rootFolderType) === FORMS_ROOT_FOLDER_TYPE,
@@ -581,9 +543,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
           setIsAiRoomsSection(
             Number(item.rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE,
           );
-          setSelectedItemType(
-            item.rootFolderType === FolderType.AiAgents ? "agents" : "rooms",
-          );
+          setSelectedItemType("rooms");
         } else {
           setSelectedItemType("files");
         }
@@ -819,11 +779,6 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       return;
     }
 
-    if (selectedItemType === "agents") {
-      getAgentList(0);
-      return;
-    }
-
     if (selectedItemType === "rooms") {
       getRoomList(0);
       return;
@@ -842,7 +797,6 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     if (selectedItemType === "files" && (selectedItemId || isUserOnly))
       getFileList(0);
   }, [
-    getAgentList,
     getFileList,
     getRoomList,
     selectedItemType,
@@ -912,11 +866,9 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
     loadNextPage: isRoot
       ? async () => {}
-      : selectedItemType === "agents"
-        ? getAgentList
-        : selectedItemType === "rooms"
-          ? getRoomList
-          : getFileList,
+      : selectedItemType === "rooms"
+        ? getRoomList
+        : getFileList,
 
     items: displayItems,
     onSelect: onSelectAction,
@@ -927,7 +879,6 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     isRoot,
 
     selectedItemType,
-    agentsEmptyDescription,
   });
 
   const selectorComponent = embedded ? (

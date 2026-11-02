@@ -42,15 +42,13 @@ const useInputItemHelper = ({
   }, [setItems, withCreate]);
 
   const onAcceptInput = React.useCallback(
-    async (value: string, roomType?: RoomType, isAgent?: boolean) => {
+    async (value: string, roomType?: RoomType) => {
       const currentSelectedItemId = selectedItemIdRef.current;
-      if (!withCreate || (!currentSelectedItemId && !roomType && !isAgent))
-        return;
+      if (!withCreate || (!currentSelectedItemId && !roomType)) return;
 
       let createdItem: TSelectorItem | undefined;
 
       try {
-        // if (isAgent) await createAIAgent({ title: value });
         // NOTE: currentSelectedItemId can be string but types cannot be fixed right now, using type assertion
         if (currentSelectedItemId) {
           const res = await foldersApi.createFolder({
@@ -115,7 +113,6 @@ const useInputItemHelper = ({
       icon: string | React.ReactElement,
       roomType?: RoomType,
       placeholder?: string,
-      isAgent?: boolean,
     ) => {
       if (!withCreate || !setItems) return;
 
@@ -123,8 +120,7 @@ const useInputItemHelper = ({
         label: "",
         id: "new-folder-input",
         isInputItem: true,
-        onAcceptInput: (value: string) =>
-          onAcceptInput(value, roomType, isAgent),
+        onAcceptInput: (value: string) => onAcceptInput(value, roomType),
         onCancelInput,
         defaultInputValue,
         icon,

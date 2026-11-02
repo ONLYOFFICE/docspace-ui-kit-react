@@ -194,8 +194,7 @@ const SaveDialog = ({
       _isRoot,
       selectedItemSecurity,
     ) => {
-      if (selectedItemType === "rooms" || selectedItemType === "agents")
-        return true;
+      if (selectedItemType === "rooms") return true;
       if (
         selectedItemSecurity &&
         "Create" in selectedItemSecurity &&
