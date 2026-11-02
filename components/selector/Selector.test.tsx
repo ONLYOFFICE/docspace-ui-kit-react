@@ -380,5 +380,28 @@ describe("<Selector /> keyboard", () => {
       expect(onCancelInput).toHaveBeenCalledOnce();
       expect(onAcceptInput).not.toHaveBeenCalled();
     });
+
+    // ModalDialog closes on an Escape keyup on the window, and the Selector
+    // submits on an Enter one: a key the name row took closed the dialog
+    // around the selector, or submitted it, along with the row.
+    it.each([
+      ["Escape", "cancels"],
+      ["Enter", "accepts"],
+    ])("keeps the %s keyup it %s on from the window", (key) => {
+      const onAcceptInput = vi.fn();
+      const onCancelInput = vi.fn();
+      withInput(onAcceptInput, onCancelInput);
+      const keyup = vi.fn();
+      window.addEventListener("keyup", keyup);
+
+      fireEvent.keyDown(screen.getByRole("textbox"), { key });
+      fireEvent.keyUp(screen.getByRole("textbox"), { key });
+      window.removeEventListener("keyup", keyup);
+
+      expect(
+        key === "Escape" ? onCancelInput : onAcceptInput,
+      ).toHaveBeenCalledOnce();
+      expect(keyup).not.toHaveBeenCalled();
+    });
   });
 });

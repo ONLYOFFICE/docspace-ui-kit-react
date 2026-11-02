@@ -11,6 +11,7 @@ import { RoomLogo } from "../../room-logo";
 import { Loader, LoaderTypes } from "../../loader";
 import { useCommonTranslation } from "../../../utils/i18n";
 import { activateOnButtonKey } from "../../../utils/keyboard-activation";
+import { consumeKey } from "../../../utils/consume-key";
 
 import styles from "../Selector.module.scss";
 import type { InputItemProps } from "../Selector.types";
@@ -75,9 +76,13 @@ const InputItem = ({
   }, [setSavedInputValue, value]);
 
   React.useEffect(() => {
+    // The key is the row's: its keyup would close the dialog around the
+    // selector (Escape) or submit the selector (Enter) along with it.
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Enter") onAcceptInputAction();
       else if (e.key === "Escape") onCancelInputAction();
+      else return;
+      consumeKey(e);
     };
 
     window.addEventListener("keydown", onKeyDown);
