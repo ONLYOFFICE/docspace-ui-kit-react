@@ -1097,8 +1097,9 @@ pnpm format:fix     # Prettier - rewrite files
 ```
 
 Linting is Biome and formatting is Prettier: Biome's own formatter is disabled in
-`biome.json`. Only `lint`, `tsc` and `test` run on pre-push and in CI, so formatting is
-not enforced by any gate.
+`biome.json`. Both run on pre-push and in CI, along with `tsc` and the tests. Pre-push
+(`pnpm gate` runs it by hand) checks only the tests a change reaches, and builds and
+packs only when the build's own code changed; CI runs everything in full.
 
 ## Useful Links
 

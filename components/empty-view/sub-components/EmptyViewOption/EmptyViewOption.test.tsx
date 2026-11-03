@@ -100,6 +100,27 @@ const MockLinkRouter = (props: LinkRouterProps) => {
 
 const MockIcon = () => <svg data-testid="mock-icon" />;
 
+// Clicks a link the way fireEvent.click does, returning false when the
+// component prevented the default -- but never lets jsdom follow the href.
+// jsdom implements no navigation and logs "Not implemented: navigation to
+// another Document" for every click left to the browser. The listener sits on
+// the document, past React's root, so it reads what the component decided
+// before cancelling the navigation itself.
+const clickLink = (element: Element, init?: MouseEventInit): boolean => {
+  let navigates = false;
+  const stop = (event: Event) => {
+    navigates = !event.defaultPrevented;
+    event.preventDefault();
+  };
+  document.addEventListener("click", stop);
+  try {
+    fireEvent.click(element, init);
+  } finally {
+    document.removeEventListener("click", stop);
+  }
+  return navigates;
+};
+
 describe("EmptyViewOption", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -124,7 +145,7 @@ describe("EmptyViewOption", () => {
     expect(link).toHaveClass("empty-view-link");
     expect(link).toHaveTextContent("Learn more");
 
-    fireEvent.click(link);
+    clickLink(link);
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
@@ -143,13 +164,13 @@ describe("EmptyViewOption", () => {
     const link = screen.getByTestId("ui-link");
     expect(link).toHaveAttribute("href", "/rooms?folder=1");
 
-    const plain = fireEvent.click(link);
+    const plain = clickLink(link);
     expect(plain).toBe(false); // default prevented: no navigation
     expect(onClick).toHaveBeenCalledTimes(1);
 
     // Left to the browser, which opens a new tab -- and only that: the
     // handler does not also run in the current page.
-    const modified = fireEvent.click(link, { ctrlKey: true });
+    const modified = clickLink(link, { ctrlKey: true });
     expect(modified).toBe(true);
     expect(onClick).toHaveBeenCalledTimes(1);
   });
@@ -186,7 +207,7 @@ describe("EmptyViewOption", () => {
 
     const link = screen.getByTestId("ui-link");
     expect(link).toHaveAttribute("href", "/files");
-    expect(fireEvent.click(link)).toBe(true);
+    expect(clickLink(link)).toBe(true);
   });
 
   it.each([

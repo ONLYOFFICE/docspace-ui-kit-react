@@ -14,8 +14,9 @@ paths:
 
 The gate does not cover this. CI is two `ubuntu-latest` jobs, so a command that only works on a
 POSIX shell goes green in the pull request and breaks on the first Windows machine that runs it.
-`lefthook.yml` is where a Windows developer's gate actually runs -- format, lint, tsc, test,
-build and `verify:package` on pre-push -- so that is the surface that has to be portable.
+`lefthook.yml` is where a Windows developer's gate actually runs -- format, lint, tsc, tests,
+and `build` and `verify:package` whenever a push changes the build's own code -- so that is
+the surface that has to be portable.
 
 ## Scripts in `package.json`
 

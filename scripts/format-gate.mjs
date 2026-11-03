@@ -47,7 +47,35 @@ const runPrettier = (args) =>
 // --list-different names every file whose formatting differs, and nothing else.
 // It respects .prettierignore, so pnpm-lock.yaml, locales/, css/ and *.mdx stay
 // out of scope here exactly as they do for `pnpm format`.
-const listed = runPrettier(["--list-different", "."]);
+//
+// --cache skips files already known to be formatted: about 25 seconds over the
+// whole tree uncached, five or so once warm. The strategy is `content` -- a
+// checkout or a rebase rewrites mtimes without changing a byte -- spelled out
+// so a change of Prettier's default cannot quietly turn it into mtime. The
+// cache is keyed on the Prettier and Node versions and the options, so an
+// upgrade or a .prettierrc change starts it afresh.
+//
+// The location is this gate's own, not Prettier's default: every Prettier run
+// WITHOUT --cache deletes the default cache file -- `pnpm format`, the
+// pre-commit hook, an editor running the CLI -- so the gate found it gone on
+// nearly every push.
+const CACHE_LOCATION = path.join(
+  repoRoot,
+  "node_modules",
+  ".cache",
+  "prettier",
+  "format-gate",
+);
+
+const listed = runPrettier([
+  "--list-different",
+  "--cache",
+  "--cache-strategy",
+  "content",
+  "--cache-location",
+  CACHE_LOCATION,
+  ".",
+]);
 
 if (listed.error) {
   console.error(`Could not run Prettier: ${listed.error.message}`);

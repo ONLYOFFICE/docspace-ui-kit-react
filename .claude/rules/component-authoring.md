@@ -116,7 +116,7 @@ still true, and all still unenforced.
   their `argTypes`, each story's `description.story`, the visual-regression surface. A fact a
   story would state goes into the README — which is what `package.json` publishes and what the
   `ui-kit` agent skill syncs; stories are in neither.
-- **`vitest.config.ts` holds two projects.** `unit` is Vitest + React Testing Library in
+- **`vitest.config.mts` holds two projects.** `unit` is Vitest + React Testing Library in
   jsdom, and it **lists the directories it runs** — `components`, `selectors`, `ai-agent`,
   `errors`, `ui`, `utils`, `uploader`, `context`, `providers`, `hooks`, `scripts` (which also
   collects `*.test.mjs`), and `docs`, for the logic the samples carry (PKCE, role mapping). A
@@ -125,8 +125,20 @@ still true, and all still unenforced.
   `storybook` renders every story in Chromium through `@storybook/addon-vitest` — a smoke test
   that it renders, plus its `play` function — with the demo portal's service worker served and
   `VITE_PROVIDER_*` blanked, so no story reaches a live portal.
-- `pnpm test` runs `unit` only, and so does pre-push. `pnpm test:stories` runs `storybook`, and
-  CI's "Story tests" job runs it on every pull request. A `play` function that clicks or types
+- `pnpm test` runs `unit` only, and CI runs it in full. Pre-push runs `pnpm test:changed`: the
+  `unit` tests whose imports reach a file the branch changed, or all of them when the setup,
+  the mocks, `locales/en` or the configuration changed (`forceRerunTriggers`, a root-level
+  option -- inside a project it is silently ignored). `pnpm test:stories` runs `storybook`, and
+  CI's "Story tests" job runs it on every pull request.
+- `unit` runs on threads and pre-bundles `@onlyoffice/docspace-api-sdk` and jest-dom
+  (`deps.optimizer`). Every test file gets a fresh worker, so an unbundled package is read
+  module by module once per file: the SDK's 882 modules cost about 7 s in each of the 99 files
+  that load it, and the suite went from 124 s to 48 s without them. A new dependency that
+  shows up high in `experimental.importDurations` belongs in that list too.
+- A click on an `<a href>` that the component leaves to the browser makes jsdom log "Not
+  implemented: navigation to another Document" -- it cannot navigate. Cancel it from a
+  `document` listener after reading `defaultPrevented`, as `EmptyViewOption.test.tsx` does,
+  or give a mocked router link the `preventDefault` a real one has. A `play` function that clicks or types
   is a test like any other: give the story `fn()` spies for the handlers it checks, and look for
   a portalled list or tooltip through `screen`, not the story's `canvas`.
 - Seven components have no test; that is tolerated, an untested _change_ to interactive logic is

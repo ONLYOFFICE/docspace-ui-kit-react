@@ -1,10 +1,37 @@
 import path from "node:path";
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 import { playwright } from "@vitest/browser-playwright";
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
+
+// .mts, not .ts: the source package.json says "type": "commonjs", so a .ts
+// config written in ESM made Vite warn on every run that `configLoader:
+// 'native'` -- its future default -- cannot load it. Hence import.meta.dirname
+// rather than __dirname below.
+const root = import.meta.dirname;
+
+// Packages pre-bundled into one file for the unit project. Every test file runs
+// in a fresh worker, so an unbundled dependency is read from disk module by
+// module once per file. @onlyoffice/docspace-api-sdk is 882 modules -- reached
+// through the enums re-exported from enums/, types/ and utils/common -- and cost
+// about 7 seconds in each of the 99 files that load it, 721 of the 1044 seconds
+// the suite spent importing. jest-dom is loaded by every file, through
+// test/setup.ts.
+const PREBUNDLED = [
+  "@onlyoffice/docspace-api-sdk",
+  "@testing-library/jest-dom",
+];
 
 export default defineConfig({
   test: {
+    // `pnpm test:changed` runs only the tests whose import graph reaches a
+    // changed file. The setup file, the mocks and the English strings reach
+    // every test without being imported by any, so a change to them runs the
+    // whole suite. A root-only option: set inside a project it is ignored.
+    forceRerunTriggers: [
+      ...configDefaults.forceRerunTriggers,
+      "**/test/**",
+      "**/locales/en/**",
+    ],
     projects: [
       {
         resolve: {
@@ -15,32 +42,31 @@ export default defineConfig({
               // the resulting "SVGSVGElement is not defined" unhandled errors.
               find: /^react-svg$/,
               replacement: path.resolve(
-                __dirname,
+                root,
                 "./test/__mocks__/reactSvgMock.tsx",
               ),
             },
             {
               find: /^(.*)\.react\.svg$/,
-              replacement: path.resolve(
-                __dirname,
-                "./test/__mocks__/svgMock.tsx",
-              ),
+              replacement: path.resolve(root, "./test/__mocks__/svgMock.tsx"),
             },
             {
               find: /^(.*)\.svg$/,
-              replacement: path.resolve(
-                __dirname,
-                "./test/__mocks__/svgMock.tsx",
-              ),
+              replacement: path.resolve(root, "./test/__mocks__/svgMock.tsx"),
             },
             {
               find: "react-svg",
               replacement: path.resolve(
-                __dirname,
+                root,
                 "./test/__mocks__/reactSvgMock.tsx",
               ),
             },
           ],
+          // The SDK's `main` is CommonJS. Pre-bundled from there it needs interop,
+          // every named import is then read off `.default`, and the vi.mock
+          // factories in providers/ -- which return named exports only -- fail
+          // with 'No "default" export is defined'. Its `module` entry is ESM.
+          mainFields: ["module", "jsnext:main", "jsnext", "main"],
         },
         test: {
           name: "unit",
@@ -64,6 +90,26 @@ export default defineConfig({
             // that readers copy into applications, so it is tested like the kit.
             "docs/**/*.test.{ts,tsx}",
           ],
+          // Threads start faster than forked processes, on Windows most of all:
+          // 124 seconds with forks, 75 with threads, before the pre-bundling
+          // below. Fewer workers than the default was slower still (92 with 12).
+          // `isolate: false` is not an option -- tests leak state into each other.
+          pool: "threads",
+          deps: {
+            optimizer: {
+              client: {
+                enabled: true,
+                include: [
+                  "@onlyoffice/docspace-api-sdk",
+                  "@testing-library/jest-dom/vitest",
+                ],
+                // axios stays external: bundled for the browser, its Node
+                // dependencies fail with "util.inherits is not a function".
+                exclude: ["axios", "vitest"],
+              },
+            },
+          },
+          server: { deps: { inline: PREBUNDLED } },
           css: {
             modules: {
               classNameStrategy: "non-scoped",
@@ -78,7 +124,7 @@ export default defineConfig({
         // icons a browser can draw.
         plugins: [
           storybookTest({
-            configDir: path.join(__dirname, ".storybook"),
+            configDir: path.join(root, ".storybook"),
             storybookScript: "pnpm storybook --no-open",
           }),
         ],

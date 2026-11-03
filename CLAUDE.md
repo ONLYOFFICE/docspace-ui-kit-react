@@ -25,7 +25,7 @@ Path-scoped detail that does not belong here, loaded when the matching files are
 | Rule                     | Covers                                                                                                                                                                                                                           |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `plugin-api.md`          | the root barrel **is** the DocSpace plugin UI API; the portal shim, subpath imports that throw, and the `agent-skills` skill that documents it                                                                                   |
-| `component-authoring.md` | folder layout, props and JSDoc, `ref` as a prop, stories, what `vitest.config.ts` actually collects                                                                                                                              |
+| `component-authoring.md` | folder layout, props and JSDoc, `ref` as a prop, stories, what `vitest.config.mts` actually collects                                                                                                                             |
 | `theming.md`             | which layer a `var(--x)` comes from, undefined tokens failing silently, RTL                                                                                                                                                      |
 | `packaging.md`           | `exports`, `publishConfig`, ESM-only dist, dependency placement, per-module CSS, `"use client"`                                                                                                                                  |
 | `live-portal.md`         | how anything here talks to a real DocSpace: `useApi()`'s clients, the provider Storybook already mounts, `.env` and the portal switcher, whose identity a key runs as, and why every committed screen must render with no portal |
@@ -57,11 +57,14 @@ Path-scoped detail that does not belong here, loaded when the matching files are
 - **SCSS Modules** — styling (`*.module.scss` per component); theming via CSS
   custom properties
 - **Lefthook** — git hooks. Pre-commit and pre-merge-commit rewrite the staged files
-  with Prettier (`stage_fixed`); pre-push runs `format:gate`, `lint`, `tsc`, `test`,
-  `build` and `verify:package`, in that order and stopping at the first failure
-  (`priority` + `piped` — lefthook otherwise sorts commands alphabetically and runs
-  them all). `format:gate` fixes the files it finds and still fails the push, because
-  a pre-push hook cannot rewrite the commits being pushed
+  with Prettier (`stage_fixed`). Pre-push is a list of `jobs`, run in order and stopping
+  at the first failure (`piped`): `format:gate`; then `lint`, `tsc` and the README and
+  surface checks side by side; then `test:changed` — only the unit tests a change can
+  reach, or all of them when the setup, mocks, locales or config changed; then `build`
+  and `verify:package`, **only when the pushed commits touch the build's own code**
+  (`scripts/push-touches-build.mjs`). CI runs everything in full. Prettier and `tsc`
+  cache in `node_modules/.cache`. `format:gate` fixes the files it finds and still fails
+  the push, because a pre-push hook cannot rewrite the commits being pushed
 - **pnpm** — package manager
 
 ## Repository Structure
@@ -146,8 +149,14 @@ pnpm storybook
 # Build Storybook static
 pnpm storybook-build
 
-# Run tests (the jsdom `unit` project; what pre-push runs)
+# Run tests (the jsdom `unit` project; what CI runs)
 pnpm test
+
+# Only the unit tests the branch's changes reach (what pre-push runs)
+pnpm test:changed
+
+# The whole pre-push gate, by hand, exactly as lefthook runs it
+pnpm gate
 
 # Render every story in Chromium and run its play function (the `storybook`
 # project; CI's "Story tests" job runs it)

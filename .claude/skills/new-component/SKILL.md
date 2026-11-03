@@ -45,7 +45,7 @@ If the component is portal-specific or not ready to be committed to, scaffold wi
 3. **The story.** Every component needs one, and the story carries the docs: the feature list,
    the accessibility notes and the CSS-variable table. Replace `UI/TODO section/` with the real
    Storybook section — look at a neighbouring component rather than inventing one.
-4. **The test.** `vitest.config.ts` collects `components/**`, so a test here runs. It would not
+4. **The test.** `vitest.config.mts` collects `components/**`, so a test here runs. It would not
    under `billing/`, `uploader/`, `document-editor/` or `api/`
    ([component-authoring.md](../../rules/component-authoring.md)).
 5. **The README.** It ships in the published package (`files` in `package.json`), so a TODO
