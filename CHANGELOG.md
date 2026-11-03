@@ -241,6 +241,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Added
 
+- **`hasTabStop(root)`** (`hooks/useFocusTrap`): whether `root` holds a Tab stop, by the rule of
+  `getTabStops`, reading the layout no further than the first one
 - **`RoomType`'s `isDisabled`** greys out any room type, marks it `aria-disabled` and stops its
   `onClick`, as `disabledFormRoom` and `disabledPublicRoom` do for their own types
 - `AiAgentProviders` takes `chatIntro`: what an empty chat shows above the suggestion chips in place of the default illustration and tagline (an AI project puts its logo, name and sources there).
@@ -267,6 +269,15 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **A tab panel no longer lays out all its controls on every change.** `useTabPanel` re-read the
+  panel on each frame its content changed and listed every Tab stop to learn whether there was
+  one; it now asks `hasTabStop`, which stops at the first
+- The focus trap leaves out controls inside a `<fieldset disabled>`: they take no focus, though
+  their own `disabled` is false, and Tab stood still on them
+- `Selector`'s list says `aria-multiselectable="true"` in multi select, so a screen reader no longer
+  announces it as a single choice
+- `Selector`'s new-name row leaves an Enter that ends an input method composition (Chinese,
+  Japanese, Korean) to it, instead of accepting the name half typed
 - **An AI project opens on its own model, not on the default.** `AiChatStoresBridge` looked the
   project's model up among the assigned profiles only (`init`); a model outside them missed and
   the chat fell back to the default. It now waits for the whole list (`ensureProfiles`) first.
