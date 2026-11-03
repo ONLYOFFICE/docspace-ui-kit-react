@@ -56,8 +56,15 @@ export type DataTableColumn<T> = {
   /** Whether a drag may change the column's width. Ignored for `fixed` columns.
    * @default true */
   resizable?: boolean;
-  /** Field the rows are sorted by when this header is clicked; makes the header a sort button. */
+  /**
+   * Field the rows are sorted by in this column. The header shows it as the
+   * current sort, sorting by it turns the column on when it is hidden, and a
+   * click on the header sorts by it unless `sortable` is false.
+   */
   sortKey?: string;
+  /** Whether a click on the header sorts by `sortKey`, which makes the header a sort button.
+   * @default true */
+  sortable?: boolean;
   /** Ref of the header cell element, for content that measures its column. */
   headerRef?: React.Ref<HTMLDivElement>;
   /** Applied to every cell of the column. */

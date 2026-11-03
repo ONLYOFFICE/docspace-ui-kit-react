@@ -85,9 +85,9 @@ export const useRowVirtualizer = ({
 }: RowVirtualizerOptions) => {
   const [target, setTarget] = useState<ScrollTarget | null>(null);
   const [scrollMargin, setScrollMargin] = useState(0);
-  // The sticky header covers the top of the view, so a row scrolled "to the
-  // top" has to land below it.
-  const [headerHeight, setHeaderHeight] = useState(0);
+  // The sticky header, and whatever it stops below, covers the top of the
+  // view, so a row scrolled "to the top" has to land below it.
+  const [headerBottom, setHeaderBottom] = useState(0);
 
   // Found before the first paint, so the first rows paint with the table.
   useLayoutEffect(() => {
@@ -103,9 +103,13 @@ export const useRowVirtualizer = ({
     const next = measureScrollMargin(body, target);
     setScrollMargin((prev) => (Math.abs(prev - next) < 0.5 ? prev : next));
 
-    // The header is the body's previous sibling.
+    // The header is the body's previous sibling; its `top` is where it sticks.
     const header = body?.previousElementSibling;
-    setHeaderHeight(header ? header.getBoundingClientRect().height : 0);
+    const bottom = header
+      ? (Number.parseFloat(getComputedStyle(header).top) || 0) +
+        header.getBoundingClientRect().height
+      : 0;
+    setHeaderBottom((prev) => (Math.abs(prev - bottom) < 0.5 ? prev : bottom));
   }, [bodyRef, target]);
 
   useLayoutEffect(() => {
@@ -121,7 +125,7 @@ export const useRowVirtualizer = ({
     estimateSize: () => rowHeight,
     overscan,
     scrollMargin,
-    scrollPaddingStart: headerHeight,
+    scrollPaddingStart: headerBottom,
     getItemKey: (index) => getItemKey(index) as string | number,
     // A content change above the table moves it within the scroller; the
     // next scroll measures where it went.

@@ -253,6 +253,23 @@ describe("DataTable", () => {
 
       expect(screen.queryAllByRole("button")).toHaveLength(0);
     });
+
+    it("shows the sort of a column that is not sortable, without a button", () => {
+      renderTable({
+        onSortChange: vi.fn(),
+        sort: { key: "author", desc: false },
+        columns: makeColumns({ Author: { sortable: false } }),
+      });
+
+      expect(
+        screen.queryByRole("button", { name: "Author" }),
+      ).not.toBeInTheDocument();
+      expect(screen.getByTestId("data-table-header-Author")).toHaveAttribute(
+        "aria-sort",
+        "ascending",
+      );
+      expect(screen.getByRole("button", { name: "Name" })).toBeInTheDocument();
+    });
   });
 
   describe("renderers", () => {

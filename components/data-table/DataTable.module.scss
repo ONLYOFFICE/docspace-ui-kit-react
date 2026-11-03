@@ -52,7 +52,9 @@
 
 .header {
   position: sticky;
-  top: 0;
+  // A page with something pinned above the list, a filter bar, says how far
+  // down the header stops.
+  top: var(--data-table-header-top, 0px);
   z-index: 1;
 
   background: token(background);
@@ -256,7 +258,7 @@
   display: grid;
   grid-template-columns: var(--data-table-grid);
   // Scrolled into view, a row stops below the sticky header, not under it.
-  scroll-margin-block-start: 40px;
+  scroll-margin-block-start: calc(40px + var(--data-table-header-top, 0px));
 
   // A selected row and the one being acted on are tinted cell by cell, as in
   // the old table, so a consumer's per-cell styles (drag and drop) still win.

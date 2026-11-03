@@ -34,7 +34,9 @@ export const HeaderCell = <T,>({
   const { id, title, header, sortKey, headerRef, headerClassName } = column;
 
   const ariaSort = ariaSortOf(sort, sortKey);
-  const sortable = Boolean(sortKey && onSortChange);
+  const sortable = Boolean(
+    sortKey && onSortChange && column.sortable !== false,
+  );
   const resizable = Boolean(resize?.canResize(id));
 
   const renderContent = () => {

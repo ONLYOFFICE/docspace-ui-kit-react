@@ -174,6 +174,10 @@ export function Sessions({ sessions }: { sessions: Session[] }) {
 }
 ```
 
+A column the rows can be sorted by elsewhere, in a sort menu, but not from its header takes
+`sortable: false` with its `sortKey`: the header shows the sort and is not a button, and sorting
+by it still turns the column on when it is hidden.
+
 ### Remembering the widths
 
 `createLocalStorageWidths(key)` keeps the widths in `localStorage` under `key`, which has to be
@@ -711,12 +715,15 @@ Set them on any ancestor of the table. Each default has a light and a dark value
 | `--data-table-row-selected-background` | `#f3f4f4` / `#3d3d3d`  | Cells of a `checked` or `active` row                                    |
 | `--data-table-row-drag-background`     | `#ffefaf` / `#a88f56`  | Cells of a `dragging` row                                               |
 
-Two more say how far the header's line reaches past the table, at the start and at the end, once
-rows scroll under the sticky header: into the page's gutters, where a selected row's strip already
-reaches. They have no theme values.
+Three more place the sticky header, and have no theme values. The bleeds say how far the header's
+line reaches past the table, at the start and at the end, once rows scroll under it: into the
+page's gutters, where a selected row's strip already reaches. The top is for a page that pins
+something above the list in the same scroller, such as a filter bar: the header stops below it, and
+`scrollToIndex` lands rows below both.
 
 | Variable                   | Default | Effect                                                   |
 | -------------------------- | ------- | -------------------------------------------------------- |
+| `--data-table-header-top`  | `0px`   | How far below the scroller's top the header sticks       |
 | `--data-table-bleed-start` | `0px`   | How far the stuck header's line runs past the start edge |
 | `--data-table-bleed-end`   | `0px`   | How far the stuck header's line runs past the end edge   |
 
@@ -726,9 +733,10 @@ Row height is the `rowHeight` prop, not a variable: the virtualiser has to know 
 
 The table element has `role="table"`, with `aria-label` from `ariaLabel`. The header and the body
 are each a `role="rowgroup"`, every row `role="row"`, header cells `role="columnheader"` and body
-cells `role="cell"`. A header with a `sortKey`, when `onSortChange` is given, holds a native
-`<button>`, so it is reachable with Tab and sorts on Enter or Space; the sorted column carries
-`aria-sort="ascending"` or `"descending"`. The sort arrow is decorative (`aria-hidden`).
+cells `role="cell"`. A header with a `sortKey`, when `onSortChange` is given and `sortable` is not
+false, holds a native `<button>`, so it is reachable with Tab and sorts on Enter or Space; the
+sorted column carries `aria-sort="ascending"` or `"descending"`, button or not. The sort arrow is
+decorative (`aria-hidden`).
 
 The settings button is a native `<button>` named by `settingsColumn`'s `title`, with
 `aria-haspopup` and `aria-expanded`; its menu items are the kit's `Checkbox`, labelled with each
