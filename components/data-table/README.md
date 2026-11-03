@@ -610,7 +610,10 @@ export function FilesTable({
   resizable column follows it, so the last flexible column and `fixed` columns have none. Dragging
   it grows the column and shrinks the resizable columns on the side the pointer moves to, nearest
   first, each down to its minimum; the column on the other side of the edge takes the difference.
-  The total never changes, so the table never scrolls sideways. `fixed` columns are skipped.
+  The total never changes, so the table never scrolls sideways. `fixed` columns are skipped. Each
+  pointer move counts from where the edge is now, so an edge stuck at the minimums waits for the
+  pointer to come back to it, and turning back mid-drag widens the edge's neighbour rather than
+  the column that was squeezed last.
 - During a drag only the `--data-table-grid` property changes, once per animation frame; React
   does not re-render. The widths are committed and stored once, when the pointer is released. A
   cancelled pointer (`pointercancel`) puts the grid back and stores nothing.

@@ -160,6 +160,32 @@ describe("DataTable resizing", () => {
     fireEvent.pointerUp(target, { pointerId: 1, clientX: 560 });
   });
 
+  it("turning back mid-drag widens the neighbour, not the column squeezed last", () => {
+    const { save } = renderTable();
+    const target = handle("Name");
+
+    fireEvent.pointerDown(target, { pointerId: 1, button: 0, clientX: 500 });
+    // Everything after Name at 110 px: the edge stops 270 px on, at 770.
+    fireEvent.pointerMove(target, { pointerId: 1, clientX: 900 });
+    const pressed =
+      "minmax(210px, 67fr) minmax(110px, 11fr) minmax(110px, 11fr) minmax(110px, 11fr) 68px";
+    expect(grid()).toBe(pressed);
+
+    // Back, but still past the stuck edge: nothing moves.
+    fireEvent.pointerMove(target, { pointerId: 1, clientX: 800 });
+    expect(grid()).toBe(pressed);
+
+    // 70 px before the edge: Name gives them to Author, its neighbour.
+    fireEvent.pointerMove(target, { pointerId: 1, clientX: 700 });
+    expect(grid()).toBe(
+      "minmax(210px, 60fr) minmax(110px, 18fr) minmax(110px, 11fr) minmax(110px, 11fr) 68px",
+    );
+
+    fireEvent.pointerUp(target, { pointerId: 1, clientX: 700 });
+    expect(save).toHaveBeenCalledTimes(1);
+    expect(save.mock.calls[0][0].Author).toBeCloseTo(0.18, 9);
+  });
+
   it("puts the grid back and stores nothing when the pointer is cancelled", () => {
     const { save } = renderTable();
     const target = handle("Name");

@@ -5,6 +5,7 @@ import {
   type LayoutColumn,
   getCompactColumns,
   getDefaultFractions,
+  getEdgeOffset,
   getFlexibleArea,
   getMinWidth,
   getRequiredWidth,
@@ -307,6 +308,16 @@ describe("resizeColumn", () => {
         (c) => c.id,
       ),
     ).toEqual(["Name", "Author", "Modified"]);
+  });
+});
+
+describe("getEdgeOffset", () => {
+  it("is the width of the column and every column before it", () => {
+    expect(getEdgeOffset(SPEC_COLUMNS, EVEN, SPEC_WIDTH, "Name")).toBe(400);
+    expect(getEdgeOffset(SPEC_COLUMNS, EVEN, SPEC_WIDTH, "Modified")).toBe(800);
+    expect(getEdgeOffset(SPEC_COLUMNS, EVEN, SPEC_WIDTH, "Menu")).toBe(
+      SPEC_WIDTH,
+    );
   });
 });
 

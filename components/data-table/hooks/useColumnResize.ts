@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useInterfaceDirection } from "../../../context/InterfaceDirectionContext";
 import {
   type ColumnFractions,
+  getEdgeOffset,
   type LayoutColumn,
   resizeColumn,
   toLogicalDelta,
@@ -18,6 +19,8 @@ type Drag = {
   columnId: string;
   pointerId: number;
   startX: number;
+  /** Where the edge was when the drag started, along the reading direction. */
+  startEdge: number;
   width: number;
   startFractions: ColumnFractions;
   latest: ColumnFractions;
@@ -55,7 +58,9 @@ export type ResizeHandleBindings = {
  * A drag never re-renders React: each animation frame writes the new grid to
  * the table's `--data-table-grid` property, and the rows, which only read that
  * property, follow. On pointer-up the shares are committed once, and stored.
- * A cancelled pointer puts the grid back as it was and stores nothing.
+ * A cancelled pointer puts the grid back as it was and stores nothing. Each
+ * move resizes the current widths by the distance from the edge to the
+ * pointer, so turning back mid-drag widens the edge's neighbour.
  *
  * Arrow keys on a focused handle move the edge by 10 px, 50 px with Shift, in
  * the visual direction of the key; a double click resets the layout.
@@ -117,11 +122,13 @@ export const useColumnResize = ({
         // while the pointer stays over the handle.
       }
 
+      const width = measure();
       dragRef.current = {
         columnId,
         pointerId: event.pointerId,
         startX: event.clientX,
-        width: measure(),
+        startEdge: getEdgeOffset(columns, fractions, width, columnId),
+        width,
         startFractions: fractions,
         latest: fractions,
         scheduled: false,
@@ -134,12 +141,23 @@ export const useColumnResize = ({
       const drag = dragRef.current;
       if (!drag || event.pointerId !== drag.pointerId) return;
 
+      // Each move goes from where the edge is now to where the pointer is, on
+      // the current widths, as the old table did. Replaying the whole movement
+      // on the widths the drag started with would, on the way back, first give
+      // width to the column squeezed last (the far one) instead of the
+      // neighbour. An edge stuck at the minimums stays put until the pointer
+      // comes back to it.
+      const target = toLogicalDelta(event.clientX - drag.startX, isRTL);
+      const moved =
+        getEdgeOffset(columns, drag.latest, drag.width, drag.columnId) -
+        drag.startEdge;
+
       drag.latest = resizeColumn(
         columns,
-        drag.startFractions,
+        drag.latest,
         drag.width,
         drag.columnId,
-        toLogicalDelta(event.clientX - drag.startX, isRTL),
+        target - moved,
       );
 
       // One write per frame. The flag says whether one is pending: the id is

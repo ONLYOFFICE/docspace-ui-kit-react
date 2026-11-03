@@ -252,6 +252,22 @@ export const hasResizeHandle = (columns: LayoutColumn[], columnId: string) => {
 };
 
 /**
+ * Where the trailing edge of `columnId` is, in pixels from the start of the
+ * table along the reading direction.
+ */
+export const getEdgeOffset = (
+  columns: LayoutColumn[],
+  fractions: ColumnFractions,
+  containerWidth: number,
+  columnId: string,
+) => {
+  const pixels = toPixels(columns, fractions, containerWidth);
+  const index = columns.findIndex((c) => c.id === columnId);
+
+  return sum(columns.slice(0, index + 1).map((c) => pixels[c.id] ?? 0));
+};
+
+/**
  * Turns a horizontal pointer movement into a movement along the reading
  * direction, which is what `resizeColumn` takes.
  */
