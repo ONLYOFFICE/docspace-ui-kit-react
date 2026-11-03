@@ -31,7 +31,9 @@ already use it.
   is `true` and the ref holds a node.
 
 `getTabStops(root)` is exported too: the elements Tab stops on inside `root`,
-in document order.
+in document order. `hasTabStop(root)` answers whether there is any by the same
+rule, reading the layout no further than the first one - for a caller that
+asks on every change, such as a tab panel deciding to be a stop itself.
 
 ## Behaviour
 

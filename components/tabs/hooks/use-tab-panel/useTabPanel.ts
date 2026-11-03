@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
 
-import { getTabStops } from "../../../../hooks/useFocusTrap";
+import { hasTabStop } from "../../../../hooks/useFocusTrap";
 
 /**
  * Ties the tab bar to the panel under it, as the WAI-ARIA tabs pattern asks:
@@ -27,12 +27,13 @@ const useTabPanel = (selectedIndex: number, hasPanel: boolean) => {
     const panel = panelRef.current;
     if (!hasPanel || !panel) return;
 
-    const update = () => setPanelHasStops(getTabStops(panel).length > 0);
+    const update = () => setPanelHasStops(hasTabStop(panel));
     update();
 
     // The content loads and changes after the panel is shown, and a control
     // can be shown or hidden by its class or style alone. Reading the stops
-    // lays the page out, so a burst of changes is read once, on the next frame.
+    // lays the page out, so a burst of changes is read once, on the next frame,
+    // and no further than the first stop.
     let frame = 0;
     const scheduleUpdate = () => {
       if (frame) return;

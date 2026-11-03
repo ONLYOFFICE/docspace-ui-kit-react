@@ -37,18 +37,31 @@ const isRadioStop = (el: HTMLElement, root: HTMLElement) => {
   return checked ? checked === el : group[0] === el;
 };
 
+// Focusable, with a tabIndex of 0 or more, enabled, outside inert content
+// and rendered - the layout reads last, as they are the costly part.
+const isTabStop = (el: HTMLElement, root: HTMLElement) =>
+  el.tabIndex >= 0 &&
+  !("disabled" in el && el.disabled === true) &&
+  !el.closest("[inert]") &&
+  isRendered(el) &&
+  isRadioStop(el, root);
+
 /**
  * The elements Tab stops on inside `root`, in document order: focusable,
  * with a tabIndex of 0 or more, enabled, rendered, and outside inert content.
  */
 export const getTabStops = (root: HTMLElement): HTMLElement[] =>
-  [...root.querySelectorAll<HTMLElement>(CANDIDATES)].filter(
-    (el) =>
-      el.tabIndex >= 0 &&
-      !("disabled" in el && el.disabled === true) &&
-      !el.closest("[inert]") &&
-      isRendered(el) &&
-      isRadioStop(el, root),
+  [...root.querySelectorAll<HTMLElement>(CANDIDATES)].filter((el) =>
+    isTabStop(el, root),
+  );
+
+/**
+ * Whether `root` holds any element Tab stops on, by the rule of
+ * `getTabStops` - reading the layout no further than the first one.
+ */
+export const hasTabStop = (root: HTMLElement): boolean =>
+  [...root.querySelectorAll<HTMLElement>(CANDIDATES)].some((el) =>
+    isTabStop(el, root),
   );
 
 // The open traps, in the order they opened. Only one of them owns the Tab key.

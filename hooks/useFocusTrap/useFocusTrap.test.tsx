@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
-import { getTabStops, useFocusTrap } from ".";
+import { getTabStops, hasTabStop, useFocusTrap } from ".";
 
 const Trap = ({
   active = true,
@@ -162,6 +162,28 @@ describe("useFocusTrap", () => {
     expect(
       getTabStops(screen.getByRole("dialog")).map((el) => el.textContent),
     ).toEqual(["First", "Last"]);
+  });
+
+  // A tab panel asks only whether it has a stop, on every frame its content
+  // changes: the answer must not lay out every control in it.
+  it("reads no further than the first stop when only asked whether there is one", () => {
+    render(
+      <Trap label="Dialog">
+        {Array.from({ length: 50 }, (_, index) => (
+          <button key={index} type="button">
+            {`Item ${index}`}
+          </button>
+        ))}
+      </Trap>,
+    );
+    const dialog = screen.getByRole("dialog");
+    const rects = vi.mocked(Element.prototype.getClientRects);
+    rects.mockClear();
+
+    expect(hasTabStop(dialog)).toBe(true);
+    expect(rects).toHaveBeenCalledTimes(1);
+
+    expect(hasTabStop(document.createElement("div"))).toBe(false);
   });
 
   it("counts a radio group as one stop", () => {
