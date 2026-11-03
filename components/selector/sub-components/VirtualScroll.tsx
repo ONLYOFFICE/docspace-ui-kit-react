@@ -6,8 +6,15 @@ import { ListboxContext } from "../contexts/Listbox";
 
 export const VirtualScroll = (props: ScrollbarProps) => {
   const scrollContentRef = useRef<HTMLDivElement | null>(null);
-  const { label, activeOptionId, onKeyDown, onFocus, onBlur, onPointerDown } =
-    useContext(ListboxContext);
+  const {
+    label,
+    multiselectable,
+    activeOptionId,
+    onKeyDown,
+    onFocus,
+    onBlur,
+    onPointerDown,
+  } = useContext(ListboxContext);
 
   // The scroll container is the list's one Tab stop, a listbox whose options
   // the arrows move through (aria-activedescendant); the rows themselves
@@ -19,10 +26,12 @@ export const VirtualScroll = (props: ScrollbarProps) => {
     list.setAttribute("role", "listbox");
     if (label) list.setAttribute("aria-label", label);
     else list.removeAttribute("aria-label");
+    if (multiselectable) list.setAttribute("aria-multiselectable", "true");
+    else list.removeAttribute("aria-multiselectable");
     if (activeOptionId)
       list.setAttribute("aria-activedescendant", activeOptionId);
     else list.removeAttribute("aria-activedescendant");
-  }, [label, activeOptionId]);
+  }, [label, multiselectable, activeOptionId]);
 
   // Body makes new handlers on every render, every arrow press among them:
   // the listeners call the current ones instead of being re-attached.

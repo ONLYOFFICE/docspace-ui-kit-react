@@ -69,6 +69,18 @@ describe("Selector list from the keyboard", () => {
     return { props, ...result };
   };
 
+  it("tells assistive technology a multi-select list takes several rows", async () => {
+    await renderList({ isMultiSelect: true });
+
+    expect(getList()).toHaveAttribute("aria-multiselectable", "true");
+  });
+
+  it("leaves a single-select list without the mark", async () => {
+    await renderList({ isMultiSelect: false });
+
+    expect(getList()).not.toHaveAttribute("aria-multiselectable");
+  });
+
   // The wheel can take the keyboard's row off screen after the keys put it
   // there, and react-window draws it out: Enter used to do nothing.
   it("presses the keyboard's row even after the wheel took it off screen", async () => {

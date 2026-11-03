@@ -5,6 +5,7 @@ import { createContext } from "react";
 // option the keyboard is on, and the handlers for the keys and the focus.
 export type TListboxContext = {
   label?: string;
+  multiselectable?: boolean;
   activeOptionId?: string;
   onKeyDown?: (e: KeyboardEvent) => void;
   onFocus?: () => void;

@@ -494,6 +494,7 @@ const Body = ({
   // instead of unpicking it.
   const listbox = {
     label: listLabel,
+    multiselectable: !!isMultiSelect,
     activeOptionId:
       activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined,
     onPointerDown: (e: PointerEvent) => {
