@@ -60,9 +60,9 @@ Path-scoped detail that does not belong here, loaded when the matching files are
   with Prettier (`stage_fixed`). Pre-push is a list of `jobs`, run in order and stopping
   at the first failure (`piped`): `format:gate`; then `lint`, `tsc` and the README and
   surface checks side by side; then `test:changed` — only the unit tests a change can
-  reach, or all of them when the setup, mocks, locales or config changed; then `build`
+  reach, or all of them when the setup, mocks, locales, lockfile or config changed; then `build`
   and `verify:package`, **only when the pushed commits touch the build's own code**
-  (`scripts/push-touches-build.mjs`). CI runs everything in full. Prettier and `tsc`
+  (`scripts/build-untouched.mjs`). CI runs everything in full. Prettier and `tsc`
   cache in `node_modules/.cache`. `format:gate` fixes the files it finds and still fails
   the push, because a pre-push hook cannot rewrite the commits being pushed
 - **pnpm** — package manager

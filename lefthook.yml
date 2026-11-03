@@ -100,7 +100,7 @@ pre-push:
             run: pnpm surface:check
 
     # The unit tests whose imports reach a changed file, or all of them when
-    # the setup, the mocks, the locales or the configuration changed. CI runs
+    # the setup, the mocks, the locales, the lockfile or the configuration changed. CI runs
     # the full suite.
     - name: test
       run: pnpm test:changed
@@ -117,9 +117,11 @@ pre-push:
     # Decided by a script rather than a `glob`: lefthook matches a glob against
     # `git diff HEAD @{push}`, which is empty for a branch's first push, so the
     # glob would skip the build on exactly the push that brings a new branch.
+    # `skip` on "the build is untouched", not `only` on "it changed": lefthook
+    # reads any non-zero exit as "no", and a script that crashes then builds.
     - name: package
-      only:
-        - run: node scripts/push-touches-build.mjs
+      skip:
+        - run: node scripts/build-untouched.mjs
       group:
         piped: true
         jobs:

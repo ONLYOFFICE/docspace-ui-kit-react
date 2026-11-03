@@ -127,7 +127,7 @@ still true, and all still unenforced.
   `VITE_PROVIDER_*` blanked, so no story reaches a live portal.
 - `pnpm test` runs `unit` only, and CI runs it in full. Pre-push runs `pnpm test:changed`: the
   `unit` tests whose imports reach a file the branch changed, or all of them when the setup,
-  the mocks, `locales/en` or the configuration changed (`forceRerunTriggers`, a root-level
+  the mocks, `locales/en`, the lockfile or the configuration changed (`forceRerunTriggers`, a root-level
   option -- inside a project it is silently ignored). `pnpm test:stories` runs `storybook`, and
   CI's "Story tests" job runs it on every pull request.
 - `unit` runs on threads and pre-bundles `@onlyoffice/docspace-api-sdk` and jest-dom

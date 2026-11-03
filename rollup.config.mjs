@@ -312,7 +312,18 @@ const SILENCED_WARNINGS = new Set(["MODULE_LEVEL_DIRECTIVE", "MIXED_EXPORTS"]);
 // are printed here instead of being handed back to rollup.
 const onwarn = (warning) => {
   if (SILENCED_WARNINGS.has(warning.code)) return;
-  console.warn(`(!) [${warning.code ?? "WARNING"}] ${warning.message}`);
+
+  // What the CLI would have printed: the plugin, where, and the code around it.
+  const plugin = warning.plugin ? ` (plugin ${warning.plugin})` : "";
+  const where = warning.loc
+    ? `${warning.loc.file ?? warning.id}:${warning.loc.line}:${warning.loc.column}`
+    : warning.id;
+
+  console.warn(
+    `(!) [${warning.code ?? "WARNING"}]${plugin} ${warning.message}`,
+  );
+  if (where) console.warn(`    ${where}`);
+  if (warning.frame) console.warn(warning.frame);
 };
 
 // Every module is emitted as `<subpath>/index.js`, so the whole package has a

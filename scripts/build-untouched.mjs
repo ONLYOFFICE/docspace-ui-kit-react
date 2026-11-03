@@ -1,16 +1,18 @@
 #!/usr/bin/env node
 /**
- * Decides whether the pre-push gate builds and packs: exits 0 when the commits
- * being pushed touch the build's own code, 1 when they do not. lefthook.yml
- * runs the `package` job `only` when this succeeds.
+ * Decides whether the pre-push gate may skip building and packing: exits 0
+ * when the commits being pushed leave the build's own code alone, and 1 when
+ * they touch it. lefthook.yml `skip`s the `package` job when this succeeds.
+ *
+ * The sense is deliberate. Lefthook reads any non-zero exit as "condition not
+ * met", and a crash exits non-zero -- so with the condition this way round a
+ * script that fails builds, where the opposite (`only` on "the build changed")
+ * would skip the build exactly when nothing could tell whether it was needed.
  *
  * The build is in the gate for one reason -- it is the only place a Windows
  * developer's platform gets tested, and the three Windows-only breakages that
  * reached CI's Linux runners were all in the build's own code. A push that
  * leaves that code alone is built and packed by CI's `package` job instead.
- *
- * When the base of the push cannot be found it says yes: building for nothing
- * costs two minutes, skipping a build that was needed costs a broken release.
  */
 
 import path from "node:path";
@@ -36,20 +38,7 @@ const touchesBuild = (file) =>
 const base = findPushBase(repoRoot);
 const changed = base && committedChangesSince(repoRoot, base.sha);
 
-if (!changed) {
-  console.log("No base to compare the push with: building and packing.");
-  process.exit(0);
-}
+// No base, no answer: build.
+if (!changed) process.exit(1);
 
-const reasons = changed.filter(touchesBuild);
-
-if (reasons.length === 0) {
-  console.log(
-    `No build code changed since ${base.ref}: build and pack left to CI.`,
-  );
-  process.exit(1);
-}
-
-console.log(`Build code changed since ${base.ref}:`);
-for (const file of reasons) console.log(`  ${file}`);
-process.exit(0);
+process.exit(changed.some(touchesBuild) ? 1 : 0);

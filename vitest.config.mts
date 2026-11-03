@@ -16,21 +16,42 @@ const root = import.meta.dirname;
 // about 7 seconds in each of the 99 files that load it, 721 of the 1044 seconds
 // the suite spent importing. jest-dom is loaded by every file, through
 // test/setup.ts.
+//
+// Each needs naming twice, which is why the list holds both: Vite only
+// processes -- and so only pre-bundles -- a package it inlines, and inlining
+// takes the package name, while the optimizer takes the entry actually
+// imported.
+//
+// The SDK's entry is its ESM build, not the CommonJS `main`. Pre-bundled from
+// `main` it needs interop, every named import is then read off `.default`, and
+// the vi.mock factories in providers/ -- named exports only -- fail with 'No
+// "default" export is defined'. The alias below sends the bare specifier there,
+// for this one package rather than for every dependency.
+const SDK_ESM_ENTRY = "@onlyoffice/docspace-api-sdk/dist/esm/index.js";
+
 const PREBUNDLED = [
-  "@onlyoffice/docspace-api-sdk",
-  "@testing-library/jest-dom",
+  { pkg: "@onlyoffice/docspace-api-sdk", entry: SDK_ESM_ENTRY },
+  {
+    pkg: "@testing-library/jest-dom",
+    entry: "@testing-library/jest-dom/vitest",
+  },
 ];
 
 export default defineConfig({
   test: {
     // `pnpm test:changed` runs only the tests whose import graph reaches a
     // changed file. The setup file, the mocks and the English strings reach
-    // every test without being imported by any, so a change to them runs the
+    // every test without being imported by any, and so do the lockfile -- a
+    // dependency updated within its range changes no file a test imports -- and
+    // the TypeScript config the transform reads; a change to any of them runs the
     // whole suite. A root-only option: set inside a project it is ignored.
     forceRerunTriggers: [
       ...configDefaults.forceRerunTriggers,
       "**/test/**",
       "**/locales/en/**",
+      "**/pnpm-lock.yaml",
+      "**/pnpm-workspace.yaml",
+      "**/tsconfig.json",
     ],
     projects: [
       {
@@ -61,12 +82,11 @@ export default defineConfig({
                 "./test/__mocks__/reactSvgMock.tsx",
               ),
             },
+            {
+              find: /^@onlyoffice\/docspace-api-sdk$/,
+              replacement: SDK_ESM_ENTRY,
+            },
           ],
-          // The SDK's `main` is CommonJS. Pre-bundled from there it needs interop,
-          // every named import is then read off `.default`, and the vi.mock
-          // factories in providers/ -- which return named exports only -- fail
-          // with 'No "default" export is defined'. Its `module` entry is ESM.
-          mainFields: ["module", "jsnext:main", "jsnext", "main"],
         },
         test: {
           name: "unit",
@@ -99,17 +119,14 @@ export default defineConfig({
             optimizer: {
               client: {
                 enabled: true,
-                include: [
-                  "@onlyoffice/docspace-api-sdk",
-                  "@testing-library/jest-dom/vitest",
-                ],
+                include: PREBUNDLED.map(({ entry }) => entry),
                 // axios stays external: bundled for the browser, its Node
                 // dependencies fail with "util.inherits is not a function".
                 exclude: ["axios", "vitest"],
               },
             },
           },
-          server: { deps: { inline: PREBUNDLED } },
+          server: { deps: { inline: PREBUNDLED.map(({ pkg }) => pkg) } },
           css: {
             modules: {
               classNameStrategy: "non-scoped",

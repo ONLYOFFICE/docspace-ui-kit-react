@@ -6,10 +6,11 @@
  * `vitest --changed <commit>` takes the files that differ from <commit> --
  * committed or not -- and runs every test whose import graph reaches one of
  * them. The commit is where this branch left what it is pushed to: the merge
- * base with its upstream, or with origin/master on a first push, which can only
- * widen the set. A change to the setup file, the mocks, the English strings or
- * the configuration reaches every test without being imported by any; those
- * are `forceRerunTriggers` in vitest.config.mts and run the whole suite.
+ * base with its upstream, or on a first push with the long-lived branch it was
+ * cut from (scripts/lib/push-base.mjs). A change to the setup file, the mocks,
+ * the English strings, the lockfile or the configuration reaches every test
+ * without being imported by any; those are `forceRerunTriggers` in
+ * vitest.config.mts and run the whole suite.
  *
  * CI runs the whole suite on every pull request (`pnpm test`), so what this
  * leaves out is still checked before a merge -- it only moves out of the push.
@@ -51,7 +52,7 @@ if (base) {
   args.push("--changed", base.sha, "--passWithNoTests");
 } else {
   console.log(
-    "No upstream or origin/master to compare with: running every test.",
+    "No upstream or long-lived branch to compare with: running every test.",
   );
 }
 
