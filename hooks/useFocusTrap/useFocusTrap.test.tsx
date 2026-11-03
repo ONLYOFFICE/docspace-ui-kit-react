@@ -155,6 +155,9 @@ describe("useFocusTrap", () => {
         <button type="button" tabIndex={-1}>
           Script only
         </button>
+        <fieldset disabled>
+          <button type="button">In a disabled fieldset</button>
+        </fieldset>
         <button type="button">Last</button>
       </Trap>,
     );

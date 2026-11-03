@@ -41,7 +41,9 @@ const isRadioStop = (el: HTMLElement, root: HTMLElement) => {
 // and rendered - the layout reads last, as they are the costly part.
 const isTabStop = (el: HTMLElement, root: HTMLElement) =>
   el.tabIndex >= 0 &&
-  !("disabled" in el && el.disabled === true) &&
+  // :disabled also covers a control inside a disabled fieldset, which takes
+  // no focus though its own disabled is false.
+  !el.matches(":disabled") &&
   !el.closest("[inert]") &&
   isRendered(el) &&
   isRadioStop(el, root);
