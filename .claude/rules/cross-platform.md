@@ -38,8 +38,16 @@ Nothing below is available in both.
 `scripts/verify-package.mjs` is the model, and its comments say why. It reads a file out of the
 `.tgz` with node's own gzip and a walk over the tar headers rather than calling `tar`, because
 `tar` resolves to bsdtar under PowerShell and to GNU tar under Git Bash, and GNU tar reads
-`C:\…` as a remote host. It also passes `shell: process.platform === "win32"` to `execFileSync`,
-which is what makes a `.cmd` shim resolve there.
+`C:\…` as a remote host.
+
+It also starts every tool without a shell. `pnpm` and `npx` are `.cmd` shims on Windows, which
+Node will not spawn directly, and the old way round that -- `shell: process.platform === "win32"`
+-- is deprecated by Node 24 whenever arguments are passed too (DEP0190). Instead it runs pnpm
+from `process.env.npm_execpath`, the path pnpm itself sets for the script it runs (a native
+`pnpm.exe`, or a `.cjs` that needs `process.execPath`), and the validators through
+`process.execPath` and the `bin` their own `package.json` declares, read from
+`node_modules/<name>`. `scripts/format-gate.mjs` and `scripts/test-changed.mjs` start Prettier and
+Vitest the same way.
 
 No build script shells out today. Keep it that way: node has `fs`, `zlib` and `child_process`.
 
