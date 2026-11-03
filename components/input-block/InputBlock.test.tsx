@@ -70,6 +70,22 @@ describe("<InputBlock />", () => {
     expect(onIconClick).toHaveBeenCalled();
   });
 
+  // It used to default to -1, which took every SearchInput and PasswordInput
+  // built on it out of the tab order unless the caller passed tabIndex={0}.
+  it("is in the tab order when tabIndex is not given", () => {
+    const { container } = render(<InputBlock {...defaultProps} />);
+
+    expect(container.querySelector("input")).not.toHaveAttribute("tabindex");
+  });
+
+  it("passes an explicit tabIndex through", () => {
+    const { container } = render(
+      <InputBlock {...defaultProps} tabIndex={-1} />,
+    );
+
+    expect(container.querySelector("input")).toHaveAttribute("tabindex", "-1");
+  });
+
   it("handles disabled state correctly", () => {
     const { container } = render(<InputBlock {...defaultProps} isDisabled />);
 

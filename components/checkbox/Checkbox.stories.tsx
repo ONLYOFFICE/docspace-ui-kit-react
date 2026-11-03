@@ -68,7 +68,7 @@ const meta = {
     tabIndex: {
       control: "number",
       description:
-        "Tab order of the box icon, which is the element that takes focus; -1 takes the checkbox out of the tab order",
+        "Tab order of the checkbox input, which is the element that takes focus; -1 takes the checkbox out of the tab order",
       table: {
         defaultValue: { summary: "0" },
       },
@@ -143,15 +143,16 @@ export const Default: Story = {
   play: async ({ args, canvas, userEvent }) => {
     const checkbox = canvas.getByRole("checkbox", { name: "Checkbox" });
 
-    await userEvent.click(canvas.getByText("Checkbox"));
+    // The input takes the focus and keeps it when Space toggles the box.
+    await userEvent.tab();
+    await expect(checkbox).toHaveFocus();
+    await userEvent.keyboard(" ");
     await expect(checkbox).toBeChecked();
+    await expect(checkbox).toHaveFocus();
+
     await userEvent.click(canvas.getByText("Checkbox"));
     await expect(checkbox).not.toBeChecked();
-
-    // Focus lands on the box icon, not the hidden input; Space presses it.
-    await userEvent.tab();
-    await expect(document.activeElement?.tagName).toBe("svg");
-    await userEvent.keyboard(" ");
+    await userEvent.click(canvas.getByText("Checkbox"));
     await expect(checkbox).toBeChecked();
     await expect(args.onChange).toHaveBeenCalledTimes(3);
   },
@@ -255,7 +256,7 @@ export const DisabledStates: Story = {
     await userEvent.click(canvas.getByText("Disabled Unchecked"));
     await expect(unchecked).not.toBeChecked();
 
-    // No box icon is a tab stop while its checkbox is disabled.
+    // A disabled checkbox is no tab stop.
     await userEvent.tab();
     await expect(document.activeElement).toBe(document.body);
   },

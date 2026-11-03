@@ -169,6 +169,15 @@
   align-items: center;
   border-radius: 6px;
 
+  &:focus-visible {
+    outline: 2px solid
+      var(
+        --accent-main,
+        var(--color-scheme-main-accent, #{colors.$light-blue-main})
+      );
+    outline-offset: -2px;
+  }
+
   &[data-with-custom-slot="true"] {
     margin-top: 16px;
   }

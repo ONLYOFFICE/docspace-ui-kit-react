@@ -28,6 +28,7 @@ const RoomType = ({
   selectedId,
   disabledFormRoom,
   disabledPublicRoom,
+  isDisabled,
   isTemplate,
   isTemplateRoom,
   isFormSection,
@@ -49,7 +50,9 @@ const RoomType = ({
   const isPublicRoom = roomType === RoomsType.PublicRoom;
 
   const disabled =
-    (isFormRoom && disabledFormRoom) || (isPublicRoom && disabledPublicRoom);
+    !!isDisabled ||
+    (isFormRoom && disabledFormRoom) ||
+    (isPublicRoom && disabledPublicRoom);
 
   // `listItem` and `dropdownItem` render the disabled state, so they also
   // refuse the click. Styling alone left the handler live.

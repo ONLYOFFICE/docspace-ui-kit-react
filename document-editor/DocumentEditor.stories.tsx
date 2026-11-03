@@ -65,7 +65,6 @@ const FileSelectorWrapper = ({
           isMultiSelect={false}
           withRecentTreeFolder
           withFavoritesTreeFolder
-          withAIAgentsTreeFolder
           openRoot
           withBreadCrumbs
           withSearch

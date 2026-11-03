@@ -172,11 +172,9 @@ const AttachDialog: React.FC<AttachDialogProps> = observer((props) => {
       isMultiSelect
       withRecentTreeFolder
       withFavoritesTreeFolder
-      // The legacy chat's attach picker listed the AI agents section (files
-      // from an agent's storage are attachable) and greyed out entries the
-      // user cannot Ask AI about; both props were lost when the picker was
-      // rewritten for the chat-lib integration.
-      withAIAgentsTreeFolder
+      // The legacy chat's attach picker greyed out entries the user cannot
+      // Ask AI about; the prop was lost when the picker was rewritten for the
+      // chat-lib integration.
       disableBySecurity="AskAi"
       isRoomsOnly={false}
       isThirdParty={false}

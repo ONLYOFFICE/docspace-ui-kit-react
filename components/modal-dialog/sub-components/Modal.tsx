@@ -65,15 +65,24 @@ const Modal = ({
   // it (a field the caller focuses itself), so Tab starts in the dialog rather
   // than in the page behind it. Closed, the focus goes back to where it was --
   // as long as nothing else has taken it in between.
+  //
+  // Where it was is read before the commit that shows the dialog touches the
+  // DOM: a field with `autoFocus`, or one the content focuses in its own
+  // effect, already has the focus by the time the effect below runs, and used
+  // to pass for the opener -- so such a dialog never handed the focus back.
+  const openerRef = React.useRef<Element | null>(null);
+  React.useInsertionEffect(() => {
+    if (visible) openerRef.current = document.activeElement;
+  }, [visible]);
+
   React.useEffect(() => {
     if (!visible) return;
     const content = contentRef.current;
     if (!content) return;
 
-    const previous = document.activeElement;
-    if (content.contains(previous)) return;
-
-    content.focus({ preventScroll: true });
+    const previous = openerRef.current;
+    if (!content.contains(document.activeElement))
+      content.focus({ preventScroll: true });
 
     return () => {
       const { activeElement } = document;

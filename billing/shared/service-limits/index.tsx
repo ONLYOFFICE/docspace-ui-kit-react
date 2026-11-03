@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { observer } from "mobx-react";
 import { useNavigate } from "react-router";
 
@@ -34,34 +34,24 @@ const ServiceLimits = ({ helpUrl, onOpenContacts }: ServiceLimitsProps) => {
     saveUserLimit,
     setUserLimitEnabled,
   } = useServiceLimitStore();
-  const { balance, fetchBalance, routes, tariff } = usePaymentStore();
-  const { walletCustomerEmail, fetchCustomerInfo } = tariff;
-
-  const [isCustomerChecked, setIsCustomerChecked] = useState(false);
+  const { routes, tariff } = usePaymentStore();
+  const { walletCustomerEmail } = tariff;
 
   useEffect(() => {
     const loadLimits = async () => {
-      const requests: Promise<unknown>[] = [
-        fetchAll(),
-        fetchCustomerInfo().finally(() => setIsCustomerChecked(true)),
-      ];
-
-      if (!balance) requests.push(fetchBalance());
-
       try {
-        await Promise.all(requests);
+        await fetchAll();
       } catch (error) {
         toastr.error(error as Error);
       }
     };
 
     loadLimits();
-  }, [fetchAll]);
+  }, []);
 
   const hasCustomer = !!walletCustomerEmail;
 
-  if (!isInit || !isCustomerChecked || (hasCustomer && !balance))
-    return <ServiceLimitsLoader />;
+  if (!isInit) return <ServiceLimitsLoader />;
 
   const paymentMethodRoute = routes.paymentMethod;
 

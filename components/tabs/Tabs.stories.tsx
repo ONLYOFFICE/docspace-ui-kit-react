@@ -618,6 +618,19 @@ export const OverflowingTabs: Story = {
     if (!row) throw new Error("No primary row");
     await expect(row.scrollWidth).toBeGreaterThan(row.clientWidth);
 
+    // The scroll track along the bottom of the bar does not take the click
+    // under a label: the whole height of the tab belongs to the tab.
+    const tab = canvasElement.querySelector<HTMLElement>(
+      '[data-testid="Documents_tab"]',
+    );
+    if (!tab) throw new Error("No Documents tab");
+    const box = tab.getBoundingClientRect();
+    for (let y = box.top + 1; y < box.bottom; y += 2) {
+      await expect(
+        tab.contains(document.elementFromPoint(box.left + box.width / 2, y)),
+      ).toBe(true);
+    }
+
     // The segmented control's right arrow selects the next tab.
     const [, right] = arrowsOnScreen(canvasElement);
     right.click();

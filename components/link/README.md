@@ -217,8 +217,8 @@ set on an ancestor is overridden. Set them through the link's own `style` prop, 
 - With `type={LinkType.action}` and no `href` it is none of those things until you pass `role`,
   `tabIndex` and `onKeyDown`. This is the component's sharpest edge.
 - `aria-label` is set from `ariaLabel`, or from `children` when that is a string.
-- The hover state is an underline; nothing distinguishes focus from hover, so a focus ring of
-  your own is worth adding where a link is the only control in a row.
+- The hover state is an underline; keyboard focus gets a 2px accent ring from
+  [`Text`](../text/README.md) (`--text-focus-color`), and pointer focus none.
 
 ## Test ids
 

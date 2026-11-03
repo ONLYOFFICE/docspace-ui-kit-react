@@ -23,7 +23,6 @@ import { toastr } from "../../components/toast";
 
 import useRoomsHelper from "../utils/hooks/useRoomsHelper";
 import useSocketHelper from "../utils/hooks/useSocketHelper";
-import useAgentsHelper from "../utils/hooks/useAgentsHelper";
 
 import useFilesHelper from "./hooks/useFilesHelper";
 import useRootHelper from "./hooks/useRootHelper";
@@ -42,7 +41,12 @@ import {
 } from "../utils/contexts/Loaders";
 import { getDefaultBreadCrumb } from "../utils";
 import { applyResolvedTitles } from "./FilesSelector.utils";
-import { FORMS_ROOT_FOLDER_TYPE, FORMS_SECTION_ID } from "../utils/constants";
+import {
+  AI_HUB_ROOT_FOLDER_TYPE,
+  AI_ROOMS_SECTION_TYPES,
+  FORMS_ROOT_FOLDER_TYPE,
+  FORMS_SECTION_ID,
+} from "../utils/constants";
 
 const FilesSelectorComponent = (props: FilesSelectorProps) => {
   const {
@@ -56,12 +60,13 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     treeFolders,
     withRecentTreeFolder,
     withFavoritesTreeFolder,
-    withAIAgentsTreeFolder,
+    withAIRoomsTreeFolder = true,
     withRoomsTreeFolder = true,
     withFormsTreeFolder = true,
 
     onSetBaseFolderPath,
     roomType,
+    roomsSectionTypes,
     isUserOnly,
     isRoomsOnly,
     openRoot,
@@ -86,8 +91,6 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     createDefineRoomLabel,
     createDefineRoomType,
     disabledCreatePublicRoom,
-    onCreateAIAgent,
-    agentsEmptyDescription,
 
     shareKey,
     formProps,
@@ -205,6 +208,34 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       createDefineRoomType === RoomType.FillingFormsRoom,
   );
 
+  // The "AI rooms" section lists the Instructions and Knowledge rooms, or only
+  // those of them the host names in `roomsSectionTypes` (the copy and move
+  // targets), and is left out when it names neither. With the section shown,
+  // those rooms leave the Rooms section.
+  const aiRoomsSectionTypes = React.useMemo(
+    () =>
+      roomsSectionTypes
+        ? AI_ROOMS_SECTION_TYPES.filter((type) =>
+            roomsSectionTypes.includes(type),
+          )
+        : AI_ROOMS_SECTION_TYPES,
+    [roomsSectionTypes],
+  );
+  const withAIRooms = withAIRoomsTreeFolder && aiRoomsSectionTypes.length > 0;
+  const ordinaryRoomsSectionTypes = React.useMemo(
+    () =>
+      withAIRooms && roomsSectionTypes
+        ? roomsSectionTypes.filter(
+            (type) => !AI_ROOMS_SECTION_TYPES.some((ai) => ai === type),
+          )
+        : roomsSectionTypes,
+    [withAIRooms, roomsSectionTypes],
+  );
+
+  const [isAiRoomsSection, setIsAiRoomsSection] = React.useState(
+    () => Number(rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE,
+  );
+
   const [recentFolder, setRecentFolder] = React.useState<
     FolderDtoInteger | undefined
   >(undefined);
@@ -234,7 +265,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     setItems,
     setHasNextPage,
     setIsInit,
-    withAIAgentsTreeFolder,
+    withAIRoomsTreeFolder: withAIRooms,
     withRoomsTreeFolder,
     withFormsTreeFolder,
     setRecentFolder,
@@ -252,33 +283,6 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     searchArea = "Templates";
   }
 
-  const { getAgentList } = useAgentsHelper({
-    isInit,
-    setIsInit,
-    setBreadCrumbs,
-    setHasNextPage,
-    setTotal,
-    setItems,
-    setIsRoot,
-    onSetBaseFolderPath,
-    setSelectedItemType,
-    subscribe,
-    setSelectedItemSecurity,
-    setSelectedTreeNode,
-    searchValue,
-    withCreate: withCreateState,
-    onCreateAIAgent,
-    getRootData,
-    disableBySecurity,
-
-    recentFolder,
-    favoritesFolder,
-    withRecentTreeFolder,
-    withFavoritesTreeFolder,
-
-    withInit,
-  });
-
   const { getRoomList } = useRoomsHelper({
     setBreadCrumbs,
     setHasNextPage,
@@ -295,6 +299,9 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
     searchValue,
     roomType,
+    roomsSectionTypes: ordinaryRoomsSectionTypes,
+    aiRoomsSectionTypes:
+      withAIRooms && isAiRoomsSection ? aiRoomsSectionTypes : undefined,
     formsSection: withFormsTreeFolder ? isFormsSection : undefined,
     isRoomsOnly,
     isInit,
@@ -422,12 +429,14 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
           setActiveSpecialScope(specialScope ?? null);
           if (specialScope) {
             setIsFormsSection(false);
+            setIsAiRoomsSection(false);
             setSelectedItemType("files");
-          } else if (item.isAgent) {
-            setSelectedItemType("agents");
           } else if (item.isRoom) {
             setIsFormsSection(
               Number(item.rootFolderType) === FORMS_ROOT_FOLDER_TYPE,
+            );
+            setIsAiRoomsSection(
+              Number(item.rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE,
             );
             setSelectedItemType("rooms");
           } else {
@@ -488,6 +497,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
           setSelectedFileInfo(null);
           setSelectedItemType("files");
           setIsFormsSection(false);
+          setIsAiRoomsSection(false);
           return;
         }
 
@@ -495,9 +505,6 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
         if (isFormRoom && formProps?.isRoomFormAccessible === false)
           return toastr.warning(formProps.message);
-
-        const isAgent =
-          item.parentId === 0 && item.rootFolderType === FolderType.AiAgents;
 
         navigatingRef.current = true;
 
@@ -510,11 +517,10 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
             label: item.label,
             id: item.id,
             isRoom:
-              !isAgent &&
               item.parentId === 0 &&
               (item.rootFolderType === FolderType.VirtualRooms ||
-                Number(item.rootFolderType) === FORMS_ROOT_FOLDER_TYPE),
-            isAgent: isAgent,
+                Number(item.rootFolderType) === FORMS_ROOT_FOLDER_TYPE ||
+                Number(item.rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE),
             roomType: item.roomType,
             shared: item.shared,
             rootFolderType: item.rootFolderType,
@@ -529,14 +535,15 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
           item.parentId === 0 &&
           (item.rootFolderType === FolderType.VirtualRooms ||
             Number(item.rootFolderType) === FORMS_ROOT_FOLDER_TYPE ||
-            item.rootFolderType === FolderType.AiAgents)
+            Number(item.rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE)
         ) {
           setIsFormsSection(
             Number(item.rootFolderType) === FORMS_ROOT_FOLDER_TYPE,
           );
-          setSelectedItemType(
-            item.rootFolderType === FolderType.AiAgents ? "agents" : "rooms",
+          setIsAiRoomsSection(
+            Number(item.rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE,
           );
+          setSelectedItemType("rooms");
         } else {
           setSelectedItemType("files");
         }
@@ -772,11 +779,6 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       return;
     }
 
-    if (selectedItemType === "agents") {
-      getAgentList(0);
-      return;
-    }
-
     if (selectedItemType === "rooms") {
       getRoomList(0);
       return;
@@ -795,7 +797,6 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     if (selectedItemType === "files" && (selectedItemId || isUserOnly))
       getFileList(0);
   }, [
-    getAgentList,
     getFileList,
     getRoomList,
     selectedItemType,
@@ -865,11 +866,9 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
 
     loadNextPage: isRoot
       ? async () => {}
-      : selectedItemType === "agents"
-        ? getAgentList
-        : selectedItemType === "rooms"
-          ? getRoomList
-          : getFileList,
+      : selectedItemType === "rooms"
+        ? getRoomList
+        : getFileList,
 
     items: displayItems,
     onSelect: onSelectAction,
@@ -880,7 +879,6 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     isRoot,
 
     selectedItemType,
-    agentsEmptyDescription,
   });
 
   const selectorComponent = embedded ? (

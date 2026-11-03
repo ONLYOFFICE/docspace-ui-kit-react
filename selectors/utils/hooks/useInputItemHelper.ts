@@ -1,6 +1,8 @@
 import React from "react";
 
-import type { RoomType } from "@onlyoffice/docspace-api-sdk";
+import type { RoomType as SdkRoomType } from "@onlyoffice/docspace-api-sdk";
+
+import type { TRoomTypeValue as RoomType } from "../../../types";
 
 import { useApi } from "../../../providers/api/ApiProvider";
 import type { TSelectorItem } from "../../../components/selector";
@@ -40,15 +42,13 @@ const useInputItemHelper = ({
   }, [setItems, withCreate]);
 
   const onAcceptInput = React.useCallback(
-    async (value: string, roomType?: RoomType, isAgent?: boolean) => {
+    async (value: string, roomType?: RoomType) => {
       const currentSelectedItemId = selectedItemIdRef.current;
-      if (!withCreate || (!currentSelectedItemId && !roomType && !isAgent))
-        return;
+      if (!withCreate || (!currentSelectedItemId && !roomType)) return;
 
       let createdItem: TSelectorItem | undefined;
 
       try {
-        // if (isAgent) await createAIAgent({ title: value });
         // NOTE: currentSelectedItemId can be string but types cannot be fixed right now, using type assertion
         if (currentSelectedItemId) {
           const res = await foldersApi.createFolder({
@@ -63,7 +63,11 @@ const useInputItemHelper = ({
           if (created) [createdItem] = convertFoldersToItems([created], []);
         } else if (roomType) {
           const res = await roomsApi.createRoom({
-            createRoomRequestDto: { roomType, title: value },
+            // The server takes every room type; only the SDK enum lags.
+            createRoomRequestDto: {
+              roomType: roomType as SdkRoomType,
+              title: value,
+            },
           });
 
           const created = res.data?.response;
@@ -109,7 +113,6 @@ const useInputItemHelper = ({
       icon: string | React.ReactElement,
       roomType?: RoomType,
       placeholder?: string,
-      isAgent?: boolean,
     ) => {
       if (!withCreate || !setItems) return;
 
@@ -117,8 +120,7 @@ const useInputItemHelper = ({
         label: "",
         id: "new-folder-input",
         isInputItem: true,
-        onAcceptInput: (value: string) =>
-          onAcceptInput(value, roomType, isAgent),
+        onAcceptInput: (value: string) => onAcceptInput(value, roomType),
         onCancelInput,
         defaultInputValue,
         icon,

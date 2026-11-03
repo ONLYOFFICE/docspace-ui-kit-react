@@ -167,9 +167,6 @@ const meta = {
     tabIndex: {
       control: "number",
       description: "HTML `tabindex` of the text field",
-      table: {
-        defaultValue: { summary: "-1" },
-      },
     },
     forwardedRef: {
       control: false,

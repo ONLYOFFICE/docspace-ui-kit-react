@@ -41,7 +41,7 @@ export interface SelectedItemProps {
   dataTestId?: string;
   /** Glyph before the label: an SVG URL, or a component rendered with no props. */
   icon?: string | React.FC<React.SVGProps<SVGSVGElement>>;
-  /** Ignored. Nothing reads this prop; passing `onClick` is what makes the chip clickable. */
+  /** Makes the chip a button to the keyboard: focusable, `role="button"`, `aria-pressed` from `isActive`, and Enter / Space clicking it. The pointer needs only `onClick`. */
   clickable?: boolean;
   /** Whether the chip is drawn in its selected colours. */
   isActive?: boolean;

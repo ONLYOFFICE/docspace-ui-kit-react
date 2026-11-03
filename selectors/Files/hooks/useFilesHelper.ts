@@ -1,7 +1,6 @@
 import React, { use } from "react";
 import {
   FolderType,
-  RoomType,
   type FolderDtoInteger,
   type FileDtoInteger,
   type FolderContentDtoInteger,
@@ -354,10 +353,6 @@ const useFilesHelper = ({
                 isRoom:
                   roomsFolderId === id ||
                   (index === 0 && typeof nextItem?.roomType !== "undefined"),
-                isAgent:
-                  index === 0 &&
-                  typeof nextItem?.roomType !== "undefined" &&
-                  nextItem.roomType === RoomType.AiRoom,
                 roomType,
                 rootFolderType: current!.rootFolderType,
               };

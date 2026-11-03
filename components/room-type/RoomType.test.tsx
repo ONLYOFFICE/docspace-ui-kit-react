@@ -194,6 +194,24 @@ describe("<RoomType />", () => {
       expect(onClick).not.toHaveBeenCalled();
     });
 
+    it("disables any room type with isDisabled", () => {
+      const onClick = vi.fn();
+      render(
+        <RoomType
+          {...baseProps}
+          roomType={RoomsType.KnowledgeRoom}
+          isDisabled
+          onClick={onClick}
+        />,
+      );
+
+      const root = screen.getByTestId("room-type-list-item");
+      fireEvent.click(root);
+
+      expect(onClick).not.toHaveBeenCalled();
+      expect(root).toHaveAttribute("aria-disabled", "true");
+    });
+
     it("does not disable a room type the flag does not apply to", () => {
       const onClick = vi.fn();
       render(

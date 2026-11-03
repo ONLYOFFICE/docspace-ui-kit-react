@@ -5,7 +5,12 @@ import type {
   TGetTooltipContent,
 } from "../tooltip";
 
-export type HelpButtonProps = Omit<IconButtonProps, "tooltipContent"> & {
+// `role` and `ariaLabel` stay out: the info icon is rendered with props of its
+// own choosing, so they would never reach it.
+export type HelpButtonProps = Omit<
+  IconButtonProps,
+  "tooltipContent" | "role" | "ariaLabel"
+> & {
   /**
    * Anchor to use instead of the info icon. The whole element becomes the
    * thing the tooltip opens from.
