@@ -14,9 +14,9 @@
  *   shrinking the columns on the side the pointer moves to, nearest first, each
  *   down to its minimum, while the column on the other side grows;
  * - a hidden column hands its width to its left neighbour;
- * - a shown column takes 60 % of the flexible area divided by the number of
- *   flexible columns, from the widest one, or the layout resets when that
- *   breaks a minimum;
+ * - a shown column takes the flexible area divided by the number of flexible
+ *   columns, from the widest one, or the layout resets when that breaks a
+ *   minimum;
  * - when the minimums no longer fit, only `fill` and `fixed` columns render.
  */
 
@@ -349,11 +349,11 @@ export const hideColumn = (
  * Shares once `columnId` is shown. `columnsAfter` lists the visible columns
  * with it; `fractions` are those of the columns before it appeared.
  *
- * A flexible column gets 60 % of the flexible area divided by the number of
- * flexible columns, itself included (the spec's 807 px and four columns give
- * 121 px); a `fixed` one gets its size. Either way the width comes from the
- * widest flexible column. If that leaves any column below its minimum, the
- * layout resets to the defaults instead.
+ * A flexible column gets the flexible area divided by the number of flexible
+ * columns, itself included (the spec's 807 px and four columns give 202 px); a
+ * `fixed` one gets its size. Either way the width comes from the widest
+ * flexible column. If that leaves any column below its minimum, the layout
+ * resets to the defaults instead.
  *
  * While the layout is compact the same rule runs on the shares, without the
  * minimum check, which only means something at a width where they fit. Before
@@ -373,10 +373,7 @@ export const showColumn = (
   const area = getFlexibleArea(columnsAfter, containerWidth);
   if (area <= 0) return reset();
 
-  const flexibleAfter = columnsAfter.filter(isFlexible);
-  const share =
-    (flexibleAfter.some(isFill) ? 1 - DATA_TABLE_FILL_SHARE : 1) /
-    flexibleAfter.length;
+  const share = 1 / columnsAfter.filter(isFlexible).length;
 
   if (isCompact(columnsAfter, containerWidth)) {
     if (!isFlexible(column)) return normalize(columnsAfter, fractions);

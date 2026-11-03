@@ -598,8 +598,8 @@ export function FilesTable({
   resize keeps the proportions without any script running.
 - A column with `visible: false` renders nothing, in the header or the rows. When a visible
   column is hidden its share goes to the flexible column on its left; when one appears it takes
-  60 % of the flexible space divided by the number of flexible columns from the widest column, or
-  the layout resets to 40/60 if that would break a minimum.
+  the flexible space divided by the number of flexible columns, itself included, from the widest
+  column, or the layout resets to 40/60 if that would break a minimum.
 - Widths are stored as shares by column id, `{ "v": 2, "widths": { "<id>": <share> } }`. A
   record of another table, of the old `Table` (a pixel string) or one that cannot be parsed reads
   as nothing stored. Storage that is blocked, full or absent is ignored.
