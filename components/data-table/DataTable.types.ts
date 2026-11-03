@@ -62,6 +62,8 @@ export type DataTableColumn<T> = {
   headerRef?: React.Ref<HTMLDivElement>;
   /** Applied to every cell of the column. */
   cellClassName?: string;
+  /** Value of `data-testid` on the column's cell in a row. */
+  cellTestId?: (row: T, index: number) => string;
   /** Applied to the column's header cell. */
   headerClassName?: string;
   /**
@@ -268,6 +270,8 @@ export interface DataTableProps<T> {
   headerClassName?: string;
   /** Value of `data-testid` on the table element. */
   testId?: string;
+  /** Value of `data-testid` on the element that holds the rows. */
+  bodyTestId?: string;
   /** Ref of the table element. */
   ref?: React.Ref<HTMLDivElement>;
 }

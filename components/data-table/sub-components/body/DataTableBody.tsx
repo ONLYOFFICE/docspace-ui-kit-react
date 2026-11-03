@@ -43,6 +43,7 @@ type DataTableBodyProps<T> = {
   loadMore?: DataTableLoadMore;
   rowHeight: number;
   apiRef?: React.Ref<DataTableApi>;
+  testId: string;
 };
 
 type Align = "start" | "center" | "end" | "auto";
@@ -89,6 +90,7 @@ export const DataTableBody = <T,>({
   loadMore,
   rowHeight,
   apiRef,
+  testId,
 }: DataTableBodyProps<T>) => {
   const bodyRef = useRef<HTMLDivElement | null>(null);
   const tailRef = useRef<HTMLDivElement | null>(null);
@@ -173,7 +175,7 @@ export const DataTableBody = <T,>({
       role="rowgroup"
       aria-busy={loading || undefined}
       className={classNames(styles.body, "table-container_body")}
-      data-testid="data-table-body"
+      data-testid={testId}
     >
       {virtualize ? (
         // The client's selection area, hotkeys and the data room's index

@@ -1,5 +1,5 @@
 import { createRef } from "react";
-import { render, screen, within } from "@testing-library/react";
+import { act, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
@@ -337,6 +337,73 @@ describe("DataTable", () => {
       within(row)
         .getAllByRole("cell")
         .forEach((cell) => expect(cell).toHaveClass("table-container_cell"));
+    });
+
+    it("gives the body and a column's cells the test ids asked for", () => {
+      renderTable({
+        bodyTestId: "table-body",
+        columns: makeColumns({
+          Name: { cellTestId: (row, index) => `name-${index}-${row.id}` },
+        }),
+      });
+
+      const body = screen.getByTestId("table-body");
+      expect(within(body).getByTestId("name-1-2")).toHaveTextContent(
+        "Budget.xlsx",
+      );
+      // A column without one has no test id on its cells.
+      expect(
+        within(screen.getAllByTestId("data-table-row")[0])
+          .getAllByRole("cell")
+          .filter((cell) => cell.hasAttribute("data-testid")),
+      ).toHaveLength(1);
+    });
+
+    it("calls its body data-table-body by default", () => {
+      renderTable();
+
+      expect(screen.getByTestId("data-table-body")).toHaveAttribute(
+        "role",
+        "rowgroup",
+      );
+    });
+  });
+
+  describe("the header line", () => {
+    it("is marked stuck once rows scroll under the sticky header", () => {
+      vi.spyOn(window, "requestAnimationFrame").mockImplementation((cb) => {
+        cb(0);
+        return 0;
+      });
+      let offsetTop = 0;
+      vi.spyOn(HTMLElement.prototype, "offsetTop", "get").mockImplementation(
+        () => offsetTop,
+      );
+      render(
+        <div data-testid="scroller" style={{ overflowY: "auto" }}>
+          <DataTable
+            columns={makeColumns()}
+            rows={FILES}
+            getRowKey={(row) => row.id}
+          />
+        </div>,
+      );
+      const header = screen.getByTestId("data-table-header");
+      const scroller = screen.getByTestId("scroller");
+      expect(header).not.toHaveClass("isStuck");
+
+      offsetTop = 120;
+      act(() => {
+        scroller.dispatchEvent(new Event("scroll"));
+      });
+      expect(header).toHaveClass("isStuck");
+
+      offsetTop = 0;
+      act(() => {
+        scroller.dispatchEvent(new Event("scroll"));
+      });
+      expect(header).not.toHaveClass("isStuck");
+      vi.restoreAllMocks();
     });
   });
 });

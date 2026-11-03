@@ -1,3 +1,4 @@
+import type React from "react";
 import classNames from "classnames";
 
 import type {
@@ -28,8 +29,11 @@ type DataTableHeaderProps<T> = {
   onSortChange?: (sortKey: string) => void;
   compact: boolean;
   resize?: HeaderResize;
+  /** Whether rows are scrolling under the header. */
+  stuck: boolean;
   id?: string;
   className?: string;
+  ref?: React.Ref<HTMLDivElement>;
 };
 
 export const DataTableHeader = <T,>({
@@ -38,16 +42,26 @@ export const DataTableHeader = <T,>({
   onSortChange,
   compact,
   resize,
+  stuck,
   id,
   className,
+  ref,
 }: DataTableHeaderProps<T>) => {
   const context: DataTableHeaderContext = { sort, compact };
 
   return (
     <div
+      ref={ref}
       id={id}
       role="rowgroup"
-      className={classNames(styles.header, "table-container_header", className)}
+      className={classNames(
+        styles.header,
+        "table-container_header",
+        className,
+        {
+          [styles.isStuck]: stuck,
+        },
+      )}
       data-testid="data-table-header"
     >
       <div role="row" className={styles.headerRow}>

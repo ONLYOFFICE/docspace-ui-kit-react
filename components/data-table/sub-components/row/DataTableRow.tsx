@@ -112,6 +112,7 @@ const DataTableRowPure = <T,>({
               : ({ value: cellProps.value } as object))}
             data-document-title={cellProps?.documentTitle}
             data-column-id={column.id}
+            data-testid={column.cellTestId?.(row, index)}
           >
             {column.cell(row, {
               index,

@@ -10,6 +10,7 @@ import {
 import type { DataTableProps, DataTableVirtualize } from "./DataTable.types";
 import { useColumnLayout } from "./hooks/useColumnLayout";
 import { useColumnResize } from "./hooks/useColumnResize";
+import { useStuckHeader } from "./hooks/useStuckHeader";
 import {
   type LayoutColumn,
   hasResizeHandle,
@@ -52,6 +53,7 @@ export const DataTable = <T,>({
   headerId,
   headerClassName,
   testId = "data-table",
+  bodyTestId = "data-table-body",
   ref,
 }: DataTableProps<T>) => {
   const visibleColumns = useMemo(
@@ -136,6 +138,9 @@ export const DataTable = <T,>({
     virtualize === false ? null : virtualize === true ? NO_OPTIONS : virtualize;
   const virtualized = virtualOptions !== null;
 
+  const headerRef = useRef<HTMLDivElement | null>(null);
+  const headerStuck = useStuckHeader(headerRef, virtualOptions?.scrollElement);
+
   const context = useMemo<DataTableContextValue>(
     () => ({
       columns: columns as DataTableContextValue["columns"],
@@ -183,8 +188,10 @@ export const DataTable = <T,>({
           onSortChange={onSortChange}
           compact={compact}
           resize={resize}
+          stuck={headerStuck}
           id={headerId}
           className={headerClassName}
+          ref={headerRef}
         />
         <DataTableBody
           rows={rows}
@@ -195,6 +202,7 @@ export const DataTable = <T,>({
           loadMore={loadMore}
           rowHeight={rowHeight}
           apiRef={apiRef}
+          testId={bodyTestId}
         />
       </div>
     </DataTableContext>
