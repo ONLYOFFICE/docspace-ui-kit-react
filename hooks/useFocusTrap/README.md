@@ -36,7 +36,8 @@ in document order.
 ## Behaviour
 
 - From the last stop Tab goes to the first; from the first Shift+Tab goes to
-  the last. In between the order is document order.
+  the last. In between the order is the browser's: stops with a positive
+  tabIndex first, lowest first, then the rest, each in document order.
 - The key is handled on the document, so a container that opened without
   taking the focus still owns the next Tab: it lands on its first stop (or its
   last, for Shift+Tab) instead of moving on through the page behind it.

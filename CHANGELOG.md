@@ -20,7 +20,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`ModalDialog` and `Aside` keep the keyboard focus inside while open.** The new
   `useFocusTrap` hook (`hooks/useFocusTrap`) takes Tab and Shift+Tab on the document while the
   container is open: the last stop wraps to the first and back, and the page behind is out of
-  reach; of nested traps only the top one acts. `Aside`'s `<aside>` carries `tabIndex={-1}`, so
+  reach; of nested traps only the top one acts. Between the ends the focus moves in the browser's
+  own order, positive tabIndex values first, so a dialog that sets them keeps its order. `Aside`'s `<aside>` carries `tabIndex={-1}`, so
   a panel with nothing to tab to holds the focus itself. A consumer that relied on tabbing out of
   an open dialog or panel no longer can
 - **`Filter`'s tags are keyboard buttons.** A value tag is `role="button"` with `aria-pressed`,

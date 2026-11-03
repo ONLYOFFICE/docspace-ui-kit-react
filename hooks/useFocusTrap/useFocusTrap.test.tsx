@@ -75,6 +75,50 @@ describe("useFocusTrap", () => {
     expect(screen.getByText("Create")).toHaveFocus();
   });
 
+  // The browser's own order: positive tabIndex values first, lowest first,
+  // then the rest. A dialog whose email field, Cancel and Send are 1, 2 and
+  // 3 - with Send first in the DOM - went email, Send, Cancel once trapped.
+  it("moves through positive tabIndex values in the browser's order", () => {
+    render(
+      <>
+        <button type="button">Behind</button>
+        <Trap label="Dialog">
+          <button type="button">Close</button>
+          <input aria-label="Email" tabIndex={1} />
+          <button type="button" tabIndex={3}>
+            Send
+          </button>
+          <button type="button" tabIndex={2}>
+            Cancel
+          </button>
+        </Trap>
+      </>,
+    );
+
+    const order = ["Email", "Cancel", "Send", "Close"];
+    const focused = () => {
+      const el = document.activeElement;
+      return el?.getAttribute("aria-label") || el?.textContent;
+    };
+
+    screen.getByLabelText("Email").focus();
+    for (const name of [...order.slice(1), order[0]]) {
+      tab();
+      expect(focused()).toBe(name);
+    }
+    for (const name of [...order].reverse()) {
+      tab(true);
+      expect(focused()).toBe(name);
+    }
+
+    screen.getByText("Behind").focus();
+    tab();
+    expect(focused()).toBe("Email");
+    screen.getByText("Behind").focus();
+    tab(true);
+    expect(focused()).toBe("Close");
+  });
+
   it("brings the focus in from the page behind", () => {
     render(
       <>

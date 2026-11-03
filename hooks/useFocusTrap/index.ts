@@ -71,6 +71,35 @@ const getTopTrap = () => {
   return top;
 };
 
+// The browser's Tab order: positive tabIndex values first, lowest first, then
+// the rest, each in document order (the sort is stable).
+const inTabOrder = (stops: HTMLElement[]) => [
+  ...stops
+    .filter((stop) => stop.tabIndex > 0)
+    .sort((a, b) => a.tabIndex - b.tabIndex),
+  ...stops.filter((stop) => stop.tabIndex === 0),
+];
+
+// Where Tab (Shift+Tab when `back`) goes from `from`; undefined past an end.
+// From a stop, the next one in Tab order. From an element that is no stop of
+// its own (the container, say), the nearest stop past it in document order.
+const stopBeside = (
+  from: HTMLElement,
+  stops: HTMLElement[],
+  ordered: HTMLElement[],
+  back: boolean,
+) => {
+  const index = ordered.indexOf(from);
+  if (index !== -1) return ordered[index + (back ? -1 : 1)];
+
+  const side = back
+    ? Node.DOCUMENT_POSITION_PRECEDING
+    : Node.DOCUMENT_POSITION_FOLLOWING;
+  const isPast = (stop: HTMLElement) =>
+    !!(from.compareDocumentPosition(stop) & side);
+  return back ? stops.findLast(isPast) : stops.find(isPast);
+};
+
 const onDocumentKeyDown = (e: KeyboardEvent) => {
   if (e.key !== "Tab" || e.defaultPrevented) return;
   if (e.altKey || e.ctrlKey || e.metaKey) return;
@@ -91,34 +120,18 @@ const onDocumentKeyDown = (e: KeyboardEvent) => {
     return;
   }
 
-  // From the focus when it is inside the trap; from the trap itself when it
-  // is still behind it (a panel that opened without taking the focus), so the
-  // first Tab lands on the first stop and Shift+Tab on the last.
-  const from =
+  const ordered = inTabOrder(stops);
+  const back = e.shiftKey;
+
+  // With the focus still behind the trap (a panel that opened without taking
+  // it) there is nothing to go on from: the first Tab lands on the first stop
+  // and Shift+Tab on the last, as past either end.
+  const next =
     activeElement instanceof HTMLElement && root.contains(activeElement)
-      ? activeElement
-      : root;
+      ? stopBeside(activeElement, stops, ordered, back)
+      : undefined;
 
-  // The next stop after the focus in document order, not the next item of
-  // the list: the focus may sit on the container or on an element that is no
-  // stop of its own.
-  const next = e.shiftKey
-    ? stops.findLast(
-        (stop) =>
-          !!(
-            from.compareDocumentPosition(stop) &
-            Node.DOCUMENT_POSITION_PRECEDING
-          ),
-      )
-    : stops.find(
-        (stop) =>
-          !!(
-            from.compareDocumentPosition(stop) &
-            Node.DOCUMENT_POSITION_FOLLOWING
-          ),
-      );
-
-  (next ?? (e.shiftKey ? stops[stops.length - 1] : stops[0])).focus();
+  (next ?? (back ? ordered[ordered.length - 1] : ordered[0])).focus();
 };
 
 /**
