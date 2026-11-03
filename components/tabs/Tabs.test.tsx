@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { screen, render, fireEvent, act } from "@testing-library/react";
+import {
+  screen,
+  render,
+  fireEvent,
+  act,
+  waitFor,
+} from "@testing-library/react";
 
 import { Tabs } from ".";
 import { TabsTypes } from "./Tabs.enums";
@@ -332,7 +338,7 @@ describe("Tabs", () => {
       fireEvent.click(tab);
 
       expect(onClickMock).toHaveBeenCalled();
-      await vi.waitFor(() => {
+      await waitFor(() => {
         expect(dispatchSpy).toHaveBeenCalledWith(
           expect.objectContaining({ type: AnimationEvents.END_ANIMATION }),
         );
@@ -516,7 +522,7 @@ describe("Tabs", () => {
       expect(arrowRight).toBeInTheDocument();
       // The arrow selects the next tab the way a click on it does, the
       // tab's own onClick included.
-      (arrowRight as HTMLElement).click();
+      act(() => (arrowRight as HTMLElement).click());
       expect(onSelectMock).toHaveBeenCalledWith(items[1]);
       expect(onTab2Click).toHaveBeenCalledTimes(1);
 
@@ -650,7 +656,7 @@ describe("Tabs", () => {
       );
 
       const tab2 = screen.getByTestId("tab1_subtab");
-      tab2.click();
+      act(() => tab2.click());
 
       expect(onSelectMock).toHaveBeenCalledWith(arrayItems[1]);
     });
@@ -724,7 +730,7 @@ describe("Tabs", () => {
 
       const arrowLeft = container.querySelector(`.${styles.arrowLeft}`);
       if (arrowLeft) {
-        (arrowLeft as HTMLElement).click();
+        act(() => (arrowLeft as HTMLElement).click());
         expect(onSelectMock).toHaveBeenCalledWith(arrayItems[0]);
       }
 

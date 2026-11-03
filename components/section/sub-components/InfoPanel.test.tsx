@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { screen, render, fireEvent } from "@testing-library/react";
+import { screen, render, fireEvent, waitFor } from "@testing-library/react";
 
 import { DeviceType } from "../../../enums";
 
@@ -209,22 +209,22 @@ describe("InfoPanel resizer", () => {
     const onShownWidthChange = vi.fn();
     render(panel({ width: 700, onResize, onShownWidthChange }));
 
-    await vi.waitFor(() => expect(panelWidth()).toBe("584px"));
-    await vi.waitFor(() =>
+    await waitFor(() => expect(panelWidth()).toBe("584px"));
+    await waitFor(() =>
       expect(onShownWidthChange).toHaveBeenLastCalledWith(584),
     );
 
     vi.restoreAllMocks();
     mockLayout(100, 584);
     fireEvent(window, new Event("resize"));
-    await vi.waitFor(() => expect(panelWidth()).toBe("400px"));
+    await waitFor(() => expect(panelWidth()).toBe("400px"));
 
     vi.restoreAllMocks();
     mockLayout(1000, 400);
     fireEvent(window, new Event("resize"));
-    await vi.waitFor(() => expect(panelWidth()).toBe("700px"));
+    await waitFor(() => expect(panelWidth()).toBe("700px"));
 
-    await vi.waitFor(() =>
+    await waitFor(() =>
       expect(onShownWidthChange).toHaveBeenLastCalledWith(700),
     );
     expect(onResize).not.toHaveBeenCalled();
@@ -241,7 +241,7 @@ describe("InfoPanel resizer", () => {
 
     rerender(panel({ width: 700, onShownWidthChange }));
 
-    await vi.waitFor(() =>
+    await waitFor(() =>
       expect(onShownWidthChange).toHaveBeenLastCalledWith(584),
     );
   });
@@ -298,7 +298,7 @@ describe("InfoPanel resizer", () => {
     const width = (el: HTMLElement) =>
       el.style.getPropertyValue("--info-panel-width");
 
-    await vi.waitFor(() => expect(width(firstPanel)).toBe("434px"));
+    await waitFor(() => expect(width(firstPanel)).toBe("434px"));
     expect(width(secondPanel)).toBe("500px");
     expect(first).not.toHaveBeenCalled();
     expect(second).not.toHaveBeenCalled();

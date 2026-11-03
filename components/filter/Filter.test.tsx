@@ -1,6 +1,13 @@
 import React from "react";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { act, render, screen, cleanup, within } from "@testing-library/react";
+import {
+  act,
+  render,
+  screen,
+  cleanup,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { DeviceType, FilterGroups } from "../../enums";
@@ -135,12 +142,12 @@ describe("Filter Component", () => {
       ) as HTMLInputElement;
 
       await user.type(field, "budget");
-      await vi.waitFor(() => expect(onSearch).toHaveBeenCalledWith("budget"), {
+      await waitFor(() => expect(onSearch).toHaveBeenCalledWith("budget"), {
         timeout: 3000,
       });
       // The user clears the field before the host has applied "budget".
       await user.clear(field);
-      await vi.waitFor(() => expect(onSearch).toHaveBeenLastCalledWith(""), {
+      await waitFor(() => expect(onSearch).toHaveBeenLastCalledWith(""), {
         timeout: 3000,
       });
 
@@ -154,7 +161,9 @@ describe("Filter Component", () => {
       );
       // ...which must not come back into the field, nor be searched again.
       expect(field.value).toBe("");
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      // The debounce would fire within this wait; inside act, so its update is
+      // not reported as one that escaped the test.
+      await act(() => new Promise((resolve) => setTimeout(resolve, 1200)));
       expect(onSearch).toHaveBeenLastCalledWith("");
 
       // A new identity returning the same value brings nothing new either.

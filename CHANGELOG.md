@@ -204,6 +204,12 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **Secondary `Tabs` in a row too narrow for one tab between the arrows keep their width.** No
+  tab fit between the two arrows, the tab size was divided by that zero, and every tab got an
+  `Infinity` width the browser dropped. The tabs now keep the width they were measured at.
+- **No i18next advertisement in the console.** i18next 25 printed a notice for its hosted
+  service when the kit's translation instance initialised, in every app that loads the kit;
+  the instance now sets `showSupportNotice: false`.
 - **An AI project opens on its own model, not on the default.** `AiChatStoresBridge` looked the
   project's model up among the assigned profiles only (`init`); a model outside them missed and
   the chat fell back to the default. It now waits for the whole list (`ensureProfiles`) first.

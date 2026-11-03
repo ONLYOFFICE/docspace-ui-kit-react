@@ -1,6 +1,12 @@
 import React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { screen, render, fireEvent } from "@testing-library/react";
+import {
+  act,
+  screen,
+  render,
+  fireEvent,
+  waitFor,
+} from "@testing-library/react";
 
 import { DeviceType } from "../../../enums";
 
@@ -24,10 +30,15 @@ const mockLayout = (sectionWidth = 1000, panelWidth = 400) => {
     });
 };
 
+// Inside act: the panel clamps itself in these frames, and a state update
+// made outside act is reported as one that escaped the test.
 const nextFrames = () =>
-  new Promise((resolve) => {
-    requestAnimationFrame(() => requestAnimationFrame(() => resolve(null)));
-  });
+  act(
+    () =>
+      new Promise((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve(null)));
+      }),
+  );
 
 const renderPanel = (props: Record<string, unknown> = {}) =>
   render(
@@ -177,10 +188,10 @@ describe("ChatPanel resizer", () => {
     renderPanel({ width: 900, onResize, onShownWidthChange });
     const panel = document.getElementById("ChatPanelWrapper");
 
-    await vi.waitFor(() =>
+    await waitFor(() =>
       expect(panel?.style.getPropertyValue("--chat-panel-width")).toBe("784px"),
     );
-    await vi.waitFor(() =>
+    await waitFor(() =>
       expect(onShownWidthChange).toHaveBeenLastCalledWith(784),
     );
     expect(onResize).not.toHaveBeenCalled();
@@ -192,7 +203,7 @@ describe("ChatPanel resizer", () => {
     renderPanel({ width: 400 });
     const panel = document.getElementById("ChatPanelWrapper");
 
-    await vi.waitFor(() =>
+    await waitFor(() =>
       expect(panel?.style.getPropertyValue("--chat-panel-width")).toBe("360px"),
     );
   });

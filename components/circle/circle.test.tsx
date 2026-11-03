@@ -1,40 +1,57 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("react-content-loader", () => ({
-  default: ({
-    children,
-    title,
-    width,
-    height,
-    className,
-    style,
-    uniqueKey,
-    ...rest
-  }: {
-    children?: React.ReactNode;
-    title?: string;
-    width?: string;
-    height?: string;
-    className?: string;
-    style?: React.CSSProperties;
-    uniqueKey?: string;
-    [key: string]: unknown;
-  }) => (
-    <svg
-      data-testid="circle-skeleton"
-      data-unique-key={uniqueKey}
-      width={width}
-      height={height}
-      className={className}
-      style={style}
-      {...rest}
-    >
-      {title && <title>{title}</title>}
-      {children}
-    </svg>
-  ),
-}));
+vi.mock("react-content-loader", () => {
+  // react-content-loader's own props. The real component consumes them; the
+  // stand-in drops them rather than handing them to an <svg>, where React
+  // rejects them as unknown DOM attributes. uniqueKey is kept, as a data
+  // attribute, because the tests below check it.
+  const LOADER_ONLY = new Set([
+    "backgroundColor",
+    "foregroundColor",
+    "backgroundOpacity",
+    "foregroundOpacity",
+    "speed",
+    "animate",
+  ]);
+
+  return {
+    default: ({
+      children,
+      title,
+      width,
+      height,
+      className,
+      style,
+      uniqueKey,
+      ...rest
+    }: {
+      children?: React.ReactNode;
+      title?: string;
+      width?: string;
+      height?: string;
+      className?: string;
+      style?: React.CSSProperties;
+      uniqueKey?: string;
+      [key: string]: unknown;
+    }) => (
+      <svg
+        data-testid="circle-skeleton"
+        data-unique-key={uniqueKey}
+        width={width}
+        height={height}
+        className={className}
+        style={style}
+        {...Object.fromEntries(
+          Object.entries(rest).filter(([name]) => !LOADER_ONLY.has(name)),
+        )}
+      >
+        {title && <title>{title}</title>}
+        {children}
+      </svg>
+    ),
+  };
+});
 
 import { CircleSkeleton } from ".";
 

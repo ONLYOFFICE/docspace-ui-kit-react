@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Selector } from "./Selector";
@@ -233,13 +233,15 @@ describe("<Selector /> selection limit", () => {
 });
 
 describe("<Selector /> Enter", () => {
-  it("submits the selector", () => {
+  it("submits the selector", async () => {
     const onSubmit = vi.fn();
     renderSelector({ onSubmit });
 
     fireEvent.keyUp(window, { key: "Enter" });
 
     expect(onSubmit).toHaveBeenCalledOnce();
+    // Submitting settles the selector's state once onSubmit has returned.
+    await act(async () => {});
   });
 
   it("does not submit while the submit button is disabled", () => {
@@ -270,7 +272,7 @@ describe("<Selector /> Enter", () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
-  it("submits once from the focused submit button", () => {
+  it("submits once from the focused submit button", async () => {
     const onSubmit = vi.fn();
     renderSelector({ onSubmit });
 
@@ -280,6 +282,8 @@ describe("<Selector /> Enter", () => {
     fireEvent.keyUp(button, { key: "Enter" });
 
     expect(onSubmit).toHaveBeenCalledOnce();
+    // Submitting settles the selector's state once onSubmit has returned.
+    await act(async () => {});
   });
 
   it("does not submit under a dialog opened from it", () => {
