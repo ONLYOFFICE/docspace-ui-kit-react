@@ -405,6 +405,17 @@ describe("<Selector /> keyboard", () => {
       expect(onAcceptInput).toHaveBeenCalledOnce();
     });
 
+    // Enter also confirms text an input method (Chinese, Japanese, Korean)
+    // was composing: that one is the composition's, not the name's.
+    it("leaves an Enter that ends an input method composition alone", () => {
+      const onAcceptInput = vi.fn();
+      withInput(onAcceptInput);
+
+      fireEvent.keyDown(window, { key: "Enter", isComposing: true });
+
+      expect(onAcceptInput).not.toHaveBeenCalled();
+    });
+
     // The field accepts on any Enter on the page; one pressed on cancel is
     // cancel's own.
     it("cancels, not accepts, on Enter pressed on cancel", () => {

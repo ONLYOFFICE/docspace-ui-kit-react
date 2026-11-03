@@ -79,6 +79,8 @@ const InputItem = ({
     // The key is the row's: its keyup would close the dialog around the
     // selector (Escape) or submit the selector (Enter) along with it.
     const onKeyDown = (e: KeyboardEvent) => {
+      // An Enter that ends an input method composition is the composition's.
+      if (e.isComposing) return;
       if (e.key === "Enter") onAcceptInputAction();
       else if (e.key === "Escape") onCancelInputAction();
       else return;
