@@ -8,6 +8,37 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **`FilesSelector` lists AI rooms instead of AI agents at its root.** `withAIAgentsTreeFolder`
+  is gone; `withAIRoomsTreeFolder` (on by default) lists the AI rooms root (`FolderType.AiHub`)
+  after Forms, whenever the portal serves it. The section holds the Instructions and Knowledge
+  rooms, never the AI projects, which hold no files, and offers no room creation or Recent /
+  Favorites rows. With `roomsSectionTypes` it keeps only the AI types named there, moves them
+  out of the Rooms section, and is left out when it names neither. A host that passed
+  `withAIAgentsTreeFolder` drops it. The chat's save dialog turns the section off: neither room
+  type takes a chat export.
+- **`FilesSelector` has no AI agents list any more.** `onCreateAIAgent` and
+  `agentsEmptyDescription` are gone, and `getIsDisabled`, `initSelectedItemType` and
+  `setSelectedItemType` take `"rooms" | "files"` only: the `"agents"` item type could only be
+  reached from the AI agents root. A host that compared against `"agents"` drops that check.
+  `AIAgentSelector` keeps its own agents list.
+- **`FolderType.AiHub` is 41 and `FolderType.AiProjects` is gone**, after the server moved the AI
+  projects under the AI rooms root: one root now keeps the Instructions rooms, the Knowledge rooms
+  and the AI projects
+- **Several context and knowledge rooms per chat**, on `@onlyoffice/ai-chat` 1.0.2:
+  `AiChatPresetSettings` carries `contextRooms` and `knowledgeRooms` (arrays) in place of
+  `contextRoom` / `knowledgeRoom`; `AiChatPanelSave` hands the host every connected room;
+  `ContextRoomSync` connects each offered room that holds skills and `ContextRoomWatcher`
+  follows every connected room on its own (one losing its skills is disconnected alone)
+- `@onlyoffice/ai-chat` peer requirement raised to `^1.0.2`
+- **`AiAgentProviders`' `entityId` is the AI project the chat is open in, `contextEntityId` the
+  location.** With the AI agents gone, threads are global per user and nothing but a project
+  scopes the chat; the folder or room the user is in goes in `contextEntityId`, which the AI
+  service uses for the prompt's location line and for generated files, and device uploads and
+  drops follow it too (`contextEntityId ?? entityId`, else My documents). A connected
+  Instructions room no longer becomes the round's scope (`contextRoomScopesRounds` off): it
+  contributes its skills only. `AiChatStore.folderContextPickerEnabled` and the composer's
+  empty Context slot are removed; the context folder is picked in the AI project itself
+
 - **`Uploader`'s progress bar moves while a chunk is being sent.** The percentage used to grow
   only when a whole chunk (5 MB by default) had been answered, so a file under one chunk went
   from 0 to done in a single step; it now also counts the bytes of chunks still on their way,
@@ -139,8 +170,24 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `aria-hidden` and no tab stop. A test that focused the `svg` or waited for it to be focused
   must use the input (`getByRole("checkbox")`) instead. The focused box still draws its border
   in the focus colour.
+- **The AI chat panel keeps its width.** A dragged docked width used to last until the panel
+  closed; `AiChatStore` now saves it in `localStorage` under `chatPanelWidth` and starts every
+  open and every visit from it. The new `utils/panel-width` holds that storage
+  (`createPanelWidthStorage`), so a host keeps the info panel's width the same way, and
+  `CHAT_PANEL_MIN_WIDTH`, the 360px the chat cannot be dragged below.
 
 ### Added
+
+- **`RoomType`'s `isDisabled`** greys out any room type, marks it `aria-disabled` and stops its
+  `onClick`, as `disabledFormRoom` and `disabledPublicRoom` do for their own types
+- `AiAgentProviders` takes `chatIntro`: what an empty chat shows above the suggestion chips in place of the default illustration and tagline (an AI project puts its logo, name and sources there).
+- `RoomsType.AiProjectRoom` (12), `FolderType.AiProjectRoom` (40) and `FolderType.AiProjects`
+  (41) for the AI projects of the DocSpace client; `RoomLogo` and the room type title /
+  description helpers know the new type (the AI room icon stands in until a dedicated one lands)
+- `AiChatStore.openProject` and `AiChatProjectSettings`: a project opens the chat with its model
+  and the lists of its Instructions / Knowledge rooms, every one of them connected
+- `AiAgentProviders` takes `contextRoom` as one room or a list; `ContextRoomProvider` gets a
+  `rooms` prop and `useContextRooms`
 
 - **`FormWrapper` can be the form.** A new `onSubmit` prop renders the card as a `<form>` that
   calls the handler with the browser's navigation prevented, so Enter in a field submits it;
@@ -151,9 +198,23 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   props had none to give it, so an icon button could be made keyboard-operable with `tabIndex`
   and `onKeyDown` but not announced as a button without a cast. Both props are rendered on the
   element, as `Link`'s are; nothing changes for a button that passes neither.
+- Section: the info panel can be resized from its inline-start edge on a desktop. `isInfoPanelResizable` turns it on, with the host's width in `infoPanelWidth` and a setter in `setInfoPanelWidth`. The edge drags from 400px to 800px (`INFO_PANEL_WIDTH`, and the new `INFO_PANEL_MAX_WIDTH` in `utils/device`) while the section keeps 416px, narrows to fit a narrower window without saving it, and a double click restores 400px. It shares its resizer with the chat panel, whose edge now also takes a finger or a pen and narrows the panel to a narrower window, a chat opened after mount included, without calling `setChatPanelWidth` for it. `onShownInfoPanelWidthChange` reports the width the open info panel, or the chat open in its place, takes on screen (`0` when neither does), for floating buttons a host draws itself; it follows a resize drag once per frame, and below a desktop the info panel counts as 400px and the chat as `0`
+- Article: `infoPanelWidth`, and the same prop on `ArticleLiveChat`, sets how far the live chat launcher moves clear of the open info panel, or of the AI chat open in its place, for a host whose panels are resizable; `0` when neither is. Unset, `isInfoPanelVisible` still assumes `INFO_PANEL_WIDTH`. The `isInfoPanelVisible` docs no longer call it unread: the launcher has moved clear of the info panel again since the switch to the Zendesk messaging API
+- `OperationsProgressButton` takes `infoPanelWidth`. Inside `Section` the button gets the width through `--operations-progress-info-panel-width` on the section container instead: the width the open info panel, or the chat open in its place, takes on a desktop, updated on every frame of a resize drag, so the button stays 24px clear of the panel instead of sitting 424px in, under it
 
 ### Fixed
 
+- **An AI project opens on its own model, not on the default.** `AiChatStoresBridge` looked the
+  project's model up among the assigned profiles only (`init`); a model outside them missed and
+  the chat fell back to the default. It now waits for the whole list (`ensureProfiles`) first.
+- The composer's link to a context or knowledge room opens it in the AI rooms section
+  (`/ai-rooms/{id}`), not in Rooms
+- `ContextRoomWatcher` refreshes the picker's room list right after it connects an offered room
+  that gained its first skill (the scheduled refresh was cancelled by the effect rerun)
+- `ContextRoomSync` no longer reads the skills a second time when the store already did
+- **`ComboBox` no longer throws when `options` is missing.** A caller that renders it before
+  its options are loaded passed `undefined`, and reading its length threw "Cannot read
+  properties of undefined (reading 'length')". A missing list is now treated as an empty one.
 - **`FileTile`'s `--tile-height` sizes the whole tile.** The thumbnail area kept its 156px and
   the name row its 64px, so a taller tile ended in an empty band under the name row, outside the
   hover and checked background. The thumbnail area now takes whatever the name row leaves; at
@@ -476,7 +537,12 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **The `Section` chat panel resizer no longer grows the panel by 1px per grab.** It measured the
   panel with its border and wrote that to `--chat-panel-width`, which sets the content box: a click
   on the edge committed 401 for a 400px panel. `setChatPanelWidth` now receives the content width,
-  and a grab released without moving commits the width unchanged.
+  and a grab released without moving commits nothing.
+- **A `Section` panel resize no longer outlives its mouse button.** A drag whose button was
+  released where the page could not see it, in another window after Alt+Tab or over the Start
+  menu, went on moving the panel with the pointer and kept the resize cursor until the next click.
+  The drag now ends, committing the width it reached, as soon as the window loses focus or the
+  pointer moves without the button.
 - **A late search result no longer overwrites a newer edit in `Filter`'s search box.** A query the
   host applied after the user had already changed or cleared the box came back into it and was
   searched again. Such a stale value, or a new `getSelectedInputValue` returning the value already
@@ -552,6 +618,7 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   elsewhere — a sign-in redirect, a link followed in the tab — would have received them. Both
   windows open the portal's `/doceditor`, so the calls are now addressed to
   `window.location.origin` and the browser drops one whose window holds any other page.
+- Table: a column reset no longer squeezes the name column below its own minimum. With many columns on and a narrow list, for instance beside the AI chat, the reset took every other column's minimum out of the name column's share, down to a negative width that broke the grid: the header lost its title and the rows came out empty. The name column now keeps its minimum, and when the other columns cannot fit next to it the table shows the name column alone, as a resize already does
 
 ## 4.1.0
 

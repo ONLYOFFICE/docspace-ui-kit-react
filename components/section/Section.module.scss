@@ -153,6 +153,7 @@
   --info-panel-width-v: var(--info-panel-width, 400px);
   --info-panel-tablet-width-v: var(--info-panel-tablet-width, 480px);
 
+  position: relative;
   height: 100%;
   width: var(--info-panel-width-v);
   background-color: var(--info-panel-bg-v);
@@ -266,26 +267,53 @@
 // the border itself, and paints the border in the accent colour while hovered
 // or dragged. `inset-block` leaves the panel header grabbable too — the handle
 // spans the full height, matching how the border reads.
-.chatPanelResizer {
-  --chat-panel-resizer-hover-v: var(
-    --chat-panel-resizer-hover-color,
-    var(--accent-main)
-  );
-
+@mixin edge-resizer($hover-color) {
   position: absolute;
   inset-block: 0;
   inset-inline-start: -3px;
   width: 6px;
   z-index: 2;
   cursor: ew-resize;
+  // The drag is handled in script; without this a finger on the edge pans
+  // or scrolls the page instead.
+  touch-action: none;
   // The visible affordance is the panel border, redrawn on this element so a
   // hover never shifts layout.
   border-inline-start: 1px solid transparent;
 
   &:hover,
   &:active {
-    border-inline-start-color: var(--chat-panel-resizer-hover-v);
+    border-inline-start-color: $hover-color;
   }
+
+  // Six pixels are enough for a mouse, not for a finger: widen the area that
+  // takes the touch without moving the line that marks the edge.
+  @media (pointer: coarse) {
+    &::before {
+      content: "";
+      position: absolute;
+      inset-block: 0;
+      inset-inline: -5px;
+    }
+  }
+}
+
+.chatPanelResizer {
+  --chat-panel-resizer-hover-v: var(
+    --chat-panel-resizer-hover-color,
+    var(--accent-main)
+  );
+
+  @include edge-resizer(var(--chat-panel-resizer-hover-v));
+}
+
+.infoPanelResizer {
+  --info-panel-resizer-hover-v: var(
+    --info-panel-resizer-hover-color,
+    var(--accent-main)
+  );
+
+  @include edge-resizer(var(--info-panel-resizer-hover-v));
 }
 
 // Applied to `body` for the duration of a resize drag: keeps the resize cursor

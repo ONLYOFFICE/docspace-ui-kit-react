@@ -717,4 +717,25 @@ describe("ComboBox", () => {
       vi.useRealTimers();
     }
   });
+
+  // Production report (DocSpace client 4.0.0): "Cannot read properties of undefined
+  // (reading 'length')" from ComboBox on /rooms/personal. A caller rendered
+  // it before its options were loaded.
+  it("renders and opens without options", async () => {
+    const user = userEvent.setup();
+    const props = {
+      ...baseProps,
+      options: undefined as unknown as typeof mockOptions,
+      selectedOption: { key: "none", label: "Nothing yet" },
+    };
+
+    render(<ComboBox {...props} />);
+
+    const button = screen.getByRole("button", { name: "Nothing yet" });
+    await user.click(button);
+    fireEvent.keyDown(button, { key: "ArrowDown" });
+    fireEvent.keyDown(button, { key: "Enter" });
+
+    expect(props.onSelect).not.toHaveBeenCalled();
+  });
 });

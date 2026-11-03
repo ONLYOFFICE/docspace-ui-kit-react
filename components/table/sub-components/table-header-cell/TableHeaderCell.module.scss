@@ -43,7 +43,7 @@
     }
   }
 
-  &.showIcon:is(:hover, .isActive) {
+  &.showIcon:is(:hover, .isActive, :focus-within) {
     .sortIcon {
       display: block;
     }
@@ -72,6 +72,17 @@
   .textWrapper {
     display: flex;
     overflow: hidden;
+
+    // Inset: the cell clips anything outside it.
+    &:focus-visible {
+      outline: 2px solid
+        var(
+          --accent-main,
+          var(--color-scheme-main-accent, #{colors.$light-blue-main})
+        );
+      outline-offset: -2px;
+      border-radius: 3px;
+    }
   }
 
   .text {

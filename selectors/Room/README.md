@@ -30,6 +30,8 @@ import RoomSelector from "@onlyoffice/apps-ui-kit/selectors/Room";
 | `isMultiSelect`             | `boolean`                                           | Yes                  | Enable multi-select mode                                  |
 | `id`                        | `string`                                            | No                   | HTML id attribute                                         |
 | `className`                 | `string`                                            | No                   | CSS class name                                            |
+| `maxSelectedItems`          | `number`                                            | No                   | Largest number of rooms ticked at once (multi-select)     |
+| `onSelectLimitReached`      | `() => void`                                        | No                   | Called when a room is ticked past `maxSelectedItems`      |
 | `style`                     | `React.CSSProperties`                               | No                   | Inline styles                                             |
 | `roomType`                  | `RoomType \| RoomType[]`                            | No                   | Filter by room type(s)                                    |
 | `searchArea`                | `SearchArea \| string`                              | No                   | Search scope (e.g., Templates)                            |

@@ -219,12 +219,13 @@ export function Legend() {
 
 ## CSS variables
 
-Both are read with a fallback, so setting either on any ancestor changes every `Text` below it.
+All are read with a fallback, so setting one on any ancestor changes every `Text` below it.
 
-| Variable        | Default | Effect                                                        |
-| --------------- | ------- | ------------------------------------------------------------- |
-| `--text-size`   | `13px`  | Font size, unless the `fontSize` prop or `style` overrides it |
-| `--text-weight` | `400`   | Font weight, unless `fontWeight`, `style` or `isBold` does    |
+| Variable             | Default         | Effect                                                                       |
+| -------------------- | --------------- | ---------------------------------------------------------------------------- |
+| `--text-size`        | `13px`          | Font size, unless the `fontSize` prop or `style` overrides it                |
+| `--text-weight`      | `400`           | Font weight, unless `fontWeight`, `style` or `isBold` does                   |
+| `--text-focus-color` | `--accent-main` | Keyboard focus ring of a focusable `Text` (a `Link`, or one with `tabIndex`) |
 
 There is no variable for the colour: `Text` does not declare one and inherits instead.
 

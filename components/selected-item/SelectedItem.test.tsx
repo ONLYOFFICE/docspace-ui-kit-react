@@ -1,6 +1,7 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
 import { screen, render, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { SelectedItem } from ".";
 
@@ -61,5 +62,38 @@ describe("<SelectedItem />", () => {
 
     expect(onClick).toHaveBeenCalledTimes(1);
     expect(onClose).not.toHaveBeenCalled();
+  });
+
+  describe("keyboard", () => {
+    it.each(["{Enter}", " "])("clicks a clickable chip on %s", async (key) => {
+      const user = userEvent.setup();
+      const onClick = vi.fn();
+      render(
+        <SelectedItem
+          {...baseProps}
+          propKey="all"
+          onClick={onClick}
+          clickable
+          hideCross
+          isActive
+        />,
+      );
+
+      await user.tab();
+      const chip = screen.getByRole("button", { name: "sample text" });
+      expect(chip).toHaveFocus();
+      expect(chip).toHaveAttribute("aria-pressed", "true");
+
+      await user.keyboard(key);
+      expect(onClick).toHaveBeenCalledTimes(1);
+    });
+
+    it("leaves a chip without clickable out of the Tab order", () => {
+      render(<SelectedItem {...baseProps} onClick={vi.fn()} hideCross />);
+
+      expect(screen.getByTestId("selected-item")).not.toHaveAttribute(
+        "tabindex",
+      );
+    });
   });
 });
