@@ -68,6 +68,7 @@ export enum SocketEvents {
   ChangeAppEnabled = "s:change-app-enabled",
   TopUpWallet = "s:top-up-wallet",
   WalletLowBalance = "s:wallet-low-balance",
+  ChangeServiceLimits = "s:change-service-limits",
   UpdateExternalShareSettings = "s:change-external-sharing-settings",
   FormSuggestedQuestions = "s:form-suggested-questions",
   AddWebhook = "s:add-webhook",
@@ -286,6 +287,16 @@ export type TWalletLowBalanceData = {
 };
 
 /**
+ * A wallet service's spending limits changed. Carries no thresholds: the
+ * clients only re-read what they show. `id` is the one limit that changed,
+ * absent when many user limits changed at once.
+ */
+export type TChangeServiceLimitsData = {
+  serviceName: string;
+  id?: number | null;
+};
+
+/**
  * Starter questions the backend generated for one attached PDF form. Arrives
  * once per attachment, when the generation finishes — the request that asks
  * for them answers `pending` until then.
@@ -408,6 +419,7 @@ export type TListenEventCallbackMap = {
   [SocketEvents.ChangeAppEnabled]: (data: TChangeAppEnabledData) => void;
   [SocketEvents.TopUpWallet]: (data: TTopUpWalletData) => void;
   [SocketEvents.WalletLowBalance]: (data: TWalletLowBalanceData) => void;
+  [SocketEvents.ChangeServiceLimits]: (data: TChangeServiceLimitsData) => void;
   [SocketEvents.FormSuggestedQuestions]: (
     data: TFormSuggestedQuestionsData,
   ) => void;
