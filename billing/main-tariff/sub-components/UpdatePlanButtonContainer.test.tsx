@@ -6,6 +6,7 @@ import UpdatePlanButtonContainer from "./UpdatePlanButtonContainer";
 
 const mockStore = vi.hoisted(() => ({
   current: {} as Record<string, unknown>,
+  onConfirm: undefined as (() => Promise<void> | void) | undefined,
   isPurchaseCompleted: undefined as (() => Promise<boolean>) | undefined,
 }));
 
@@ -18,16 +19,12 @@ vi.mock("../../shared/top-up-balance/SimpleTopUpDialogWrapper", () => ({
     onConfirm,
     isPurchaseCompleted,
   }: {
-    onConfirm?: () => void;
+    onConfirm?: () => Promise<void> | void;
     isPurchaseCompleted?: () => Promise<boolean>;
   }) => {
+    mockStore.onConfirm = onConfirm;
     mockStore.isPurchaseCompleted = isPurchaseCompleted;
-    return (
-      <div
-        data-testid="top-up-dialog"
-        data-flow={onConfirm ? "instant" : "stripe"}
-      />
-    );
+    return <div data-testid="top-up-dialog" />;
   },
 }));
 
@@ -105,6 +102,7 @@ const renderWithStore = (store: ReturnType<typeof createStore>) => {
 describe("<UpdatePlanButtonContainer /> repurchase", () => {
   beforeEach(() => {
     mockStore.current = {};
+    mockStore.onConfirm = undefined;
     mockStore.isPurchaseCompleted = undefined;
   });
 
@@ -120,10 +118,8 @@ describe("<UpdatePlanButtonContainer /> repurchase", () => {
     fireEvent.click(button);
 
     expect(store.executeWalletUpdate).not.toHaveBeenCalled();
-    expect(screen.getByTestId("top-up-dialog")).toHaveAttribute(
-      "data-flow",
-      "stripe",
-    );
+    expect(screen.getByTestId("top-up-dialog")).toBeInTheDocument();
+    expect(mockStore.isPurchaseCompleted).toBeDefined();
   });
 
   it("tops up and upgrades in place when the card is linked and the balance is short", () => {
@@ -166,9 +162,14 @@ describe("<UpdatePlanButtonContainer /> repurchase", () => {
     fireEvent.click(button);
 
     expect(store.executeWalletUpdate).not.toHaveBeenCalled();
-    expect(screen.getByTestId("top-up-dialog")).toHaveAttribute(
-      "data-flow",
-      "instant",
+    expect(screen.getByTestId("top-up-dialog")).toBeInTheDocument();
+
+    mockStore.onConfirm?.();
+
+    expect(store.executeWalletUpdate).toHaveBeenCalledWith(
+      4,
+      ProductQuantityType.Add,
+      t,
     );
   });
 
@@ -186,10 +187,8 @@ describe("<UpdatePlanButtonContainer /> repurchase", () => {
     fireEvent.click(button);
 
     expect(store.executeWalletUpdate).not.toHaveBeenCalled();
-    expect(screen.getByTestId("top-up-dialog")).toHaveAttribute(
-      "data-flow",
-      "stripe",
-    );
+    expect(screen.getByTestId("top-up-dialog")).toBeInTheDocument();
+    expect(mockStore.isPurchaseCompleted).toBeDefined();
   });
 });
 
@@ -208,6 +207,7 @@ describe("<UpdatePlanButtonContainer /> Stripe purchase completion", () => {
 
   beforeEach(() => {
     mockStore.current = {};
+    mockStore.onConfirm = undefined;
     mockStore.isPurchaseCompleted = undefined;
   });
 
@@ -218,10 +218,11 @@ describe("<UpdatePlanButtonContainer /> Stripe purchase completion", () => {
 
     expect(store.tariff.fetchPortalTariff).toHaveBeenCalledWith(true);
     expect(store.quotas.fetchPortalQuota).toHaveBeenCalledWith(true);
+    expect(store.fetchBalance).not.toHaveBeenCalled();
     expect(store.resetTariffContainerToBasic).not.toHaveBeenCalled();
   });
 
-  it("is completed once the refreshed tariff is paid and refreshes the page", async () => {
+  it("is completed once the refreshed tariff is paid without touching the page", async () => {
     const store = openStripeTopUp();
     store.tariff.fetchPortalTariff.mockImplementation(async () => {
       store.tariff.isNotPaidPeriod = false;
@@ -229,6 +230,18 @@ describe("<UpdatePlanButtonContainer /> Stripe purchase completion", () => {
 
     expect(await purchaseCheck()()).toBe(true);
 
+    expect(store.fetchBalance).not.toHaveBeenCalled();
+    expect(store.resetTariffContainerToBasic).not.toHaveBeenCalled();
+  });
+
+  it("refreshes the page instead of charging again once the callback has purchased", async () => {
+    const store = openStripeTopUp();
+
+    await mockStore.onConfirm?.();
+
+    expect(store.executeWalletUpdate).not.toHaveBeenCalled();
+    expect(store.tariff.fetchPortalTariff).not.toHaveBeenCalled();
+    expect(store.quotas.fetchPortalQuota).not.toHaveBeenCalled();
     expect(store.fetchBalance).toHaveBeenCalledWith(true);
     expect(store.paymentQuotas.fetchPaymentQuotas).toHaveBeenCalled();
     expect(store.resetTariffContainerToBasic).toHaveBeenCalled();

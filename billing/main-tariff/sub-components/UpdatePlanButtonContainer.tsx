@@ -89,6 +89,11 @@ const UpdatePlanButtonContainer = ({
     resetTariffContainerToBasic();
   };
 
+  const refreshAfterPurchase = async () => {
+    await Promise.all([fetchBalance(true), fetchPaymentQuotas()]);
+    resetTariffContainerToBasic();
+  };
+
   const dueTodayAmount = tariffDueTodayAmount ?? totalPrice;
   const isBalanceInsufficient = walletBalance < dueTodayAmount;
   const topUpShortfall = Math.max(0, Math.ceil(dueTodayAmount - walletBalance));
@@ -124,18 +129,12 @@ const UpdatePlanButtonContainer = ({
   const isTariffPurchased = async () => {
     await Promise.all([fetchPortalTariff(true), fetchPortalQuota(true)]);
 
-    const isPurchased =
+    return (
       !store.quotas.isFreeTariff &&
       !store.tariff.isGracePeriod &&
       !store.tariff.isNotPaidPeriod &&
-      store.quotas.maxCountManagersByQuota >= managersCount;
-
-    if (isPurchased) {
-      await Promise.all([fetchBalance(true), fetchPaymentQuotas()]);
-      resetTariffContainerToBasic();
-    }
-
-    return isPurchased;
+      store.quotas.maxCountManagersByQuota >= managersCount
+    );
   };
 
   const onTopUpConfirm = async () => {
@@ -252,7 +251,9 @@ const UpdatePlanButtonContainer = ({
         <SimpleTopUpDialog
           visible={isTopUpDialogVisible}
           onClose={closeTopUpDialog}
-          onConfirm={isCardMissingOrInactive ? undefined : onTopUpConfirm}
+          onConfirm={
+            isCardMissingOrInactive ? refreshAfterPurchase : onTopUpConfirm
+          }
           isPurchaseCompleted={isTariffPurchased}
           minValue={topUpShortfall > 0 ? `${topUpShortfall}` : undefined}
           successParams={{
