@@ -35,12 +35,17 @@ const run = (file, args, opts = {}) =>
       })
     : execFileSync(file, args, { encoding: "utf8", ...opts });
 
+// Set by every package manager, not only pnpm: under `npm run` it is
+// npm-cli.js, and packing with that is exactly the npm tarball described
+// above -- every check would then fail on the missing `exports`, not on the
+// real cause. pnpm's own path ends in `pnpm`, `pnpm.exe` or `pnpm.cjs`.
 const pnpmPath = process.env.npm_execpath;
 
-if (!pnpmPath) {
+if (!pnpmPath || !/^pnpm(\.[a-z]+)?$/i.test(path.basename(pnpmPath))) {
   console.error(
-    "npm_execpath is not set, so pnpm cannot be located. Run this as " +
-      "`pnpm verify:package`, not with node directly.",
+    `${pnpmPath ? `npm_execpath is ${pnpmPath}, not pnpm` : "npm_execpath is not set"}, ` +
+      "and the tarball must be packed by pnpm. Run this as " +
+      "`pnpm verify:package`, not through npm, yarn or node directly.",
   );
   process.exit(1);
 }

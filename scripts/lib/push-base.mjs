@@ -36,7 +36,11 @@ const LONG_LIVED = [
 const baseAgainst = (cwd, ref) => {
   const sha = git(cwd, "merge-base", "HEAD", ref);
   if (!sha) return null;
-  const ahead = Number(git(cwd, "rev-list", "--count", `${sha}..HEAD`));
+  const count = git(cwd, "rev-list", "--count", `${sha}..HEAD`);
+  // Checked before converting: Number(null) is 0, which would make a ref git
+  // could not count the nearest of all.
+  if (count === null) return null;
+  const ahead = Number(count);
   return Number.isNaN(ahead) ? null : { sha, ref, ahead };
 };
 
@@ -70,8 +74,18 @@ export function findPushBase(cwd) {
   return nearest;
 }
 
-/** Files the commits from `sha` to HEAD touch, repository-relative, POSIX. */
-export function committedChangesSince(cwd, sha) {
-  const out = git(cwd, "diff", "--name-only", sha, "HEAD");
-  return out === null ? null : out.split("\n").filter(Boolean);
+/**
+ * Files that differ from `sha` -- committed, staged, unstaged or untracked --
+ * repository-relative and POSIX; null when git cannot say.
+ *
+ * The working tree counts, as it does for `vitest --changed`, so the steps of
+ * one gate agree on what changed. On a push it only adds work; run by hand
+ * (`pnpm gate`) before a commit, it is what makes an edited rollup.config.mjs
+ * build instead of being skipped.
+ */
+export function changesSince(cwd, sha) {
+  const tracked = git(cwd, "diff", "--name-only", sha);
+  const untracked = git(cwd, "ls-files", "--others", "--exclude-standard");
+  if (tracked === null || untracked === null) return null;
+  return [...new Set(`${tracked}\n${untracked}`.split("\n").filter(Boolean))];
 }

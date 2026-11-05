@@ -1,8 +1,15 @@
 #!/usr/bin/env node
 /**
  * Decides whether the pre-push gate may skip building and packing: exits 0
- * when the commits being pushed leave the build's own code alone, and 1 when
- * they touch it. lefthook.yml `skip`s the `package` job when this succeeds.
+ * when the branch leaves the build's own code alone, and 1 when it touches it.
+ * lefthook.yml `skip`s the `package` job when this succeeds.
+ *
+ * "The branch" is everything that differs from where it left what it is pushed
+ * to (scripts/lib/push-base.mjs): the commits being pushed, and the working
+ * tree as well, the way `vitest --changed` sees it in the test step. On a push
+ * the working tree is not what is sent, so counting it can only add a build;
+ * run by hand with `pnpm gate` before a commit, it is what keeps an edited
+ * rollup.config.mjs from being skipped.
  *
  * The sense is deliberate. Lefthook reads any non-zero exit as "condition not
  * met", and a crash exits non-zero -- so with the condition this way round a
@@ -19,27 +26,13 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 
-import { committedChangesSince, findPushBase } from "./lib/push-base.mjs";
+import { touchesBuild } from "./lib/build-inputs.mjs";
+import { changesSince, findPushBase } from "./lib/push-base.mjs";
 
 const repoRoot = path.resolve(fileURLToPath(import.meta.url), "../..");
 
-// Files and directories the build reads as code rather than as input.
-// tsconfig.json is among them: rollup's TypeScript plugin compiles with it,
-// while tsconfig.build.json only drives the declaration pass.
-const BUILD_FILES = new Set([
-  "rollup.config.mjs",
-  "package.json",
-  "pnpm-lock.yaml",
-  "tsconfig.json",
-  "tsconfig.build.json",
-]);
-const BUILD_DIRS = ["scripts/"];
-
-const touchesBuild = (file) =>
-  BUILD_FILES.has(file) || BUILD_DIRS.some((dir) => file.startsWith(dir));
-
 const base = findPushBase(repoRoot);
-const changed = base && committedChangesSince(repoRoot, base.sha);
+const changed = base && changesSince(repoRoot, base.sha);
 
 // No base, no answer: build.
 if (!changed) process.exit(1);
