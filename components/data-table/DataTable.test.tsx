@@ -384,6 +384,19 @@ describe("DataTable", () => {
         "rowgroup",
       );
     });
+
+    it("calls its header data-table-header, or what headerTestId says", () => {
+      const { unmount } = renderTable();
+      expect(screen.getByTestId("data-table-header")).toHaveClass(
+        "table-container_header",
+      );
+      unmount();
+
+      renderTable({ headerTestId: "table-header" });
+      expect(screen.getByTestId("table-header")).toHaveClass(
+        "table-container_header",
+      );
+    });
   });
 
   describe("the header line", () => {

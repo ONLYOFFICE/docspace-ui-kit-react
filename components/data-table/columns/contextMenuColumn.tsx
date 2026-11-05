@@ -9,6 +9,9 @@ type ContextMenuColumnOptions = {
   /** Id of the column.
    * @default "ContextMenu" */
   id?: string;
+  /** Value of `data-testid` on each row's menu button.
+   * @default "data-table-context-menu-button" */
+  contextMenuButtonTestId?: string;
 };
 
 /**
@@ -19,10 +22,11 @@ type ContextMenuColumnOptions = {
  */
 export const contextMenuColumn = <T,>({
   id = "ContextMenu",
+  contextMenuButtonTestId,
 }: ContextMenuColumnOptions = {}): DataTableColumn<T> => ({
   id,
   title: "",
   width: { type: "fixed", size: DATA_TABLE_SETTINGS_WIDTH },
-  cell: () => <RowContextMenu />,
+  cell: () => <RowContextMenu buttonTestId={contextMenuButtonTestId} />,
   cellClassName: DATA_TABLE_CONTEXT_MENU_CELL_CLASS,
 });

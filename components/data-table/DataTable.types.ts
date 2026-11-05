@@ -324,6 +324,8 @@ export interface DataTableProps<T> {
   headerClassName?: string;
   /** Value of `data-testid` on the table element. */
   testId?: string;
+  /** Value of `data-testid` on the header element. */
+  headerTestId?: string;
   /** Value of `data-testid` on the element that holds the rows. */
   bodyTestId?: string;
   /** Ref of the table element. */

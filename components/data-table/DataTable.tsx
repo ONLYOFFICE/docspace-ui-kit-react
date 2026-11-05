@@ -53,6 +53,7 @@ export const DataTable = <T,>({
   headerId,
   headerClassName,
   testId = "data-table",
+  headerTestId = "data-table-header",
   bodyTestId = "data-table-body",
   ref,
 }: DataTableProps<T>) => {
@@ -191,6 +192,7 @@ export const DataTable = <T,>({
           stuck={headerStuck}
           id={headerId}
           className={headerClassName}
+          testId={headerTestId}
           ref={headerRef}
         />
         <DataTableBody

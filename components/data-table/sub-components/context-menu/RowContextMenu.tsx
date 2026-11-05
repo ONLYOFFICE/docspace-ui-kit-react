@@ -17,7 +17,12 @@ import styles from "../../DataTable.module.scss";
  * row's `contextMenu` has options; an empty `expandButton` keeps its place
  * otherwise, as in the old table.
  */
-export const RowContextMenu = () => {
+export const RowContextMenu = ({
+  buttonTestId = "data-table-context-menu-button",
+}: {
+  /** Value of `data-testid` on the menu button. */
+  buttonTestId?: string;
+}) => {
   const row = useDataTableRowContext();
   if (!row) return null;
 
@@ -45,7 +50,7 @@ export const RowContextMenu = () => {
           onClick={openMenu}
           onClose={contextMenu?.onClose}
           title={contextMenu?.title}
-          testId="data-table-context-menu-button"
+          testId={buttonTestId}
         />
       ) : (
         <div className={classNames(styles.contextMenuSpacer, "expandButton")} />

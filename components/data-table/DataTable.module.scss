@@ -137,6 +137,13 @@ $row-bleed-end: var(
   &.isFixed {
     padding-inline-end: 0;
   }
+
+  // The 38px title lies on the row's top, as the old table's did: centred in
+  // the 39px row it would sit half a pixel lower, which rounds to a whole one.
+  > .headerText,
+  > .sortButton {
+    align-self: flex-start;
+  }
 }
 
 // ===== Resize handle =====
@@ -273,8 +280,10 @@ $row-bleed-end: var(
     fill: token(header-text-hover-color);
   }
 
+  // Inside the button: the header cell clips what reaches past it.
   &:focus-visible {
     outline: 1px solid token(header-text-hover-color);
+    outline-offset: -1px;
   }
 
   &:disabled {
@@ -410,8 +419,10 @@ $row-bleed-end: var(
 
 // ===== Row content =====
 
-// The icon and the checkbox share one 32px square, one hidden behind the
-// other. The checkbox stays focusable while hidden, and shows once focused.
+// The icon and the checkbox share one 32px square, the checkbox on top. While
+// hidden it still takes the click, so a tap or a click with no hover first
+// selects the row, as with the old table; it stays focusable, and shows once
+// focused.
 .rowCheckbox {
   display: inline-grid;
   flex: none;
@@ -433,7 +444,6 @@ $row-bleed-end: var(
   --checkbox-gap: 0px;
 
   opacity: 0;
-  pointer-events: none;
 }
 
 .rowCheckbox:not(.isDisabled) {
@@ -445,7 +455,6 @@ $row-bleed-end: var(
 
     .rowCheckboxInput {
       opacity: 1;
-      pointer-events: auto;
     }
   }
 }
@@ -460,7 +469,6 @@ $row-bleed-end: var(
 
     .rowCheckboxInput {
       opacity: 1;
-      pointer-events: auto;
     }
   }
 

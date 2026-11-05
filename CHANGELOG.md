@@ -195,7 +195,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `highlight`, `busy` — on a strip that reaches into the page's gutters
   (`--data-table-row-bleed-start` / `-end`) with one line shared between neighbours, so a screen
   needs none of the row styles each old table copied; `DataTableRowCheckbox` is the icon that turns
-  into the row's checkbox, and `DataTableRowActions` holds what shows only on such a row
+  into the row's checkbox, and `DataTableRowActions` holds what shows only on such a row. The
+  header's and the row menu button's test ids can be set (`headerTestId`,
+  `contextMenuButtonTestId`), so a suite written against `Table` finds them where it did
 - **`RoomType`'s `isDisabled`** greys out any room type, marks it `aria-disabled` and stops its
   `onClick`, as `disabledFormRoom` and `disabledPublicRoom` do for their own types
 - `AiAgentProviders` takes `chatIntro`: what an empty chat shows above the suggestion chips in place of the default illustration and tagline (an AI project puts its logo, name and sources there).

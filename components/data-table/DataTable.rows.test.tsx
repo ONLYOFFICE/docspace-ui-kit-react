@@ -293,6 +293,32 @@ describe("DataTable row menu", () => {
     ).toBeInTheDocument();
   });
 
+  it("gives the menu button the test id either column is asked for", () => {
+    const { unmount } = renderTable({
+      columns: [
+        ...BASE_COLUMNS,
+        settingsColumn({
+          withContextMenu: true,
+          contextMenuButtonTestId: "context-menu-button",
+        }),
+      ],
+      getRowProps: () => ({ contextMenu: { options } }),
+    });
+    expect(
+      within(rows()[0]).getByTestId("context-menu-button"),
+    ).toBeInTheDocument();
+    unmount();
+
+    renderTable({
+      columns: [
+        ...BASE_COLUMNS,
+        contextMenuColumn({ contextMenuButtonTestId: "row-menu" }),
+      ],
+      getRowProps: () => ({ contextMenu: { options } }),
+    });
+    expect(within(rows()[0]).getByTestId("row-menu")).toBeInTheDocument();
+  });
+
   it("disables the settings button with disabled", () => {
     renderTable({
       columns: [

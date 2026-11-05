@@ -33,6 +33,7 @@ type DataTableHeaderProps<T> = {
   stuck: boolean;
   id?: string;
   className?: string;
+  testId: string;
   ref?: React.Ref<HTMLDivElement>;
 };
 
@@ -45,6 +46,7 @@ export const DataTableHeader = <T,>({
   stuck,
   id,
   className,
+  testId,
   ref,
 }: DataTableHeaderProps<T>) => {
   const context: DataTableHeaderContext = { sort, compact };
@@ -62,7 +64,7 @@ export const DataTableHeader = <T,>({
           [styles.isStuck]: stuck,
         },
       )}
-      data-testid="data-table-header"
+      data-testid={testId}
     >
       <div role="row" className={styles.headerRow}>
         {columns.map((column) => (
