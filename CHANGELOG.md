@@ -72,6 +72,12 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   a consumer renders gains a Tab stop: pass `tabIndex={-1}` where something around the link is
   the control already, or `role` or `onKeyDown` to wire the keyboard yourself. A `tabIndex` of 0
   or more only places the stop: the keys still press the link
+- **Two inner controls left the Tab order.** `Dropzone`'s link is `tabIndex={-1}`, as the area
+  around it is the keyboard's button already, and `DropDownItem`'s external-link icon is
+  `tabIndex={-1}` when it has no `onClickExternalLink`, where it did nothing on a press
+- **`ComboBox` walks the rows of marked components with the arrows.** Custom `advancedOptions`
+  were walked only when their children were `DropDownItem`s; a component marked with
+  `markAsDropDownItem` (see _Added_) counts as one too
 - **`FilesSelector` lists AI rooms instead of AI agents at its root.** `withAIAgentsTreeFolder`
   is gone; `withAIRoomsTreeFolder` (on by default) lists the AI rooms root (`FolderType.AiHub`)
   after Forms, whenever the portal serves it. The section holds the Instructions and Knowledge
@@ -243,6 +249,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 - **`hasTabStop(root)`** (`hooks/useFocusTrap`): whether `root` holds a Tab stop, by the rule of
   `getTabStops`, reading the layout no further than the first one
+- **`markAsDropDownItem(component)`** (`utils/drop-down-item-mark`): marks a component that renders
+  a `DropDownItem` from the props it takes - a wrapper adding labels, say - so that `ComboBox`
+  walks its rows with the arrow keys
+- **`Text`'s `onKeyDown` and `aria-haspopup`**, passed to the element unchanged: what a
+  `role="button"` text needs to take the keyboard and say what it opens
 - **`RoomType`'s `isDisabled`** greys out any room type, marks it `aria-disabled` and stops its
   `onClick`, as `disabledFormRoom` and `disabledPublicRoom` do for their own types
 - `AiAgentProviders` takes `chatIntro`: what an empty chat shows above the suggestion chips in place of the default illustration and tagline (an AI project puts its logo, name and sources there).
@@ -269,6 +280,19 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **Tab from a menu over a dialog goes on from the control that opened it.** A context menu or a
+  drop-down a control in a `ModalDialog` or `Aside` opens lives in a portal, outside the focus
+  trap, and Tab there went to the dialog's first stop (Shift+Tab to its last) wherever the menu
+  came from. The trap now goes on from the element inside it that had the focus last
+- **`Selector`'s `aria-activedescendant` names only a drawn row.** Home, End or the wheel took the
+  keyboard's row past what the virtualized list renders, and the list pointed at an id no
+  element had, which a screen reader announced as nothing. It points at the row once it is drawn
+- **The "New" menu gives the focus back when the picked entry moves it nowhere.** An entry whose
+  action focuses nothing of its own left the focus on the page's body as the menu closed
+- **`InputBlock` names its icon only when the icon is a button.** With `iconAriaLabel` but no
+  `onIconClick` the icon carried an `aria-label` and no role, which ARIA does not allow
+- **The focus trap looks a radio group up once per key press.** It searched the trap for each
+  radio's group, once per radio
 - **A tab panel no longer lays out all its controls on every change.** `useTabPanel` re-read the
   panel on each frame its content changed and listed every Tab stop to learn whether there was
   one; it now asks `hasTabStop`, which stops at the first
