@@ -32,6 +32,8 @@ class ServicesStore {
 
   #rawApiClient: TApiClient;
 
+  #usageAbortController: AbortController | null = null;
+
   private abortControllers: AbortController[] = [];
 
   paymentStore: PaymentStore;
@@ -348,12 +350,17 @@ class ServicesStore {
   fetchServiceUsageMonthly = async ({
     from,
     to,
+    signal,
   }: {
     from?: DateTime;
     to?: DateTime;
+    signal?: AbortSignal;
   } = {}) => {
     const abortController = new AbortController();
     this.abortControllers.push(abortController);
+    signal?.addEventListener("abort", () => abortController.abort(), {
+      once: true,
+    });
 
     try {
       const { data } = await this.#rawApiClient.instance.get(
@@ -390,10 +397,15 @@ class ServicesStore {
     // any other period invalidates them.
     if (period !== "thisMonth") this.loadedServiceName = null;
 
+    this.#usageAbortController?.abort();
+    const usageAbortController = new AbortController();
+    this.#usageAbortController = usageAbortController;
+    const { signal } = usageAbortController;
+
     await Promise.all([
       this.paymentStore.initWalletPayerAndBalance(false),
-      this.fetchServiceUsage(range),
-      this.fetchServiceUsageMonthly(range),
+      this.fetchServiceUsage({ ...range, signal }),
+      this.fetchServiceUsageMonthly({ ...range, signal }),
     ]);
   };
 
