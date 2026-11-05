@@ -28,10 +28,24 @@ export const VirtualScroll = (props: ScrollbarProps) => {
     else list.removeAttribute("aria-label");
     if (multiselectable) list.setAttribute("aria-multiselectable", "true");
     else list.removeAttribute("aria-multiselectable");
-    if (activeOptionId)
-      list.setAttribute("aria-activedescendant", activeOptionId);
-    else list.removeAttribute("aria-activedescendant");
-  }, [label, multiselectable, activeOptionId]);
+  }, [label, multiselectable]);
+
+  // The active option only while its row is drawn: Home, End or the wheel
+  // take it past the rows react-window renders, and an id that names no
+  // element is announced as nothing. Checked on every render - the list
+  // renders again as it draws new rows - so it follows once the row is there.
+  useEffect(() => {
+    const list = scrollContentRef.current;
+    if (!list) return;
+
+    const option = activeOptionId
+      ? document.getElementById(activeOptionId)
+      : null;
+    if (option && activeOptionId && list.contains(option)) {
+      if (list.getAttribute("aria-activedescendant") !== activeOptionId)
+        list.setAttribute("aria-activedescendant", activeOptionId);
+    } else list.removeAttribute("aria-activedescendant");
+  });
 
   // Body makes new handlers on every render, every arrow press among them:
   // the listeners call the current ones instead of being re-attached.

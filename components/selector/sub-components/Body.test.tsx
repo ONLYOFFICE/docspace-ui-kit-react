@@ -81,6 +81,29 @@ describe("Selector list from the keyboard", () => {
     expect(getList()).not.toHaveAttribute("aria-multiselectable");
   });
 
+  // An id naming no element is announced as nothing: the list points at the
+  // keyboard's row only while react-window draws it, and again once it does.
+  it("points at the keyboard's row only while it is drawn", async () => {
+    await renderList();
+    const list = getList();
+    act(() => list.focus());
+
+    fireEvent.keyDown(list, { key: "End" });
+    await waitFor(() => expect(activeOptionText()).toContain("Item 60"));
+
+    for (let el: HTMLElement | null = list; el; el = el.parentElement) {
+      el.scrollTop = 0;
+      fireEvent.scroll(el);
+    }
+    await waitFor(() =>
+      expect(list).not.toHaveAttribute("aria-activedescendant"),
+    );
+
+    // End again: the active row stays the same, only its row is drawn.
+    fireEvent.keyDown(list, { key: "End" });
+    await waitFor(() => expect(activeOptionText()).toContain("Item 60"));
+  });
+
   // The wheel can take the keyboard's row off screen after the keys put it
   // there, and react-window draws it out: Enter used to do nothing.
   it("presses the keyboard's row even after the wheel took it off screen", async () => {
