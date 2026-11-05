@@ -349,6 +349,100 @@ export function Tasks({
 }
 ```
 
+### What a row looks like in each state
+
+The table draws every state of a row itself; the consumer only says which applies. A row in a
+state, or under the pointer, stretches its strip past the table into the page's gutters, as far as
+`--data-table-row-bleed-start` and `-end` say. `DataTableRowCheckbox` is the item's icon that turns
+into the row's checkbox, and `DataTableRowActions` holds what shows only on a row under the
+pointer, selected or acted on.
+
+```tsx
+import { useCallback } from "react";
+import {
+  DataTable,
+  type DataTableColumn,
+  DataTableRowActions,
+  DataTableRowCheckbox,
+  type DataTableRowState,
+} from "@onlyoffice/apps-ui-kit/components/data-table";
+
+type Item = { id: number; title: string; isFolder: boolean };
+
+declare const FolderIcon: () => React.ReactNode;
+declare const FileIcon: () => React.ReactNode;
+
+export function Items({
+  items,
+  selected,
+  onSelect,
+  cursor,
+  dragging,
+  running,
+}: {
+  items: Item[];
+  selected: number[];
+  onSelect: (id: number, checked: boolean) => void;
+  cursor: number | null;
+  dragging: boolean;
+  running: number[];
+}) {
+  const columns: DataTableColumn<Item>[] = [
+    {
+      id: "Name",
+      title: "Name",
+      width: { type: "fill" },
+      cell: (item) => (
+        <>
+          <DataTableRowCheckbox
+            icon={item.isFolder ? <FolderIcon /> : <FileIcon />}
+            label={`Select ${item.title}`}
+            checked={selected.includes(item.id)}
+            loading={running.includes(item.id)}
+            onChange={(checked) => onSelect(item.id, checked)}
+          />
+          {item.title}
+          <DataTableRowActions>
+            <button type="button">Share</button>
+          </DataTableRowActions>
+        </>
+      ),
+    },
+  ];
+
+  const getRowProps = useCallback(
+    (item: Item): DataTableRowState => ({
+      checked: selected.includes(item.id),
+      caret: item.id === cursor,
+      // A drag owns the pointer: folders take the drop, files fade.
+      hover: !dragging,
+      dropTarget: dragging && item.isFolder,
+      dimmed: dragging && !item.isFolder,
+      busy: running.includes(item.id),
+    }),
+    [selected, cursor, dragging, running],
+  );
+
+  // The strips reach across the 20px gutters around the table.
+  const gutters = {
+    padding: "0 20px",
+    "--data-table-row-bleed-start": "20px",
+    "--data-table-row-bleed-end": "20px",
+  } as React.CSSProperties;
+
+  return (
+    <div style={gutters}>
+      <DataTable
+        columns={columns}
+        rows={items}
+        getRowKey={(item) => item.id}
+        getRowProps={getRowProps}
+      />
+    </div>
+  );
+}
+```
+
 ### Long lists
 
 `virtualize` renders only the rows in and near the view. Name the element that scrolls, or let
@@ -520,6 +614,12 @@ component given every column. What each part becomes:
 | `TableBody` `useReactWindow`, `fetchMoreFiles`, `hasMoreFiles`, `itemHeight` | `virtualize`, `loadMore.onLoadMore`, `loadMore.hasMore`, `rowHeight`            |
 | `tagRef` + `withTagRef`                                                      | the column's `headerRef`                                                        |
 | reading the last column out of `localStorage`                                | `isLast` in the cell context                                                    |
+| the consumer's row styles: hover, selected, hotkey border, `droppable-hover` | the row's `hover`, `checked`, `active`, `caret`, `dropTarget`, `dropOver`       |
+| negative margins on the first and last cell for the full-width strip         | `--data-table-row-bleed-start` / `-end`                                         |
+| `border-top` + `margin-top: -1px` + 49 px cells for one line between rows    | nothing: rows share one line                                                    |
+| `lengthen-header` / `hotkeys-lengthen-header` set from the rows              | nothing: the header follows the first row and the scroll                        |
+| `TableCell hasAccess` with `table-container_row-checkbox` inside             | `DataTableRowCheckbox`                                                          |
+| `create-share-link` hidden by the old `TableRow`                             | `DataTableRowActions`, or `DATA_TABLE_ROW_ACTIONS_CLASS` on the element         |
 
 Old pixel records are not migrated: the first visit after the switch starts from 40/60.
 
@@ -646,8 +746,8 @@ export function FilesTable({
   Escape, giving the focus back to its button.
 - `isLast` in the cell context is true for the last rendered column that is not `fixed`, so
   trailing content lands before a fixed context-menu column, not in it.
-- The header is `position: sticky` at the top of the nearest scrolling ancestor. Each body cell is
-  `rowHeight` high, 48 px by default (`DATA_TABLE_ROW_HEIGHT`), including its 1 px bottom border;
+- The header is `position: sticky` at the top of the nearest scrolling ancestor. Each body row is
+  `rowHeight` high, 48 px by default (`DATA_TABLE_ROW_HEIGHT`), including the 1 px line below it;
   the header row is 39 px plus a 1 px border. Every row has the same height: the table measures
   none of them.
 - With `virtualize`, the rows in view plus `overscan` (5) beyond each edge are in the DOM. Each
@@ -682,9 +782,29 @@ export function FilesTable({
   its index and these two functions, so `getRowProps` runs again only for a row that changed, or
   for all of them when the function does. A cell reading a store that changes on its own (MobX)
   has to be an observer itself; the row does not track what its cells read.
-- A row with `checked` gets the `checked` class, `aria-selected="true"` and a tinted background
-  on every cell; `active` tints it the same way without selecting it; `dragging` tints it with the
-  drag-and-drop colour. The tint is on the cells, so a consumer's per-cell styles win.
+- A row draws its background and its lines on a strip behind its cells. The line above a row lies
+  on the line below the previous one, so neighbours share one line and a border never doubles.
+  A row under the pointer (unless `hover: false`), `checked`, `active`, `caret`, `dropTarget` or
+  `highlight` stretches the strip, lines included, past the table by
+  `--data-table-row-bleed-start` / `-end`; the header's background reaches as far, so such a row
+  scrolled under the header stays hidden there. Hover tints only where the pointer can hover.
+- A row with `checked` gets the `checked` class, `aria-selected="true"` and the selected tint;
+  `active` tints it the same way without selecting it. `caret` draws its two lines in the caret
+  colour and raises the row over its neighbours so theirs do not cover them; on the first row,
+  while the header is not stuck, the header's line takes the caret colour too. `dropTarget` tints
+  in the drop colour and `dropOver` in the stronger one, which a `dropTarget` row also takes under
+  the pointer, since a drag that moves the pointer itself leaves `:hover` working. A drop tint wins
+  over the selected one. `dimmed` fades the cells to 0.4, `busy` makes them ignore the pointer, and
+  `highlight` flashes the strip once, over 2 s. A row with `onClick` has the pointer cursor.
+- The strip is behind the cells, so a cell's own background covers it; the line below a row is the
+  cell's last pixel, which its content is centred above.
+- `DataTableRowCheckbox` shows the icon and keeps the checkbox in the same 32 px square, hidden but
+  in the tab order. The checkbox shows while the pointer is over the square itself, as the old
+  table's did, on a `checked` row and while it has the keyboard focus; `disabled` keeps the icon
+  alone and `loading` puts a loader in place of both. The checkbox is the kit's `Checkbox`, which is not controlled: the row's `checked` sets it.
+- Content in `DataTableRowActions`, or any element with `DATA_TABLE_ROW_ACTIONS_CLASS`, is
+  `display: none` on a row that is not under the pointer, `checked`, `active` or holding the
+  focus; where nothing can hover, it always shows.
 - `cellProps` goes on every cell of the row: drag and drop finds all the cells of a row by a
   class and reads the `value` attribute, as with the old table's cells.
 - A right-click on a row calls its `onContextMenu` first; `preventDefault()` there keeps the
@@ -693,7 +813,8 @@ export function FilesTable({
   old table, so that other open menus and click-outside listeners close; that click does not
   reach the row's own `onClick`. The button is drawn only while `options` has items; the cell
   keeps an empty `expandButton` otherwise. The cell has the old
-  `table-container_row-context-menu-wrapper` class.
+  `table-container_row-context-menu-wrapper` class and does not clip, so the button's focus ring
+  shows whole.
 - Reordering rows, or any other mode, is a different set of columns rather than a flag: an index
   column with buttons, `settingsColumn({ disabled: true })` and no row menu.
 - There is no slot for a group menu over the header: the portal renders it in the section header,
@@ -704,28 +825,39 @@ export function FilesTable({
 Set them on any ancestor of the table. Each default has a light and a dark value, picked by the
 `.light` / `.dark` class `ThemeProvider` sets.
 
-| Variable                               | Default (light / dark) | Effect                                                                  |
-| -------------------------------------- | ---------------------- | ----------------------------------------------------------------------- |
-| `--data-table-background`              | `#ffffff` / `#333333`  | Background of the sticky header, so rows scroll under it unseen         |
-| `--data-table-border-color`            | `#eceef1` / `#474747`  | Line under the header and under every row                               |
-| `--data-table-header-text-color`       | `#a3a9ae` / `#858585`  | Header titles, the sort arrow and the settings button                   |
-| `--data-table-header-text-hover-color` | `#657077` / `#ffffff`  | The same under the pointer, and the focus ring of the header's controls |
-| `--data-table-resize-color`            | `#d0d5da` / `#474747`  | The resize edges, and the settings button while it is disabled          |
-| `--data-table-resize-active-color`     | `#657077` / `#858585`  | A resize edge under the pointer, focused or being dragged               |
-| `--data-table-row-selected-background` | `#f3f4f4` / `#3d3d3d`  | Cells of a `checked` or `active` row                                    |
-| `--data-table-row-drag-background`     | `#ffefaf` / `#a88f56`  | Cells of a `dragging` row                                               |
+| Variable                                | Default (light / dark)      | Effect                                                                  |
+| --------------------------------------- | --------------------------- | ----------------------------------------------------------------------- |
+| `--data-table-background`               | `#ffffff` / `#333333`       | Background of the sticky header, so rows scroll under it unseen         |
+| `--data-table-border-color`             | `#eceef1` / `#474747`       | Line under the header and under every row                               |
+| `--data-table-header-text-color`        | `#a3a9ae` / `#858585`       | Header titles, the sort arrow and the settings button                   |
+| `--data-table-header-text-hover-color`  | `#657077` / `#ffffff`       | The same under the pointer, and the focus ring of the header's controls |
+| `--data-table-resize-color`             | `#d0d5da` / `#474747`       | The resize edges, and the settings button while it is disabled          |
+| `--data-table-resize-active-color`      | `#657077` / `#858585`       | A resize edge under the pointer, focused or being dragged               |
+| `--data-table-row-hover-background`     | `#f3f4f4` / `#3d3d3d`       | A row under the pointer                                                 |
+| `--data-table-row-selected-background`  | `#f3f4f4` / `#3d3d3d`       | A `checked` or `active` row                                             |
+| `--data-table-row-drop-background`      | `#e5e48a` at 50 % / at 12 % | A `dropTarget` row                                                      |
+| `--data-table-row-drop-over-background` | `#ffefaf` / `#a88f56`       | A `dropTarget` row with `dropOver` or under the pointer                 |
+| `--data-table-row-background`           | `transparent`               | Every row's strip, before any state; within the table, not the gutters  |
+| `--data-table-row-caret-color`          | `#5299e0`                   | The lines of a `caret` row                                              |
+| `--data-table-row-highlight-background` | `#5299e0`                   | Where a `highlight` row's flash starts                                  |
 
-Three more place the sticky header, and have no theme values. The bleeds say how far the header's
-line reaches past the table, at the start and at the end, once rows scroll under it: into the
-page's gutters, where a selected row's strip already reaches. The top is for a page that pins
+Each of them may also be set on a row, through its `className` or `style`, to recolour that row
+alone: a mode that tints every row sets `--data-table-row-background`.
+
+Five more place the sticky header and the strips, and have no theme values. The header's bleeds
+say how far its line reaches past the table, at the start and at the end, once rows scroll under
+it: into the page's gutters, where a selected row's strip already reaches. The rows' bleeds say how
+far a row's strip reaches, and are the header's unless set. The top is for a page that pins
 something above the list in the same scroller, such as a filter bar: the header stops below it, and
 `scrollToIndex` lands rows below both.
 
-| Variable                   | Default | Effect                                                   |
-| -------------------------- | ------- | -------------------------------------------------------- |
-| `--data-table-header-top`  | `0px`   | How far below the scroller's top the header sticks       |
-| `--data-table-bleed-start` | `0px`   | How far the stuck header's line runs past the start edge |
-| `--data-table-bleed-end`   | `0px`   | How far the stuck header's line runs past the end edge   |
+| Variable                       | Default                    | Effect                                                   |
+| ------------------------------ | -------------------------- | -------------------------------------------------------- |
+| `--data-table-header-top`      | `0px`                      | How far below the scroller's top the header sticks       |
+| `--data-table-bleed-start`     | `0px`                      | How far the stuck header's line runs past the start edge |
+| `--data-table-bleed-end`       | `0px`                      | How far the stuck header's line runs past the end edge   |
+| `--data-table-row-bleed-start` | `--data-table-bleed-start` | How far a row's strip runs past the start edge           |
+| `--data-table-row-bleed-end`   | `--data-table-bleed-end`   | How far a row's strip runs past the end edge             |
 
 Row height is the `rowHeight` prop, not a variable: the virtualiser has to know it too.
 
@@ -761,6 +893,12 @@ With `virtualize`, only some rows exist in the DOM, so the table states the full
 A row given `checked` reports it as `aria-selected`; a row without `checked` carries no
 `aria-selected` at all.
 
+`DataTableRowCheckbox` is a native checkbox named by `label`, as `aria-label` and tooltip. While the
+icon shows, the checkbox is hidden but stays in the tab order, and shows once it has the focus, so
+the keyboard can select rows the pointer never visited; the icon goes into the same square and is
+the consumer's to hide from screen readers. Content in `DataTableRowActions` shows as soon as the
+focus is anywhere in its row, so Tab moves on into it rather than skipping it.
+
 Skeleton rows are `aria-hidden`, so they are not announced as empty rows; while a page loads the
 body carries `aria-busy="true"` instead.
 
@@ -780,6 +918,7 @@ body carries `aria-busy="true"` instead.
 | Each body row                 | `data-table-row`, or the row's `testId` |
 | A column's cell in a row      | what the column's `cellTestId` returns  |
 | A row's menu button           | `data-table-context-menu-button`        |
+| `DataTableRowCheckbox`        | `data-table-row-checkbox`, or `testId`  |
 | A skeleton row                | `data-table-skeleton-row`               |
 
 Header and body cells also carry `data-column-id="<columnId>"`.

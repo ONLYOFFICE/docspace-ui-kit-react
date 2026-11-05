@@ -1,5 +1,7 @@
 export { DataTable } from "./DataTable";
 export { DataTableRow } from "./sub-components/row/DataTableRow";
+export { DataTableRowCheckbox } from "./sub-components/row/RowCheckbox";
+export { DataTableRowActions } from "./sub-components/row/RowActions";
 
 export type {
   DataTableCellContext,
@@ -8,6 +10,8 @@ export type {
   DataTableHeaderContext,
   DataTableProps,
   DataTableRenderRowProps,
+  DataTableRowActionsProps,
+  DataTableRowCheckboxProps,
   DataTableRowContextMenu,
   DataTableRowProps,
   DataTableRowState,
@@ -20,6 +24,7 @@ export type {
 export {
   DATA_TABLE_MIN_COLUMN_WIDTH,
   DATA_TABLE_MIN_FILL_WIDTH,
+  DATA_TABLE_ROW_ACTIONS_CLASS,
   DATA_TABLE_ROW_HEIGHT,
   DATA_TABLE_SETTINGS_WIDTH,
 } from "./DataTable.constants";

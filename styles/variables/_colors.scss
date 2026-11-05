@@ -91,6 +91,10 @@ $dnd-color: rgba(255, 249, 219, 1);
 $dnd-dark-color: rgba(78, 70, 54, 1);
 $dnd-hover-color: rgba(255, 239, 175, 1);
 $dnd-dark-hover: rgba(168, 143, 86, 1);
+// A table row that takes a drop, as the theme's `dragAndDrop.background`
+// (`globalColors.dndColor` / `dndDarkColor`) tints it.
+$dnd-target-color: rgba(229, 228, 138, 0.5);
+$dnd-target-dark-color: rgba(229, 228, 138, 0.12);
 
 $on-white-color: rgba(0, 0, 0, 0.1);
 $on-black-color: rgba(255, 255, 255, 0.1);

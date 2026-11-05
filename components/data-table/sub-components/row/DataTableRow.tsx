@@ -19,7 +19,13 @@ const DataTableRowPure = <T,>({
   index,
   checked,
   active,
-  dragging,
+  hover = true,
+  caret,
+  dropTarget,
+  dropOver,
+  dimmed,
+  highlight,
+  busy,
   className,
   style,
   cellProps,
@@ -82,9 +88,17 @@ const DataTableRowPure = <T,>({
         aria-rowindex={virtualized ? index + 2 : undefined}
         className={classNames(styles.row, "table-container_row", className, {
           checked,
+          [styles.isFirstRow]: index === 0,
+          [styles.isClickable]: !!onClick,
+          [styles.hasHover]: hover,
           [styles.isChecked]: checked,
           [styles.isActive]: active,
-          [styles.isDragging]: dragging,
+          [styles.isCaret]: caret,
+          [styles.isDropTarget]: dropTarget,
+          [styles.isDropOver]: dropOver,
+          [styles.isDimmed]: dimmed,
+          [styles.isHighlight]: highlight,
+          [styles.isBusy]: busy,
         })}
         style={style}
         onClick={onRowClick}

@@ -8,6 +8,8 @@ import {
   type DataTableApi,
   type DataTableColumn,
   DataTableRow,
+  DataTableRowActions,
+  DataTableRowCheckbox,
   type DataTableRowState,
   type DataTableSort,
   createLocalStorageWidths,
@@ -592,6 +594,167 @@ export const RowsAndMenus: Story = {
   },
 };
 
+// One row in each state the table draws, named after it.
+const STATE_ROWS: [string, DataTableRowState][] = [
+  ["Plain", {}],
+  ["Keyboard cursor (caret)", { caret: true }],
+  ["Selected (checked)", { checked: true }],
+  ["Menu open (active)", { active: true }],
+  ["Folder taking a drop (dropTarget)", { dropTarget: true }],
+  ["Folder under the drop (dropOver)", { dropTarget: true, dropOver: true }],
+  ["Cannot take the drop (dimmed)", { dimmed: true }],
+  ["Just created (highlight)", { highlight: true }],
+  ["Operation running (busy)", { busy: true }],
+  ["Plain", {}],
+];
+
+const StatesTemplate = () => {
+  const [selected, setSelected] = useState<number[]>([]);
+  const isChecked = useCallback(
+    (row: FileRow) =>
+      !!STATE_ROWS[row.id - 1][1].checked || selected.includes(row.id),
+    [selected],
+  );
+
+  const rows = useMemo(
+    () =>
+      STATE_ROWS.map(([name], i) => ({ ...ROWS[i], name: `${i}. ${name}` })),
+    [],
+  );
+
+  const columns = useMemo<DataTableColumn<FileRow>[]>(
+    () => [
+      {
+        ...COLUMNS[0],
+        cell: (row) => (
+          <span
+            style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}
+          >
+            <DataTableRowCheckbox
+              icon={<FileIcon />}
+              label={`Select ${row.name}`}
+              checked={isChecked(row)}
+              loading={row.id === 9}
+              onChange={(checked) =>
+                setSelected((prev) =>
+                  checked
+                    ? [...prev, row.id]
+                    : prev.filter((id) => id !== row.id),
+                )
+              }
+            />
+            <span style={{ flex: 1 }}>{row.name}</span>
+            <DataTableRowActions>
+              <button type="button">Share</button>
+            </DataTableRowActions>
+          </span>
+        ),
+      },
+      ...ROW_COLUMNS.slice(1),
+    ],
+    [isChecked],
+  );
+
+  const getRowProps = useCallback(
+    (row: FileRow): DataTableRowState => ({
+      ...STATE_ROWS[row.id - 1][1],
+      checked: isChecked(row),
+      contextMenu: { options: MENU_OPTIONS, title: "Actions" },
+      testId: `state-row-${row.id - 1}`,
+    }),
+    [isChecked],
+  );
+
+  return (
+    // The gutters the strips of rows in a state reach into.
+    <div
+      style={
+        {
+          "--data-table-row-bleed-start": "20px",
+          "--data-table-row-bleed-end": "20px",
+        } as React.CSSProperties
+      }
+    >
+      <FilesTable
+        columns={columns}
+        rows={rows}
+        getRowKey={(row) => row.id}
+        getRowProps={getRowProps}
+        ariaLabel="Files"
+      />
+    </div>
+  );
+};
+
+const FileIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M6 2h8l5 5v15H6z" fill="currentColor" opacity="0.35" />
+    <path d="M14 2v5h5" fill="currentColor" opacity="0.6" />
+  </svg>
+);
+
+export const RowStates: Story = {
+  render: () => <StatesTemplate />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Every state a row can be in, one per row. A row in a state, or under the pointer, stretches its strip into the page's gutters (`--data-table-row-bleed-start` / `-end`, 20 px here); rows share one line between them. The icon turns into the row's checkbox under the pointer, on a selected row and on keyboard focus; the Share button shows only on rows under the pointer, selected or acted on.",
+      },
+      source: {
+        code: `const getRowProps = (row: FileRow): DataTableRowState => ({
+  checked: isSelected(row),
+  active: row.id === menuRow,
+  caret: row.id === cursorRow,
+  hover: !isDragging,
+  dropTarget: isDragging && row.isFolder,
+  dimmed: isDragging && !row.isFolder,
+  highlight: row.id === createdRow,
+  busy: isRunning(row),
+});
+
+cell: (row) => (
+  <>
+    <DataTableRowCheckbox
+      icon={<FileIcon />}
+      label={\`Select \${row.name}\`}
+      checked={isSelected(row)}
+      onChange={(checked) => select(row, checked)}
+    />
+    {row.name}
+    <DataTableRowActions>
+      <ShareButton />
+    </DataTableRowActions>
+  </>
+)`,
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const row = (i: number) => canvas.getByTestId(`state-row-${i}`);
+
+    // The hidden checkbox is still in the tab order; focused, it shows, and
+    // Space ticks the row through the consumer's state.
+    const checkbox = within(row(0)).getByRole("checkbox", {
+      name: /^Select 0\./,
+    });
+    checkbox.focus();
+    await userEvent.keyboard(" ");
+    await waitFor(() =>
+      expect(row(0)).toHaveAttribute("aria-selected", "true"),
+    );
+    await userEvent.keyboard(" ");
+    await waitFor(() =>
+      expect(row(0)).toHaveAttribute("aria-selected", "false"),
+    );
+    checkbox.blur();
+
+    // A row with an operation running shows a loader, not the checkbox.
+    await expect(within(row(8)).queryByRole("checkbox")).toBeNull();
+  },
+};
+
 type IndexedRow = FileRow & { index: number };
 
 const INDEXED_ROWS: IndexedRow[] = ROWS.slice(0, 8).map((row, i) => ({
@@ -1072,6 +1235,7 @@ export const CssCustomization: Story = {
           "--data-table-header-text-color": "#3949ab",
           "--data-table-header-text-hover-color": "#1a237e",
           "--data-table-resize-color": "#9fa8da",
+          "--data-table-row-hover-background": "#f5f6fb",
           "--data-table-row-selected-background": "#e8eaf6",
         } as React.CSSProperties
       }
@@ -1083,7 +1247,7 @@ export const CssCustomization: Story = {
     docs: {
       description: {
         story:
-          "An indigo table: the borders, the header text and its hover, the resize edges and the selected row's tint set on a wrapper. Click a row to see the tint.",
+          "An indigo table: the borders, the header text and its hover, the resize edges and the tints of a row under the pointer and a selected one set on a wrapper. Click a row to see the selected tint.",
       },
       source: {
         code: `<div style={{
@@ -1091,6 +1255,7 @@ export const CssCustomization: Story = {
   "--data-table-header-text-color": "#3949ab",
   "--data-table-header-text-hover-color": "#1a237e",
   "--data-table-resize-color": "#9fa8da",
+  "--data-table-row-hover-background": "#f5f6fb",
   "--data-table-row-selected-background": "#e8eaf6",
 }}>
   <DataTable columns={columns} rows={rows} getRowKey={(row) => row.id} />
@@ -1108,12 +1273,13 @@ export const CssCustomization: Story = {
       borderBottomColor: "rgb(197, 202, 233)",
     });
 
+    // The tint is on the strip behind the cells, the row's ::before.
     const row = canvas.getAllByTestId("data-table-row")[0];
     await userEvent.click(within(row).getByText(ROWS[0].name));
     await waitFor(() =>
-      expect(row.querySelector('[role="cell"]')).toHaveStyle({
-        backgroundColor: "rgb(232, 234, 246)",
-      }),
+      expect(getComputedStyle(row, "::before").backgroundColor).toBe(
+        "rgb(232, 234, 246)",
+      ),
     );
   },
 };

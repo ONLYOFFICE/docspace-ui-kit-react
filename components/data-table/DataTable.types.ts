@@ -124,8 +124,24 @@ export type DataTableRowState = {
   checked?: boolean;
   /** Marks the row as the one being acted on, such as the one whose menu is open. */
   active?: boolean;
-  /** Marks the row as being dragged. */
-  dragging?: boolean;
+  /** Whether the row is tinted under the pointer. Turn it off while a drag or another mode owns the pointer. */
+  hover?: boolean;
+  /** Marks the row the keyboard cursor is on: a line in the caret colour above and below it. */
+  caret?: boolean;
+  /** Marks a row that takes what is being dragged, such as a folder: tinted in the drop colour, stronger under the pointer. */
+  dropTarget?: boolean;
+  /**
+   * Marks the drop target something is dragged over. The pointer over a
+   * `dropTarget` row does the same, except in a native drag, which moves no
+   * pointer: the consumer says it here.
+   */
+  dropOver?: boolean;
+  /** Fades the row's cells, as rows that cannot take a drag are faded while it lasts. */
+  dimmed?: boolean;
+  /** Flashes the row once, for an item just created or found. Set it again to flash again. */
+  highlight?: boolean;
+  /** Makes the row's cells ignore the pointer, while an operation on the item runs. */
+  busy?: boolean;
   /** Applied to the row. */
   className?: string;
   /** Applied to the row. Widths do not belong here: they come from the table. */
@@ -156,6 +172,37 @@ export type DataTableRowProps<T> = DataTableRowState & {
   index: number;
   /** Ref of the row element. */
   ref?: React.Ref<HTMLDivElement>;
+};
+
+/** Props of `DataTableRowCheckbox`. */
+export type DataTableRowCheckboxProps = {
+  /** The item's icon, shown while the checkbox is not. */
+  icon: React.ReactNode;
+  /** Whether the row is selected. A selected row shows the checkbox, ticked. */
+  checked?: boolean;
+  /** Called when the checkbox is ticked or unticked, with the new state. */
+  onChange?: (
+    checked: boolean,
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => void;
+  /** Accessible name and tooltip of the checkbox, such as "Select file". */
+  label?: string;
+  /** Shows a loader instead of the icon and the checkbox, while an operation on the item runs. */
+  loading?: boolean;
+  /** Keeps the icon and offers no checkbox, as while rows are being reordered. */
+  disabled?: boolean;
+  /** Applied to the element that holds the icon and the checkbox. */
+  className?: string;
+  /** Value of `data-testid` on that element. */
+  testId?: string;
+};
+
+/** Props of `DataTableRowActions`. */
+export type DataTableRowActionsProps = {
+  /** What shows only on a row that is under the pointer, selected or acted on. */
+  children: React.ReactNode;
+  /** Applied to the element that holds them. */
+  className?: string;
 };
 
 /** What `renderRow` is given for one row. */

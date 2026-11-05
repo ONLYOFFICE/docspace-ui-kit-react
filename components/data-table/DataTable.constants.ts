@@ -14,6 +14,13 @@ export const DATA_TABLE_SETTINGS_WIDTH = 24;
 export const DATA_TABLE_CONTEXT_MENU_CELL_CLASS =
   "table-container_row-context-menu-wrapper";
 
+/**
+ * Class of content a row shows only under the pointer, selected or acted on.
+ * `DataTableRowActions` puts it on its element; content that cannot be wrapped
+ * may carry it itself.
+ */
+export const DATA_TABLE_ROW_ACTIONS_CLASS = "data-table-row-actions";
+
 /** Height of a body row, its bottom border included, in pixels. */
 export const DATA_TABLE_ROW_HEIGHT = 48;
 

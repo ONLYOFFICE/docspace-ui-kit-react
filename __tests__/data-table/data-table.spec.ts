@@ -10,7 +10,14 @@ import { gotoStory } from "./data-table.helpers";
 // every other screenshot in __tests__/screenshots: fonts render differently
 // on each OS.
 
-type Case = { name: string; story: string; shot: string; dark?: boolean };
+type Case = {
+  name: string;
+  story: string;
+  shot: string;
+  dark?: boolean;
+  /** What keeps moving however long the page waits, such as a spinner. */
+  mask?: string;
+};
 
 const CASES: Case[] = [
   { name: "default", story: "default", shot: "data-table-default", dark: true },
@@ -20,6 +27,13 @@ const CASES: Case[] = [
     story: "rows-and-menus",
     shot: "data-table-rows-and-menus",
     dark: true,
+  },
+  {
+    name: "row states",
+    story: "row-states",
+    shot: "data-table-row-states",
+    dark: true,
+    mask: "[data-testid='data-table-row-checkbox'] [data-testid='loader']",
   },
   {
     name: "index editing",
@@ -54,10 +68,12 @@ const CASES: Case[] = [
 ];
 
 test.describe("DataTable — light", () => {
-  for (const { name, story, shot } of CASES) {
+  for (const { name, story, shot, mask } of CASES) {
     test(name, async ({ page }) => {
       await gotoStory(page, story);
-      await expect(page).toHaveScreenshot(`${shot}.png`);
+      await expect(page).toHaveScreenshot(`${shot}.png`, {
+        mask: mask ? [page.locator(mask)] : [],
+      });
     });
   }
 });
@@ -74,10 +90,12 @@ test.describe("DataTable — dark", () => {
     });
   });
 
-  for (const { name, story, shot } of CASES.filter((c) => c.dark)) {
+  for (const { name, story, shot, mask } of CASES.filter((c) => c.dark)) {
     test(`${name} dark`, async ({ page }) => {
       await gotoStory(page, story);
-      await expect(page).toHaveScreenshot(`${shot}-dark.png`);
+      await expect(page).toHaveScreenshot(`${shot}-dark.png`, {
+        mask: mask ? [page.locator(mask)] : [],
+      });
     });
   }
 });

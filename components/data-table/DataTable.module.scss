@@ -12,6 +12,17 @@
   @return var(--data-table-#{$name}, var(--data-table-#{$name}-default));
 }
 
+// How far a row's strip reaches past the table into the page's gutters: the
+// rows' own reach, else the header line's.
+$row-bleed-start: var(
+  --data-table-row-bleed-start,
+  var(--data-table-bleed-start, 0px)
+);
+$row-bleed-end: var(
+  --data-table-row-bleed-end,
+  var(--data-table-bleed-end, 0px)
+);
+
 .dataTable {
   :global(.light) & {
     --data-table-background-default: #{colors.$white};
@@ -20,8 +31,10 @@
     --data-table-header-text-hover-color-default: #{colors.$light-gray-dark};
     --data-table-resize-color-default: #{colors.$gray-strong};
     --data-table-resize-active-color-default: #{colors.$light-gray-dark};
+    --data-table-row-hover-background-default: #{colors.$light-gray-hover};
     --data-table-row-selected-background-default: #{colors.$light-gray-hover};
-    --data-table-row-drag-background-default: #{colors.$dnd-hover-color};
+    --data-table-row-drop-background-default: #{colors.$dnd-target-color};
+    --data-table-row-drop-over-background-default: #{colors.$dnd-hover-color};
   }
 
   :global(.dark) & {
@@ -31,9 +44,16 @@
     --data-table-header-text-hover-color-default: #{colors.$white};
     --data-table-resize-color-default: #{colors.$gray-dark-strong};
     --data-table-resize-active-color-default: #{colors.$gray-dark};
+    --data-table-row-hover-background-default: #{colors.$light-dark-gray-hover};
     --data-table-row-selected-background-default: #{colors.$light-dark-gray-hover};
-    --data-table-row-drag-background-default: #{colors.$dnd-dark-hover};
+    --data-table-row-drop-background-default: #{colors.$dnd-target-dark-color};
+    --data-table-row-drop-over-background-default: #{colors.$dnd-dark-hover};
   }
+
+  // The same in both themes.
+  --data-table-row-background-default: transparent;
+  --data-table-row-caret-color-default: #{colors.$light-second-main};
+  --data-table-row-highlight-background-default: #{colors.$light-second-main};
 
   position: relative;
   width: 100%;
@@ -55,10 +75,29 @@
   // A page with something pinned above the list, a filter bar, says how far
   // down the header stops.
   top: var(--data-table-header-top, 0px);
-  z-index: 1;
+  // Above the rows, the one with the caret included, which rises over its
+  // neighbours.
+  z-index: 2;
 
   background: token(background);
   border-bottom: 1px solid token(border-color);
+
+  // A row's strip reaches into the gutters; scrolled under the header, the
+  // strip hides there too.
+  &::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset-block: 0;
+    inset-inline: calc(-1 * #{$row-bleed-start}) calc(-1 * #{$row-bleed-end});
+    background: token(background);
+  }
+
+  // Resting on the first row while the keyboard cursor is on it, the header's
+  // line is the cursor's top line.
+  .dataTable:has(.isFirstRow.isCaret) &:not(.isStuck) {
+    border-bottom-color: token(row-caret-color);
+  }
 
   // Once rows scroll under the header, its line reaches as far as the strip of
   // a selected row does, past the table into the page's gutters, as the old
@@ -254,21 +293,100 @@
 
 // ===== Body =====
 
+// A row draws its background and its lines on a strip behind its cells: the
+// line above it lies on the previous row's line below, so two rows share one
+// line. A row in a state (under the pointer, selected, acted on, under the
+// keyboard cursor, taking a drop, flashing) stretches the strip, lines
+// included, past the table into the page's gutters.
 .row {
+  position: relative;
+  // The strip goes behind the cells and no further.
+  isolation: isolate;
   display: grid;
   grid-template-columns: var(--data-table-grid);
   // Scrolled into view, a row stops below the sticky header, not under it.
   scroll-margin-block-start: calc(40px + var(--data-table-header-top, 0px));
 
-  // A selected row and the one being acted on are tinted cell by cell, as in
-  // the old table, so a consumer's per-cell styles (drag and drop) still win.
-  &.isChecked .cell,
-  &.isActive .cell {
+  &::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset-block: -1px 0;
+    inset-inline: 0;
+    pointer-events: none;
+
+    border-block: 1px solid token(border-color);
+    background: token(row-background);
+  }
+
+  &.isChecked,
+  &.isActive,
+  &.isCaret,
+  &.isDropTarget,
+  &.isHighlight {
+    &::before {
+      inset-inline: calc(-1 * #{$row-bleed-start}) calc(-1 * #{$row-bleed-end});
+    }
+  }
+
+  // No more specific than a state, so a selected row under the pointer keeps
+  // its selected tint.
+  @media (hover: hover) {
+    &.hasHover:where(:hover)::before {
+      inset-inline: calc(-1 * #{$row-bleed-start}) calc(-1 * #{$row-bleed-end});
+      background: token(row-hover-background);
+    }
+  }
+
+  &.isChecked::before,
+  &.isActive::before {
     background: token(row-selected-background);
   }
 
-  &.isDragging .cell {
-    background: token(row-drag-background);
+  // What is being dragged matters more than the selection it started from.
+  &.isDropTarget::before {
+    background: token(row-drop-background);
+  }
+
+  &.isDropTarget.isDropOver::before {
+    background: token(row-drop-over-background);
+  }
+
+  @media (hover: hover) {
+    &.isDropTarget:hover::before {
+      background: token(row-drop-over-background);
+    }
+  }
+
+  // Raised over the rows around it, so its lines are not covered by theirs.
+  &.isCaret {
+    z-index: 1;
+
+    &::before {
+      border-color: token(row-caret-color);
+    }
+  }
+
+  &.isHighlight::before {
+    animation: data-table-row-highlight 2s 1;
+  }
+
+  &.isClickable {
+    cursor: pointer;
+  }
+
+  &.isDimmed .cell {
+    opacity: 0.4;
+  }
+
+  &.isBusy .cell {
+    pointer-events: none;
+  }
+}
+
+@keyframes data-table-row-highlight {
+  from {
+    background: token(row-highlight-background);
   }
 }
 
@@ -279,8 +397,80 @@
   min-width: 0;
   height: var(--data-table-row-height, 48px);
   overflow: hidden;
+  // The row's line below takes the last pixel, as a border of the cell did;
+  // content stays centred above it.
+  padding-block-end: 1px;
 
-  border-bottom: 1px solid token(border-color);
+  // The menu button's focus ring reaches past its cell; there is nothing in
+  // it to ellipsize.
+  &:global(.table-container_row-context-menu-wrapper) {
+    overflow: visible;
+  }
+}
+
+// ===== Row content =====
+
+// The icon and the checkbox share one 32px square, one hidden behind the
+// other. The checkbox stays focusable while hidden, and shows once focused.
+.rowCheckbox {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+
+  > * {
+    grid-area: 1 / 1;
+  }
+}
+
+.rowCheckboxIcon {
+  display: flex;
+}
+
+.rowCheckboxInput {
+  // No label beside the box, so no gap after it: the box is centred.
+  --checkbox-gap: 0px;
+
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rowCheckbox:not(.isDisabled) {
+  &.isRowChecked,
+  &:focus-within {
+    .rowCheckboxIcon {
+      visibility: hidden;
+    }
+
+    .rowCheckboxInput {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+}
+
+@media (hover: hover) {
+  // Under the pointer itself, as the old table's icon did: the rest of the
+  // row is for opening and selecting with a click.
+  .rowCheckbox:not(.isDisabled):hover {
+    .rowCheckboxIcon {
+      visibility: hidden;
+    }
+
+    .rowCheckboxInput {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  // Row actions wait for the pointer, a selection, the row being acted on or
+  // the keyboard in the row, which then tabs on into them. Without a hovering
+  // pointer there is nothing to wait for.
+  .row:not(:hover, :focus-within, .isChecked, .isActive)
+    :global(.data-table-row-actions) {
+    display: none;
+  }
 }
 
 // ===== Virtual list =====
