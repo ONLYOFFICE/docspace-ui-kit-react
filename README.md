@@ -212,6 +212,7 @@ import {
   ContextMenuButton,
   ContextMenuButtonDisplayType,
 } from "@onlyoffice/apps-ui-kit/components/context-menu-button";
+import { DataTable } from "@onlyoffice/apps-ui-kit/components/data-table";
 import { DatePicker } from "@onlyoffice/apps-ui-kit/components/date-picker";
 import { DateTimePicker } from "@onlyoffice/apps-ui-kit/components/date-time-picker";
 import { DragAndDrop } from "@onlyoffice/apps-ui-kit/components/drag-and-drop";
@@ -294,14 +295,7 @@ import { Slider } from "@onlyoffice/apps-ui-kit/components/slider";
 import { SnackBar } from "@onlyoffice/apps-ui-kit/components/snackbar";
 import { StatusMessage } from "@onlyoffice/apps-ui-kit/components/status-message";
 import { TabItem } from "@onlyoffice/apps-ui-kit/components/tab-item";
-import {
-  TableContainer,
-  TableBody,
-  TableRow,
-  TableHeader,
-  TableGroupMenu,
-  TableCell,
-} from "@onlyoffice/apps-ui-kit/components/table";
+import { TableGroupMenu } from "@onlyoffice/apps-ui-kit/components/table-group-menu";
 import { Tabs, TabsTypes } from "@onlyoffice/apps-ui-kit/components/tabs";
 import { Tag } from "@onlyoffice/apps-ui-kit/components/tag";
 import { Tags } from "@onlyoffice/apps-ui-kit/components/tags";
@@ -436,6 +430,7 @@ import type { TFile, TFolder, TUser, TFileSecurity, TFolderSecurity, TRoomSecuri
 | [ComboBox](./components/combobox/README.md)                           | Combo box combining text input with dropdown list, supporting search and custom styling                                         |
 | [ContextMenu](./components/context-menu/README.md)                    | Context menu for displaying contextual actions with submenus, headers, toggles, and hotkeys                                     |
 | [ContextMenuButton](./components/context-menu-button/README.md)       | Button for displaying context menu actions on list items with dropdown support                                                  |
+| [DataTable](./components/data-table/README.md)                        | Columnar list whose header and rows share one grid, with sortable, resizable and hideable columns                               |
 | [DatePicker](./components/date-picker/README.md)                      | Date picker input component for selecting dates                                                                                 |
 | [DateTimePicker](./components/date-time-picker/README.md)             | Combined date and time input component                                                                                          |
 | [DragAndDrop](./components/drag-and-drop/README.md)                   | File drag-and-drop handler for upload operations                                                                                |
@@ -494,7 +489,7 @@ import type { TFile, TFolder, TUser, TFileSecurity, TFolderSecurity, TRoomSecuri
 | SnackBar                                                              | Toast notification component for temporary messages and alerts                                                                  |
 | [StatusMessage](./components/status-message/README.md)                | Animated status message component for displaying error and warning messages                                                     |
 | [TabItem](./components/tab-item/README.md)                            | Tab navigation component with active states, multi-select, and disabled state support                                           |
-| TableContainer                                                        | Modular table with body, row, header, group menu, and cell sub-components                                                       |
+| [TableGroupMenu](./components/table-group-menu/README.md)             | Toolbar that takes a section header's place while items are selected                                                            |
 | [Tabs](./components/tabs/README.md)                                   | Tab container component with primary/secondary themes, sticky positioning, and content management                               |
 | [Tag](./components/tag/README.md)                                     | Tag component for displaying virtual room tags                                                                                  |
 | [Tags](./components/tags/README.md)                                   | Container component for displaying multiple tags                                                                                |

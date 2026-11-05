@@ -10,7 +10,7 @@
   "exports": ["Selector", "SelectorProps", "TSelectorItem", "SelectorAccessRightsMode", "RowLoader", "SearchLoader", "BreadCrumbsLoader"],
   "providers": ["ThemeProvider", "TranslationProvider"],
   "state": { "visibility": null, "close": "onClose", "loading": "isLoading", "disabled": null },
-  "related": ["aside", "search-input", "table"],
+  "related": ["aside", "search-input", "data-table"],
   "subComponents": [],
   "testIds": ["selector", "selector_search_input", "selector_submit_button", "selector_cancel_button"],
   "storiesAudit": "2026-09-28"
@@ -29,7 +29,7 @@ breadcrumbs, pagination and footer.
   selection back in one callback.
 - Not for a short, fixed list of options — [`ComboBox`](../combobox/README.md) is that, and it
   costs none of the pagination machinery.
-- Not for a table of data with columns — [`Table`](../table/README.md) is that.
+- Not for a table of data with columns — [`DataTable`](../data-table/README.md) is that.
 - Not as a dialog on its own. Selector has no visibility prop; it fills whatever box you put it
   in. `useAside` is the one switch that turns it into a panel, and for anything else wrap it in
   [`ModalDialog`](../modal-dialog/README.md) yourself.
@@ -749,4 +749,4 @@ Only the first can be overridden by a prop.
 
 - [`Aside`](../aside/README.md) — the panel `useAside` wraps this in.
 - [`SearchInput`](../search-input/README.md) — the search box, whose `onChange` gives a string.
-- [`Table`](../table/README.md) — for rows with columns rather than a single label.
+- [`DataTable`](../data-table/README.md) — for rows with columns rather than a single label.

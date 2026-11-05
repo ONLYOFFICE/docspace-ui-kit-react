@@ -58,7 +58,7 @@ const UpcomingPayments = () => {
           <Consumer>
             {(context) =>
               viewAs === "table" ? (
-                <TableView sectionWidth={context.sectionWidth || 0} />
+                <TableView />
               ) : (
                 <RowView sectionWidth={context.sectionWidth || 0} />
               )

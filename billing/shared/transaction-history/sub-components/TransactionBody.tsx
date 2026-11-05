@@ -98,10 +98,7 @@ const TransactionBody = ({
     <Consumer>
       {(context) =>
         viewAs === "table" ? (
-          <TableView
-            sectionWidth={context.sectionWidth || 0}
-            serviceName={serviceName}
-          />
+          <TableView serviceName={serviceName} />
         ) : (
           <RowView
             sectionWidth={context.sectionWidth || 0}

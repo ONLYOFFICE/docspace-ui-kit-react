@@ -787,10 +787,10 @@
   }
 
   // Opt-in (stickyTableHeader): the desktop SectionFilter renders inside the
-  // scroll body as a sticky element below the scrollable banner, and the table
-  // header pins below it via `position: sticky` (instead of `position: fixed`),
-  // so the header tracks the filter natively with no host JS. The host supplies
-  // the resting pin offset (section header height + filter height) via the
+  // scroll body as a sticky element below the scrollable banner, and the
+  // DataTable's sticky header (`.table-container_header`) pins below it, so the
+  // header tracks the filter natively with no host JS. The host supplies the
+  // resting pin offset (section header height + filter height) via the
   // `--section-filter-bottom` CSS variable. Default consumers never match this.
   &.stickyTableHeader {
     :global(.section-body_sticky-filter) {
@@ -827,27 +827,14 @@
       // --section-filter-height); resolved natively against #sectionScroll,
       // no JS measurement.
       top: var(--section-filter-bottom, 0);
-      // Back in normal flow (vs fixed): span the grid and ignore the
-      // imperative fixed-mode pixel width that TableHeader sets.
       width: 100% !important;
     }
 
-    // The grid's default `margin-top: -25px` tucks a *fixed* (out-of-flow)
-    // header that sits at the grid's own top. Here the header is `sticky`, so
-    // it stays IN flow and occupies its own 39px. The negative margin would
-    // slide it up under the in-body filter (hiding the column titles until
-    // scroll), so cancel it.
+    // A host may raise its table 25px into the body's top padding, where the
+    // section's own pinned header would end; under the in-body filter that
+    // would slide the column titles under it, so the table stays in place.
     :global(.table-container) {
       margin-top: 0;
-    }
-
-    // The 40px spacer TableHeader renders to reserve room for the out-of-flow
-    // *fixed* header. A sticky header is IN flow and reserves its own height, so
-    // the spacer is pure double-counting here — remove it. It carries only a
-    // CSS-module class (no global class), so match it by attribute substring,
-    // the same way ModelSettingsTable does.
-    :global([class*="emptyTableContainer"]) {
-      display: none;
     }
   }
 }

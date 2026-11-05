@@ -15,7 +15,7 @@ node .claude/scripts/component-docs/gaps.mjs
 ```
 
 Ten components have no README, one (`theme-provider`) has no story. Stories are searched
-recursively — `table`, `rows` and `tiles` keep theirs in subdirectories, so do not conclude one
+recursively — `rows`, `tiles` and `table-group-menu` keep theirs in subdirectories, so do not conclude one
 is missing from a flat listing.
 
 ## Writing a README
@@ -76,8 +76,8 @@ put what it means for a consumer in `CHANGELOG.md`, which is where someone upgra
 The story shows the component; the README describes it — and the README is also what the
 story's Docs page renders (`.storybook/blocks/DocsPage.tsx`), so there is no second description.
 A story file carries no `parameters.docs.description.component`; `STORY_TEMPLATE.md` governs
-the rest of it. The one exception is a story file whose own folder has no README (the table's
-parts, the skeletons, `ArticleItem`): it keeps one purpose sentence naming the parent page.
+the rest of it. The one exception is a story file whose own folder has no README (`GroupMenuItem`
+and, the skeletons, `ArticleItem`): it keeps one purpose sentence naming the parent page.
 
 That replaced a hand-written second description, which nothing compared with the README and
 which went stale first — one claimed `ModalDialog` traps focus, which it has never done. When

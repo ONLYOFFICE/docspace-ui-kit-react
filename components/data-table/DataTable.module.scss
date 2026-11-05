@@ -186,7 +186,7 @@ $row-bleed-end: var(
   white-space: nowrap;
   text-overflow: ellipsis;
 
-  font-size: 13px;
+  font-size: var(--data-table-header-font-size, 13px);
   font-weight: 600;
   line-height: 38px;
   color: token(header-text-color);

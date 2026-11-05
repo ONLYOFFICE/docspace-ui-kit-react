@@ -222,7 +222,7 @@ applies. Three levels, fastest first:
   trailing commas, 2-space indent, LF. Biome's formatter is off and configures none of this
 - **Tests**: Vitest + React Testing Library, setup in `test/setup.ts`
 - **Stories**: every component must have a story. It may live in a subdirectory rather
-  than beside `index.ts` — `table`, `rows` and `tiles` all do — so check recursively
+  than beside `index.ts` — `rows`, `tiles` and `table-group-menu` all do — so check recursively
   before concluding one is missing. Every component folder has one now, `theme-provider`
   included.
 

@@ -6,11 +6,11 @@
   "category": "Data display",
   "status": "public",
   "summary": "Columnar list whose header and rows share one grid, with sortable, resizable and hideable columns whose widths are remembered as shares of the table.",
-  "import": { "subpath": "components/data-table", "barrel": false, "default": false },
+  "import": { "subpath": "components/data-table", "barrel": true, "default": false },
   "exports": ["DataTable", "DataTableRow", "DataTableProps", "DataTableRowProps", "DataTableRowState", "DataTableRenderRowProps", "DataTableRowContextMenu", "DataTableCellProps", "DataTableColumn", "DataTableSort", "DataTableCellContext", "DataTableHeaderContext", "ColumnWidth", "WidthStorage", "createLocalStorageWidths", "createMemoryWidths", "settingsColumn", "contextMenuColumn", "ColumnSettings", "DataTableApi", "DataTableVirtualize", "DataTableLoadMore", "DATA_TABLE_MIN_FILL_WIDTH", "DATA_TABLE_MIN_COLUMN_WIDTH", "DATA_TABLE_ROW_HEIGHT", "DATA_TABLE_SETTINGS_WIDTH"],
   "providers": ["ThemeProvider"],
   "state": { "visibility": null, "close": null, "loading": null, "disabled": null },
-  "related": ["table", "rows", "context-menu"],
+  "related": ["table-group-menu", "rows", "context-menu"],
   "subComponents": [],
   "testIds": ["data-table", "data-table-header", "data-table-header-<columnId>", "data-table-sort-<columnId>", "data-table-resize-<columnId>", "data-table-settings", "data-table-settings-button", "data-table-settings-<columnId>", "data-table-body", "data-table-row", "data-table-context-menu-button", "data-table-skeleton-row"]
 } -->
@@ -18,8 +18,8 @@
 # DataTable
 
 Columnar list whose header and rows share one grid, with sortable, resizable and hideable columns
-whose widths are remembered as shares of the table. It is the successor of
-[`Table`](../table/README.md), being built next to it.
+whose widths are remembered as shares of the table. It replaced `Table`, which is gone; "Moving
+from `Table`" below maps one onto the other.
 
 ## Use this when / not when
 
@@ -37,8 +37,7 @@ whose widths are remembered as shares of the table. It is the successor of
 import { DataTable } from "@onlyoffice/apps-ui-kit/components/data-table";
 ```
 
-The table is **not in the root barrel** while it is being trialled, so it is not part of the
-plugin API; import it by subpath.
+A plugin imports it from the root barrel, `@onlyoffice/apps-ui-kit`, like every other name.
 
 Needs `ThemeProvider` from `@onlyoffice/apps-ui-kit/providers/theme`: the borders and header
 colours are set under its `.light` / `.dark` class, and without it they are not drawn.
@@ -596,8 +595,8 @@ export function DroppableItems({
 
 ### Moving from `Table`
 
-The old table is a kit of parts the consumer assembles and keeps in step; this one is one
-component given every column. What each part becomes:
+`Table` was a kit of parts the consumer assembled and kept in step; this one is one component
+given every column. For code written against it, what each part becomes:
 
 | `Table`                                                                      | `DataTable`                                                                     |
 | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
@@ -847,20 +846,22 @@ Set them on any ancestor of the table. Each default has a light and a dark value
 Each of them may also be set on a row, through its `className` or `style`, to recolour that row
 alone: a mode that tints every row sets `--data-table-row-background`.
 
-Five more place the sticky header and the strips, and have no theme values. The header's bleeds
+Six more place and size the header and the strips, and have no theme values. The header's bleeds
 say how far its line reaches past the table, at the start and at the end, once rows scroll under
 it: into the page's gutters, where a selected row's strip already reaches. The rows' bleeds say how
 far a row's strip reaches, and are the header's unless set. The top is for a page that pins
 something above the list in the same scroller, such as a filter bar: the header stops below it, and
-`scrollToIndex` lands rows below both.
+`scrollToIndex` lands rows below both. The font size is for a table set in smaller type than a
+section list, such as one on a settings page.
 
-| Variable                       | Default                    | Effect                                                   |
-| ------------------------------ | -------------------------- | -------------------------------------------------------- |
-| `--data-table-header-top`      | `0px`                      | How far below the scroller's top the header sticks       |
-| `--data-table-bleed-start`     | `0px`                      | How far the stuck header's line runs past the start edge |
-| `--data-table-bleed-end`       | `0px`                      | How far the stuck header's line runs past the end edge   |
-| `--data-table-row-bleed-start` | `--data-table-bleed-start` | How far a row's strip runs past the start edge           |
-| `--data-table-row-bleed-end`   | `--data-table-bleed-end`   | How far a row's strip runs past the end edge             |
+| Variable                        | Default                    | Effect                                                   |
+| ------------------------------- | -------------------------- | -------------------------------------------------------- |
+| `--data-table-header-top`       | `0px`                      | How far below the scroller's top the header sticks       |
+| `--data-table-header-font-size` | `13px`                     | Size of the column titles                                |
+| `--data-table-bleed-start`      | `0px`                      | How far the stuck header's line runs past the start edge |
+| `--data-table-bleed-end`        | `0px`                      | How far the stuck header's line runs past the end edge   |
+| `--data-table-row-bleed-start`  | `--data-table-bleed-start` | How far a row's strip runs past the start edge           |
+| `--data-table-row-bleed-end`    | `--data-table-bleed-end`   | How far a row's strip runs past the end edge             |
 
 Row height is the `rowHeight` prop, not a variable: the virtualiser has to know it too.
 
@@ -928,8 +929,8 @@ Header and body cells also carry `data-column-id="<columnId>"`.
 
 ## Related
 
-- [`Table`](../table/README.md) — the table this one replaces, unchanged; the portal's lists stay
-  on it until each moves over. "Moving from `Table`" above maps one onto the other.
+- [`TableGroupMenu`](../table-group-menu/README.md) — the bar a section header shows in place of
+  its title while rows of the table are selected.
 - [`ContextMenu`](../context-menu/README.md) — the menu a row's `contextMenu` opens, for its
   model and keyboard use.
 - [`Rows`](../rows/README.md) — a one-line-per-item list instead of columns.

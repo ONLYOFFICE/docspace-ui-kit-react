@@ -277,7 +277,7 @@ The props table lives between markers and is written by `pnpm readme:props`:
 <!-- props:end -->
 ```
 
-A compound component names its type in the marker: `<!-- props:start TableHeaderProps -->`.
+A compound component names its type in the marker: `<!-- props:start ArticleProps -->`.
 
 Rules:
 

@@ -5,10 +5,14 @@ import Image24Svg from "../../assets/icons/24/image.svg";
 import Pdf24Svg from "../../assets/icons/24/pdf.svg";
 import Slide24Svg from "../../assets/icons/24/slide.svg";
 import Word24Svg from "../../assets/icons/24/word.svg";
-import { Checkbox } from "../../components/checkbox";
+import {
+  type DataTableColumn,
+  DataTableRowCheckbox,
+  settingsColumn,
+} from "../../components/data-table";
 import { Link, LinkType } from "../../components/link";
-import { TableCell } from "../../components/table";
 import { Text } from "../../components/text";
+import { SortByFieldName } from "../../enums";
 import { globalColors } from "../../providers/theme";
 
 export type StoryFile = { name: string; type: string; tags: string };
@@ -34,101 +38,109 @@ const icons: Record<string, React.ReactNode> = {
   ".png": <Image24Svg />,
 };
 
-const elementWrapperStyle: React.CSSProperties = {
-  minWidth: "40px",
-  border: "none",
-};
-
-const elementContainerStyle: React.CSSProperties = {
-  width: "32px",
-  height: "32px",
+// The icon square, 8px, then the name, as the old table's 40px element
+// wrapper laid them out.
+const nameCellStyle: React.CSSProperties = {
   display: "flex",
-  justifyContent: "center",
   alignItems: "center",
-};
-
-// As the client's files table sets it. The label is laid out with a 12px gap
-// after the box for a text it does not have, so at its natural width it is
-// centred in the 32px container 8px to the left of the icon it replaces;
-// narrowed to 12px, the box overflows into that gap and lands on the icon.
-const checkboxStyle: React.CSSProperties = {
-  width: "12px",
+  gap: "8px",
+  minWidth: 0,
 };
 
 const nameStyle: React.CSSProperties = {
-  paddingBlock: "14px",
   paddingInlineEnd: "8px",
 };
 
-const FileCells = ({
+const sideCellStyle: React.CSSProperties = {
+  minWidth: 0,
+  paddingInlineEnd: "8px",
+};
+
+const FileName = ({
   file,
-  checked = false,
+  checked,
   onSelect,
 }: {
   file: StoryFile;
-  checked?: boolean;
+  checked: boolean;
   onSelect?: (checked: boolean) => void;
 }) => {
   const dot = file.name.lastIndexOf(".");
   const exst = file.name.slice(dot);
 
   return (
-    <>
-      <TableCell>
-        <TableCell
-          className="table-container_element-wrapper"
-          style={elementWrapperStyle}
-          hasAccess
-          checked={checked}
-        >
-          <div
-            className="table-container_element-container"
-            style={elementContainerStyle}
-          >
-            <div className="table-container_element">{icons[exst]}</div>
-            <Checkbox
-              className="table-container_row-checkbox"
-              style={checkboxStyle}
-              isChecked={checked}
-              onChange={(e) => onSelect?.(e.target.checked)}
-            />
-          </div>
-        </TableCell>
-        <Link
-          type={LinkType.page}
-          title={file.name}
-          fontSize="13px"
-          fontWeight={600}
-          style={nameStyle}
-          isTextOverflow
-          truncate
-        >
-          {file.name.slice(0, dot)}
-          <span style={{ color: globalColors.gray }}>{exst}</span>
-        </Link>
-      </TableCell>
-      <TableCell>
-        <Text
-          fontSize="12px"
-          fontWeight={600}
-          color={globalColors.gray}
-          truncate
-        >
-          {file.type}
-        </Text>
-      </TableCell>
-      <TableCell>
-        <Text
-          fontSize="12px"
-          fontWeight={600}
-          color={globalColors.gray}
-          truncate
-        >
-          {file.tags}
-        </Text>
-      </TableCell>
-    </>
+    <div style={nameCellStyle}>
+      <DataTableRowCheckbox
+        icon={icons[exst]}
+        label={`Select ${file.name}`}
+        checked={checked}
+        onChange={(value) => onSelect?.(value)}
+      />
+      <Link
+        type={LinkType.page}
+        title={file.name}
+        fontSize="13px"
+        fontWeight={600}
+        style={nameStyle}
+        isTextOverflow
+        truncate
+      >
+        {file.name.slice(0, dot)}
+        <span style={{ color: globalColors.gray }}>{exst}</span>
+      </Link>
+    </div>
   );
 };
 
-export default FileCells;
+const side = (value: string) => (
+  <div style={sideCellStyle}>
+    <Text fontSize="12px" fontWeight={600} color={globalColors.gray} truncate>
+      {value}
+    </Text>
+  </div>
+);
+
+/**
+ * The columns of a files table over `storyFiles`, for a `DataTable`: the name
+ * with the file's icon, which turns into the row's checkbox, then the type and
+ * the tags, which the settings button at the end shows and hides. The three
+ * sort by the client's sort keys.
+ */
+export const storyFileColumns = ({
+  isChecked = () => false,
+  onSelect,
+}: {
+  isChecked?: (file: StoryFile) => boolean;
+  onSelect?: (file: StoryFile, checked: boolean) => void;
+} = {}): DataTableColumn<StoryFile>[] => [
+  {
+    id: "Name",
+    title: "Name",
+    width: { type: "fill" },
+    sortKey: SortByFieldName.Name,
+    cell: (file) => (
+      <FileName
+        file={file}
+        checked={isChecked(file)}
+        onSelect={(checked) => onSelect?.(file, checked)}
+      />
+    ),
+  },
+  {
+    id: "Type",
+    title: "Type",
+    width: { type: "flex" },
+    sortKey: SortByFieldName.Type,
+    hideable: true,
+    cell: (file) => side(file.type),
+  },
+  {
+    id: "Tags",
+    title: "Tags",
+    width: { type: "flex" },
+    sortKey: SortByFieldName.Tags,
+    hideable: true,
+    cell: (file) => side(file.tags),
+  },
+  settingsColumn<StoryFile>({ title: "Choose columns" }),
+];

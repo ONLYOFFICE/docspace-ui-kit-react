@@ -26,16 +26,18 @@
 
 .transactionHistoryBody {
   margin-top: 27px;
+}
 
-  :global(.table-container_header) {
-    position: absolute;
-  }
+// The 12px titles the page's tables had.
+.table {
+  --data-table-header-font-size: 12px;
 
-  :global(.table-container_cell) {
+  // A long description wraps, and its row grows to fit; the list is not
+  // virtualised, so rows of different heights are fine. Inside `.table`, to
+  // outrank the table's own cell height.
+  .cell {
     height: auto;
-    max-height: none;
-    min-height: 48px;
-    overflow: visible;
+    min-height: var(--data-table-row-height, 48px);
     white-space: normal;
   }
 }

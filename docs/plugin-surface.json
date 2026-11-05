@@ -1,8 +1,8 @@
 {
   "entry": "index.ts",
   "package": "@onlyoffice/apps-ui-kit",
-  "total": 717,
-  "values": 466,
+  "total": 743,
+  "values": 475,
   "exports": {
     "ADMIN": {
       "kind": "variable",
@@ -292,6 +292,14 @@
       "kind": "variable",
       "origin": "components/color-picker"
     },
+    "ColumnSettings": {
+      "kind": "variable",
+      "origin": "components/data-table/sub-components/settings"
+    },
+    "ColumnWidth": {
+      "kind": "type",
+      "origin": "components/data-table/layout"
+    },
     "ColumnarInfoBar": {
       "kind": "variable",
       "origin": "components/columnar-info-bar"
@@ -425,6 +433,26 @@
       "origin": "components/quick-actions",
       "external": "assets (*.react.svg)"
     },
+    "DATA_TABLE_MIN_COLUMN_WIDTH": {
+      "kind": "variable",
+      "origin": "components/data-table"
+    },
+    "DATA_TABLE_MIN_FILL_WIDTH": {
+      "kind": "variable",
+      "origin": "components/data-table"
+    },
+    "DATA_TABLE_ROW_ACTIONS_CLASS": {
+      "kind": "variable",
+      "origin": "components/data-table"
+    },
+    "DATA_TABLE_ROW_HEIGHT": {
+      "kind": "variable",
+      "origin": "components/data-table"
+    },
+    "DATA_TABLE_SETTINGS_WIDTH": {
+      "kind": "variable",
+      "origin": "components/data-table"
+    },
     "DEFAULT_CHUNK_UPLOAD_SIZE": {
       "kind": "variable",
       "origin": "constants"
@@ -476,6 +504,82 @@
     "Data": {
       "kind": "type",
       "origin": "components/selector"
+    },
+    "DataTable": {
+      "kind": "variable",
+      "origin": "components/data-table"
+    },
+    "DataTableApi": {
+      "kind": "type",
+      "origin": "components/data-table"
+    },
+    "DataTableCellContext": {
+      "kind": "type",
+      "origin": "components/data-table"
+    },
+    "DataTableCellProps": {
+      "kind": "type",
+      "origin": "components/data-table"
+    },
+    "DataTableColumn": {
+      "kind": "type",
+      "origin": "components/data-table"
+    },
+    "DataTableHeaderContext": {
+      "kind": "type",
+      "origin": "components/data-table"
+    },
+    "DataTableLoadMore": {
+      "kind": "type",
+      "origin": "components/data-table"
+    },
+    "DataTableProps": {
+      "kind": "interface",
+      "origin": "components/data-table"
+    },
+    "DataTableRenderRowProps": {
+      "kind": "type",
+      "origin": "components/data-table"
+    },
+    "DataTableRow": {
+      "kind": "variable",
+      "origin": "components/data-table/sub-components/row"
+    },
+    "DataTableRowActions": {
+      "kind": "variable",
+      "origin": "components/data-table/sub-components/row"
+    },
+    "DataTableRowActionsProps": {
+      "kind": "type",
+      "origin": "components/data-table"
+    },
+    "DataTableRowCheckbox": {
+      "kind": "variable",
+      "origin": "components/data-table/sub-components/row"
+    },
+    "DataTableRowCheckboxProps": {
+      "kind": "type",
+      "origin": "components/data-table"
+    },
+    "DataTableRowContextMenu": {
+      "kind": "type",
+      "origin": "components/data-table"
+    },
+    "DataTableRowProps": {
+      "kind": "type",
+      "origin": "components/data-table"
+    },
+    "DataTableRowState": {
+      "kind": "type",
+      "origin": "components/data-table"
+    },
+    "DataTableSort": {
+      "kind": "type",
+      "origin": "components/data-table"
+    },
+    "DataTableVirtualize": {
+      "kind": "type",
+      "origin": "components/data-table"
     },
     "DatePicker": {
       "kind": "variable",
@@ -1704,7 +1808,7 @@
     },
     "TGroupMenuItem": {
       "kind": "type",
-      "origin": "components/table"
+      "origin": "components/table-group-menu"
     },
     "THeaderBackButton": {
       "kind": "type",
@@ -1926,10 +2030,6 @@
       "kind": "type",
       "origin": "components/tabs"
     },
-    "TTableColumn": {
-      "kind": "type",
-      "origin": "components/table"
-    },
     "TTheme": {
       "kind": "type",
       "origin": "providers/theme/themes"
@@ -1978,29 +2078,13 @@
       "kind": "variable",
       "origin": "components/tab-item"
     },
-    "TableBody": {
-      "kind": "variable",
-      "origin": "components/table/table-body"
-    },
-    "TableCell": {
-      "kind": "variable",
-      "origin": "components/table/sub-components/table-cell"
-    },
-    "TableContainer": {
-      "kind": "variable",
-      "origin": "components/table/table-container"
-    },
     "TableGroupMenu": {
       "kind": "variable",
-      "origin": "components/table/table-group-menu"
+      "origin": "components/table-group-menu"
     },
-    "TableHeader": {
-      "kind": "variable",
-      "origin": "components/table/table-header"
-    },
-    "TableRow": {
-      "kind": "variable",
-      "origin": "components/table/table-row"
+    "TableGroupMenuProps": {
+      "kind": "type",
+      "origin": "components/table-group-menu"
     },
     "Tabs": {
       "kind": "variable",
@@ -2252,6 +2336,10 @@
       "kind": "enum",
       "origin": "enums"
     },
+    "WidthStorage": {
+      "kind": "interface",
+      "origin": "components/data-table/layout"
+    },
     "WindowI18n": {
       "kind": "type",
       "origin": "utils/i18n"
@@ -2292,6 +2380,10 @@
       "kind": "variable",
       "origin": "utils/combineUrl"
     },
+    "contextMenuColumn": {
+      "kind": "variable",
+      "origin": "components/data-table/columns"
+    },
     "convertDuration": {
       "kind": "function",
       "origin": "utils/date"
@@ -2311,6 +2403,14 @@
     "createDuration": {
       "kind": "function",
       "origin": "utils/date"
+    },
+    "createLocalStorageWidths": {
+      "kind": "variable",
+      "origin": "components/data-table/layout"
+    },
+    "createMemoryWidths": {
+      "kind": "variable",
+      "origin": "components/data-table/layout"
     },
     "dateDiff": {
       "kind": "function",
@@ -2747,6 +2847,10 @@
     "setDefaultTimezone": {
       "kind": "function",
       "origin": "utils/date"
+    },
+    "settingsColumn": {
+      "kind": "variable",
+      "origin": "components/data-table/columns"
     },
     "size": {
       "kind": "variable",

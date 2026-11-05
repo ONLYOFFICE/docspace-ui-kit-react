@@ -55,18 +55,20 @@ describe("InfiniteLoader Component", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders table component in list view", () => {
-    render(
-      <InfiniteLoaderComponent
-        {...defaultProps}
-        viewAs="table"
-        columnStorageName="test-storage"
-        columnInfoPanelStorageName="test-info-storage"
-      />,
+  it("renders viewAs table exactly like row", () => {
+    const { container: rowRender, unmount } = render(
+      <InfiniteLoaderComponent {...defaultProps} viewAs="row" />,
+    );
+    const rowMarkup = rowRender.innerHTML;
+    unmount();
+
+    const { container: tableRender } = render(
+      <InfiniteLoaderComponent {...defaultProps} viewAs="table" />,
     );
     expect(
       screen.getByTestId("infinite-loader-container-list"),
     ).toBeInTheDocument();
+    expect(tableRender.innerHTML).toBe(rowMarkup);
   });
 
   it("chooses correct scroll element based on isMobile (mobile)", () => {

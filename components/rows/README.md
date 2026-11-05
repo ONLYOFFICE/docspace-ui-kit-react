@@ -32,7 +32,7 @@ below before choosing it.
   prop name, and the virtual list measures itself through a literal element id — see
   [`RowContainer`](./row-container/README.md).
 - Not for tabular data with columns the user sorts or resizes: that is
-  [`Table`](../table/README.md).
+  [`DataTable`](../data-table/README.md).
 - Not for a handful of items. Three names and an avatar are a flex column of your own, and cost
   nothing to keep.
 
@@ -169,8 +169,8 @@ the shapes still.
   menu opens on right-click or from a `<div>` that is not focusable.
 - Selection is a [`Checkbox`](../checkbox/README.md) inside the row, which is a real input and
   is reachable — it is the only part of a row that is.
-- A list a keyboard user must be able to work through needs [`Table`](../table/README.md) or
-  markup of your own.
+- A list a keyboard user must be able to work through needs [`DataTable`](../data-table/README.md),
+  whose row checkboxes and menu buttons are in the tab order, or markup of your own.
 - Each skeleton shape is an SVG with `role="img"`, so a screen reader meets three images per
   placeholder row. `title` names every one of them through an SVG `<title>`; without it they
   have no name and nothing is announced. The skeletons set no `aria-busy` — mark the loading

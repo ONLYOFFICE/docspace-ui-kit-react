@@ -1,78 +1,126 @@
-import React, { useRef } from "react";
+import React, { useMemo } from "react";
 import { observer } from "mobx-react";
 
-import { TableBody, TableContainer } from "../../../../../components/table";
+import {
+  DataTable,
+  createLocalStorageWidths,
+  type DataTableColumn,
+} from "../../../../../components/data-table";
+import { Text } from "../../../../../components/text";
+import { Link } from "../../../../../components/link";
 import { useCommonTranslation } from "../../../../../utils/i18n";
 
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
+import type { TUpcomingPayment } from "../../../../types";
 import { getServiceQuantity } from "../../../utils";
 
-import TableHeader from "./TableHeader";
-import TableRow from "./TableRow";
 import styles from "./UpcomingPaymentsTable.module.scss";
 
-const TABLE_VERSION = "1";
-const COLUMNS_SIZE = `upcomingPaymentsColumnsSize_ver-${TABLE_VERSION}`;
-const INFO_PANEL_COLUMNS_SIZE = `infoPanelUpcomingPaymentsColumnsSize_ver-${TABLE_VERSION}`;
+const COLUMN_WIDTHS = "upcomingPaymentsColumnsWidths_ver-1";
 
-type UpcomingPaymentsTableViewProps = {
-  sectionWidth: number;
-};
+const getRowKey = (payment: TUpcomingPayment) => payment.id;
 
-const TableView = ({ sectionWidth }: UpcomingPaymentsTableViewProps) => {
-  const paymentStore = usePaymentStore();
+const CellText = ({ children }: { children: React.ReactNode }) => (
+  <Text fontSize="12px" fontWeight={600} className={styles.cellText}>
+    {children}
+  </Text>
+);
+
+const ActionCell = ({ payment }: { payment: TUpcomingPayment }) => {
   const t = useCommonTranslation();
+  const { actionType, actionRoute } = payment;
 
-  const { upcomingPayments, formatWalletCurrency, userId, language } =
-    paymentStore;
+  const actionLabel =
+    actionType === "edit-plan"
+      ? t("EditPlan")
+      : actionType === "edit-subscription"
+        ? t("EditSubscription")
+        : "";
 
-  const columnStorageName = `${COLUMNS_SIZE}=${userId}`;
-  const columnInfoPanelStorageName = `${INFO_PANEL_COLUMNS_SIZE}=${userId}`;
-  const ref = useRef<HTMLDivElement>(null);
+  if (!actionLabel) return null;
 
   return (
-    <div className={styles.tableWrapper}>
-      <TableContainer
-        forwardedRef={ref as React.RefObject<HTMLDivElement>}
-        useReactWindow={false}
-        className={styles.tableContainer}
-      >
-        <TableHeader
-          sectionWidth={sectionWidth}
-          containerRef={ref as React.RefObject<HTMLDivElement>}
-          columnStorageName={columnStorageName}
-          columnInfoPanelStorageName={columnInfoPanelStorageName}
-          itemHeight={48}
-        />
-        <TableBody
-          useReactWindow={false}
-          columnStorageName={columnStorageName}
-          columnInfoPanelStorageName={columnInfoPanelStorageName}
-          itemHeight={48}
-          filesLength={upcomingPayments.length}
-          fetchMoreFiles={() => Promise.resolve()}
-          hasMoreFiles={false}
-          itemCount={upcomingPayments.length}
-        >
-          {upcomingPayments.map((payment) => (
-            <TableRow
-              key={payment.id}
-              renewalDate={payment.renewalDate}
-              type={payment.title}
-              details={getServiceQuantity(
-                t,
-                language,
-                payment.quantity,
-                payment.unitOfMeasure,
-              )}
-              amount={formatWalletCurrency(payment.amount, 2)}
-              actionType={payment.actionType}
-              actionRoute={payment.actionRoute}
-            />
-          ))}
-        </TableBody>
-      </TableContainer>
-    </div>
+    <Link
+      fontSize="12px"
+      fontWeight={600}
+      textDecoration="underline"
+      onClick={() => {
+        if (actionRoute) window.DocSpace?.navigate(actionRoute);
+      }}
+      className={styles.actionLink}
+    >
+      {actionLabel}
+    </Link>
+  );
+};
+
+const TableView = () => {
+  const t = useCommonTranslation();
+  const { upcomingPayments, formatWalletCurrency, userId, language } =
+    usePaymentStore();
+
+  const columns = useMemo<DataTableColumn<TUpcomingPayment>[]>(
+    () => [
+      {
+        id: "RenewalDate",
+        title: t("RenewalDate"),
+        width: { type: "fill" },
+        cell: (payment) => <CellText>{payment.renewalDate}</CellText>,
+      },
+      {
+        id: "Type",
+        title: t("Type"),
+        width: { type: "flex", min: 160 },
+        cell: (payment) => <CellText>{payment.title}</CellText>,
+      },
+      {
+        id: "Details",
+        title: t("Details"),
+        width: { type: "flex", min: 140 },
+        cell: (payment) => (
+          <CellText>
+            {getServiceQuantity(
+              t,
+              language,
+              payment.quantity,
+              payment.unitOfMeasure,
+            )}
+          </CellText>
+        ),
+      },
+      {
+        id: "Amount",
+        title: t("Amount"),
+        width: { type: "flex", min: 120 },
+        cell: (payment) => (
+          <CellText>{formatWalletCurrency(payment.amount, 2)}</CellText>
+        ),
+      },
+      {
+        id: "Action",
+        title: "",
+        width: { type: "flex", min: 120 },
+        resizable: false,
+        cell: (payment) => <ActionCell payment={payment} />,
+      },
+    ],
+    [t, language, formatWalletCurrency],
+  );
+
+  const widthStorage = useMemo(
+    () => createLocalStorageWidths(`${COLUMN_WIDTHS}=${userId}`),
+    [userId],
+  );
+
+  return (
+    <DataTable<TUpcomingPayment>
+      ariaLabel={t("UpcomingPayments")}
+      columns={columns}
+      rows={upcomingPayments}
+      getRowKey={getRowKey}
+      widthStorage={widthStorage}
+      className={styles.table}
+    />
   );
 };
 

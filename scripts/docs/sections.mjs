@@ -113,10 +113,6 @@ export const SECTIONS = {
       "Loaders and progress: spinners, the full-screen application loader, the " +
       "infinite-scroll loader and the progress bar.",
   },
-  "UI/Table": {
-    description:
-      "The data table with resizable columns, its header, rows and group menu.",
-  },
   "UI/Tiles": {
     description:
       "The tile grid: a container, the base tile and the file, folder, room and " +

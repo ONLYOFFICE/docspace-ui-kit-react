@@ -28,7 +28,7 @@ virtualisation is built for the ONLYOFFICE Apps portal and needs the portal's ow
 - Not outside the portal with virtualisation on: the list looks for the portal's scroll
   container and measures its width through a literal element id. Pass `useReactWindow={false}`
   and the container becomes a plain `<div>` that renders every child.
-- Not for a list with columns — [`Table`](../../table/README.md) — and not for a handful of
+- Not for a list with columns — [`DataTable`](../../data-table/README.md) — and not for a handful of
   items, which need no container at all.
 
 ## Import
@@ -165,8 +165,8 @@ export function PagedList({
 - The container is a plain `<div>` with no list role, and virtualisation means only the rows
   near the viewport exist in the DOM — a screen reader is given no count and no position.
 - There is no keyboard navigation between rows, and nothing here is focusable.
-- A list users must work through from the keyboard needs [`Table`](../../table/README.md) or
-  markup of your own.
+- A list users must work through from the keyboard needs [`DataTable`](../../data-table/README.md),
+  whose row checkboxes and menu buttons are in the tab order, or markup of your own.
 
 ## Test ids
 

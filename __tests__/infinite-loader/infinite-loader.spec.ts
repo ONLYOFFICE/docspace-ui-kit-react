@@ -62,11 +62,6 @@ test.describe("InfiniteLoader — light", () => {
     await expect(page).toHaveScreenshot("infinite-loader-row-layout.png");
   });
 
-  test("table layout", async ({ page }) => {
-    await gotoStory(page, "table-layout");
-    await expect(page).toHaveScreenshot("infinite-loader-table-layout.png");
-  });
-
   test("right to left", async ({ page }) => {
     await gotoStory(page, "right-to-left");
     await expect(page).toHaveScreenshot("infinite-loader-right-to-left.png");

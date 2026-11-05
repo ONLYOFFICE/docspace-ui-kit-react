@@ -197,4 +197,6 @@ export { default as Section } from "./section";
 
 export * from "./selector";
 
-export * from "./table";
+export * from "./table-group-menu";
+
+export * from "./data-table";

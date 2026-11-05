@@ -53,19 +53,12 @@
   color: var(--section-story-row-side);
 }
 
-// The table fills the body; the header measures this element.
+// The table fills the body. Its header sticks below what the section pins;
+// the rows' strips reach into the scroll body's 20px start gutter.
 .table {
-  width: 100%;
-}
+  --data-table-bleed-start: 20px;
 
-// The table's header is `position: fixed`, so it stays put while the section
-// scrolls under it -- in the client, whose page itself never scrolls. A docs
-// page does, and a header fixed to the viewport stays behind when the story
-// moves. The section's scrollbar root, which does not scroll itself, becomes
-// the header's containing block: it still holds through a scroll inside the
-// section and now goes with the section when the page scrolls.
-.frame :global(#sectionScroll) {
-  transform: translateZ(0);
+  width: 100%;
 }
 
 // The client's name cell: the 32px icon, 12px, then the name.
@@ -74,6 +67,12 @@
   align-items: center;
   gap: 12px;
   min-width: 0;
+  padding-inline-end: 8px;
+}
+
+.sideCell {
+  min-width: 0;
+  padding-inline-end: 8px;
 }
 
 .nameIcon {

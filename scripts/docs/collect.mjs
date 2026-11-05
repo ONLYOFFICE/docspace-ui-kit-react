@@ -241,7 +241,7 @@ export const collect = (root, { warn }) => {
   }
 
   // A README with no story in its folder but stories below it
-  // (components/rows, components/tiles, components/table) describes the
+  // (components/rows, components/tiles) describes the
   // group those stories sit in, and becomes that category's page.
   for (const [folder, readme] of readmeByFolder) {
     if (usedReadmes.has(readme.source)) continue;

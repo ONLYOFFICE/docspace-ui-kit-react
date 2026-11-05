@@ -23,7 +23,6 @@ const defaultProps = {
 
 describe("ListComponent", () => {
   let rowContainer: HTMLDivElement;
-  let tableContainer: HTMLDivElement;
 
   beforeEach(() => {
     rowContainer = document.createElement("div");
@@ -32,18 +31,11 @@ describe("ListComponent", () => {
     vi.spyOn(rowContainer, "getBoundingClientRect").mockReturnValue({
       width: 1000,
     } as DOMRect);
-
-    tableContainer = document.createElement("div");
-    tableContainer.id = "table-container";
-    document.body.appendChild(tableContainer);
-    vi.spyOn(tableContainer, "getBoundingClientRect").mockReturnValue({
-      width: 1200,
-    } as DOMRect);
   });
 
   afterEach(() => {
     document.body.removeChild(rowContainer);
-    document.body.removeChild(tableContainer);
+
     vi.clearAllMocks();
   });
 
@@ -54,55 +46,40 @@ describe("ListComponent", () => {
     expect(screen.getByText("Item 1")).toBeInTheDocument();
   });
 
-  it("applies correct grid styles in table mode from localStorage", () => {
-    const columnStorageName = "test-col";
-    const storageSize = "100px 200px 300px";
-    localStorage.setItem(columnStorageName, storageSize);
+  it("draws viewAs table as the row list", () => {
+    render(<ListComponent {...defaultProps} viewAs="table" />);
 
-    render(
-      <ListComponent
-        {...defaultProps}
-        viewAs="table"
-        columnStorageName={columnStorageName}
-        columnInfoPanelStorageName="test-info"
-      />,
-    );
-
-    const tableItem = screen.getByText("Item 0").parentElement;
-    expect(tableItem).toHaveStyle(`grid-template-columns: ${storageSize}`);
-    expect(tableItem).toHaveClass("table-list-item");
+    const item = screen.getByText("Item 0").parentElement;
+    expect(item).toHaveClass("row-list-item", "window-item");
+    expect(item?.style.gridTemplateColumns).toBe("");
+    expect(document.querySelector(".table-list-item")).toBeNull();
   });
 
-  it("throws error when storage props are missing for table view", () => {
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-
-    expect(() => {
-      render(<ListComponent {...defaultProps} viewAs="table" />);
-    }).toThrow("columnStorageName is required for a table view");
-
-    consoleSpy.mockRestore();
-  });
-
-  it("applies correct CSS classes for different view modes", () => {
+  it("applies the row class to the row and table layouts alike", () => {
     const { rerender } = render(
       <ListComponent {...defaultProps} viewAs="row" />,
     );
 
     // Check by selector since styles are CSS modules
     const listElement = document.querySelector(".ReactVirtualized__List");
-    expect(listElement?.className).toContain("row");
+    const rowClassName = listElement?.className;
+    expect(rowClassName).toContain("row");
 
-    rerender(
-      <ListComponent
-        {...defaultProps}
-        viewAs="table"
-        columnStorageName="a"
-        columnInfoPanelStorageName="b"
-      />,
-    );
-    expect(listElement?.className).toContain("table");
+    rerender(<ListComponent {...defaultProps} viewAs="table" />);
+    expect(listElement?.className).toBe(rowClassName);
+    expect(listElement?.className).not.toContain("table");
   });
 
+  it("takes its width from #rowContainer", () => {
+    render(<ListComponent {...defaultProps} />);
+
+    const listElement = document.querySelector<HTMLElement>(
+      ".ReactVirtualized__List",
+    );
+    expect(
+      listElement?.style.getPropertyValue("--infinite-loader-measured-width"),
+    ).toBe("1000px");
+  });
   it("renders loading skeletons when items are not loaded", () => {
     // filesLength = 10, itemCount = 20 means indices 10-19 are "loading"
     render(
@@ -124,24 +101,19 @@ describe("ListComponent", () => {
     );
   });
 
-  it("renders TableSkeleton when items are not loaded in table view", () => {
+  it("renders the row skeleton for rows not loaded in the table layout", () => {
     render(
       <ListComponent
         {...defaultProps}
         viewAs="table"
-        columnStorageName="test"
-        columnInfoPanelStorageName="test-info"
         itemCount={20}
         filesLength={1}
         hasMoreFiles={true}
       />,
     );
-    expect(screen.getAllByTestId("table-skeleton").length).toBeGreaterThan(0);
-    expect(screen.getAllByTestId("rectangle-skeleton").length).toBeGreaterThan(
-      0,
-    );
+    expect(screen.getAllByTestId("rows-skeleton").length).toBeGreaterThan(0);
+    expect(screen.getAllByTestId("row-skeleton").length).toBeGreaterThan(0);
   });
-
   it("returns null from getLoader for unknown viewAs", () => {
     render(
       <ListComponent
@@ -153,7 +125,6 @@ describe("ListComponent", () => {
       />,
     );
     expect(screen.queryAllByTestId("rows-skeleton").length).toBe(0);
-    expect(screen.queryAllByTestId("table-skeleton").length).toBe(0);
   });
 
   it("calculates height from scroll element when WindowScroller height is undefined", () => {

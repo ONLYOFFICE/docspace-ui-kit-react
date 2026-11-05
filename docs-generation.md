@@ -113,7 +113,7 @@ file is the label in kebab-case, split at its capitals (`PeopleSelector` -> `peo
 `Error404` -> `error-404`); a README page is named after its folder, which already is.
 
 - **A README with no story of its own** but with stories below it (`components/rows`,
-  `components/tiles`, `components/table`) describes the group those stories sit in. It becomes
+  `components/tiles`) describes the group those stories sit in. It becomes
   that category's page, followed by the table of its pages.
 - **Order is `storySort.order`** in `.storybook/preview.tsx`, read with the TypeScript parser,
   so there is one order and the site cannot drift from the sidebar. It stays inline in the

@@ -30,7 +30,7 @@ line of text under them.
 - Not for content with its own layout. Positions are fixed, the third child onwards is hidden,
   and its text is joined into one line with pipes — markup of your own inside a row is often the smaller
   answer.
-- Not for columns the user reads across: [`Table`](../../table/README.md).
+- Not for columns the user reads across: [`DataTable`](../../data-table/README.md).
 
 ## Import
 

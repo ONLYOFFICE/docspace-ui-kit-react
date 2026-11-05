@@ -38,9 +38,7 @@ const ScrollStructureWrapper = ({ children }: { children: ReactNode }) => (
     <Scrollbar>
       {/* The loader measures its width from these portal container ids */}
       <div id="tileContainer" style={{ width: "100%" }}>
-        <div id="rowContainer">
-          <div id="table-container">{children}</div>
-        </div>
+        <div id="rowContainer">{children}</div>
       </div>
     </Scrollbar>
   </div>
@@ -52,10 +50,7 @@ type InfiniteLoaderDemoProps = {
   itemSize?: number;
   countTilesInRow?: number;
   isLoading?: boolean;
-  infoPanelVisible?: boolean;
   hasMoreFiles?: boolean;
-  columnStorageName?: string;
-  columnInfoPanelStorageName?: string;
   loadMoreItems?: (range: IndexRange) => Promise<void>;
   onScroll?: () => void;
   renderItem?: (index: number) => ReactNode;
@@ -67,10 +62,7 @@ const InfiniteLoaderDemo = ({
   itemSize = 20,
   countTilesInRow = 4,
   isLoading = false,
-  infoPanelVisible,
   hasMoreFiles: hasMoreFilesProp,
-  columnStorageName,
-  columnInfoPanelStorageName,
   loadMoreItems: onLoadMore,
   onScroll,
   renderItem,
@@ -126,9 +118,6 @@ const InfiniteLoaderDemo = ({
       itemSize={itemSize}
       countTilesInRow={countTilesInRow}
       isLoading={isLoading}
-      infoPanelVisible={infoPanelVisible}
-      columnStorageName={columnStorageName}
-      columnInfoPanelStorageName={columnInfoPanelStorageName}
       onScroll={onScroll}
     >
       {items}
@@ -153,9 +142,9 @@ const meta = {
   argTypes: {
     viewAs: {
       control: "select",
-      options: ["row", "tile", "table"],
+      options: ["row", "tile"],
       description:
-        "Which layout to render: `tile` lays the children out as rows of a grid, `row` and `table` as a list; it also picks the placeholder shown for rows not loaded yet",
+        "Which layout to render: `tile` lays the children out as rows of a grid, `row` as a list; it also picks the placeholder shown for rows not loaded yet. `table` is accepted and drawn exactly like `row`",
     },
     hasMoreFiles: {
       control: "boolean",
@@ -178,12 +167,12 @@ const meta = {
     itemSize: {
       control: "number",
       description:
-        "Height of every row in pixels in the `row` and `table` layouts; the `tile` layout ignores it and sizes each row from the tile it holds",
+        "Height of every row in pixels in the `row` layout; the `tile` layout ignores it and sizes each row from the tile it holds",
     },
     children: {
       control: false,
       description:
-        "The items, as an array with one entry per list row, table row or row of tiles",
+        "The items, as an array with one entry per list row or row of tiles",
     },
     onScroll: {
       control: false,
@@ -204,24 +193,7 @@ const meta = {
         defaultValue: { summary: "1" },
       },
     },
-    columnStorageName: {
-      control: "text",
-      description:
-        "`localStorage` key holding the table's column widths; required in the `table` layout, which throws without it",
-    },
-    columnInfoPanelStorageName: {
-      control: "text",
-      description:
-        "`localStorage` key holding the table's column widths while the info panel is open; required in the `table` layout",
-    },
-    infoPanelVisible: {
-      control: "boolean",
-      description:
-        "Reads the table's column widths from the info-panel key instead of the regular one",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
+
     className: {
       control: "text",
       description: "Class added to the list element",
@@ -285,7 +257,6 @@ export const Default: Story = {
     itemSize: 20,
     countTilesInRow: 4,
     isLoading: false,
-    infoPanelVisible: false,
     hasMoreFiles: true,
     loadMoreItems: fn(),
     onScroll: fn(),
@@ -322,24 +293,6 @@ export const Default: Story = {
       },
     },
   },
-};
-
-const renderTableRow = (index: number) => (
-  <>
-    <div style={{ padding: "12px 8px" }}>Document {index + 1}</div>
-    <div style={{ padding: "12px 8px" }}>Today</div>
-    <div style={{ padding: "12px 8px" }}>{(index % 9) + 1} KB</div>
-  </>
-);
-
-const TABLE_COLUMNS_KEY = "storybook-infinite-loader-columns";
-
-const saveTableColumns = () => {
-  try {
-    localStorage.setItem(TABLE_COLUMNS_KEY, "2fr 1fr 1fr");
-  } catch {
-    // Without storage the rows fall back to a single column
-  }
 };
 
 export const RowLayout: Story = {
@@ -379,60 +332,6 @@ export const RowLayout: Story = {
   itemSize={48}
 >
   {items}
-</InfiniteLoaderComponent>`,
-      },
-    },
-  },
-};
-
-export const TableLayout: Story = {
-  args: {
-    viewAs: "table" as TViewAs,
-    itemCount: 100,
-    itemSize: 48,
-    hasMoreFiles: true,
-    columnStorageName: TABLE_COLUMNS_KEY,
-    columnInfoPanelStorageName: TABLE_COLUMNS_KEY,
-    loadMoreItems: fn(),
-  },
-  render: (args) => {
-    saveTableColumns();
-    return <InfiniteLoaderDemo {...args} renderItem={renderTableRow} />;
-  },
-  play: async ({ canvas }) => {
-    // The rows take their column layout from localStorage.
-    const cell = await canvas.findByText("Document 1");
-    const row = cell.parentElement as HTMLElement;
-    await expect(
-      getComputedStyle(row).gridTemplateColumns.split(" "),
-    ).toHaveLength(3);
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'A table whose rows share one column layout (`viewAs="table"`). The layout is not passed as a prop: the loader reads it from `localStorage` under the key it is given (`columnStorageName`, or `columnInfoPanelStorageName` while `infoPanelVisible` is set), which lets the table header that saves the widths and the rows below stay in step. The rows not loaded yet show the table skeleton.',
-      },
-      source: {
-        code: `localStorage.setItem("filesColumns", "2fr 1fr 1fr");
-
-<InfiniteLoaderComponent
-  viewAs="table"
-  itemCount={100}
-  filesLength={loadedItems.length}
-  hasMoreFiles={hasMore}
-  loadMoreItems={handleLoadMore}
-  itemSize={48}
-  columnStorageName="filesColumns"
-  columnInfoPanelStorageName="filesColumnsInfoPanel"
->
-  {rows.map((file) => (
-    <>
-      <div>{file.title}</div>
-      <div>{file.modified}</div>
-      <div>{file.size}</div>
-    </>
-  ))}
 </InfiniteLoaderComponent>`,
       },
     },

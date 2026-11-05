@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import { useArgs } from "storybook/preview-api";
@@ -7,15 +7,24 @@ import { expect, fireEvent, fn, screen, waitFor, within } from "storybook/test";
 
 import ViewRowsReactSvg from "../../assets/view-rows.react.svg";
 import ViewTilesReactSvg from "../../assets/view-tiles.react.svg";
-import FileCells, { storyFiles } from "../../.storybook/utils/FileCells";
-import { DeviceType, FilterGroups, SortByFieldName } from "../../enums";
+import {
+  type StoryFile,
+  storyFileColumns,
+  storyFiles,
+} from "../../.storybook/utils/FileCells";
+import { useSectionPinnedHeight } from "../../.storybook/utils/useSectionPinnedHeight";
+import { DeviceType, FilterGroups } from "../../enums";
 import {
   deviceFor,
   useWindowDevice,
 } from "../../.storybook/utils/useWindowDevice";
+import {
+  DataTable,
+  type DataTableRowState,
+  type DataTableSort,
+} from "../data-table";
 import Filter from "../filter";
 import Navigation from "../navigation/Navigation";
-import { TableBody, TableContainer, TableHeader, TableRow } from "../table";
 import { Tabs } from "../tabs";
 import { Text } from "../text";
 import type { Operation } from "../operations-progress-button/OperationsProgressButton.types";
@@ -384,9 +393,6 @@ type Story = StoryObj<ComponentProps<typeof Section>>;
 
 export default meta;
 
-const COLUMN_STORAGE_NAME = "section-story-columns";
-const COLUMN_INFO_PANEL_STORAGE_NAME = "section-story-columns-info";
-
 const noop = () => {};
 
 const part = (root: HTMLElement, selector: string) =>
@@ -434,39 +440,6 @@ const mockSortData = [
 const mockViewSettings = [
   { id: "1", label: "Grid", value: "tile", icon: <ViewTilesReactSvg /> },
   { id: "2", label: "List", value: "row", icon: <ViewRowsReactSvg /> },
-];
-
-const mockColumns = [
-  {
-    key: "name",
-    title: "Name",
-    resizable: true,
-    enable: true,
-    default: true,
-    sortBy: SortByFieldName.Name,
-    minWidth: 210,
-    onChange: noop,
-    onClick: noop,
-  },
-  {
-    key: "type",
-    title: "Type",
-    enable: true,
-    resizable: true,
-    sortBy: SortByFieldName.Type,
-    onChange: noop,
-    onClick: noop,
-  },
-  {
-    key: "tags",
-    title: "Tags",
-    enable: true,
-    resizable: true,
-    sortBy: SortByFieldName.Tags,
-    withTagRef: true,
-    onChange: noop,
-    onClick: noop,
-  },
 ];
 
 const mockFiles = storyFiles;
@@ -579,41 +552,83 @@ const FilterContent = ({
   />
 );
 
-const TableContent = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
+const sortField: Record<string, keyof StoryFile> = {
+  AZ: "name",
+  Type: "type",
+  Tags: "tags",
+};
 
-  const rows = mockFiles.map((file) => (
-    <TableRow key={`row-${file.name}`}>
-      <FileCells file={file} />
-    </TableRow>
-  ));
+// A files table as a page holds it: the story keeps the selection, the sort
+// and the hidden columns, the table only reports them.
+const TableContent = () => {
+  const [node, setNode] = useState<HTMLDivElement | null>(null);
+  const pinnedHeight = useSectionPinnedHeight(node);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [hidden, setHidden] = useState<string[]>([]);
+  const [sort, setSort] = useState<DataTableSort>();
+
+  const columns = useMemo(
+    () =>
+      storyFileColumns({
+        isChecked: (file) => selected.includes(file.name),
+        onSelect: (file, checked) =>
+          setSelected((prev) =>
+            checked
+              ? [...prev, file.name]
+              : prev.filter((name) => name !== file.name),
+          ),
+      }).map((column) => ({ ...column, visible: !hidden.includes(column.id) })),
+    [selected, hidden],
+  );
+
+  const rows = useMemo(() => {
+    if (!sort) return mockFiles;
+    const field = sortField[sort.key];
+    const sorted = [...mockFiles].sort((a, b) =>
+      a[field].localeCompare(b[field]),
+    );
+    return sort.desc ? sorted.reverse() : sorted;
+  }, [sort]);
+
+  const getRowProps = useCallback(
+    (file: StoryFile): DataTableRowState => ({
+      checked: selected.includes(file.name),
+    }),
+    [selected],
+  );
 
   return (
-    <TableContainer forwardedRef={containerRef} useReactWindow={false}>
-      <TableHeader
-        containerRef={containerRef}
-        columns={mockColumns}
-        columnStorageName={COLUMN_STORAGE_NAME}
-        columnInfoPanelStorageName={COLUMN_INFO_PANEL_STORAGE_NAME}
-        sectionWidth={800}
-        useReactWindow={false}
-        showSettings
-        sortingVisible
-        sorted
+    <div
+      ref={setNode}
+      style={
+        {
+          // Below what the section pins, and the row strips reaching into the
+          // scroll body's 20px start gutter.
+          "--data-table-header-top": `${pinnedHeight}px`,
+          "--data-table-bleed-start": "20px",
+        } as React.CSSProperties
+      }
+    >
+      <DataTable
+        columns={columns}
+        rows={rows}
+        getRowKey={(file) => file.name}
+        getRowProps={getRowProps}
+        sort={sort}
+        onSortChange={(key) =>
+          setSort((prev) => ({
+            key,
+            desc: prev?.key === key ? !prev.desc : false,
+          }))
+        }
+        onColumnVisibilityChange={(id, visible) =>
+          setHidden((prev) =>
+            visible ? prev.filter((x) => x !== id) : [...prev, id],
+          )
+        }
+        ariaLabel="Files"
       />
-      <TableBody
-        columnStorageName={COLUMN_STORAGE_NAME}
-        columnInfoPanelStorageName={COLUMN_INFO_PANEL_STORAGE_NAME}
-        fetchMoreFiles={async () => {}}
-        filesLength={mockFiles.length}
-        hasMoreFiles={false}
-        itemCount={mockFiles.length}
-        itemHeight={50}
-        useReactWindow={false}
-      >
-        {rows}
-      </TableBody>
-    </TableContainer>
+    </div>
   );
 };
 

@@ -94,7 +94,7 @@ still true, and all still unenforced.
 
 - Every component needs a story, and every folder has one — `theme-provider` was the last to
   get it. The file may sit in
-  a subdirectory (`table`, `rows`, `tiles` do), so search recursively before concluding one is
+  a subdirectory (`rows`, `tiles`, `table-group-menu` do), so search recursively before concluding one is
   missing.
 - **`STORY_TEMPLATE.md` governs stories, and it is the only file that does.** It no longer
   asks for a component description: the Docs page is the component's `README.md`, rendered by
@@ -109,7 +109,7 @@ still true, and all still unenforced.
   Of the two story descriptions restored on that revert, one claimed `ModalDialog` traps
   focus, which it has never done — the story half was the stale one, which is why the README
   is the half that stayed.
-- The exception is a story file whose own folder has no README (the table's parts, the
+- The exception is a story file whose own folder has no README (`GroupMenuItem`, the
   skeletons, `ArticleItem`): its Docs page falls back to the default template, so it keeps a
   one-sentence description naming the parent page, and the facts live in the parent README.
 - What stays in the story is what cannot be written down: the scenarios, the controls and

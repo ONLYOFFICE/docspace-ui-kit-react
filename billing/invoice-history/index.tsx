@@ -89,11 +89,7 @@ const InvoiceHistory = () => {
       <Consumer>
         {(context) =>
           viewAs === "table" ? (
-            <TableView
-              sectionWidth={context.sectionWidth || 0}
-              invoices={invoices}
-              onOpenInvoice={onOpenInvoice}
-            />
+            <TableView invoices={invoices} onOpenInvoice={onOpenInvoice} />
           ) : (
             <RowView
               sectionWidth={context.sectionWidth || 0}

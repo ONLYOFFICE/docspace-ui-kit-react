@@ -3,10 +3,6 @@
   min-width: 0;
   contain: inline-size;
   max-width: 1280px;
-
-  .tableContainer {
-    margin-top: 0;
-  }
 }
 
 .introText {
@@ -23,12 +19,9 @@
   max-width: 300px;
 }
 
-.tableContainer :global(.table-container_header) {
-  position: static !important;
-}
-
-.tableContainer :global([class*="emptyTableContainer"]) {
-  height: 0 !important;
+// The 12px titles the page's tables had.
+.table {
+  --data-table-header-font-size: 12px;
 }
 
 .cellText {

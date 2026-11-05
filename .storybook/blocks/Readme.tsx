@@ -57,7 +57,7 @@ const folderOf = (fileName: string) =>
   fileName.replace(/^\.\//, "").replace(/\/[^/]+$/, "");
 
 // Only the story file's own folder counts. A sub-part without a README of its
-// own (the table's parts, the skeletons, ArticleItem) keeps its story
+// own (`GroupMenuItem`, the skeletons, ArticleItem) keeps its story
 // description rather than borrowing the parent's whole page.
 const readmeKeyFor = (fileName: string): string | undefined => {
   const key = `../../${folderOf(fileName)}/README.md`;

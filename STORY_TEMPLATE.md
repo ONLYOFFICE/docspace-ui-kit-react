@@ -135,7 +135,7 @@ What stays in the story is what a README cannot hold: the canvases, the controls
 `argTypes` descriptions, each story's `description.story` saying why it exists, and
 `source.code`.
 
-One exception: a story file whose own folder has no README — the table's parts, the
+One exception: a story file whose own folder has no README — `GroupMenuItem`, the
 skeletons, `ArticleItem` — keeps a one-sentence `description.component`, because its Docs page
 has nothing else to show. It names the parent page that describes the part in full, and the
 facts live in the parent README.
@@ -167,13 +167,13 @@ Seven, and they are the same seven a README's `category` may hold. The two must 
 - `Interactive elements` - Button, IconButton, Link, Tag, etc.
 - `Form controls` - FieldContainer, TextInput, Textarea, ComboBox, Checkbox, Slider, etc.
 - `Overlays` - ModalDialog, Aside, DropDown, ContextMenu, Tooltip, etc.
-- `Data display` - Badge, Avatar, Text, Card, Table, Tiles, etc.
+- `Data display` - Badge, Avatar, Text, Card, DataTable, Tiles, etc.
 - `Layout` - Section, Article, Portal, Scrollbar, etc.
 - `Navigation` - Navigation, Paging, Tabs, Filter, etc.
 - `Feedback` - Toast, Snackbar, Loader, ProgressBar, skeletons, etc.
 
 A story title may also use one of these grouping sections, which keep a family together in
-the sidebar and count as their category above: `Table` and `Tiles` and `Rows` (Data
+the sidebar and count as their category above: `Tiles` and `Rows` (Data
 display), `Layout components` (Layout), `Status components` and `Skeletons` (Feedback).
 
 ## How to Use This With Claude Code

@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef } from "react";
 import { InfiniteLoader, WindowScroller, List } from "react-virtualized";
 import classNames from "classnames";
 
-import { TableSkeleton } from "../../../table/sub-components/skeletons";
 import { RowsSkeleton } from "../../../rows/skeletons/RowsSkeleton";
 
 import { ListComponentProps } from "../../InfiniteLoader.types";
@@ -16,46 +15,28 @@ const ListComponent = ({
   onScroll,
   loadMoreItems,
   itemSize,
-  columnStorageName,
-  columnInfoPanelStorageName,
   children,
   className,
   scroll,
-  infoPanelVisible,
   showSkeleton,
 }: ListComponentProps) => {
   const loaderRef = useRef<InfiniteLoader | null>(null);
   const listRef = useRef<List | null>(null);
 
-  const listItemRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     listRef?.current?.forceUpdate();
   });
 
+  // `table` is drawn as the row list: the table layout went with the old
+  // table, and DataTable virtualises its own rows.
+  const isRowList = viewAs === "row" || viewAs === "table";
+
   const getLoader = (style: React.CSSProperties, key: string) => {
-    switch (viewAs) {
-      case "table":
-        return (
-          <TableSkeleton
-            key={key}
-            style={style}
-            className="table-container_body-loader"
-            count={1}
-          />
-        );
-      case "row":
-        return (
-          <RowsSkeleton
-            key={key}
-            style={style}
-            className="row-loader"
-            count={1}
-          />
-        );
-      default:
-        return null;
-    }
+    if (!isRowList) return null;
+
+    return (
+      <RowsSkeleton key={key} style={style} className="row-loader" count={1} />
+    );
   };
 
   const isItemLoaded = useCallback(
@@ -85,49 +66,9 @@ const ListComponent = ({
     );
   };
 
-  const renderTable = ({
-    index,
-    style,
-    key,
-    isScrolling,
-  }: {
-    index: number;
-    style: React.CSSProperties;
-    key: string;
-    isScrolling: boolean;
-  }) => {
-    if (!columnInfoPanelStorageName || !columnStorageName) {
-      throw new Error("columnStorageName is required for a table view");
-    }
-
-    const storageSize = infoPanelVisible
-      ? localStorage.getItem(columnInfoPanelStorageName)
-      : localStorage.getItem(columnStorageName);
-
-    const isLoaded = isItemLoaded({ index });
-    if (!isLoaded || (isScrolling && showSkeleton))
-      return getLoader(style, key);
-
-    return (
-      <div
-        className="table-list-item window-item"
-        ref={listItemRef}
-        style={{
-          ...style,
-          display: "grid",
-          gridTemplateColumns: storageSize!,
-        }}
-        key={key}
-      >
-        {children[index]}
-      </div>
-    );
-  };
-
   const listClassName = classNames(styles.list, className, {
     [styles.tile]: viewAs === "tile",
-    [styles.row]: viewAs === "row",
-    [styles.table]: viewAs === "table",
+    [styles.row]: isRowList,
   });
 
   return (
@@ -149,11 +90,8 @@ const ListComponent = ({
                 newHeight = scroll.getBoundingClientRect().height;
               }
 
-              const viewId =
-                viewAs === "table" ? "table-container" : "rowContainer";
-
               const width =
-                document.getElementById(viewId)?.getBoundingClientRect()
+                document.getElementById("rowContainer")?.getBoundingClientRect()
                   .width ?? 0;
 
               return (
@@ -169,7 +107,7 @@ const ListComponent = ({
                     hasMoreFiles ? children.length + 2 : children.length
                   }
                   rowHeight={itemSize}
-                  rowRenderer={viewAs === "table" ? renderTable : renderRow}
+                  rowRenderer={renderRow}
                   isScrolling={isScrolling}
                   onChildScroll={onChildScroll}
                   scrollTop={scrollTop}
@@ -181,7 +119,7 @@ const ListComponent = ({
                   style={
                     {
                       direction: "inherit",
-                      "--infinite-loader-table-width": `${width}px`,
+                      "--infinite-loader-measured-width": `${width}px`,
                     } as React.CSSProperties
                   }
                   className={listClassName}

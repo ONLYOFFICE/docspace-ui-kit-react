@@ -1,17 +1,17 @@
 import type { ReactElement } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { RoomType } from "@onlyoffice/docspace-api-sdk";
 
+import { useSectionPinnedHeight } from "../../.storybook/utils/useSectionPinnedHeight";
 import type { ContextMenuModel } from "../../components/context-menu";
-import { Link, LinkType } from "../../components/link";
 import {
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHeader,
-  TableRow,
-  type TTableColumn,
-} from "../../components/table";
+  DataTable,
+  type DataTableColumn,
+  type DataTableRowState,
+  contextMenuColumn,
+  createLocalStorageWidths,
+} from "../../components/data-table";
+import { Link, LinkType } from "../../components/link";
 import { Text } from "../../components/text";
 import {
   FileTile,
@@ -74,24 +74,6 @@ type ViewProps = {
   contextOptions: (item: SectionItem) => ContextMenuModel[];
 };
 
-/** Width of the element, kept current: the header lays its columns out by it. */
-const useWidth = () => {
-  const ref = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(0);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-    const observer = new ResizeObserver(([entry]) =>
-      setWidth(Math.round(entry.contentRect.width)),
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
-
-  return [ref, width] as const;
-};
-
 type SectionTableProps = ViewProps & {
   sortBy: SortKey;
   ascending: boolean;
@@ -114,117 +96,121 @@ export const SectionTable = ({
   ascending,
   onSort,
 }: SectionTableProps) => {
-  const [frameRef, width] = useWidth();
-  const containerRef = useRef<HTMLDivElement>(null);
-  // One layout per list shape: the header saves the widths under this key.
-  // Both keys are needed: without the info-panel one the header lays out
-  // nothing and the body renders nothing, whatever the types say.
+  const [node, setNode] = useState<HTMLDivElement | null>(null);
+  const pinnedHeight = useSectionPinnedHeight(node);
+  // One layout per list shape: the table remembers the widths under this key.
   const storage = `section-${kind}-${roomsList ? "rooms" : "items"}-columns`;
+  const widthStorage = useMemo(
+    () => createLocalStorageWidths(storage),
+    [storage],
+  );
 
-  const sort = (key: string) => onSort(key as SortKey);
+  const columns = useMemo<DataTableColumn<SectionItem>[]>(() => {
+    const side =
+      (value: (item: SectionItem) => string) => (item: SectionItem) => (
+        <Text
+          fontSize="12px"
+          fontWeight={600}
+          color="var(--section-story-row-side)"
+          className={styles.sideCell}
+          truncate
+        >
+          {value(item)}
+        </Text>
+      );
 
-  const columns: TTableColumn[] = [
-    {
-      key: "Name",
-      title: "Name",
-      enable: true,
-      default: true,
-      resizable: true,
-      minWidth: 210,
-      sortBy: SortByFieldName.Name,
-      onClick: sort,
-    },
-    roomsList
-      ? { key: "Tags", title: "Tags", enable: true, resizable: true }
-      : {
-          key: "Modified",
-          title: "Modified",
-          enable: true,
-          resizable: true,
-          sortBy: SortByFieldName.ModifiedDate,
-          onClick: sort,
-        },
-    roomsList
-      ? {
-          key: "Activity",
-          title: "Last activity",
-          enable: true,
-          resizable: true,
-          sortBy: SortByFieldName.ModifiedDate,
-          onClick: sort,
-        }
-      : { key: "Size", title: "Size", enable: true, resizable: true },
-  ];
+    const tags = (item: SectionItem) => (item.tags ?? []).join(", ");
+    const updated = (item: SectionItem) => changedAt(item.updated);
+    const size = (item: SectionItem) =>
+      item.kind === "file" ? item.detail : "";
 
-  const side = (value: string) => (
-    <TableCell>
-      <Text
-        fontSize="12px"
-        fontWeight={600}
-        color="var(--section-story-row-side)"
-        truncate
-      >
-        {value}
-      </Text>
-    </TableCell>
+    return [
+      {
+        id: "Name",
+        title: "Name",
+        width: { type: "fill" },
+        sortKey: SortByFieldName.Name,
+        cell: (item) => (
+          <div className={styles.nameCell}>
+            <div className={styles.nameIcon}>{iconOf(item)}</div>
+            <Link
+              type={LinkType.page}
+              title={item.title}
+              fontSize="13px"
+              fontWeight={600}
+              isTextOverflow
+              truncate
+              onClick={() => open(item)}
+            >
+              <NameText item={item} />
+            </Link>
+          </div>
+        ),
+      },
+      roomsList
+        ? {
+            id: "Tags",
+            title: "Tags",
+            width: { type: "flex" },
+            cell: side(tags),
+          }
+        : {
+            id: "Modified",
+            title: "Modified",
+            width: { type: "flex" },
+            sortKey: SortByFieldName.ModifiedDate,
+            cell: side(updated),
+          },
+      roomsList
+        ? {
+            id: "Activity",
+            title: "Last activity",
+            width: { type: "flex" },
+            sortKey: SortByFieldName.ModifiedDate,
+            cell: side(updated),
+          }
+        : {
+            id: "Size",
+            title: "Size",
+            width: { type: "flex" },
+            cell: side(size),
+          },
+      contextMenuColumn<SectionItem>(),
+    ];
+  }, [roomsList, iconOf, open]);
+
+  const getRowProps = useCallback(
+    (item: SectionItem): DataTableRowState => ({
+      contextMenu: {
+        title: "Actions",
+        options: contextOptions(item),
+        getModel: () => contextOptions(item),
+      },
+    }),
+    [contextOptions],
   );
 
   return (
-    <div ref={frameRef} className={styles.table}>
-      {width ? (
-        <TableContainer forwardedRef={containerRef} useReactWindow={false}>
-          <TableHeader
-            containerRef={containerRef}
-            columns={columns}
-            columnStorageName={storage}
-            columnInfoPanelStorageName={`${storage}-info-panel`}
-            sectionWidth={width}
-            useReactWindow={false}
-            showSettings={false}
-            sortBy={sortBy}
-            sorted={!ascending}
-          />
-          <TableBody
-            columnStorageName={storage}
-            columnInfoPanelStorageName={`${storage}-info-panel`}
-            filesLength={items.length}
-            itemCount={items.length}
-            itemHeight={48}
-            hasMoreFiles={false}
-            useReactWindow={false}
-            fetchMoreFiles={() => Promise.resolve()}
-          >
-            {items.map((item) => (
-              <TableRow
-                key={`${item.kind}-${item.id}`}
-                contextOptions={contextOptions(item)}
-                getContextModel={() => contextOptions(item)}
-              >
-                <TableCell className={styles.nameCell}>
-                  <div className={styles.nameIcon}>{iconOf(item)}</div>
-                  <Link
-                    type={LinkType.page}
-                    title={item.title}
-                    fontSize="13px"
-                    fontWeight={600}
-                    isTextOverflow
-                    truncate
-                    onClick={() => open(item)}
-                  >
-                    <NameText item={item} />
-                  </Link>
-                </TableCell>
-                {roomsList
-                  ? side((item.tags ?? []).join(", "))
-                  : side(changedAt(item.updated))}
-                {roomsList
-                  ? side(changedAt(item.updated))
-                  : side(item.kind === "file" ? item.detail : "")}
-              </TableRow>
-            ))}
-          </TableBody>
-        </TableContainer>
-      ) : null}
+    <div
+      ref={setNode}
+      className={styles.table}
+      style={
+        {
+          // Below what the section pins: its header and the filter.
+          "--data-table-header-top": `${pinnedHeight}px`,
+        } as React.CSSProperties
+      }
+    >
+      <DataTable
+        columns={columns}
+        rows={items}
+        getRowKey={(item) => `${item.kind}-${item.id}`}
+        getRowProps={getRowProps}
+        sort={{ key: sortBy, desc: !ascending }}
+        onSortChange={(key) => onSort(key as SortKey)}
+        widthStorage={widthStorage}
+        ariaLabel="Contents"
+      />
     </div>
   );
 };

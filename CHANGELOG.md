@@ -176,11 +176,34 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   (`createPanelWidthStorage`), so a host keeps the info panel's width the same way, and
   `CHAT_PANEL_MIN_WIDTH`, the 360px the chat cannot be dragged below.
 
+### Removed
+
+- **`Table` is gone — a breaking change for plugins and for every consumer.** `TableContainer`,
+  `TableHeader`, `TableBody`, `TableRow`, `TableCell` and `TTableColumn` are no longer exported,
+  from the root barrel or from `components/table`, which no longer exists. Move a table to
+  `DataTable` (its README's "Moving from `Table`" maps each part and prop). The widths the old
+  header saved as pixel strings under `…ColumnsSize…` keys are not read by `DataTable`; a table
+  moved to it starts from its default layout once and stores shares under a key of its own.
+- **`TableGroupMenu` moved to `components/table-group-menu`**, with `TGroupMenuItem` and now
+  `TableGroupMenuProps`. The root barrel still exports both names; a subpath import of
+  `components/table` changes to `components/table-group-menu`. Its stories are
+  `UI/Data display/TableGroupMenu` and `UI/Data display/GroupMenuItem`.
+- **`InfiniteLoader` has no `table` layout any more.** It existed only for the old `TableBody`;
+  `DataTable` virtualises its own rows. `viewAs="table"` is still accepted and renders exactly
+  like `viewAs="row"`: one plain row item per child with the row skeleton, measured from
+  `#rowContainer`, with no `grid-template-columns` read from `localStorage` and no throw without
+  storage keys. `columnStorageName`, `columnInfoPanelStorageName` and `infoPanelVisible` are
+  removed from `InfiniteLoaderProps`; passing them is a type error, so delete them at the call
+  site. The private `--infinite-loader-table-width` is renamed `--infinite-loader-measured-width`;
+  `--infinite-loader-list-width` is unchanged. In right-to-left the row skeleton is now pinned to
+  the right edge like the rows (a `.row-loade` selector typo).
+
 ### Added
 
-- **`DataTable`, the successor of `Table`, at `components/data-table`.** It is built beside the
-  old table, which is unchanged, and is **not in the root barrel** while the portal trials it, so
-  it is not plugin API yet; import it by subpath. The header and every row lay out from one CSS
+- **`DataTable`, the successor of `Table`, at `components/data-table`**, in the root barrel and
+  so plugin API: `DataTable`, `DataTableRow`, `DataTableRowCheckbox`, `DataTableRowActions`,
+  `settingsColumn`, `contextMenuColumn`, `ColumnSettings`, `createLocalStorageWidths`,
+  `createMemoryWidths`, the `DATA_TABLE_*` constants and their types. The header and every row lay out from one CSS
   grid, so they cannot disagree. Widths are shares of the table rather than pixels, so two
   windows of different widths and an open info panel no longer overwrite each other's layout;
   they are remembered only when a `widthStorage` is given (`createLocalStorageWidths(key)`), in
@@ -197,7 +220,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   needs none of the row styles each old table copied; `DataTableRowCheckbox` is the icon that turns
   into the row's checkbox, and `DataTableRowActions` holds what shows only on such a row. The
   header's and the row menu button's test ids can be set (`headerTestId`,
-  `contextMenuButtonTestId`), so a suite written against `Table` finds them where it did
+  `contextMenuButtonTestId`), so a suite written against `Table` finds them where it did, and
+  `--data-table-header-font-size` sets the titles smaller for a table on a settings page
 - **`RoomType`'s `isDisabled`** greys out any room type, marks it `aria-disabled` and stops its
   `onClick`, as `disabledFormRoom` and `disabledPublicRoom` do for their own types
 - `AiAgentProviders` takes `chatIntro`: what an empty chat shows above the suggestion chips in place of the default illustration and tagline (an AI project puts its logo, name and sources there).

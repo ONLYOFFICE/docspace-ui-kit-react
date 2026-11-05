@@ -162,11 +162,11 @@ export type SectionContainerProps = {
   /**
    * When true, the desktop SectionFilter slot is rendered INSIDE the scroll
    * body as a sticky element (below the optional scrollable banner) instead of
-   * the always-pinned `.section-sticky-container`, and the table header is
-   * switched from `position: fixed` to `position: sticky` so it pins below the
-   * in-body filter natively (no host JS to measure the header `top`). The host
-   * supplies the pin offset via the `--section-filter-bottom` CSS variable.
-   * Defaults to false (legacy fixed-header + sticky-container-filter).
+   * the always-pinned `.section-sticky-container`, and a DataTable's sticky
+   * header pins below the in-body filter natively (no host JS to measure the
+   * header `top`). The host supplies the pin offset via the
+   * `--section-filter-bottom` CSS variable. Defaults to false (the filter in
+   * the pinned container).
    */
   stickyTableHeader?: boolean;
   /**

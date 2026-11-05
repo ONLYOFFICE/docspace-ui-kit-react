@@ -4,8 +4,9 @@ import { TViewAs } from "../../types";
 export type InfiniteLoaderProps = {
   /**
    * Which layout to render: `tile` lays the children out in a grid, anything
-   * else in a list. It also picks the skeleton shown while a page loads —
-   * `table` and `row` have one, the rest show nothing.
+   * else in a list. `table` has no layout of its own and is drawn exactly like
+   * `row`; a table is `DataTable`. It also picks the skeleton shown while a page
+   * loads: `row` and `table` show the row skeleton, the rest show nothing.
    */
   viewAs: TViewAs;
   /** Whether there is another page to ask for. */
@@ -24,14 +25,8 @@ export type InfiniteLoaderProps = {
   onScroll?: () => void;
   /** Renders nothing at all while it is true. */
   isLoading?: boolean;
-  /** `localStorage` key of the table's column widths, for the table skeleton. */
-  columnStorageName?: string;
-  /** The info-panel variant of that key. */
-  columnInfoPanelStorageName?: string;
   /** Applied to the list element. */
   className?: string;
-  /** Narrows the layout for an open info panel. */
-  infoPanelVisible?: boolean;
   /** How many tiles fit on a row, in the `tile` layout. */
   countTilesInRow?: number;
   /** Ignored: the loader sets it itself after a scroll jump of more than 800px, and a value passed here never reaches the list. */

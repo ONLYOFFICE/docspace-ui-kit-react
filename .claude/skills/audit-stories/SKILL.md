@@ -37,7 +37,7 @@ keeps the fixed shape below with only the `### Template` section.
 
 1. **A story exists at all.** The convention is one `.stories.tsx`
    per component; a component without one is a finding by itself. The
-   file may sit in a subdirectory (`table`, `rows` and `tiles` keep
+   file may sit in a subdirectory (`rows`, `tiles` and `table-group-menu` keep
    theirs there), so search recursively before reporting one missing.
 2. **Props coverage.** Compare the exported props type
    (`<Name>.types.ts`) with what the stories exercise through `args`,
@@ -235,7 +235,7 @@ follows it:
   `disabled` does) and what the consumer must still supply (a name via
   `<label for>` or `aria-label`) — never an `aria-*` the component does
   not set, in either direction. A story file whose folder has no README
-  (the table's parts, the skeletons, `ArticleItem`) keeps one purpose
+  (`GroupMenuItem`, the skeletons, `ArticleItem`) keeps one purpose
   sentence naming the parent page, and its facts go into the parent
   README. Storybook's own guidance applies to what stays: a story
   description says _why_ one would use what it shows, not what it

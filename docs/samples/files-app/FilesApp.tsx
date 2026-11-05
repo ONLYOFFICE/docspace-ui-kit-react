@@ -28,8 +28,8 @@ import Navigation from "../../../components/navigation";
 import { RoomIcon } from "../../../components/room-icon";
 import { Row, RowContainer, RowContent } from "../../../components/rows";
 import Section from "../../../components/section";
-import { TableGroupMenu } from "../../../components/table";
-import type { TGroupMenuItem } from "../../../components/table";
+import { TableGroupMenu } from "../../../components/table-group-menu";
+import type { TGroupMenuItem } from "../../../components/table-group-menu";
 import { Text } from "../../../components/text";
 import { InputType, TextInput } from "../../../components/text-input";
 import {

@@ -29,7 +29,7 @@ menu. Which parts appear is decided by which props you pass at all, not by their
   made of.
 - Not as a generic list row. It reads `item` off its child's props to build its context menu's
   header, and it renders a right-click menu whether or not you want one.
-- Not for tabular data the user sorts: [`Table`](../../table/README.md).
+- Not for tabular data the user sorts: [`DataTable`](../../data-table/README.md).
 - Not for a clickable card or a menu entry —
   [`DropDownItem`](../../drop-down-item/README.md) or markup of your own is smaller and says
   what it is.

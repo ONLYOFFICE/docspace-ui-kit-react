@@ -7,7 +7,7 @@ if (typeof SVGSVGElement === "undefined") {
 }
 
 // jsdom doesn't provide ResizeObserver, used by components that observe
-// container-driven size changes (e.g. TableHeader).
+// container-driven size changes (e.g. DataTable).
 if (typeof ResizeObserver === "undefined") {
   (globalThis as Record<string, unknown>).ResizeObserver =
     class ResizeObserver {
