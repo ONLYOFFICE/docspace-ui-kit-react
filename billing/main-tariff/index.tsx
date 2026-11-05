@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 
 import { observer } from "mobx-react";
 import { useCommonTranslation } from "../../utils/i18n";
+import socket, { SocketEvents, type TOptSocket } from "../../utils/socket";
 
 import PaymentsLoader from "../loader";
 
@@ -30,7 +31,10 @@ const SaaSPage = observer(
       resetTariffContainerToBasic,
       isShowStorageTariffDeactivatedModal,
       init,
+      fetchBalance,
     } = paymentStore;
+    const { fetchPortalQuota } = paymentStore.quotas;
+    const { fetchPortalTariff, fetchCustomerInfo } = paymentStore.tariff;
 
     const t = useCommonTranslation();
     const shouldShowLoader =
@@ -44,6 +48,29 @@ const SaaSPage = observer(
       init(t);
       return () => resetTariffContainerToBasic();
     }, [isQuotasLoaded]);
+
+    useEffect(() => {
+      const onQuotaFeatureChanged = (data: TOptSocket) => {
+        fetchPortalQuota(true);
+        if (data?.featureId === "free") fetchPortalTariff(true);
+      };
+
+      const onTopUpWallet = () => {
+        fetchBalance(true).catch(() => undefined);
+        fetchCustomerInfo(true);
+      };
+
+      socket?.on(SocketEvents.ChangedQuotaFeatureValue, onQuotaFeatureChanged);
+      socket?.on(SocketEvents.TopUpWallet, onTopUpWallet);
+
+      return () => {
+        socket?.off(
+          SocketEvents.ChangedQuotaFeatureValue,
+          onQuotaFeatureChanged,
+        );
+        socket?.off(SocketEvents.TopUpWallet, onTopUpWallet);
+      };
+    }, [fetchPortalQuota, fetchPortalTariff, fetchBalance, fetchCustomerInfo]);
 
     useEffect(() => {
       const title = t("Billing");
