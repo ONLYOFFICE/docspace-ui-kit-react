@@ -1,3 +1,4 @@
+import React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
@@ -85,5 +86,57 @@ describe("NewItemDropDown keyboard", () => {
     expect(onCloseDropDown).toHaveBeenCalled();
     expect(keyup.listener).not.toHaveBeenCalled();
     keyup.remove();
+  });
+
+  // A menu that closes on the pick, as the Selector's does.
+  const Host = ({ onPick }: { onPick: () => void }) => {
+    const [open, setOpen] = React.useState(false);
+    return (
+      <>
+        <button type="button" onClick={() => setOpen(true)}>
+          New
+        </button>
+        <input aria-label="Name" />
+        {open ? (
+          <NewItemDropDown
+            dropDownItems={[
+              <div
+                key="a"
+                role="option"
+                aria-selected={false}
+                tabIndex={-1}
+                onClick={onPick}
+              >
+                Entry
+              </div>,
+            ]}
+            onCloseDropDown={() => setOpen(false)}
+            listHeight={600}
+          />
+        ) : null}
+      </>
+    );
+  };
+
+  const openAndPick = async (onPick: () => void) => {
+    render(<Host onPick={onPick} />);
+    const opener = screen.getByText("New");
+    opener.focus();
+    fireEvent.click(opener);
+    expect(screen.getByText("Entry")).toHaveFocus();
+    press("Enter");
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+  };
+
+  it("gives the focus back when the picked entry moves it nowhere", async () => {
+    await openAndPick(() => {});
+
+    expect(screen.getByText("New")).toHaveFocus();
+  });
+
+  it("leaves the focus where the picked entry moved it", async () => {
+    await openAndPick(() => screen.getByLabelText("Name").focus());
+
+    expect(screen.getByLabelText("Name")).toHaveFocus();
   });
 });

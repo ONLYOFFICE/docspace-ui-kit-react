@@ -115,6 +115,14 @@ const NewItemDropDown = ({
         case " ":
           list[index]?.click();
           onCloseDropDown();
+          // The entry's own action moves the focus where it belongs - to the
+          // name field it adds. One that moves it nowhere leaves it on the
+          // page as the menu goes: then it goes back where the menu came from.
+          requestAnimationFrame(() => {
+            const { activeElement } = document;
+            if (!activeElement || activeElement === document.body)
+              giveFocusBack();
+          });
           break;
         case "Escape":
         case "Tab":
