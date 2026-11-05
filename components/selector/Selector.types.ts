@@ -320,6 +320,10 @@ export type NewItemProps = {
   hotkey?: string;
   inputItemVisible?: boolean;
   listHeight: number;
+  /** Id of the row as an option of the list's listbox. */
+  optionId?: string;
+  /** Whether the keyboard is on this row. */
+  isActive?: boolean;
 };
 
 // NewItemDropDown
@@ -684,6 +688,8 @@ export type BodyProps = TSelectorInfo &
     isLimitReached?: boolean;
 
     displayFileExtension?: boolean;
+    /** Accessible name of the list: the header's title, when there is one. */
+    listLabel?: string;
   };
 
 export type FooterProps = TSelectorFooterSubmitButton &
@@ -1032,6 +1038,10 @@ export type Data = {
   isLimitReached?: boolean;
   displayFileExtension?: boolean;
   forceIsMultiSelect?: boolean;
+  /** Id of the list as a listbox; a row's option id is `${listboxId}-option-${index}`. */
+  listboxId?: string;
+  /** Row the keyboard is on, or -1. It is drawn with a ring and named by aria-activedescendant. */
+  activeIndex?: number;
 };
 
 export interface ItemProps {

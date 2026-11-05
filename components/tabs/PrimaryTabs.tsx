@@ -10,6 +10,7 @@ import { LoaderWrapper } from "../loader-wrapper";
 
 import { useViewTab } from "./hooks/use-view-tab/useViewTab";
 import useTabsHotkeys from "./hooks/use-tabs-hotkeys/useTabsHotkeys";
+import useTabPanel from "./hooks/use-tab-panel/useTabPanel";
 import { type TTabItem, type TabsProps } from "./Tabs.types";
 import { OFFSET_RIGHT, OFFSET_LEFT } from "./Tabs.constants";
 import styles from "./Tabs.module.scss";
@@ -195,6 +196,11 @@ const PrimaryTabs = (props: TabsProps) => {
     selectTab,
   });
 
+  const { getTabProps, panelProps } = useTabPanel(
+    selectedItemIndex,
+    !!selectedContent,
+  );
+
   const classes = classNames({
     [styles.primary]: true,
   });
@@ -227,6 +233,7 @@ const PrimaryTabs = (props: TabsProps) => {
               classes,
             )}
             role="tab"
+            {...getTabProps(index)}
             aria-selected={isSelected}
             aria-disabled={item.isDisabled || undefined}
             tabIndex={index === rovingTabIndex ? 0 : -1}
@@ -329,7 +336,7 @@ const PrimaryTabs = (props: TabsProps) => {
       )}
       <LoaderWrapper isLoading={animationPhase === "progress"}>
         {selectedContent ? (
-          <div className={`${styles.tabsBody} tabs-body`}>
+          <div className={`${styles.tabsBody} tabs-body`} {...panelProps}>
             {selectedContent}
           </div>
         ) : null}

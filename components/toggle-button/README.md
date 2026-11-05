@@ -193,12 +193,13 @@ Set these on an ancestor. Everything else the stylesheet defines is private to i
 the `--toggle-button-fill-*` names an older version of this README listed, which the stylesheet
 assigns to itself and does not read from the outside.
 
-| Variable                          | Default                      | Effect                                              |
-| --------------------------------- | ---------------------------- | --------------------------------------------------- |
-| `--toggle-button-checked-color`   | `--color-scheme-main-accent` | Track colour when the switch is on, disabled or not |
-| `--toggle-button-off-color`       | `#d0d5da`                    | Track colour when it is off                         |
-| `--toggle-button-off-hover-color` | `#a3a9ae`                    | Track colour when off and hovered                   |
-| `--toggle-button-spacing`         | `8px`                        | Gap between the switch and the label                |
+| Variable                           | Default                      | Effect                                              |
+| ---------------------------------- | ---------------------------- | --------------------------------------------------- |
+| `--toggle-button-checked-color`    | `--color-scheme-main-accent` | Track colour when the switch is on, disabled or not |
+| `--toggle-button-off-color`        | `#d0d5da`                    | Track colour when it is off                         |
+| `--toggle-button-off-hover-color`  | `#a3a9ae`                    | Track colour when off and hovered                   |
+| `--toggle-button-spacing`          | `8px`                        | Gap between the switch and the label                |
+| `--toggle-button-focus-ring-color` | accent                       | The ring around a keyboard-focused switch           |
 
 The two off colours apply in the light theme only: the dark theme sets its own track colours on
 the control itself, so an ancestor's `--toggle-button-off-color` and
@@ -212,9 +213,8 @@ the control itself, so an ancestor's `--toggle-button-off-color` and
 - **There is no way to give it an accessible name other than `label`.** The component accepts
   no `aria-*` props, and the one it sets itself, `aria-checked`, is on a plain `<div>` with no
   role, where it means nothing. A switch without `label` is announced as an unnamed checkbox.
-- The hidden input carries no focus styling of its own and is the element that receives focus,
-  so keyboard focus is effectively invisible. Tab reaches the input and Space toggles it. Supply a `:focus-within` outline on your wrapper
-  if the form is meant to be usable from the keyboard.
+- The hidden input is the element that receives focus; its keyboard focus is drawn as a ring
+  around the switch. Tab reaches the input and Space toggles it.
 - `isDisabled` disables the input and sets `pointer-events: none` on the control, so it is
   skipped by the tab order as well as by the mouse.
 

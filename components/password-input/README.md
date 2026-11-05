@@ -346,8 +346,9 @@ mobile the width is a fixed `320px` and the variable is not read.
 
 ## Accessibility
 
-- The eye is [`InputBlock`](../input-block/README.md)'s icon button, and it carries no label, so
-  a screen reader announces an unnamed control that changes nothing it can perceive.
+- The eye is [`InputBlock`](../input-block/README.md)'s icon button, named "Show" while the
+  password is hidden and "Hide" while it shows. It is a Tab stop after the field, and Enter and
+  Space press it.
 - **The strength tooltip is not tied to the field.** It is opened imperatively and has no
   `aria-describedby`, so the rules and whether they are met are invisible to assistive
   technology — and colour is the only signal that a rule now passes.

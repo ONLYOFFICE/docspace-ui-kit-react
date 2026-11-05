@@ -2,6 +2,8 @@ import React from "react";
 import classNames from "classnames";
 
 import { Scrollbar } from "../scrollbar";
+import { useFocusTrap } from "../../hooks/useFocusTrap";
+import { useFocusReturn } from "../../hooks/useFocusReturn";
 
 import { AsideHeader } from "./aside-header";
 
@@ -35,6 +37,13 @@ const AsidePure = (props: AsideProps) => {
     else headerProps[key] = value;
   }
 
+  // An open panel lies over the page with a backdrop in front of it, so it
+  // takes the focus, Tab and Shift+Tab stay in it, and closed it gives the
+  // focus back to the control that opened it.
+  const asideRef = React.useRef<HTMLElement>(null);
+  useFocusReturn(asideRef, !!visible);
+  useFocusTrap(asideRef, !!visible);
+
   const asideClasses = classNames(
     styles.aside,
     className,
@@ -48,6 +57,10 @@ const AsidePure = (props: AsideProps) => {
 
   return (
     <aside
+      ref={asideRef}
+      // The panel holds the focus when it opens, and is the trap's fallback:
+      // with nothing in it to tab to, Tab does not go dead.
+      tabIndex={-1}
       className={asideClasses}
       style={{ zIndex }}
       data-testid="aside"

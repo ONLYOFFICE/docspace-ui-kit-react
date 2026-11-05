@@ -110,6 +110,21 @@
     stroke: var(--checkbox-focus-color);
   }
 
+  // The border alone barely changes from the resting one: ring the box in the
+  // accent as well, as the other controls are.
+  .hiddenInput:focus-visible + svg {
+    outline: 2px solid
+      var(
+        --checkbox-focus-ring-color,
+        var(
+          --accent-main,
+          var(--color-scheme-main-accent, #{variables.$light-blue-main})
+        )
+      );
+    outline-offset: 1px;
+    border-radius: 3px;
+  }
+
   &.error {
     .checkboxText {
       color: var(--checkbox-error-color);

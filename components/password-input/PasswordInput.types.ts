@@ -141,6 +141,7 @@ export type PasswordInputProps = Omit<
   | "onChange"
   | "children"
   | "iconName"
+  | "iconAriaLabel"
   | "iconButtonClassName"
   | "name"
   | "width"

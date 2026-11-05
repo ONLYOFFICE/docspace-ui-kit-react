@@ -609,7 +609,7 @@ export const CssCustomization: Story = {
           "--tile-thumbnail-image-radius": "8px",
           "--tile-thumbnail-image-hover-bg": "light-dark(#e6f3fb, #16303e)",
           "--tile-thumbnail-transition": "background 0.6s",
-          "--tile-option-button-padding-end": "8px",
+          "--tile-option-button-margin-end": "0px",
           "--tile-hotkey-color": "#e0662e",
         } as CSSProperties
       }
@@ -712,7 +712,7 @@ Two instances:
   "--tile-thumbnail-image-radius": "8px",
   "--tile-thumbnail-image-hover-bg": "light-dark(#e6f3fb, #16303e)",
   "--tile-thumbnail-transition": "background 0.6s",
-  "--tile-option-button-padding-end": "8px",
+  "--tile-option-button-margin-end": "0px",
   "--tile-hotkey-color": "#e0662e",
 }}>
   <FileTile item={file} element={<WordIcon />} contextOptions={options} thumbnail={thumbnailUrl} badges={badges} contentElement={quickActions}>

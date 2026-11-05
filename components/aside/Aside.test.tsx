@@ -1,5 +1,6 @@
+import React from "react";
 import { describe, expect, it, afterEach, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 
 import { Aside } from ".";
 import styles from "./Aside.module.scss";
@@ -59,6 +60,66 @@ describe("Aside Component", () => {
     );
 
     expect(screen.getByTestId("scrollbar")).toBeInTheDocument();
+  });
+
+  // The focus trap keeps Tab in the panel. With nothing in it to tab to, the
+  // panel itself must take the focus, or Tab does nothing at all.
+  it("takes the focus itself on Tab when it has nothing to tab to", () => {
+    render(
+      <>
+        <button type="button">Behind</button>
+        <Aside visible onClose={mockOnClose} withoutHeader withoutBodyScroll>
+          plain text
+        </Aside>
+      </>,
+    );
+
+    const behind = screen.getByRole("button", { name: "Behind" });
+    behind.focus();
+    fireEvent.keyDown(behind, { key: "Tab" });
+
+    expect(screen.getByTestId("aside")).toHaveFocus();
+  });
+
+  // A panel opened from the keyboard left the focus on the opener behind the
+  // backdrop, and closed it dropped the focus on the page's body: the
+  // keyboard's place was lost.
+  it("takes the focus when it opens and hands it back when it closes", () => {
+    const Host = ({ open }: { open: boolean }) => (
+      <>
+        <button type="button">Open</button>
+        <Aside visible={open} onClose={mockOnClose}>
+          <button type="button">Inside</button>
+        </Aside>
+      </>
+    );
+
+    const { rerender } = render(<Host open={false} />);
+    const opener = screen.getByRole("button", { name: "Open" });
+    opener.focus();
+
+    rerender(<Host open />);
+    expect(screen.getByTestId("aside")).toHaveFocus();
+
+    screen.getByRole("button", { name: "Inside" }).focus();
+    rerender(<Host open={false} />);
+    expect(opener).toHaveFocus();
+  });
+
+  it("leaves the focus on a field its content focused itself", () => {
+    const Field = () => {
+      const ref = React.useRef<HTMLInputElement>(null);
+      React.useEffect(() => ref.current?.focus(), []);
+      return <input ref={ref} aria-label="Name" />;
+    };
+
+    render(
+      <Aside visible onClose={mockOnClose}>
+        <Field />
+      </Aside>,
+    );
+
+    expect(screen.getByLabelText("Name")).toHaveFocus();
   });
 
   it("renders with withoutBodyScroll prop", () => {

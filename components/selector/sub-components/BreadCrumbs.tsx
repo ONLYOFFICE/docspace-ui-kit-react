@@ -12,6 +12,7 @@ import {
 } from "../../context-menu-button";
 import type { ContextMenuModel } from "../../context-menu";
 import { Text } from "../../text";
+import { activateOnButtonKey } from "../../../utils/keyboard-activation";
 
 import type {
   TBreadCrumb,
@@ -129,6 +130,8 @@ const calculateDisplayedItems = (
   return [];
 };
 
+const CURRENT_CRUMB_PROPS: React.AriaAttributes = { "aria-current": "page" };
+
 const BreadCrumbs = ({ visible = true }: BreadCrumbsProps) => {
   const {
     withBreadCrumbs,
@@ -217,6 +220,20 @@ const BreadCrumbs = ({ visible = true }: BreadCrumbsProps) => {
         ) : (
           <Text
             key={`bread-crumb-item-${item.id}`}
+            // A crumb before the last navigates, so it is a link to the
+            // keyboard; the last one is where the list already is.
+            {...(index === displayedItems.length - 1
+              ? CURRENT_CRUMB_PROPS
+              : {
+                  role: "link",
+                  tabIndex: 0,
+                  onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
+                    if (e.key !== "Enter") return;
+                    activateOnButtonKey(e, ({ currentTarget }) =>
+                      currentTarget.click(),
+                    );
+                  },
+                })}
             dataTestId={`selector_bread_crumb_item_${item.id}`}
             fontSize="16px"
             fontWeight={600}
