@@ -270,6 +270,13 @@ type AiAgentProvidersProps = {
   composerHeader?: ReactNode;
   composerDisabled?: boolean;
   /**
+   * The state that keeps the chat from working right now (an empty wallet,
+   * a spending limit reached), shown as a warning bar above the composer
+   * and cleared by the host when the state ends — see
+   * {@link WidgetConfig.composerNotice}.
+   */
+  composerNotice?: WidgetConfig["composerNotice"];
+  /**
    * Welcome-screen suggestion chips. The host builds the lists for the current
    * section (room / folder context) and passes them in ready-made; which list
    * is shown depends on what the composer currently holds — see
@@ -619,6 +626,7 @@ const AiAgentProviders = ({
   onThreadContextChange,
   composerHeader,
   composerDisabled,
+  composerNotice,
   suggestions,
   chatIntro,
   contextRoom,
@@ -1111,6 +1119,7 @@ const AiAgentProviders = ({
       composerActions,
       composerHeader,
       composerDisabled,
+      composerNotice,
       entityId,
       contextEntityId,
       // Host-driven model-picker visibility: the lib falls back to hiding
@@ -1175,6 +1184,7 @@ const AiAgentProviders = ({
       composerActions,
       composerHeader,
       composerDisabled,
+      composerNotice,
       entityId,
       contextEntityId,
       analyzeActive,
