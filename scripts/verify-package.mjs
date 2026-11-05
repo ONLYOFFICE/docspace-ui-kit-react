@@ -38,10 +38,12 @@ const run = (file, args, opts = {}) =>
 // Set by every package manager, not only pnpm: under `npm run` it is
 // npm-cli.js, and packing with that is exactly the npm tarball described
 // above -- every check would then fail on the missing `exports`, not on the
-// real cause. pnpm's own path ends in `pnpm`, `pnpm.exe` or `pnpm.cjs`.
+// real cause. pnpm's own file is named in more ways than one -- `pnpm`,
+// `pnpm.exe`, `pnpm.cjs`, and `pnpm-native` under corepack, as on CI -- so the
+// test is that the name says pnpm at all; npm's and yarn's never do.
 const pnpmPath = process.env.npm_execpath;
 
-if (!pnpmPath || !/^pnpm(\.[a-z]+)?$/i.test(path.basename(pnpmPath))) {
+if (!pnpmPath || !/pnpm/i.test(path.basename(pnpmPath))) {
   console.error(
     `${pnpmPath ? `npm_execpath is ${pnpmPath}, not pnpm` : "npm_execpath is not set"}, ` +
       "and the tarball must be packed by pnpm. Run this as " +
