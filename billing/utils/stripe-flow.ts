@@ -9,8 +9,6 @@ const POLL_MAX_INTERVAL_MS = 5000;
 const POLL_TIMEOUT_MS = 5 * 60 * 1000;
 const POLLING_TIMEOUT_MESSAGE = "Polling timeout";
 
-// The purchase may still go through after the wait gives up, so callers tell
-// this apart from a failure that happened before the checkout was opened.
 export const isPollingTimeoutError = (error: unknown) =>
   error instanceof Error && error.message === POLLING_TIMEOUT_MESSAGE;
 
@@ -133,14 +131,12 @@ export const waitForTopUpCompletion = async (
 
   if (isDelayedPaymentMethod) return { isDelayedPaymentMethod };
 
-  await pollUntil(
-    isPurchaseCompleted ??
-      (async () => {
-        const newBalance = await fetchBalance(true);
-        return newBalance > initialBalance;
-      }),
-    signal,
-  );
+  const isBalanceIncreased = async () => {
+    const newBalance = await fetchBalance(true);
+    return newBalance > initialBalance;
+  };
+
+  await pollUntil(isPurchaseCompleted ?? isBalanceIncreased, signal);
 
   return { isDelayedPaymentMethod };
 };
