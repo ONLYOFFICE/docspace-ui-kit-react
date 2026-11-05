@@ -91,7 +91,7 @@ const createStores = (currentStoragePlanSize: number) => {
 
   mocks.paymentStore = {
     tariff,
-    fetchBalance: vi.fn(),
+    fetchBalance: vi.fn().mockResolvedValue(undefined),
     refreshTransactionHistory: vi.fn(),
     storageServiceName: "disk-storage",
     storagePriceIncrement: 0.14,

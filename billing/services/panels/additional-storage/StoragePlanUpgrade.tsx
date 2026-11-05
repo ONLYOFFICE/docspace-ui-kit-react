@@ -321,14 +321,14 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
           return;
         }
 
-        fetchBalance();
+        fetchBalance(true).catch(console.error);
         refreshTransactionHistory(storageServiceName ?? DISK_STORAGE);
         onClose();
         return;
       }
 
       if (isUpgradeStoragePlan) {
-        fetchBalance();
+        fetchBalance(true).catch(console.error);
         refreshTransactionHistory(storageServiceName ?? DISK_STORAGE);
       }
       const tariff = await fetchPortalTariff!(true);
@@ -435,7 +435,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
         return;
       }
 
-      fetchBalance(true);
+      fetchBalance(true).catch(console.error);
       refreshTransactionHistory(storageServiceName ?? DISK_STORAGE);
 
       if (
