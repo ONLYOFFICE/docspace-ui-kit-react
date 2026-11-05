@@ -276,7 +276,10 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
 
     const amountValue = +amountRef.current;
     const difference = calculateDifferenceBetweenPlan(amountValue);
-    const productType = isUpgradeStoragePlan && !isCancellation ? 1 : 0;
+    const productType =
+      isUpgradeStoragePlan && !isCancellation
+        ? ProductQuantityType.Add
+        : ProductQuantityType.Set;
     const quantity = isUpgradeStoragePlan ? difference : amountValue;
     const value = isCancellation ? null : quantity;
 
