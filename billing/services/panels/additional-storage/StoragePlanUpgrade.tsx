@@ -195,10 +195,11 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
       setAmount(String(currentStoragePlanSize ?? ""));
 
     if (intervalRef.current) {
-      toastr.success(t("StorageCapacityUpdated"));
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+
+    toastr.success(t("StorageCapacityUpdated"));
 
     if (localStorage.getItem(STORAGE_TARIFF_DEACTIVATED) !== null) {
       localStorage.removeItem(STORAGE_TARIFF_DEACTIVATED);
