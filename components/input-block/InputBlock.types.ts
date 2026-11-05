@@ -24,11 +24,8 @@ type CommonProps = {
   /** Ref to the `<input>` element itself. */
   forwardedRef?: React.Ref<HTMLInputElement>;
   /**
-   * Used as HTML `tabindex` property of the `<input>`. Unlike `TextInput`'s, this one defaults to
-   * `-1`, so the field is out of the tab order until you pass `0` — and so is every component
-   * built on it that passes its own `tabIndex` through, `SearchInput` and `PasswordInput` among
-   * them.
-   * @default -1
+   * Used as HTML `tabindex` property of the `<input>`. Unset, the field keeps its natural place in
+   * the tab order; pass `-1` only for a field the keyboard must skip.
    */
   tabIndex?: number;
 };
@@ -57,6 +54,13 @@ type IconProps = {
    * disabled style and does not respond — it is what makes the icon a button.
    */
   onIconClick?: (e: React.MouseEvent) => void;
+  /**
+   * Name of the icon as a button. With `onIconClick` it also puts the icon in
+   * the Tab order, where Enter and Space press it; without a name it stays
+   * out, so the keyboard never meets a button it cannot announce. Without
+   * `onIconClick` the icon is no button, and the name is not set.
+   */
+  iconAriaLabel?: string;
   /** Applied to the box around the icon. */
   iconButtonClassName?: string;
   /**

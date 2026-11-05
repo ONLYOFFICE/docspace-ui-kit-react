@@ -11,6 +11,9 @@ import { ComboBox } from "../../combobox";
 import { Checkbox } from "../../checkbox";
 import { Text } from "../../text";
 import { ToggleButton } from "../../toggle-button";
+import { activateOnButtonKey } from "../../../utils/keyboard-activation";
+import { useCommonTranslation } from "../../../utils/i18n";
+import { focusSelectorOpener } from "../Filter.utils";
 
 import styles from "../Filter.module.scss";
 import {
@@ -36,6 +39,7 @@ const FilterBlockItem = ({
   withMultiItems,
   renderCustom,
 }: FilterBlockItemProps) => {
+  const t = useCommonTranslation();
   const changeFilterValueAction = (
     key: string,
     isSelected?: boolean,
@@ -75,13 +79,25 @@ const FilterBlockItem = ({
   const getSelectorItem = (item: TSelectorItem) => {
     const isRoomsSelector = item.group === FilterGroups.filterRoom;
     const isGroupsSelector = item.group === FilterGroups.filterGroup;
-    const selectorType = isRoomsSelector
-      ? FilterSelectorTypes.rooms
-      : isGroupsSelector
-        ? FilterSelectorTypes.groups
-        : FilterSelectorTypes.people;
+    const selectorType =
+      item.selectorType ??
+      (isRoomsSelector
+        ? FilterSelectorTypes.rooms
+        : isGroupsSelector
+          ? FilterSelectorTypes.groups
+          : FilterSelectorTypes.people);
+
+    // The group's choice is one of its plain options, not a pick of this
+    // selector: the selector stays an "add" link beside it.
+    const isSiblingOptionSelected = groupItem.some(
+      (gi) =>
+        gi !== item &&
+        !("displaySelectorType" in gi && gi.displaySelectorType) &&
+        gi.key === item.selectedKey,
+    );
 
     return !item.isSelected ||
+      isSiblingOptionSelected ||
       item.selectedKey === "me" ||
       item.selectedKey === FilterKeys.withoutGroup ||
       item.selectedKey === "other" ? (
@@ -131,6 +147,9 @@ const FilterBlockItem = ({
         }
         data-testid={`filter_selector_selected_${item.key}`}
       >
+        {/* The pointer presses the tag as a whole; to the keyboard its label
+            and its cross are two buttons: one opens the selector again, the
+            other clears the value. */}
         <Text
           className={classNames(
             styles.filterBlockItemTagText,
@@ -143,6 +162,15 @@ const FilterBlockItem = ({
           fontSize="13px"
           fontWeight={400}
           lineHeight="20px"
+          role="button"
+          tabIndex={0}
+          aria-haspopup="dialog"
+          data-selector-opener={item.group}
+          onKeyDown={(e: React.KeyboardEvent<HTMLElement>) =>
+            activateOnButtonKey(e, () =>
+              showSelector?.(selectorType, item.group),
+            )
+          }
         >
           {item?.selectedLabel}
         </Text>
@@ -151,6 +179,15 @@ const FilterBlockItem = ({
             className={styles.filterBlockItemTagIcon}
             ref={clearSelectorRef}
             data-testid={`filter_selector_clear_${item.key}`}
+            role="button"
+            tabIndex={0}
+            aria-label={t("Remove")}
+            onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) =>
+              activateOnButtonKey(e, () => {
+                changeFilterValue?.(item.group, "", true);
+                focusSelectorOpener(item.group);
+              })
+            }
           >
             <XIcon style={{ marginTop: "2px" }} />
           </div>
@@ -265,22 +302,40 @@ const FilterBlockItem = ({
         return;
     }
 
+    const opensSelector =
+      item.key === FilterKeys.other || item.key === "filter_group-other";
+    const toggleTag = () =>
+      changeFilterValueAction(
+        item.key as string,
+        item.isSelected,
+        item.isMultiSelect,
+      );
+
+    // A tag is a div the pointer clicks; to the keyboard it is a button that
+    // Enter and Space press: a toggle for a value, or the one that opens the
+    // selector for "Other".
+    const onTagKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) =>
+      activateOnButtonKey(e, () =>
+        opensSelector ? showSelector?.(selectorType, item.group) : toggleTag(),
+      );
+
     return (
       <div
         key={Array.isArray(item.key) ? item.key[0] : item.key}
         className={styles.filterBlockItemTag}
         data-selected={item.isSelected ? "true" : "false"}
         id={item.id}
+        role="button"
+        tabIndex={0}
+        aria-pressed={opensSelector ? undefined : !!item.isSelected}
+        aria-haspopup={opensSelector ? "dialog" : undefined}
+        data-selector-opener={opensSelector ? item.group : undefined}
+        onKeyDown={onTagKeyDown}
         onClick={
-          item.key === FilterKeys.other || item.key === "filter_group-other"
+          opensSelector
             ? (event: React.MouseEvent) =>
                 showSelectorAction(event, selectorType, item.group, [])
-            : () =>
-                changeFilterValueAction(
-                  item.key as string,
-                  item.isSelected,
-                  item.isMultiSelect,
-                )
+            : toggleTag
         }
         data-testid={`filter_tag_${Array.isArray(item.key) ? item.key[0] : item.key}`}
       >

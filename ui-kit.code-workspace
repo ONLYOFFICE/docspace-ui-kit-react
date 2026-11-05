@@ -43,7 +43,7 @@
           {
             "label": "The whole pre-push gate",
             "task": "Check | the whole pre-push gate",
-            "tooltip": "✅ format:gate, lint, tsc and test -- the fast half of what lefthook runs on push, in the same order",
+            "tooltip": "✅ Exactly what lefthook runs on push: format, lint, tsc, README checks, the tests your changes reach, and the build when it changed",
           },
           {
             "label": "Typescript (tsc)",
@@ -63,7 +63,7 @@
           {
             "label": "Test (Vitest)",
             "task": "Check | Vitest",
-            "tooltip": "✅ One pass over the directories vitest.config.ts collects",
+            "tooltip": "✅ One pass over the directories vitest.config.mts collects",
           },
           {
             "label": "Test: watch",

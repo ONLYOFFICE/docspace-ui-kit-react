@@ -52,6 +52,94 @@ describe("<IconButton />", () => {
     expect(element).not.toHaveAttribute("aria-label");
   });
 
+  describe("keyboard", () => {
+    it("is a focusable button named by title when it has an onClick", async () => {
+      const user = userEvent.setup();
+      render(<IconButton {...baseProps} title="Close" onClick={vi.fn()} />);
+
+      await user.tab();
+
+      expect(screen.getByRole("button", { name: "Close" })).toHaveFocus();
+    });
+
+    it.each(["{Enter}", " "])("calls onClick on %s", async (key) => {
+      const user = userEvent.setup();
+      const onClick = vi.fn();
+      render(<IconButton {...baseProps} title="Close" onClick={onClick} />);
+
+      await user.tab();
+      await user.keyboard(key);
+
+      expect(onClick).toHaveBeenCalledTimes(1);
+    });
+
+    it("hands onClick a click placed at the button for a menu to open at", async () => {
+      const user = userEvent.setup();
+      const onClick = vi.fn();
+      render(<IconButton {...baseProps} title="Menu" onClick={onClick} />);
+      const button = screen.getByRole("button", { name: "Menu" });
+      button.getBoundingClientRect = () =>
+        DOMRect.fromRect({ x: 40, y: 10, width: 16, height: 16 });
+
+      await user.tab();
+      await user.keyboard("{Enter}");
+
+      expect(onClick.mock.calls[0][0]).toMatchObject({
+        pageX: 40,
+        pageY: 26,
+        currentTarget: button,
+      });
+    });
+
+    it("keeps a handled key from listeners further up", async () => {
+      const user = userEvent.setup();
+      const onPageKey = vi.fn();
+      render(<IconButton {...baseProps} title="Close" onClick={vi.fn()} />);
+
+      await user.tab();
+      document.addEventListener("keydown", onPageKey);
+      await user.keyboard("{Enter}");
+      document.removeEventListener("keydown", onPageKey);
+
+      expect(onPageKey).not.toHaveBeenCalled();
+    });
+
+    it("is not a tab stop when disabled", () => {
+      render(
+        <IconButton
+          {...baseProps}
+          title="Close"
+          onClick={vi.fn()}
+          isDisabled
+        />,
+      );
+
+      const element = screen.getByTestId("icon-button");
+      expect(element).not.toHaveAttribute("tabindex");
+      expect(element).not.toHaveAttribute("role");
+    });
+
+    it("leaves the keyboard to a caller that passes its own onKeyDown", async () => {
+      const user = userEvent.setup();
+      const onClick = vi.fn();
+      const onKeyDown = vi.fn();
+      render(
+        <IconButton
+          {...baseProps}
+          onClick={onClick}
+          onKeyDown={onKeyDown}
+          tabIndex={0}
+        />,
+      );
+
+      await user.tab();
+      await user.keyboard("{Enter}");
+
+      expect(onKeyDown).toHaveBeenCalled();
+      expect(onClick).not.toHaveBeenCalled();
+    });
+  });
+
   it("accepts and applies id prop", () => {
     const testId = "test-id";
     render(<IconButton {...baseProps} id={testId} />);

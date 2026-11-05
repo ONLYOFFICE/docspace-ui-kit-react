@@ -211,6 +211,10 @@
 .optionButton {
   display: block;
 
+  // Against the tile's edge, where the tile clips what overflows: the
+  // icon button's ring goes inside it, not past the edge.
+  --icon-button-focus-offset: -2px;
+
   .expandButton > div:first-child {
     padding-block: 8px;
     padding-inline: 0 16px;

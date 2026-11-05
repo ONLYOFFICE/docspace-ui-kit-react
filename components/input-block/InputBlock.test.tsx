@@ -70,6 +70,22 @@ describe("<InputBlock />", () => {
     expect(onIconClick).toHaveBeenCalled();
   });
 
+  // It used to default to -1, which took every SearchInput and PasswordInput
+  // built on it out of the tab order unless the caller passed tabIndex={0}.
+  it("is in the tab order when tabIndex is not given", () => {
+    const { container } = render(<InputBlock {...defaultProps} />);
+
+    expect(container.querySelector("input")).not.toHaveAttribute("tabindex");
+  });
+
+  it("passes an explicit tabIndex through", () => {
+    const { container } = render(
+      <InputBlock {...defaultProps} tabIndex={-1} />,
+    );
+
+    expect(container.querySelector("input")).toHaveAttribute("tabindex", "-1");
+  });
+
   it("handles disabled state correctly", () => {
     const { container } = render(<InputBlock {...defaultProps} isDisabled />);
 
@@ -182,5 +198,21 @@ describe("<InputBlock />", () => {
 
     const inputBlock = screen.getByTestId("input-block");
     expect(inputBlock).toHaveStyle(customStyle);
+  });
+
+  // ARIA prohibits a name on an element with no role: the icon is a button
+  // only with onIconClick, and only then does it carry the name.
+  it("names the icon only when it is a button", () => {
+    const { container, rerender } = render(
+      <InputBlock
+        {...defaultProps}
+        onIconClick={undefined}
+        iconAriaLabel="Search"
+      />,
+    );
+    expect(container.querySelector('[aria-label="Search"]')).toBeNull();
+
+    rerender(<InputBlock {...defaultProps} iconAriaLabel="Search" />);
+    expect(screen.getByRole("button", { name: "Search" })).toBeInTheDocument();
   });
 });

@@ -194,8 +194,7 @@ const SaveDialog = ({
       _isRoot,
       selectedItemSecurity,
     ) => {
-      if (selectedItemType === "rooms" || selectedItemType === "agents")
-        return true;
+      if (selectedItemType === "rooms") return true;
       if (
         selectedItemSecurity &&
         "Create" in selectedItemSecurity &&
@@ -212,15 +211,14 @@ const SaveDialog = ({
       isPanelVisible
       openRoot
       isRoomsOnly={false}
-      // The legacy chat's save picker listed the AI agents section (an
-      // agent's storage the user can Create in is a valid save target); the
-      // prop was lost when the picker was rewritten for the chat-lib
-      // integration.
-      withAIAgentsTreeFolder
       // The Forms section only accepts PDF forms, which a chat message can
       // never produce, so a save target inside it does not exist (Bug 83486).
       // The attach dialog keeps the section — reading forms is legitimate.
       withFormsTreeFolder={false}
+      // An Instructions room only accepts skill files with a frontmatter and
+      // a Knowledge room is a RAG source, not a place for chat exports, so
+      // the AI rooms section is no save target either.
+      withAIRoomsTreeFolder={false}
       // Form-filling rooms are still reachable through the Rooms section and
       // pass the security.Create check, but the export into them dies
       // silently in the AI Worker. Block entering them with the selector's

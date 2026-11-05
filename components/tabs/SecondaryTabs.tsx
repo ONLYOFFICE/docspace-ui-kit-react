@@ -16,6 +16,7 @@ import {
 } from "./Tabs.constants";
 import styles from "./Tabs.module.scss";
 import useTabsHotkeys from "./hooks/use-tabs-hotkeys/useTabsHotkeys";
+import useTabPanel from "./hooks/use-tab-panel/useTabPanel";
 import { useViewTab } from "./hooks/use-view-tab/useViewTab";
 import { useInterfaceDirection } from "../../context/InterfaceDirectionContext";
 
@@ -29,10 +30,14 @@ const SecondaryTabs = (props: TabsProps) => {
     layoutId,
     isLoading,
     scaled,
+    withoutArrows = false,
     hotkeysId,
     className,
     ...rest
   } = props;
+
+  // A mobile device never shows the arrows: tabs that do not fit scroll.
+  const scrollOnly = isMobile || withoutArrows;
 
   const selectedItemIndex = !selectedItemId
     ? 0
@@ -70,7 +75,7 @@ const SecondaryTabs = (props: TabsProps) => {
       const containerWidth = containerElement.offsetWidth;
       const tabWidth = tabElement?.offsetWidth;
       const tabOffsetLeft = tabElement?.offsetLeft;
-      const arrowsWidth = isMobile ? 0 : ARROW_WIDTH;
+      const arrowsWidth = scrollOnly ? 0 : ARROW_WIDTH;
 
       if (tabOffsetLeft - TABS_GAP < containerElement.scrollLeft) {
         scrollRef.current.scrollTo(tabOffsetLeft - TABS_GAP - arrowsWidth);
@@ -84,7 +89,7 @@ const SecondaryTabs = (props: TabsProps) => {
         );
       }
     },
-    [tabsCountInContainer],
+    [tabsCountInContainer, scrollOnly],
   );
 
   useEffect(() => {
@@ -169,7 +174,7 @@ const SecondaryTabs = (props: TabsProps) => {
       if (maxTabsCount < items.length) {
         setTabsIsOverflowing(true);
 
-        if (isMobile) return;
+        if (scrollOnly) return;
 
         const arrowsWidth = ARROW_WIDTH * 2;
 
@@ -177,6 +182,11 @@ const SecondaryTabs = (props: TabsProps) => {
           (tabsContainerWidth - arrowsWidth) /
             (referenceTabSize + TABS_GAP + TAB_PADDING),
         );
+
+        // A row narrower than the two arrows and one tab fits none between
+        // them, and dividing by that zero made every tab `Infinity` wide -- a
+        // value the browser drops. The tabs keep their measured width instead.
+        if (maxTabsCount < 1) return;
 
         const size =
           Math.round(tabsContainerWidth - arrowsWidth) / maxTabsCount -
@@ -187,7 +197,7 @@ const SecondaryTabs = (props: TabsProps) => {
         setTabsCountInContainer(maxTabsCount);
       }
     }
-  }, [referenceTabSize, items.length, tabsIsOverflowing]);
+  }, [referenceTabSize, items.length, tabsIsOverflowing, scrollOnly]);
 
   useEffect(() => {
     scrollToTab(selectedItemIndex);
@@ -229,7 +239,13 @@ const SecondaryTabs = (props: TabsProps) => {
         items.length * TABS_GAP
       : null;
 
-  const withArrows = tabsIsOverflowing && !isMobile;
+  const withArrows = tabsIsOverflowing && !scrollOnly;
+
+  const selectedContent = items[selectedItemIndex]?.content;
+  const { getTabProps, panelProps } = useTabPanel(
+    selectedItemIndex,
+    !!selectedContent,
+  );
 
   const renderContent = (
     <div
@@ -270,6 +286,7 @@ const SecondaryTabs = (props: TabsProps) => {
               "tab",
             )}
             role="tab"
+            {...getTabProps(index)}
             aria-selected={isSelected}
             aria-disabled={item.isDisabled || undefined}
             tabIndex={index === rovingTabIndex ? 0 : -1}
@@ -331,6 +348,10 @@ const SecondaryTabs = (props: TabsProps) => {
             })}
             isFill
             onClick={onSelectPrev}
+            // The arrow keys already move along the bar: out of the Tab
+            // order, so Tab goes from the bar straight into the panel.
+            tabIndex={-1}
+            aria-hidden
             iconNode={<ArrowReactUrl />}
           />
         ) : null}
@@ -371,6 +392,8 @@ const SecondaryTabs = (props: TabsProps) => {
             })}
             isFill
             onClick={onSelectNext}
+            tabIndex={-1}
+            aria-hidden
             iconNode={<ArrowReactUrl />}
           />
         ) : null}
@@ -379,12 +402,9 @@ const SecondaryTabs = (props: TabsProps) => {
       {withoutStickyIntend ? null : (
         <div className={classNames(styles.stickyIndent, "sticky-indent")} />
       )}
-      {items[selectedItemIndex]?.content ? (
-        <div
-          // style={{ overflow: "hidden" }}
-          className={`${styles.tabsBody} tabs-body`}
-        >
-          {items[selectedItemIndex].content}
+      {selectedContent ? (
+        <div className={`${styles.tabsBody} tabs-body`} {...panelProps}>
+          {selectedContent}
         </div>
       ) : null}
     </div>

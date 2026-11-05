@@ -182,7 +182,9 @@ describe("<StatusMessage />", () => {
       rerender(<StatusMessage message="" />);
 
       const messageElement = screen.getByText("Test").parentElement;
-      messageElement?.dispatchEvent(new Event("animationend"));
+      act(() => {
+        messageElement?.dispatchEvent(new Event("animationend"));
+      });
 
       await waitFor(() => {
         expect(container.firstChild).toBeNull();
@@ -195,7 +197,9 @@ describe("<StatusMessage />", () => {
       rerender(<StatusMessage message="" />);
 
       const messageElement = screen.getByText("Test").parentElement;
-      messageElement?.dispatchEvent(new Event("transitionend"));
+      act(() => {
+        messageElement?.dispatchEvent(new Event("transitionend"));
+      });
 
       await waitFor(() => {
         expect(container.firstChild).toBeNull();
@@ -208,7 +212,9 @@ describe("<StatusMessage />", () => {
       rerender(<StatusMessage message="Second" />);
 
       const messageElement = screen.getByText("First").parentElement;
-      messageElement?.dispatchEvent(new Event("animationend"));
+      act(() => {
+        messageElement?.dispatchEvent(new Event("animationend"));
+      });
 
       await waitFor(() => {
         expect(screen.getByText("Second")).toBeInTheDocument();
@@ -221,7 +227,9 @@ describe("<StatusMessage />", () => {
       rerender(<StatusMessage message="Second" />);
 
       const messageElement = screen.getByText("First").parentElement;
-      messageElement?.dispatchEvent(new Event("transitionend"));
+      act(() => {
+        messageElement?.dispatchEvent(new Event("transitionend"));
+      });
 
       await waitFor(() => {
         expect(screen.getByText("Second")).toBeInTheDocument();
@@ -239,7 +247,9 @@ describe("<StatusMessage />", () => {
         });
       }
 
-      messageElement?.dispatchEvent(new Event("animationend"));
+      act(() => {
+        messageElement?.dispatchEvent(new Event("animationend"));
+      });
 
       await waitFor(() => {
         expect(container.querySelector(`.${styles.body}`)).toBeInTheDocument();

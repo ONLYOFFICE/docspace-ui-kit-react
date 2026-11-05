@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 
 import enCommon from "../locales/en/Common.json";
 import type { TTranslations } from "./translation";
@@ -82,23 +82,27 @@ const baseProps = {
 };
 
 describe("Providers", () => {
-  it("renders children through all composed providers", () => {
+  it("renders children through all composed providers", async () => {
     render(
       <Providers {...baseProps}>
         <div data-testid="child">Hello</div>
       </Providers>,
     );
+    // With no settings passed, Providers fetches them on mount and updates
+    // when the request resolves; let that land inside act.
+    await act(async () => {});
 
     expect(screen.getByTestId("child")).toBeInTheDocument();
     expect(screen.getByText("Hello")).toBeInTheDocument();
   });
 
-  it("renders with translations", () => {
+  it("renders with translations", async () => {
     render(
       <Providers {...baseProps} translations={translations} locale="en">
         <div data-testid="child">Translated content</div>
       </Providers>,
     );
+    await act(async () => {});
 
     expect(screen.getByText("Translated content")).toBeInTheDocument();
   });

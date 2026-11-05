@@ -4,6 +4,11 @@ import equal from "fast-deep-equal";
 
 import { TextUi } from "../text";
 import { withTooltip } from "../tooltip";
+import { useInterfaceDirection } from "../../context/InterfaceDirectionContext";
+import {
+  activateOnButtonKey,
+  keyboardClickAt,
+} from "../../utils/keyboard-activation";
 
 import type { LinkProps } from "./Link.types";
 import { LinkType, LinkTarget } from "./Link.enums";
@@ -25,6 +30,9 @@ const LinkUi: React.FC<LinkProps> = React.memo(
     lineHeight,
     rel,
     tabIndex,
+    role,
+    onClick,
+    onKeyDown,
     type = LinkType.page,
     isTextOverflow = false,
     noHover = false,
@@ -39,6 +47,32 @@ const LinkUi: React.FC<LinkProps> = React.memo(
     containerMinWidth: _containerMinWidth,
     ...rest
   }: LinkProps) => {
+    const { isRTL } = useInterfaceDirection();
+
+    // A link with an onClick and no href is out of the keyboard's reach: it
+    // takes a Tab stop and its keys, unless the caller wires the keyboard
+    // itself (a role or a key handler of its own) or keeps the link out of
+    // it (a negative tabIndex, where something around it is the control). A
+    // tabIndex of 0 or more only places the stop. An action link runs code,
+    // so it is a button; a page link navigates, so it stays a link.
+    const isKeyboardOperable =
+      !href &&
+      !!onClick &&
+      role === undefined &&
+      (tabIndex === undefined || tabIndex >= 0) &&
+      !onKeyDown;
+    const isAction = type === LinkType.action;
+
+    // Enter presses it as a click would, and Space too for a button - a link
+    // takes Enter only. Handlers that open a menu at the click's position get
+    // the link's own corner instead.
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+      if (!isAction && e.key === " ") return;
+      activateOnButtonKey(e, ({ currentTarget }) =>
+        onClick?.(keyboardClickAt(currentTarget, isRTL)),
+      );
+    };
+
     const linkClasses = classNames(
       styles.link,
       {
@@ -72,7 +106,10 @@ const LinkUi: React.FC<LinkProps> = React.memo(
         as="a"
         href={href}
         rel={rel}
-        tabIndex={tabIndex}
+        role={isKeyboardOperable ? (isAction ? "button" : "link") : role}
+        tabIndex={isKeyboardOperable ? (tabIndex ?? 0) : tabIndex}
+        onClick={onClick}
+        onKeyDown={isKeyboardOperable ? handleKeyDown : onKeyDown}
         isBold={isBold}
         style={commonStyle}
         aria-label={

@@ -6,7 +6,10 @@ import {
   type FolderDtoInteger,
 } from "@onlyoffice/docspace-api-sdk";
 
-import { FORMS_SECTION_ID } from "../../utils/constants";
+import {
+  AI_HUB_ROOT_FOLDER_TYPE,
+  FORMS_SECTION_ID,
+} from "../../utils/constants";
 import { LoadersContextProvider } from "../../utils/contexts/Loaders";
 import type { UseRootHelperProps } from "../FilesSelector.types";
 import useRootHelper from "./useRootHelper";
@@ -78,6 +81,46 @@ describe("useRootHelper", () => {
       await getRootIds({
         withRoomsTreeFolder: false,
         withFormsTreeFolder: false,
+      }),
+    ).toEqual([1]);
+  });
+});
+
+describe("useRootHelper AI sections", () => {
+  const withAiRoots = [
+    ...treeFolders,
+    { id: 3, parentId: 0, rootFolderType: FolderType.AiAgents, security: {} },
+    {
+      id: 4,
+      parentId: 0,
+      rootFolderType: AI_HUB_ROOT_FOLDER_TYPE as FolderType,
+      security: {},
+    },
+  ] as FolderDtoInteger[];
+
+  it("lists AI rooms after Forms and never AI agents", async () => {
+    expect(
+      await getRootIds({
+        treeFolders: withAiRoots,
+        withAIRoomsTreeFolder: true,
+      }),
+    ).toEqual([1, 2, FORMS_SECTION_ID, 4]);
+  });
+
+  it("leaves AI rooms out when the host turns it off", async () => {
+    expect(await getRootIds({ treeFolders: withAiRoots })).toEqual([
+      1,
+      2,
+      FORMS_SECTION_ID,
+    ]);
+  });
+
+  it("leaves AI rooms out of a My documents only picker", async () => {
+    expect(
+      await getRootIds({
+        treeFolders: withAiRoots,
+        withAIRoomsTreeFolder: true,
+        isUserOnly: true,
       }),
     ).toEqual([1]);
   });

@@ -527,17 +527,25 @@ export const WithStickyHeader: Story = {
     const heading = canvas.getByText("Project files");
     const box = heading.closest<HTMLElement>('[style*="overflow"]');
     if (!box) throw new Error("No scrolling box");
-    const before = heading.getBoundingClientRect().top;
-    // Scrolled, the heading and the bar stay at the top of the box.
+    const top = (el: Element) => el.getBoundingClientRect().top;
+    const entry = canvas.getByText("Overview entry 1");
+    const before = { heading: top(heading), entry: top(entry) };
+    // Scrolled, the heading and the bar stay at the top of the box while the
+    // content moves under them.
     box.scrollTop = 200;
-    await waitFor(() =>
-      expect(
-        canvas.getByText("Overview entry 1").getBoundingClientRect().top,
-      ).toBeLessThan(box.getBoundingClientRect().top),
-    );
-    await expect(Math.round(heading.getBoundingClientRect().top)).toBe(
-      Math.round(before),
-    );
+    await waitFor(() => expect(top(entry)).toBeLessThan(top(box)));
+    const moved = {
+      heading: Math.abs(top(heading) - before.heading),
+      entry: before.entry - top(entry),
+    };
+    await expect(moved.entry).toBeGreaterThan(150);
+    // Not a pixel-exact compare: the CI runners now and then put the heading
+    // 2px off between the two frames, a shift no layout read here reproduces.
+    // A heading that does not stick moves with the content, 200px.
+    await expect(
+      moved.heading,
+      `heading ${before.heading} -> ${top(heading)}, box ${top(box)}`,
+    ).toBeLessThanOrEqual(2);
     await expect(canvas.getByTestId("Overview_tab")).toBeVisible();
   },
   args: {
@@ -617,6 +625,19 @@ export const OverflowingTabs: Story = {
     )?.parentElement;
     if (!row) throw new Error("No primary row");
     await expect(row.scrollWidth).toBeGreaterThan(row.clientWidth);
+
+    // The scroll track along the bottom of the bar does not take the click
+    // under a label: the whole height of the tab belongs to the tab.
+    const tab = canvasElement.querySelector<HTMLElement>(
+      '[data-testid="Documents_tab"]',
+    );
+    if (!tab) throw new Error("No Documents tab");
+    const box = tab.getBoundingClientRect();
+    for (let y = box.top + 1; y < box.bottom; y += 2) {
+      await expect(
+        tab.contains(document.elementFromPoint(box.left + box.width / 2, y)),
+      ).toBe(true);
+    }
 
     // The segmented control's right arrow selects the next tab.
     const [, right] = arrowsOnScreen(canvasElement);

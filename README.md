@@ -35,8 +35,8 @@
 
 ## Requirements
 
-- React ^19.0.0
-- React DOM ^19.0.0
+- React ^19.2.0
+- React DOM ^19.2.0
 
 ## Installation
 
@@ -58,7 +58,7 @@ pnpm build && pnpm pack
 pnpm add file:../path/to/onlyoffice-apps-ui-kit-<version>.tgz
 ```
 
-**Peer dependencies:** four are required — `react` and `react-dom` ^19.0.0, plus `i18next`
+**Peer dependencies:** four are required — `react` and `react-dom` ^19.2.0, plus `i18next`
 and `react-i18next`, which the translated components need and which break silently if a
 second copy ends up in the tree. Fifteen more are optional and only matter to the modules
 that use them: `mobx` / `mobx-react` and `react-router` for the portal-coupled modules,
@@ -1097,8 +1097,9 @@ pnpm format:fix     # Prettier - rewrite files
 ```
 
 Linting is Biome and formatting is Prettier: Biome's own formatter is disabled in
-`biome.json`. Only `lint`, `tsc` and `test` run on pre-push and in CI, so formatting is
-not enforced by any gate.
+`biome.json`. Both run on pre-push and in CI, along with `tsc` and the tests. Pre-push
+(`pnpm gate` runs it by hand) checks only the tests a change reaches, and builds and
+packs only when the build's own code changed; CI runs everything in full.
 
 ## Useful Links
 

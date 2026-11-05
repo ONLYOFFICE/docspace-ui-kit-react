@@ -162,6 +162,13 @@
     padding: 0;
   }
 
+  // The horizontal track is 16px tall and covers the lower half of the bar,
+  // so a click under a label landed on the track and scrolled the row
+  // instead of selecting the tab. Its 1px thumb cannot be grabbed anyway.
+  :global(.track-horizontal) {
+    pointer-events: none;
+  }
+
   :global(.track > .thumb-horizontal) {
     height: 1px !important;
   }
@@ -473,6 +480,13 @@
   width: 100%;
   display: flex;
   align-items: center;
+
+  // A panel with nothing in it to tab to is a Tab stop of its own; inside,
+  // where the page's scroller cannot clip it.
+  &:focus-visible {
+    outline: 2px solid var(--accent-main, #{$light-blue-main});
+    outline-offset: -2px;
+  }
 }
 
 .motionBackground {

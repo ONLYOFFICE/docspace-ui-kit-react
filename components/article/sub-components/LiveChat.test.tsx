@@ -213,10 +213,27 @@ describe("ArticleLiveChat", () => {
     expect(position()?.offset.web).toEqual({ horizontal: 424, vertical: 24 });
   });
 
+  it("moves clear of the info panel's actual width, or the chat's in its place", () => {
+    render(
+      <ArticleLiveChat {...props} isInfoPanelVisible infoPanelWidth={640} />,
+    );
+    expect(position()?.offset.web).toEqual({ horizontal: 664, vertical: 24 });
+
+    render(<ArticleLiveChat {...props} infoPanelWidth={520} />);
+    expect(position()?.offset.web).toEqual({ horizontal: 544, vertical: 24 });
+
+    render(
+      <ArticleLiveChat {...props} isInfoPanelVisible infoPanelWidth={0} />,
+    );
+    expect(position()?.offset.web).toEqual({ horizontal: 24, vertical: 24 });
+  });
+
   it("ignores the info panel on a phone, where it covers the screen", () => {
     isMobile.mockReturnValue(true);
 
-    render(<ArticleLiveChat {...props} isInfoPanelVisible />);
+    render(
+      <ArticleLiveChat {...props} isInfoPanelVisible infoPanelWidth={640} />,
+    );
 
     expect(position()?.offset.web).toEqual({ horizontal: 16, vertical: 16 });
   });

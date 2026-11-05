@@ -1,21 +1,11 @@
+# `skips` names a job that did not run -- above all the pre-push build, which
+# runs only when a push changes the build's own code; without it a skipped
+# build and a passed one look the same in the summary.
 output:
   - meta
   - summary
+  - skips
 
-# Ordered cheapest-and-most-likely-to-fail first -- a typical miss is a
-# formatting or lint slip, and there is no reason to find it after 2143 tests
-# and a 40s build.
-#
-# Two keys are what make that true, and both were once missing. `priority` sets
-# the order: lefthook sorts a hook's commands ALPHABETICALLY, so the order they
-# appear in this file counts for nothing, and `build` ran before `format` on
-# every push. `piped` stops at the first failure; without it lefthook runs the
-# rest anyway, so a formatting slip still paid for the build, the tests and the
-# tarball. Together they took a failing push from 78 seconds to 5. Add a command
-# here and give it a priority, or it lands wherever its name falls.
-#
-# `skip_empty` is deliberately absent -- it only has an effect together with a
-# `files`/`glob` filter, and every command here runs over the whole tree.
 # Formats what is being committed, so the tree never drifts between commits and
 # the `format` check below has nothing left to find. `stage_fixed` re-stages the
 # files Prettier rewrote, so the commit carries the formatted bytes rather than
@@ -52,56 +42,90 @@ pre-merge-commit:
       run: pnpm exec prettier --write --ignore-unknown {staged_files}
       stage_fixed: true
 
+# Cheapest and most likely to fail first: a typical miss is a formatting or
+# lint slip, and there is no reason to find it after the tests and a build.
+#
+# `jobs` is a list, and its order is the order they run in. The `commands` map
+# this used to be was sorted ALPHABETICALLY by lefthook whatever the file said,
+# which is why every command once carried a `priority`. `piped` stops at the
+# first failure; without it lefthook runs the rest anyway, so a formatting slip
+# still paid for the build, the tests and the tarball -- 78 seconds to report
+# something found in 5.
+#
+# The whole gate took about seven minutes on a 24-thread Windows machine, run
+# end to end one step at a time. What brings a typical push under one:
+#   - Prettier and tsc keep caches in node_modules/.cache (format, tsc);
+#   - lint, tsc and the README checks are independent and run side by side;
+#   - only the unit tests a change can reach run (test-changed.mjs);
+#   - the build and the tarball run only when the build itself changed.
+# CI runs every one of these in full on every pull request, so nothing here is
+# the last line of defence.
 pre-push:
-  parallel: false
-  # `piped` is what makes the ordering below worth anything. Without it lefthook
-  # runs every command even after one fails, so a formatting slip still paid for
-  # the build, the tests and the tarball before the push was refused -- 78
-  # seconds to report something found in 5. With it the hook stops at the first
-  # failure.
   piped: true
-  commands:
+  # Streams each job's output as it runs rather than after it finishes. The
+  # option belongs to the hook: set on a single command, as it once was, it is
+  # rejected by the schema and ignored.
+  follow: true
+  jobs:
     # Fixes rather than just reporting: it rewrites the offending files with
     # Prettier and then still stops the push, because a pre-push hook cannot
     # rewrite the commits already being pushed. It names the files it changed
     # and the amend command to fold them in. Passing straight through after
     # rewriting would push the unformatted commits and leave the fix stranded
     # in a dirty tree.
-    format:
-      priority: 1
+    - name: format
       run: pnpm format:gate
-      follow: true
-    lint:
-      priority: 2
-      run: pnpm lint
-      follow: true
-    tsc:
-      priority: 3
-      run: pnpm tsc
-      follow: true
-    # Structure and derived truth only; the `--compile` pass that type-checks
-    # every example in every README takes half a minute and runs in CI.
-    # `scripts/readme-allowlist.json` is `[]` -- a folder listed there is a folder
-    # this step stops checking.
-    check-readme:
-      priority: 4
-      run: pnpm check:readme && pnpm readme:props:check && pnpm readme:catalogue:check && pnpm surface:check
-      follow: true
-    test:
-      priority: 5
-      run: pnpm test
-      follow: true
+
+    # Each builds its own view of the tree and none writes anything another
+    # reads, so they run at once and the group takes as long as the slowest.
+    - name: static
+      group:
+        parallel: true
+        jobs:
+          - name: lint
+            run: pnpm lint
+          - name: tsc
+            run: pnpm tsc
+          # Structure and derived truth only; the `--compile` pass that
+          # type-checks every example in every README takes half a minute and
+          # runs in CI. `scripts/readme-allowlist.json` is `[]` -- a folder
+          # listed there is a folder this step stops checking.
+          - name: check-readme
+            run: pnpm check:readme
+          - name: readme-props
+            run: pnpm readme:props:check
+          - name: readme-catalogue
+            run: pnpm readme:catalogue:check
+          - name: surface
+            run: pnpm surface:check
+
+    # The unit tests whose imports reach a changed file, or all of them when
+    # the setup, the mocks, the locales, the lockfile or the configuration changed. CI runs
+    # the full suite.
+    - name: test
+      run: pnpm test:changed
+
     # The gate used to stop at tsc, lint and test, which left the packaging
     # steps to CI -- and CI is Linux only. Three Windows-only breakages shipped
     # through that gap: `clean` called `rm -rf`, the per-module-css plugin keyed
     # its map by a raw module id, and check-dist compared `\` ids against POSIX
-    # ones. All three fail in `build`, so build here, where the developer's own
-    # platform is the one being tested. Adds about 30 seconds.
-    build:
-      priority: 6
-      run: pnpm build
-      follow: true
-    verify-package:
-      priority: 7
-      run: pnpm verify:package
-      follow: true
+    # ones. All three were in the build's own code, so the build runs here when
+    # a pushed commit touches that code -- the platform being tested is then the
+    # developer's own. Any other push leaves it to CI's `package` job: a change
+    # to a component cannot break the build in a way only Windows would see.
+    #
+    # Decided by a script rather than a `glob`: lefthook matches a glob against
+    # `git diff HEAD @{push}`, which is empty for a branch's first push, so the
+    # glob would skip the build on exactly the push that brings a new branch.
+    # `skip` on "the build is untouched", not `only` on "it changed": lefthook
+    # reads any non-zero exit as "no", and a script that crashes then builds.
+    - name: package
+      skip:
+        - run: node scripts/build-untouched.mjs
+      group:
+        piped: true
+        jobs:
+          - name: build
+            run: pnpm build
+          - name: verify-package
+            run: pnpm verify:package

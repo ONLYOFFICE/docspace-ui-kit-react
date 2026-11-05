@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 
 import AiChatStore from "./AiChatStore";
 
@@ -207,5 +207,140 @@ describe("AiChatStore analyze mode", () => {
     store.markAnalyzeSent();
 
     expect(store.isAnalyzeMode).toBe(false);
+  });
+});
+
+describe("AiChatStore project view", () => {
+  it("carries the project title and the composer flag the host sets", () => {
+    const store = new AiChatStore();
+    expect(store.projectTitle).toBeNull();
+    expect(store.composerContextHidden).toBe(false);
+    store.setProjectTitle("Contract review");
+    store.setComposerContextHidden(true);
+    expect(store.projectTitle).toBe("Contract review");
+    expect(store.composerContextHidden).toBe(true);
+    store.setProjectTitle(null);
+    store.setComposerContextHidden(false);
+    expect(store.projectTitle).toBeNull();
+    expect(store.composerContextHidden).toBe(false);
+  });
+
+  it("carries the knowledge picker switch the host sets", () => {
+    const store = new AiChatStore();
+    expect(store.knowledgePickerHidden).toBe(false);
+    store.setKnowledgePickerHidden(true);
+    expect(store.knowledgePickerHidden).toBe(true);
+    store.setKnowledgePickerHidden(false);
+    expect(store.knowledgePickerHidden).toBe(false);
+  });
+});
+
+describe("AiChatStore projects", () => {
+  it("opens a project as a preset of every one of its rooms", () => {
+    const store = new AiChatStore();
+    store.openProject({
+      profileId: "p1",
+      profileName: "GPT",
+      instructionsRooms: [
+        { cloud: "docspace", id: "1", name: "Brand voice" },
+        { cloud: "docspace", id: "2", name: "Legal tone" },
+      ],
+      knowledgeRooms: [],
+    });
+    expect(store.isVisible).toBe(true);
+    expect(store.userFullscreen).toBe(true);
+    expect(store.pendingPresetFresh).toBe(true);
+    expect(store.pendingPreset).toEqual({
+      profileId: "p1",
+      profileName: "GPT",
+      contextRooms: [
+        { cloud: "docspace", id: "1", name: "Brand voice" },
+        { cloud: "docspace", id: "2", name: "Legal tone" },
+      ],
+      knowledgeRooms: [],
+    });
+  });
+});
+
+describe("AiChatStore presets", () => {
+  it("opens a preset fullscreen on a fresh conversation and hands the settings to the bridge", () => {
+    const store = new AiChatStore();
+    store.setAgentId(5);
+    const settings = {
+      profileId: "p1",
+      profileName: "Claude",
+      contextRooms: [{ cloud: "docspace", id: "12", name: "Skills" }],
+      knowledgeRooms: [],
+    };
+    store.openPreset(settings);
+    expect(store.isVisible).toBe(true);
+    expect(store.userFullscreen).toBe(true);
+    expect(store.agentId).toBeNull();
+    expect(store.pendingPreset).toEqual(settings);
+    store.consumePendingPreset();
+    expect(store.pendingPreset).toBeNull();
+  });
+
+  it("applies a preset to the open chat without touching the panel", () => {
+    const store = new AiChatStore();
+    store.open();
+    store.setPanelWidth(640);
+    const settings = {
+      profileId: "p2",
+      profileName: "GPT",
+      contextRooms: [],
+      knowledgeRooms: [{ cloud: "docspace", id: "9", name: "Docs" }],
+    };
+    store.applyPreset(settings);
+    expect(store.pendingPreset).toEqual(settings);
+    expect(store.pendingPresetFresh).toBe(false);
+    expect(store.userFullscreen).toBe(false);
+    expect(store.panelWidth).toBe(640);
+    store.consumePendingPreset();
+    expect(store.pendingPreset).toBeNull();
+    expect(store.pendingPresetFresh).toBe(true);
+  });
+
+  it("keeps the save hook the host wires", () => {
+    const store = new AiChatStore();
+    expect(store.onSavePreset).toBeNull();
+    const hook = () => {};
+    store.setOnSavePreset(hook);
+    expect(store.onSavePreset).toBe(hook);
+    store.setOnSavePreset(null);
+    expect(store.onSavePreset).toBeNull();
+  });
+});
+
+describe("AiChatStore panel width", () => {
+  afterEach(() => {
+    localStorage.clear();
+  });
+
+  it("keeps the dragged width across closing and opening the panel", () => {
+    const store = new AiChatStore();
+    store.open();
+    store.setPanelWidth(640);
+
+    store.close();
+    store.open();
+    expect(store.panelWidth).toBe(640);
+
+    store.toggle();
+    store.toggle();
+    store.close();
+    store.openNewChat();
+    expect(store.panelWidth).toBe(640);
+  });
+
+  it("starts the next visit from the width saved in the last one", () => {
+    new AiChatStore().setPanelWidth(640);
+
+    expect(localStorage.getItem("chatPanelWidth")).toBe("640");
+    expect(new AiChatStore().panelWidth).toBe(640);
+  });
+
+  it("starts from the default width while nothing is saved", () => {
+    expect(new AiChatStore().panelWidth).toBe(400);
   });
 });

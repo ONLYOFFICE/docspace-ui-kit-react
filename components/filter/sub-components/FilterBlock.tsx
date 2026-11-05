@@ -10,6 +10,7 @@ import { Button, ButtonSize } from "../../button";
 import { ModalDialog, ModalDialogType } from "../../modal-dialog";
 import { IconButton } from "../../icon-button";
 import { useCommonTranslation } from "../../../utils/i18n";
+import { consumeKey } from "../../../utils/consume-key";
 import styles from "../Filter.module.scss";
 import {
   CustomItemRenderProps,
@@ -21,6 +22,7 @@ import {
   TRenderCustomItem,
 } from "../Filter.types";
 import {
+  focusSelectorOpener,
   removeGroupManagerFilterValueIfNeeded,
   syncGroupManagerCheckBox,
 } from "../Filter.utils";
@@ -372,6 +374,30 @@ const FilterBlock = ({
     setShowSelector((val) => ({ ...val, show: false }));
   }, []);
 
+  // The selector step closed - on a pick, its arrow or Escape - and the list
+  // that held the focus went with it: back to the tag that opens it.
+  const selectorWasShownRef = React.useRef(false);
+  React.useEffect(() => {
+    const wasShown = selectorWasShownRef.current;
+    selectorWasShownRef.current = showSelector.show;
+    if (wasShown && !showSelector.show && showSelector.group)
+      focusSelectorOpener(showSelector.group);
+  }, [showSelector.show, showSelector.group]);
+
+  // Escape on the selector step goes back to the filter, as its arrow does.
+  // The dialog closes on an Escape keyup and would take the whole filter with
+  // it, so the key is consumed.
+  React.useEffect(() => {
+    if (!showSelector.show) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || e.defaultPrevented) return;
+      consumeKey(e);
+      onArrowClick();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [showSelector.show, onArrowClick]);
+
   const changeCustomValue = React.useCallback(
     (group: FilterGroups, value: TCustomItemValue | null) => {
       setFilterValues((values) => {
@@ -510,6 +536,7 @@ const FilterBlock = ({
               onBackClick: onArrowClick,
               onCloseClick: hideFilterBlock,
               selectorLabel,
+              group: showSelector.group ?? undefined,
               isRooms,
               userId,
               disableThirdParty,

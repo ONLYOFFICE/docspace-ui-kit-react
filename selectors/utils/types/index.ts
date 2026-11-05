@@ -1,10 +1,12 @@
 import type {
-  FolderType,
-  RoomType,
   FolderDtoInteger,
   FileEntryDtoIntegerAllOfSecurity,
   SearchArea,
 } from "@onlyoffice/docspace-api-sdk";
+import type {
+  TFolderTypeValue as FolderType,
+  TRoomTypeValue as RoomType,
+} from "../../../types";
 
 import type { TSelectorItem, TBreadCrumb } from "../../../components/selector";
 
@@ -20,13 +22,23 @@ export type TGetIcon = (
 ) => React.FC<React.SVGProps<SVGSVGElement>> | string | null;
 
 export type UseRoomsHelperProps = TUseInputItemHelper & {
-  isAgent?: boolean;
   searchValue?: string;
   searchArea?: SearchArea | string;
   disableThirdParty?: boolean;
   isRoomsOnly: boolean;
   roomType?: RoomType | RoomType[];
   formsSection?: boolean;
+  /**
+   * The room types the Rooms section lists when no `roomType` is given.
+   * Defaults to the ordinary rooms; a host adds Instructions or Knowledge
+   * rooms when what it carries can land there.
+   */
+  roomsSectionTypes?: RoomType[];
+  /**
+   * Set while the "AI rooms" section is open: the room types it lists. The
+   * listing then asks for the AiHub search area and offers no room creation.
+   */
+  aiRoomsSectionTypes?: RoomType[];
   excludeItems?: (number | string | undefined)[];
   isInit: boolean;
   createDefineRoomLabel?: string;
@@ -45,13 +57,15 @@ export type UseRoomsHelperProps = TUseInputItemHelper & {
   setTotal: (value: number) => void;
   setIsRoot?: (value: boolean) => void;
   setSelectedItemType?: React.Dispatch<
-    React.SetStateAction<"rooms" | "files" | "agents" | undefined>
+    React.SetStateAction<"rooms" | "files" | undefined>
   >;
   setSelectedItemSecurity?: React.Dispatch<
     React.SetStateAction<FileEntryDtoIntegerAllOfSecurity | undefined>
   >;
   setSelectedTreeNode?: React.Dispatch<React.SetStateAction<FolderDtoInteger>>;
   isRoomDisabled?: (room: FolderDtoInteger) => boolean;
+  /** The hint shown on a disabled room (`disabledText`); read for every room, used for the disabled ones. */
+  getRoomDisabledText?: (room: FolderDtoInteger) => string | undefined;
   recentFolder?: FolderDtoInteger | null;
   favoritesFolder?: FolderDtoInteger | null;
   withRecentTreeFolder?: boolean;
@@ -77,7 +91,7 @@ export type UseAgentsHelperProps = TUseInputItemHelper & {
   setTotal: (value: number) => void;
   setIsRoot?: (value: boolean) => void;
   setSelectedItemType?: React.Dispatch<
-    React.SetStateAction<"rooms" | "files" | "agents" | undefined>
+    React.SetStateAction<"rooms" | "files" | undefined>
   >;
   setSelectedItemSecurity?: React.Dispatch<
     React.SetStateAction<FileEntryDtoIntegerAllOfSecurity | undefined>

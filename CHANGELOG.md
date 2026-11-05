@@ -8,6 +8,106 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **`FileTile`'s `--tile-option-button-padding-end` is now `--tile-option-button-margin-end`,
+  default `8px`.** The actions button pads its icon alike on every side, so its keyboard focus
+  ring sits around the icon, and the room to the tile's edge is a margin after it. The space to
+  the edge is the same as before: an old padding of `X` is a margin of `X - 8px` (`8px` was
+  `16px`, `0px` was `8px`). A consumer still setting the old name sets nothing
+- **React and React DOM 19.2 are required.** The peer range moves from `^19.0.0` to `^19.2.0`:
+  the kit calls `useEffectEvent` (Selector's list, `useUnmount`, `useCloseOnAnchorCovered`, the
+  AI agent's platform provider), which React 19.0 and 19.1 do not export. A consumer on those
+  versions gets a peer warning on install and a crash where the hook is reached
+- **`ModalDialog` and `Aside` keep the keyboard focus inside while open.** The new
+  `useFocusTrap` hook (`hooks/useFocusTrap`) takes Tab and Shift+Tab on the document while the
+  container is open: the last stop wraps to the first and back, and the page behind is out of
+  reach; of nested traps only the top one acts. Between the ends the focus moves in the browser's
+  own order, positive tabIndex values first, so a dialog that sets them keeps its order. `Aside`'s `<aside>` carries `tabIndex={-1}`, so
+  a panel with nothing to tab to holds the focus itself. A consumer that relied on tabbing out of
+  an open dialog or panel no longer can
+- **`Filter`'s tags are keyboard buttons.** A value tag is `role="button"` with `aria-pressed`,
+  "Other" is one with `aria-haspopup="dialog"`; both take `tabIndex={0}`, Enter and Space, and a
+  focus ring. The panel used to offer the keyboard only its close cross and Cancel. Escape on the
+  selector step that "Other" opens goes back to the filter, as its arrow does, instead of closing
+  the whole panel. When that step closes - a pick, the arrow or Escape - the focus goes to the
+  tag that opens the group's selector rather than the page's body; a picked value's label opens
+  the selector again and its cross (named "Remove") clears the value, each a Tab stop of its own
+- **Escape closes one layer at a time.** `Selector` (with an `onCancel`) and the "New" row's menu
+  consume the Escape they close on, keyup included: a selector opened from a `ModalDialog` used
+  to close that dialog along with itself, as the dialog closes on an Escape keyup on the window.
+  The "New" menu's Enter is consumed the same way, so picking an entry never also submits the
+  selector
+- **`Aside` takes the focus when it opens and gives it back when it closes**, as `ModalDialog`
+  already did. Both use the new `useFocusReturn` hook (`hooks/useFocusReturn`): the container
+  takes the focus unless its content focused a control of its own, and on close the focus goes
+  back to the element that had it before, if it is still in the page. A panel used to leave the
+  focus behind its backdrop on open and drop it on the page's body on close
+- **`Selector`'s list is a listbox and takes the keyboard.** The scroll container is one Tab stop
+  (`role="listbox"`, named by the header's title, `aria-activedescendant` on the row the keyboard
+  is on). Focused, it marks the selected row on screen or the first row; the arrows, Home and
+  End move between the rows that can be picked, and Enter or Space click the row - open a
+  folder, pick an item, start "New". Enter on the row already picked in single select still
+  submits. The row's checkbox and the "New" row's button are no Tab stops of their own, the
+  "New" row's menu takes the arrows and Escape, and the new-name field gives the focus back to
+  the list when it goes. The search box lost its `tabIndex={1}`. A consumer test that pressed
+  Enter in the focused list to submit now picks the marked row unless it is the picked one. A
+  row pressed with the pointer takes the keyboard off its row: Enter submits that pick, as it
+  did before, and the next arrow goes on from the row pressed. A dimmed list (a refresh under
+  way) takes the arrows but not Enter or Space, as the pointer cannot reach it. Enter and Escape
+  in the new-name row are consumed with their keyup, so the row no longer closes the dialog
+  around the selector or submits the selector along with it
+- **`Tabs` ties each tab to its panel.** The body is `role="tabpanel"`, labelled by the selected
+  tab, which points at it with `aria-controls`; a panel with nothing to tab to is a Tab stop
+  (`tabIndex={0}`). The segmented bar's scroll arrows left the Tab order, so Tab goes from the
+  bar straight into the panel
+- **Focus rings on the keyboard's controls.** `Checkbox`, `RadioButton`, `ToggleButton`,
+  `FileInput`, `ComboBox`, `GroupMenuItem` and `Article`'s back button draw a 2px accent ring
+  under `:focus-visible` (themable through `--checkbox-focus-ring-color`,
+  `--radio-button-focus-ring-color`, `--toggle-button-focus-ring-color`,
+  `--file-input-focus-ring-color`, `--combobox-focus-ring-color`); `Article`'s back button and
+  `PasswordInput`'s eye (named "Show" or "Hide", through `InputBlock`'s new `iconAriaLabel`) are
+  keyboard buttons now
+- **A `Link` with an `onClick` and no `href` is a Tab stop.** It used to be out of the keyboard's
+  reach; it now takes `tabIndex={0}` and a key handler. An `action` link is `role="button"`,
+  pressed by Enter and Space, and a `page` link `role="link"`, followed by Enter. Every such link
+  a consumer renders gains a Tab stop: pass `tabIndex={-1}` where something around the link is
+  the control already, or `role` or `onKeyDown` to wire the keyboard yourself. A `tabIndex` of 0
+  or more only places the stop: the keys still press the link
+- **Two inner controls left the Tab order.** `Dropzone`'s link is `tabIndex={-1}`, as the area
+  around it is the keyboard's button already, and `DropDownItem`'s external-link icon is
+  `tabIndex={-1}` when it has no `onClickExternalLink`, where it did nothing on a press
+- **`ComboBox` walks the rows of marked components with the arrows.** Custom `advancedOptions`
+  were walked only when their children were `DropDownItem`s; a component marked with
+  `markAsDropDownItem` (see _Added_) counts as one too
+- **`FilesSelector` lists AI rooms instead of AI agents at its root.** `withAIAgentsTreeFolder`
+  is gone; `withAIRoomsTreeFolder` (on by default) lists the AI rooms root (`FolderType.AiHub`)
+  after Forms, whenever the portal serves it. The section holds the Instructions and Knowledge
+  rooms, never the AI projects, which hold no files, and offers no room creation or Recent /
+  Favorites rows. With `roomsSectionTypes` it keeps only the AI types named there, moves them
+  out of the Rooms section, and is left out when it names neither. A host that passed
+  `withAIAgentsTreeFolder` drops it. The chat's save dialog turns the section off: neither room
+  type takes a chat export.
+- **`FilesSelector` has no AI agents list any more.** `onCreateAIAgent` and
+  `agentsEmptyDescription` are gone, and `getIsDisabled`, `initSelectedItemType` and
+  `setSelectedItemType` take `"rooms" | "files"` only: the `"agents"` item type could only be
+  reached from the AI agents root. A host that compared against `"agents"` drops that check.
+  `AIAgentSelector` keeps its own agents list.
+- **`FolderType.AiHub` is 41 and `FolderType.AiProjects` is gone**, after the server moved the AI
+  projects under the AI rooms root: one root now keeps the Instructions rooms, the Knowledge rooms
+  and the AI projects
+- **Several context and knowledge rooms per chat**, on `@onlyoffice/ai-chat` 1.0.2:
+  `AiChatPresetSettings` carries `contextRooms` and `knowledgeRooms` (arrays) in place of
+  `contextRoom` / `knowledgeRoom`; `AiChatPanelSave` hands the host every connected room;
+  `ContextRoomSync` connects each offered room that holds skills and `ContextRoomWatcher`
+  follows every connected room on its own (one losing its skills is disconnected alone)
+- `@onlyoffice/ai-chat` peer requirement raised to `^1.0.2`
+- **`AiAgentProviders`' `entityId` is the AI project the chat is open in, `contextEntityId` the
+  location.** With the AI agents gone, threads are global per user and nothing but a project
+  scopes the chat; the folder or room the user is in goes in `contextEntityId`, which the AI
+  service uses for the prompt's location line and for generated files, and device uploads and
+  drops follow it too (`contextEntityId ?? entityId`, else My documents). A connected
+  Instructions room no longer becomes the round's scope (`contextRoomScopesRounds` off): it
+  contributes its skills only. `AiChatStore.folderContextPickerEnabled` and the composer's
+  empty Context slot are removed; the context folder is picked in the AI project itself
 - **`Uploader`'s progress bar moves while a chunk is being sent.** The percentage used to grow
   only when a whole chunk (5 MB by default) had been answered, so a file under one chunk went
   from 0 to done in a single step; it now also counts the bytes of chunks still on their way,
@@ -139,8 +239,31 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `aria-hidden` and no tab stop. A test that focused the `svg` or waited for it to be focused
   must use the input (`getByRole("checkbox")`) instead. The focused box still draws its border
   in the focus colour.
+- **The AI chat panel keeps its width.** A dragged docked width used to last until the panel
+  closed; `AiChatStore` now saves it in `localStorage` under `chatPanelWidth` and starts every
+  open and every visit from it. The new `utils/panel-width` holds that storage
+  (`createPanelWidthStorage`), so a host keeps the info panel's width the same way, and
+  `CHAT_PANEL_MIN_WIDTH`, the 360px the chat cannot be dragged below.
 
 ### Added
+
+- **`hasTabStop(root)`** (`hooks/useFocusTrap`): whether `root` holds a Tab stop, by the rule of
+  `getTabStops`, reading the layout no further than the first one
+- **`markAsDropDownItem(component)`** (`utils/drop-down-item-mark`): marks a component that renders
+  a `DropDownItem` from the props it takes - a wrapper adding labels, say - so that `ComboBox`
+  walks its rows with the arrow keys
+- **`Text`'s `onKeyDown` and `aria-haspopup`**, passed to the element unchanged: what a
+  `role="button"` text needs to take the keyboard and say what it opens
+- **`RoomType`'s `isDisabled`** greys out any room type, marks it `aria-disabled` and stops its
+  `onClick`, as `disabledFormRoom` and `disabledPublicRoom` do for their own types
+- `AiAgentProviders` takes `chatIntro`: what an empty chat shows above the suggestion chips in place of the default illustration and tagline (an AI project puts its logo, name and sources there).
+- `RoomsType.AiProjectRoom` (12), `FolderType.AiProjectRoom` (40) and `FolderType.AiProjects`
+  (41) for the AI projects of the DocSpace client; `RoomLogo` and the room type title /
+  description helpers know the new type (the AI room icon stands in until a dedicated one lands)
+- `AiChatStore.openProject` and `AiChatProjectSettings`: a project opens the chat with its model
+  and the lists of its Instructions / Knowledge rooms, every one of them connected
+- `AiAgentProviders` takes `contextRoom` as one room or a list; `ContextRoomProvider` gets a
+  `rooms` prop and `useContextRooms`
 
 - **`FormWrapper` can be the form.** A new `onSubmit` prop renders the card as a `<form>` that
   calls the handler with the browser's navigation prevented, so Enter in a field submits it;
@@ -151,9 +274,51 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   props had none to give it, so an icon button could be made keyboard-operable with `tabIndex`
   and `onKeyDown` but not announced as a button without a cast. Both props are rendered on the
   element, as `Link`'s are; nothing changes for a button that passes neither.
+- Section: the info panel can be resized from its inline-start edge on a desktop. `isInfoPanelResizable` turns it on, with the host's width in `infoPanelWidth` and a setter in `setInfoPanelWidth`. The edge drags from 400px to 800px (`INFO_PANEL_WIDTH`, and the new `INFO_PANEL_MAX_WIDTH` in `utils/device`) while the section keeps 416px, narrows to fit a narrower window without saving it, and a double click restores 400px. It shares its resizer with the chat panel, whose edge now also takes a finger or a pen and narrows the panel to a narrower window, a chat opened after mount included, without calling `setChatPanelWidth` for it. `onShownInfoPanelWidthChange` reports the width the open info panel, or the chat open in its place, takes on screen (`0` when neither does), for floating buttons a host draws itself; it follows a resize drag once per frame, and below a desktop the info panel counts as 400px and the chat as `0`
+- Article: `infoPanelWidth`, and the same prop on `ArticleLiveChat`, sets how far the live chat launcher moves clear of the open info panel, or of the AI chat open in its place, for a host whose panels are resizable; `0` when neither is. Unset, `isInfoPanelVisible` still assumes `INFO_PANEL_WIDTH`. The `isInfoPanelVisible` docs no longer call it unread: the launcher has moved clear of the info panel again since the switch to the Zendesk messaging API
+- `OperationsProgressButton` takes `infoPanelWidth`. Inside `Section` the button gets the width through `--operations-progress-info-panel-width` on the section container instead: the width the open info panel, or the chat open in its place, takes on a desktop, updated on every frame of a resize drag, so the button stays 24px clear of the panel instead of sitting 424px in, under it
 
 ### Fixed
 
+- **Secondary `Tabs` in a row too narrow for one tab between the arrows keep their width.** No
+  tab fit between the two arrows, the tab size was divided by that zero, and every tab got an
+  `Infinity` width the browser dropped. The tabs now keep the width they were measured at.
+- **No i18next advertisement in the console.** i18next 25 printed a notice for its hosted
+  service when the kit's translation instance initialised, in every app that loads the kit;
+  the instance now sets `showSupportNotice: false`.
+- **Tab from a menu over a dialog goes on from the control that opened it.** A context menu or a
+  drop-down a control in a `ModalDialog` or `Aside` opens lives in a portal, outside the focus
+  trap, and Tab there went to the dialog's first stop (Shift+Tab to its last) wherever the menu
+  came from. The trap now goes on from the element inside it that had the focus last
+- **`Selector`'s `aria-activedescendant` names only a drawn row.** Home, End or the wheel took the
+  keyboard's row past what the virtualized list renders, and the list pointed at an id no
+  element had, which a screen reader announced as nothing. It points at the row once it is drawn
+- **The "New" menu gives the focus back when the picked entry moves it nowhere.** An entry whose
+  action focuses nothing of its own left the focus on the page's body as the menu closed
+- **`InputBlock` names its icon only when the icon is a button.** With `iconAriaLabel` but no
+  `onIconClick` the icon carried an `aria-label` and no role, which ARIA does not allow
+- **The focus trap looks a radio group up once per key press.** It searched the trap for each
+  radio's group, once per radio
+- **A tab panel no longer lays out all its controls on every change.** `useTabPanel` re-read the
+  panel on each frame its content changed and listed every Tab stop to learn whether there was
+  one; it now asks `hasTabStop`, which stops at the first
+- The focus trap leaves out controls inside a `<fieldset disabled>`: they take no focus, though
+  their own `disabled` is false, and Tab stood still on them
+- `Selector`'s list says `aria-multiselectable="true"` in multi select, so a screen reader no longer
+  announces it as a single choice
+- `Selector`'s new-name row leaves an Enter that ends an input method composition (Chinese,
+  Japanese, Korean) to it, instead of accepting the name half typed
+- **An AI project opens on its own model, not on the default.** `AiChatStoresBridge` looked the
+  project's model up among the assigned profiles only (`init`); a model outside them missed and
+  the chat fell back to the default. It now waits for the whole list (`ensureProfiles`) first.
+- The composer's link to a context or knowledge room opens it in the AI rooms section
+  (`/ai-rooms/{id}`), not in Rooms
+- `ContextRoomWatcher` refreshes the picker's room list right after it connects an offered room
+  that gained its first skill (the scheduled refresh was cancelled by the effect rerun)
+- `ContextRoomSync` no longer reads the skills a second time when the store already did
+- **`ComboBox` no longer throws when `options` is missing.** A caller that renders it before
+  its options are loaded passed `undefined`, and reading its length threw "Cannot read
+  properties of undefined (reading 'length')". A missing list is now treated as an empty one.
 - **`FileTile`'s `--tile-height` sizes the whole tile.** The thumbnail area kept its 156px and
   the name row its 64px, so a taller tile ended in an empty band under the name row, outside the
   hover and checked background. The thumbnail area now takes whatever the name row leaves; at
@@ -213,6 +378,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   carrying its name — so hovering one of three buttons opened three tooltips, and the page held
   three elements with one `id`. A button without an `id` now gets a generated one; a button
   with an `id` is unchanged
+- **A click under a `Tabs` label selects the tab.** When the underlined row overflows, its
+  horizontal scroll track — 16px tall, at the bottom of the 32px bar — lay over the lower half
+  of every tab, so a click on the bottom of a label or just under it reached the track, which
+  scrolled the row instead of selecting the tab. The track now lets the pointer through; the
+  wheel and the trackpad still scroll the row
 - **A disabled `Tabs` item cannot be selected.** The click handlers of both bars, the segmented
   keyboard and the overflow arrows now refuse it; before, only CSS `pointer-events: none` kept
   the pointer off it, and the arrows selected it
@@ -471,7 +641,12 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **The `Section` chat panel resizer no longer grows the panel by 1px per grab.** It measured the
   panel with its border and wrote that to `--chat-panel-width`, which sets the content box: a click
   on the edge committed 401 for a 400px panel. `setChatPanelWidth` now receives the content width,
-  and a grab released without moving commits the width unchanged.
+  and a grab released without moving commits nothing.
+- **A `Section` panel resize no longer outlives its mouse button.** A drag whose button was
+  released where the page could not see it, in another window after Alt+Tab or over the Start
+  menu, went on moving the panel with the pointer and kept the resize cursor until the next click.
+  The drag now ends, committing the width it reached, as soon as the window loses focus or the
+  pointer moves without the button.
 - **A late search result no longer overwrites a newer edit in `Filter`'s search box.** A query the
   host applied after the user had already changed or cleared the box came back into it and was
   searched again. Such a stale value, or a new `getSelectedInputValue` returning the value already
@@ -547,6 +722,7 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   elsewhere — a sign-in redirect, a link followed in the tab — would have received them. Both
   windows open the portal's `/doceditor`, so the calls are now addressed to
   `window.location.origin` and the browser drops one whose window holds any other page.
+- Table: a column reset no longer squeezes the name column below its own minimum. With many columns on and a narrow list, for instance beside the AI chat, the reset took every other column's minimum out of the name column's share, down to a negative width that broke the grid: the header lost its title and the rows came out empty. The name column now keeps its minimum, and when the other columns cannot fit next to it the table shows the name column alone, as a resize already does
 
 ## 4.1.0
 

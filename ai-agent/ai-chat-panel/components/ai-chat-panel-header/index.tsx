@@ -63,6 +63,9 @@ const AiChatPanelHeader = ({
           <IconButton
             iconNode={isFullscreen ? <CollapseIcon /> : <ExpandIcon />}
             size={17}
+            // Stroked glyphs: recolor the outline, as the fill mode would
+            // close the arrowheads into solid triangles and never hover.
+            isStroke
             className={styles.fullscreenToggle}
             onClick={onToggleFullscreen}
             tooltipId="ai-chat-panel-fullscreen-tooltip"
@@ -76,6 +79,7 @@ const AiChatPanelHeader = ({
           <IconButton
             iconNode={<CrossIcon />}
             size={17}
+            isStroke
             onClick={onClose}
             tooltipId="ai-chat-panel-close-tooltip"
             tooltipContent={closeTooltip}

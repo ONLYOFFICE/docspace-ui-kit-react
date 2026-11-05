@@ -6,6 +6,7 @@ import React from "react";
 import classNames from "classnames";
 
 import { ButtonKeys } from "../../enums";
+import { consumeKey } from "../../utils/consume-key";
 
 import { Aside } from "../aside";
 import { Backdrop } from "../backdrop";
@@ -30,6 +31,28 @@ import type {
   TSelectorCancelButton,
 } from "./Selector.types";
 import { Providers } from "./contexts";
+
+// A dialog opened from the selector (e.g. "New agent" opens the host's
+// create dialog) is portalled after it and handles this same key itself;
+// the selector must not react to it as well. Only a modal dialog counts --
+// a popover such as ColorPicker is also role="dialog" -- and not one the
+// selector itself sits in.
+const isUnderModalDialog = (root: HTMLElement | null) =>
+  !!root &&
+  Array.from(
+    document.querySelectorAll('[role="dialog"][aria-modal="true"]'),
+  ).some(
+    (dialog) =>
+      !dialog.contains(root) &&
+      !dialog.closest('[inert], [aria-hidden="true"]') &&
+      !!(
+        root.compareDocumentPosition(dialog) & Node.DOCUMENT_POSITION_FOLLOWING
+      ),
+  );
+
+const isEnterHandledByTarget = (target: EventTarget | null) =>
+  target instanceof Element &&
+  !!target.closest(".selector-search-input, button");
 
 const Selector = ({
   id,
@@ -98,6 +121,7 @@ const Selector = ({
   forceIsMultiSelect,
   selectedItems,
   maxSelectedItems,
+  onSelectLimitReached,
 
   onSelect,
 
@@ -193,7 +217,26 @@ const Selector = ({
     ],
   );
 
+  // The rows are memoized and keep the handler of an earlier render, so
+  // the limit check reads the current selection through a ref.
+  const newSelectedItemsRef = React.useRef(newSelectedItems);
+  newSelectedItemsRef.current = newSelectedItems;
+  const onSelectLimitReachedRef = React.useRef(onSelectLimitReached);
+  onSelectLimitReachedRef.current = onSelectLimitReached;
+
   const onSelectAction = (item: TSelectorItem, isDoubleClick: boolean) => {
+    if (
+      onSelectLimitReachedRef.current &&
+      isMultiSelect &&
+      !item.isSelected &&
+      !(item.disableMultiSelect && !forceIsMultiSelect) &&
+      maxSelectedItems &&
+      newSelectedItemsRef.current.length >= maxSelectedItems
+    ) {
+      onSelectLimitReachedRef.current();
+      return;
+    }
+
     onSelect?.(
       {
         ...item,
@@ -439,26 +482,11 @@ const Selector = ({
   React.useEffect(() => {
     const onKeyboardAction = (e: KeyboardEvent) => {
       if (inputItemVisible) return;
-      // A dialog opened from the selector (e.g. "New agent" opens the host's
-      // create dialog) is portalled after it and closes on this same Escape;
-      // it must not take the selector down with it. Only a modal dialog
-      // counts -- a popover such as ColorPicker is also role="dialog" -- and
-      // not one the selector itself sits in.
-      const root = selectorRef.current;
-      const isUnderDialog =
-        !!root &&
-        Array.from(
-          document.querySelectorAll('[role="dialog"][aria-modal="true"]'),
-        ).some(
-          (dialog) =>
-            !dialog.contains(root) &&
-            !!(
-              root.compareDocumentPosition(dialog) &
-              Node.DOCUMENT_POSITION_FOLLOWING
-            ),
-        );
-      if (isUnderDialog) return;
+      if (isUnderModalDialog(selectorRef.current)) return;
       if (e.key === ButtonKeys.esc) {
+        // The keyup too: a ModalDialog the selector was opened from closes on
+        // an Escape keyup, and one press would close both.
+        if (onCancel) consumeKey(e);
         onCancel?.();
       }
     };
@@ -472,6 +500,8 @@ const Selector = ({
   React.useEffect(() => {
     const onKeyboardAction = (e: KeyboardEvent) => {
       if (inputItemVisible) return;
+      if (isEnterHandledByTarget(e.target)) return;
+      if (isUnderModalDialog(selectorRef.current)) return;
 
       const isSubmitDisabled = !withFooterInput
         ? disableSubmitButton
@@ -731,8 +761,11 @@ const Selector = ({
           isSSR={isSSR}
           hideBackButton={hideBackButton}
           withErrorFooter={withErrorFooter}
-          isLimitReached={isLimitReached}
+          // With `onSelectLimitReached` the rows past the limit keep their
+          // look and the tick is refused in `onSelectAction`.
+          isLimitReached={onSelectLimitReached ? false : isLimitReached}
           displayFileExtension={displayFileExtension}
+          listLabel={withHeader ? headerProps?.headerLabel : undefined}
           forceIsMultiSelect={forceIsMultiSelect}
           // info
           {...infoProps}

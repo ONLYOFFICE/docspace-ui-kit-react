@@ -4,10 +4,12 @@ import classNames from "classnames";
 import { Portal } from "../../portal";
 
 import { DeviceType } from "../../../enums";
+import { INFO_PANEL_MAX_WIDTH, INFO_PANEL_WIDTH } from "../../../utils/device";
 
 import { Aside } from "../../aside";
 import { Backdrop } from "../../backdrop";
 
+import { useEdgeResizer } from "../hooks/useEdgeResizer";
 import { InfoPanelProps } from "../Section.types";
 import styles from "../Section.module.scss";
 
@@ -23,8 +25,39 @@ const InfoPanel = ({
   topInfoPanel,
   onClose,
   withoutBodyScroll,
+  isResizable,
+  width,
+  onResize,
+  onLiveResize,
+  onShownWidthChange,
 }: InfoPanelProps) => {
   const infoPanelRef = useRef<null | HTMLDivElement>(null);
+
+  const canResize =
+    !!isResizable && currentDeviceType === DeviceType.desktop && !topInfoPanel;
+
+  const {
+    panelRef,
+    isDockedResize,
+    shownWidth,
+    onResizerPointerDown,
+    onResizerDoubleClick,
+  } = useEdgeResizer({
+    isVisible: !!isVisible && !!canDisplay,
+    canResize,
+    cssVariable: "--info-panel-width",
+    minWidth: INFO_PANEL_WIDTH,
+    maxWidth: INFO_PANEL_MAX_WIDTH,
+    defaultWidth: INFO_PANEL_WIDTH,
+    width,
+    onResize,
+    onLiveResize,
+  });
+
+  useEffect(() => {
+    onShownWidthChange?.(shownWidth);
+    return () => onShownWidthChange?.(undefined);
+  }, [shownWidth, onShownWidthChange]);
 
   useEffect(() => {
     const onMouseDown = (e: MouseEvent) => {
@@ -77,7 +110,28 @@ const InfoPanel = ({
       id="InfoPanelWrapper"
       ref={infoPanelRef}
     >
-      <div className={classNames(styles.infoPanel)}>{children}</div>
+      <div
+        ref={panelRef}
+        className={classNames(styles.infoPanel)}
+        style={
+          isDockedResize && shownWidth
+            ? ({
+                "--info-panel-width": `${shownWidth}px`,
+              } as React.CSSProperties)
+            : undefined
+        }
+      >
+        {canResize ? (
+          <div
+            role="presentation"
+            className={classNames(styles.infoPanelResizer, "not-selectable")}
+            onPointerDown={onResizerPointerDown}
+            onDoubleClick={onResizerDoubleClick}
+            data-testid="info-panel-resizer"
+          />
+        ) : null}
+        {children}
+      </div>
     </div>
   );
 

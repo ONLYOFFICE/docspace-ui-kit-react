@@ -6,7 +6,8 @@ import { ComboBox } from "./ComboBox";
 import { ComboBoxDisplayType, ComboBoxSize } from "./ComboBox.enums";
 import styles from "./ComboBox.module.scss";
 import * as DropDownModule from "../drop-down";
-import { DropDownItem } from "../drop-down-item";
+import { DropDownItem, type DropDownItemProps } from "../drop-down-item";
+import { markAsDropDownItem } from "../../utils/drop-down-item-mark";
 import type { DropDownProps } from "../drop-down/DropDown.types";
 
 const mockOptions = [
@@ -346,6 +347,36 @@ describe("ComboBox", () => {
     expect(combo).toHaveAttribute("aria-expanded", "true");
 
     window.removeEventListener("keydown", onWindowKeyDown);
+  });
+
+  // The client wraps DropDownItem to add its labels; the table's checkbox
+  // options are drawn with that wrapper, and their arrows did nothing.
+  it("walks rows drawn by a component marked as a DropDownItem", () => {
+    const WrappedItem = markAsDropDownItem((props: DropDownItemProps) => (
+      <DropDownItem {...props} />
+    ));
+    render(
+      <ComboBox
+        {...baseProps}
+        options={[]}
+        advancedOptions={
+          <>
+            <WrappedItem key="all" label="All" />
+            <WrappedItem key="folders" label="Folders" />
+          </>
+        }
+      />,
+    );
+    const button = screen.getAllByRole("button")[0];
+    const highlighted = () =>
+      document.getElementById(
+        button.getAttribute("aria-activedescendant") ?? "",
+      );
+
+    fireEvent.keyDown(button, { key: "Enter" });
+    expect(highlighted()).toHaveTextContent("All");
+    fireEvent.keyDown(button, { key: "ArrowDown" });
+    expect(highlighted()).toHaveTextContent("Folders");
   });
 
   // AccessRightSelect draws its rich rows as advancedOptions DropDownItems.
@@ -716,5 +747,26 @@ describe("ComboBox", () => {
       window.removeEventListener("keyup", onWindowKeyUp);
       vi.useRealTimers();
     }
+  });
+
+  // Production report (DocSpace client 4.0.0): "Cannot read properties of undefined
+  // (reading 'length')" from ComboBox on /rooms/personal. A caller rendered
+  // it before its options were loaded.
+  it("renders and opens without options", async () => {
+    const user = userEvent.setup();
+    const props = {
+      ...baseProps,
+      options: undefined as unknown as typeof mockOptions,
+      selectedOption: { key: "none", label: "Nothing yet" },
+    };
+
+    render(<ComboBox {...props} />);
+
+    const button = screen.getByRole("button", { name: "Nothing yet" });
+    await user.click(button);
+    fireEvent.keyDown(button, { key: "ArrowDown" });
+    fireEvent.keyDown(button, { key: "Enter" });
+
+    expect(props.onSelect).not.toHaveBeenCalled();
   });
 });

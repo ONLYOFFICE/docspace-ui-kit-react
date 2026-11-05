@@ -2,6 +2,8 @@ import type {
   EmployeeFullDto,
   FileDtoInteger,
   GroupDto,
+  FolderType as SdkFolderType,
+  RoomType as SdkRoomType,
 } from "@onlyoffice/docspace-api-sdk";
 
 export type { EmployeeFullDto, FileDtoInteger, GroupDto };
@@ -20,6 +22,13 @@ import type {
   RoomsType,
 } from "../enums";
 import type { TooltipRefProps } from "react-tooltip";
+
+// The published API SDK enums lag behind the server: they have no
+// Instructions or Knowledge rooms yet. Props that take a room or a folder
+// type accept the kit's own enums as well, so a host never has to patch the
+// SDK to pass the newer values.
+export type TRoomTypeValue = SdkRoomType | RoomsType;
+export type TFolderTypeValue = SdkFolderType | FolderType;
 
 export type TGetIcon = (
   size: number,

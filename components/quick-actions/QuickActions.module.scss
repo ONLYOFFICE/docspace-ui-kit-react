@@ -179,10 +179,12 @@ $control-outset: $control-gap + $control-size + $control-inset;
     outline: none;
   }
 
+  // Inset: the scrolling track clips anything outside the tile, which cut
+  // the ring's top and bottom off.
   &:focus-visible {
     background-color: var(--_tile-bg-hover);
     outline: 2px solid currentColor;
-    outline-offset: 2px;
+    outline-offset: -2px;
   }
 
   &.disabled,

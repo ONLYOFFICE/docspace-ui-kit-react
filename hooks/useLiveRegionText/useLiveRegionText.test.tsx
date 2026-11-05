@@ -99,14 +99,20 @@ describe("useLiveRegionTextOf", () => {
     };
 
     const { rerender } = render(<Late shown={false} />);
-    // Past LIVE_REGION_DELAY with nothing under the ref.
-    await new Promise((resolve) => setTimeout(resolve, LIVE_REGION_DELAY * 2));
+    // Past LIVE_REGION_DELAY with nothing under the ref. Inside act: the hook's
+    // own timer fires during the wait and sets state.
+    await act(
+      () =>
+        new Promise((resolve) => setTimeout(resolve, LIVE_REGION_DELAY * 2)),
+    );
 
     rerender(<Late shown />);
     const status = screen.getByRole("status");
     await waitFor(() => expect(status).toHaveTextContent("Late"));
 
-    act(() => {
+    // Async: the MutationObserver reports the change after the edit returns,
+    // and its update has to land inside act too.
+    await act(async () => {
       screen.getByTestId("late").textContent = "Updated";
     });
 

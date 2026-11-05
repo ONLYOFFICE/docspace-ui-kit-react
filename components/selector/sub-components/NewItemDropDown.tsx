@@ -8,11 +8,14 @@ import { isMobile as isMobileUtils } from "../../../utils";
 import { Backdrop } from "../../backdrop";
 
 import { Scrollbar } from "../../scrollbar";
+import { consumeKey } from "../../../utils/consume-key";
 
 import styles from "../Selector.module.scss";
 import type { NewItemDropDownProps } from "../Selector.types";
 
 export const DROPDOWN_CLASS_NAME = "selector-create-new-dropdown";
+
+const ENTRY_SELECTOR = '[role="option"], [role="menuitem"], [role="button"]';
 
 const DROPDOWN_CONTAINER_WITH_PADDING = 560;
 const PADDING = 80;
@@ -35,6 +38,111 @@ const NewItemDropDown = ({
     };
   }, [onCloseDropDown]);
 
+  // The keyboard opens the menu from the list too: it takes the focus to its
+  // first entry, walks the entries with the arrows, picks one with Enter or
+  // Space, and closes on Escape or Tab, giving the focus back to the list.
+  // Caught on the window ahead of the Selector, whose own Escape would close
+  // the whole selector.
+  // The menu is drawn in place or, at a phone's width, in a portal, and a
+  // resize can swap one for the other while it is open: the keys always read
+  // the menu that is on screen now, and the focus follows it to the new one.
+  // The focus goes back to the element it came from on opening.
+  const menuRef = React.useRef<HTMLDivElement>(null);
+  const openerRef = React.useRef<Element | null>(null);
+  React.useEffect(() => {
+    openerRef.current = document.activeElement;
+  }, []);
+
+  // The entries are DropDownItems (options) or a caller's own buttons, such
+  // as the room types; a button inside an entry is no entry of its own.
+  const entries = React.useCallback(() => {
+    const menu = menuRef.current;
+    if (!menu) return [];
+    const all = Array.from(menu.querySelectorAll<HTMLElement>(ENTRY_SELECTOR));
+    return all.filter(
+      (entry) =>
+        entry.getAttribute("aria-disabled") !== "true" &&
+        !all.some((other) => other !== entry && other.contains(entry)),
+    );
+  }, []);
+
+  // The entry the keyboard is on, so a swapped container focuses the same.
+  // The keys scroll the entry they move to into view in a long menu; only
+  // the focus on mount keeps still, as the menu is still being placed.
+  const focusedIndexRef = React.useRef(0);
+  const focusEntry = React.useCallback(
+    (index: number, preventScroll = false) => {
+      const list = entries();
+      if (!list.length) return;
+      const clamped = Math.min(Math.max(index, 0), list.length - 1);
+      focusedIndexRef.current = clamped;
+      list[clamped].focus({ preventScroll });
+    },
+    [entries],
+  );
+
+  React.useEffect(() => {
+    if (menuRef.current?.contains(document.activeElement)) return;
+    focusEntry(focusedIndexRef.current, true);
+  }, [focusEntry, isMobile]);
+
+  React.useEffect(() => {
+    const giveFocusBack = () => {
+      const opener = openerRef.current;
+      if (opener instanceof HTMLElement && opener.isConnected)
+        opener.focus({ preventScroll: true });
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (!menuRef.current) return;
+      const list = entries();
+      const index = list.findIndex((entry) => entry === document.activeElement);
+
+      switch (e.key) {
+        case "ArrowDown":
+          focusEntry((index + 1) % list.length);
+          break;
+        case "ArrowUp":
+          focusEntry((index - 1 + list.length) % list.length);
+          break;
+        case "Home":
+          focusEntry(0);
+          break;
+        case "End":
+          focusEntry(list.length - 1);
+          break;
+        case "Enter":
+        case " ":
+          list[index]?.click();
+          onCloseDropDown();
+          // The entry's own action moves the focus where it belongs - to the
+          // name field it adds. One that moves it nowhere leaves it on the
+          // page as the menu goes: then it goes back where the menu came from.
+          requestAnimationFrame(() => {
+            const { activeElement } = document;
+            if (!activeElement || activeElement === document.body)
+              giveFocusBack();
+          });
+          break;
+        case "Escape":
+        case "Tab":
+          onCloseDropDown();
+          giveFocusBack();
+          break;
+        default:
+          return;
+      }
+
+      // The keyup too: ModalDialog closes on an Escape keyup and the
+      // Selector submits on an Enter keyup, both on the window.
+      e.preventDefault();
+      consumeKey(e);
+    };
+
+    window.addEventListener("keydown", onKeyDown, true);
+    return () => window.removeEventListener("keydown", onKeyDown, true);
+  }, [entries, focusEntry, onCloseDropDown]);
+
   React.useEffect(() => {
     const onResize = () => {
       if (isMobileUtils(window.innerWidth)) return setIsMobile(true);
@@ -54,6 +162,7 @@ const NewItemDropDown = ({
   const dropDown =
     dropDownItems.length > 0 ? (
       <div
+        ref={menuRef}
         className={classNames(
           styles.createDropDown,
           { [styles.isEmpty]: isEmpty },
@@ -84,6 +193,7 @@ const NewItemDropDown = ({
               zIndex={450}
             />
             <div
+              ref={menuRef}
               className={classNames(
                 styles.createDropDown,
                 { [styles.isEmpty]: isEmpty },

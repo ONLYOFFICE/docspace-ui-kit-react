@@ -26,6 +26,7 @@ import SortButton from "./sub-components/SortButton";
 import { isDesktop, isMobile } from "../../utils";
 import useSearch from "./hooks/useSearch";
 import { useCommonTranslation } from "../../utils/i18n";
+import { activateOnButtonKey } from "../../utils/keyboard-activation";
 import styles from "./Filter.module.scss";
 import { FilterProps, TItem, TRoomGroup } from "./Filter.types";
 import {
@@ -239,6 +240,10 @@ const FilterInput = React.memo(
     const onCreateGroup = () => {
       setEditRoomGroupsDialogVisible?.(true);
     };
+
+    const groupManagementLabel = isFormsSection
+      ? t("ManageGroupSpaces")
+      : t("ManageGroupRooms");
 
     const showSortButton = !isIndexing && !isFlowsPage && !isRecentFolder;
 
@@ -797,7 +802,9 @@ const FilterInput = React.memo(
               )}
 
               {/* Hidden measurement container */}
-              <div className={styles.groupTagsMeasure} aria-hidden>
+              {/* Inert: the copies here are clickable chips, which must not
+                  join the Tab order. */}
+              <div className={styles.groupTagsMeasure} aria-hidden inert>
                 <SelectedItem
                   propKey="m-all"
                   label={isFormsSection ? t("AllSpaces") : t("AllRooms")}
@@ -833,12 +840,14 @@ const FilterInput = React.memo(
                 <TooltipContainer
                   as="div"
                   className={styles.groupManagementButton}
-                  title={
-                    isFormsSection
-                      ? t("ManageGroupSpaces")
-                      : t("ManageGroupRooms")
-                  }
+                  title={groupManagementLabel}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={groupManagementLabel}
                   onClick={onCreateGroup}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) =>
+                    activateOnButtonKey(e, onCreateGroup)
+                  }
                 >
                   <IconButton
                     size={16}

@@ -1,9 +1,16 @@
 import React from "react";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { act, render, screen, cleanup } from "@testing-library/react";
+import {
+  act,
+  render,
+  screen,
+  cleanup,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { DeviceType, FilterGroups } from "../../enums";
+import { DeviceType, FilterGroups, FilterKeys } from "../../enums";
 import Filter from ".";
 import {
   CustomItemRenderProps,
@@ -135,12 +142,12 @@ describe("Filter Component", () => {
       ) as HTMLInputElement;
 
       await user.type(field, "budget");
-      await vi.waitFor(() => expect(onSearch).toHaveBeenCalledWith("budget"), {
+      await waitFor(() => expect(onSearch).toHaveBeenCalledWith("budget"), {
         timeout: 3000,
       });
       // The user clears the field before the host has applied "budget".
       await user.clear(field);
-      await vi.waitFor(() => expect(onSearch).toHaveBeenLastCalledWith(""), {
+      await waitFor(() => expect(onSearch).toHaveBeenLastCalledWith(""), {
         timeout: 3000,
       });
 
@@ -154,7 +161,9 @@ describe("Filter Component", () => {
       );
       // ...which must not come back into the field, nor be searched again.
       expect(field.value).toBe("");
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      // The debounce would fire within this wait; inside act, so its update is
+      // not reported as one that escaped the test.
+      await act(() => new Promise((resolve) => setTimeout(resolve, 1200)));
       expect(onSearch).toHaveBeenLastCalledWith("");
 
       // A new identity returning the same value brings nothing new either.
@@ -190,6 +199,224 @@ describe("Filter Component", () => {
       expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
       expect(screen.queryByDisplayValue("draft")).not.toBeInTheDocument();
       expect(screen.getByText("New")).toBeInTheDocument();
+    });
+  });
+
+  describe("keyboard", () => {
+    it("keeps the search field in the tab order", async () => {
+      await act(async () => {
+        renderComponent();
+      });
+
+      expect(screen.getByRole("textbox")).not.toHaveAttribute("tabindex");
+    });
+
+    it("opens the filter panel from the keyboard", async () => {
+      const user = userEvent.setup();
+      const getFilterData = vi.fn().mockResolvedValue([]);
+      await act(async () => {
+        renderComponent({ getFilterData });
+      });
+      const button = screen.getByTestId("filter_icon_button");
+
+      expect(button).toHaveAttribute("role", "button");
+      expect(button).toHaveAttribute("aria-expanded", "false");
+
+      button.focus();
+      await user.keyboard("{Enter}");
+
+      expect(button).toHaveAttribute("aria-expanded", "true");
+    });
+
+    it("opens the sort list from the keyboard and sorts with Enter", async () => {
+      const user = userEvent.setup();
+      const onSort = vi.fn();
+      const sortData = [
+        { id: "sort-title", key: "title", label: "Name", default: true },
+        { id: "sort-date", key: "date", label: "Modified" },
+      ];
+      await act(async () => {
+        renderComponent({
+          onSort,
+          getSortData: () => sortData,
+          getSelectedSortData: () => ({
+            sortId: "title",
+            sortDirection: "asc",
+          }),
+        });
+      });
+      const sortButton = within(
+        screen.getByTestId("filter_sort_combobox"),
+      ).getByRole("button");
+
+      sortButton.focus();
+      await user.keyboard("{Enter}");
+
+      expect(
+        await screen.findByTestId("filter_sort_option_date"),
+      ).toBeVisible();
+
+      await user.keyboard("{ArrowDown}{Enter}");
+
+      expect(onSort).toHaveBeenCalled();
+    });
+  });
+
+  // The panel's tags were divs only the pointer could press: the keyboard
+  // never reached a value, nor "Other" and the selector it opens.
+  describe("Tags from the keyboard", () => {
+    const getFilterData = () =>
+      Promise.resolve([
+        {
+          key: FilterGroups.filterGroup,
+          group: FilterGroups.filterGroup,
+          label: "Group",
+          isHeader: true,
+        },
+        {
+          key: FilterKeys.withoutGroup,
+          group: FilterGroups.filterGroup,
+          label: "Without group",
+        },
+        {
+          key: FilterKeys.other,
+          group: FilterGroups.filterGroup,
+          label: "Other",
+        },
+        {
+          key: FilterKeys.selectedGroup,
+          group: FilterGroups.filterGroup,
+          displaySelectorType: "link",
+        },
+      ]);
+
+    // The host draws the selector "Other" opens; its button picks a group.
+    const renderSelector = ({
+      selectorType,
+      onSubmit,
+    }: {
+      selectorType: string;
+      onSubmit: (items: { id: string; label: string }[]) => void;
+    }) => (
+      <div data-testid={selectorType}>
+        <button
+          type="button"
+          onClick={() => onSubmit([{ id: "group-1", label: "Group 1" }])}
+        >
+          Pick
+        </button>
+      </div>
+    );
+
+    // Opens the selector from "Other" with the keyboard and picks Group 1.
+    const pickFromKeyboard = async (
+      user: ReturnType<typeof userEvent.setup>,
+    ) => {
+      const other = await screen.findByRole("button", { name: "Other" });
+      other.focus();
+      await user.keyboard("{Enter}");
+      screen.getByRole("button", { name: "Pick" }).focus();
+      await user.keyboard("{Enter}");
+    };
+
+    const openFilter = async () => {
+      await act(async () => {
+        renderComponent({ getFilterData, renderSelector });
+      });
+      await userEvent.click(screen.getByTestId("filter_icon_button"));
+    };
+
+    it("makes a value a toggle button that Enter presses", async () => {
+      const user = userEvent.setup();
+      await openFilter();
+      const tag = await screen.findByRole("button", { name: "Without group" });
+
+      expect(tag).toHaveAttribute("tabindex", "0");
+      expect(tag).toHaveAttribute("aria-pressed", "false");
+
+      tag.focus();
+      await user.keyboard("{Enter}");
+
+      expect(tag).toHaveAttribute("aria-pressed", "true");
+    });
+
+    it("makes Other a button that opens the selector", async () => {
+      const user = userEvent.setup();
+      await openFilter();
+      const other = await screen.findByRole("button", { name: "Other" });
+
+      expect(other).toHaveAttribute("aria-haspopup", "dialog");
+      expect(other).not.toHaveAttribute("aria-pressed");
+
+      other.focus();
+      await user.keyboard("{Enter}");
+
+      expect(await screen.findByTestId("groups-selector")).toBeInTheDocument();
+    });
+
+    // The dialog closes on an Escape keyup: one press on the selector step
+    // used to close the whole filter.
+    it("goes back from the selector to the filter on Escape", async () => {
+      const user = userEvent.setup();
+      await openFilter();
+      const other = await screen.findByRole("button", { name: "Other" });
+      other.focus();
+      await user.keyboard("{Enter}");
+      expect(await screen.findByTestId("groups-selector")).toBeInTheDocument();
+
+      await user.keyboard("{Escape}");
+
+      expect(screen.queryByTestId("groups-selector")).not.toBeInTheDocument();
+      // Still in the filter, back on the tag that opened the selector.
+      await waitFor(() =>
+        expect(screen.getByRole("button", { name: "Other" })).toHaveFocus(),
+      );
+    });
+
+    // A pick swaps "Other" for the picked value: the focus, which was in the
+    // selector's list, used to fall on the page's body.
+    it("gives the focus to the picked value after a pick", async () => {
+      const user = userEvent.setup();
+      await openFilter();
+
+      await pickFromKeyboard(user);
+
+      const picked = await screen.findByRole("button", { name: "Group 1" });
+      expect(picked).toHaveAttribute("aria-haspopup", "dialog");
+      await waitFor(() => expect(picked).toHaveFocus());
+    });
+
+    // The picked value's tag is the pointer's one target; to the keyboard its
+    // label opens the selector again and its cross clears the value.
+    it("clears the picked value with its cross and gives the focus to Other", async () => {
+      const user = userEvent.setup();
+      await openFilter();
+      await pickFromKeyboard(user);
+      await screen.findByRole("button", { name: "Group 1" });
+
+      const remove = screen.getByRole("button", { name: "Remove" });
+      expect(remove).toHaveAttribute("tabindex", "0");
+      remove.focus();
+      await user.keyboard("{Enter}");
+
+      expect(
+        screen.queryByRole("button", { name: "Group 1" }),
+      ).not.toBeInTheDocument();
+      await waitFor(() =>
+        expect(screen.getByRole("button", { name: "Other" })).toHaveFocus(),
+      );
+    });
+
+    it("opens the selector again from the picked value's label", async () => {
+      const user = userEvent.setup();
+      await openFilter();
+      await pickFromKeyboard(user);
+      const picked = await screen.findByRole("button", { name: "Group 1" });
+
+      picked.focus();
+      await user.keyboard("{Enter}");
+
+      expect(await screen.findByTestId("groups-selector")).toBeInTheDocument();
     });
   });
 
@@ -498,6 +725,35 @@ describe("<ViewSelector />", () => {
     const viewSelector = screen.getByTestId("view-selector");
     expect(viewSelector).toHaveClass("custom-class");
     expect(viewSelector.style.backgroundColor).toBe("red");
+  });
+
+  it.each(["{Enter}", " "])(
+    "switches the view from the keyboard on %s",
+    async (key) => {
+      const user = userEvent.setup();
+      const onChangeView = vi.fn();
+      render(
+        <ViewSelector
+          {...viewSelectorDefaultProps}
+          viewAs="row"
+          isFilter
+          onChangeView={onChangeView}
+        />,
+      );
+
+      await user.tab();
+      expect(screen.getByTestId("view-selector-icon")).toHaveFocus();
+
+      await user.keyboard(key);
+      expect(onChangeView).toHaveBeenCalledWith("tile");
+    },
+  );
+
+  it("leaves a disabled selector out of the Tab order", () => {
+    render(<ViewSelector {...viewSelectorDefaultProps} isDisabled />);
+
+    for (const icon of screen.getAllByTestId("view-selector-icon"))
+      expect(icon).not.toHaveAttribute("tabindex");
   });
 
   it("renders only one icon when isFilter is true", () => {
