@@ -101,6 +101,11 @@ export const useColumnLayout = (
     pendingSaveRef.current = current.fractions;
     setState(current);
   }
+  // The signature leaves out what moves no share, such as `resizable`, so a
+  // change to that alone keeps the stored columns; the ones in use are always
+  // this render's. Not stored: a consumer passing a new array every render
+  // would re-render forever.
+  if (current.columns !== columns) current = { ...current, columns };
 
   const storageRef = useRef(storage);
   storageRef.current = storage;

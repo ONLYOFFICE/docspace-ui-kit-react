@@ -108,6 +108,29 @@ describe("DataTable resizing", () => {
     ]);
   });
 
+  it("drops the handles when the columns stop being resizable, keeping the widths", () => {
+    // One record throughout: a new one would restore the layout from scratch.
+    const storage = createMemoryWidths();
+    const table = (columns: DataTableColumn<Row>[]) => (
+      <DataTable
+        columns={columns}
+        rows={[{ id: 1 }]}
+        getRowKey={(row) => row.id}
+        widthStorage={storage}
+      />
+    );
+    const { rerender } = render(table(COLUMNS));
+
+    rerender(table(COLUMNS.map((column) => ({ ...column, resizable: false }))));
+
+    expect(screen.queryAllByRole("separator")).toEqual([]);
+    expect(grid()).toBe(DEFAULT_GRID);
+
+    rerender(table(COLUMNS));
+
+    expect(screen.getAllByRole("separator")).toHaveLength(3);
+  });
+
   it("reports the column's share as its value", () => {
     renderTable();
 
