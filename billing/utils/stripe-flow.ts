@@ -1,3 +1,4 @@
+import { PaymentMethodStatus } from "@onlyoffice/docspace-api-sdk";
 import { isIOS } from "react-device-detect";
 
 import { toAbsoluteUrl } from "./url";
@@ -99,7 +100,7 @@ export const openStripeCheckout = async (
 };
 
 export type TTopUpCustomerInfo = {
-  email?: string | null;
+  paymentMethodStatus?: number | null;
   isDelayedPaymentMethod?: boolean;
 };
 
@@ -126,7 +127,7 @@ export const waitForTopUpCompletion = async (
   await pollUntil(async () => {
     const info = await fetchCustomerInfo(true);
     isDelayedPaymentMethod = info?.isDelayedPaymentMethod === true;
-    return !!info?.email;
+    return info?.paymentMethodStatus === PaymentMethodStatus.Set;
   }, signal);
 
   if (isDelayedPaymentMethod) return { isDelayedPaymentMethod };

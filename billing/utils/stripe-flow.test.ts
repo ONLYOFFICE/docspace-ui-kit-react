@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { PaymentMethodStatus } from "@onlyoffice/docspace-api-sdk";
 
 import { isPollingTimeoutError, waitForTopUpCompletion } from "./stripe-flow";
 
@@ -6,7 +7,9 @@ const FIVE_MINUTES = 5 * 60 * 1000;
 
 const createDeps = () => ({
   walletBalance: 0,
-  fetchCustomerInfo: vi.fn().mockResolvedValue({ email: "payer@example.com" }),
+  fetchCustomerInfo: vi
+    .fn()
+    .mockResolvedValue({ paymentMethodStatus: PaymentMethodStatus.Set }),
   fetchBalance: vi.fn().mockResolvedValue(0),
 });
 
@@ -92,7 +95,7 @@ describe("waitForTopUpCompletion", () => {
   it("skips waiting for the purchase with a delayed payment method", async () => {
     const deps = createDeps();
     deps.fetchCustomerInfo.mockResolvedValue({
-      email: "payer@example.com",
+      paymentMethodStatus: PaymentMethodStatus.Set,
       isDelayedPaymentMethod: true,
     });
     const isPurchaseCompleted = vi.fn();
