@@ -102,6 +102,7 @@ const UpdatePlanButtonContainer = ({
   const isBalanceInsufficient = walletBalance < dueTodayAmount;
   const topUpShortfall = Math.max(0, Math.ceil(dueTodayAmount - walletBalance));
   const isDelayedPaymentTopUp = isDelayedPaymentMethod && isBalanceInsufficient;
+  const isCardMissingTopUp = isCardMissingOrInactive && isBalanceInsufficient;
 
   const onUpdateTariff = () => {
     if (isVisiblePaymentConfirm) onClose();
@@ -153,15 +154,13 @@ const UpdatePlanButtonContainer = ({
 
   const getPayTariffLabel = () => {
     if (isDelayedPaymentTopUp) return t("TopUpWallet");
-    if (isCardMissingOrInactive || isBalanceInsufficient)
-      return t("TopUpAndUpgrade");
+    if (isBalanceInsufficient) return t("TopUpAndUpgrade");
     return t("UpgradeNow");
   };
 
   const getUpdateTariffAction = () => {
     if (needsWalletMigration) return openMigrateDialog;
-    if (isDelayedPaymentTopUp || isCardMissingOrInactive)
-      return openTopUpDialog;
+    if (isDelayedPaymentTopUp || isCardMissingTopUp) return openTopUpDialog;
     return onUpdateTariff;
   };
 
@@ -175,7 +174,7 @@ const UpdatePlanButtonContainer = ({
       }
 
       if (canPayTariff) {
-        isCardMissingOrInactive
+        isCardMissingTopUp
           ? openTopUpDialog()
           : executeWalletUpdate(managersCount, ProductQuantityType.Add, t);
         return;
