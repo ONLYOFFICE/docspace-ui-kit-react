@@ -94,6 +94,10 @@ const UpdatePlanButtonContainer = ({
     resetTariffContainerToBasic();
   };
 
+  const purchasedManagersCount = isRepurchase
+    ? managersCount
+    : managersCount - maxCountManagersByQuota;
+
   const dueTodayAmount = tariffDueTodayAmount ?? totalPrice;
   const isBalanceInsufficient = walletBalance < dueTodayAmount;
   const topUpShortfall = Math.max(0, Math.ceil(dueTodayAmount - walletBalance));
@@ -140,9 +144,11 @@ const UpdatePlanButtonContainer = ({
   const onTopUpConfirm = async () => {
     closeTopUpDialog();
 
-    await (isRepurchase
-      ? executeWalletUpdate(managersCount, ProductQuantityType.Add, t)
-      : onUpdateTariff());
+    await executeWalletUpdate(
+      purchasedManagersCount,
+      ProductQuantityType.Add,
+      t,
+    );
   };
 
   const getPayTariffLabel = () => {
@@ -154,7 +160,8 @@ const UpdatePlanButtonContainer = ({
 
   const getUpdateTariffAction = () => {
     if (needsWalletMigration) return openMigrateDialog;
-    if (isDelayedPaymentTopUp) return openTopUpDialog;
+    if (isDelayedPaymentTopUp || isCardMissingOrInactive)
+      return openTopUpDialog;
     return onUpdateTariff;
   };
 
@@ -257,7 +264,7 @@ const UpdatePlanButtonContainer = ({
           isPurchaseCompleted={isTariffPurchased}
           minValue={topUpShortfall > 0 ? `${topUpShortfall}` : undefined}
           successParams={{
-            admins: `${managersCount}`,
+            admins: `${purchasedManagersCount}`,
             storage: getConvertedSize(t, allowedStorageSizeByQuota),
             plan: isFreeTariff ? tariffPlanTitle : currentTariffPlanTitle,
             price: formatPaymentCurrency(totalPrice, 2),
