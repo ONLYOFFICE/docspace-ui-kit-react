@@ -280,6 +280,12 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **Secondary `Tabs` in a row too narrow for one tab between the arrows keep their width.** No
+  tab fit between the two arrows, the tab size was divided by that zero, and every tab got an
+  `Infinity` width the browser dropped. The tabs now keep the width they were measured at.
+- **No i18next advertisement in the console.** i18next 25 printed a notice for its hosted
+  service when the kit's translation instance initialised, in every app that loads the kit;
+  the instance now sets `showSupportNotice: false`.
 - **Tab from a menu over a dialog goes on from the control that opened it.** A context menu or a
   drop-down a control in a `ModalDialog` or `Aside` opens lives in a portal, outside the focus
   trap, and Tab there went to the dialog's first stop (Shift+Tab to its last) wherever the menu

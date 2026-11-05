@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { screen, fireEvent, render } from "@testing-library/react";
+import { screen, fireEvent, render, waitFor } from "@testing-library/react";
 import { RoomIcon } from ".";
 import type { TModel } from "./RoomIcon.types";
 import styles from "./RoomIcon.module.scss";
@@ -231,7 +231,9 @@ describe("<RoomIcon />", () => {
           logo={{ medium: "broken.png" } as never}
         />,
       );
-      await vi.waitFor(() =>
+      // Testing Library's waitFor, not vi.waitFor: the image fails on a timer,
+      // and only this one lets the update it causes happen inside act.
+      await waitFor(() =>
         expect(screen.getByTestId("room-icon")).toHaveAttribute(
           "data-is-wrong-image",
           "true",

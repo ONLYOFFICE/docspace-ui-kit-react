@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { screen, render, fireEvent, act } from "@testing-library/react";
+import {
+  screen,
+  render,
+  fireEvent,
+  act,
+  waitFor,
+} from "@testing-library/react";
 
 import { Tabs } from ".";
 import { TabsTypes } from "./Tabs.enums";
@@ -332,7 +338,7 @@ describe("Tabs", () => {
       fireEvent.click(tab);
 
       expect(onClickMock).toHaveBeenCalled();
-      await vi.waitFor(() => {
+      await waitFor(() => {
         expect(dispatchSpy).toHaveBeenCalledWith(
           expect.objectContaining({ type: AnimationEvents.END_ANIMATION }),
         );
@@ -516,7 +522,7 @@ describe("Tabs", () => {
       expect(arrowRight).toBeInTheDocument();
       // The arrow selects the next tab the way a click on it does, the
       // tab's own onClick included.
-      (arrowRight as HTMLElement).click();
+      act(() => (arrowRight as HTMLElement).click());
       expect(onSelectMock).toHaveBeenCalledWith(items[1]);
       expect(onTab2Click).toHaveBeenCalledTimes(1);
 
@@ -529,6 +535,52 @@ describe("Tabs", () => {
         );
       } else {
         delete (HTMLElement.prototype as { offsetWidth?: number }).offsetWidth;
+      }
+    });
+
+    it("keeps a finite width when no tab fits between the arrows", () => {
+      // A 100px row, 50px tabs: 19px of label each, and the two 32px arrows
+      // leave 36px -- less than one tab with its padding and gap. The tab size
+      // used to be divided by that zero count, and every width became Infinity.
+      const originalOffsetWidth = Object.getOwnPropertyDescriptor(
+        HTMLElement.prototype,
+        "offsetWidth",
+      );
+      Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+        configurable: true,
+        get: function () {
+          if (this.classList.contains(styles.tabs)) return 100;
+          if (this.classList.contains(styles.tab)) return 50;
+          return 0;
+        },
+      });
+
+      try {
+        const items = [
+          { id: "1", name: "Tab 1", content: "1" },
+          { id: "2", name: "Tab 2", content: "2" },
+          { id: "3", name: "Tab 3", content: "3" },
+        ];
+        render(
+          <Tabs items={items} type={TabsTypes.Secondary} selectedItemId="1" />,
+        );
+
+        // The tabs keep their measured width: 3 x (19 + 31 padding) + two
+        // 32px arrows + 3 x 4px gaps.
+        const tabList = screen.getByRole("tablist");
+        expect(tabList.style.getPropertyValue("--tabs-width")).toBe("226px");
+        expect(screen.getByTestId("1_subtab").style.width).toBe("19px");
+      } finally {
+        if (originalOffsetWidth) {
+          Object.defineProperty(
+            HTMLElement.prototype,
+            "offsetWidth",
+            originalOffsetWidth,
+          );
+        } else {
+          delete (HTMLElement.prototype as { offsetWidth?: number })
+            .offsetWidth;
+        }
       }
     });
 
@@ -650,7 +702,7 @@ describe("Tabs", () => {
       );
 
       const tab2 = screen.getByTestId("tab1_subtab");
-      tab2.click();
+      act(() => tab2.click());
 
       expect(onSelectMock).toHaveBeenCalledWith(arrayItems[1]);
     });
@@ -724,7 +776,7 @@ describe("Tabs", () => {
 
       const arrowLeft = container.querySelector(`.${styles.arrowLeft}`);
       if (arrowLeft) {
-        (arrowLeft as HTMLElement).click();
+        act(() => (arrowLeft as HTMLElement).click());
         expect(onSelectMock).toHaveBeenCalledWith(arrayItems[0]);
       }
 

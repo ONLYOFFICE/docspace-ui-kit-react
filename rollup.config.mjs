@@ -305,9 +305,25 @@ const detectUseClient = () => ({
 // current per-module interop and silence the notice.
 const SILENCED_WARNINGS = new Set(["MODULE_LEVEL_DIRECTIVE", "MIXED_EXPORTS"]);
 
-const onwarn = (warning, warn) => {
+// `pnpm build` runs `rollup -c --silent`. Without it the CLI opens with every
+// entry point joined on one line -- 717 of them, some 35 KB of cyan that read
+// as an error in the pre-push log. `--silent` drops that banner and also stops
+// the CLI printing warnings, but it still calls this handler, so the warnings
+// are printed here instead of being handed back to rollup.
+const onwarn = (warning) => {
   if (SILENCED_WARNINGS.has(warning.code)) return;
-  warn(warning);
+
+  // What the CLI would have printed: the plugin, where, and the code around it.
+  const plugin = warning.plugin ? ` (plugin ${warning.plugin})` : "";
+  const where = warning.loc
+    ? `${warning.loc.file ?? warning.id}:${warning.loc.line}:${warning.loc.column}`
+    : warning.id;
+
+  console.warn(
+    `(!) [${warning.code ?? "WARNING"}]${plugin} ${warning.message}`,
+  );
+  if (where) console.warn(`    ${where}`);
+  if (warning.frame) console.warn(warning.frame);
 };
 
 // Every module is emitted as `<subpath>/index.js`, so the whole package has a

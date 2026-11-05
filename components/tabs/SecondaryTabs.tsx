@@ -183,6 +183,11 @@ const SecondaryTabs = (props: TabsProps) => {
             (referenceTabSize + TABS_GAP + TAB_PADDING),
         );
 
+        // A row narrower than the two arrows and one tab fits none between
+        // them, and dividing by that zero made every tab `Infinity` wide -- a
+        // value the browser drops. The tabs keep their measured width instead.
+        if (maxTabsCount < 1) return;
+
         const size =
           Math.round(tabsContainerWidth - arrowsWidth) / maxTabsCount -
           TAB_PADDING -
