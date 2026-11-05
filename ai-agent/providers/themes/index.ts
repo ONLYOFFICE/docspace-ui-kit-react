@@ -450,6 +450,10 @@ const buildTokens = (
   // different grey from its two neighbours.
   "--attachment-button-color": p.attachmentButtonColor,
   "--prompt-button-color": p.promptButtonColor,
+  // Without these the widget falls back to --text-normal on hover, near
+  // black in the light theme, unlike every other icon button.
+  "--attachment-button-hover-color": p.iconButtonHoverColor,
+  "--prompt-button-hover-color": p.iconButtonHoverColor,
   "--composer-settings-button-color": p.attachmentButtonColor,
 
   // Misc
