@@ -697,6 +697,17 @@
   margin-top: 8px;
   cursor: pointer;
   color: var(--back-button-color-v);
+  border-radius: 4px;
+
+  // Outside: the row has no padding for an inset ring to sit in.
+  &:focus-visible {
+    outline: 2px solid
+      var(
+        --accent-main,
+        var(--color-scheme-main-accent, #{colors.$light-blue-main})
+      );
+    outline-offset: 2px;
+  }
 
   p {
     font-size: 15px;

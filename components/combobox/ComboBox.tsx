@@ -5,6 +5,7 @@ import classNames from "classnames";
 
 import EmptyIcon from "../../assets/empty.svg";
 import { consumeKey } from "../../utils/consume-key";
+import { hasDropDownItemMark } from "../../utils/drop-down-item-mark";
 
 import { DropDown } from "../drop-down";
 import { DropDownItem, type DropDownItemProps } from "../drop-down-item";
@@ -149,8 +150,9 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
   );
 
   // `advancedOptions` whose children are all DropDownItems (AccessRightSelect
-  // draws its rich rows that way) is still a list, and the keyboard walks it
-  // like `options`. Any other custom content keeps its own keys.
+  // draws its rich rows that way), or components marked as rendering one, is
+  // still a list, and the keyboard walks it like `options`. Any other custom
+  // content keeps its own keys.
   const advancedItems = React.useMemo(() => {
     const { advancedOptions } = props;
     if (!React.isValidElement(advancedOptions)) return null;
@@ -158,7 +160,10 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     const children = React.Children.toArray(advancedOptions.props.children);
     const items: React.ReactElement<DropDownItemProps>[] = [];
     for (const child of children) {
-      if (!React.isValidElement(child) || child.type !== DropDownItem)
+      if (
+        !React.isValidElement(child) ||
+        (child.type !== DropDownItem && !hasDropDownItemMark(child.type))
+      )
         return null;
       items.push(child as React.ReactElement<DropDownItemProps>);
     }

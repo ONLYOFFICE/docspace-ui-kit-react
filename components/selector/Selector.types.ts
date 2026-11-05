@@ -2,12 +2,14 @@ import type React from "react";
 import type {
   EmployeeStatus,
   EmployeeType,
-  RoomType,
   FileShare,
   FileType,
-  FolderType,
   FileEntryDtoIntegerAllOfSecurity,
 } from "@onlyoffice/docspace-api-sdk";
+import type {
+  TFolderTypeValue as FolderType,
+  TRoomTypeValue as RoomType,
+} from "../../types";
 
 import type {
   ICover,
@@ -318,6 +320,10 @@ export type NewItemProps = {
   hotkey?: string;
   inputItemVisible?: boolean;
   listHeight: number;
+  /** Id of the row as an option of the list's listbox. */
+  optionId?: string;
+  /** Whether the keyboard is on this row. */
+  isActive?: boolean;
 };
 
 // NewItemDropDown
@@ -594,6 +600,12 @@ export type SelectorProps = TSelectorHeader &
      * unticked rows go grey and stop responding, with no message of their own.
      */
     maxSelectedItems?: number;
+    /**
+     * Called when a row is ticked past `maxSelectedItems`. With it set, the
+     * unticked rows stay as they are and the tick is refused here instead, so
+     * the host can say why (a toast) only when the limit is hit.
+     */
+    onSelectLimitReached?: () => void;
 
     /** Whether to skip the `loadNextPage(0)` call Selector makes on mount. */
     disableFirstFetch?: boolean;
@@ -676,6 +688,8 @@ export type BodyProps = TSelectorInfo &
     isLimitReached?: boolean;
 
     displayFileExtension?: boolean;
+    /** Accessible name of the list: the header's title, when there is one. */
+    listLabel?: string;
   };
 
 export type FooterProps = TSelectorFooterSubmitButton &
@@ -1024,6 +1038,10 @@ export type Data = {
   isLimitReached?: boolean;
   displayFileExtension?: boolean;
   forceIsMultiSelect?: boolean;
+  /** Id of the list as a listbox; a row's option id is `${listboxId}-option-${index}`. */
+  listboxId?: string;
+  /** Row the keyboard is on, or -1. It is drawn with a ring and named by aria-activedescendant. */
+  activeIndex?: number;
 };
 
 export interface ItemProps {

@@ -21,6 +21,7 @@ import InputItem from "./InputItem";
 import styles from "../Selector.module.scss";
 import { useTheme } from "../../../context/ThemeContext";
 import { globalColors } from "../../../providers/theme";
+import { isCreateNewItemShown } from "../Selector.utils";
 
 const compareFunction = (prevProps: ItemProps, nextProps: ItemProps) => {
   const prevData = prevProps.data;
@@ -40,7 +41,10 @@ const compareFunction = (prevProps: ItemProps, nextProps: ItemProps) => {
     prevItem?.isSelected === nextItem?.isSelected &&
     nextData?.inputItemVisible === prevData?.inputItemVisible &&
     nextData?.listHeight === prevData?.listHeight &&
-    nextData?.isLimitReached === prevData?.isLimitReached
+    nextData?.isLimitReached === prevData?.isLimitReached &&
+    nextData?.listboxId === prevData?.listboxId &&
+    (nextData?.activeIndex === nextIndex) ===
+      (prevData?.activeIndex === prevIndex)
   );
 };
 
@@ -60,7 +64,12 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
     isLimitReached,
     displayFileExtension,
     forceIsMultiSelect,
+    listboxId,
+    activeIndex,
   }: Data = data;
+
+  const optionId = listboxId ? `${listboxId}-option-${index}` : undefined;
+  const isActive = activeIndex === index;
 
   const { isBase } = useTheme();
 
@@ -71,7 +80,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
 
     if (!item || (item && !item.id))
       return (
-        <div key="row-loader" style={style}>
+        <div key="row-loader" style={style} role="presentation">
           {rowLoader}
         </div>
       );
@@ -115,7 +124,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
 
     if (isSeparator) {
       return (
-        <div style={style}>
+        <div style={style} role="presentation">
           <div
             style={{
               backgroundColor: isBase
@@ -152,10 +161,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
       );
     }
 
-    if (
-      isCreateNewItem &&
-      (items.length > 2 || (items.length === 2 && !items[1].isInputItem))
-    ) {
+    if (isCreateNewItem && isCreateNewItemShown(items)) {
       return (
         <NewItem
           label={label}
@@ -165,6 +171,8 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
           style={style}
           hotkey={hotkey}
           inputItemVisible={inputItemVisible}
+          optionId={optionId}
+          isActive={isActive}
         />
       );
     }
@@ -233,7 +241,12 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
         key={`${label}-${avatar}-${role}`}
         style={style}
         onClick={onClick}
+        id={optionId}
+        role={optionId ? "option" : undefined}
+        aria-selected={optionId ? !!isSelected : undefined}
+        aria-disabled={optionId && isItemDisabled ? true : undefined}
         className={classNames(styles.selectorItem, {
+          [styles.keyboardActive]: isActive,
           [styles.disabled]: isItemDisabled,
           [styles.selectedSingle]: isSelected && !isMultiSelect,
           [styles.hoverable]: !isItemDisabled,
@@ -360,13 +373,22 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
             isChecked={isSelected}
             isDisabled={isItemDisabled}
             onChange={onChangeAction}
+            // The row is the option the list's arrows and Space act on; its box
+            // is no Tab stop of its own inside the listbox.
+            tabIndex={-1}
           />
         ) : null}
       </div>
     );
   };
 
-  return isLoaded ? renderItem() : <div style={style}>{rowLoader}</div>;
+  return isLoaded ? (
+    renderItem()
+  ) : (
+    <div style={style} role="presentation">
+      {rowLoader}
+    </div>
+  );
 }, compareFunction);
 
 Item.displayName = "Item";

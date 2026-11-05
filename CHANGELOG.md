@@ -8,6 +8,106 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **`FileTile`'s `--tile-option-button-padding-end` is now `--tile-option-button-margin-end`,
+  default `8px`.** The actions button pads its icon alike on every side, so its keyboard focus
+  ring sits around the icon, and the room to the tile's edge is a margin after it. The space to
+  the edge is the same as before: an old padding of `X` is a margin of `X - 8px` (`8px` was
+  `16px`, `0px` was `8px`). A consumer still setting the old name sets nothing
+- **React and React DOM 19.2 are required.** The peer range moves from `^19.0.0` to `^19.2.0`:
+  the kit calls `useEffectEvent` (Selector's list, `useUnmount`, `useCloseOnAnchorCovered`, the
+  AI agent's platform provider), which React 19.0 and 19.1 do not export. A consumer on those
+  versions gets a peer warning on install and a crash where the hook is reached
+- **`ModalDialog` and `Aside` keep the keyboard focus inside while open.** The new
+  `useFocusTrap` hook (`hooks/useFocusTrap`) takes Tab and Shift+Tab on the document while the
+  container is open: the last stop wraps to the first and back, and the page behind is out of
+  reach; of nested traps only the top one acts. Between the ends the focus moves in the browser's
+  own order, positive tabIndex values first, so a dialog that sets them keeps its order. `Aside`'s `<aside>` carries `tabIndex={-1}`, so
+  a panel with nothing to tab to holds the focus itself. A consumer that relied on tabbing out of
+  an open dialog or panel no longer can
+- **`Filter`'s tags are keyboard buttons.** A value tag is `role="button"` with `aria-pressed`,
+  "Other" is one with `aria-haspopup="dialog"`; both take `tabIndex={0}`, Enter and Space, and a
+  focus ring. The panel used to offer the keyboard only its close cross and Cancel. Escape on the
+  selector step that "Other" opens goes back to the filter, as its arrow does, instead of closing
+  the whole panel. When that step closes - a pick, the arrow or Escape - the focus goes to the
+  tag that opens the group's selector rather than the page's body; a picked value's label opens
+  the selector again and its cross (named "Remove") clears the value, each a Tab stop of its own
+- **Escape closes one layer at a time.** `Selector` (with an `onCancel`) and the "New" row's menu
+  consume the Escape they close on, keyup included: a selector opened from a `ModalDialog` used
+  to close that dialog along with itself, as the dialog closes on an Escape keyup on the window.
+  The "New" menu's Enter is consumed the same way, so picking an entry never also submits the
+  selector
+- **`Aside` takes the focus when it opens and gives it back when it closes**, as `ModalDialog`
+  already did. Both use the new `useFocusReturn` hook (`hooks/useFocusReturn`): the container
+  takes the focus unless its content focused a control of its own, and on close the focus goes
+  back to the element that had it before, if it is still in the page. A panel used to leave the
+  focus behind its backdrop on open and drop it on the page's body on close
+- **`Selector`'s list is a listbox and takes the keyboard.** The scroll container is one Tab stop
+  (`role="listbox"`, named by the header's title, `aria-activedescendant` on the row the keyboard
+  is on). Focused, it marks the selected row on screen or the first row; the arrows, Home and
+  End move between the rows that can be picked, and Enter or Space click the row - open a
+  folder, pick an item, start "New". Enter on the row already picked in single select still
+  submits. The row's checkbox and the "New" row's button are no Tab stops of their own, the
+  "New" row's menu takes the arrows and Escape, and the new-name field gives the focus back to
+  the list when it goes. The search box lost its `tabIndex={1}`. A consumer test that pressed
+  Enter in the focused list to submit now picks the marked row unless it is the picked one. A
+  row pressed with the pointer takes the keyboard off its row: Enter submits that pick, as it
+  did before, and the next arrow goes on from the row pressed. A dimmed list (a refresh under
+  way) takes the arrows but not Enter or Space, as the pointer cannot reach it. Enter and Escape
+  in the new-name row are consumed with their keyup, so the row no longer closes the dialog
+  around the selector or submits the selector along with it
+- **`Tabs` ties each tab to its panel.** The body is `role="tabpanel"`, labelled by the selected
+  tab, which points at it with `aria-controls`; a panel with nothing to tab to is a Tab stop
+  (`tabIndex={0}`). The segmented bar's scroll arrows left the Tab order, so Tab goes from the
+  bar straight into the panel
+- **Focus rings on the keyboard's controls.** `Checkbox`, `RadioButton`, `ToggleButton`,
+  `FileInput`, `ComboBox`, `GroupMenuItem` and `Article`'s back button draw a 2px accent ring
+  under `:focus-visible` (themable through `--checkbox-focus-ring-color`,
+  `--radio-button-focus-ring-color`, `--toggle-button-focus-ring-color`,
+  `--file-input-focus-ring-color`, `--combobox-focus-ring-color`); `Article`'s back button and
+  `PasswordInput`'s eye (named "Show" or "Hide", through `InputBlock`'s new `iconAriaLabel`) are
+  keyboard buttons now
+- **A `Link` with an `onClick` and no `href` is a Tab stop.** It used to be out of the keyboard's
+  reach; it now takes `tabIndex={0}` and a key handler. An `action` link is `role="button"`,
+  pressed by Enter and Space, and a `page` link `role="link"`, followed by Enter. Every such link
+  a consumer renders gains a Tab stop: pass `tabIndex={-1}` where something around the link is
+  the control already, or `role` or `onKeyDown` to wire the keyboard yourself. A `tabIndex` of 0
+  or more only places the stop: the keys still press the link
+- **Two inner controls left the Tab order.** `Dropzone`'s link is `tabIndex={-1}`, as the area
+  around it is the keyboard's button already, and `DropDownItem`'s external-link icon is
+  `tabIndex={-1}` when it has no `onClickExternalLink`, where it did nothing on a press
+- **`ComboBox` walks the rows of marked components with the arrows.** Custom `advancedOptions`
+  were walked only when their children were `DropDownItem`s; a component marked with
+  `markAsDropDownItem` (see _Added_) counts as one too
+- **`FilesSelector` lists AI rooms instead of AI agents at its root.** `withAIAgentsTreeFolder`
+  is gone; `withAIRoomsTreeFolder` (on by default) lists the AI rooms root (`FolderType.AiHub`)
+  after Forms, whenever the portal serves it. The section holds the Instructions and Knowledge
+  rooms, never the AI projects, which hold no files, and offers no room creation or Recent /
+  Favorites rows. With `roomsSectionTypes` it keeps only the AI types named there, moves them
+  out of the Rooms section, and is left out when it names neither. A host that passed
+  `withAIAgentsTreeFolder` drops it. The chat's save dialog turns the section off: neither room
+  type takes a chat export.
+- **`FilesSelector` has no AI agents list any more.** `onCreateAIAgent` and
+  `agentsEmptyDescription` are gone, and `getIsDisabled`, `initSelectedItemType` and
+  `setSelectedItemType` take `"rooms" | "files"` only: the `"agents"` item type could only be
+  reached from the AI agents root. A host that compared against `"agents"` drops that check.
+  `AIAgentSelector` keeps its own agents list.
+- **`FolderType.AiHub` is 41 and `FolderType.AiProjects` is gone**, after the server moved the AI
+  projects under the AI rooms root: one root now keeps the Instructions rooms, the Knowledge rooms
+  and the AI projects
+- **Several context and knowledge rooms per chat**, on `@onlyoffice/ai-chat` 1.0.2:
+  `AiChatPresetSettings` carries `contextRooms` and `knowledgeRooms` (arrays) in place of
+  `contextRoom` / `knowledgeRoom`; `AiChatPanelSave` hands the host every connected room;
+  `ContextRoomSync` connects each offered room that holds skills and `ContextRoomWatcher`
+  follows every connected room on its own (one losing its skills is disconnected alone)
+- `@onlyoffice/ai-chat` peer requirement raised to `^1.0.2`
+- **`AiAgentProviders`' `entityId` is the AI project the chat is open in, `contextEntityId` the
+  location.** With the AI agents gone, threads are global per user and nothing but a project
+  scopes the chat; the folder or room the user is in goes in `contextEntityId`, which the AI
+  service uses for the prompt's location line and for generated files, and device uploads and
+  drops follow it too (`contextEntityId ?? entityId`, else My documents). A connected
+  Instructions room no longer becomes the round's scope (`contextRoomScopesRounds` off): it
+  contributes its skills only. `AiChatStore.folderContextPickerEnabled` and the composer's
+  empty Context slot are removed; the context folder is picked in the AI project itself
 - **`Uploader`'s progress bar moves while a chunk is being sent.** The percentage used to grow
   only when a whole chunk (5 MB by default) had been answered, so a file under one chunk went
   from 0 to done in a single step; it now also counts the bytes of chunks still on their way,
@@ -147,6 +247,24 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Added
 
+- **`hasTabStop(root)`** (`hooks/useFocusTrap`): whether `root` holds a Tab stop, by the rule of
+  `getTabStops`, reading the layout no further than the first one
+- **`markAsDropDownItem(component)`** (`utils/drop-down-item-mark`): marks a component that renders
+  a `DropDownItem` from the props it takes - a wrapper adding labels, say - so that `ComboBox`
+  walks its rows with the arrow keys
+- **`Text`'s `onKeyDown` and `aria-haspopup`**, passed to the element unchanged: what a
+  `role="button"` text needs to take the keyboard and say what it opens
+- **`RoomType`'s `isDisabled`** greys out any room type, marks it `aria-disabled` and stops its
+  `onClick`, as `disabledFormRoom` and `disabledPublicRoom` do for their own types
+- `AiAgentProviders` takes `chatIntro`: what an empty chat shows above the suggestion chips in place of the default illustration and tagline (an AI project puts its logo, name and sources there).
+- `RoomsType.AiProjectRoom` (12), `FolderType.AiProjectRoom` (40) and `FolderType.AiProjects`
+  (41) for the AI projects of the DocSpace client; `RoomLogo` and the room type title /
+  description helpers know the new type (the AI room icon stands in until a dedicated one lands)
+- `AiChatStore.openProject` and `AiChatProjectSettings`: a project opens the chat with its model
+  and the lists of its Instructions / Knowledge rooms, every one of them connected
+- `AiAgentProviders` takes `contextRoom` as one room or a list; `ContextRoomProvider` gets a
+  `rooms` prop and `useContextRooms`
+
 - **`FormWrapper` can be the form.** A new `onSubmit` prop renders the card as a `<form>` that
   calls the handler with the browser's navigation prevented, so Enter in a field submits it;
   `aria-label` / `aria-labelledby` make it a named form landmark. Without `onSubmit` it is a
@@ -162,6 +280,36 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **Tab from a menu over a dialog goes on from the control that opened it.** A context menu or a
+  drop-down a control in a `ModalDialog` or `Aside` opens lives in a portal, outside the focus
+  trap, and Tab there went to the dialog's first stop (Shift+Tab to its last) wherever the menu
+  came from. The trap now goes on from the element inside it that had the focus last
+- **`Selector`'s `aria-activedescendant` names only a drawn row.** Home, End or the wheel took the
+  keyboard's row past what the virtualized list renders, and the list pointed at an id no
+  element had, which a screen reader announced as nothing. It points at the row once it is drawn
+- **The "New" menu gives the focus back when the picked entry moves it nowhere.** An entry whose
+  action focuses nothing of its own left the focus on the page's body as the menu closed
+- **`InputBlock` names its icon only when the icon is a button.** With `iconAriaLabel` but no
+  `onIconClick` the icon carried an `aria-label` and no role, which ARIA does not allow
+- **The focus trap looks a radio group up once per key press.** It searched the trap for each
+  radio's group, once per radio
+- **A tab panel no longer lays out all its controls on every change.** `useTabPanel` re-read the
+  panel on each frame its content changed and listed every Tab stop to learn whether there was
+  one; it now asks `hasTabStop`, which stops at the first
+- The focus trap leaves out controls inside a `<fieldset disabled>`: they take no focus, though
+  their own `disabled` is false, and Tab stood still on them
+- `Selector`'s list says `aria-multiselectable="true"` in multi select, so a screen reader no longer
+  announces it as a single choice
+- `Selector`'s new-name row leaves an Enter that ends an input method composition (Chinese,
+  Japanese, Korean) to it, instead of accepting the name half typed
+- **An AI project opens on its own model, not on the default.** `AiChatStoresBridge` looked the
+  project's model up among the assigned profiles only (`init`); a model outside them missed and
+  the chat fell back to the default. It now waits for the whole list (`ensureProfiles`) first.
+- The composer's link to a context or knowledge room opens it in the AI rooms section
+  (`/ai-rooms/{id}`), not in Rooms
+- `ContextRoomWatcher` refreshes the picker's room list right after it connects an offered room
+  that gained its first skill (the scheduled refresh was cancelled by the effect rerun)
+- `ContextRoomSync` no longer reads the skills a second time when the store already did
 - **`ComboBox` no longer throws when `options` is missing.** A caller that renders it before
   its options are loaded passed `undefined`, and reading its length threw "Cannot read
   properties of undefined (reading 'length')". A missing list is now treated as an empty one.

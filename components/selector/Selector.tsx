@@ -6,6 +6,7 @@ import React from "react";
 import classNames from "classnames";
 
 import { ButtonKeys } from "../../enums";
+import { consumeKey } from "../../utils/consume-key";
 
 import { Aside } from "../aside";
 import { Backdrop } from "../backdrop";
@@ -120,6 +121,7 @@ const Selector = ({
   forceIsMultiSelect,
   selectedItems,
   maxSelectedItems,
+  onSelectLimitReached,
 
   onSelect,
 
@@ -215,7 +217,26 @@ const Selector = ({
     ],
   );
 
+  // The rows are memoized and keep the handler of an earlier render, so
+  // the limit check reads the current selection through a ref.
+  const newSelectedItemsRef = React.useRef(newSelectedItems);
+  newSelectedItemsRef.current = newSelectedItems;
+  const onSelectLimitReachedRef = React.useRef(onSelectLimitReached);
+  onSelectLimitReachedRef.current = onSelectLimitReached;
+
   const onSelectAction = (item: TSelectorItem, isDoubleClick: boolean) => {
+    if (
+      onSelectLimitReachedRef.current &&
+      isMultiSelect &&
+      !item.isSelected &&
+      !(item.disableMultiSelect && !forceIsMultiSelect) &&
+      maxSelectedItems &&
+      newSelectedItemsRef.current.length >= maxSelectedItems
+    ) {
+      onSelectLimitReachedRef.current();
+      return;
+    }
+
     onSelect?.(
       {
         ...item,
@@ -463,6 +484,9 @@ const Selector = ({
       if (inputItemVisible) return;
       if (isUnderModalDialog(selectorRef.current)) return;
       if (e.key === ButtonKeys.esc) {
+        // The keyup too: a ModalDialog the selector was opened from closes on
+        // an Escape keyup, and one press would close both.
+        if (onCancel) consumeKey(e);
         onCancel?.();
       }
     };
@@ -737,8 +761,11 @@ const Selector = ({
           isSSR={isSSR}
           hideBackButton={hideBackButton}
           withErrorFooter={withErrorFooter}
-          isLimitReached={isLimitReached}
+          // With `onSelectLimitReached` the rows past the limit keep their
+          // look and the tick is refused in `onSelectAction`.
+          isLimitReached={onSelectLimitReached ? false : isLimitReached}
           displayFileExtension={displayFileExtension}
+          listLabel={withHeader ? headerProps?.headerLabel : undefined}
           forceIsMultiSelect={forceIsMultiSelect}
           // info
           {...infoProps}

@@ -1,7 +1,7 @@
 {
   "entry": "index.ts",
   "package": "@onlyoffice/apps-ui-kit",
-  "total": 715,
+  "total": 717,
   "values": 466,
   "exports": {
     "ADMIN": {
@@ -1682,6 +1682,10 @@
       "kind": "type",
       "origin": "types"
     },
+    "TFolderTypeValue": {
+      "kind": "type",
+      "origin": "types"
+    },
     "TGetContextMenuModel": {
       "kind": "type",
       "origin": "components/context-menu"
@@ -1787,6 +1791,10 @@
       "origin": "utils/calculateRoomLogoParams"
     },
     "TRoomSecurity": {
+      "kind": "type",
+      "origin": "types"
+    },
+    "TRoomTypeValue": {
       "kind": "type",
       "origin": "types"
     },

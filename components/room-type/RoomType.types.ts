@@ -19,6 +19,8 @@ export type RoomTypeProps = {
   disabledFormRoom?: boolean;
   /** Greys the row out while `roomType` is `PublicRoom`, marks it `aria-disabled` and stops it calling `onClick`. */
   disabledPublicRoom?: boolean;
+  /** Greys the row out whatever `roomType` is, marks it `aria-disabled` and stops it calling `onClick`. */
+  isDisabled?: boolean;
   /** Replaces the title and the description with the "from template" wording, whatever `roomType` says, and switches the glyph to the template one. */
   isTemplate?: boolean;
   /** Switches the glyph to the template variant of `roomType` without touching the texts. */

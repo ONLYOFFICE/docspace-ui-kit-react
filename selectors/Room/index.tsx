@@ -34,6 +34,8 @@ const RoomSelectorComponent = ({
   style,
 
   excludeItems,
+  isRoomDisabled,
+  getRoomDisabledText,
 
   withSearch,
 
@@ -81,6 +83,8 @@ const RoomSelectorComponent = ({
   selectedItems,
   disableFirstFetch,
   forceIsMultiSelect,
+  maxSelectedItems,
+  onSelectLimitReached,
 }: RoomSelectorProps) => {
   const t = useCommonTranslation();
   const { isBase } = useTheme();
@@ -259,6 +263,8 @@ const RoomSelectorComponent = ({
     disableThirdParty,
     searchArea,
     subscribe,
+    isRoomDisabled,
+    getRoomDisabledText,
   });
 
   const headerSelectorProps: TSelectorHeader = withHeader
@@ -349,6 +355,8 @@ const RoomSelectorComponent = ({
       }
       isSSR={withInit}
       forceIsMultiSelect={forceIsMultiSelect}
+      maxSelectedItems={maxSelectedItems}
+      onSelectLimitReached={onSelectLimitReached}
       dataTestId="room_selector"
       disableFirstFetch={disableFirstFetch}
     />

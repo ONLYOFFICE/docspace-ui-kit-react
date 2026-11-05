@@ -21,7 +21,7 @@ const AiChatStoresBridge = () => {
   const store = useAiChatStore();
   const stores = useStores();
   const currentPage = stores.useRouter((s) => s.currentPage);
-  const profiles = stores.useProfilesStore((s) => s.profiles);
+  const hasProfiles = stores.useProfilesStore((s) => s.hasProfiles);
   const initialized = stores.useProfilesStore((s) => s.initialized);
 
   useEffect(() => {
@@ -34,8 +34,8 @@ const AiChatStoresBridge = () => {
     // hasProfiles to false and blink every gated UI across the app, so the
     // last known value is kept until hydration completes.
     if (!initialized) return;
-    store.setHasProfiles(profiles.length > 0);
-  }, [store, profiles, initialized]);
+    store.setHasProfiles(hasProfiles);
+  }, [store, hasProfiles, initialized]);
 
   const hasAnalyzeChip = useAnalyzeLock(stores.useAttachmentsStore);
 
@@ -71,6 +71,101 @@ const AiChatStoresBridge = () => {
       ),
     [store, stores],
   );
+
+  // A preset opens a fresh conversation with its rooms connected and its
+  // model picked. The skills rooms are also handed to the host's
+  // `contextRoom` by the host itself, so ContextRoomSync keeps them when the
+  // pane mounts; the knowledge bases and the model have no such sync and
+  // are set here.
+  useEffect(() => {
+    // Bumped by every preset: a model lookup still awaiting a load when
+    // another preset arrives must not overwrite the newer one's model.
+    let presetRequest = 0;
+    return reaction(
+      () => store.pendingPreset,
+      (preset) => {
+        if (!preset) return;
+        const request = ++presetRequest;
+        const fresh = store.pendingPresetFresh;
+        if (fresh) {
+          stores.useThreadsStore
+            .getState()
+            .onSwitchToNewThread({ keepSessionProfile: true });
+        }
+        const clouds = stores.useCloudsStore.getState();
+        // The rooms of a preset share one cloud (the portal); a mixed
+        // list is connected one room at a time.
+        const connect = (
+          rooms: typeof preset.contextRooms,
+          replace: (
+            cloud: string,
+            list: { id: string; name: string }[],
+          ) => void,
+          add: (cloud: string, room: { id: string; name: string }) => void,
+          clear: () => void,
+        ) => {
+          const clouds = new Set(rooms.map((room) => room.cloud));
+          if (clouds.size <= 1) {
+            const cloud = rooms[0]?.cloud;
+            if (cloud)
+              replace(
+                cloud,
+                rooms.map(({ id, name }) => ({ id, name })),
+              );
+            else clear();
+            return;
+          }
+          clear();
+          for (const { cloud, id, name } of rooms) add(cloud, { id, name });
+        };
+        connect(
+          preset.contextRooms,
+          clouds.selectContextFolders,
+          clouds.selectContextFolder,
+          clouds.clearContextFolder,
+        );
+        connect(
+          preset.knowledgeRooms,
+          clouds.selectKnowledgeFolders,
+          clouds.selectKnowledgeFolder,
+          clouds.clearKnowledgeFolder,
+        );
+        // A preset holds no context folder: a fresh conversation starts
+        // without one, whatever the previous chat had connected; applied in
+        // place, the chat keeps the folder the user connected.
+        if (fresh) clouds.clearFolderContext();
+        // The model is looked up among the loaded profiles: opened before
+        // they arrive (a deep link to the projects page), the lookup would
+        // miss and the chat would fall back to the default model, so the
+        // load is awaited first. `init` reads the assigned profiles only;
+        // a model outside them waits for the whole list (`ensureProfiles`).
+        // Both share one request in flight.
+        const applyProfile = () => {
+          if (request !== presetRequest) return;
+          const profiles = stores.useProfilesStore.getState();
+          const profile = preset.profileId
+            ? profiles.getProfileById(preset.profileId)
+            : null;
+          if (preset.profileId && !profile && !profiles.profilesLoaded) {
+            void profiles.ensureProfiles().then(() => {
+              if (request !== presetRequest) return;
+              profiles.setSessionChatProfile(
+                stores.useProfilesStore
+                  .getState()
+                  .getProfileById(preset.profileId!),
+              );
+            });
+            return;
+          }
+          profiles.setSessionChatProfile(profile);
+        };
+        const { initialized, init } = stores.useProfilesStore.getState();
+        if (preset.profileId && !initialized) void init().then(applyProfile);
+        else applyProfile();
+        store.consumePendingPreset();
+      },
+    );
+  }, [store, stores]);
 
   return null;
 };

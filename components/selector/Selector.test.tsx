@@ -130,6 +130,34 @@ describe("<Selector /> Escape", () => {
     expect(onCancel).toHaveBeenCalledOnce();
   });
 
+  // ModalDialog closes on an Escape keyup on the window: a selector opened
+  // from a dialog closed that dialog along with itself.
+  it("keeps the Escape keyup it closed on from the window", () => {
+    const onCancel = vi.fn();
+    renderSelector({ onCancel });
+    const keyup = vi.fn();
+    window.addEventListener("keyup", keyup);
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    fireEvent.keyUp(window, { key: "Escape" });
+    window.removeEventListener("keyup", keyup);
+
+    expect(onCancel).toHaveBeenCalledOnce();
+    expect(keyup).not.toHaveBeenCalled();
+  });
+
+  it("leaves the Escape keyup alone when it has no onCancel", () => {
+    renderSelector({ onCancel: undefined });
+    const keyup = vi.fn();
+    window.addEventListener("keyup", keyup);
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    fireEvent.keyUp(window, { key: "Escape" });
+    window.removeEventListener("keyup", keyup);
+
+    expect(keyup).toHaveBeenCalledOnce();
+  });
+
   it("leaves the selector open under a dialog opened from it", () => {
     const onCancel = vi.fn();
     renderSelector({ onCancel });
@@ -190,6 +218,45 @@ describe("<Selector /> Escape", () => {
     popover.remove();
 
     expect(onCancel).toHaveBeenCalledOnce();
+  });
+});
+
+describe("<Selector /> selection limit", () => {
+  const multi = {
+    isMultiSelect: true,
+    maxSelectedItems: 1,
+    selectedItems: [{ id: "1", label: "First item" }],
+  };
+
+  it("refuses a tick past the limit and reports it", () => {
+    const onSelect = vi.fn();
+    const onSelectLimitReached = vi.fn();
+    renderSelector({ ...multi, onSelect, onSelectLimitReached });
+
+    fireEvent.click(screen.getByText("Second item"));
+
+    expect(onSelectLimitReached).toHaveBeenCalledTimes(1);
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it("still unticks a row at the limit", () => {
+    const onSelect = vi.fn();
+    const onSelectLimitReached = vi.fn();
+    renderSelector({ ...multi, onSelect, onSelectLimitReached });
+
+    fireEvent.click(screen.getByText("First item"));
+
+    expect(onSelectLimitReached).not.toHaveBeenCalled();
+    expect(onSelect).toHaveBeenCalledTimes(1);
+  });
+
+  it("greys the rows out without the callback", () => {
+    const onSelect = vi.fn();
+    renderSelector({ ...multi, onSelect });
+
+    fireEvent.click(screen.getByText("Second item"));
+
+    expect(onSelect).not.toHaveBeenCalled();
   });
 });
 
@@ -256,5 +323,135 @@ describe("<Selector /> Enter", () => {
     dialog.remove();
 
     expect(onSubmit).not.toHaveBeenCalled();
+  });
+});
+
+describe("<Selector /> keyboard", () => {
+  const breadCrumbs = [
+    { id: "apps", label: "Apps", isRoom: false },
+    { id: "rooms", label: "Rooms", isRoom: false },
+  ];
+  const withCrumbs = (override: object = {}) => ({
+    withBreadCrumbs: true,
+    isBreadCrumbsLoading: false,
+    breadCrumbs,
+    breadCrumbsLoader: <div />,
+    ...override,
+  });
+
+  it("makes a crumb before the last a link that Enter follows", () => {
+    const onSelectBreadCrumb = vi.fn();
+    renderSelector(withCrumbs({ onSelectBreadCrumb }));
+
+    const apps = screen.getByRole("link", { name: "Apps" });
+    expect(apps).toHaveAttribute("tabindex", "0");
+    expect(screen.getByText("Rooms")).toHaveAttribute("aria-current", "page");
+    expect(screen.queryByRole("link", { name: "Rooms" })).toBeNull();
+
+    fireEvent.keyDown(apps, { key: "Enter" });
+
+    expect(onSelectBreadCrumb).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "apps" }),
+    );
+  });
+
+  it("makes the empty screen's Back a button that Enter and Space press", () => {
+    const onSelectBreadCrumb = vi.fn();
+    renderSelector(
+      withCrumbs({ items: [], totalItems: 0, onSelectBreadCrumb }),
+    );
+
+    const back = screen.getByRole("button", { name: "Back" });
+    expect(back).toHaveAttribute("tabindex", "0");
+
+    fireEvent.keyDown(back, { key: "Enter" });
+    fireEvent.keyDown(back, { key: " " });
+
+    expect(onSelectBreadCrumb).toHaveBeenCalledTimes(2);
+    expect(onSelectBreadCrumb).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "apps" }),
+    );
+  });
+
+  describe("the new-name row", () => {
+    const withInput = (onAcceptInput = vi.fn(), onCancelInput = vi.fn()) =>
+      renderSelector({
+        items: [
+          { id: "new", label: "New folder", isCreateNewItem: true },
+          {
+            id: "input",
+            label: "",
+            isInputItem: true,
+            defaultInputValue: "New folder",
+            onAcceptInput,
+            onCancelInput,
+          },
+          ...items,
+        ],
+        totalItems: items.length + 2,
+      });
+
+    it("makes accept and cancel buttons that the keyboard presses", () => {
+      const onAcceptInput = vi.fn();
+      const onCancelInput = vi.fn();
+      withInput(onAcceptInput, onCancelInput);
+
+      const accept = screen.getByRole("button", { name: "Done" });
+      const cancel = screen.getByRole("button", { name: "Cancel" });
+      expect(accept).toHaveAttribute("tabindex", "0");
+      expect(cancel).toHaveAttribute("tabindex", "0");
+
+      fireEvent.keyDown(accept, { key: " " });
+      expect(onAcceptInput).toHaveBeenCalledOnce();
+    });
+
+    // Enter also confirms text an input method (Chinese, Japanese, Korean)
+    // was composing: that one is the composition's, not the name's.
+    it("leaves an Enter that ends an input method composition alone", () => {
+      const onAcceptInput = vi.fn();
+      withInput(onAcceptInput);
+
+      fireEvent.keyDown(window, { key: "Enter", isComposing: true });
+
+      expect(onAcceptInput).not.toHaveBeenCalled();
+    });
+
+    // The field accepts on any Enter on the page; one pressed on cancel is
+    // cancel's own.
+    it("cancels, not accepts, on Enter pressed on cancel", () => {
+      const onAcceptInput = vi.fn();
+      const onCancelInput = vi.fn();
+      withInput(onAcceptInput, onCancelInput);
+
+      fireEvent.keyDown(screen.getByRole("button", { name: "Cancel" }), {
+        key: "Enter",
+      });
+
+      expect(onCancelInput).toHaveBeenCalledOnce();
+      expect(onAcceptInput).not.toHaveBeenCalled();
+    });
+
+    // ModalDialog closes on an Escape keyup on the window, and the Selector
+    // submits on an Enter one: a key the name row took closed the dialog
+    // around the selector, or submitted it, along with the row.
+    it.each([
+      ["Escape", "cancels"],
+      ["Enter", "accepts"],
+    ])("keeps the %s keyup it %s on from the window", (key) => {
+      const onAcceptInput = vi.fn();
+      const onCancelInput = vi.fn();
+      withInput(onAcceptInput, onCancelInput);
+      const keyup = vi.fn();
+      window.addEventListener("keyup", keyup);
+
+      fireEvent.keyDown(screen.getByRole("textbox"), { key });
+      fireEvent.keyUp(screen.getByRole("textbox"), { key });
+      window.removeEventListener("keyup", keyup);
+
+      expect(
+        key === "Escape" ? onCancelInput : onAcceptInput,
+      ).toHaveBeenCalledOnce();
+      expect(keyup).not.toHaveBeenCalled();
+    });
   });
 });

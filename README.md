@@ -35,8 +35,8 @@
 
 ## Requirements
 
-- React ^19.0.0
-- React DOM ^19.0.0
+- React ^19.2.0
+- React DOM ^19.2.0
 
 ## Installation
 
@@ -58,7 +58,7 @@ pnpm build && pnpm pack
 pnpm add file:../path/to/onlyoffice-apps-ui-kit-<version>.tgz
 ```
 
-**Peer dependencies:** four are required — `react` and `react-dom` ^19.0.0, plus `i18next`
+**Peer dependencies:** four are required — `react` and `react-dom` ^19.2.0, plus `i18next`
 and `react-i18next`, which the translated components need and which break silently if a
 second copy ends up in the tree. Fifteen more are optional and only matter to the modules
 that use them: `mobx` / `mobx-react` and `react-router` for the portal-coupled modules,

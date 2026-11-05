@@ -10,6 +10,7 @@ import type { TSelectorItem } from "../../../components/selector";
 import { toastr, type TData } from "../../../components/toast";
 import { getDefaultBreadCrumb } from "../../utils";
 import {
+  AI_HUB_ROOT_FOLDER_TYPE,
   FORMS_ROOT_FOLDER_TYPE,
   FORMS_SECTION_ID,
 } from "../../utils/constants";
@@ -24,7 +25,6 @@ import CatalogFavoritesSvg from "../../../assets/icons/16/catalog.favorites.reac
 import CatalogRecentSvg from "../../../assets/icons/16/catalog-settings-restore.svg";
 import CatalogPrivateSvg from "../../../assets/icons/16/catalog.private.react.svg";
 import CatalogTrashSvg from "../../../assets/icons/16/catalog.trash.react.svg";
-import CatalogAiAgentsSvg from "../../../assets/icons/16/catalog.ai-agents.react.svg";
 
 import type { UseRootHelperProps } from "../FilesSelector.types";
 
@@ -38,14 +38,14 @@ const catalogIcons: Partial<Record<FolderType, React.FC>> = {
   [FolderType.Recent]: CatalogRecentSvg,
   [FolderType.Privacy]: CatalogPrivateSvg,
   [FolderType.TRASH]: CatalogTrashSvg,
-  [FolderType.AiAgents]: CatalogAiAgentsSvg,
+  [AI_HUB_ROOT_FOLDER_TYPE as FolderType]: CatalogRoomsSvg,
 };
 
 // Canonical display order of root folders, matching the left-side Article menu.
 const rootFolderDisplayOrder: FolderType[] = [
   FolderType.USER,
   FolderType.VirtualRooms,
-  FolderType.AiAgents,
+  AI_HUB_ROOT_FOLDER_TYPE as FolderType,
   FolderType.SHARE,
   FolderType.Favorites,
   FolderType.Recent,
@@ -70,7 +70,7 @@ const useRootHelper = ({
 
   setItems,
   treeFolders,
-  withAIAgentsTreeFolder,
+  withAIRoomsTreeFolder,
   withRoomsTreeFolder,
   withFormsTreeFolder,
   setRecentFolder,
@@ -139,8 +139,9 @@ const useRootHelper = ({
             !isUserOnly &&
             folder.rootFolderType === FolderType.VirtualRooms) ||
           folder.rootFolderType === FolderType.USER ||
-          (withAIAgentsTreeFolder &&
-            folder.rootFolderType === FolderType.AiAgents)
+          (withAIRoomsTreeFolder &&
+            !isUserOnly &&
+            Number(folder.rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE)
         ) {
           let title = "";
 
@@ -151,8 +152,8 @@ const useRootHelper = ({
             case FolderType.VirtualRooms:
               title = t("Rooms");
               break;
-            case FolderType.AiAgents:
-              title = t("AIAgents");
+            case AI_HUB_ROOT_FOLDER_TYPE as FolderType:
+              title = t("AiRooms");
               break;
             default:
               break;
@@ -162,7 +163,7 @@ const useRootHelper = ({
             label: title,
             id: folder.id!,
             parentId: folder.parentId!,
-            rootFolderType: folder.rootFolderType,
+            rootFolderType: folder.rootFolderType!,
             filesCount: folder.filesCount!,
             foldersCount: folder.foldersCount!,
             security: folder.security!,
@@ -214,7 +215,7 @@ const useRootHelper = ({
     setTotal,
     t,
     treeFolders,
-    withAIAgentsTreeFolder,
+    withAIRoomsTreeFolder,
     withRoomsTreeFolder,
     withFormsTreeFolder,
     setRecentFolder,
