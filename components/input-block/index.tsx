@@ -165,7 +165,9 @@ const InputBlock = React.memo(
                 color={iconColor}
                 isDisabled={typeof onIconClick !== "function"}
                 hoverColor={hoverColor}
-                ariaLabel={iconAriaLabel}
+                // A name only for a button: on an icon with no role it is a
+                // name nothing announces, which ARIA does not allow.
+                ariaLabel={isIconKeyboardButton ? iconAriaLabel : undefined}
                 onClick={
                   isIconKeyboardButton ? handleIconButtonClick : undefined
                 }
