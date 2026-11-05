@@ -44,6 +44,12 @@ $mobile-footer-height: 64px;
   background-color: var(--aside-bg-v);
   height: 100%;
 
+  // The panel takes the focus only when it has nothing to tab to; the
+  // controls in it show their own rings.
+  &:focus {
+    outline: none;
+  }
+
   // A column, so the header keeps its own height and the body gets what is
   // left. Block-level, the body was given no height at all and the scrolling
   // holder sized itself to the whole panel, putting its last ~53px below the

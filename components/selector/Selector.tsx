@@ -6,6 +6,7 @@ import React from "react";
 import classNames from "classnames";
 
 import { ButtonKeys } from "../../enums";
+import { consumeKey } from "../../utils/consume-key";
 
 import { Aside } from "../aside";
 import { Backdrop } from "../backdrop";
@@ -483,6 +484,9 @@ const Selector = ({
       if (inputItemVisible) return;
       if (isUnderModalDialog(selectorRef.current)) return;
       if (e.key === ButtonKeys.esc) {
+        // The keyup too: a ModalDialog the selector was opened from closes on
+        // an Escape keyup, and one press would close both.
+        if (onCancel) consumeKey(e);
         onCancel?.();
       }
     };
@@ -761,6 +765,7 @@ const Selector = ({
           // look and the tick is refused in `onSelectAction`.
           isLimitReached={onSelectLimitReached ? false : isLimitReached}
           displayFileExtension={displayFileExtension}
+          listLabel={withHeader ? headerProps?.headerLabel : undefined}
           forceIsMultiSelect={forceIsMultiSelect}
           // info
           {...infoProps}

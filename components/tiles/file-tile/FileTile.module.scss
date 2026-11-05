@@ -191,7 +191,8 @@
 
     .checkbox,
     .checkbox:active {
-      padding-top: 8px;
+      // Above and below alike, or the mark sits low in its box.
+      padding-block: 8px;
       padding-inline-start: 8px;
 
       svg {
@@ -217,7 +218,7 @@
     display: none;
     flex: 0 0 16px;
 
-    padding-top: 8px;
+    padding-block: 8px;
     padding-inline-start: 7px;
 
     @include mixins.tablet {
@@ -300,9 +301,13 @@
   .optionButton {
     display: block;
 
+    // Against the tile's edge, where the tile clips what overflows: the
+    // icon button's ring goes inside it, not past the edge.
+    --icon-button-focus-offset: -2px;
+
     .expandButton > div:first-child {
-      padding-block: 8px;
-      padding-inline: 8px var(--tile-option-button-padding-end, 16px);
+      padding: 8px;
+      margin-inline-end: var(--tile-option-button-margin-end, 8px);
     }
   }
 

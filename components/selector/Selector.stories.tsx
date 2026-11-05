@@ -1119,13 +1119,34 @@ export const SelectionLimit: Story = {
     selectedItems: [limitItems[0], limitItems[2]],
     alwaysShowFooter: true,
   },
-  play: async ({ args, canvas }) => {
+  play: async ({ args, canvas, userEvent }) => {
     const root = selector(canvas);
     // At the limit, an unticked row is greyed out and ignores clicks.
     const other = row(root, limitItems[1].label);
     await expect(other.className).toMatch(/disabled/);
     other.click();
     await expect(args.onSelect).not.toHaveBeenCalled();
+
+    const list = within(root).getByRole("listbox");
+    const active = () =>
+      document.getElementById(list.getAttribute("aria-activedescendant") ?? "")
+        ?.textContent ?? "";
+
+    // Focused, the list puts the keyboard on the ticked row on screen; the
+    // arrows then step over the rows the limit disables.
+    list.focus();
+    await waitFor(() => expect(active()).toContain(limitItems[0].label));
+    await userEvent.keyboard("{ArrowDown}");
+    await waitFor(() => expect(active()).toContain(limitItems[2].label));
+
+    // Space unticks it, and the keyboard stays on that row.
+    await userEvent.keyboard(" ");
+    await waitFor(() => expect(args.onSelect).toHaveBeenCalled());
+    await expect(active()).toContain(limitItems[2].label);
+
+    // Below the limit again, the row between is back within reach.
+    await userEvent.keyboard("{ArrowUp}");
+    await waitFor(() => expect(active()).toContain(limitItems[1].label));
   },
   parameters: {
     docs: {

@@ -200,6 +200,16 @@ describe("<DropDownItem />", () => {
 
       expect(navigatesOnPlainClick(link)).toBe(false);
     });
+
+    // Link makes an action link with an onClick a keyboard button; without
+    // a callback the icon does nothing, so it must not become one.
+    it("is no Tab stop without onExternalLinkClick", () => {
+      render(<DropDownItem {...externalProps} externalLinkPath="/help" />);
+      const link = screen.getByLabelText(/Help center/);
+
+      expect(link).toHaveAttribute("tabindex", "-1");
+      expect(link).not.toHaveAttribute("role", "button");
+    });
   });
 });
 

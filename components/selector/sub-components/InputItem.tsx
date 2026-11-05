@@ -9,9 +9,15 @@ import { IconButton } from "../../icon-button";
 import { RoomIcon } from "../../room-icon";
 import { RoomLogo } from "../../room-logo";
 import { Loader, LoaderTypes } from "../../loader";
+import { useCommonTranslation } from "../../../utils/i18n";
+import { activateOnButtonKey } from "../../../utils/keyboard-activation";
+import { consumeKey } from "../../../utils/consume-key";
 
 import styles from "../Selector.module.scss";
 import type { InputItemProps } from "../Selector.types";
+
+// How many frames a list drawn after the name row is waited for.
+const LIST_FRAMES = 10;
 
 const InputItem = ({
   defaultInputValue,
@@ -70,9 +76,15 @@ const InputItem = ({
   }, [setSavedInputValue, value]);
 
   React.useEffect(() => {
+    // The key is the row's: its keyup would close the dialog around the
+    // selector (Escape) or submit the selector (Enter) along with it.
     const onKeyDown = (e: KeyboardEvent) => {
+      // An Enter that ends an input method composition is the composition's.
+      if (e.isComposing) return;
       if (e.key === "Enter") onAcceptInputAction();
       else if (e.key === "Escape") onCancelInputAction();
+      else return;
+      consumeKey(e);
     };
 
     window.addEventListener("keydown", onKeyDown);
@@ -81,6 +93,25 @@ const InputItem = ({
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [onAcceptInputAction, onCancelInputAction]);
+
+  const t = useCommonTranslation();
+
+  // Accept and cancel are divs the pointer clicks; to the keyboard each is a
+  // named button whose Enter / Space click it. Its own key stays off the
+  // window listener above, which would otherwise accept on an Enter pressed
+  // on cancel.
+  const getButtonProps = (label: string) =>
+    isLoading
+      ? {}
+      : {
+          role: "button",
+          tabIndex: 0,
+          "aria-label": label,
+          onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) =>
+            activateOnButtonKey(e, ({ currentTarget }) =>
+              currentTarget.click(),
+            ),
+        };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVal = e.target.value;
@@ -94,6 +125,28 @@ const InputItem = ({
       inputRef.current.focus({ preventScroll: true });
       inputRef.current.select();
     }
+
+    // Once the name is entered or the row cancelled, the field goes and the
+    // focus with it: it goes back to the list, not the page. In an empty
+    // folder the field stood alone, with no list around it yet: the list
+    // drawn after it takes the focus then, watched for a few frames as its
+    // rows may wait on an update of their own.
+    const body = inputRef.current?.closest<HTMLElement>(".selector_body");
+    const focusLost = () =>
+      !document.activeElement || document.activeElement === document.body;
+    const focusList = () => {
+      const list = body?.querySelector<HTMLElement>('[role="listbox"]');
+      list?.focus({ preventScroll: true });
+      return !!list;
+    };
+    const retry = (framesLeft: number) => {
+      if (!framesLeft || !body?.isConnected || !focusLost()) return;
+      if (!focusList()) requestAnimationFrame(() => retry(framesLeft - 1));
+    };
+    return () => {
+      if (!focusLost() || !body?.isConnected) return;
+      if (!focusList()) requestAnimationFrame(() => retry(LIST_FRAMES));
+    };
   }, []);
 
   return (
@@ -149,6 +202,7 @@ const InputItem = ({
           [styles.loading]: isLoading,
         })}
         onClick={onAcceptInputAction}
+        {...getButtonProps(t("Done"))}
       >
         {isLoading ? (
           <Loader isDecorative type={LoaderTypes.track} size="16px" />
@@ -165,6 +219,7 @@ const InputItem = ({
           [styles.loading]: isLoading,
         })}
         onClick={onCancelInputAction}
+        {...getButtonProps(t("CancelButton"))}
       >
         <IconButton
           iconNode={<CancelIconReactSvg />}

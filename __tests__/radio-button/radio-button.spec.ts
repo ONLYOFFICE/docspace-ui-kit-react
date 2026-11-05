@@ -52,6 +52,13 @@ async function gotoStory(page: Page, storyId: string) {
 test.describe("RadioButton — light", () => {
   test("default", async ({ page }) => {
     await gotoStory(page, "default");
+    // The story's play leaves the keyboard focus on the control: that is
+    // one state, and the control at rest, focus taken away, the other.
+    await expect(page).toHaveScreenshot("radio-button-keyboard-focus.png");
+    await page.evaluate(() => {
+      const focused = document.activeElement;
+      if (focused instanceof HTMLElement) focused.blur();
+    });
     await expect(page).toHaveScreenshot("radio-button-default.png");
   });
 
@@ -86,6 +93,13 @@ test.describe("RadioButton — dark", () => {
 
   test("default dark", async ({ page }) => {
     await gotoStory(page, "default");
+    // The story's play leaves the keyboard focus on the control: that is
+    // one state, and the control at rest, focus taken away, the other.
+    await expect(page).toHaveScreenshot("radio-button-keyboard-focus-dark.png");
+    await page.evaluate(() => {
+      const focused = document.activeElement;
+      if (focused instanceof HTMLElement) focused.blur();
+    });
     await expect(page).toHaveScreenshot("radio-button-default-dark.png");
   });
 

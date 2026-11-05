@@ -207,11 +207,9 @@ a neighbouring header's title away from its back arrow.
 
 - The header is a plain `<div>`: no `<header>` element, no `role="banner"`, and the title is not
   associated with the panel. A dialog that needs an accessible name has to supply one itself.
-- The close cross is an `IconButton`, which renders a `<div>` — it has an `aria-label` but no
-  button role, no tab stop and no Enter or Space activation. The header is not operable by
-  keyboard.
-- The back arrow is an `IconButton` too: it has an `aria-label` but no role and no tab stop.
-  The `headerIcons` have not even the label.
+- The close cross and the back arrow are `IconButton`s with an `onClick`, so each is a focusable
+  `role="button"` that Enter and Space activate, named by its `aria-label`. The `headerIcons`
+  are buttons the same way when they have an `onClick`, but nothing names them.
 - The cross is named by `closeLabel`, by default the kit's "CloseButton" translation ("Close"
   when none is loaded); the arrow by `backLabel`, by default "Back".
 - The title, string or node, is truncated with an ellipsis, so a long one is unreadable rather
