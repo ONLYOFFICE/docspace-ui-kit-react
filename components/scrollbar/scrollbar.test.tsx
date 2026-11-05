@@ -118,8 +118,15 @@ describe("<Scrollbar />", () => {
         <CustomScrollbar
           disableTrackYMousewheelScrolling
           scrollerProps={{
-            renderer: ({ elementRef, ...rest }) => (
-              <div {...rest} ref={elementRef} data-testid="scroller" />
+            // The library hands the renderer its `key` among the props; spread,
+            // React warns, so it is passed on its own as Scrollbar.tsx does.
+            renderer: ({ elementRef, key, ...rest }) => (
+              <div
+                key={key}
+                {...rest}
+                ref={elementRef}
+                data-testid="scroller"
+              />
             ),
           }}
         >

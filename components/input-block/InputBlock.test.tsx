@@ -199,4 +199,20 @@ describe("<InputBlock />", () => {
     const inputBlock = screen.getByTestId("input-block");
     expect(inputBlock).toHaveStyle(customStyle);
   });
+
+  // ARIA prohibits a name on an element with no role: the icon is a button
+  // only with onIconClick, and only then does it carry the name.
+  it("names the icon only when it is a button", () => {
+    const { container, rerender } = render(
+      <InputBlock
+        {...defaultProps}
+        onIconClick={undefined}
+        iconAriaLabel="Search"
+      />,
+    );
+    expect(container.querySelector('[aria-label="Search"]')).toBeNull();
+
+    rerender(<InputBlock {...defaultProps} iconAriaLabel="Search" />);
+    expect(screen.getByRole("button", { name: "Search" })).toBeInTheDocument();
+  });
 });

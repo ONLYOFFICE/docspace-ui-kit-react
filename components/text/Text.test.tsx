@@ -108,6 +108,20 @@ describe("Text Component", () => {
       render(<Text title={title}>Hover Text</Text>);
       expect(screen.getByTestId("text")).toHaveAttribute("title", title);
     });
+
+    // A role="button" text that opens a selector says so to assistive
+    // technology: the attribute reaches the element unchanged.
+    it("passes aria-haspopup to the element", () => {
+      render(
+        <Text role="button" tabIndex={0} aria-haspopup="dialog">
+          Opens a selector
+        </Text>,
+      );
+
+      expect(
+        screen.getByRole("button", { name: "Opens a selector" }),
+      ).toHaveAttribute("aria-haspopup", "dialog");
+    });
   });
 
   describe("CSS Module Classes", () => {

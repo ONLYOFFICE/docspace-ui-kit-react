@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import ListComponent from "./List";
 
 const mockLoadMoreItems = vi.fn(() => Promise.resolve());
@@ -80,7 +80,8 @@ describe("ListComponent", () => {
       listElement?.style.getPropertyValue("--infinite-loader-measured-width"),
     ).toBe("1000px");
   });
-  it("renders loading skeletons when items are not loaded", () => {
+
+  it("renders loading skeletons when items are not loaded", async () => {
     // filesLength = 10, itemCount = 20 means indices 10-19 are "loading"
     render(
       <ListComponent
@@ -90,6 +91,9 @@ describe("ListComponent", () => {
         hasMoreFiles={true}
       />,
     );
+    // Rows that are not loaded make the loader call loadMoreItems and redraw
+    // once it resolves; let that happen inside act.
+    await act(async () => {});
 
     // Since ListComponent renders getLoader when !isLoaded (index >= filesLength)
     // and react-virtualized will attempt to render multiple rows,
@@ -101,7 +105,7 @@ describe("ListComponent", () => {
     );
   });
 
-  it("renders the row skeleton for rows not loaded in the table layout", () => {
+  it("renders the row skeleton for rows not loaded in the table layout", async () => {
     render(
       <ListComponent
         {...defaultProps}
@@ -111,10 +115,14 @@ describe("ListComponent", () => {
         hasMoreFiles={true}
       />,
     );
+    // Rows that are not loaded make the loader call loadMoreItems and redraw
+    // once it resolves; let that happen inside act.
+    await act(async () => {});
     expect(screen.getAllByTestId("rows-skeleton").length).toBeGreaterThan(0);
     expect(screen.getAllByTestId("row-skeleton").length).toBeGreaterThan(0);
   });
-  it("returns null from getLoader for unknown viewAs", () => {
+
+  it("returns null from getLoader for unknown viewAs", async () => {
     render(
       <ListComponent
         {...defaultProps}
@@ -124,6 +132,9 @@ describe("ListComponent", () => {
         hasMoreFiles={true}
       />,
     );
+    // Rows that are not loaded make the loader call loadMoreItems and redraw
+    // once it resolves; let that happen inside act.
+    await act(async () => {});
     expect(screen.queryAllByTestId("rows-skeleton").length).toBe(0);
   });
 

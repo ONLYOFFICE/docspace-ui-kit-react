@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { CommonTrans } from "../../../../utils/i18n/CommonTrans";
 import { observer } from "mobx-react";
+import { ProductQuantityType } from "@onlyoffice/docspace-api-sdk";
 
 import { Text } from "../../../../components/text";
 import { TextInput, InputType } from "../../../../components/text-input";
@@ -194,10 +195,11 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
       setAmount(String(currentStoragePlanSize ?? ""));
 
     if (intervalRef.current) {
-      toastr.success(t("StorageCapacityUpdated"));
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+
+    toastr.success(t("StorageCapacityUpdated"));
 
     if (localStorage.getItem(STORAGE_TARIFF_DEACTIVATED) !== null) {
       localStorage.removeItem(STORAGE_TARIFF_DEACTIVATED);
@@ -267,101 +269,92 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
     [isUpgradeStoragePlan],
   );
 
-  const handleStoragePlanChange = useCallback(
-    async (isCancellation: boolean = false, skipTopUp: boolean = false) => {
-      if (isLoading) return;
+  const handleStoragePlanChange = async (isCancellation: boolean = false) => {
+    if (isLoading) return;
 
-      setIsLoading(true);
+    setIsLoading(true);
 
-      const amountValue = +amountRef.current;
-      const difference = calculateDifferenceBetweenPlan(amountValue);
-      const productType = isUpgradeStoragePlan && !isCancellation ? 1 : 0;
-      const quantity = isUpgradeStoragePlan ? difference : amountValue;
-      const value = isCancellation ? null : quantity;
+    const amountValue = +amountRef.current;
+    const difference = calculateDifferenceBetweenPlan(amountValue);
+    const productType =
+      isUpgradeStoragePlan && !isCancellation
+        ? ProductQuantityType.Add
+        : ProductQuantityType.Set;
+    const quantity = isUpgradeStoragePlan ? difference : amountValue;
+    const value = isCancellation ? null : quantity;
 
-      const isNewSubscription = !hasStorageSubscription;
+    const isNewSubscription = !hasStorageSubscription;
 
-      try {
-        // skipTopUp: the Stripe checkout callback has already deposited the
-        // required amount, re-depositing here would charge the card twice.
-        if (
-          !isCancellation &&
-          !skipTopUp &&
-          !isDelayedPaymentMethod &&
-          isBalanceInsufficient &&
-          recommendedAmount > 0
-        ) {
-          await paymentApi.topUpDeposit({
-            topUpDepositRequestDto: {
-              amount: recommendedAmount,
-              currency: walletCodeCurrency || "USD",
-            },
-          });
-        }
-
-        const walletRes = await paymentApi.updateWalletPayment({
-          walletQuantityRequestDto: {
-            quantity: value !== null ? { storage: value } : null,
-            productQuantityType: productType,
+    try {
+      if (
+        !isCancellation &&
+        !isDelayedPaymentMethod &&
+        isBalanceInsufficient &&
+        recommendedAmount > 0
+      ) {
+        await paymentApi.topUpDeposit({
+          topUpDepositRequestDto: {
+            amount: recommendedAmount,
+            currency: walletCodeCurrency || "USD",
           },
         });
-        const res = walletRes?.data?.response;
+      }
 
-        if (res === false) {
-          throw new Error(t("UnexpectedError"));
-        }
+      const walletRes = await paymentApi.updateWalletPayment({
+        walletQuantityRequestDto: {
+          quantity: value !== null ? { storage: value } : null,
+          productQuantityType: productType,
+        },
+      });
+      const res = walletRes?.data?.response;
 
-        if (isNewSubscription) {
-          await fetchPortalTariff!(true);
+      if (res === false) {
+        throw new Error(t("UnexpectedError"));
+      }
 
-          if (!window.location.pathname.includes("/disk-storage")) {
-            const targetPath = `${paymentStore.routes.diskStorage}?complete=true`;
-            navigate(targetPath);
-            return;
-          }
+      if (isNewSubscription) {
+        await fetchPortalTariff!(true);
 
-          onClose();
+        if (!window.location.pathname.includes("/disk-storage")) {
+          const targetPath = `${paymentStore.routes.diskStorage}?complete=true`;
+          navigate(targetPath);
           return;
         }
 
-        if (isUpgradeStoragePlan) {
-          fetchBalance();
-          refreshTransactionHistory(storageServiceName ?? DISK_STORAGE);
-        }
-        const tariff = await fetchPortalTariff!(true);
-        const quotas = tariff?.quotas ?? [];
-
-        if (isUpdatedTariff(quotas, isCancellation)) {
-          resetIntervalSuccess(isCancellation);
-        } else {
-          waitingForTariff(isCancellation);
-        }
-
+        fetchBalance(true).catch(console.error);
+        refreshTransactionHistory(storageServiceName ?? DISK_STORAGE);
         onClose();
-      } catch (e) {
-        if (isInsufficientFundsError(e)) {
-          toastr.error(
-            isPayer
-              ? t("InsufficientFundsCheckCredits")
-              : t("InsufficientFundsContactPayerShort"),
-            t("InsufficientFunds"),
-          );
-        } else {
-          toastr.error(e as Error);
-        }
-        setIsLoading(false);
+        return;
       }
-    },
-    [
-      isLoading,
-      isUpgradeStoragePlan,
-      isBalanceInsufficient,
-      recommendedAmount,
-      walletCodeCurrency,
-      isPayer,
-      t,
-    ],
-  );
+
+      if (isUpgradeStoragePlan) {
+        fetchBalance(true).catch(console.error);
+        refreshTransactionHistory(storageServiceName ?? DISK_STORAGE);
+      }
+      const tariff = await fetchPortalTariff!(true);
+      const quotas = tariff?.quotas ?? [];
+
+      if (isUpdatedTariff(quotas, isCancellation)) {
+        resetIntervalSuccess(isCancellation);
+      } else {
+        waitingForTariff(isCancellation);
+      }
+
+      onClose();
+    } catch (e) {
+      if (isInsufficientFundsError(e)) {
+        toastr.error(
+          isPayer
+            ? t("InsufficientFundsCheckCredits")
+            : t("InsufficientFundsContactPayerShort"),
+          t("InsufficientFunds"),
+        );
+      } else {
+        toastr.error(e as Error);
+      }
+      setIsLoading(false);
+    }
+  };
 
   const stripeAbortRef = useRef<AbortController | null>(null);
 
@@ -388,6 +381,9 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
 
     setIsLoading(true);
 
+    const amountValue = +debouncedAmount;
+    const isNewSubscription = !hasStorageSubscription;
+
     try {
       const chargeAmount =
         recommendedAmount > 0 ? recommendedAmount : Math.ceil(totalPrice);
@@ -401,16 +397,32 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
         String(chargeAmount),
         storageServiceName ?? DISK_STORAGE,
         {
-          storage: getConvertedSize(t, +debouncedAmount * 1024 ** 3),
+          storage: getConvertedSize(t, amountValue * 1024 ** 3),
+          storageQuantity: String(
+            isUpgradeStoragePlan
+              ? calculateDifferenceBetweenPlan(amountValue)
+              : amountValue,
+          ),
+          storageType: String(
+            isUpgradeStoragePlan
+              ? ProductQuantityType.Add
+              : ProductQuantityType.Set,
+          ),
           price: String(totalPrice),
         },
       );
+
+      const isStoragePurchased = async () => {
+        await fetchPortalTariff!(true);
+        return paymentStore.tariff.currentStoragePlanSize === amountValue;
+      };
 
       const completion = await waitForTopUpCompletion(
         {
           walletBalance: walletBalance ?? 0,
           fetchCustomerInfo,
           fetchBalance: fetchBalanceValue,
+          isPurchaseCompleted: isStoragePurchased,
         },
         signal,
       );
@@ -423,18 +435,33 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
         return;
       }
 
-      await handleStoragePlanChange(false, true);
+      fetchBalance(true).catch(console.error);
+      refreshTransactionHistory(storageServiceName ?? DISK_STORAGE);
+
+      if (
+        isNewSubscription &&
+        !window.location.pathname.includes("/disk-storage")
+      ) {
+        navigate(`${paymentStore.routes.diskStorage}?complete=true`);
+        return;
+      }
+
+      await resetIntervalSuccess(false);
+      if (!isUpgradeStoragePlan) onClose();
     } catch (e) {
       console.error("[storage-topup] flow failed", e);
       if (!signal.aborted) {
         toastr.error(t("UnexpectedError"));
         setIsLoading(false);
+        onClose();
       }
     }
   };
 
   const onBuy = () =>
-    isStripeCheckoutRequired ? onStripeBuy() : handleStoragePlanChange();
+    isStripeCheckoutRequired && isBalanceInsufficient
+      ? onStripeBuy()
+      : handleStoragePlanChange();
 
   const onSendRequest = useCallback(() => {
     setIsRequestDialog(true);

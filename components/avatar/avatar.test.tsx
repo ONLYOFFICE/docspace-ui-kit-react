@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("react-svg", () => ({
@@ -488,7 +488,7 @@ describe("Avatar utilities", () => {
       expect(screen.getByRole("img", { name: "Jane Doe" })).toBeInTheDocument();
     });
 
-    it("keeps the tooltip id stable across renders", () => {
+    it("keeps the tooltip id stable across renders", async () => {
       const props = {
         ...baseProps,
         role: AvatarRole.admin,
@@ -503,6 +503,10 @@ describe("Avatar utilities", () => {
       rerender(<Avatar {...props} tooltipContent="Administrator" />);
       expect(first).toMatch(/^roleTooltip_/);
       expect(badge().getAttribute("data-tooltip-id")).toBe(first);
+
+      // The tooltip positions itself asynchronously; let it finish inside act
+      // rather than update after the test has ended.
+      await act(async () => {});
     });
 
     it("gives every file input an id of its own", () => {

@@ -54,6 +54,24 @@ if (offenders.length > 0) {
 
 console.log("dist/ carries no bundled dependencies.");
 
+// Tool configuration -- vitest.config, playwright.config -- is not library code,
+// and its declarations import packages the manifest does not declare. tsconfig
+// .build.json excludes it by name, which is exactly how it leaked: renaming
+// vitest.config.ts to .mts slipped past an exclude spelled `*.config.ts`, and
+// dist/types/vitest.config.d.mts went into the tarball. No module in the source
+// is named `*.config.*`, so any such file here is one of those.
+const configFiles = [...walk(DIST)]
+  .filter((e) => !e.isDir && /\.config\.(d\.)?[mc]?[jt]s$/.test(e.name))
+  .map((e) => e.id);
+
+if (configFiles.length > 0) {
+  console.error(
+    "Tool configuration found in dist/. Exclude it in tsconfig.build.json:\n",
+  );
+  for (const id of configFiles) console.error(`  dist/${id}`);
+  process.exit(1);
+}
+
 // "use client" is a module-level directive, and rollup drops it while bundling:
 // it warns "Module level directives cause errors when bundled" once per file,
 // which is invisible among hundreds of lines of build output. Without the

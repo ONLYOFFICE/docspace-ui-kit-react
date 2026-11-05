@@ -707,20 +707,35 @@ the stylesheet reads neither, so setting them changes nothing.
 
 ## Accessibility
 
-- **The list is not reachable from the keyboard.** Rows are `<div>`s with an `onClick`, carry
-  no role and are never focusable; only the rows near the viewport exist in the DOM at all, so
-  assistive technology is given no list, no count and no position. In multi-select the row's
-  checkbox is focusable with Tab and toggled with Space, and that is the only way through the
-  list; outside multi-select a row can be picked only with the pointer.
+- **The list is one Tab stop, a listbox.** Its scroll container takes the focus, is named by the
+  header's title, and names the row the keyboard is on (`aria-activedescendant`); the rows are
+  options with `aria-selected`, and separators and loading rows are `role="presentation"`.
+  Focused, the list puts the keyboard on the selected row on screen, or else the first row. The
+  arrows, Home and End move between the rows that can be picked - separators, the new-name
+  field, disabled rows and rows the selection limit disables are skipped - and scroll to them,
+  and Enter or Space click the row, so a key does what the pointer does there: open a folder,
+  pick an item, start "New folder". Enter on the row already picked in single select submits the
+  choice instead of unpicking it. Picking a row keeps the keyboard on it; only a new list (a
+  folder opened, a search run) starts again from its first row. The row is ringed only while the
+  focus came from the keyboard. The Enter that opened a row does not also submit the selector.
+  The row's own controls - the multi-select checkbox, the "New" row's button - are no Tab stops
+  of their own. A "New" row with a menu opens it with Enter: the focus moves to its first entry
+  (an option or a button, such as a room type), the arrows walk it, Enter or Space picks one,
+  Escape or Tab closes it and gives the focus back to the list. With `isSSR`, which renders the
+  rows without the virtual list, none of this applies.
 - **Focus moves into the selector when it mounts**: to the list's scroll container, unless the
   search box already has it, and to the new-name field when that field appears, with its text
   selected. Neither scrolls the page (`preventScroll`), so a selector further down a page takes
-  focus without pulling the page to itself.
-- The search box is given `tabIndex={1}`, a positive tab index, which pulls it ahead of
-  everything else on the page in tab order.
+  focus without pulling the page to itself. From there Tab moves on in document order; in a
+  side panel it cycles through the header, the search box, the list and the footer
+  ([`Aside`](../aside/README.md)'s focus trap). It used to be sent back to the search box from
+  anywhere in the list, so the header and the footer were out of the keyboard's reach.
 - Escape and Enter are listened for on the window, so they act even when focus is outside the
   panel — and Enter submits without the button being focused.
-- The empty screen's create and back controls are `<div>`s with click handlers, not buttons.
+- The empty screen's create, back and clear-filter controls are buttons to the keyboard
+  (`role="button"`, Enter and Space), named by their labels.
+- A breadcrumb before the last is a link to the keyboard (Enter); the last one, where the list
+  is, carries `aria-current="page"`.
 - The footer's submit and cancel buttons are native buttons, reached with Tab and pressed with
   Enter or Space.
 - Give the panel a name yourself: `headerProps.headerLabel` renders as text, not as a label for

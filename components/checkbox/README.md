@@ -179,13 +179,14 @@ export function RoomPicker() {
 
 ## CSS variables
 
-| Variable                  | Default     | Effect                                                                                                               |
-| ------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------- |
-| `--checkbox-gap`          | `12px`      | Space between the box and the label                                                                                  |
-| `--checkbox-lh`           | `16px`      | Line height of the control; the label text keeps its own 16px line, so a larger value only makes the row taller      |
-| `--checkbox-fill-color`   | theme-based | Fill of the box while it is checked; an indeterminate box uses it too, for its outer box and its inner square's edge |
-| `--checkbox-border-color` | theme-based | Border of the box; hover, focus, error and disabled draw their own border colour over it                             |
-| `--checkbox-arrow-color`  | theme-based | Colour of the tick in a checked box                                                                                  |
+| Variable                      | Default     | Effect                                                                                                               |
+| ----------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------- |
+| `--checkbox-gap`              | `12px`      | Space between the box and the label                                                                                  |
+| `--checkbox-lh`               | `16px`      | Line height of the control; the label text keeps its own 16px line, so a larger value only makes the row taller      |
+| `--checkbox-fill-color`       | theme-based | Fill of the box while it is checked; an indeterminate box uses it too, for its outer box and its inner square's edge |
+| `--checkbox-border-color`     | theme-based | Border of the box; hover, focus, error and disabled draw their own border colour over it                             |
+| `--checkbox-arrow-color`      | theme-based | Colour of the tick in a checked box                                                                                  |
+| `--checkbox-focus-ring-color` | accent      | The ring around a keyboard-focused box                                                                               |
 
 The other colour variables (`--checkbox-fill-color-default`, `--checkbox-error-color` and the
 rest) are **not** consumer settings: the stylesheet assigns them on the component's own
@@ -198,7 +199,7 @@ colours.
 - The control is a real `<input type="checkbox">` wrapped in a `<label>`, so a click on the
   label toggles it and a screen reader announces a checkbox with its state and its label.
 - Keyboard focus lands on the input itself (`tabIndex`, `0` by default), and the focused box
-  draws its border in the focus colour. The keys are the native checkbox's: Space toggles it,
+  draws its border in the focus colour and a ring in the accent around it. The keys are the native checkbox's: Space toggles it,
   once however long it is held, and `onChange` receives the same event a pointer produces; Enter
   does nothing. The focus stays on the checkbox when it toggles, so the next Tab moves on from
   it, and a screen reader announces the focused control with its label and state.

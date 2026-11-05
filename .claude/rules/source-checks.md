@@ -155,9 +155,11 @@ The rest of the monorepo stays AGPL-3.0-only and keeps its headers, so never poi
 
 ## What this repository does enforce
 
-`lefthook.yml` here runs `pnpm format:gate`, `pnpm lint`, `pnpm tsc`, `pnpm test`, `pnpm build`
-and `pnpm verify:package` on pre-push -- in that order, stopping at the first failure -- and
-rewrites the staged files with Prettier on pre-commit and pre-merge-commit.
+`lefthook.yml` here runs `pnpm format:gate`, then `pnpm lint`, `pnpm tsc` and the README and
+surface checks side by side, then `pnpm test:changed` (the tests a change reaches), then
+`pnpm build` and `pnpm verify:package` when the push changes the build's own code -- stopping at
+the first failure -- and rewrites the staged files with Prettier on pre-commit and
+pre-merge-commit.
 CI runs the same formatting, lint, type and test checks plus the packaging ones, and renders
 every story in Chromium (`pnpm test:stories`, which pre-push does not run). None of the
 rules above are among any of them.

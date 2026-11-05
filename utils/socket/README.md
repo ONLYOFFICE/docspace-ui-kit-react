@@ -9,6 +9,7 @@
 - `connect(url, publicRoomKey?)` — establishes the WebSocket connection; queues `emit`/`on` calls made before the socket is ready and flushes them once connected
 - `emit(command, data, room?)` — sends a typed command (`SocketCommands`), scoped to a room or global
 - `on(event, callback)` — registers a listener for a typed event (`SocketEvents`)
+- `onReconnect(callback)` / `offReconnect(callback)` — a callback fired on every connect of the client except the first one, after the subscriptions are re-sent. The server does not replay events missed while the socket was down, so re-read the state you show there. The first connect is counted per client: a new client created by a repeated `connect()` does not fire it on its first connect
 - exposes `isEnabled`, `isReady`, and `socketSubscribers` getters
 
 `SocketEvents` and `SocketCommands` enumerate every event/command the portal socket protocol supports (file/room/folder changes, chat, backup, wallet balance, plugin state, and more), each with a typed payload via `TEmitEventsDataMap` / `TListenEventCallbackMap`.

@@ -53,6 +53,13 @@ async function gotoStory(page: Page, storyId: string) {
 test.describe("Checkbox — light", () => {
   test("default", async ({ page }) => {
     await gotoStory(page, "default");
+    // The story's play leaves the keyboard focus on the control: that is
+    // one state, and the control at rest, focus taken away, the other.
+    await expect(page).toHaveScreenshot("checkbox-keyboard-focus.png");
+    await page.evaluate(() => {
+      const focused = document.activeElement;
+      if (focused instanceof HTMLElement) focused.blur();
+    });
     await expect(page).toHaveScreenshot("checkbox-default.png");
   });
 
@@ -87,6 +94,13 @@ test.describe("Checkbox — dark", () => {
 
   test("default dark", async ({ page }) => {
     await gotoStory(page, "default");
+    // The story's play leaves the keyboard focus on the control: that is
+    // one state, and the control at rest, focus taken away, the other.
+    await expect(page).toHaveScreenshot("checkbox-keyboard-focus-dark.png");
+    await page.evaluate(() => {
+      const focused = document.activeElement;
+      if (focused instanceof HTMLElement) focused.blur();
+    });
     await expect(page).toHaveScreenshot("checkbox-default-dark.png");
   });
 

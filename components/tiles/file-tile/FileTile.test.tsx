@@ -17,9 +17,15 @@ vi.mock("react-i18next", () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
-// Mock ReactSVG component
+// Mock ReactSVG component. Only what a DOM element can take is passed on:
+// `loading` is a component, and an empty `src` -- a tile with no
+// temporaryIcon -- makes React warn that the browser would fetch the page.
+// The tests below read a non-empty `src` back.
 vi.mock("react-svg", () => ({
-  ReactSVG: (props: Record<string, unknown>) => <div {...props} />,
+  ReactSVG: ({ loading: _loading, src, ...props }: Record<string, unknown>) => {
+    const attributes: Record<string, unknown> = src ? { ...props, src } : props;
+    return <div {...attributes} />;
+  },
 }));
 
 // Mock styles - return default export for CSS Modules

@@ -298,3 +298,20 @@ export {
   convertFilterDataToSelectedItems,
   replaceEqualFilterValuesWithPrev,
 };
+
+/**
+ * Gives the focus to the tag that opens a group's selector, once the panel
+ * has drawn its tags again - when the focus was lost on the way. The element
+ * the keyboard left is often gone by then: closing the selector on a pick
+ * swaps "Other" for the picked value, and clearing that value swaps it back.
+ */
+export const focusSelectorOpener = (group: FilterGroups) =>
+  requestAnimationFrame(() => {
+    const { activeElement } = document;
+    if (activeElement && activeElement !== document.body) return;
+    document
+      .querySelector<HTMLElement>(
+        `[data-selector-opener="${CSS.escape(group)}"]`,
+      )
+      ?.focus({ preventScroll: true });
+  });
