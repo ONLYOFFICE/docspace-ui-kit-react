@@ -291,6 +291,9 @@ const Dropzone = ({
                 data-testid="dropzone-main-text"
                 color="accent"
                 onClick={isFolderUpload ? openFolderDialog : handleFileClick}
+                // The area around it is the keyboard's button already: the
+                // link stays a pointer target, not a second Tab stop inside it.
+                tabIndex={-1}
               >
                 {linkMainText}
               </Link>

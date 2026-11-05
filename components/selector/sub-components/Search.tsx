@@ -49,7 +49,6 @@ const Search = React.memo(({ isSearch }: SearchProps) => {
       onClearSearch={onClearSearchAction}
       size={InputSize.base}
       dataTestId="selector_search_input"
-      tabIndex={1}
     />
   );
 });

@@ -8,6 +8,7 @@ import UpReactSvg from "../../../assets/up.svg";
 import ClearEmptyFilterReactSvg from "../../../assets/clear.empty.filter.svg";
 
 import { useCommonTranslation } from "../../../utils/i18n";
+import { activateOnButtonKey } from "../../../utils/keyboard-activation";
 
 import { Heading } from "../../heading";
 import { Text } from "../../text";
@@ -81,6 +82,15 @@ const EmptyScreen = ({
     createItem.onCreateClick?.();
   };
 
+  // Each action is a div the pointer clicks; to the keyboard it is a button
+  // that Enter and Space click, named by its label.
+  const keyboardButtonProps = {
+    role: "button",
+    tabIndex: 0,
+    onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) =>
+      activateOnButtonKey(e, ({ currentTarget }) => currentTarget.click()),
+  };
+
   const onBackClick = () => {
     onSelectBreadCrumb?.(breadCrumbs?.[breadCrumbs.length - 2]);
   };
@@ -131,6 +141,7 @@ const EmptyScreen = ({
           <div
             className="empty-folder_container-links"
             onClick={onCreateClickAction}
+            {...keyboardButtonProps}
           >
             <IconButton
               className="empty-folder_container-icon"
@@ -157,6 +168,7 @@ const EmptyScreen = ({
                 ? () => onClearSearch?.(() => setIsSearch(false))
                 : onBackClick
             }
+            {...keyboardButtonProps}
           >
             <IconButton
               className="empty-folder_container-icon"

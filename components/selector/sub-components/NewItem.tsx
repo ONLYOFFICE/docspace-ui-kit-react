@@ -18,6 +18,8 @@ const NewItem = ({
   hotkey,
   inputItemVisible,
   listHeight,
+  optionId,
+  isActive,
 }: NewItemProps) => {
   const { isOpenDropDown, onCloseDropDown, setIsOpenDropDown } =
     useCreateDropDown();
@@ -62,11 +64,19 @@ const NewItem = ({
     <div
       key="create-new-item"
       style={style}
-      className={classNames(styles.selectorItem, styles.hoverable)}
+      className={classNames(styles.selectorItem, styles.hoverable, {
+        [styles.keyboardActive]: isActive,
+      })}
+      id={optionId}
+      role={optionId ? "option" : undefined}
+      aria-selected={optionId ? false : undefined}
       onClick={onCreateClickAction}
     >
       <AddButton
         isAction
+        // The row is the option the list's keys act on: its button is no
+        // Tab stop of its own inside the listbox.
+        tabIndex={-1}
         label={label}
         titleText={label}
         fontSize="14px"
