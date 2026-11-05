@@ -169,6 +169,60 @@ describe("useFocusTrap", () => {
 
   // A tab panel asks only whether it has a stop, on every frame its content
   // changes: the answer must not lay out every control in it.
+  // A menu a control in the dialog opened lives in a portal, outside the
+  // trap, and does not handle Tab itself: Tab from it went to the dialog's
+  // first stop, Shift+Tab to its last, wherever the menu's opener sat.
+  it("goes on from the control that opened a menu in a portal", () => {
+    render(
+      <>
+        <Trap label="Dialog">
+          <button type="button">First</button>
+          <button type="button">Opener</button>
+          <button type="button">After</button>
+        </Trap>
+        <div role="menu">
+          <button type="button" role="menuitem">
+            Item
+          </button>
+        </div>
+      </>,
+    );
+
+    screen.getByText("Opener").focus();
+    screen.getByText("Item").focus();
+    tab();
+    expect(screen.getByText("After")).toHaveFocus();
+
+    screen.getByText("Opener").focus();
+    screen.getByText("Item").focus();
+    tab(true);
+    expect(screen.getByText("First")).toHaveFocus();
+  });
+
+  it("counts a radio group as one stop however many radios it holds", () => {
+    render(
+      <Trap label="Dialog">
+        {Array.from({ length: 30 }, (_, index) => (
+          <input
+            key={index}
+            type="radio"
+            name="many"
+            aria-label={`R${index}`}
+            defaultChecked={index === 7}
+          />
+        ))}
+      </Trap>,
+    );
+    const dialog = screen.getByRole("dialog");
+    const query = vi.spyOn(dialog, "querySelectorAll");
+
+    expect(
+      getTabStops(dialog).map((el) => el.getAttribute("aria-label")),
+    ).toEqual(["R7"]);
+    // The candidates once, and the group once - not once per radio.
+    expect(query).toHaveBeenCalledTimes(2);
+  });
+
   it("reads no further than the first stop when only asked whether there is one", () => {
     render(
       <Trap label="Dialog">

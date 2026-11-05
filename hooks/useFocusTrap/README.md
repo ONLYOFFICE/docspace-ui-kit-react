@@ -43,6 +43,10 @@ asks on every change, such as a tab panel deciding to be a stop itself.
 - The key is handled on the document, so a container that opened without
   taking the focus still owns the next Tab: it lands on its first stop (or its
   last, for Shift+Tab) instead of moving on through the page behind it.
+- A popup a control inside opened - the kit's context menu or drop-down, or
+  any `role="menu"` / `role="listbox"` - lives in a portal, outside the
+  container. Tab there goes on from the element inside that had the focus
+  last, the menu's opener, as if the menu sat where it was opened.
 - A stop is focusable, has a tabIndex of 0 or more, is enabled and rendered,
   and is outside `inert` content. A radio group is one stop: its checked radio,
   or the first one.
