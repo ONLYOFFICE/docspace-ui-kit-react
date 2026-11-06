@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import classNames from "classnames";
 
 import { FieldContainer } from "../../../../components/field-container";
@@ -35,6 +35,11 @@ const LimitAmountField = ({
 }: LimitAmountFieldProps) => {
   const t = useCommonTranslation();
   const hasError = Boolean(errorMessage);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isAutoFocussed) inputRef.current?.select();
+  }, []);
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const next = e.target.value;
@@ -65,6 +70,7 @@ const LimitAmountField = ({
         isDisabled={isDisabled}
         hasError={hasError}
         isAutoFocussed={isAutoFocussed}
+        forwardedRef={inputRef}
         placeholder="0"
         aria-label={t("Amount")}
         tabIndex={0}
