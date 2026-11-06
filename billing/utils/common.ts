@@ -91,6 +91,7 @@ export const formatCurrencyValue = (
   const truncated = Number(truncatedStr);
 
   const formatter = new Intl.NumberFormat(language, {
+    numberingSystem: "latn",
     style: "currency",
     currency,
     minimumFractionDigits: fractionDigits,
@@ -102,13 +103,17 @@ export const formatCurrencyValue = (
 
 /** Formats a fee percent with the locale's decimal separator, e.g. 5.5 → "5,5". */
 export const formatPercentValue = (language: string, value: number) =>
-  new Intl.NumberFormat(language, { maximumFractionDigits: 2 }).format(value);
+  new Intl.NumberFormat(language, {
+    numberingSystem: "latn",
+    maximumFractionDigits: 2,
+  }).format(value);
 
 export const formatNumber = (language: string, value: number) =>
-  new Intl.NumberFormat(language).format(value);
+  new Intl.NumberFormat(language, { numberingSystem: "latn" }).format(value);
 
 export const formatCompactNumber = (value: number, language = "en"): string =>
   new Intl.NumberFormat(language, {
+    numberingSystem: "latn",
     notation: value >= 1_000_000 ? "compact" : "standard",
     maximumFractionDigits: 2,
   }).format(value);

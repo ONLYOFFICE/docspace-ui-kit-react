@@ -92,9 +92,10 @@ export function humanizeDuration(
   if (options?.addSuffix) {
     // With suffix: "in 2 days" / "2 days ago"
     const rtf = new Intl.RelativeTimeFormat(locale, {
+      numberingSystem: "latn",
       numeric: "auto",
       style: "long",
-    });
+    } as Intl.RelativeTimeFormatOptions);
     return rtf.format(significantValue, significantUnit);
   }
 

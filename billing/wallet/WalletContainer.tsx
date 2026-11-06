@@ -99,6 +99,7 @@ const Wallet = (props: WalletProps) => {
   const monthLabel = useMemo(
     () =>
       new Intl.DateTimeFormat(store.language || "en", {
+        numberingSystem: "latn",
         month: "long",
         year: "numeric",
       }).format(new Date()),

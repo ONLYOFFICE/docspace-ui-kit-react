@@ -21,6 +21,7 @@ export const formattedBalanceTokens = (
   const truncated = Number(truncatedStr);
 
   const formatter = new Intl.NumberFormat(language, {
+    numberingSystem: "latn",
     style: "currency",
     currency,
     minimumFractionDigits: maximumFractionDigits,
@@ -87,6 +88,7 @@ export const formatterCurrencyWithoutTranction = (
     : amount;
 
   const formatter = new Intl.NumberFormat(language, {
+    numberingSystem: "latn",
     style: "currency",
     currency,
     minimumFractionDigits: effectiveFractionDigits,

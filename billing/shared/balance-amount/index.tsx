@@ -76,6 +76,7 @@ const BalanceAmount = (props: BalanceAmountProps) => {
     const truncated = Number(truncatedStr);
 
     const formatter = new Intl.NumberFormat(language, {
+      numberingSystem: "latn",
       style: "currency",
       currency,
       minimumFractionDigits: maximumFractionDigits,
