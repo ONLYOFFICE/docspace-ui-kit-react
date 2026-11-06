@@ -90,8 +90,9 @@ establish reachability, say the finding is unverified instead of asserting it.
 
 ## Step 4 -- the checks nothing runs
 
-The pre-push gate (`format:gate`, `lint`, `tsc`, `test`, `build`,
-`verify:package`) and CI cover formatting, lint, types, tests and packaging.
+The pre-push gate (`format:gate`, `lint`, `tsc`, `test:changed`, and `build` and
+`verify:package` when the build changed) and CI cover formatting, lint, types,
+tests and packaging.
 **Everything below is outside both**, and the client suite that used to catch
 some of it no longer scans this source
 ([source-checks.md](../../rules/source-checks.md)). Run the ones step 1 listed
@@ -132,7 +133,7 @@ including "nothing was run" when nothing was.
 
 If the changed code has no test and is unit-testable, say so and name the test
 that would guard it (`components/<name>/<Name>.test.tsx`; check
-`vitest.config.ts` for what is actually collected). Keyboard handling, focus
+`vitest.config.mts` for what is actually collected). Keyboard handling, focus
 management and anything under `billing/` without a regression test are worth
 calling out on their own.
 

@@ -68,6 +68,8 @@ type BasePalette = {
 
   chatListGroupHeaderColor: string;
   chatMessageErrorBackgroundColor: string;
+  chatComposerNoticeBackgroundColor: string;
+  chatComposerNoticeBorderColor: string;
   dropdownTriggerColor: string;
   dropdownTriggerHoverColor: string;
   attachmentButtonColor: string;
@@ -417,6 +419,16 @@ const buildTokens = (
   "--chat-message-error-background-color": p.chatMessageErrorBackgroundColor,
   "--chat-message-error-border-color": "transparent",
   "--chat-message-error-color": "var(--text-normal)",
+  // The note under an interrupted answer: muted text and a Retry link in
+  // the link colour (ai-chat 1.0.2-progress.29 replaced the error box).
+  "--chat-message-interrupted-color": "var(--text-secondary)",
+  "--chat-message-interrupted-action-color": "var(--text-link)",
+  // The state notice above the composer (an empty wallet, a limit reached).
+  "--chat-composer-notice-background-color":
+    p.chatComposerNoticeBackgroundColor,
+  "--chat-composer-notice-border-color": p.chatComposerNoticeBorderColor,
+  "--chat-composer-notice-title-color": "var(--text-normal)",
+  "--chat-composer-notice-description-color": "var(--text-secondary)",
   "--chat-message-link-color": "var(--text-link)",
   "--chat-message-td-color": "var(--text-normal)",
   "--chat-message-th-color": "var(--text-normal)",
@@ -438,6 +450,10 @@ const buildTokens = (
   // different grey from its two neighbours.
   "--attachment-button-color": p.attachmentButtonColor,
   "--prompt-button-color": p.promptButtonColor,
+  // Without these the widget falls back to --text-normal on hover, near
+  // black in the light theme, unlike every other icon button.
+  "--attachment-button-hover-color": p.iconButtonHoverColor,
+  "--prompt-button-hover-color": p.iconButtonHoverColor,
   "--composer-settings-button-color": p.attachmentButtonColor,
 
   // Misc
@@ -523,6 +539,9 @@ const portalBasePalette: BasePalette = {
   chatListGroupHeaderColor: globalColors.gray,
   // ai-chat theme-light.css error box background.
   chatMessageErrorBackgroundColor: "#faeae6",
+  // A warning, not an error: the favourites yellow over a pale tint of it.
+  chatComposerNoticeBackgroundColor: "#fff8e1",
+  chatComposerNoticeBorderColor: globalColors.favoritesStatus,
 
   // IconButton.module.scss (light): rest = gray, hover = lightGrayDark.
   iconButtonColor: globalColors.gray,
@@ -615,6 +634,9 @@ const portalDarkPalette: BasePalette = {
   // darkErrorStatus (#E06451) at 20% — a dark-surface error tint instead of
   // the light theme's pink.
   chatMessageErrorBackgroundColor: "rgba(224, 100, 81, 0.2)",
+  // The favourites yellow at 12% on the dark surface, outlined in full.
+  chatComposerNoticeBackgroundColor: "rgba(237, 196, 9, 0.12)",
+  chatComposerNoticeBorderColor: globalColors.favoritesStatus,
 
   // IconButton.module.scss (dark): rest = grayDark, hover = white.
   iconButtonColor: globalColors.grayDark,

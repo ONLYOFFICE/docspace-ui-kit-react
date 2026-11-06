@@ -5,6 +5,8 @@ import classNames from "classnames";
 import { DialogModalSkeleton } from "./skeletons/Dialog.modal";
 import { DialogAsideSkeleton } from "./skeletons/Dialog.aside";
 import { Scrollbar } from "../../scrollbar";
+import { useFocusTrap } from "../../../hooks/useFocusTrap";
+import { useFocusReturn } from "../../../hooks/useFocusReturn";
 import { AsideHeader } from "../../aside";
 import styles from "../ModalDialog.module.scss";
 import { ModalBackdrop } from "./ModalBackdrop";
@@ -61,47 +63,13 @@ const Modal = ({
   const internalContentRef = React.useRef<null | HTMLDivElement>(null);
   const contentRef = sheetRef ?? internalContentRef;
 
-  // Opened, the dialog takes the focus unless something inside already has
-  // it (a field the caller focuses itself), so Tab starts in the dialog rather
-  // than in the page behind it. Closed, the focus goes back to where it was --
-  // as long as nothing else has taken it in between.
-  //
-  // Where it was is read before the commit that shows the dialog touches the
-  // DOM: a field with `autoFocus`, or one the content focuses in its own
-  // effect, already has the focus by the time the effect below runs, and used
-  // to pass for the opener -- so such a dialog never handed the focus back.
-  const openerRef = React.useRef<Element | null>(null);
-  React.useInsertionEffect(() => {
-    if (visible) openerRef.current = document.activeElement;
-  }, [visible]);
+  // Opened, the dialog takes the focus, so Tab starts in the dialog rather
+  // than in the page behind it; closed, it gives the focus back.
+  useFocusReturn(contentRef, !!visible);
 
-  React.useEffect(() => {
-    if (!visible) return;
-    const content = contentRef.current;
-    if (!content) return;
-
-    const previous = openerRef.current;
-    if (!content.contains(document.activeElement))
-      content.focus({ preventScroll: true });
-
-    return () => {
-      const { activeElement } = document;
-      // `hideContent` unmounts the content node and mounts a new one while
-      // the dialog stays open, so the node captured above may be detached by
-      // now; the ref holds the one the focus is actually in.
-      const focusLeftWithDialog =
-        !activeElement ||
-        activeElement === document.body ||
-        content.contains(activeElement) ||
-        !!contentRef.current?.contains(activeElement);
-      if (
-        focusLeftWithDialog &&
-        previous instanceof HTMLElement &&
-        previous.isConnected
-      )
-        previous.focus({ preventScroll: true });
-    };
-  }, [visible, contentRef]);
+  // Tab and Shift+Tab cycle through the dialog and never reach the page
+  // behind it. `hideContent` swaps the content node, so the trap follows it.
+  useFocusTrap(contentRef, !!visible && !hideContent);
 
   const headerComponent = React.isValidElement(header)
     ? (header.props as { children: React.ReactNode }).children

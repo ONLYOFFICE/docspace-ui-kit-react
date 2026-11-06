@@ -34,8 +34,8 @@ Four are required:
 
 | Package         | Range     |
 | --------------- | --------- |
-| `react`         | `^19.0.0` |
-| `react-dom`     | `^19.0.0` |
+| `react`         | `^19.2.0` |
+| `react-dom`     | `^19.2.0` |
 | `i18next`       | `^25.5.2` |
 | `react-i18next` | `^15.7.3` |
 

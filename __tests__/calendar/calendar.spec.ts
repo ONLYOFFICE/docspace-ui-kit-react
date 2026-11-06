@@ -5,6 +5,10 @@ import { type Page, expect, test } from "@playwright/test";
 const STORY_BASE = "ui-form-controls-calendar";
 
 async function gotoStory(page: Page, storyId: string) {
+  // The stories draw today, and css-customization picks its selected day and
+  // minDate from it, so without a frozen clock every shot differs from its
+  // baseline the day after it was recorded.
+  await page.clock.install({ time: new Date("2026-01-15T09:20:00") });
   const url = `/iframe.html?id=${STORY_BASE}--${storyId}&viewMode=story`;
   // The stories open on today and highlight it, so a screenshot taken on
   // another day differs. Pin "today" to the day the baselines were taken.

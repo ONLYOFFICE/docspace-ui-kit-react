@@ -147,3 +147,82 @@ for (const { id, name, stories = [] } of COMPONENTS) {
     }
   });
 }
+
+// The actions button sits against the tile's edge, in a part of the tile that
+// clips what overflows it: the icon button's ring, drawn outside it, ran past
+// the tile and was cut off there. Each tile draws it inside the button.
+const TILES_WITH_ACTIONS = [
+  "ui-tiles-basetile",
+  "ui-tiles-filetile",
+  "ui-tiles-foldertile",
+  "ui-tiles-roomtile",
+  "ui-tiles-templatetile",
+];
+
+for (const id of TILES_WITH_ACTIONS) {
+  test(`${id}: the actions button's focus ring stays inside the tile`, async ({
+    page,
+  }) => {
+    await gotoStory(page, id, "default");
+
+    const ring = await page.evaluate(() => {
+      const button = document.querySelector<HTMLElement>(
+        "#storybook-root .expandButton [role='button']",
+      );
+      // The tile is the card around the button: the nearest box that draws
+      // a border of its own.
+      let tile = button?.parentElement ?? null;
+      while (tile && getComputedStyle(tile).borderTopStyle === "none")
+        tile = tile.parentElement;
+      if (!button || !tile) return null;
+      button.focus({ focusVisible: true });
+      const style = getComputedStyle(button);
+      const reach =
+        parseFloat(style.outlineOffset) + parseFloat(style.outlineWidth);
+      const box = button.getBoundingClientRect();
+      const edge = tile.getBoundingClientRect();
+      return {
+        focusVisible: button.matches(":focus-visible"),
+        outline: style.outlineStyle,
+        inside:
+          box.left - reach >= edge.left &&
+          box.right + reach <= edge.right &&
+          box.top - reach >= edge.top &&
+          box.bottom + reach <= edge.bottom,
+      };
+    });
+
+    expect(ring).not.toBeNull();
+    expect(ring?.focusVisible).toBe(true);
+    expect(ring?.outline).toBe("solid");
+    expect(ring?.inside).toBe(true);
+  });
+}
+
+// A checked tile shows its checkbox in place of the icon. The file tile padded
+// the checkbox above it but not below, and its mark sat 4px low in the box.
+for (const id of TILES_WITH_ACTIONS) {
+  test(`${id}: a checked tile's checkbox sits in the middle of its box`, async ({
+    page,
+  }) => {
+    await gotoStory(page, id, "checked");
+
+    const offset = await page.evaluate(() => {
+      const mark = document.querySelector<SVGElement>(
+        "#storybook-root label:has(input[type='checkbox']) svg",
+      );
+      const box = mark?.closest("label")?.parentElement;
+      if (!mark || !box) return null;
+      const m = mark.getBoundingClientRect();
+      const b = box.getBoundingClientRect();
+      return {
+        x: m.left + m.width / 2 - (b.left + b.width / 2),
+        y: m.top + m.height / 2 - (b.top + b.height / 2),
+      };
+    });
+
+    expect(offset).not.toBeNull();
+    expect(Math.abs(offset?.x ?? Infinity)).toBeLessThanOrEqual(0.5);
+    expect(Math.abs(offset?.y ?? Infinity)).toBeLessThanOrEqual(0.5);
+  });
+}

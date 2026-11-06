@@ -86,6 +86,8 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
     service,
     admins,
     storage,
+    storageQuantity,
+    storageType,
     plan,
     price,
     users,
@@ -103,6 +105,8 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
         service: "",
         admins: "",
         storage: "",
+        storageQuantity: "",
+        storageType: "",
         plan: "",
         price: "",
         users: "",
@@ -126,6 +130,8 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
       service: urlParams.get("service") || "",
       admins: urlParams.get("admins") || "",
       storage: urlParams.get("storage") || "",
+      storageQuantity: urlParams.get("storageQuantity") || "",
+      storageType: urlParams.get("storageType") || "",
       plan: urlParams.get("plan") || "",
       price: urlParams.get("price") || "",
       users: urlParams.get("users") || "",
@@ -222,18 +228,38 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
         if (walletServicesToActivate.length > 0) setStepIndex(3);
 
         if (admins) {
-          await paymentApi.updateWalletPayment({
+          const adminsRes = await paymentApi.updateWalletPayment({
             walletQuantityRequestDto: {
               quantity: { adminwallet: Number(admins) },
               productQuantityType: ProductQuantityType.Add,
             },
           });
 
+          if (adminsRes?.data?.response === false)
+            throw new Error(t("UnexpectedError"));
+
+          setStepIndex(3);
+        }
+
+        if (Number(storageQuantity) > 0) {
+          const storageRes = await paymentApi.updateWalletPayment({
+            walletQuantityRequestDto: {
+              quantity: { storage: Number(storageQuantity) },
+              productQuantityType:
+                Number(storageType) === ProductQuantityType.Add
+                  ? ProductQuantityType.Add
+                  : ProductQuantityType.Set,
+            },
+          });
+
+          if (storageRes?.data?.response === false)
+            throw new Error(t("UnexpectedError"));
+
           setStepIndex(3);
         }
 
         if (isDocsConnect && docsConnectAddUsers > 0) {
-          await paymentApi.updateWalletPayment({
+          const docsConnectRes = await paymentApi.updateWalletPayment({
             walletQuantityRequestDto: {
               quantity: {
                 [withDevPack
@@ -243,6 +269,9 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
               productQuantityType: ProductQuantityType.Add,
             },
           });
+
+          if (docsConnectRes?.data?.response === false)
+            throw new Error(t("UnexpectedError"));
 
           setStepIndex(3);
         }
@@ -276,8 +305,13 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
   }, [isBusy, hasPaymentParams]);
 
-  const onGoToBillingClick = () => {
+  const onSuccessRedirectClick = () => {
     window.location.href = pageContent.redirectUrl;
+  };
+
+  const onErrorRedirectClick = () => {
+    window.location.href =
+      pageContent.errorRedirectUrl ?? pageContent.redirectUrl;
   };
 
   const onBackToBillingClick = () => {
@@ -325,7 +359,7 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
             title={pageContent.successTitle}
             hint={pageContent.successHint}
             buttonLabel={pageContent.successButtonLabel}
-            onGoToServiceClick={onGoToBillingClick}
+            onGoToServiceClick={onSuccessRedirectClick}
             amount={amount}
             currency={currency}
             language={language}
@@ -344,16 +378,14 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
               title={t("AddonActivationFailed")}
               hint={t("AddonActivationFailedHint")}
               buttonLabel={t("TryAgainInAddon")}
-              onGoToServiceClick={onGoToBillingClick}
+              onGoToServiceClick={onErrorRedirectClick}
             />
           ) : (
             <ErrorCard
               title={pageContent.errorTitle ?? t("WalletTopUpErrorTitle")}
               hint={pageContent.errorHint ?? t("WalletTopUpCallbackErrorHint")}
-              buttonLabel={
-                pageContent.errorButtonLabel ?? t("WalletTopUpErrorRetry")
-              }
-              onGoToServiceClick={onGoToBillingClick}
+              buttonLabel={t("WalletTopUpErrorRetry")}
+              onGoToServiceClick={onErrorRedirectClick}
             />
           )
         ) : null}

@@ -251,6 +251,7 @@ the inner [`TextInput`](../text-input/README.md); the icon box is the bordered s
 | `--file-input-error-border`      | theme value | Border colour of the field and the icon box under `hasError`        |
 | `--file-input-placeholder-color` | theme value | Placeholder colour of the field under `isDisabled` or `isLoading`   |
 | `--file-input-radius`            | `3px`       | Radius of the icon box's outer corners                              |
+| `--file-input-focus-ring-color`  | accent      | The ring around the control while it has keyboard focus             |
 
 The field's background, text colour and radius are `TextInput`'s own `--text-input-bg`,
 `--text-input-color` and `--text-input-radius`, which reach it from the same ancestor. The
@@ -263,6 +264,8 @@ a wrapper's value never reaches it.
   so it is reached with Tab and announced as a button. Enter and Space on it open the file
   dialog. It is the only tab stop: the read-only field and the `buttonLabel` button inside it
   have `tabIndex="-1"`.
+- Under `:focus-visible` the wrapper draws a 2px ring in the accent outside its border
+  (`--file-input-focus-ring-color`).
 - **There is no accessible name unless you pass `aria-label`.** The placeholder is not a label.
   `aria-label` and `aria-description` are both applied to the wrapper.
 - `aria-disabled` is `"true"` under `isDisabled` or `isLoading` and `"false"` otherwise; while

@@ -30,12 +30,8 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
     resetTariffContainerToBasic,
   } = store;
 
-  const {
-    isGracePeriod,
-    isNotPaidPeriod,
-    walletCustomerStatusNotActive,
-    hasScheduledTariffAdminsChange,
-  } = store.tariff;
+  const { isGracePeriod, isNotPaidPeriod, hasScheduledTariffAdminsChange } =
+    store.tariff;
   const { isYearTariff } = store.quotas;
   const { planCost, addedManagersCountTitle } = store.paymentQuotas;
 
@@ -142,12 +138,7 @@ const PriceCalculation = observer(({ t }: { t: TTranslation }) => {
 
         <TotalTariffContainer t={t} isDisabled={isDisabled} />
 
-        <ButtonContainer
-          isDisabled={
-            (!isNotPaidPeriod && walletCustomerStatusNotActive) || isDisabled
-          }
-          t={t}
-        />
+        <ButtonContainer isDisabled={isDisabled} t={t} />
       </div>
     </div>
   );

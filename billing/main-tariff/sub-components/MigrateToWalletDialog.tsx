@@ -107,17 +107,23 @@ const MigrateToWalletDialog = observer(
       setIsSubmitting(true);
 
       try {
-        await rawApiClient.instance.post(
+        const { data } = await rawApiClient.instance.post(
           "api/2.0/portal/payment/subscription/movetowallet",
           {
             quantity: { adminwallet: managersCount },
           },
         );
+
+        if (data?.response !== true) toastr.error(t("ErrorNotification"));
       } catch (e) {
         console.error("[migrate-to-wallet] migration failed", e);
         toastr.error(t("ErrorNotification"));
       } finally {
-        await onMigrated();
+        try {
+          await onMigrated();
+        } catch (e) {
+          console.error("[migrate-to-wallet] refresh failed", e);
+        }
         onClose();
         setIsSubmitting(false);
       }

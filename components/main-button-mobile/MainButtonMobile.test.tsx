@@ -167,7 +167,15 @@ describe("<MainButtonMobile />", () => {
     const w = window as unknown as {
       i18n?: { loaded: Record<string, { data: Record<string, string> }> };
     };
-    w.i18n = { loaded: { "en/Common.json": { data: { Alert: "Warnung" } } } };
+    // CancelButton too: the component looks it up from the same place, and a
+    // key missing here is logged as a missing translation.
+    w.i18n = {
+      loaded: {
+        "en/Common.json": {
+          data: { Alert: "Warnung", CancelButton: "Abbrechen" },
+        },
+      },
+    };
     document.cookie = "asc_language=en";
     try {
       render(<MainButtonMobile alert />);
