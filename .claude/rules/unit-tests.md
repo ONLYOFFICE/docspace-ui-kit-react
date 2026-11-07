@@ -42,6 +42,18 @@ component with pending work, so wrap the call even when the test is quiet today.
 Fix the test, not the component. Change the component only when its update outlives it, because
 it schedules a timer or a frame it never cancels; that is a bug of its own.
 
+## Mocking a module that `React.lazy` loads
+
+`vi.mock` on the module itself does not hold for the `import()` React calls. Vitest takes the
+importer from the stack, and under `React.lazy` the top frame is React's, in `node_modules`. The
+same `import()` called from the component's own code (a prefetch in an effect) gets the mock;
+the one from the lazy initializer gets the real module. Mock what the lazy module imports
+statically instead, so either path renders the stub. `useAiChatPanel.test.tsx` mocks `new-chat`
+and the header's children rather than `ai-chat-panel-body` and
+`ai-chat-panel-header-container`. A test that needs a fresh `React.lazy` (one that resolves, then
+one that fails) takes the hook through `vi.resetModules()` and `vi.doMock` per test, because a
+lazy component keeps the first outcome of its load.
+
 ## Seeing the warnings
 
 Vitest 4 switches to its agent reporter when an AI agent runs it. That reporter hides what

@@ -2,6 +2,8 @@
 
 import React from "react";
 
+import ErrorBoundary from "../../../providers/error-boundary/ErrorBoundary";
+
 import { useAiChatStoreOptional } from "../../providers/ai-chat-store";
 
 import AiChatTrigger from "../components/ai-chat-trigger";
@@ -95,10 +97,12 @@ export function useAiChatPanel(
     unsetChatPanelFullscreen: () => aiChatStore.setFullscreen(false),
     chatButton: <AiChatTrigger />,
     chatPanelContent: (
-      <React.Suspense fallback={null}>
-        <AiChatPanelHeaderContainer />
-        <AiChatPanelBody {...chatProps} />
-      </React.Suspense>
+      <ErrorBoundary fallback={() => null} onError={() => aiChatStore.close()}>
+        <React.Suspense fallback={null}>
+          <AiChatPanelHeaderContainer />
+          <AiChatPanelBody {...chatProps} />
+        </React.Suspense>
+      </ErrorBoundary>
     ),
     closeChatPanel: () => aiChatStore.close(),
   };
