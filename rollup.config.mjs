@@ -131,9 +131,10 @@ const hasExportsMap = (packageName) => {
   try {
     const pkgJsonPath = require.resolve(`${packageName}/package.json`);
     result = "exports" in JSON.parse(readFileSync(pkgJsonPath, "utf8"));
-  } catch {
+  } catch (error) {
     // Package without its own package.json entry (e.g. a Node builtin
     // reached through a non-builtin name) -- treat as no exports map.
+    result = error?.code === "ERR_PACKAGE_PATH_NOT_EXPORTED";
   }
 
   packageHasExportsMap.set(packageName, result);
