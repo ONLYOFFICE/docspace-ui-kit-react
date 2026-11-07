@@ -1,6 +1,7 @@
 import React from "react";
 import ServiceLimitStore from "./ServiceLimitStore";
 import { useApi } from "../../providers/api";
+import { usePaymentStore } from "./PaymentStoreProvider";
 
 type TServiceLimitStoreProviderProps = {
   children: React.ReactNode;
@@ -26,10 +27,11 @@ const ServiceLimitStoreProviderInner = ({
   children,
 }: TServiceLimitStoreProviderProps) => {
   const { rawApiClient } = useApi();
+  const paymentStore = usePaymentStore();
 
   const store = React.useMemo(
-    () => new ServiceLimitStore(rawApiClient.instance),
-    [rawApiClient],
+    () => new ServiceLimitStore(rawApiClient.instance, paymentStore),
+    [rawApiClient, paymentStore],
   );
 
   return (

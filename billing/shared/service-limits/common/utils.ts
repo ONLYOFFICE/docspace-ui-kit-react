@@ -28,7 +28,6 @@ export const getPeriodLabel = (
   }
 };
 
-export const MIN_LIMIT_AMOUNT = 1;
 export const MAX_LIMIT_AMOUNT = 10000;
 
 export const AMOUNT_FRACTION_DIGITS = 2;
@@ -47,7 +46,7 @@ export const parseAmount = (value: string): number | null => {
 };
 
 export const isAmountOutOfRange = (amount: number | null): boolean =>
-  amount !== null && (amount < MIN_LIMIT_AMOUNT || amount > MAX_LIMIT_AMOUNT);
+  amount !== null && amount > MAX_LIMIT_AMOUNT;
 
 export const formatAmountInput = (amount: number | null | undefined): string =>
   amount === null || amount === undefined
