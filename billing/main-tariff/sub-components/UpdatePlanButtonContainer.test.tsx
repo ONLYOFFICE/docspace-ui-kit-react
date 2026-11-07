@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { screen, render, fireEvent } from "@testing-library/react";
+import { screen, render, fireEvent, act } from "@testing-library/react";
 import { ProductQuantityType } from "@onlyoffice/docspace-api-sdk";
 
 import UpdatePlanButtonContainer from "./UpdatePlanButtonContainer";
@@ -153,7 +153,7 @@ describe("<UpdatePlanButtonContainer /> repurchase", () => {
     );
   });
 
-  it("opens the top-up dialog for a delayed payment method with a short balance", () => {
+  it("opens the top-up dialog for a delayed payment method with a short balance", async () => {
     const store = createStore({ isDelayedPaymentMethod: true });
     const button = renderWithStore(store);
 
@@ -164,7 +164,9 @@ describe("<UpdatePlanButtonContainer /> repurchase", () => {
     expect(store.executeWalletUpdate).not.toHaveBeenCalled();
     expect(screen.getByTestId("top-up-dialog")).toBeInTheDocument();
 
-    mockStore.onConfirm?.();
+    await act(async () => {
+      await mockStore.onConfirm?.();
+    });
 
     expect(store.executeWalletUpdate).toHaveBeenCalledWith(
       4,

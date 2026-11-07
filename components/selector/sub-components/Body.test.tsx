@@ -171,10 +171,11 @@ describe("Selector list from the keyboard", () => {
       fireEvent.pointerDown(row);
       fireEvent.click(row);
     };
-    const pressEnter = () => {
-      fireEvent.keyDown(getList(), { key: "Enter" });
-      fireEvent.keyUp(getList(), { key: "Enter" });
-    };
+    const pressEnter = () =>
+      act(async () => {
+        fireEvent.keyDown(getList(), { key: "Enter" });
+        fireEvent.keyUp(getList(), { key: "Enter" });
+      });
     const pickedIds = (onSelect: SelectorProps["onSelect"]) =>
       vi.mocked(onSelect!).mock.calls.map(([item]) => item.id);
 
@@ -183,7 +184,7 @@ describe("Selector list from the keyboard", () => {
       expect(document.activeElement).toBe(getList());
 
       pickWithPointer("Item 3");
-      pressEnter();
+      await pressEnter();
 
       expect(pickedIds(props.onSelect)).toEqual(["Item-3"]);
       expect(props.onSubmit).toHaveBeenCalledOnce();
@@ -193,7 +194,7 @@ describe("Selector list from the keyboard", () => {
       const { props } = await renderList({ isMultiSelect: true });
 
       pickWithPointer("Item 3");
-      pressEnter();
+      await pressEnter();
 
       expect(pickedIds(props.onSelect)).toEqual(["Item-3"]);
       expect(props.onSubmit).toHaveBeenCalledOnce();
@@ -214,7 +215,7 @@ describe("Selector list from the keyboard", () => {
       fireEvent.click(row);
 
       expect(activeOptionText()).toBeNull();
-      pressEnter();
+      await pressEnter();
       expect(pickedIds(props.onSelect)).toEqual(["Item-3"]);
       expect(props.onSubmit).toHaveBeenCalledOnce();
     });

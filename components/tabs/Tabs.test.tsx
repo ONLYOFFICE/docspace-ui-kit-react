@@ -394,7 +394,7 @@ describe("Tabs", () => {
         />,
       );
       const [first, second, third] = screen.getAllByRole("tab");
-      first.focus();
+      act(() => first.focus());
 
       fireEvent.keyDown(first, { key: "ArrowRight" });
       expect(second).toHaveFocus();
@@ -424,7 +424,7 @@ describe("Tabs", () => {
       const onWindowKey = vi.fn();
       window.addEventListener("keydown", onWindowKey);
 
-      first.focus();
+      act(() => first.focus());
       fireEvent.keyDown(first, { key: "ArrowRight" });
       expect(onWindowKey).not.toHaveBeenCalled();
 
@@ -440,7 +440,7 @@ describe("Tabs", () => {
     it("moves the arrows from a tab focused by a click that selects nothing", () => {
       render(<Tabs items={primaryItems} selectedItemId="tab0" />);
       const [first, second] = screen.getAllByRole("tab");
-      first.focus();
+      act(() => first.focus());
       fireEvent.keyDown(first, { key: "ArrowRight" });
       expect(second).toHaveFocus();
 
@@ -839,7 +839,7 @@ describe("Tabs", () => {
         />,
       );
       const [first, second] = screen.getAllByRole("tab");
-      first.focus();
+      act(() => first.focus());
       fireEvent.keyDown(first, { key: "ArrowRight" });
       expect(second).toHaveFocus();
       expect(second).toHaveAttribute("tabindex", "0");
@@ -861,7 +861,7 @@ describe("Tabs", () => {
         />,
       );
       const [first, second] = screen.getAllByRole("tab");
-      first.focus();
+      act(() => first.focus());
       fireEvent.keyDown(first, { key: "ArrowRight" });
       expect(second).toHaveFocus();
 
@@ -881,7 +881,7 @@ describe("Tabs", () => {
         />,
       );
       const tabs = screen.getAllByRole("tab");
-      tabs[0].focus();
+      act(() => tabs[0].focus());
       fireEvent.keyDown(tabs[0], { key: "End" });
       expect(tabs[2]).toHaveFocus();
 

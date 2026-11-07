@@ -395,7 +395,7 @@ describe("<Selector /> keyboard", () => {
         totalItems: items.length + 2,
       });
 
-    it("makes accept and cancel buttons that the keyboard presses", () => {
+    it("makes accept and cancel buttons that the keyboard presses", async () => {
       const onAcceptInput = vi.fn();
       const onCancelInput = vi.fn();
       withInput(onAcceptInput, onCancelInput);
@@ -405,7 +405,9 @@ describe("<Selector /> keyboard", () => {
       expect(accept).toHaveAttribute("tabindex", "0");
       expect(cancel).toHaveAttribute("tabindex", "0");
 
-      fireEvent.keyDown(accept, { key: " " });
+      await act(async () => {
+        fireEvent.keyDown(accept, { key: " " });
+      });
       expect(onAcceptInput).toHaveBeenCalledOnce();
     });
 
@@ -441,14 +443,16 @@ describe("<Selector /> keyboard", () => {
     it.each([
       ["Escape", "cancels"],
       ["Enter", "accepts"],
-    ])("keeps the %s keyup it %s on from the window", (key) => {
+    ])("keeps the %s keyup it %s on from the window", async (key) => {
       const onAcceptInput = vi.fn();
       const onCancelInput = vi.fn();
       withInput(onAcceptInput, onCancelInput);
       const keyup = vi.fn();
       window.addEventListener("keyup", keyup);
 
-      fireEvent.keyDown(screen.getByRole("textbox"), { key });
+      await act(async () => {
+        fireEvent.keyDown(screen.getByRole("textbox"), { key });
+      });
       fireEvent.keyUp(screen.getByRole("textbox"), { key });
       window.removeEventListener("keyup", keyup);
 
