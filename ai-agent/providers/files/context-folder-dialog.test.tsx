@@ -5,7 +5,7 @@ import { act, render } from "@testing-library/react";
 const clouds = { selectFolderContext: vi.fn() };
 const useCloudsStore = { getState: () => clouds };
 
-vi.mock("@onlyoffice/ai-chat", () => ({
+vi.mock("@onlyoffice/ai-chat/store", () => ({
   useStores: () => ({ useCloudsStore }),
 }));
 

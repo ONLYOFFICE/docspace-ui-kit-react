@@ -2,7 +2,8 @@
 
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useStores, ATTACHMENT_ACCEPT } from "@onlyoffice/ai-chat";
+import { useStores } from "@onlyoffice/ai-chat/store";
+import { ATTACHMENT_ACCEPT } from "@onlyoffice/ai-chat/platform";
 
 import { useApi as useFilesApi } from "../../../providers/api";
 

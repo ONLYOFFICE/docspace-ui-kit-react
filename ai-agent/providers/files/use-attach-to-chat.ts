@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useStores } from "@onlyoffice/ai-chat";
+import { useStores } from "@onlyoffice/ai-chat/store";
 
 import { FileType } from "../../../enums";
 

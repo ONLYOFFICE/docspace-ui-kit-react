@@ -3,7 +3,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { FilterType, FolderType } from "@onlyoffice/docspace-api-sdk";
-import { useStores } from "@onlyoffice/ai-chat";
+import { useStores } from "@onlyoffice/ai-chat/store";
 
 import FilesSelector from "../../../selectors/Files";
 import useGetIcon from "../../hooks/useGetIcon";

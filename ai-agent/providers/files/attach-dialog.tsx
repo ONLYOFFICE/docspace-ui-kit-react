@@ -4,7 +4,7 @@ import React from "react";
 import { observer } from "mobx-react";
 import { useTranslation } from "react-i18next";
 import { FileType, FolderType } from "@onlyoffice/docspace-api-sdk";
-import { useStores } from "@onlyoffice/ai-chat";
+import { useStores } from "@onlyoffice/ai-chat/store";
 
 import FilesSelector from "../../../selectors/Files";
 import type { TSelectorItem } from "../../../components/selector";

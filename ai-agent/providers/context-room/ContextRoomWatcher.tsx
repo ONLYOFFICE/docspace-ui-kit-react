@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-import { useStores } from "@onlyoffice/ai-chat";
+import { useStores } from "@onlyoffice/ai-chat/store";
 
 import { useApi } from "../../../providers/api";
 import socket, {

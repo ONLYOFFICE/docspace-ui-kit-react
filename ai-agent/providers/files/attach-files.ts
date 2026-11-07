@@ -1,4 +1,4 @@
-import { useStores } from "@onlyoffice/ai-chat";
+import { useStores } from "@onlyoffice/ai-chat/store";
 
 import { rememberFormAttachments } from "./form-attachments";
 import {

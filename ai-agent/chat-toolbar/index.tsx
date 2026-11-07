@@ -3,7 +3,7 @@
 import { useTranslation } from "react-i18next";
 import classNames from "classnames";
 
-import { useStores } from "@onlyoffice/ai-chat";
+import { useStores } from "@onlyoffice/ai-chat/store";
 
 import HistoriesIcon from "../../assets/icons/16/clock.svg";
 import PlusIcon from "../../assets/icons/16/button.plus.react.svg";

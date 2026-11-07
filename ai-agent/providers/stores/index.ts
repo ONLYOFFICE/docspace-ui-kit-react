@@ -1,5 +1,7 @@
 import type { StoreKeys } from "@onlyoffice/ai-chat";
 
+export { useStores } from "@onlyoffice/ai-chat/store";
+
 const PREFIX = "docspace.ai-agent";
 
 export const storeKeys: StoreKeys = {

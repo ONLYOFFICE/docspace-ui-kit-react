@@ -30,7 +30,7 @@ const fakeStore = <T extends object>(state: T) =>
     getState: () => state,
   });
 
-vi.mock("@onlyoffice/ai-chat", () => ({
+vi.mock("@onlyoffice/ai-chat/store", () => ({
   useStores: () => ({
     useRouter: fakeStore({ currentPage: "chat" }),
     useProfilesStore: fakeStore(profiles),

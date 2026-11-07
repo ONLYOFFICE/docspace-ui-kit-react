@@ -39,7 +39,7 @@ const MODELS: Record<string, { id: string; name: string }> = {
   p2: { id: "p2", name: "Claude" },
 };
 
-vi.mock("@onlyoffice/ai-chat", () => ({
+vi.mock("@onlyoffice/ai-chat/store", () => ({
   useStores: () => ({
     useProfilesStore: Object.assign(
       (selector: (s: typeof profilesState) => unknown) =>

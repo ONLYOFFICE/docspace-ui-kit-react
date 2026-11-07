@@ -5,10 +5,14 @@ import React from "react";
 import { useAiChatStoreOptional } from "../../providers/ai-chat-store";
 
 import AiChatTrigger from "../components/ai-chat-trigger";
-import AiChatPanelHeaderContainer from "../components/ai-chat-panel-header-container";
-import AiChatPanelBody, {
-  type AiChatPanelBodyProps,
-} from "../components/ai-chat-panel-body";
+import type { AiChatPanelBodyProps } from "../components/ai-chat-panel-body";
+
+const loadPanelHeader = () =>
+  import("../components/ai-chat-panel-header-container");
+const loadPanelBody = () => import("../components/ai-chat-panel-body");
+
+const AiChatPanelHeaderContainer = React.lazy(loadPanelHeader);
+const AiChatPanelBody = React.lazy(loadPanelBody);
 
 // Everything a host layout needs to mount the AI chat panel: the header trigger
 // button, the panel content (header + body), and the reactive visibility/
@@ -68,6 +72,12 @@ export function useAiChatPanel(
   // provider at all (private rooms), and the hook must not throw.
   const aiChatStore = useAiChatStoreOptional();
 
+  React.useEffect(() => {
+    if (!enabled) return;
+    loadPanelHeader().catch(() => undefined);
+    loadPanelBody().catch(() => undefined);
+  }, [enabled]);
+
   if (!enabled) return undefined;
 
   if (!aiChatStore) {
@@ -85,10 +95,10 @@ export function useAiChatPanel(
     unsetChatPanelFullscreen: () => aiChatStore.setFullscreen(false),
     chatButton: <AiChatTrigger />,
     chatPanelContent: (
-      <>
+      <React.Suspense fallback={null}>
         <AiChatPanelHeaderContainer />
         <AiChatPanelBody {...chatProps} />
-      </>
+      </React.Suspense>
     ),
     closeChatPanel: () => aiChatStore.close(),
   };

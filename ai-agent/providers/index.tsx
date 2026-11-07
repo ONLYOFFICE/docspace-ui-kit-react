@@ -16,29 +16,32 @@ import {
 
 import {
   ApiProvider,
+  DEFAULT_SERVER_API_ROUTES,
+  createServerAPI,
+} from "@onlyoffice/ai-chat/providers/ApiProvider";
+import {
   CallbacksManager,
   ChatEventBus,
-  ComponentsProvider,
-  DEFAULT_SERVER_API_ROUTES,
   EventsProvider,
+} from "@onlyoffice/ai-chat/events";
+import { MiddlewareRunner } from "@onlyoffice/ai-chat/middleware";
+import { PlatformProvider } from "@onlyoffice/ai-chat/platform";
+import { Servers, ToolsProvider } from "@onlyoffice/ai-chat/tools";
+import {
+  StoresProvider,
+  createStores,
+  useStores,
+} from "@onlyoffice/ai-chat/store";
+import { useProfiles, useServers, useThread } from "@onlyoffice/ai-chat/hooks";
+import {
+  ComponentsProvider,
   I18nProvider,
   ImagesProvider,
-  MiddlewareRunner,
-  PlatformProvider,
-  Servers,
-  StoresProvider,
   ThemeProvider,
-  ToolsProvider,
   WidgetConfigProvider,
-  createServerAPI,
-  createStores,
-  useProfiles,
-  useServers,
-  useStores,
-  useThread,
-  type WidgetConfig,
-} from "@onlyoffice/ai-chat";
+} from "@onlyoffice/ai-chat/widget-providers";
 import type {
+  WidgetConfig,
   ChatCallbacks,
   HostTool,
   Profile,
@@ -1312,8 +1315,12 @@ export {
   useContextRooms,
   type ContextRoom,
 } from "./context-room";
-export { useApi, useI18n, useStores } from "@onlyoffice/ai-chat";
-export { DEFAULT_SERVER_API_ROUTES } from "@onlyoffice/ai-chat";
+export {
+  useApi,
+  DEFAULT_SERVER_API_ROUTES,
+} from "@onlyoffice/ai-chat/providers/ApiProvider";
+export { useStores } from "@onlyoffice/ai-chat/store";
+export { useI18n } from "@onlyoffice/ai-chat/widget-providers";
 export type {
   ComposerAction,
   Profile,

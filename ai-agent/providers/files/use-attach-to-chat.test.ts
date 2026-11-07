@@ -31,7 +31,7 @@ const useAttachmentsStore = { getState: () => storeState };
 const messageState = { isRequestRunning: false };
 const useMessageStore = { getState: () => messageState };
 
-vi.mock("@onlyoffice/ai-chat", () => ({
+vi.mock("@onlyoffice/ai-chat/store", () => ({
   useStores: () => ({ useAttachmentsStore, useMessageStore }),
 }));
 

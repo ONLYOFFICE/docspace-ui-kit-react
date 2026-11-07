@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { reaction } from "mobx";
 
-import { useStores } from "@onlyoffice/ai-chat";
+import { useStores } from "@onlyoffice/ai-chat/store";
 
 import { dropAnalyzeAttachment } from "../files/form-attachments";
 import { useAnalyzeLock } from "../files/use-analyze-lock";

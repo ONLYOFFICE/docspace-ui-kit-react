@@ -1,5 +1,5 @@
 import type { TFunction } from "i18next";
-import { useStores } from "@onlyoffice/ai-chat";
+import { useStores } from "@onlyoffice/ai-chat/store";
 
 import type { TApiContext } from "../../../providers/api";
 import { toastr, type TData } from "../../../components/toast";

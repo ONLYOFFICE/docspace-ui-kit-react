@@ -13,7 +13,7 @@ const clouds = {
 };
 const useCloudsStore = { getState: () => clouds };
 
-vi.mock("@onlyoffice/ai-chat", () => ({
+vi.mock("@onlyoffice/ai-chat/store", () => ({
   useStores: () => ({ useCloudsStore }),
 }));
 

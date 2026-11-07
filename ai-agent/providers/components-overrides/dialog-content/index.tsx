@@ -1,7 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 
-import { useTheme } from "@onlyoffice/ai-chat";
+import { useTheme } from "@onlyoffice/ai-chat/widget-providers";
 import type { DialogContentProps } from "@onlyoffice/ai-chat";
 
 import {
