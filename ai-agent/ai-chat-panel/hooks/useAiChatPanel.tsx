@@ -1,7 +1,9 @@
 "use client";
 
 import React from "react";
+import { useTranslation } from "react-i18next";
 
+import { toastr } from "../../../components/toast";
 import ErrorBoundary from "../../../providers/error-boundary/ErrorBoundary";
 
 import { useAiChatStoreOptional } from "../../providers/ai-chat-store";
@@ -13,8 +15,10 @@ const loadPanelHeader = () =>
   import("../components/ai-chat-panel-header-container");
 const loadPanelBody = () => import("../components/ai-chat-panel-body");
 
-const AiChatPanelHeaderContainer = React.lazy(loadPanelHeader);
-const AiChatPanelBody = React.lazy(loadPanelBody);
+const createPanelChunks = () => ({
+  Header: React.lazy(loadPanelHeader),
+  Body: React.lazy(loadPanelBody),
+});
 
 // Everything a host layout needs to mount the AI chat panel: the header trigger
 // button, the panel content (header + body), and the reactive visibility/
@@ -73,6 +77,8 @@ export function useAiChatPanel(
   // Null-safe read: with `enabled=false` the section may not mount the
   // provider at all (private rooms), and the hook must not throw.
   const aiChatStore = useAiChatStoreOptional();
+  const { t } = useTranslation(["Common"]);
+  const [panelChunks, setPanelChunks] = React.useState(createPanelChunks);
 
   React.useEffect(() => {
     if (!enabled) return;
@@ -88,6 +94,14 @@ export function useAiChatPanel(
     );
   }
 
+  const { Header, Body } = panelChunks;
+
+  const onPanelError = () => {
+    setPanelChunks(createPanelChunks());
+    toastr.error(t("Common:UnexpectedError"));
+    aiChatStore.close();
+  };
+
   return {
     isChatPanelVisible: aiChatStore.isVisible,
     isChatPanelFullscreen: aiChatStore.effectiveFullscreen,
@@ -97,10 +111,10 @@ export function useAiChatPanel(
     unsetChatPanelFullscreen: () => aiChatStore.setFullscreen(false),
     chatButton: <AiChatTrigger />,
     chatPanelContent: (
-      <ErrorBoundary fallback={() => null} onError={() => aiChatStore.close()}>
+      <ErrorBoundary fallback={() => null} onError={onPanelError}>
         <React.Suspense fallback={null}>
-          <AiChatPanelHeaderContainer />
-          <AiChatPanelBody {...chatProps} />
+          <Header />
+          <Body {...chatProps} />
         </React.Suspense>
       </ErrorBoundary>
     ),
