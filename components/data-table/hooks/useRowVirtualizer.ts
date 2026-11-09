@@ -89,9 +89,33 @@ export const useRowVirtualizer = ({
     setHeaderBottom((prev) => (Math.abs(prev - bottom) < 0.5 ? prev : bottom));
   }, [bodyRef, target]);
 
+  // Measured when the table, its row count or its scroller changes, and when
+  // something in the scroller changes size - a filter growing above the
+  // table, say - but never on a scroll, which moves nothing within the
+  // scroller: a measurement right after the rows changed makes the browser
+  // restyle and lay them out on the spot, once more each frame.
   useLayoutEffect(() => {
-    if (enabled) updateScrollMargin();
-  });
+    if (!enabled || !target) return undefined;
+    updateScrollMargin();
+
+    const content = isWindow(target) ? [document.body] : [...target.children];
+    let scheduled = false;
+    let frame = 0;
+    const observer = new ResizeObserver(() => {
+      if (scheduled) return;
+      scheduled = true;
+      frame = requestAnimationFrame(() => {
+        scheduled = false;
+        updateScrollMargin();
+      });
+    });
+    for (const element of content) observer.observe(element);
+
+    return () => {
+      observer.disconnect();
+      if (scheduled) cancelAnimationFrame(frame);
+    };
+  }, [enabled, target, count, updateScrollMargin]);
 
   // One hook for both kinds of scroller: the element functions and the
   // window ones differ only in what they observe.
@@ -104,9 +128,6 @@ export const useRowVirtualizer = ({
     scrollMargin,
     scrollPaddingStart: headerBottom,
     getItemKey: (index) => getItemKey(index) as string | number,
-    // A content change above the table moves it within the scroller; the
-    // next scroll measures where it went.
-    onChange: updateScrollMargin,
     useFlushSync: false,
     ...(isWindow(target)
       ? ({

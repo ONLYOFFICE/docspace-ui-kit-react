@@ -10,6 +10,7 @@ import {
   toLogicalDelta,
 } from "../layout/engine";
 import { buildGridTemplate } from "../layout/grid";
+import styles from "../DataTable.module.scss";
 
 /** Pixels an arrow key moves a column edge; Shift moves five times as far. */
 const KEY_STEP = 10;
@@ -55,9 +56,11 @@ export type ResizeHandleBindings = {
 /**
  * Drag and keyboard resizing of the column edges.
  *
- * A drag never re-renders React: each animation frame writes the new grid to
- * the table's `--data-table-grid` property, and the rows, which only read that
- * property, follow. On pointer-up the shares are committed once, and stored.
+ * A drag never re-renders React: each animation frame writes the new grid
+ * onto the header row and the rows themselves, and on pointer-up back to the
+ * table's `--data-table-grid` property, which they read again; the shares are
+ * committed once, and stored. A row that mounts mid-drag shows the grid the
+ * drag started from until it ends.
  * A cancelled pointer puts the grid back as it was and stores nothing. Each
  * move resizes the current widths by the distance from the edge to the
  * pointer, so turning back mid-drag widens the edge's neighbour.
@@ -79,11 +82,37 @@ export const useColumnResize = ({
   const measure = () =>
     containerRef.current?.getBoundingClientRect().width ?? 0;
 
+  /** The header row and the rows of this table, not of a table inside it. */
+  const gridRows = () => {
+    const table = containerRef.current;
+    if (!table) return [];
+    return Array.from(
+      table.querySelectorAll<HTMLElement>(
+        `.${styles.headerRow}, .${styles.row}`,
+      ),
+    ).filter((row) => row.closest('[role="table"]') === table);
+  };
+
+  // While dragging, the grid goes straight onto each row. `--data-table-grid`
+  // is inherited, so a new value on the table restyles every element in it,
+  // which for a few hundred rows costs a frame many times over;
+  // `grid-template-columns` restyles the rows alone.
+  const writeRows = (shares: ColumnFractions) => {
+    const template = buildGridTemplate(columns, shares, false);
+    for (const row of gridRows()) {
+      row.style.setProperty("grid-template-columns", template);
+    }
+  };
+
+  /** Back to the table's property, set once, with the rows reading it again. */
   const writeGrid = (shares: ColumnFractions) => {
     containerRef.current?.style.setProperty(
       "--data-table-grid",
       buildGridTemplate(columns, shares, false),
     );
+    for (const row of gridRows()) {
+      row.style.removeProperty("grid-template-columns");
+    }
   };
 
   const end = (event: React.PointerEvent<HTMLElement>, apply: boolean) => {
@@ -103,8 +132,8 @@ export const useColumnResize = ({
       return;
     }
 
-    // The last frame may not have been drawn yet; React writes the same value
-    // on the commit's render, this only avoids a frame of the old grid.
+    // React writes the same value on the commit's render; this hands the rows
+    // back to the property now, so no frame shows the old grid.
     writeGrid(drag.latest);
     if (drag.latest !== drag.startFractions) commit(drag.latest);
   };
@@ -167,7 +196,7 @@ export const useColumnResize = ({
         drag.scheduled = true;
         drag.frame = requestAnimationFrame(() => {
           drag.scheduled = false;
-          writeGrid(drag.latest);
+          writeRows(drag.latest);
         });
       }
     },

@@ -696,8 +696,8 @@ export function FilesTable({
 ## Behaviour the types don't state
 
 - The header and the rows read one `grid-template-columns` from the `--data-table-grid` custom
-  property on the table element. Rows carry no inline grid and read no storage, so they cannot
-  lay out differently from the header.
+  property on the table element. Rows read no storage, and carry no inline grid except during a
+  drag, so they cannot lay out differently from the header.
 - A `fill` column starts at 40 % of the space left by the `fixed` columns and the `flex` ones
   share 60 %, with minimums of 210 px and 110 px (`DATA_TABLE_MIN_FILL_WIDTH`,
   `DATA_TABLE_MIN_COLUMN_WIDTH`). Flexible tracks are `minmax(<min>px, <share>fr)`, so a window
@@ -722,9 +722,12 @@ export function FilesTable({
   pointer move counts from where the edge is now, so an edge stuck at the minimums waits for the
   pointer to come back to it, and turning back mid-drag widens the edge's neighbour rather than
   the column that was squeezed last.
-- During a drag only the `--data-table-grid` property changes, once per animation frame; React
-  does not re-render. The widths are committed and stored once, when the pointer is released. A
-  cancelled pointer (`pointercancel`) puts the grid back and stores nothing.
+- During a drag the grid is written once per animation frame straight onto the header row and
+  the rows, and React does not re-render. The table's `--data-table-grid` changes only when the
+  pointer is released: a custom property is inherited, so changing it restyles every element in
+  the table, which a few hundred rows cannot afford each frame. A row that mounts mid-drag
+  shows the starting grid until the end. The widths are committed and stored once, on release.
+  A cancelled pointer (`pointercancel`) puts the grid back and stores nothing.
 - A double click on any edge resets every column to 40/60 and clears the stored record.
 - The table's colours follow the nearest `.light` or `.dark` ancestor, so a `dark` wrapper turns
   the table dark on a light page. The settings and row menus open in a portal on `<body>` and
@@ -764,8 +767,9 @@ export function FilesTable({
   looked past again on the next frames, and the first element round the table that scrolls
   becomes the scroller. The same goes for the sticky header's "stuck" state and for the plain
   list's load-more observer. Content above the table inside the same
-  scroller is allowed: where the body starts is measured on every render and every scroll, so a
-  filter bar that grows is caught by the next scroll at the latest.
+  scroller is allowed: where the body starts is measured when the scroller, the row count or the
+  size of anything in the scroller changes, so a filter bar that grows is caught in the next
+  frame. A scroll measures nothing.
 - With `loadMore` and `hasMore`, `skeletonRows` (2) skeleton rows follow the loaded ones. The
   next page is asked for when the last rendered row is within `threshold` (15) of the last
   loaded one — rendered rows include the overscan — or, without `virtualize`, when the skeleton

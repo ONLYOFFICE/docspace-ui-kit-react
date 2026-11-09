@@ -83,6 +83,14 @@ const renderTable = (
 const grid = () =>
   screen.getByTestId("data-table").style.getPropertyValue("--data-table-grid");
 
+/** The grid a drag writes onto the rows, the header row first. */
+const rowGrids = () =>
+  screen
+    .getAllByRole("row")
+    .map((row) => row.style.getPropertyValue("grid-template-columns"));
+
+const dragGrid = () => rowGrids()[0];
+
 const handle = (columnId: string) =>
   screen.getByTestId(`data-table-resize-${columnId}`);
 
@@ -160,7 +168,7 @@ describe("DataTable resizing", () => {
     fireEvent.pointerDown(target, { pointerId: 1, button: 0, clientX: 500 });
     fireEvent.pointerMove(target, { pointerId: 1, clientX: 550 });
 
-    expect(grid()).toContain("minmax(210px, 45fr)");
+    expect(dragGrid()).toContain("minmax(210px, 45fr)");
     expect(screen.getByTestId("data-table")).toHaveClass("isResizing");
     expect(save).not.toHaveBeenCalled();
 
@@ -169,17 +177,35 @@ describe("DataTable resizing", () => {
     expect(screen.getByTestId("data-table")).not.toHaveClass("isResizing");
   });
 
+  it("writes the grid onto the rows while dragging and back onto the table at the end", () => {
+    renderTable();
+    const target = handle("Name");
+
+    fireEvent.pointerDown(target, { pointerId: 1, button: 0, clientX: 500 });
+    fireEvent.pointerMove(target, { pointerId: 1, clientX: 550 });
+
+    // The table's property, inherited by everything in it, stays put.
+    expect(grid()).toBe(DEFAULT_GRID);
+    expect(rowGrids()).toHaveLength(2);
+    for (const value of rowGrids()) expect(value).toContain("45fr");
+
+    fireEvent.pointerUp(target, { pointerId: 1, clientX: 550 });
+
+    expect(grid()).toContain("minmax(210px, 45fr)");
+    expect(rowGrids()).toEqual(["", ""]);
+  });
+
   it("follows every move of a drag, not just the first", () => {
     renderTable();
     const target = handle("Name");
 
     fireEvent.pointerDown(target, { pointerId: 1, button: 0, clientX: 500 });
     fireEvent.pointerMove(target, { pointerId: 1, clientX: 520 });
-    expect(grid()).toContain("minmax(210px, 42fr)");
+    expect(dragGrid()).toContain("minmax(210px, 42fr)");
     fireEvent.pointerMove(target, { pointerId: 1, clientX: 540 });
-    expect(grid()).toContain("minmax(210px, 44fr)");
+    expect(dragGrid()).toContain("minmax(210px, 44fr)");
     fireEvent.pointerMove(target, { pointerId: 1, clientX: 560 });
-    expect(grid()).toContain("minmax(210px, 46fr)");
+    expect(dragGrid()).toContain("minmax(210px, 46fr)");
     fireEvent.pointerUp(target, { pointerId: 1, clientX: 560 });
   });
 
@@ -192,15 +218,15 @@ describe("DataTable resizing", () => {
     fireEvent.pointerMove(target, { pointerId: 1, clientX: 900 });
     const pressed =
       "minmax(210px, 67fr) minmax(110px, 11fr) minmax(110px, 11fr) minmax(110px, 11fr) 68px";
-    expect(grid()).toBe(pressed);
+    expect(dragGrid()).toBe(pressed);
 
     // Back, but still past the stuck edge: nothing moves.
     fireEvent.pointerMove(target, { pointerId: 1, clientX: 800 });
-    expect(grid()).toBe(pressed);
+    expect(dragGrid()).toBe(pressed);
 
     // 70 px before the edge: Name gives them to Author, its neighbour.
     fireEvent.pointerMove(target, { pointerId: 1, clientX: 700 });
-    expect(grid()).toBe(
+    expect(dragGrid()).toBe(
       "minmax(210px, 60fr) minmax(110px, 18fr) minmax(110px, 11fr) minmax(110px, 11fr) 68px",
     );
 
@@ -218,6 +244,7 @@ describe("DataTable resizing", () => {
     fireEvent.pointerCancel(target, { pointerId: 1 });
 
     expect(grid()).toBe(DEFAULT_GRID);
+    expect(rowGrids()).toEqual(["", ""]);
     expect(save).not.toHaveBeenCalled();
   });
 
