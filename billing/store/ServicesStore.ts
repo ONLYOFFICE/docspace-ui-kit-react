@@ -385,14 +385,11 @@ class ServicesStore {
   initUsageData = async (period: TUsagePeriodKey) => {
     const range = getUsageRange(period);
 
-    // The usage page overwrites the shared rows with a whole period. Only rows
-    // of the current month match what a service page requests for itself, so
-    // any other period invalidates them.
-    if (period !== "thisMonth") this.loadedServiceName = null;
+    this.loadedServiceName = null;
 
     await Promise.all([
       this.paymentStore.initWalletPayerAndBalance(false),
-      this.fetchServiceUsage(range),
+      this.fetchServiceUsage({ ...range, mergeByok: true }),
       this.fetchServiceUsageMonthly(range),
     ]);
   };

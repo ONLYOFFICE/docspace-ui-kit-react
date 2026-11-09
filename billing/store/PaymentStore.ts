@@ -80,6 +80,7 @@ import {
   AI_SEARCH,
   AI_SEARCH_ENUM,
   AI_TOOLS,
+  AI_TOOLS_BYOK,
   BACKUP_SERVICE,
   STORAGE_TARIFF_DEACTIVATED,
   STORAGE_DEACTIVATION_VISITED,
@@ -565,6 +566,17 @@ class PaymentStore {
     ];
   }
 
+  getTransactionServiceNames = (
+    serviceName?: string,
+  ): string | string[] | undefined => {
+    if (isDocsConnectServiceName(serviceName))
+      return this.docsConnectServiceNames;
+
+    if (serviceName === AI_TOOLS) return [AI_TOOLS, AI_TOOLS_BYOK];
+
+    return serviceName;
+  };
+
   get backupServicePrice() {
     return (
       (
@@ -973,11 +985,13 @@ class PaymentStore {
     from,
     to,
     participantName,
+    mergeByok,
   }: {
     serviceName?: string;
     from?: DateTime;
     to?: DateTime;
     participantName?: string;
+    mergeByok?: boolean;
   } = {}) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
@@ -994,6 +1008,7 @@ class PaymentStore {
             StartDate: from ? this.formatDate(from, "start") : undefined,
             EndDate: to ? this.formatDate(to, "end") : undefined,
             ParticipantName: participantName,
+            mergeByok: mergeByok || undefined,
           },
         },
       );
@@ -1085,10 +1100,7 @@ class PaymentStore {
       this.filterSelectedTypeKey,
     );
 
-    const serviceNames: string | string[] | undefined =
-      isDocsConnectServiceName(serviceName)
-        ? this.docsConnectServiceNames
-        : serviceName;
+    const serviceNames = this.getTransactionServiceNames(serviceName);
 
     try {
       const res = await this.paymentApi.getCustomerOperations(
@@ -1627,7 +1639,10 @@ class PaymentStore {
       requests.push(
         this.tariff.fetchPortalTariff(),
         this.fetchUpcomingPayments(),
-        this.fetchWalletUsage(getUsageRange("thisMonth")),
+        this.fetchWalletUsage({
+          ...getUsageRange("thisMonth"),
+          mergeByok: true,
+        }),
       );
 
       if (onInit) requests.push(Promise.resolve(onInit()));
