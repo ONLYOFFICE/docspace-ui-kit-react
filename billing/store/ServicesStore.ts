@@ -492,6 +492,7 @@ class ServicesStore {
             serviceName,
             from: monthStart,
             to: monthEnd,
+            mergeByok: serviceName === AI_TOOLS,
           }),
         );
       }
