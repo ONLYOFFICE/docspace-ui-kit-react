@@ -9,6 +9,7 @@ import {
   AI_ENUM,
   AI_SEARCH,
   AI_TOOLS,
+  AI_TOOLS_BYOK,
   BACKUP_SERVICE,
   STORAGE_ENUM,
 } from "../constants";
@@ -481,6 +482,10 @@ class ServicesStore {
 
       if (serviceName === AI_TOOLS || serviceName === AI_SEARCH) {
         requests.push(this.paymentStore.fetchServiceFeePercent(serviceName));
+      }
+
+      if (serviceName === AI_TOOLS) {
+        requests.push(this.paymentStore.fetchServiceFeePercent(AI_TOOLS_BYOK));
       }
 
       const monthStart = now().startOf("month");

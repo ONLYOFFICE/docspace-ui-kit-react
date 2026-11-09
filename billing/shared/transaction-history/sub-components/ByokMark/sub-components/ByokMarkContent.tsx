@@ -1,7 +1,7 @@
 import { Text } from "../../../../../../components/text";
 import { useCommonTranslation } from "../../../../../../utils/i18n";
 
-import { AI_TOOLS } from "../../../../../constants";
+import { AI_TOOLS_BYOK } from "../../../../../constants";
 import { usePaymentStore } from "../../../../../store/PaymentStoreProvider";
 import { formatterCurrencyWithoutTranction } from "../../../../../wallet/utils";
 import type { ByokOperation } from "../../../utils";
@@ -47,7 +47,7 @@ export const ByokMarkContent = ({
   const format = (value: number) =>
     formatterCurrencyWithoutTranction(language, value, currency ?? "");
 
-  const percent = formatServiceFeePercent(AI_TOOLS);
+  const percent = formatServiceFeePercent(AI_TOOLS_BYOK);
 
   return (
     <div className={styles.content} data-testid="byok_content">

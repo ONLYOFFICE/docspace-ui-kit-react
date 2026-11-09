@@ -1631,6 +1631,7 @@ class PaymentStore {
           this.fetchTransactionHistory(),
           this.fetchServiceFeePercent(AI_TOOLS),
           this.fetchServiceFeePercent(AI_SEARCH),
+          this.fetchServiceFeePercent(AI_TOOLS_BYOK),
         );
       } else {
         requests.push(this.fetchCardLinked(integrationUrl));
