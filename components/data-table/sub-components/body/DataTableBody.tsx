@@ -24,10 +24,8 @@ import type {
 } from "../../DataTable.types";
 import { useFastScroll } from "../../hooks/useFastScroll";
 import { useLoadMore } from "../../hooks/useLoadMore";
-import {
-  findScrollParent,
-  useRowVirtualizer,
-} from "../../hooks/useRowVirtualizer";
+import { useRowVirtualizer } from "../../hooks/useRowVirtualizer";
+import { isWindow, useScrollParent } from "../../hooks/useScrollParent";
 import styles from "../../DataTable.module.scss";
 
 import { RowSlot } from "../row/RowSlot";
@@ -58,25 +56,30 @@ const useInView = (
   margin: number,
 ) => {
   const [inView, setInView] = useState(false);
+  const parent = useScrollParent(ref, enabled);
 
   useEffect(() => {
     const element = ref.current;
-    if (!enabled || !element || typeof IntersectionObserver === "undefined") {
+    if (
+      !enabled ||
+      !element ||
+      !parent ||
+      typeof IntersectionObserver === "undefined"
+    ) {
       setInView(false);
       return undefined;
     }
 
-    const parent = findScrollParent(element);
     const observer = new IntersectionObserver(
       ([entry]) => setInView(entry.isIntersecting),
       {
-        root: "scrollY" in parent ? null : parent,
+        root: isWindow(parent) ? null : parent,
         rootMargin: `${margin}px 0px`,
       },
     );
     observer.observe(element);
     return () => observer.disconnect();
-  }, [ref, enabled, margin]);
+  }, [ref, enabled, margin, parent]);
 
   return inView;
 };

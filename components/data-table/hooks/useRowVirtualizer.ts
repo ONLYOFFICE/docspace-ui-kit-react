@@ -13,10 +13,14 @@ import {
   windowScroll,
 } from "@tanstack/react-virtual";
 
+import {
+  type ScrollTarget,
+  isWindow,
+  useScrollParent,
+} from "./useScrollParent";
+
 // The only module that imports the virtualizer, so it can be swapped for
 // another one, or for code of our own, without the table noticing.
-
-type ScrollTarget = HTMLElement | Window;
 
 type RowVirtualizerOptions = {
   /** Whether to virtualise at all; when false the hook does nothing. */
@@ -36,24 +40,6 @@ export type VirtualRow = {
   key: React.Key;
   /** Offset of the row from the top of the body, in pixels. */
   top: number;
-};
-
-const isRoot = (node: Element) =>
-  node === document.documentElement || node === document.body;
-
-// Not `instanceof Window`: a window from another realm (an iframe, jsdom)
-// fails it.
-const isWindow = (target: ScrollTarget | null): target is Window =>
-  target !== null && (target as Window).window === target;
-
-/** The nearest ancestor that scrolls vertically, or the window. */
-export const findScrollParent = (from: Element | null): ScrollTarget => {
-  for (let node = from?.parentElement; node && !isRoot(node);) {
-    const { overflowY } = getComputedStyle(node);
-    if (/auto|scroll|overlay/.test(overflowY)) return node;
-    node = node.parentElement;
-  }
-  return window;
 };
 
 /** Where the body starts within the scroller's content, in pixels. */
@@ -83,20 +69,11 @@ export const useRowVirtualizer = ({
   bodyRef,
   getItemKey,
 }: RowVirtualizerOptions) => {
-  const [target, setTarget] = useState<ScrollTarget | null>(null);
+  const target = useScrollParent(bodyRef, enabled, scrollElement);
   const [scrollMargin, setScrollMargin] = useState(0);
   // The sticky header, and whatever it stops below, covers the top of the
   // view, so a row scrolled "to the top" has to land below it.
   const [headerBottom, setHeaderBottom] = useState(0);
-
-  // Found before the first paint, so the first rows paint with the table.
-  useLayoutEffect(() => {
-    if (!enabled) {
-      setTarget(null);
-      return;
-    }
-    setTarget(scrollElement ?? findScrollParent(bodyRef.current));
-  }, [enabled, scrollElement, bodyRef]);
 
   const updateScrollMargin = useCallback(() => {
     const body = bodyRef.current;

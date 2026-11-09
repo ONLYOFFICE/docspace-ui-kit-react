@@ -1,7 +1,7 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { findScrollParent } from "./useRowVirtualizer";
+import { useScrollParent } from "./useScrollParent";
 
 /**
  * Whether the sticky header has stuck, that is, rows are scrolling under it.
@@ -14,12 +14,12 @@ export const useStuckHeader = (
   scrollElement?: HTMLElement | null,
 ) => {
   const [stuck, setStuck] = useState(false);
+  const target = useScrollParent(headerRef, true, scrollElement);
 
   useEffect(() => {
     const header = headerRef.current;
-    if (!header) return undefined;
+    if (!header || !target) return undefined;
 
-    const target = scrollElement ?? findScrollParent(header);
     const check = () => setStuck(header.offsetTop > 0);
 
     // The flag, not the id, says whether a frame is pending: the id is
@@ -42,7 +42,7 @@ export const useStuckHeader = (
       target.removeEventListener("scroll", onScroll);
       if (scheduled) cancelAnimationFrame(frame);
     };
-  }, [headerRef, scrollElement]);
+  }, [headerRef, target]);
 
   return stuck;
 };

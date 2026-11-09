@@ -219,7 +219,9 @@ export type DataTableRenderRowProps<T> = {
 export type DataTableVirtualize = {
   /**
    * The element that scrolls the table. Without it, the nearest scrolling
-   * ancestor, or the window when there is none.
+   * ancestor, or the window when there is none - looked for again while it is
+   * the window, since a custom scrollbar may start scrolling only after the
+   * table mounts.
    */
   scrollElement?: HTMLElement | null;
   /** Rows rendered beyond each edge of the visible ones.

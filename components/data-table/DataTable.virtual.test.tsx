@@ -8,7 +8,7 @@ import type {
   DataTableColumn,
   DataTableProps,
 } from "./DataTable.types";
-import { findScrollParent } from "./hooks/useRowVirtualizer";
+import { findScrollParent } from "./hooks/useScrollParent";
 
 type Item = { id: number; name: string };
 
@@ -215,6 +215,45 @@ describe("DataTable virtualisation", () => {
       fireEvent.scroll(window);
     });
     expect(indexes()[0]).toBe(295);
+  });
+
+  // A custom scrollbar turns its overflow on after its first render, when
+  // the table inside it has already looked for its scroller.
+  const renderInLateScroller = () =>
+    render(
+      <div data-testid="scroller" style={{ overflowY: "hidden" }}>
+        <DataTable<Item>
+          columns={COLUMNS}
+          rows={ITEMS}
+          getRowKey={(r) => r.id}
+          virtualize={STILL}
+        />
+      </div>,
+    );
+
+  const nextFrame = () =>
+    act(() => new Promise((resolve) => requestAnimationFrame(resolve)));
+
+  it("finds a scroller that starts scrolling after the table mounts", async () => {
+    renderInLateScroller();
+
+    screen.getByTestId("scroller").style.overflowY = "auto";
+    await nextFrame();
+    await nextFrame();
+    scrollBy(48 * 5000);
+
+    expect(indexes()[0]).toBe(4995);
+  });
+
+  it("takes the element round it that scrolls first as its scroller", async () => {
+    renderInLateScroller();
+    await nextFrame();
+
+    // Still `hidden` to getComputedStyle, yet it scrolls.
+    scrollBy(48 * 5000);
+    scrollBy(48 * 5000 + 1);
+
+    expect(indexes()[0]).toBe(4995);
   });
 
   it("renders every row without virtualize", () => {

@@ -757,7 +757,11 @@ export function FilesTable({
   hotkeys and the data room's index separator read exactly that markup. The table carries
   `aria-rowcount` and each row `aria-rowindex`, the header counting as row 1.
 - The scroller is `virtualize.scrollElement`, else the nearest ancestor whose `overflow-y` is
-  `auto`, `scroll` or `overlay`, else the window. Content above the table inside the same
+  `auto`, `scroll` or `overlay`, else the window. A custom scrollbar may switch its overflow on
+  only after its first render, past the moment the table looks; so a window found that way is
+  looked past again on the next frames, and the first element round the table that scrolls
+  becomes the scroller. The same goes for the sticky header's "stuck" state and for the plain
+  list's load-more observer. Content above the table inside the same
   scroller is allowed: where the body starts is measured on every render and every scroll, so a
   filter bar that grows is caught by the next scroll at the latest.
 - With `loadMore` and `hasMore`, `skeletonRows` (2) skeleton rows follow the loaded ones. The
