@@ -15,7 +15,8 @@ const loadPanelHeader = () =>
   import("../components/ai-chat-panel-header-container");
 const loadPanelBody = () => import("../components/ai-chat-panel-body");
 
-const createPanelChunks = () => ({
+const createPanelChunks = (generation: number) => ({
+  generation,
   Header: React.lazy(loadPanelHeader),
   Body: React.lazy(loadPanelBody),
 });
@@ -78,7 +79,15 @@ export function useAiChatPanel(
   // provider at all (private rooms), and the hook must not throw.
   const aiChatStore = useAiChatStoreOptional();
   const { t } = useTranslation(["Common"]);
-  const [panelChunks, setPanelChunks] = React.useState(createPanelChunks);
+  const [panelChunks, setPanelChunks] = React.useState(() =>
+    createPanelChunks(0),
+  );
+  const [panelFailed, setPanelFailed] = React.useState(false);
+
+  if (panelFailed && aiChatStore?.isVisible) {
+    setPanelFailed(false);
+    setPanelChunks(createPanelChunks(panelChunks.generation + 1));
+  }
 
   React.useEffect(() => {
     if (!enabled) return;
@@ -94,12 +103,12 @@ export function useAiChatPanel(
     );
   }
 
-  const { Header, Body } = panelChunks;
+  const { generation, Header, Body } = panelChunks;
 
   const onPanelError = () => {
-    setPanelChunks(createPanelChunks());
-    toastr.error(t("Common:UnexpectedError"));
     aiChatStore.close();
+    setPanelFailed(true);
+    toastr.error(t("Common:UnexpectedError"));
   };
 
   return {
@@ -111,7 +120,11 @@ export function useAiChatPanel(
     unsetChatPanelFullscreen: () => aiChatStore.setFullscreen(false),
     chatButton: <AiChatTrigger />,
     chatPanelContent: (
-      <ErrorBoundary fallback={() => null} onError={onPanelError}>
+      <ErrorBoundary
+        key={generation}
+        fallback={() => null}
+        onError={onPanelError}
+      >
         <React.Suspense fallback={null}>
           <Header />
           <Body {...chatProps} />
