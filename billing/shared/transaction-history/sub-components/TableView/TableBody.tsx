@@ -17,6 +17,7 @@ import {
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
 import { getTransactionSourceLabel, hasTransactionSource } from "../../utils";
 import { TokenUsageAnchor } from "../TokenUsage";
+import { ByokMarkAnchor } from "../ByokMark/sub-components/ByokMarkAnchor";
 
 interface TransactionRowProps {
   transaction: WalletOperationDto;
@@ -69,6 +70,7 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
           {transaction.description}
           {transaction.details ? ` (${transaction.details})` : ""}
         </Text>
+        <ByokMarkAnchor transaction={transaction} />
       </TableCell>
 
       <TableCell>
