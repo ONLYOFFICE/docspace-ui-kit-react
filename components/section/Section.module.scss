@@ -457,7 +457,10 @@
       outline: none;
       @include paddingStyles;
 
-      &:has(.chat-container:not([style*="display: none"])) {
+      // No condition on the `style` attribute in here: with one, every inline
+      // style written anywhere in the section (a virtual row's position, a
+      // column resize) makes the browser restyle the whole section.
+      &:has(.chat-container) {
         padding-block: 0;
       }
 

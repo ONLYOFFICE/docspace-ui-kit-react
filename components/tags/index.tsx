@@ -33,6 +33,25 @@ const makeTagsFocusable = (root: HTMLElement) => {
   });
 };
 
+const sameValue = (a: unknown, b: unknown) =>
+  Object.is(a, b) ||
+  (Array.isArray(a) &&
+    Array.isArray(b) &&
+    a.length === b.length &&
+    a.every((item, index) => Object.is(item, b[index])));
+
+/** Whether two laid-out tag lists draw the same tags, field by field. */
+const sameTags = (a: TagType[], b: TagType[]) =>
+  a.length === b.length &&
+  a.every((tag, index) => {
+    const other = b[index];
+    const keys = Object.keys(tag) as (keyof TagType)[];
+    return (
+      keys.length === Object.keys(other).length &&
+      keys.every((key) => sameValue(tag[key], other[key]))
+    );
+  });
+
 const Tags: FC<TagsProps> = ({
   id,
   tags,
@@ -59,12 +78,22 @@ const Tags: FC<TagsProps> = ({
 
   const resolvedCreateTagLabel = createTagLabel || t("AddButton") || "Add";
 
+  // The width the tags were last laid out at. Reading `offsetWidth` makes the
+  // browser lay the page out there and then, so it is read once, on mount;
+  // after that the observer reports the width, from a layout already done.
+  const measuredWidthRef = React.useRef<number | null>(null);
+
   React.useEffect(() => {
     const element = tagsRef.current;
     if (!element || typeof ResizeObserver === "undefined") return;
 
-    const observer = new ResizeObserver(() => {
-      setContainerWidth(element.offsetWidth);
+    const observer = new ResizeObserver(([entry]) => {
+      const width = Math.round(
+        entry.borderBoxSize?.[0]?.inlineSize ?? entry.contentRect.width,
+      );
+      // Its first report is the width the tags were just laid out at.
+      if (width === measuredWidthRef.current) return;
+      setContainerWidth(width);
     });
 
     observer.observe(element);
@@ -76,16 +105,19 @@ const Tags: FC<TagsProps> = ({
     if (isNil(columnCount) || !tags || !tagsRef.current) return;
 
     const withDropDownTags = !onOptionTagClick;
+    const width = containerWidth || tagsRef.current.offsetWidth;
+    measuredWidthRef.current = width;
 
     const newTags = calculateRenderedTags(
       tags,
       columnCount,
-      tagsRef.current.offsetWidth,
+      width,
       showCreateTag,
       withDropDownTags,
     );
 
-    setRenderedTags(newTags);
+    // The same tags again render nothing new; skipping them saves a render.
+    setRenderedTags((prev) => (sameTags(prev, newTags) ? prev : newTags));
   }, [tags, columnCount, showCreateTag, onOptionTagClick, containerWidth]);
 
   React.useLayoutEffect(() => {

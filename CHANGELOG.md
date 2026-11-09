@@ -324,6 +324,18 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **An inline style written inside `Section` no longer restyles the whole section.** The rule
+  that drops the body's vertical padding around a chat looked for a `.chat-container` whose
+  `style` attribute did not say `display: none`, so the browser re-checked it on every inline
+  style change below: each frame of a virtual list's scroll or a column drag restyled every
+  element in the section. It now looks for a `.chat-container` alone; nothing hides one with an
+  inline style any more.
+- **Long lists scroll with less work per frame.** A closed `ContextMenu` no longer calls
+  `getContextModel` on every render (a list renders one closed menu per row); the items are built
+  when the menu opens, as before. `SectionFilter` reads the scroller once per frame instead of
+  in every scroll event, and not at all on a desktop, where it never pins. `Tags` reads its own
+  width once on mount and then takes it from its `ResizeObserver`, which no longer re-renders it
+  when the width has not changed.
 - **Secondary `Tabs` in a row too narrow for one tab between the arrows keep their width.** No
   tab fit between the two arrows, the tab size was divided by that zero, and every tab got an
   `Infinity` width the browser dropped. The tabs now keep the width they were measured at.

@@ -18,10 +18,10 @@ const AT_TOP_THRESHOLD = 20;
 const SectionFilter = React.memo(
   ({ className, children, withTabs }: SectionFilterProps) => {
     const scrollTopRef = useRef(0);
+    const scrollFrameRef = useRef(0);
     const [isFixed, setIsFixed] = useState(false);
 
-    const onScroll = useCallback((e: Event) => {
-      const eventTarget = e.target as HTMLElement;
+    const onScrollFrame = useCallback((eventTarget: HTMLElement) => {
       const { scrollHeight, clientHeight } = eventTarget;
 
       // Clamp to the real scrollable range: iOS rubber-banding reports
@@ -61,6 +61,22 @@ const SectionFilter = React.memo(
       }
     }, []);
 
+    // Once a frame, not on every scroll event: reading the scroller's sizes in
+    // the event, after the scrollbar has restyled its thumb, lays the whole
+    // page out on the spot. A desktop never pins the filter, so it reads
+    // nothing at all.
+    const onScroll = useCallback(
+      (e: Event) => {
+        if (isDesktop() || scrollFrameRef.current) return;
+        const eventTarget = e.target as HTMLElement;
+        scrollFrameRef.current = requestAnimationFrame(() => {
+          scrollFrameRef.current = 0;
+          onScrollFrame(eventTarget);
+        });
+      },
+      [onScrollFrame],
+    );
+
     useEffect(() => {
       const scroll = isMobile()
         ? document.querySelector("#customScrollBar .scroll-wrapper > .scroller")
@@ -69,6 +85,8 @@ const SectionFilter = React.memo(
 
       return () => {
         scroll?.removeEventListener("scroll", onScroll);
+        cancelAnimationFrame(scrollFrameRef.current);
+        scrollFrameRef.current = 0;
       };
     }, [onScroll]);
 

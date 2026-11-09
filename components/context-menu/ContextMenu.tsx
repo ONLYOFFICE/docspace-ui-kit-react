@@ -617,7 +617,10 @@ const ContextMenu = (props: ContextMenuProps) => {
   } = useContextMenuHotkeys({
     visible,
     withHotkeys,
-    model: model ?? getContextModel?.() ?? propsModel,
+    // Built only for an open menu: the hotkeys act on nothing else, and a list
+    // renders a closed menu in every row, where building the items each
+    // render costs more than the row itself.
+    model: model ?? (visible ? getContextModel?.() : undefined) ?? propsModel,
     currentEvent,
     hide,
     showDisabledItems,
