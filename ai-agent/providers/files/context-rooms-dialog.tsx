@@ -13,6 +13,16 @@ import { CONTEXT_ROOM_CLOUD } from "../context-room/ContextRoomSync";
 /** Which composer slot the picker serves: the skills or the knowledge bases. */
 export type ContextRoomsKind = "skills" | "knowledge";
 
+/**
+ * The chat keeps room ids as strings while the selector lists the rooms
+ * with the API's numeric ids, and ticks a row only on a strict match. A
+ * connected room handed over as "12" is therefore shown unticked, and
+ * picking it again sends it twice: once from the preselection and once
+ * from the row. The id goes to the selector in the row's form.
+ */
+const toSelectorId = (id: string): string | number =>
+  /^\d+$/.test(id) ? Number(id) : id;
+
 type ContextRoomsDialogProps = {
   kind: ContextRoomsKind;
   onClose: () => void;
@@ -43,17 +53,24 @@ const ContextRoomsDialog: React.FC<ContextRoomsDialogProps> = ({
       .filter((item) => item.cloud === CONTEXT_ROOM_CLOUD)
       .map(
         (item) =>
-          ({ id: item.room.id, label: item.room.name }) as TSelectorItem,
+          ({
+            id: toSelectorId(item.room.id),
+            label: item.room.name,
+          }) as TSelectorItem,
       );
   }, [isKnowledge, useCloudsStore]);
 
   const onSubmit = React.useCallback(
     (items: TSelectorItem[]) => {
       const state = useCloudsStore.getState();
-      const rooms = items.map((item) => ({
-        id: String(item.id),
-        name: String(item.label ?? ""),
-      }));
+      // One entry per room, whatever form its id came in.
+      const seen = new Set<string>();
+      const rooms = items.flatMap((item) => {
+        const id = String(item.id);
+        if (seen.has(id)) return [];
+        seen.add(id);
+        return [{ id, name: String(item.label ?? "") }];
+      });
       if (isKnowledge) state.selectKnowledgeFolders(CONTEXT_ROOM_CLOUD, rooms);
       else state.selectContextFolders(CONTEXT_ROOM_CLOUD, rooms);
       onClose();
