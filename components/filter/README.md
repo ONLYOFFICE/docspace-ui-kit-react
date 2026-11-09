@@ -390,6 +390,7 @@ export function FilterWithChips() {
 | `--filter-btn-border`           | theme   | Border of the filter button, as a `border` shorthand                                                            |
 | `--filter-btn-hover-border`     | theme   | The same on hover                                                                                               |
 | `--filter-btn-open-fill`        | theme   | Fill of the filter button's icon while the panel is open                                                        |
+| `--filter-btn-open-bg`          | theme   | Background of the filter button while the panel is open                                                         |
 | `--filter-btn-radius`           | `3px`   | Corner radius of the filter button                                                                              |
 | `--filter-sort-bg`              | theme   | Background of the sort button                                                                                   |
 | `--filter-sort-selected-bg`     | theme   | Background of the current field in the open sort menu                                                           |

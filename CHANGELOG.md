@@ -324,6 +324,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`Filter`'s button keeps its icon while the panel is open.** The open button turned its icon
+  white but lost the grey background it had before the move from the client, so the icon vanished
+  on the light theme. The background is back, and `--filter-btn-open-bg` overrides it.
 - **An inline style written inside `Section` no longer restyles the whole section.** The rule
   that drops the body's vertical padding around a chat looked for a `.chat-container` whose
   `style` attribute did not say `display: none`, so the browser re-checked it on every inline

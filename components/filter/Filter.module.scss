@@ -66,6 +66,10 @@
     --filter-btn-open-fill,
     var(--filter-button-open-fill)
   );
+  --filter-btn-open-bg-v: var(
+    --filter-btn-open-bg,
+    var(--filter-button-open-background)
+  );
   --filter-btn-radius-v: var(--filter-btn-radius, 3px);
 
   width: 32px;
@@ -112,6 +116,7 @@
   }
 
   &.isOpen {
+    background: var(--filter-btn-open-bg-v);
     pointer-events: none;
     svg {
       path {

@@ -1,6 +1,8 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import type { AxiosInstance } from "axios";
 
+import type PaymentStore from "./PaymentStore";
+
 import {
   createServiceLimit,
   deleteServiceLimit,
@@ -17,6 +19,8 @@ import type {
 class ServiceLimitStore {
   #api: AxiosInstance;
 
+  #paymentStore: PaymentStore;
+
   portalLimit: TServiceLimit | null = null;
 
   userLimit: TServiceLimit | null = null;
@@ -29,8 +33,9 @@ class ServiceLimitStore {
 
   isUserSaving = false;
 
-  constructor(api: AxiosInstance) {
+  constructor(api: AxiosInstance, paymentStore: PaymentStore) {
     this.#api = api;
+    this.#paymentStore = paymentStore;
 
     makeAutoObservable(this);
   }
@@ -38,8 +43,18 @@ class ServiceLimitStore {
   fetchAll = async () => {
     this.isLoading = true;
 
+    const { balance, fetchBalance, tariff } = this.#paymentStore;
+
+    const requests: Promise<unknown>[] = [
+      this.fetchPortalLimit(),
+      this.fetchUserLimit(),
+      tariff.fetchCustomerInfo(),
+    ];
+
+    if (!balance) requests.push(fetchBalance());
+
     try {
-      await Promise.all([this.fetchPortalLimit(), this.fetchUserLimit()]);
+      await Promise.all(requests);
     } finally {
       runInAction(() => {
         this.isLoading = false;
