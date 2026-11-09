@@ -52,7 +52,9 @@ const TableView = ({ serviceName }: TransactionHistoryProps) => {
         id: "Date",
         title: t("Date"),
         cellClassName: styles.cell,
-        width: { type: "fill" },
+        // Not "fill": the old header had no default column here, so every
+        // column got an even share and Type did not wrap.
+        width: { type: "flex", min: 150 },
         cell: (transaction) => (
           <CellText dataTestId="transaction_date">
             {getCorrectDate(language, transaction.date)}

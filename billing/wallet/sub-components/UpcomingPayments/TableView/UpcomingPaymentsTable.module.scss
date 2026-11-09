@@ -1,6 +1,8 @@
-// The 12px titles the page's tables had.
+// The 12px titles the page's tables had. The old table pulled itself 25px up
+// into the space under the intro; the margin keeps the header where it was.
 .table {
   --data-table-header-font-size: 12px;
+  margin-top: -24px;
 }
 
 .cellText {

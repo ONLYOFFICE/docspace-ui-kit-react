@@ -24,8 +24,11 @@
   }
 }
 
+// The old table pulled itself up into the space under the filters. This
+// collapses with their 8px bottom margin into 3px, which keeps the header
+// where it was.
 .transactionHistoryBody {
-  margin-top: 27px;
+  margin-top: -5px;
 }
 
 // The 12px titles the page's tables had.
