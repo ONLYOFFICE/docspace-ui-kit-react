@@ -1,5 +1,10 @@
 import type { TTranslation } from "../../../utils/common";
-import { formatNumber, truncateNumberToFraction } from "../../utils/common";
+import {
+  formatCurrencyIsolated,
+  formatNumber,
+  isolateCurrencyParts,
+  truncateNumberToFraction,
+} from "../../utils/common";
 
 const truncateNumberToFractionNumeric = (
   value: number,
@@ -28,7 +33,7 @@ export const formattedBalanceTokens = (
     maximumFractionDigits,
   });
 
-  return formatter.formatToParts(truncated);
+  return isolateCurrencyParts(language, formatter.formatToParts(truncated));
 };
 
 export const getEffectiveFraction = (
@@ -95,7 +100,7 @@ export const formatterCurrencyWithoutTranction = (
     maximumFractionDigits: effectiveFractionDigits,
   });
 
-  return formatter.format(truncated);
+  return formatCurrencyIsolated(language, formatter, truncated);
 };
 
 export const accountingLedgersFormat = (

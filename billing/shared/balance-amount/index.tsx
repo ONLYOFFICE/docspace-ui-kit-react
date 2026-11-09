@@ -4,7 +4,10 @@ import classNames from "classnames";
 
 import { Text } from "../../../components/text";
 import { Tooltip } from "../../../components/tooltip";
-import { truncateNumberToFraction } from "../../utils/common";
+import {
+  isolateCurrencyParts,
+  truncateNumberToFraction,
+} from "../../utils/common";
 import { formatterCurrencyWithoutTranction } from "../../wallet/utils";
 import RefreshIconButton from "../refresh-icon-button";
 import styles from "./BalanceAmount.module.scss";
@@ -83,7 +86,7 @@ const BalanceAmount = (props: BalanceAmountProps) => {
       maximumFractionDigits,
     });
 
-    return formatter.formatToParts(truncated);
+    return isolateCurrencyParts(language, formatter.formatToParts(truncated));
   }, [
     amount,
     currency,

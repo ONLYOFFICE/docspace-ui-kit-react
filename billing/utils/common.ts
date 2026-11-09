@@ -1,6 +1,34 @@
 import { Duration } from "luxon";
 
+import { isLanguageRtl } from "../../providers/theme/rtl-utils";
 import { dateDiff, now } from "../../utils/date";
+
+const FIRST_STRONG_ISOLATE = "\u2068";
+const POP_DIRECTIONAL_ISOLATE = "\u2069";
+
+export const isolateCurrencySymbol = (language: string, symbol: string) =>
+  symbol && isLanguageRtl(language)
+    ? `${FIRST_STRONG_ISOLATE}${symbol}${POP_DIRECTIONAL_ISOLATE}`
+    : symbol;
+
+export const isolateCurrencyParts = (
+  language: string,
+  parts: Intl.NumberFormatPart[],
+): Intl.NumberFormatPart[] =>
+  parts.map((part) =>
+    part.type === "currency"
+      ? { ...part, value: isolateCurrencySymbol(language, part.value) }
+      : part,
+  );
+
+export const formatCurrencyIsolated = (
+  language: string,
+  formatter: Intl.NumberFormat,
+  amount: number,
+) =>
+  isolateCurrencyParts(language, formatter.formatToParts(amount))
+    .map(({ value }) => value)
+    .join("");
 
 /**
  * Whole days from now until `date` (negative if the date is in the past).
@@ -98,7 +126,7 @@ export const formatCurrencyValue = (
     maximumFractionDigits: fractionDigits,
   });
 
-  return formatter.format(truncated);
+  return formatCurrencyIsolated(language, formatter, truncated);
 };
 
 /** Formats a fee percent with the locale's decimal separator, e.g. 5.5 → "5,5". */
@@ -124,10 +152,11 @@ export const getCurrencySymbol = (
 ): string => {
   if (!currency) return "";
   try {
-    return (
+    return isolateCurrencySymbol(
+      language,
       new Intl.NumberFormat(language, { style: "currency", currency })
         .formatToParts(0)
-        .find((part) => part.type === "currency")?.value ?? currency
+        .find((part) => part.type === "currency")?.value ?? currency,
     );
   } catch {
     return currency;
