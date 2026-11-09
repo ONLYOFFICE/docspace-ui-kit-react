@@ -57,10 +57,14 @@ const signatureOf = (columns: LayoutColumn[]) =>
  * reset or a change of the visible columns. Restoring and rendering never
  * write, so a window that only renders cannot overwrite a record another
  * window saved.
+ *
+ * `flexibleTotal` counts the table's flexible columns, hidden ones included:
+ * a column shown takes that share of the flexible area.
  */
 export const useColumnLayout = (
   columns: LayoutColumn[],
   storage: WidthStorage | undefined,
+  flexibleTotal?: number,
 ) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const widthRef = useRef(0);
@@ -74,7 +78,7 @@ export const useColumnLayout = (
     columns,
     storageId,
     measuredAt: width,
-    fractions: restoreFractions(columns, storage?.load(), width),
+    fractions: restoreFractions(columns, storage?.load(), width, flexibleTotal),
   });
 
   const [state, setState] = useState<LayoutState>(() => restore(0));
@@ -96,6 +100,7 @@ export const useColumnLayout = (
         columns,
         state.fractions,
         widthRef.current,
+        flexibleTotal,
       ),
     };
     pendingSaveRef.current = current.fractions;
@@ -109,6 +114,8 @@ export const useColumnLayout = (
 
   const storageRef = useRef(storage);
   storageRef.current = storage;
+  const flexibleTotalRef = useRef(flexibleTotal);
+  flexibleTotalRef.current = flexibleTotal;
 
   useEffect(() => {
     if (!pendingSaveRef.current) return;
@@ -150,6 +157,7 @@ export const useColumnLayout = (
               prev.columns,
               storageRef.current?.load(),
               widthRef.current,
+              flexibleTotalRef.current,
             ),
           }
         : prev,

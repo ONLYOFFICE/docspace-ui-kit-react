@@ -476,6 +476,76 @@ describe("showColumn", () => {
       getDefaultFractions(after, 0),
     );
   });
+
+  // My documents at 1124 px of flexible area: Name, Modified and Size shown,
+  // Author, Created and Type hidden - six flexible columns in all.
+  const DOCS_WIDTH = 1124 + 24;
+
+  it("divides by every flexible column, hidden ones included, and moves no other", () => {
+    const before = [fill(), flex("Modified"), flex("Size"), SETTINGS];
+    const after = [
+      fill(),
+      flex("Modified"),
+      flex("Size"),
+      flex("Type"),
+      SETTINGS,
+    ];
+    const shares = sharesFor(before, { Name: 450, Modified: 337, Size: 337 });
+
+    // 1124 / 6 = 187.33 from Name; by the visible count, 1124 / 4 = 281
+    // would take Name below 210 and reset every column.
+    expect(
+      round(
+        toPixels(
+          after,
+          showColumn(after, shares, DOCS_WIDTH, "Type", 6),
+          DOCS_WIDTH,
+        ),
+      ),
+    ).toEqual({
+      Name: 262.67,
+      Modified: 337,
+      Size: 337,
+      Type: 187.33,
+      Settings: 24,
+    });
+  });
+
+  it("resets when only one flexible column was visible", () => {
+    const after = [fill(), flex("Size"), SETTINGS];
+
+    expect(showColumn(after, { Name: 1 }, DOCS_WIDTH, "Size", 6)).toEqual(
+      getDefaultFractions(after, DOCS_WIDTH),
+    );
+  });
+
+  it("takes the width from the last of the widest columns", () => {
+    const before = [fill(), flex("Modified"), flex("Size"), SETTINGS];
+    const after = [
+      fill(),
+      flex("Modified"),
+      flex("Size"),
+      flex("Type"),
+      SETTINGS,
+    ];
+    const shares = sharesFor(before, { Name: 324, Modified: 400, Size: 400 });
+
+    expect(
+      round(
+        toPixels(
+          after,
+          showColumn(after, shares, DOCS_WIDTH, "Type", 6),
+          DOCS_WIDTH,
+        ),
+      ),
+    ).toEqual({
+      Name: 324,
+      Modified: 400,
+      Size: 212.67,
+      Type: 187.33,
+      Settings: 24,
+    });
+  });
 });
 
 describe("reconcileColumns", () => {

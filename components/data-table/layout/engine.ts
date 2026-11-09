@@ -365,11 +365,14 @@ export const hideColumn = (
  * Shares once `columnId` is shown. `columnsAfter` lists the visible columns
  * with it; `fractions` are those of the columns before it appeared.
  *
- * A flexible column gets the flexible area divided by the number of flexible
- * columns, itself included (the spec's 807 px and four columns give 202 px); a
- * `fixed` one gets its size. Either way the width comes from the widest
- * flexible column. If that leaves any column below its minimum, the layout
- * resets to the defaults instead.
+ * A flexible column gets the flexible area divided by `flexibleTotal`, the
+ * number of flexible columns the table has, hidden ones included, as the old
+ * table divided it; without it, the flexible columns visible once it is shown
+ * (the spec's 807 px and four columns give 202 px). A `fixed` one gets its
+ * size. Either way the width comes from the widest flexible column, the last
+ * of several as wide, and no other column moves. If that leaves either column
+ * below its minimum, or only one flexible column was visible before, the
+ * layout resets to the defaults instead.
  *
  * While the layout is compact the same rule runs on the shares, without the
  * minimum check, which only means something at a width where they fit. Before
@@ -380,6 +383,7 @@ export const showColumn = (
   fractions: ColumnFractions,
   containerWidth: number,
   columnId: string,
+  flexibleTotal?: number,
 ): ColumnFractions => {
   const column = columnsAfter.find((c) => c.id === columnId);
   const reset = () => getDefaultFractions(columnsAfter, containerWidth);
@@ -389,18 +393,27 @@ export const showColumn = (
   const area = getFlexibleArea(columnsAfter, containerWidth);
   if (area <= 0) return reset();
 
-  const share = 1 / columnsAfter.filter(isFlexible).length;
+  const flexibleAfter = columnsAfter.filter(isFlexible).length;
+  const share = 1 / Math.max(flexibleTotal ?? 0, flexibleAfter);
+  // Next to a single flexible column, which holds the whole flexible area,
+  // the new one starts the layout over.
+  if (isFlexible(column) && flexibleAfter === 2) return reset();
+
+  // The last of the widest, as the old table took it.
+  const widestBy = (size: ColumnFractions) =>
+    columnsBefore
+      .filter(isFlexible)
+      .reduce<LayoutColumn | null>(
+        (best, c) =>
+          !best || size[c.id] >= size[best.id] - EPSILON ? c : best,
+        null,
+      );
 
   if (isCompact(columnsAfter, containerWidth)) {
     if (!isFlexible(column)) return normalize(columnsAfter, fractions);
 
     const shares = normalize(columnsBefore, fractions);
-    const widest = columnsBefore
-      .filter(isFlexible)
-      .reduce<LayoutColumn | null>(
-        (best, c) => (!best || shares[c.id] > shares[best.id] ? c : best),
-        null,
-      );
+    const widest = widestBy(shares);
     if (!widest || shares[widest.id] <= share) return reset();
 
     shares[widest.id] -= share;
@@ -411,12 +424,7 @@ export const showColumn = (
   const width = isFlexible(column) ? area * share : getMinWidth(column);
 
   const pixels = toPixels(columnsBefore, fractions, containerWidth);
-  const widest = columnsBefore
-    .filter(isFlexible)
-    .reduce<LayoutColumn | null>(
-      (best, c) => (!best || pixels[c.id] > pixels[best.id] ? c : best),
-      null,
-    );
+  const widest = widestBy(pixels);
   if (!widest) return reset();
 
   pixels[widest.id] -= width;
@@ -433,13 +441,14 @@ export const showColumn = (
  * Shares for the visible columns after they changed from `prevColumns` to
  * `nextColumns`: every removed column is hidden and every added one shown, in
  * order, by the rules above. Columns that only moved or changed their width
- * spec keep their shares.
+ * spec keep their shares. `flexibleTotal` is passed on to `showColumn`.
  */
 export const reconcileColumns = (
   prevColumns: LayoutColumn[],
   nextColumns: LayoutColumn[],
   fractions: ColumnFractions,
   containerWidth: number,
+  flexibleTotal?: number,
 ): ColumnFractions => {
   const nextIds = new Set(nextColumns.map((c) => c.id));
   let current = prevColumns;
@@ -458,7 +467,7 @@ export const reconcileColumns = (
     .forEach((c) => {
       present.add(c.id);
       current = nextColumns.filter((x) => present.has(x.id));
-      shares = showColumn(current, shares, containerWidth, c.id);
+      shares = showColumn(current, shares, containerWidth, c.id, flexibleTotal);
     });
 
   return normalize(nextColumns, shares);
@@ -474,6 +483,7 @@ export const restoreFractions = (
   columns: LayoutColumn[],
   stored: ColumnFractions | null | undefined,
   containerWidth: number,
+  flexibleTotal?: number,
 ): ColumnFractions => {
   const known = columns.filter(
     (c) => isFlexible(c) && isValidShare(stored?.[c.id]),
@@ -491,5 +501,6 @@ export const restoreFractions = (
     columns,
     normalize(knownColumns, stored),
     containerWidth,
+    flexibleTotal,
   );
 };

@@ -72,7 +72,13 @@ export const DataTable = <T,>({
     [visibleColumns],
   );
 
-  const layout = useColumnLayout(layoutColumns, widthStorage);
+  // Hidden columns count too: a column shown takes the flexible area divided
+  // by all of them, as the old table gave it.
+  const flexibleTotal = columns.filter(
+    (column) => column.width.type !== "fixed",
+  ).length;
+
+  const layout = useColumnLayout(layoutColumns, widthStorage, flexibleTotal);
   const { containerRef, gridTemplate, compact } = layout;
 
   const { bind, resizingId } = useColumnResize(layout);
