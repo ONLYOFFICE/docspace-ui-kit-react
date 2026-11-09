@@ -280,6 +280,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`Filter`'s button keeps its icon while the panel is open.** The open button turned its icon
+  white but lost the grey background it had before the move from the client, so the icon vanished
+  on the light theme. The background is back, and `--filter-btn-open-bg` overrides it.
 - **Secondary `Tabs` in a row too narrow for one tab between the arrows keep their width.** No
   tab fit between the two arrows, the tab size was divided by that zero, and every tab got an
   `Infinity` width the browser dropped. The tabs now keep the width they were measured at.
