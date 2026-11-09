@@ -73,7 +73,12 @@ const LimitStatus = ({
   const hasReset = Boolean(usage.periodEnd);
   const warning = highlight(styles.statusWarning);
 
-  if (draftAmount !== null && draftAmount < usage.amountConsumed) {
+  const isUnsaved =
+    !limit?.enabled ||
+    draftAmount !== limit.amountValue ||
+    draftPeriod !== limit.period;
+
+  if (isUnsaved && draftAmount !== null && draftAmount < usage.amountConsumed) {
     const values = {
       spent,
       amount: formatWalletCurrency(draftAmount, 2, currency),

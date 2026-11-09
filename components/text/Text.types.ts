@@ -43,6 +43,8 @@ export type TextProps = {
   children?: React.ReactNode;
   /** Called with the event when the element is clicked. */
   onClick?: (e: React.MouseEvent<Element>) => void;
+  /** Called with the event on a key press while the element has focus; passed to the element unchanged. */
+  onKeyDown?: (e: React.KeyboardEvent<HTMLElement>) => void;
   /** Passed to the element unchanged, for `as="label"`. */
   htmlFor?: string;
   /** Only `"tile"` is recognised, and only together with `dir="auto"`: it clamps the text to two lines. */
@@ -61,6 +63,8 @@ export type TextProps = {
   "aria-live"?: React.AriaAttributes["aria-live"];
   /** Hides the element from assistive technology, passed unchanged, for decoration that repeats what is already read. */
   "aria-hidden"?: React.AriaAttributes["aria-hidden"];
+  /** What a `role="button"` text opens, passed unchanged: `dialog` for one that opens a panel or a selector. */
+  "aria-haspopup"?: React.AriaAttributes["aria-haspopup"];
   /** Not read here — it reaches the DOM as an unknown attribute. It is read off this element by `RowContent` and `TileContent`, which use it as the width of the slot they put the child in. */
   containerWidth?: string;
   /** Not read here — it reaches the DOM as an unknown attribute. It is read off this element by `RowContent`, which uses it as the minimum width of a side slot. */

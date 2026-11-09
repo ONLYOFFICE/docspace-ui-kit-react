@@ -42,6 +42,7 @@ const PriceDetailsDialog = observer(
       tariffDueTodayAmount,
       isTariffDueTodayCalculating,
       formatPaymentCurrency,
+      formatDueTodayAmount,
       formatWalletCurrency,
       language,
       walletBalance,
@@ -188,7 +189,7 @@ const PriceDetailsDialog = observer(
                     <Loader color="" size="16px" type={LoaderTypes.track} />
                   ) : (
                     <Text as="span" fontSize="14px" fontWeight={600}>
-                      {formatPaymentCurrency(dueToday)}
+                      {formatDueTodayAmount(dueToday)}
                     </Text>
                   )}
                 </div>

@@ -43,6 +43,8 @@
     "scripts",
     "**/storybook-helpers/**",
     "*.config.ts",
-    "**/*.config.ts"
+    "**/*.config.ts",
+    "*.config.mts",
+    "**/*.config.mts"
   ]
 }

@@ -55,6 +55,13 @@ async function gotoStory(page: Page, storyId: string) {
 test.describe("ToggleButton — light", () => {
   test("default", async ({ page }) => {
     await gotoStory(page, "default");
+    // The story's play leaves the keyboard focus on the control: that is
+    // one state, and the control at rest, focus taken away, the other.
+    await expect(page).toHaveScreenshot("toggle-button-keyboard-focus.png");
+    await page.evaluate(() => {
+      const focused = document.activeElement;
+      if (focused instanceof HTMLElement) focused.blur();
+    });
     await expect(page).toHaveScreenshot("toggle-button-default.png");
   });
 
@@ -89,6 +96,15 @@ test.describe("ToggleButton — dark", () => {
 
   test("default dark", async ({ page }) => {
     await gotoStory(page, "default");
+    // The story's play leaves the keyboard focus on the control: that is
+    // one state, and the control at rest, focus taken away, the other.
+    await expect(page).toHaveScreenshot(
+      "toggle-button-keyboard-focus-dark.png",
+    );
+    await page.evaluate(() => {
+      const focused = document.activeElement;
+      if (focused instanceof HTMLElement) focused.blur();
+    });
     await expect(page).toHaveScreenshot("toggle-button-default-dark.png");
   });
 

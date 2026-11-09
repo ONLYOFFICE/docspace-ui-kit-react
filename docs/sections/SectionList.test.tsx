@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -84,9 +84,7 @@ describe("SectionList", () => {
 
     await openFilter();
     await userEvent.click(await findTag("me"));
-    await act(async () => {
-      await userEvent.click(screen.getByTestId("filter_apply_button"));
-    });
+    await userEvent.click(screen.getByTestId("filter_apply_button"));
 
     await waitFor(() =>
       expect(screen.queryByText("Finance department")).not.toBeInTheDocument(),
@@ -96,9 +94,7 @@ describe("SectionList", () => {
     // Picked again in the panel, the chip is dropped like any other tag.
     await openFilter();
     await userEvent.click(await findTag("me"));
-    await act(async () => {
-      await userEvent.click(screen.getByTestId("filter_apply_button"));
-    });
+    await userEvent.click(screen.getByTestId("filter_apply_button"));
 
     expect(await screen.findByText("Finance department")).toBeInTheDocument();
   });

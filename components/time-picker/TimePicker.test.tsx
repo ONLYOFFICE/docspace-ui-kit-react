@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, fireEvent, screen } from "@testing-library/react";
+import { act, render, fireEvent, screen } from "@testing-library/react";
 import { TimePicker, type TimePickerProps } from ".";
 
 describe("<TimePicker />", () => {
@@ -122,12 +122,12 @@ describe("<TimePicker />", () => {
     const hoursInput = screen.getByLabelText("Hours") as HTMLInputElement;
     const minutesInput = screen.getByLabelText("Minutes") as HTMLInputElement;
 
-    hoursInput.focus();
+    act(() => hoursInput.focus());
     fireEvent.change(hoursInput, { target: { value: "09" } });
     expect(hoursInput).toHaveFocus();
     expect(mockOnChange).toHaveBeenCalled();
 
-    minutesInput.focus();
+    act(() => minutesInput.focus());
     fireEvent.change(minutesInput, { target: { value: "45" } });
     expect(minutesInput).toHaveFocus();
     expect(minutesInput.value).toBe("45");

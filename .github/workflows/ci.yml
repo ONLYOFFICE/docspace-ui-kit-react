@@ -4,7 +4,11 @@ name: CI
 # its pull request: with `feature/*` and `bugfix/*` under both triggers, every
 # push to a branch with an open PR ran each job twice on the same commit. The
 # pull_request run is the one worth keeping -- it checks the merge result, not
-# the branch alone. A task branch with no PR yet is covered by the pre-push gate.
+# the branch alone. A task branch with no PR yet has only the pre-push gate,
+# which is partial on purpose: format, lint, tsc and the README checks in full,
+# but only the unit tests a change reaches, and the build and the tarball only
+# when the build's own code changed. The full suite, the build, the package
+# checks and the story tests run here, once a pull request is open.
 "on":
   push:
     branches: [master, develop, release/v*, hotfix/v*]
@@ -50,6 +54,8 @@ jobs:
       - name: Run TypeScript
         run: pnpm tsc
 
+      # The whole suite. Pre-push runs `pnpm test:changed`, only the tests a
+      # change reaches, so this is the first run of the rest.
       - name: Run Tests
         run: pnpm test
 

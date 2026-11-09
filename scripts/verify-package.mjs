@@ -1,10 +1,9 @@
 // Runs the two packaging validators against a real tarball.
 //
-// Both are invoked through `npx --yes` rather than added as devDependencies:
-// the repository's dependencies test detects usage by scanning for
-// import/require/from literals, and a CLI-only tool has none, so declaring
-// them would be reported as an unused dependency and fail the push. Adding
-// them properly means an allowlist entry on the client side -- tracked as debt.
+// Both are pinned devDependencies, run from node_modules. They used to go
+// through `npx --yes`, because the DocSpace client's dependency test -- which
+// scanned this source until the split -- reported a CLI-only devDependency as
+// unused. Nothing scans it now, and npx asked the registry on every run.
 //
 // The tarball MUST be produced by pnpm. `publishConfig` field overrides are a
 // pnpm feature; `npm pack` leaves them unapplied, so an npm-packed tarball has
@@ -23,15 +22,50 @@ const PKG_DIR = path.resolve(
   "..",
 );
 
-// shell on win32: pnpm and npx are .CMD shims there, and Node will not spawn
-// one directly -- without this the script fails with ENOENT before it checks
-// anything, on the platform where nobody would think to look.
-const run = (cmd, args, opts = {}) =>
-  execFileSync(cmd, args, {
-    encoding: "utf8",
-    shell: process.platform === "win32",
-    ...opts,
-  });
+// No shell anywhere. `pnpm` and `npx` are .CMD shims on win32, which Node will
+// not spawn directly, and this used to pass `shell: true` to reach them -- which
+// Node 24 deprecates whenever arguments are passed too (DEP0190). So pnpm is
+// run from the path pnpm itself put in npm_execpath (a native pnpm.exe, or a
+// .cjs that needs node), and the validators through node and their own bin.
+const run = (file, args, opts = {}) =>
+  /\.[cm]?js$/.test(file)
+    ? execFileSync(process.execPath, [file, ...args], {
+        encoding: "utf8",
+        ...opts,
+      })
+    : execFileSync(file, args, { encoding: "utf8", ...opts });
+
+// Set by every package manager, not only pnpm: under `npm run` it is
+// npm-cli.js, and packing with that is exactly the npm tarball described
+// above -- every check would then fail on the missing `exports`, not on the
+// real cause. pnpm's own file is named in more ways than one -- `pnpm`,
+// `pnpm.exe`, `pnpm.cjs`, and `pnpm-native` under corepack, as on CI -- so the
+// test is that the name says pnpm at all; npm's and yarn's never do.
+const pnpmPath = process.env.npm_execpath;
+
+if (!pnpmPath || !/pnpm/i.test(path.basename(pnpmPath))) {
+  console.error(
+    `${pnpmPath ? `npm_execpath is ${pnpmPath}, not pnpm` : "npm_execpath is not set"}, ` +
+      "and the tarball must be packed by pnpm. Run this as " +
+      "`pnpm verify:package`, not through npm, yarn or node directly.",
+  );
+  process.exit(1);
+}
+
+// A direct devDependency is linked at node_modules/<name> by pnpm; its
+// package.json is read from there because not every package exports it.
+const binOf = (name, bin) => {
+  const dir = path.join(PKG_DIR, "node_modules", name);
+  const manifest = JSON.parse(
+    fs.readFileSync(path.join(dir, "package.json"), "utf8"),
+  );
+  const entry =
+    typeof manifest.bin === "string" ? manifest.bin : manifest.bin?.[bin];
+
+  if (!entry) throw new Error(`${name} declares no "${bin}" bin`);
+
+  return path.join(dir, entry);
+};
 
 // Reads one file out of a .tgz with node's own gzip and a walk over the tar
 // headers, never the `tar` binary. `tar` resolves to bsdtar in PowerShell and
@@ -84,7 +118,7 @@ const outDir = fs.mkdtempSync(path.join(os.tmpdir(), "ui-kit-verify-"));
 
 try {
   console.log("Packing with pnpm (publishConfig applied)...");
-  run("pnpm", ["pack", "--pack-destination", outDir], { cwd: PKG_DIR });
+  run(pnpmPath, ["pack", "--pack-destination", outDir], { cwd: PKG_DIR });
 
   const tarball = fs
     .readdirSync(outDir)
@@ -109,7 +143,7 @@ try {
 
   console.log(`\n=== publint ===`);
   try {
-    console.log(run("npx", ["--yes", "publint", tarball]));
+    console.log(run(binOf("publint", "publint"), [tarball]));
   } catch (error) {
     console.log(error.stdout ?? String(error));
     process.exitCode = 1;
@@ -127,9 +161,7 @@ try {
     console.log(
       // The tarball goes first: --exclude-entrypoints is variadic and would
       // otherwise swallow the path as another entry point name.
-      run("npx", [
-        "--yes",
-        "@arethetypeswrong/cli",
+      run(binOf("@arethetypeswrong/cli", "attw"), [
         tarball,
         "--exclude-entrypoints",
         "styles.css",

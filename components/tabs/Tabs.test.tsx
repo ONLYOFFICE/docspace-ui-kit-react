@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { screen, render, fireEvent, act } from "@testing-library/react";
+import {
+  screen,
+  render,
+  fireEvent,
+  act,
+  waitFor,
+} from "@testing-library/react";
 
 import { Tabs } from ".";
 import { TabsTypes } from "./Tabs.enums";
@@ -332,7 +338,7 @@ describe("Tabs", () => {
       fireEvent.click(tab);
 
       expect(onClickMock).toHaveBeenCalled();
-      await vi.waitFor(() => {
+      await waitFor(() => {
         expect(dispatchSpy).toHaveBeenCalledWith(
           expect.objectContaining({ type: AnimationEvents.END_ANIMATION }),
         );
@@ -516,7 +522,7 @@ describe("Tabs", () => {
       expect(arrowRight).toBeInTheDocument();
       // The arrow selects the next tab the way a click on it does, the
       // tab's own onClick included.
-      (arrowRight as HTMLElement).click();
+      act(() => (arrowRight as HTMLElement).click());
       expect(onSelectMock).toHaveBeenCalledWith(items[1]);
       expect(onTab2Click).toHaveBeenCalledTimes(1);
 
@@ -529,6 +535,52 @@ describe("Tabs", () => {
         );
       } else {
         delete (HTMLElement.prototype as { offsetWidth?: number }).offsetWidth;
+      }
+    });
+
+    it("keeps a finite width when no tab fits between the arrows", () => {
+      // A 100px row, 50px tabs: 19px of label each, and the two 32px arrows
+      // leave 36px -- less than one tab with its padding and gap. The tab size
+      // used to be divided by that zero count, and every width became Infinity.
+      const originalOffsetWidth = Object.getOwnPropertyDescriptor(
+        HTMLElement.prototype,
+        "offsetWidth",
+      );
+      Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+        configurable: true,
+        get: function () {
+          if (this.classList.contains(styles.tabs)) return 100;
+          if (this.classList.contains(styles.tab)) return 50;
+          return 0;
+        },
+      });
+
+      try {
+        const items = [
+          { id: "1", name: "Tab 1", content: "1" },
+          { id: "2", name: "Tab 2", content: "2" },
+          { id: "3", name: "Tab 3", content: "3" },
+        ];
+        render(
+          <Tabs items={items} type={TabsTypes.Secondary} selectedItemId="1" />,
+        );
+
+        // The tabs keep their measured width: 3 x (19 + 31 padding) + two
+        // 32px arrows + 3 x 4px gaps.
+        const tabList = screen.getByRole("tablist");
+        expect(tabList.style.getPropertyValue("--tabs-width")).toBe("226px");
+        expect(screen.getByTestId("1_subtab").style.width).toBe("19px");
+      } finally {
+        if (originalOffsetWidth) {
+          Object.defineProperty(
+            HTMLElement.prototype,
+            "offsetWidth",
+            originalOffsetWidth,
+          );
+        } else {
+          delete (HTMLElement.prototype as { offsetWidth?: number })
+            .offsetWidth;
+        }
       }
     });
 
@@ -650,7 +702,7 @@ describe("Tabs", () => {
       );
 
       const tab2 = screen.getByTestId("tab1_subtab");
-      tab2.click();
+      act(() => tab2.click());
 
       expect(onSelectMock).toHaveBeenCalledWith(arrayItems[1]);
     });
@@ -724,7 +776,7 @@ describe("Tabs", () => {
 
       const arrowLeft = container.querySelector(`.${styles.arrowLeft}`);
       if (arrowLeft) {
-        (arrowLeft as HTMLElement).click();
+        act(() => (arrowLeft as HTMLElement).click());
         expect(onSelectMock).toHaveBeenCalledWith(arrayItems[0]);
       }
 
@@ -869,5 +921,105 @@ describe("Tabs", () => {
       expect(onSelectMock).not.toHaveBeenCalled();
       expect(onClickMock).not.toHaveBeenCalled();
     });
+  });
+
+  describe.each([
+    ["primary", TabsTypes.Primary],
+    ["secondary", TabsTypes.Secondary],
+  ])("the %s bar's panel", (_, type) => {
+    const items: TTabItem[] = [
+      { id: "first", name: "First", content: <p>First text</p> },
+      { id: "second", name: "Second", content: <p>Second text</p> },
+    ];
+
+    it("is a tabpanel labelled by the selected tab, which controls it", () => {
+      render(<Tabs type={type} items={items} selectedItemId="second" />);
+
+      const panel = screen.getByRole("tabpanel", { name: "Second" });
+      expect(panel).toHaveTextContent("Second text");
+
+      const [first, second] = screen.getAllByRole("tab");
+      expect(second).toHaveAttribute("aria-controls", panel.id);
+      // The other tab's panel is not rendered, so nothing to point at.
+      expect(first).not.toHaveAttribute("aria-controls");
+    });
+
+    // jsdom lays nothing out, so every element would read as unrendered and
+    // every panel as empty: the rendered check needs a box to look at.
+    const withLayout = () =>
+      vi.spyOn(Element.prototype, "getClientRects").mockImplementation(() => {
+        const rects = [new DOMRect(0, 0, 10, 10)];
+        return Object.assign(rects, {
+          item: (i: number) => rects[i] ?? null,
+        });
+      });
+
+    it("is a Tab stop itself when it has nothing to tab to", () => {
+      const layout = withLayout();
+      render(<Tabs type={type} items={items} selectedItemId="first" />);
+
+      expect(screen.getByRole("tabpanel")).toHaveAttribute("tabindex", "0");
+      layout.mockRestore();
+    });
+
+    it("is no Tab stop of its own when it holds a control", () => {
+      const layout = withLayout();
+      render(
+        <Tabs
+          type={type}
+          items={[
+            {
+              id: "form",
+              name: "Form",
+              content: <button type="button">Save</button>,
+            },
+          ]}
+          selectedItemId="form"
+        />,
+      );
+
+      expect(screen.getByRole("tabpanel")).not.toHaveAttribute("tabindex");
+      layout.mockRestore();
+    });
+  });
+
+  it("keeps the secondary bar's scroll arrows out of the Tab order", () => {
+    mockIsMobile.value = false;
+    const original = Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      "offsetWidth",
+    );
+    // A narrow bar for three wide tabs: the arrows show.
+    Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+      configurable: true,
+      get: function () {
+        if (this.classList.contains(styles.tabs)) return 100;
+        if (this.classList.contains(styles.tab)) return 50;
+        return 0;
+      },
+    });
+
+    try {
+      const { container } = render(
+        <Tabs
+          type={TabsTypes.Secondary}
+          items={[
+            { id: "1", name: "Tab 1", content: null },
+            { id: "2", name: "Tab 2", content: null },
+            { id: "3", name: "Tab 3", content: null },
+          ]}
+          selectedItemId="1"
+        />,
+      );
+
+      const arrows = container.querySelectorAll(`.${styles.arrowIcon}`);
+      expect(arrows).toHaveLength(2);
+      for (const arrow of arrows) {
+        expect(arrow).toHaveAttribute("tabindex", "-1");
+      }
+    } finally {
+      if (original)
+        Object.defineProperty(HTMLElement.prototype, "offsetWidth", original);
+    }
   });
 });

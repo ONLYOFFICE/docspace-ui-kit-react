@@ -60,10 +60,9 @@ const AiChatPanelSave = observer(() => {
     <IconButton
       iconNode={<SaveIcon />}
       size={17}
-      // A stroked glyph in its own grey, like the fullscreen and close
-      // icons beside it: the default fill recolor would paint the outline
-      // shut and in a dimmer grey.
-      isFill={false}
+      // A stroked glyph, like the fullscreen and close icons beside it:
+      // recolor the outline (and on hover), never fill it shut.
+      isStroke
       onClick={onClick}
       tooltipId="ai-chat-panel-save-tooltip"
       tooltipContent={t("Common:SaveAIProject", {

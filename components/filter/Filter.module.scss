@@ -421,6 +421,15 @@
 
   cursor: pointer;
 
+  // A tag, or the label and the cross of a picked value's tag, is a keyboard
+  // button: ring it as the other controls are.
+  &:focus-visible,
+  [role="button"]:focus-visible {
+    outline: 2px solid
+      var(--accent-main, var(--color-scheme-main-accent, #{$light-blue-main}));
+    outline-offset: 1px;
+  }
+
   &[data-selected="true"] {
     background: var(--filter-tag-selected-bg-v);
     border-color: var(--filter-tag-selected-bg-v);

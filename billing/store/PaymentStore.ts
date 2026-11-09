@@ -943,6 +943,9 @@ class PaymentStore {
     );
   };
 
+  formatDueTodayAmount = (amount: number) =>
+    this.formatPaymentCurrency(amount, Number.isInteger(amount) ? 0 : 2);
+
   formatFuturePaymentCurrency = (item?: number, fractionDigits: number = 0) => {
     const amount = item ?? this.walletBalance;
     const { isoCurrencySymbol } = this.paymentQuotas.futurePlanCost;
@@ -985,16 +988,21 @@ class PaymentStore {
     from,
     to,
     participantName,
+    signal,
     mergeByok,
   }: {
     serviceName?: string;
     from?: DateTime;
     to?: DateTime;
     participantName?: string;
+    signal?: AbortSignal;
     mergeByok?: boolean;
   } = {}) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
+    signal?.addEventListener("abort", () => abortController.abort(), {
+      once: true,
+    });
 
     try {
       const { data } = await this.#rawApiClient.instance.get(
@@ -1766,6 +1774,8 @@ class PaymentStore {
   ) => {
     this.setIsLoading(true);
 
+    let isUpdated = false;
+
     try {
       const dueTodayAmount = this.tariffDueTodayAmount ?? this.totalPrice;
       const isBalanceInsufficient = this.walletBalance < dueTodayAmount;
@@ -1800,6 +1810,8 @@ class PaymentStore {
         return false;
       }
 
+      isUpdated = true;
+
       if (type === ProductQuantityType.Add) {
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({
@@ -1824,6 +1836,7 @@ class PaymentStore {
       toastr.error(t("ErrorNotification"));
       return false;
     } finally {
+      if (!isUpdated) await this.fetchBalance(true).catch(() => undefined);
       this.setIsLoading(false);
     }
   };
@@ -1847,7 +1860,7 @@ class PaymentStore {
           ? t("TopUpWallet")
           : t("TopUpAndUpgrade");
       return t("PayAndUpgrade", {
-        amount: this.formatPaymentCurrency(dueTodayAmount),
+        amount: this.formatDueTodayAmount(dueTodayAmount),
       });
     }
 

@@ -1,3 +1,4 @@
+import { PaymentMethodStatus } from "@onlyoffice/docspace-api-sdk";
 import { isIOS } from "react-device-detect";
 
 import { toAbsoluteUrl } from "./url";
@@ -7,6 +8,10 @@ export const PAYMENT_CALLBACK_PATH = "/billing/payment-complete";
 const POLL_INITIAL_INTERVAL_MS = 2000;
 const POLL_MAX_INTERVAL_MS = 5000;
 const POLL_TIMEOUT_MS = 5 * 60 * 1000;
+const POLLING_TIMEOUT_MESSAGE = "Polling timeout";
+
+export const isPollingTimeoutError = (error: unknown) =>
+  error instanceof Error && error.message === POLLING_TIMEOUT_MESSAGE;
 
 export type TPollOptions = {
   initialIntervalMs?: number;
@@ -48,7 +53,7 @@ export const pollUntil = async (
     if (await check()) return;
     if (signal.aborted) return;
     if (Date.now() - startedAt > timeoutMs) {
-      throw new Error("Polling timeout");
+      throw new Error(POLLING_TIMEOUT_MESSAGE);
     }
     await sleep(interval, signal);
     interval = Math.min(interval * 2, maxIntervalMs);
@@ -95,7 +100,7 @@ export const openStripeCheckout = async (
 };
 
 export type TTopUpCustomerInfo = {
-  email?: string | null;
+  paymentMethodStatus?: number | null;
   isDelayedPaymentMethod?: boolean;
 };
 
@@ -105,6 +110,7 @@ export type TTopUpCompletionDeps = {
     refresh?: boolean,
   ) => Promise<TTopUpCustomerInfo | null | undefined>;
   fetchBalance: (isRefresh?: boolean) => Promise<number>;
+  isPurchaseCompleted?: () => Promise<boolean>;
 };
 
 export const waitForTopUpCompletion = async (
@@ -112,6 +118,7 @@ export const waitForTopUpCompletion = async (
     walletBalance: initialBalance,
     fetchCustomerInfo,
     fetchBalance,
+    isPurchaseCompleted,
   }: TTopUpCompletionDeps,
   signal: AbortSignal,
 ) => {
@@ -120,15 +127,17 @@ export const waitForTopUpCompletion = async (
   await pollUntil(async () => {
     const info = await fetchCustomerInfo(true);
     isDelayedPaymentMethod = info?.isDelayedPaymentMethod === true;
-    return !!info?.email;
+    return info?.paymentMethodStatus === PaymentMethodStatus.Set;
   }, signal);
 
   if (isDelayedPaymentMethod) return { isDelayedPaymentMethod };
 
-  await pollUntil(async () => {
+  const isBalanceIncreased = async () => {
     const newBalance = await fetchBalance(true);
     return newBalance > initialBalance;
-  }, signal);
+  };
+
+  await pollUntil(isPurchaseCompleted ?? isBalanceIncreased, signal);
 
   return { isDelayedPaymentMethod };
 };

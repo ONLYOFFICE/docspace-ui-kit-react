@@ -15,8 +15,23 @@ const toHref = (to: To): string => {
   return `${pathname}${search}${hash}`;
 };
 
-const MockLinkRouter = ({ children, to, ...props }: LinkRouterProps) => (
-  <a href={toHref(to)} {...props}>
+// A router link handles the click itself, as react-router's Link does, so the
+// browser never follows the href -- jsdom cannot, and would log "Not
+// implemented: navigation to another Document".
+const MockLinkRouter = ({
+  children,
+  to,
+  onClick,
+  ...props
+}: LinkRouterProps) => (
+  <a
+    href={toHref(to)}
+    {...props}
+    onClick={(event) => {
+      event.preventDefault();
+      onClick?.(event);
+    }}
+  >
     {children}
   </a>
 );

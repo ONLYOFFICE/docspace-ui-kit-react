@@ -89,10 +89,20 @@ const UpdatePlanButtonContainer = ({
     resetTariffContainerToBasic();
   };
 
+  const refreshAfterPurchase = async () => {
+    await Promise.all([fetchBalance(true), fetchPaymentQuotas()]);
+    resetTariffContainerToBasic();
+  };
+
+  const purchasedManagersCount = isRepurchase
+    ? managersCount
+    : managersCount - maxCountManagersByQuota;
+
   const dueTodayAmount = tariffDueTodayAmount ?? totalPrice;
   const isBalanceInsufficient = walletBalance < dueTodayAmount;
   const topUpShortfall = Math.max(0, Math.ceil(dueTodayAmount - walletBalance));
   const isDelayedPaymentTopUp = isDelayedPaymentMethod && isBalanceInsufficient;
+  const isCardMissingTopUp = isCardMissingOrInactive && isBalanceInsufficient;
 
   const onUpdateTariff = () => {
     if (isVisiblePaymentConfirm) onClose();
@@ -121,24 +131,36 @@ const UpdatePlanButtonContainer = ({
     setIsVisibleDowngradePlanDialog(false);
   };
 
+  const isTariffPurchased = async () => {
+    await Promise.all([fetchPortalTariff(true), fetchPortalQuota(true)]);
+
+    return (
+      !store.quotas.isFreeTariff &&
+      !store.tariff.isGracePeriod &&
+      !store.tariff.isNotPaidPeriod &&
+      store.quotas.maxCountManagersByQuota >= managersCount
+    );
+  };
+
   const onTopUpConfirm = async () => {
     closeTopUpDialog();
 
-    await (isRepurchase
-      ? executeWalletUpdate(managersCount, ProductQuantityType.Add, t)
-      : onUpdateTariff());
+    await executeWalletUpdate(
+      purchasedManagersCount,
+      ProductQuantityType.Add,
+      t,
+    );
   };
 
   const getPayTariffLabel = () => {
     if (isDelayedPaymentTopUp) return t("TopUpWallet");
-    if (!isCardLinkedToPortal || isBalanceInsufficient)
-      return t("TopUpAndUpgrade");
+    if (isBalanceInsufficient) return t("TopUpAndUpgrade");
     return t("UpgradeNow");
   };
 
   const getUpdateTariffAction = () => {
     if (needsWalletMigration) return openMigrateDialog;
-    if (isDelayedPaymentTopUp) return openTopUpDialog;
+    if (isDelayedPaymentTopUp || isCardMissingTopUp) return openTopUpDialog;
     return onUpdateTariff;
   };
 
@@ -152,9 +174,9 @@ const UpdatePlanButtonContainer = ({
       }
 
       if (canPayTariff) {
-        isCardLinkedToPortal
-          ? executeWalletUpdate(managersCount, ProductQuantityType.Add, t)
-          : openTopUpDialog();
+        isCardMissingTopUp
+          ? openTopUpDialog()
+          : executeWalletUpdate(managersCount, ProductQuantityType.Add, t);
         return;
       }
 
@@ -235,10 +257,13 @@ const UpdatePlanButtonContainer = ({
         <SimpleTopUpDialog
           visible={isTopUpDialogVisible}
           onClose={closeTopUpDialog}
-          onConfirm={isCardMissingOrInactive ? undefined : onTopUpConfirm}
+          onConfirm={
+            isCardMissingOrInactive ? refreshAfterPurchase : onTopUpConfirm
+          }
+          isPurchaseCompleted={isTariffPurchased}
           minValue={topUpShortfall > 0 ? `${topUpShortfall}` : undefined}
           successParams={{
-            admins: `${managersCount}`,
+            admins: `${purchasedManagersCount}`,
             storage: getConvertedSize(t, allowedStorageSizeByQuota),
             plan: isFreeTariff ? tariffPlanTitle : currentTariffPlanTitle,
             price: formatPaymentCurrency(totalPrice, 2),

@@ -7,7 +7,6 @@ import {
   formatAmountInput,
   isAmountOutOfRange,
   MAX_LIMIT_AMOUNT,
-  MIN_LIMIT_AMOUNT,
   parseAmount,
 } from "../common/utils";
 
@@ -62,12 +61,6 @@ export const useLimitForm = ({
     if (amount > MAX_LIMIT_AMOUNT) {
       return t("MaxCurrency", {
         currency: formatCurrency(MAX_LIMIT_AMOUNT, 0, currency),
-      });
-    }
-
-    if (amount < MIN_LIMIT_AMOUNT) {
-      return t("MinCurrency", {
-        currency: formatCurrency(MIN_LIMIT_AMOUNT, 0, currency),
       });
     }
 

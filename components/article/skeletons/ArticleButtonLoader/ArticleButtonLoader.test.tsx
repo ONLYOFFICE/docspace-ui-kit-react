@@ -6,9 +6,12 @@ import { ArticleButtonLoader } from ".";
 import styles from "./ArticleButtonLoader.module.scss";
 import type { RectangleSkeletonProps } from "../../../rectangle";
 
+// The props are read off the mock's calls, not off the DOM: spread onto a
+// <div>, the skeleton's own props (borderRadius, backgroundColor, animate...)
+// are unknown attributes React warns about.
 const rectangleMocks = vi.hoisted(() => ({
-  rectangleSkeletonMock: vi.fn((props: RectangleSkeletonProps) => (
-    <div data-testid="rectangle-skeleton-mock" {...props} />
+  rectangleSkeletonMock: vi.fn((_props: RectangleSkeletonProps) => (
+    <div data-testid="rectangle-skeleton-mock" />
   )),
 }));
 

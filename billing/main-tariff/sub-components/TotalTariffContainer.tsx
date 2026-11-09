@@ -25,6 +25,7 @@ const TotalTariffContainer = observer(
       maxAvailableManagersCount,
       managersCount,
       formatPaymentCurrency,
+      formatDueTodayAmount,
       tariffDueTodayAmount,
       setTariffDueTodayAmount,
       isTariffDueTodayCalculating,
@@ -88,7 +89,7 @@ const TotalTariffContainer = observer(
             amount: number;
           } | null;
 
-          if (result) setTariffDueTodayAmount(Math.ceil(result.amount));
+          if (result) setTariffDueTodayAmount(result.amount);
           setIsTariffDueTodayCalculating(false);
         } catch (e) {
           if (e instanceof Error && e.name === "CanceledError") return;
@@ -130,7 +131,7 @@ const TotalTariffContainer = observer(
             />
           ) : (
             <Text as="span" className={styles.proratedNowPrice}>
-              {formatPaymentCurrency(tariffDueTodayAmount)}
+              {formatDueTodayAmount(tariffDueTodayAmount)}
             </Text>
           )}
         </div>
