@@ -46,6 +46,9 @@ export const DEFAULT_CHAT_PANEL_WIDTH = 400;
 /** A room as a preset remembers it: the chat library's cloud + id pair, plus the name to show. */
 export type AiChatPresetRoom = { cloud: string; id: string; name: string };
 
+/** A folder connected as the chat's context, with where it sits for its pill. */
+export type AiChatContextFolder = AiChatPresetRoom & { path?: string };
+
 /**
  * The chat settings a host saves as a preset and hands back to open one: the
  * model (profile), the Instructions rooms connected for their skills and
@@ -57,6 +60,12 @@ export type AiChatPresetSettings = {
   profileName: string | null;
   contextRooms: AiChatPresetRoom[];
   knowledgeRooms: AiChatPresetRoom[];
+  /**
+   * The folder a fresh conversation opens with as its context, if the
+   * host remembers one (an AI project's last folder); absent or `null`,
+   * it opens without one.
+   */
+  folderContext?: AiChatContextFolder | null;
 };
 
 /**
@@ -69,6 +78,8 @@ export type AiChatProjectSettings = {
   profileName: string | null;
   instructionsRooms: AiChatPresetRoom[];
   knowledgeRooms: AiChatPresetRoom[];
+  /** The folder the project's chat last worked in, as the host remembers it. */
+  folderContext?: AiChatContextFolder | null;
 };
 
 /** The preset a project opens as. */
@@ -79,6 +90,7 @@ export const projectToPreset = (
   profileName: project.profileName,
   contextRooms: project.instructionsRooms,
   knowledgeRooms: project.knowledgeRooms,
+  folderContext: project.folderContext ?? null,
 });
 
 const panelWidthStorage = createPanelWidthStorage("chatPanelWidth", {

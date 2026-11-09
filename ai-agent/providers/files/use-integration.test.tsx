@@ -25,6 +25,11 @@ vi.mock("./save-dialog", () => ({
 vi.mock("./device-uploader", () => ({
   default: React.forwardRef(() => <div data-testid="device-uploader" />),
 }));
+vi.mock("./context-folder-dialog", () => ({
+  default: ({ onClose }: { onClose: () => void }) => (
+    <button type="button" data-testid="folder-dialog" onClick={onClose} />
+  ),
+}));
 vi.mock("./context-rooms-dialog", () => ({
   default: ({ kind, onClose }: { kind: string; onClose: () => void }) => (
     <button
@@ -82,6 +87,15 @@ describe("useFilesIntegration: the composer's source pickers", () => {
 
     act(() => screen.getByTestId("rooms-dialog").click());
     expect(screen.queryByTestId("rooms-dialog")).toBeNull();
+  });
+
+  it("opens the folder picker behind the Folder slot", () => {
+    render(<Host />);
+    expect(screen.queryByTestId("folder-dialog")).toBeNull();
+    act(() => integration().onPickFolderContext());
+    expect(screen.getByTestId("folder-dialog")).toBeInTheDocument();
+    act(() => screen.getByTestId("folder-dialog").click());
+    expect(screen.queryByTestId("folder-dialog")).toBeNull();
   });
 
   it("opens a room of this portal in the AI rooms section of Files", () => {

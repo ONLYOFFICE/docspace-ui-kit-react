@@ -43,9 +43,16 @@ const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
         return;
       const name =
         folderTitle || breadCrumbs[breadCrumbs.length - 1]?.label || "";
+      // Where the folder sits, for its pill: the crumbs above it, the
+      // folder itself last. The virtual root crumb is not a place.
+      const crumbs = breadCrumbs
+        .filter((crumb) => crumb.id !== "" && crumb.label)
+        .map((crumb) => crumb.label);
+      if (crumbs[crumbs.length - 1] !== name) crumbs.push(String(name));
       useCloudsStore.getState().selectFolderContext(CONTEXT_ROOM_CLOUD, {
         id: String(selectedItemId),
         name: String(name),
+        path: crumbs.join(" / "),
       });
       onClose();
     },

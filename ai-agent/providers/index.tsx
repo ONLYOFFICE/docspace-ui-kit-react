@@ -98,6 +98,7 @@ import { addDialogSubmitInterceptor } from "./components-overrides/dialog-footer
 import { useApi as useFilesApi } from "../../providers/api";
 import { ContextRoomProvider, type ContextRoom } from "./context-room";
 import ContextRoomWatcher from "./context-room/ContextRoomWatcher";
+import { CONTEXT_ROOM_CLOUD } from "./context-room/ContextRoomSync";
 import {
   useAnalyzeQuestions,
   useComposerTyping,
@@ -250,6 +251,16 @@ type AiAgentProvidersProps = {
    * host refreshes what `profilePickerActions` lists (the AI projects).
    */
   onProfilePickerOpen?: () => void | Promise<void>;
+  /**
+   * Opens the folder connected as the chat's context in the host, from the
+   * composer's folder pill ("Open folder"). Omitted → the pill's menu offers
+   * no way to open it.
+   */
+  onOpenFolderContext?: (folder: {
+    id: string;
+    name: string;
+    path?: string;
+  }) => void;
   /**
    * Host override for the chat error box content (title / description /
    * action) by normalized error code — see {@link WidgetConfig.formatChatError}.
@@ -622,6 +633,7 @@ const AiAgentProviders = ({
   profilePickerAlias,
   onProfilePickerSelect,
   onProfilePickerOpen,
+  onOpenFolderContext,
   formatChatError,
   onThreadContextChange,
   composerHeader,
@@ -724,6 +736,7 @@ const AiAgentProviders = ({
     composerActions: attachActions,
     onPickContextRooms,
     onPickKnowledgeRooms,
+    onPickFolderContext,
     onOpenContextRoom,
     onSaveAsFile,
     exportFormats,
@@ -1179,6 +1192,14 @@ const AiAgentProviders = ({
       onOpenContextRoom,
       onPickKnowledgeRooms,
       onOpenKnowledgeRoom: onOpenContextRoom,
+      // Any folder of the portal can be the chat's context; the host opens
+      // a connected one from its pill (the chat only knows the id).
+      onPickFolderContext,
+      onOpenFolderContext: onOpenFolderContext
+        ? (cloud, folder) => {
+            if (cloud === CONTEXT_ROOM_CLOUD) onOpenFolderContext(folder);
+          }
+        : undefined,
     }),
     [
       composerActions,
@@ -1203,6 +1224,8 @@ const AiAgentProviders = ({
       onPickContextRooms,
       onPickKnowledgeRooms,
       onOpenContextRoom,
+      onPickFolderContext,
+      onOpenFolderContext,
       t,
     ],
   );

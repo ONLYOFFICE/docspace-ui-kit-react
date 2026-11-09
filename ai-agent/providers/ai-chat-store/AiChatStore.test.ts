@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 
-import AiChatStore from "./AiChatStore";
+import AiChatStore, { projectToPreset } from "./AiChatStore";
 
 describe("AiChatStore fullscreen", () => {
   let store: AiChatStore;
@@ -258,6 +258,7 @@ describe("AiChatStore projects", () => {
         { cloud: "docspace", id: "2", name: "Legal tone" },
       ],
       knowledgeRooms: [],
+      folderContext: null,
     });
   });
 });
@@ -342,5 +343,42 @@ describe("AiChatStore panel width", () => {
 
   it("starts from the default width while nothing is saved", () => {
     expect(new AiChatStore().panelWidth).toBe(400);
+  });
+});
+
+describe("projectToPreset", () => {
+  it("carries the project's rooms, model and remembered folder", () => {
+    const folder = {
+      cloud: "docspace",
+      id: "77",
+      name: "Reports",
+      path: "My documents / Reports",
+    };
+    expect(
+      projectToPreset({
+        profileId: "p1",
+        profileName: "Claude",
+        instructionsRooms: [{ cloud: "docspace", id: "1", name: "Brand" }],
+        knowledgeRooms: [],
+        folderContext: folder,
+      }),
+    ).toEqual({
+      profileId: "p1",
+      profileName: "Claude",
+      contextRooms: [{ cloud: "docspace", id: "1", name: "Brand" }],
+      knowledgeRooms: [],
+      folderContext: folder,
+    });
+  });
+
+  it("opens without a folder when the project remembers none", () => {
+    expect(
+      projectToPreset({
+        profileId: null,
+        profileName: null,
+        instructionsRooms: [],
+        knowledgeRooms: [],
+      }).folderContext,
+    ).toBeNull();
   });
 });
