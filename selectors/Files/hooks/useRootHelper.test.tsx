@@ -107,6 +107,35 @@ describe("useRootHelper AI sections", () => {
     ).toEqual([1, 2, FORMS_SECTION_ID, 4]);
   });
 
+  it("titles the AI section as the host's AI Workspace", async () => {
+    // The hosts' Common namespace names the section; a key the host dropped
+    // would leave the row without a label (the former "AiRooms").
+    const setItems = vi.fn();
+    const { result } = renderHook(
+      () =>
+        useRootHelper({
+          setBreadCrumbs: vi.fn(),
+          setTotal: vi.fn(),
+          setItems,
+          setHasNextPage: vi.fn(),
+          setIsInit: vi.fn(),
+          treeFolders: withAiRoots,
+          withRoomsTreeFolder: true,
+          withFormsTreeFolder: true,
+          withAIRoomsTreeFolder: true,
+        }),
+      { wrapper },
+    );
+    await act(async () => {
+      await result.current.getRootData();
+    });
+    const labels = setItems.mock.calls[0][0].map(
+      (item: { id: number | string; label: string }) => [item.id, item.label],
+    );
+    expect(labels).toContainEqual([4, "AI Workspace"]);
+    expect(labels.every(([, label]: [unknown, string]) => label)).toBe(true);
+  });
+
   it("leaves AI rooms out when the host turns it off", async () => {
     expect(await getRootIds({ treeFolders: withAiRoots })).toEqual([
       1,
