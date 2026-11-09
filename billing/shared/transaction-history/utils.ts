@@ -92,7 +92,7 @@ export const BYOK_TOOLTIP_ID = "byokTooltip";
 
 export type ByokOperation = Pick<
   WalletOperationDto,
-  "provider" | "cost" | "debit" | "currency" | "service"
+  "provider" | "cost" | "debit" | "currency"
 >;
 
 export const serializeByokOperation = ({
@@ -100,9 +100,7 @@ export const serializeByokOperation = ({
   cost,
   debit,
   currency,
-  service,
-}: WalletOperationDto) =>
-  JSON.stringify({ provider, cost, debit, currency, service });
+}: WalletOperationDto) => JSON.stringify({ provider, cost, debit, currency });
 
 export const parseByokOperation = (
   content: string | null,
