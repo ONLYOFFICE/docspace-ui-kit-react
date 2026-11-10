@@ -5,6 +5,7 @@ export const ROOM = "room";
 export const YEAR_KEY = "year";
 export const BACKUP_SERVICE = "backup";
 export const AI_TOOLS = "ai-tools";
+export const AI_TOOLS_BYOK = "ai-tools-byok";
 export const AI_ENUM = "aitools";
 export const AI_SEARCH = "ai-search";
 export const AI_SEARCH_ENUM = "aisearch";

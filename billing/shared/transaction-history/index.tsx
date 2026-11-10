@@ -29,7 +29,6 @@ import TableLoader from "./sub-components/TableLoader";
 import { Link } from "../../../components/link";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import { Encoder } from "../../../utils/encoder";
-import { isDocsConnectServiceName } from "../../utils/docs-connect";
 
 type TransactionHistoryReportResponse = {
   error?: string;
@@ -314,10 +313,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     const isCredit = filterSelectedTypeKey !== "debit";
     const isDebit = filterSelectedTypeKey !== "credit";
 
-    const serviceNames: string | string[] | undefined =
-      isDocsConnectServiceName(serviceName)
-        ? store.docsConnectServiceNames
-        : serviceName;
+    const serviceNames = store.getTransactionServiceNames(serviceName);
 
     try {
       await paymentApi.createCustomerOperationsReport({
