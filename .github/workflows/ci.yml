@@ -51,6 +51,11 @@ jobs:
       - name: Run Lint
         run: pnpm lint
 
+      # Selectors on the class or style attribute, which restyle every element
+      # on each change below them (.claude/rules/css-selectors.md).
+      - name: Check CSS selectors
+        run: pnpm check:css-selectors
+
       - name: Run TypeScript
         run: pnpm tsc
 

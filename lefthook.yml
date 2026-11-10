@@ -98,6 +98,10 @@ pre-push:
             run: pnpm readme:catalogue:check
           - name: surface
             run: pnpm surface:check
+          # Selectors on the class or style attribute, outside the baseline
+          # (.claude/rules/css-selectors.md).
+          - name: css-selectors
+            run: pnpm check:css-selectors
 
     # The unit tests whose imports reach a changed file, or all of them when
     # the setup, the mocks, the locales, the lockfile or the configuration changed. CI runs

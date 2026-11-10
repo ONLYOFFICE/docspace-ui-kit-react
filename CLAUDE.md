@@ -33,6 +33,7 @@ Path-scoped detail that does not belong here, loaded when the matching files are
 | `cross-platform.md`      | why every command has to run on Windows too, what `package.json` scripts may not contain, and why `path.sep` does not make an id POSIX                                                                                           |
 | `vscode-tasks.md`        | the three layers behind the status-bar buttons in `ui-kit.code-workspace`                                                                                                                                                        |
 | `product-naming.md`      | DocSpace is now ONLYOFFICE Apps: what to rename in user-facing text, which names stay, and the grep that finds leftovers                                                                                                         |
+| `css-selectors.md`       | selectors that restyle the whole page: no `[class*=…]` / `[style*=…]` (checked by `pnpm check:css-selectors`), where a `:has()` may sit, and how to find such a rule with a trace                                                |
 
 ## Tech Stack
 

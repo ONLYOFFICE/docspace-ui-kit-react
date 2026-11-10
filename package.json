@@ -62,6 +62,7 @@
     "readme:props": "node scripts/readme-props.mjs --write",
     "readme:props:check": "node scripts/readme-props.mjs --check",
     "check:readme": "node scripts/check-readme.mjs",
+    "check:css-selectors": "node scripts/check-css-selectors.mjs",
     "check:readme:full": "node scripts/check-readme.mjs --compile",
     "readme:catalogue": "node scripts/readme-catalogue.mjs",
     "readme:catalogue:check": "node scripts/readme-catalogue.mjs --check",
