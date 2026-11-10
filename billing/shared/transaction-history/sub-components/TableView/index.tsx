@@ -20,6 +20,7 @@ import {
 } from "../../../../wallet/utils";
 import { getTransactionSourceLabel, hasTransactionSource } from "../../utils";
 import { TokenUsageAnchor } from "../TokenUsage";
+import { ByokMarkAnchor } from "../ByokMark/sub-components/ByokMarkAnchor";
 
 import styles from "../../styles/TransactionHistory.module.scss";
 
@@ -82,10 +83,13 @@ const TableView = ({ serviceName }: TransactionHistoryProps) => {
         cellClassName: styles.cell,
         width: { type: "flex", min: 120 },
         cell: (transaction) => (
-          <CellText as="span" className={styles.transactionRowDescription}>
-            {transaction.description}
-            {transaction.details ? ` (${transaction.details})` : ""}
-          </CellText>
+          <>
+            <CellText as="span" className={styles.transactionRowDescription}>
+              {transaction.description}
+              {transaction.details ? ` (${transaction.details})` : ""}
+            </CellText>
+            <ByokMarkAnchor transaction={transaction} />
+          </>
         ),
       },
       {

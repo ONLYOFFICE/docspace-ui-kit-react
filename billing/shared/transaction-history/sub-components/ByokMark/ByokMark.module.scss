@@ -1,0 +1,66 @@
+@use "../../../../../styles/variables/colors" as *;
+
+.mark {
+  --byok-mark-background: #{$gray-light-mid};
+  --byok-mark-color: #{$light-gray-dark};
+
+  flex-shrink: 0;
+  margin-inline-start: 4px;
+}
+
+.content {
+  --byok-divider-color: #{$gray-light-mid};
+  --byok-note-color: #{$light-gray-dark};
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 220px;
+  color: var(--tooltip-text-color);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+:global(.dark) {
+  :local {
+    .mark {
+      --byok-mark-background: #{$gray-dark-strong};
+      --byok-mark-color: #{$dark-gray-dark};
+    }
+
+    .content {
+      --byok-divider-color: #{$gray-dark-strong};
+      --byok-note-color: #{$dark-gray-dark};
+    }
+  }
+}
+
+.title {
+  font-weight: 600;
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.label {
+  flex: 1;
+}
+
+.value {
+  font-variant-numeric: tabular-nums;
+}
+
+.note {
+  padding-top: 8px;
+  border-top: 1px solid var(--byok-divider-color);
+  color: var(--byok-note-color);
+}
