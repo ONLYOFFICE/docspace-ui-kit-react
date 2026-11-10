@@ -248,6 +248,46 @@ describe("DataTable resizing", () => {
     expect(save).not.toHaveBeenCalled();
   });
 
+  it("ends a drag released away from its handle", () => {
+    const { save } = renderTable();
+    const target = handle("Name");
+
+    fireEvent.pointerDown(target, { pointerId: 1, button: 0, clientX: 500 });
+    fireEvent.pointerMove(target, { pointerId: 1, clientX: 550 });
+    fireEvent.pointerUp(document.body, { pointerId: 1, clientX: 550 });
+
+    expect(screen.getByTestId("data-table")).not.toHaveClass("isResizing");
+    expect(save).toHaveBeenCalledTimes(1);
+  });
+
+  it("ends a drag, storing nothing, when its handle goes before the release", () => {
+    const storage = createMemoryWidths();
+    const save = vi.spyOn(storage, "save");
+    const table = (columns: DataTableColumn<Row>[]) => (
+      <DataTable
+        columns={columns}
+        rows={[{ id: 1 }]}
+        getRowKey={(row) => row.id}
+        widthStorage={storage}
+      />
+    );
+    const view = render(table(COLUMNS));
+    const target = handle("Name");
+
+    fireEvent.pointerDown(target, { pointerId: 1, button: 0, clientX: 500 });
+    fireEvent.pointerMove(target, { pointerId: 1, clientX: 650 });
+    // The handles go mid-drag, as when the table turns compact.
+    view.rerender(table(COLUMNS.map((c) => ({ ...c, resizable: false }))));
+    expect(screen.queryByRole("separator")).not.toBeInTheDocument();
+
+    fireEvent.pointerUp(document.body, { pointerId: 1, clientX: 650 });
+
+    expect(screen.getByTestId("data-table")).not.toHaveClass("isResizing");
+    expect(grid()).toBe(DEFAULT_GRID);
+    expect(rowGrids()).toEqual(["", ""]);
+    expect(save).not.toHaveBeenCalled();
+  });
+
   it("ignores another pointer and the right mouse button", () => {
     const { save } = renderTable();
     const target = handle("Name");

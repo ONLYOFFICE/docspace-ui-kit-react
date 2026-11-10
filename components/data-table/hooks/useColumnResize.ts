@@ -1,5 +1,5 @@
 import type React from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useInterfaceDirection } from "../../../context/InterfaceDirectionContext";
 import {
@@ -19,6 +19,8 @@ const KEY_STEP_LARGE = 50;
 type Drag = {
   columnId: string;
   pointerId: number;
+  /** The handle the drag started on. */
+  handle: HTMLElement;
   startX: number;
   /** Where the edge was when the drag started, along the reading direction. */
   startEdge: number;
@@ -37,6 +39,8 @@ type UseColumnResizeOptions = {
   fractions: ColumnFractions;
   /** The table element, which carries the grid variable. */
   containerRef: React.RefObject<HTMLDivElement | null>;
+  /** The grid the table renders with, compact or not. */
+  gridTemplate: string;
   /** Applies and stores shares the user chose. */
   commit: (fractions: ColumnFractions) => void;
   /** Back to the default layout. */
@@ -61,7 +65,10 @@ export type ResizeHandleBindings = {
  * table's `--data-table-grid` property, which they read again; the shares are
  * committed once, and stored. A row that mounts mid-drag shows the grid the
  * drag started from until it ends.
- * A cancelled pointer puts the grid back as it was and stores nothing. Each
+ * A cancelled pointer puts the grid back as it was and stores nothing. So does
+ * a release after the handle went away mid-drag, as when the container
+ * narrows and the table turns compact: the window hears it, since the handle
+ * cannot. Each
  * move resizes the current widths by the distance from the edge to the
  * pointer, so turning back mid-drag widens the edge's neighbour.
  *
@@ -72,12 +79,18 @@ export const useColumnResize = ({
   columns,
   fractions,
   containerRef,
+  gridTemplate,
   commit,
   reset,
 }: UseColumnResizeOptions) => {
   const { isRTL } = useInterfaceDirection();
   const dragRef = useRef<Drag | null>(null);
+  const detachRef = useRef<(() => void) | null>(null);
+  const gridTemplateRef = useRef(gridTemplate);
+  gridTemplateRef.current = gridTemplate;
   const [resizingId, setResizingId] = useState<string | null>(null);
+
+  useEffect(() => () => detachRef.current?.(), []);
 
   const measure = () =>
     containerRef.current?.getBoundingClientRect().width ?? 0;
@@ -115,16 +128,31 @@ export const useColumnResize = ({
     }
   };
 
-  const end = (event: React.PointerEvent<HTMLElement>, apply: boolean) => {
+  const end = (pointerId: number, apply: boolean) => {
     const drag = dragRef.current;
-    if (!drag || event.pointerId !== drag.pointerId) return;
+    if (!drag || pointerId !== drag.pointerId) return;
 
     if (drag.scheduled) cancelAnimationFrame(drag.frame);
     dragRef.current = null;
+    detachRef.current?.();
+    detachRef.current = null;
     setResizingId(null);
 
-    if (event.currentTarget.hasPointerCapture?.(drag.pointerId)) {
-      event.currentTarget.releasePointerCapture(drag.pointerId);
+    if (drag.handle.hasPointerCapture?.(drag.pointerId)) {
+      drag.handle.releasePointerCapture(drag.pointerId);
+    }
+
+    // The handle is gone, and the columns it resized may be too: the rows go
+    // back to the grid the table renders now.
+    if (!drag.handle.isConnected) {
+      containerRef.current?.style.setProperty(
+        "--data-table-grid",
+        gridTemplateRef.current,
+      );
+      for (const row of gridRows()) {
+        row.style.removeProperty("grid-template-columns");
+      }
+      return;
     }
 
     if (!apply) {
@@ -151,10 +179,23 @@ export const useColumnResize = ({
         // while the pointer stays over the handle.
       }
 
+      // Also heard by the window, in case the handle goes before the release.
+      // The handle's own events come first, so this is a no-op otherwise.
+      detachRef.current?.();
+      const onUp = (e: PointerEvent) => end(e.pointerId, true);
+      const onCancel = (e: PointerEvent) => end(e.pointerId, false);
+      window.addEventListener("pointerup", onUp);
+      window.addEventListener("pointercancel", onCancel);
+      detachRef.current = () => {
+        window.removeEventListener("pointerup", onUp);
+        window.removeEventListener("pointercancel", onCancel);
+      };
+
       const width = measure();
       dragRef.current = {
         columnId,
         pointerId: event.pointerId,
+        handle: event.currentTarget,
         startX: event.clientX,
         startEdge: getEdgeOffset(columns, fractions, width, columnId),
         width,
@@ -201,8 +242,8 @@ export const useColumnResize = ({
       }
     },
 
-    onPointerUp: (event) => end(event, true),
-    onPointerCancel: (event) => end(event, false),
+    onPointerUp: (event) => end(event.pointerId, true),
+    onPointerCancel: (event) => end(event.pointerId, false),
 
     onKeyDown: (event) => {
       if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;

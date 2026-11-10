@@ -728,7 +728,10 @@ export function FilesTable({
   pointer is released: a custom property is inherited, so changing it restyles every element in
   the table, which a few hundred rows cannot afford each frame. A row that mounts mid-drag
   shows the starting grid until the end. The widths are committed and stored once, on release.
-  A cancelled pointer (`pointercancel`) puts the grid back and stores nothing.
+  A cancelled pointer (`pointercancel`) puts the grid back and stores nothing. The release is
+  heard by the window too, so a drag ends wherever the pointer is let go; if the handle went away
+  mid-drag — the container narrowed and the table turned compact — the table keeps the grid it
+  renders and stores nothing.
 - A double click on any edge resets every column to 40/60 and clears the stored record.
 - The table's colours follow the nearest `.light` or `.dark` ancestor, so a `dark` wrapper turns
   the table dark on a light page. The settings and row menus open in a portal on `<body>` and
