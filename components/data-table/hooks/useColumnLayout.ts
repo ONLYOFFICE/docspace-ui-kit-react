@@ -44,8 +44,13 @@ const signatureOf = (columns: LayoutColumn[]) =>
  *
  * - The shares are restored from `storage` before the first paint, at the
  *   measured container width, so the table never flashes a default layout.
- * - When the visible columns change, removed columns are hidden and added ones
- *   shown by the engine's rules, in the same render, and the result is stored.
+ * - When the user shows or hides a column (`expectChange`, then the columns
+ *   that follow it), it is hidden or shown by the engine's rules, in the same
+ *   render, and the result is stored.
+ * - When the visible columns change on their own (a record of them read after
+ *   the first render, a column a socket brings), the shares are restored from
+ *   `storage` for the new set and nothing is stored. Without `storage` there
+ *   is nothing to restore, so the engine's rules apply as for the user.
  * - A different `storage.id` restores again; the same id with a new adapter
  *   object does nothing.
  * - The container is watched: once the columns no longer fit at their
@@ -54,7 +59,7 @@ const signatureOf = (columns: LayoutColumn[]) =>
  *   either way, so the proportions come back with the width.
  *
  * The storage is written only when the user changed something: a resize, a
- * reset or a change of the visible columns. Restoring and rendering never
+ * reset or a column shown or hidden. Restoring and rendering never
  * write, so a window that only renders cannot overwrite a record another
  * window saved.
  *
@@ -69,6 +74,7 @@ export const useColumnLayout = (
   const containerRef = useRef<HTMLDivElement | null>(null);
   const widthRef = useRef(0);
   const pendingSaveRef = useRef<ColumnFractions | null>(null);
+  const expectedRef = useRef<{ id: string; visible: boolean } | null>(null);
 
   const signature = signatureOf(columns);
   const storageId = storage?.id ?? null;
@@ -91,19 +97,34 @@ export const useColumnLayout = (
     pendingSaveRef.current = null;
     setState(current);
   } else if (state.signature !== signature) {
-    current = {
-      ...state,
-      signature,
-      columns,
-      fractions: reconcileColumns(
-        state.columns,
+    const expected = expectedRef.current;
+    const has = (list: LayoutColumn[]) =>
+      list.some((column) => column.id === expected?.id);
+    const byUser =
+      expected !== null &&
+      has(columns) === expected.visible &&
+      has(state.columns) !== expected.visible;
+
+    if (byUser || !storage) {
+      current = {
+        ...state,
+        signature,
         columns,
-        state.fractions,
-        widthRef.current,
-        flexibleTotal,
-      ),
-    };
-    pendingSaveRef.current = current.fractions;
+        fractions: reconcileColumns(
+          state.columns,
+          columns,
+          state.fractions,
+          widthRef.current,
+          flexibleTotal,
+        ),
+      };
+      if (byUser) {
+        expectedRef.current = null;
+        pendingSaveRef.current = current.fractions;
+      }
+    } else {
+      current = restore(widthRef.current);
+    }
     setState(current);
   }
   // The signature leaves out what moves no share, such as `resizable`, so a
@@ -204,8 +225,14 @@ export const useColumnLayout = (
     storageRef.current?.clear();
   }, []);
 
+  /** Says the user is about to show or hide this column. */
+  const expectChange = useCallback((id: string, visible: boolean) => {
+    expectedRef.current = { id, visible };
+  }, []);
+
   return {
     containerRef,
+    expectChange,
     /** The visible columns the shares belong to. */
     columns: current.columns,
     fractions: current.fractions,

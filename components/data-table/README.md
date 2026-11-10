@@ -712,8 +712,9 @@ export function FilesTable({
   record of another table, of the old `Table` (a pixel string) or one that cannot be parsed reads
   as nothing stored. Storage that is blocked, full or absent is ignored.
 - The table restores the stored record before its first paint, and again only when
-  `widthStorage.id` changes. It writes the record only when the user resizes or resets, never by
-  rendering, so a second window with the same key does not overwrite the first one's layout.
+  `widthStorage.id` changes or the visible columns change on their own. It writes the record
+  only when the user resizes, resets, or shows or hides a column, never by rendering, so a
+  second window with the same key does not overwrite the first one's layout.
 - A column's trailing edge in the header is a resize handle when the column is resizable and a
   resizable column follows it, so the last flexible column and `fixed` columns have none. Dragging
   it grows the column and shrinks the resizable columns on the side the pointer moves to, nearest
@@ -744,8 +745,12 @@ export function FilesTable({
 - The container is watched with a `ResizeObserver`, measured at most once per animation frame,
   so an info panel opening, a window resize or the article collapsing are all handled the same
   way, and none of them writes to the storage.
-- When a column's `visible` changes, the new shares are stored, since that change is the user's
-  choice. Sorting by a hidden column marked `hideable` calls
+- When the user shows or hides a column — the settings menu, or a sort that turns a hidden
+  column on — the new shares are stored once the consumer's `visible` follows. A `visible` that
+  changes any other way (a saved choice read after the first render, a column that a server
+  event adds) is not the user's: with `widthStorage` the stored record is restored for the new
+  columns and nothing is written, so a reload cannot shift a saved layout; without it the
+  column is shown or hidden by the same rules. Sorting by a hidden column marked `hideable` calls
   `onColumnVisibilityChange(id, true)` once, when `sort.key` moves to it, so the sorted values
   are on screen.
 - The settings menu does not let the last visible flexible column be unticked, and it closes on
@@ -775,7 +780,9 @@ export function FilesTable({
   loaded one — rendered rows include the overscan — or, without `virtualize`, when the skeleton
   rows come within that distance of their scroller's view. One call per loaded count: while a
   returned promise is pending nothing is asked, a page that brings no rows does not set off
-  another call, and a rejected one is retried only when the view moves, never in a loop. A
+  another call, and a rejected one is retried only when the view moves, never in a loop. A list
+  that was replaced — fewer rows than before, or another first row, as after a new sort — starts
+  over, even at the count the last call was made at. A
   page that does not fill the view is followed by the next one as soon as it settles. The body
   carries `aria-busy="true"` while a page loads.
 - Skeleton rows are `div.table-container_body-loader` on the same grid as the real rows, with a

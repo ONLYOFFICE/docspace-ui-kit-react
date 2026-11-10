@@ -196,6 +196,29 @@ describe("DataTable loading more rows", () => {
     expect(onLoadMore).toHaveBeenCalledTimes(1);
   });
 
+  it("asks again at the same count once the list was replaced", async () => {
+    const onLoadMore = vi.fn(() => Promise.resolve());
+    const { rerenderWith } = renderTable(makeItems(5), {
+      loadMore: { hasMore: true, onLoadMore },
+    });
+    await act(async () => {});
+    expect(onLoadMore).toHaveBeenCalledTimes(1);
+
+    // The last page arrives, then a new sort brings a first page as long as
+    // the list the call was made at.
+    rerenderWith(makeItems(10), { loadMore: { hasMore: false, onLoadMore } });
+    await act(async () => {});
+    expect(onLoadMore).toHaveBeenCalledTimes(1);
+
+    rerenderWith(
+      makeItems(5).map((item) => ({ ...item, id: item.id + 100 })),
+      { loadMore: { hasMore: true, onLoadMore } },
+    );
+    await act(async () => {});
+
+    expect(onLoadMore).toHaveBeenCalledTimes(2);
+  });
+
   it("tries again on the next scroll after a failed page", async () => {
     const page = deferred();
     const onLoadMore = vi.fn(() => page.promise);

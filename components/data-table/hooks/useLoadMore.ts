@@ -8,6 +8,8 @@ type LoadMoreOptions = {
   loadMore?: DataTableLoadMore;
   /** How many rows are loaded. */
   loadedCount: number;
+  /** Key of the first loaded row: a new one means the list was replaced. */
+  firstKey: unknown;
   /** Whether the view is within the threshold of the last loaded row. */
   nearEnd: boolean;
   /** Changes whenever the view moves, such as the last rendered index. */
@@ -23,10 +25,15 @@ const isPromise = (value: unknown): value is Promise<unknown> =>
  * `hasMore` that stays true by mistake cannot loop. A rejected call is
  * repeated only once the view moves, never straight away, so a server that
  * keeps failing is not asked in a tight loop.
+ *
+ * A list that was replaced starts over: fewer rows than before, or another
+ * first row, is a new sort, filter or folder, and its first page may be as
+ * long as the list the last call was made at.
  */
 export const useLoadMore = ({
   loadMore,
   loadedCount,
+  firstKey,
   nearEnd,
   position,
 }: LoadMoreOptions) => {
@@ -35,6 +42,7 @@ export const useLoadMore = ({
   const requestedAtRef = useRef<number | null>(null);
   const failedAtRef = useRef<unknown>(undefined);
   const failedRef = useRef(false);
+  const listRef = useRef({ loadedCount, firstKey });
 
   const hasMore = Boolean(loadMore?.hasMore);
   const onLoadMore = loadMore?.onLoadMore;
@@ -64,12 +72,18 @@ export const useLoadMore = ({
   // `loading` is a dependency so that a page which did not fill the view
   // asks for the next one as soon as it settles.
   useEffect(() => {
+    const list = listRef.current;
+    if (loadedCount < list.loadedCount || firstKey !== list.firstKey) {
+      requestedAtRef.current = null;
+    }
+    listRef.current = { loadedCount, firstKey };
+
     if (failedRef.current && position !== failedAtRef.current) {
       failedRef.current = false;
       requestedAtRef.current = null;
     }
     if (nearEnd && !loading) request();
-  }, [nearEnd, loading, position, request]);
+  }, [nearEnd, loading, position, request, loadedCount, firstKey]);
 
   return { loading };
 };

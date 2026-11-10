@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -335,7 +336,7 @@ describe("DataTable compact mode", () => {
 });
 
 describe("DataTable visibility and storage", () => {
-  it("stores the shares after a column is hidden or shown", () => {
+  it("stores the shares after the user hides or shows a column", async () => {
     const storage = createMemoryWidths({
       Name: 0.4,
       Author: 0.2,
@@ -343,17 +344,72 @@ describe("DataTable visibility and storage", () => {
       Size: 0.2,
     });
     const save = vi.spyOn(storage, "save");
-    const { rerenderWith } = renderTable({ widthStorage: storage });
+
+    // The consumer's side of the settings menu: it owns `visible`.
+    const Harness = () => {
+      const [hidden, setHidden] = useState<Record<string, boolean>>({});
+      return (
+        <DataTable<Row>
+          columns={makeColumns(
+            Object.fromEntries(
+              Object.entries(hidden).map(([id, off]) => [
+                id,
+                { visible: !off },
+              ]),
+            ),
+          )}
+          rows={[{ id: 1 }]}
+          getRowKey={(row) => row.id}
+          widthStorage={storage}
+          onColumnVisibilityChange={(id, visible) =>
+            setHidden((prev) => ({ ...prev, [id]: !visible }))
+          }
+        />
+      );
+    };
+    render(<Harness />);
     expect(save).not.toHaveBeenCalled();
 
-    rerenderWith({ columns: makeColumns({ Modified: { visible: false } }) });
+    const item = (id: string) =>
+      within(screen.getByTestId(`data-table-settings-${id}`)).getByRole(
+        "checkbox",
+      );
+
+    await userEvent.click(settingsButton());
+    await userEvent.click(item("Modified"));
     expect(save).toHaveBeenCalledTimes(1);
     expect(save.mock.calls[0][0].Author).toBeCloseTo(0.4, 9);
     expect(save.mock.calls[0][0]).not.toHaveProperty("Modified");
 
-    rerenderWith({ columns: makeColumns() });
+    await userEvent.click(item("Modified"));
     expect(save).toHaveBeenCalledTimes(2);
     expect(save.mock.calls[1][0]).toHaveProperty("Modified");
+  });
+
+  it("restores the record, and stores nothing, when the columns change on their own", () => {
+    // What the user left: Type on, at these shares.
+    const storage = createMemoryWidths({
+      Name: 0.2,
+      Author: 0.35,
+      Modified: 0.3,
+      Size: 0.15,
+    });
+    const save = vi.spyOn(storage, "save");
+
+    // The consumer reads which columns are on only after its first render.
+    const { rerenderWith } = renderTable({
+      widthStorage: storage,
+      columns: makeColumns({ Size: { visible: false } }),
+    });
+    rerenderWith({ columns: makeColumns() });
+
+    expect(save).not.toHaveBeenCalled();
+    const grid = screen
+      .getByTestId("data-table")
+      .style.getPropertyValue("--data-table-grid");
+    expect(grid).toBe(
+      "minmax(210px, 20fr) minmax(110px, 35fr) minmax(110px, 30fr) minmax(110px, 15fr) 68px 24px",
+    );
   });
 
   it("turns a hidden column on when the sort moves to it", () => {

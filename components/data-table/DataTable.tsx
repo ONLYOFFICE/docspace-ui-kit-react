@@ -79,7 +79,20 @@ export const DataTable = <T,>({
   ).length;
 
   const layout = useColumnLayout(layoutColumns, widthStorage, flexibleTotal);
-  const { containerRef, gridTemplate, compact } = layout;
+  const { containerRef, gridTemplate, compact, expectChange } = layout;
+
+  // Every choice of the user's goes through here, so that the layout can tell
+  // it from columns that change on their own and store only the former.
+  const changeVisibility = useMemo(
+    () =>
+      onColumnVisibilityChange
+        ? (columnId: string, visible: boolean) => {
+            expectChange(columnId, visible);
+            onColumnVisibilityChange(columnId, visible);
+          }
+        : undefined,
+    [onColumnVisibilityChange, expectChange],
+  );
 
   const { bind, resizingId } = useColumnResize(layout);
 
@@ -137,9 +150,9 @@ export const DataTable = <T,>({
       (column) => sortKey !== undefined && column.sortKey === sortKey,
     );
     if (sorted && sorted.visible === false && sorted.hideable) {
-      onColumnVisibilityChange?.(sorted.id, true);
+      changeVisibility?.(sorted.id, true);
     }
-  }, [sortKey, columns, onColumnVisibilityChange]);
+  }, [sortKey, columns, changeVisibility]);
 
   const virtualOptions =
     virtualize === false ? null : virtualize === true ? NO_OPTIONS : virtualize;
@@ -156,7 +169,7 @@ export const DataTable = <T,>({
       lastColumnId,
       compact,
       virtualized,
-      onColumnVisibilityChange,
+      onColumnVisibilityChange: changeVisibility,
     }),
     [
       columns,
@@ -164,7 +177,7 @@ export const DataTable = <T,>({
       lastColumnId,
       compact,
       virtualized,
-      onColumnVisibilityChange,
+      changeVisibility,
     ],
   );
 

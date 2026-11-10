@@ -141,6 +141,7 @@ export const DataTableBody = <T,>({
   const { loading } = useLoadMore({
     loadMore,
     loadedCount: loaded,
+    firstKey: loaded ? getRowKey(rows[0], 0) : undefined,
     nearEnd,
     position: virtualize ? lastIndex : tailInView,
   });
