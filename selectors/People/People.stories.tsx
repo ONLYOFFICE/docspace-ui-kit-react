@@ -9,6 +9,7 @@ import type { PeopleSelectorProps } from "./PeopleSelector.types";
 import type { TAccessRight, TSelectorItem } from "../../components/selector";
 
 import { withPortalGate } from "../../.storybook/decorators/PortalGate";
+import { DEMO_LARGE_ROOM_ID } from "../../.storybook/mocks/fixtures/people";
 
 type StoryArgs = {
   // Layout
@@ -494,6 +495,31 @@ export const AsideMode: Story = {
   onSubmit={(items) => console.log("selected", items[0])}
   onClose={() => setOpen(false)}
 />`,
+      },
+    },
+  },
+};
+
+export const LargeRoom: Story = {
+  tags: ["!autodocs"],
+  render: (args: StoryArgs) => <Template {...args} />,
+  args: {
+    roomId: DEMO_LARGE_ROOM_ID,
+    withHeader: true,
+    headerProps: {
+      headerLabel: "Contacts",
+      onCloseClick: fn(),
+    },
+    isMultiSelect: true,
+    onSubmit: fn(),
+    onClose: fn(),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A room on a portal with 327 people, more than one page of 100: " +
+          "scrolling past the first page loads the next one.",
       },
     },
   },
