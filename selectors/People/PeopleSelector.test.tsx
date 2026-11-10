@@ -65,14 +65,17 @@ vi.mock("../../components/selector", async (importOriginal) => {
 
 const { default: PeopleSelector } = await import("./index");
 
-const groups = (names: string[], count = names.length) => ({
+// The portal's envelope: `count` is the items in this answer, `total` every
+// item the query matches.
+const groups = (names: string[], total = names.length) => ({
   data: {
     response: names.map((name) => ({ id: `g-${name}`, name })),
-    count,
+    count: names.length,
+    total,
   },
 });
 
-const people = (names: string[]) => ({
+const people = (names: string[], total = names.length) => ({
   data: {
     response: names.map((name) => ({
       id: `u-${name}`,
@@ -80,6 +83,7 @@ const people = (names: string[]) => ({
       email: `${name}@example.com`,
     })),
     count: names.length,
+    total,
   },
 });
 
@@ -91,16 +95,47 @@ const submit = {
   disableSubmitButton: false,
 };
 
-describe("<PeopleSelector /> Groups tab", () => {
-  beforeEach(() => {
-    mocks.getGroups.mockReset();
-    mocks.searchUsersByExtendedFilter.mockReset();
-    mocks.getGroupsWithRoomsShared.mockReset();
-    mocks.getGroups.mockResolvedValue(groups(["Legal", "Sales"]));
-    mocks.searchUsersByExtendedFilter.mockResolvedValue(people(["Alex"]));
-    mocks.getGroupsWithRoomsShared.mockResolvedValue(groups(["Shared"]));
-  });
+beforeEach(() => {
+  mocks.getGroups.mockReset();
+  mocks.searchUsersByExtendedFilter.mockReset();
+  mocks.getGroupsWithRoomsShared.mockReset();
+  mocks.getGroups.mockResolvedValue(groups(["Legal", "Sales"]));
+  mocks.searchUsersByExtendedFilter.mockResolvedValue(people(["Alex"]));
+  mocks.getGroupsWithRoomsShared.mockResolvedValue(groups(["Shared"]));
+});
 
+describe("<PeopleSelector /> paging", () => {
+  // `count` is one page at most: read as the total it ended the list at the
+  // first page, and the rest was never asked for.
+  it("asks for the next page while the portal has more people", async () => {
+    mocks.searchUsersByExtendedFilter.mockResolvedValueOnce(
+      people(["Alex", "Bella"], 3),
+    );
+    render(<PeopleSelector {...submit} />);
+
+    await waitFor(() => expect(labels()).toEqual(["Alex", "Bella"]));
+    expect(mocks.lastProps.totalItems).toBe(3);
+    expect(mocks.lastProps.hasNextPage).toBe(true);
+
+    mocks.searchUsersByExtendedFilter.mockResolvedValueOnce(
+      people(["Chris"], 3),
+    );
+    // The loader is async: a braced body keeps its promise from `act`, which
+    // would take it for an async scope left unawaited.
+    act(() => {
+      mocks.lastProps.loadNextPage(2);
+    });
+
+    await waitFor(() => expect(labels()).toEqual(["Alex", "Bella", "Chris"]));
+    expect(mocks.searchUsersByExtendedFilter).toHaveBeenLastCalledWith(
+      expect.objectContaining({ startIndex: 2 }),
+      expect.anything(),
+    );
+    expect(mocks.lastProps.hasNextPage).toBe(false);
+  });
+});
+
+describe("<PeopleSelector /> Groups tab", () => {
   it("lists the portal's groups when there is no roomId", async () => {
     render(<PeopleSelector withGroups isGroupsOnly {...submit} />);
 

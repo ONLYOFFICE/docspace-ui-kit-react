@@ -65,10 +65,13 @@ vi.mock("../../components/selector", async (importOriginal) => {
 
 const { default: GroupsSelector } = await import("./index");
 
+// The portal's envelope: `count` is the items in this answer, `total` every
+// group the query matches.
 const groupsPage = (names: string[], total = names.length) => ({
   data: {
     response: names.map((name) => ({ id: name, name })),
-    count: total,
+    count: names.length,
+    total,
   },
 });
 

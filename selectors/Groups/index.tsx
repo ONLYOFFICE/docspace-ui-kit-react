@@ -15,6 +15,7 @@ import {
 import { toastr, type TData } from "../../components/toast";
 import { useTheme } from "../../context/ThemeContext";
 import useContentLoading from "../utils/hooks/useContentLoading";
+import { getListTotal } from "../utils/getListTotal";
 
 import type { GroupsSelectorProps } from "./GroupsSelector.types";
 
@@ -119,7 +120,7 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
         if (!isLatest()) return;
 
         const items = res.data.response ?? [];
-        const total = res.data.count ?? 0;
+        const total = getListTotal(res.data);
 
         const convertedItems: TSelectorItem[] = items.map((group) => ({
           id: group.id,

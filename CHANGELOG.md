@@ -280,6 +280,10 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`PeopleSelector` and `GroupsSelector` load past their first page.** Both took the list's
+  size from the answer's `count`, which is the items in that answer - one page of 100 at most -
+  so the list never had a next page and scrolling to its end loaded nothing. They read the
+  envelope's `total` now, through `getListTotal` (`selectors/utils/getListTotal`).
 - **`Filter`'s button keeps its icon while the panel is open.** The open button turned its icon
   white but lost the grey background it had before the move from the client, so the icon vanished
   on the light theme. The background is back, and `--filter-btn-open-bg` overrides it.

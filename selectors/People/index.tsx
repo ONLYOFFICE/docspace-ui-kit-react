@@ -36,6 +36,7 @@ import { globalColors } from "../../providers/theme";
 import { toastr } from "../../components/toast";
 import { useTheme } from "../../context/ThemeContext";
 import useContentLoading from "../utils/hooks/useContentLoading";
+import { getListTotal } from "../utils/getListTotal";
 
 import type { PeopleSelectorProps } from "./PeopleSelector.types";
 import StyledSendClockIcon from "./components/SendClockIcon";
@@ -352,7 +353,7 @@ const PeopleSelector = ({
             { signal },
           );
           items = res.data.response ?? [];
-          responseTotal = res.data.count ?? 0;
+          responseTotal = getListTotal(res.data);
         } else if (!roomId) {
           const employeeTypes =
             currentFilter.role as SearchUsersByExtendedFilterEmployeeTypesEnum[];
@@ -371,7 +372,7 @@ const PeopleSelector = ({
             },
           );
           items = res.data.response ?? [];
-          responseTotal = res.data.count ?? 0;
+          responseTotal = getListTotal(res.data);
         } else if (isGroupsTab) {
           // NOTE: roomId can be string but types cannot be fixed right now, using type assertion
           const id = roomId as number;
@@ -395,7 +396,7 @@ const PeopleSelector = ({
             ...g,
             isGroup: true,
           }));
-          responseTotal = res.data.count ?? 0;
+          responseTotal = getListTotal(res.data);
         } else {
           // NOTE: roomId can be string but types cannot be fixed right now, using type assertion
           const id = roomId as number;
@@ -424,7 +425,7 @@ const PeopleSelector = ({
             { signal },
           );
           items = res.data.response ?? [];
-          responseTotal = res.data.count ?? 0;
+          responseTotal = getListTotal(res.data);
         }
 
         let totalDifferent = startIndex ? responseTotal - totalRef.current : 0;
