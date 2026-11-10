@@ -96,6 +96,7 @@ type TAiToolsChatModelPrice = {
   provider: string;
   image: string;
   link?: string;
+  byok?: boolean;
   price: TAiToolsChatPrice;
 };
 

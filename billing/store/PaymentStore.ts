@@ -35,6 +35,9 @@ export type WalletOperationDto = Omit<
   sourceTitle?: string | null;
   sourceType?: TransactionSourceType | null;
   tokenUsage?: OperationTokenUsage | null;
+  cost?: number | null;
+  byok?: boolean;
+  provider?: string | null;
 };
 
 import { toastr } from "../../components/toast";
@@ -77,6 +80,7 @@ import {
   AI_SEARCH,
   AI_SEARCH_ENUM,
   AI_TOOLS,
+  AI_TOOLS_BYOK,
   BACKUP_SERVICE,
   STORAGE_TARIFF_DEACTIVATED,
   STORAGE_DEACTIVATION_VISITED,
@@ -562,6 +566,17 @@ class PaymentStore {
     ];
   }
 
+  getTransactionServiceNames = (
+    serviceName?: string,
+  ): string | string[] | undefined => {
+    if (isDocsConnectServiceName(serviceName))
+      return this.docsConnectServiceNames;
+
+    if (serviceName === AI_TOOLS) return [AI_TOOLS, AI_TOOLS_BYOK];
+
+    return serviceName;
+  };
+
   get backupServicePrice() {
     return (
       (
@@ -974,12 +989,14 @@ class PaymentStore {
     to,
     participantName,
     signal,
+    mergeByok,
   }: {
     serviceName?: string;
     from?: DateTime;
     to?: DateTime;
     participantName?: string;
     signal?: AbortSignal;
+    mergeByok?: boolean;
   } = {}) => {
     const abortController = new AbortController();
     this.addAbortController(abortController);
@@ -999,6 +1016,7 @@ class PaymentStore {
             StartDate: from ? this.formatDate(from, "start") : undefined,
             EndDate: to ? this.formatDate(to, "end") : undefined,
             ParticipantName: participantName,
+            mergeByok: mergeByok || undefined,
           },
         },
       );
@@ -1090,10 +1108,7 @@ class PaymentStore {
       this.filterSelectedTypeKey,
     );
 
-    const serviceNames: string | string[] | undefined =
-      isDocsConnectServiceName(serviceName)
-        ? this.docsConnectServiceNames
-        : serviceName;
+    const serviceNames = this.getTransactionServiceNames(serviceName);
 
     try {
       const res = await this.paymentApi.getCustomerOperations(
@@ -1611,7 +1626,13 @@ class PaymentStore {
           }
         }
 
-        requests.push(this.fetchAutoPayments(), this.fetchTransactionHistory());
+        requests.push(
+          this.fetchAutoPayments(),
+          this.fetchTransactionHistory(),
+          this.fetchServiceFeePercent(AI_TOOLS),
+          this.fetchServiceFeePercent(AI_SEARCH),
+          this.fetchServiceFeePercent(AI_TOOLS_BYOK),
+        );
       } else {
         requests.push(this.fetchCardLinked(integrationUrl));
         runInAction(() => {
@@ -1627,7 +1648,10 @@ class PaymentStore {
       requests.push(
         this.tariff.fetchPortalTariff(),
         this.fetchUpcomingPayments(),
-        this.fetchWalletUsage(getUsageRange("thisMonth")),
+        this.fetchWalletUsage({
+          ...getUsageRange("thisMonth"),
+          mergeByok: true,
+        }),
       );
 
       if (onInit) requests.push(Promise.resolve(onInit()));

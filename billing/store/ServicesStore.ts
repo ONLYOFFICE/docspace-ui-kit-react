@@ -9,6 +9,7 @@ import {
   AI_ENUM,
   AI_SEARCH,
   AI_TOOLS,
+  AI_TOOLS_BYOK,
   BACKUP_SERVICE,
   STORAGE_ENUM,
 } from "../constants";
@@ -392,10 +393,7 @@ class ServicesStore {
   initUsageData = async (period: TUsagePeriodKey) => {
     const range = getUsageRange(period);
 
-    // The usage page overwrites the shared rows with a whole period. Only rows
-    // of the current month match what a service page requests for itself, so
-    // any other period invalidates them.
-    if (period !== "thisMonth") this.loadedServiceName = null;
+    this.loadedServiceName = null;
 
     this.#usageAbortController?.abort();
     const usageAbortController = new AbortController();
@@ -404,7 +402,7 @@ class ServicesStore {
 
     await Promise.all([
       this.paymentStore.initWalletPayerAndBalance(false),
-      this.fetchServiceUsage({ ...range, signal }),
+      this.fetchServiceUsage({ ...range, signal, mergeByok: true }),
       this.fetchServiceUsageMonthly({ ...range, signal }),
     ]);
   };
@@ -486,6 +484,10 @@ class ServicesStore {
         requests.push(this.paymentStore.fetchServiceFeePercent(serviceName));
       }
 
+      if (serviceName === AI_TOOLS) {
+        requests.push(this.paymentStore.fetchServiceFeePercent(AI_TOOLS_BYOK));
+      }
+
       const monthStart = now().startOf("month");
       const monthEnd = now().endOf("month");
 
@@ -495,6 +497,7 @@ class ServicesStore {
             serviceName,
             from: monthStart,
             to: monthEnd,
+            mergeByok: serviceName === AI_TOOLS,
           }),
         );
       }
