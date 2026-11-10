@@ -10,10 +10,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Selector } from "../Selector";
 import type { SelectorProps, TSelectorItem } from "../Selector.types";
 
-const makeItems = (count: number) =>
+const makeItems = (count: number, from = 1) =>
   Array.from({ length: count }, (_, index) => ({
-    id: `Item-${index + 1}`,
-    label: `Item ${index + 1}`,
+    id: `Item-${from + index}`,
+    label: `Item ${from + index}`,
   })) as TSelectorItem[];
 
 const makeProps = (override: Partial<SelectorProps> = {}) =>
@@ -41,6 +41,7 @@ const makeProps = (override: Partial<SelectorProps> = {}) =>
 // The virtualized list: react-window draws only the rows near the viewport,
 // so the body needs a height of its own - jsdom lays nothing out.
 const BODY_HEIGHT = 480;
+const ROW_HEIGHT = 48;
 
 describe("Selector list paging", () => {
   beforeEach(() => {
@@ -91,5 +92,72 @@ describe("Selector list paging", () => {
     const props = await renderAtEnd({ hasNextPage: false, totalItems: 100 });
 
     expect(props.loadNextPage).not.toHaveBeenCalled();
+  });
+
+  // PeopleSelector puts the current user first on whichever page they come
+  // with. A list with another first row counted as a new one, and the list
+  // with the focus - it takes it as it mounts - went back to its top.
+  describe("when the next page moves a row of its own to the top", () => {
+    const withNextPage = [
+      { id: "me", label: "Me" } as TSelectorItem,
+      ...makeItems(100),
+      ...makeItems(100, 101),
+    ];
+
+    const renderList = async () => {
+      const props = makeProps();
+      const result = render(<Selector {...props} />);
+      await waitFor(() =>
+        expect(screen.getAllByRole("option").length).toBeGreaterThan(0),
+      );
+      return { props, list: screen.getByRole("listbox"), ...result };
+    };
+
+    it("keeps the list where the wheel left it", async () => {
+      // react-window clamps a scroll to the scroller's size, which jsdom
+      // reports as zero.
+      vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(
+        BODY_HEIGHT,
+      );
+      vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(
+        ROW_HEIGHT * 300,
+      );
+      const { props, list, rerender } = await renderList();
+      expect(list).toHaveFocus();
+
+      // The listbox is the scroller's content; the scroll is the scroller's.
+      for (let el: HTMLElement | null = list; el; el = el.parentElement) {
+        el.scrollTop = ROW_HEIGHT * 80;
+        fireEvent.scroll(el);
+      }
+      await waitFor(() => expect(screen.getByText("Item 85")).toBeTruthy());
+
+      rerender(<Selector {...props} items={withNextPage} />);
+
+      // The rows are one further down the list, and still on screen.
+      await waitFor(() =>
+        expect(
+          screen.getByText("Item 85").closest('[role="option"]')?.id,
+        ).toMatch(/-option-85$/),
+      );
+      expect(screen.getByTestId("scroller").scrollTop).toBe(ROW_HEIGHT * 80);
+      expect(screen.queryByText("Me")).toBeNull();
+    });
+
+    it("keeps the keyboard on its row", async () => {
+      const { props, list, rerender } = await renderList();
+      const activeText = () => {
+        const id = list.getAttribute("aria-activedescendant");
+        return id ? document.getElementById(id)?.textContent : null;
+      };
+
+      fireEvent.keyDown(list, { key: "ArrowDown" });
+      await waitFor(() => expect(activeText()).toContain("Item 2"));
+
+      rerender(<Selector {...props} items={withNextPage} />);
+
+      await waitFor(() => expect(screen.getByText("Me")).toBeTruthy());
+      await waitFor(() => expect(activeText()).toContain("Item 2"));
+    });
   });
 });

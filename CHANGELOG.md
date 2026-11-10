@@ -291,6 +291,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   page, and off lists they are not in. The total ran short and the list could end before its
   last rows. Pages now start after the rows the portal has sent, the user is counted off on the
   page they come with, and the list ends when the portal has no more rows.
+- **`Selector` keeps its place when a page moves a row up the list.** `PeopleSelector` puts the
+  current user first on whichever page they come with, and a list with another first row counted
+  as a new list: with the focus on it, as it is from mount, the list scrolled back to its top.
+  A list that holds every row it held before is the same list - nothing scrolls, and the
+  keyboard follows its row to its new index.
 - **`Selector` asks for a next page of one row.** The row after the loaded ones draws the loader,
   and the list asks for the row after that one. With `totalItems` one above the loaded rows - 101
   items after a page of 100 - or counted short by the caller, no such row was in range, and the

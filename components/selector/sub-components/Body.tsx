@@ -452,17 +452,30 @@ const Body = ({
   // keyboard starts again on its first row while the list keeps the focus.
   // Only a new list does that - not a pick re-rendering the same rows (the
   // items array is rebuilt on every Selector render), nor the next page
-  // appended below them.
-  const itemIdsRef = React.useRef<unknown[]>([]);
+  // appended below them, nor that page moving a row of its own up the list
+  // (PeopleSelector puts the current user first on whichever page they come
+  // with): scrolled to its top, a list would lose its place on every such
+  // page.
+  const itemIdsRef = React.useRef<TSelectorItem["id"][]>([]);
   React.useEffect(() => {
     const ids = items.map((item) => item?.id);
     const previous = itemIdsRef.current;
     itemIdsRef.current = ids;
+    if (activeIndexRef.current < 0) return;
     // An empty list before is no "same list": a folder that loads through an
     // empty one would keep the keyboard on a row index of the list before it.
-    const sameList =
-      previous.length > 0 && previous.every((id, index) => ids[index] === id);
-    if (sameList || activeIndexRef.current < 0) return;
+    if (previous.length > 0) {
+      if (previous.every((id, index) => ids[index] === id)) return;
+
+      // The same rows, in another order or with new ones among them: the
+      // keyboard follows its row to where it is now, and nothing scrolls.
+      const idSet = new Set(ids);
+      if (previous.every((id) => idSet.has(id))) {
+        const row = ids.indexOf(previous[activeIndexRef.current]);
+        if (row >= 0) setActiveIndex(row);
+        return;
+      }
+    }
 
     const list = document.activeElement;
     const keepsFocus =
