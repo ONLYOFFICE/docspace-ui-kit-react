@@ -184,6 +184,27 @@ const toEmployee = (person: DemoPerson) => {
 
 export const DEMO_PEOPLE = PEOPLE.map(toEmployee);
 
+/**
+ * A room on a portal larger than one page of the selector (100): the size
+ * nct2 reported when PeopleSelector stopped after its first page, reading the
+ * envelope's `count` (the page) as the `total` (all matches).
+ */
+export const DEMO_LARGE_ROOM_ID = 327;
+
+export const DEMO_LARGE_ROOM_PEOPLE = Array.from(
+  { length: 327 },
+  (_, index) => {
+    const number = String(index + 1).padStart(3, "0");
+    return toEmployee({
+      id: `5a9e3c10-0000-4000-8000-000000100${number}`,
+      firstName: "Member",
+      lastName: number,
+      title: "Staff",
+      role: "user",
+    });
+  },
+);
+
 /** Whose key the demo portal pretends to be: its owner. */
 export const DEMO_SELF = DEMO_PEOPLE[0];
 
