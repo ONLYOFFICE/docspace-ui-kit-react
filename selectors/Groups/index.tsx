@@ -136,7 +136,9 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
         } else {
           setItemsList((value) => {
             const arr = [...value, ...convertedItems];
-            setHasNextPage(arr.length < total);
+            // An empty answer ends the list whatever the total says: the
+            // list would ask for that page again and again.
+            setHasNextPage(convertedItems.length > 0 && arr.length < total);
             return arr;
           });
         }

@@ -284,6 +284,13 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   size from the answer's `count`, which is the items in that answer - one page of 100 at most -
   so the list never had a next page and scrolling to its end loaded nothing. They read the
   envelope's `total` now, through `getListTotal` (`selectors/utils/getListTotal`).
+- **`PeopleSelector` counts the rows it leaves out once, and pages by the rows loaded.** It asked
+  for the next page by the rows drawn, fewer than the rows loaded once the current user, an
+  excluded or a disabled account was left out, so pages overlapped and the rows left out were
+  counted again; with `withOutCurrentAuthorizedUser` the user was also counted off on every
+  page, and off lists they are not in. The total ran short and the list could end before its
+  last rows. Pages now start after the rows the portal has sent, the user is counted off on the
+  page they come with, and the list ends when the portal has no more rows.
 - **`Selector` asks for a next page of one row.** The row after the loaded ones draws the loader,
   and the list asks for the row after that one. With `totalItems` one above the loaded rows - 101
   items after a page of 100 - or counted short by the caller, no such row was in range, and the

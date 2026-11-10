@@ -95,6 +95,18 @@ const submit = {
   disableSubmitButton: false,
 };
 
+// A stable array, as a caller's memoized one: a new one every render would
+// rebuild the page loader and ask for page 0 again.
+const EXCLUDED = ["u-Bella"];
+
+// Asks for the page after `rows` drawn rows, as the Selector does. The loader
+// is async: the braced body keeps its promise from `act`, which would take it
+// for an async scope left unawaited.
+const loadAfter = (rows: number) =>
+  act(() => {
+    mocks.lastProps.loadNextPage(rows);
+  });
+
 beforeEach(() => {
   mocks.getGroups.mockReset();
   mocks.searchUsersByExtendedFilter.mockReset();
@@ -120,11 +132,7 @@ describe("<PeopleSelector /> paging", () => {
     mocks.searchUsersByExtendedFilter.mockResolvedValueOnce(
       people(["Chris"], 3),
     );
-    // The loader is async: a braced body keeps its promise from `act`, which
-    // would take it for an async scope left unawaited.
-    act(() => {
-      mocks.lastProps.loadNextPage(2);
-    });
+    loadAfter(2);
 
     await waitFor(() => expect(labels()).toEqual(["Alex", "Bella", "Chris"]));
     expect(mocks.searchUsersByExtendedFilter).toHaveBeenLastCalledWith(
@@ -132,6 +140,110 @@ describe("<PeopleSelector /> paging", () => {
       expect.anything(),
     );
     expect(mocks.lastProps.hasNextPage).toBe(false);
+  });
+
+  // The Selector asks by the rows it draws, one fewer than the rows loaded
+  // once the current user is left out: the portal is asked by its own rows.
+  // The user used to be counted off again on every page, and the list ended
+  // a row early.
+  it("counts the current user off once across the pages", async () => {
+    mocks.searchUsersByExtendedFilter.mockResolvedValueOnce(
+      people(["Alex", "Me"], 5),
+    );
+    render(
+      <PeopleSelector
+        withOutCurrentAuthorizedUser
+        currentUserId="u-Me"
+        {...submit}
+      />,
+    );
+
+    await waitFor(() => expect(labels()).toEqual(["Alex"]));
+    expect(mocks.lastProps.totalItems).toBe(4);
+    expect(mocks.lastProps.hasNextPage).toBe(true);
+
+    mocks.searchUsersByExtendedFilter.mockResolvedValueOnce(
+      people(["Bella", "Chris"], 5),
+    );
+    loadAfter(1);
+
+    await waitFor(() => expect(labels()).toEqual(["Alex", "Bella", "Chris"]));
+    expect(mocks.searchUsersByExtendedFilter).toHaveBeenLastCalledWith(
+      expect.objectContaining({ startIndex: 2 }),
+      expect.anything(),
+    );
+    expect(mocks.lastProps.totalItems).toBe(4);
+    expect(mocks.lastProps.hasNextPage).toBe(true);
+
+    mocks.searchUsersByExtendedFilter.mockResolvedValueOnce(
+      people(["Dana"], 5),
+    );
+    loadAfter(3);
+
+    await waitFor(() =>
+      expect(labels()).toEqual(["Alex", "Bella", "Chris", "Dana"]),
+    );
+    expect(mocks.searchUsersByExtendedFilter).toHaveBeenLastCalledWith(
+      expect.objectContaining({ startIndex: 4 }),
+      expect.anything(),
+    );
+    expect(mocks.lastProps.totalItems).toBe(4);
+    expect(mocks.lastProps.hasNextPage).toBe(false);
+  });
+
+  it("counts nobody off a list the current user is not in", async () => {
+    mocks.searchUsersByExtendedFilter.mockResolvedValueOnce(
+      people(["Alex", "Bella"]),
+    );
+    render(
+      <PeopleSelector
+        withOutCurrentAuthorizedUser
+        currentUserId="u-Me"
+        {...submit}
+      />,
+    );
+
+    await waitFor(() => expect(labels()).toEqual(["Alex", "Bella"]));
+    expect(mocks.lastProps.totalItems).toBe(2);
+    expect(mocks.lastProps.hasNextPage).toBe(false);
+  });
+
+  it("counts an excluded row off once and loads past it", async () => {
+    mocks.searchUsersByExtendedFilter.mockResolvedValueOnce(
+      people(["Alex", "Bella"], 4),
+    );
+    render(<PeopleSelector excludeItems={EXCLUDED} {...submit} />);
+
+    await waitFor(() => expect(labels()).toEqual(["Alex"]));
+    expect(mocks.lastProps.totalItems).toBe(3);
+
+    mocks.searchUsersByExtendedFilter.mockResolvedValueOnce(
+      people(["Chris", "Dana"], 4),
+    );
+    loadAfter(1);
+
+    await waitFor(() => expect(labels()).toEqual(["Alex", "Chris", "Dana"]));
+    expect(mocks.searchUsersByExtendedFilter).toHaveBeenLastCalledWith(
+      expect.objectContaining({ startIndex: 2 }),
+      expect.anything(),
+    );
+    expect(mocks.lastProps.totalItems).toBe(3);
+    expect(mocks.lastProps.hasNextPage).toBe(false);
+  });
+
+  it("ends the list on an empty page", async () => {
+    mocks.searchUsersByExtendedFilter.mockResolvedValueOnce(
+      people(["Alex", "Bella"], 3),
+    );
+    render(<PeopleSelector {...submit} />);
+
+    await waitFor(() => expect(mocks.lastProps.hasNextPage).toBe(true));
+
+    mocks.searchUsersByExtendedFilter.mockResolvedValueOnce(people([], 3));
+    loadAfter(2);
+
+    await waitFor(() => expect(mocks.lastProps.hasNextPage).toBe(false));
+    expect(labels()).toEqual(["Alex", "Bella"]);
   });
 });
 

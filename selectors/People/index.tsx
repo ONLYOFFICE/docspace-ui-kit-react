@@ -252,7 +252,11 @@ const PeopleSelector = ({
     useContentLoading();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const afterSearch = useRef(false);
-  const totalRef = useRef(0);
+  // The rows the portal has answered with so far, and how many of them the
+  // list left out: the next page starts after the first, and the total is
+  // short by the second.
+  const loadedRef = useRef(0);
+  const droppedRef = useRef(0);
   const searchTab = useRef(PEOPLE_TAB_ID);
   const abortControllerRef = useRef(new AbortController());
 
@@ -314,6 +318,10 @@ const PeopleSelector = ({
           return;
         }
         const pageCount = 100;
+        // The Selector asks by the rows it draws. They are fewer than the
+        // rows loaded once any are left out, and one more with the system
+        // group's separator: the portal is asked by the rows it has sent.
+        const offset = startIndex === 0 ? 0 : loadedRef.current;
 
         setIsNextPageLoading(true);
 
@@ -347,7 +355,7 @@ const PeopleSelector = ({
           const res = await groupApi.getGroups(
             {
               count: pageCount,
-              startIndex,
+              startIndex: offset,
               filterValue,
             },
             { signal },
@@ -364,7 +372,7 @@ const PeopleSelector = ({
               employeeTypes,
               area,
               count: pageCount,
-              startIndex,
+              startIndex: offset,
               filterValue,
             },
             {
@@ -387,7 +395,7 @@ const PeopleSelector = ({
             {
               id,
               count: pageCount,
-              startIndex,
+              startIndex: offset,
               filterValue,
             },
             { signal },
@@ -419,7 +427,7 @@ const PeopleSelector = ({
               includeShared,
               area,
               count: pageCount,
-              startIndex,
+              startIndex: offset,
               filterValue,
             },
             { signal },
@@ -428,7 +436,7 @@ const PeopleSelector = ({
           responseTotal = getListTotal(res.data);
         }
 
-        let totalDifferent = startIndex ? responseTotal - totalRef.current : 0;
+        let dropped = startIndex === 0 ? 0 : droppedRef.current;
 
         const data = items
           .filter((item) => {
@@ -436,7 +444,7 @@ const PeopleSelector = ({
               (excludeItems && item.id && excludeItems.includes(item.id)) ||
               ("status" in item && item.status === EmployeeStatus.Terminated)
             ) {
-              totalDifferent += 1;
+              dropped += 1;
               return false;
             }
             return true;
@@ -455,41 +463,45 @@ const PeopleSelector = ({
           );
 
         // The current user is one of the people, never one of the groups:
-        // only a list of people has them to leave out and count off.
+        // only a list of people has them to leave out. They are counted off
+        // on the page they come with - once, and not at all from a list they
+        // are not in, a search that does not match them for one.
         const withoutCurrentUser = withOutCurrentAuthorizedUser && !isGroupsTab;
+        const pageItems = withoutCurrentUser
+          ? removeCurrentUserFromList(data)
+          : data;
 
-        const newTotal = withoutCurrentUser
-          ? responseTotal - totalDifferent - 1
-          : responseTotal - totalDifferent;
+        dropped += data.length - pageItems.length;
+
+        const loaded = offset + items.length;
+        const newTotal = responseTotal - dropped;
 
         if (startIndex === 0) {
-          const newItems = withoutCurrentUser
-            ? removeCurrentUserFromList(data)
-            : moveCurrentUserToTopOfList(data);
-
-          setHasNextPage(newItems.length < newTotal);
-          setItemsList(newItems);
+          setItemsList(
+            withoutCurrentUser
+              ? pageItems
+              : moveCurrentUserToTopOfList(pageItems),
+          );
         } else {
           setItemsList((i) => {
-            const tempItems = [...i, ...data];
-
             const ids = new Set();
-            const filteredTempItems = tempItems.filter(
+            const merged = [...i, ...pageItems].filter(
               (item) => !ids.has(item.id) && ids.add(item.id),
             );
 
-            const newItems = withoutCurrentUser
-              ? removeCurrentUserFromList(filteredTempItems)
-              : moveCurrentUserToTopOfList(filteredTempItems);
-
-            setHasNextPage(newItems.length < newTotal);
-
-            return newItems;
+            return withoutCurrentUser
+              ? merged
+              : moveCurrentUserToTopOfList(merged);
           });
         }
 
+        // By the rows loaded, not the rows drawn: the two part ways with
+        // every row left out. An empty answer ends the list whatever the
+        // total says.
+        setHasNextPage(items.length > 0 && loaded < responseTotal);
         setTotal(newTotal);
-        totalRef.current = newTotal;
+        loadedRef.current = loaded;
+        droppedRef.current = dropped;
 
         setIsNextPageLoading(false);
         setIsFirstLoad(false);
@@ -535,7 +547,8 @@ const PeopleSelector = ({
     setItemsList([]);
     setHasNextPage(true);
     setTotal(-1);
-    totalRef.current = 0;
+    loadedRef.current = 0;
+    droppedRef.current = 0;
     startContentLoading();
   }, [startContentLoading]);
 
