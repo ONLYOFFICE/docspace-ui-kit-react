@@ -269,6 +269,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Added
 
+- `Navigation`: the block with the AI chat button and the info panel toggle carries the class
+  `navigation-buttons-container`, so a host stylesheet can reach it without matching the module
+  class name.
 - **`DataTable`, the successor of `Table`, at `components/data-table`**, in the root barrel and
   so plugin API: `DataTable`, `DataTableRow`, `DataTableRowCheckbox`, `DataTableRowActions`,
   `settingsColumn`, `contextMenuColumn`, `ColumnSettings`, `createLocalStorageWidths`,

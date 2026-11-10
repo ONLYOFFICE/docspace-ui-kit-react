@@ -331,8 +331,13 @@ const Navigation = ({
               carries a 20px inline-start margin, and an empty one still
               reserves it, pushing the control buttons away from the header's
               trailing edge below the desktop breakpoint. */}
+          {/* `navigation-buttons-container` is for a host to reach the block
+              by: a match on the module class name (`[class*=…]`) makes the
+              browser restyle every element with a class on any change. */}
           {showChatButton || showInfoPanelToggle ? (
-            <div className={styles.buttonsContainer}>
+            <div
+              className={`${styles.buttonsContainer} navigation-buttons-container`}
+            >
               {showChatButton ? (
                 <AiChatButton
                   id="ai-chat-button"

@@ -360,6 +360,12 @@ None of them are settable. The header container carries a row of `data-*` attrib
 `data-is-root-folder`, `data-is-desktop`, `data-is-info-panel-visible` and others — which the
 stylesheet uses and a test can select on.
 
+The block that holds the AI chat button and the info panel toggle carries the class
+`navigation-buttons-container`, for a host stylesheet to reach it. Match that class, not the
+module class name: an attribute selector such as `[class*="buttonsContainer"]` makes the browser
+restyle every element that has a class whenever the page changes, which on a scrolled list is
+most of its style time.
+
 ## Related
 
 - [`Section`](../section/README.md) — the layout this belongs in, and the source of the drop box's height.
