@@ -201,6 +201,15 @@ const Body = ({
         ? 1
         : displayItems.length;
 
+  // What the loader looks for rows to load in. The row after the loaded ones
+  // draws the loader and counts as loaded, so the first row to ask for is the
+  // one after it: a total one above the loaded rows - a last page of one row -
+  // or one a caller counted short leaves none in range, and the list ended on
+  // its loader. While there is a next page the range always holds that row.
+  const loaderItemCount = displayHasNextPage
+    ? Math.max(displayTotal, itemsCount + 1)
+    : displayTotal;
+
   const showsEmptyScreen = itemsCount === 0 && loadingMode === "none";
 
   React.useEffect(() => {
@@ -724,7 +733,7 @@ const Body = ({
               <InfiniteLoader
                 ref={listOptionsRef}
                 isItemLoaded={isItemLoaded}
-                itemCount={displayTotal}
+                itemCount={loaderItemCount}
                 loadMoreItems={onLoadMoreItems}
               >
                 {({ onItemsRendered, ref }) => (

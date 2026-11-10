@@ -284,6 +284,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   size from the answer's `count`, which is the items in that answer - one page of 100 at most -
   so the list never had a next page and scrolling to its end loaded nothing. They read the
   envelope's `total` now, through `getListTotal` (`selectors/utils/getListTotal`).
+- **`Selector` asks for a next page of one row.** The row after the loaded ones draws the loader,
+  and the list asks for the row after that one. With `totalItems` one above the loaded rows - 101
+  items after a page of 100 - or counted short by the caller, no such row was in range, and the
+  list ended on its loader. While `hasNextPage` is set the row is always in range, so
+  `loadNextPage` is now also called where `hasNextPage` stays set at exactly `totalItems` rows.
 - **`Filter`'s button keeps its icon while the panel is open.** The open button turned its icon
   white but lost the grey background it had before the move from the client, so the icon vanished
   on the light theme. The background is back, and `--filter-btn-open-bg` overrides it.
