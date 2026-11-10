@@ -98,6 +98,7 @@ const submit = {
 // A stable array, as a caller's memoized one: a new one every render would
 // rebuild the page loader and ask for page 0 again.
 const EXCLUDED = ["u-Bella"];
+const EXCLUDED_PAGE = ["u-Alex", "u-Bella"];
 
 // Asks for the page after `rows` drawn rows, as the Selector does. The loader
 // is async: the braced body keeps its promise from `act`, which would take it
@@ -229,6 +230,36 @@ describe("<PeopleSelector /> paging", () => {
     );
     expect(mocks.lastProps.totalItems).toBe(3);
     expect(mocks.lastProps.hasNextPage).toBe(false);
+  });
+
+  // The Selector asks for the next page from the rows it draws: a first page
+  // with every row left out used to leave a loader and no request behind it.
+  it("loads on past a page with every row left out", async () => {
+    mocks.searchUsersByExtendedFilter
+      .mockResolvedValueOnce(people(["Alex", "Bella"], 4))
+      .mockResolvedValueOnce(people(["Chris", "Dana"], 4));
+    render(<PeopleSelector excludeItems={EXCLUDED_PAGE} {...submit} />);
+
+    await waitFor(() => expect(labels()).toEqual(["Chris", "Dana"]));
+    expect(mocks.searchUsersByExtendedFilter).toHaveBeenCalledTimes(2);
+    expect(mocks.searchUsersByExtendedFilter).toHaveBeenLastCalledWith(
+      expect.objectContaining({ startIndex: 2 }),
+      expect.anything(),
+    );
+    expect(mocks.lastProps.totalItems).toBe(2);
+    expect(mocks.lastProps.hasNextPage).toBe(false);
+  });
+
+  it("ends an empty list once every page had its rows left out", async () => {
+    mocks.searchUsersByExtendedFilter.mockResolvedValueOnce(
+      people(["Alex", "Bella"]),
+    );
+    render(<PeopleSelector excludeItems={EXCLUDED_PAGE} {...submit} />);
+
+    await waitFor(() => expect(mocks.lastProps.hasNextPage).toBe(false));
+    expect(labels()).toEqual([]);
+    expect(mocks.lastProps.totalItems).toBe(0);
+    expect(mocks.searchUsersByExtendedFilter).toHaveBeenCalledTimes(1);
   });
 
   it("ends the list on an empty page", async () => {

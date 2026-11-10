@@ -291,6 +291,10 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   page, and off lists they are not in. The total ran short and the list could end before its
   last rows. Pages now start after the rows the portal has sent, the user is counted off on the
   page they come with, and the list ends when the portal has no more rows.
+- **`PeopleSelector` loads on past a page with every row left out.** `Selector` asks for the
+  next page from the rows it draws, so a first page whose every account was excluded or
+  disabled left a loader and no request behind it. The pages are now asked for until one brings
+  a row or the portal has no more.
 - **`Selector` keeps its place when a page moves a row up the list.** `PeopleSelector` puts the
   current user first on whichever page they come with, and a list with another first row counted
   as a new list: with the focus on it, as it is from mount, the list scrolled back to its top.
