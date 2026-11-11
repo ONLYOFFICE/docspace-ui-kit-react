@@ -1,0 +1,61 @@
+@use "../../../../../styles/variables/colors" as *;
+
+.anchor {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  cursor: pointer;
+
+  rect,
+  path {
+    stroke: var(--payment-icon-color);
+  }
+}
+
+.content {
+  --bonus-divider-color: #{$gray-light-mid};
+  --bonus-details-color: #{$light-gray-dark};
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 200px;
+  color: var(--tooltip-text-color);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+:global(.dark) {
+  :local {
+    .content {
+      --bonus-divider-color: #{$gray-dark-strong};
+      --bonus-details-color: #{$dark-gray-dark};
+    }
+  }
+}
+
+.title {
+  font-weight: 600;
+}
+
+.line {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.value {
+  font-variant-numeric: tabular-nums;
+}
+
+.details {
+  padding-top: 6px;
+  border-top: 1px solid var(--bonus-divider-color);
+  color: var(--bonus-details-color);
+}

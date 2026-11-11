@@ -26,6 +26,12 @@ export type OperationTokenUsage = {
   imageTokens: number;
 };
 
+export type OperationSource = {
+  subAccount: number;
+  isBonus: boolean;
+  amount: number;
+};
+
 export type WalletOperationDto = Omit<
   OperationDto,
   "date" | "agentId" | "agentTitle"
@@ -35,6 +41,7 @@ export type WalletOperationDto = Omit<
   sourceTitle?: string | null;
   sourceType?: TransactionSourceType | null;
   tokenUsage?: OperationTokenUsage | null;
+  sources?: OperationSource[] | null;
 };
 
 import { toastr } from "../../components/toast";

@@ -17,6 +17,7 @@ import {
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
 import { getTransactionSourceLabel, hasTransactionSource } from "../../utils";
 import { TokenUsageAnchor } from "../TokenUsage";
+import { BonusSplitAnchor } from "../BonusSplit/sub-components/BonusSplitAnchor";
 
 interface TransactionRowProps {
   transaction: WalletOperationDto;
@@ -91,15 +92,17 @@ const TransactionRow: React.FC<TransactionRowProps> = ({
         </TokenUsageAnchor>
       </TableCell>
       <TableCell>
-        <Text
-          fontWeight={600}
-          fontSize="11px"
-          className={classNames({
-            [styles.transactionRowAmountCredit]: isCredit,
-          })}
-        >
-          {formattedAmount}
-        </Text>
+        <BonusSplitAnchor transaction={transaction}>
+          <Text
+            fontWeight={600}
+            fontSize="11px"
+            className={classNames({
+              [styles.transactionRowAmountCredit]: isCredit,
+            })}
+          >
+            {formattedAmount}
+          </Text>
+        </BonusSplitAnchor>
       </TableCell>
     </TableRow>
   );

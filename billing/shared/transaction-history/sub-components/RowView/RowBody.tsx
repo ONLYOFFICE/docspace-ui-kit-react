@@ -17,6 +17,7 @@ import {
 import { usePaymentStore } from "../../../../store/PaymentStoreProvider";
 import { getTransactionSourceLabel, hasTransactionSource } from "../../utils";
 import { TokenUsageAnchor } from "../TokenUsage";
+import { BonusSplitAnchor } from "../BonusSplit/sub-components/BonusSplitAnchor";
 import tokenStyles from "../TokenUsage/TokenUsage.module.scss";
 
 type TransactionRowViewProps = {
@@ -120,15 +121,17 @@ const TransactionRowView: React.FC<TransactionRowViewProps> = ({
     <Row
       className={styles.transactionRow}
       badgesComponent={
-        <Text
-          fontWeight={600}
-          fontSize="13px"
-          className={classNames(styles.transactionRowAmount, {
-            [styles.transactionRowAmountCredit]: isCredit,
-          })}
-        >
-          {formattedAmount}
-        </Text>
+        <BonusSplitAnchor transaction={transaction}>
+          <Text
+            fontWeight={600}
+            fontSize="13px"
+            className={classNames(styles.transactionRowAmount, {
+              [styles.transactionRowAmountCredit]: isCredit,
+            })}
+          >
+            {formattedAmount}
+          </Text>
+        </BonusSplitAnchor>
       }
     >
       <RowContent sectionWidth={sectionWidth}>{getRowChildren()}</RowContent>
