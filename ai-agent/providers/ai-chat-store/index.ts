@@ -1,6 +1,7 @@
 export { default as AiChatStore } from "./AiChatStore";
 export type {
   AiChatPresetRoom,
+  AiChatContextFolder,
   AiChatPresetSettings,
   AiChatProjectSettings,
   AiChatRouterPage,

@@ -76,10 +76,17 @@ describe("ContextFolderDialog", () => {
   it("hands the folder to the chat as the round's context and closes", () => {
     const onClose = vi.fn();
     render(<ContextFolderDialog onClose={onClose} />);
-    act(() => selector().onSubmit(5, "Q3 reports", false, []));
+    act(() =>
+      selector().onSubmit(5, "Q3 reports", false, [
+        { id: "", label: "" },
+        { id: 1, label: "My documents" },
+        { id: 5, label: "Q3 reports" },
+      ]),
+    );
+    // The path skips the virtual root and ends with the folder itself.
     expect(clouds.selectFolderContext).toHaveBeenCalledWith(
       CONTEXT_ROOM_CLOUD,
-      { id: "5", name: "Q3 reports" },
+      { id: "5", name: "Q3 reports", path: "My documents / Q3 reports" },
     );
     expect(onClose).toHaveBeenCalledTimes(1);
   });
@@ -94,7 +101,7 @@ describe("ContextFolderDialog", () => {
     );
     expect(clouds.selectFolderContext).toHaveBeenCalledWith(
       CONTEXT_ROOM_CLOUD,
-      { id: "7", name: "Sales" },
+      { id: "7", name: "Sales", path: "Rooms / Sales" },
     );
   });
 

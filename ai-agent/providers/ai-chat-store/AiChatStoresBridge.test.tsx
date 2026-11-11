@@ -11,6 +11,7 @@ const { clouds, profiles, threads } = vi.hoisted(() => ({
     selectKnowledgeFolders: vi.fn(),
     clearKnowledgeFolder: vi.fn(),
     clearFolderContext: vi.fn(),
+    selectFolderContext: vi.fn(),
   },
   profiles: {
     profiles: [] as { id: string; name: string }[],
@@ -184,6 +185,41 @@ describe("AiChatStoresBridge", () => {
     ]);
     expect(clouds.clearContextFolder).not.toHaveBeenCalled();
     expect(clouds.clearKnowledgeFolder).not.toHaveBeenCalled();
+  });
+
+  it("opens a fresh chat with the folder the preset remembers, else without one", async () => {
+    const store = new AiChatStore();
+    profiles.initialized = true;
+    renderBridge(store);
+    await act(async () => {
+      store.openPreset({
+        ...PRESET,
+        folderContext: {
+          cloud: "docspace",
+          id: "77",
+          name: "Reports",
+          path: "My documents / Reports",
+        },
+      });
+    });
+    expect(clouds.selectFolderContext).toHaveBeenCalledWith("docspace", {
+      id: "77",
+      name: "Reports",
+      path: "My documents / Reports",
+    });
+    expect(clouds.clearFolderContext).not.toHaveBeenCalled();
+
+    await act(async () => {
+      store.openPreset(PRESET);
+    });
+    expect(clouds.clearFolderContext).toHaveBeenCalledTimes(1);
+
+    // Applied in place, the chat keeps the folder the user connected.
+    await act(async () => {
+      store.applyPreset({ ...PRESET, folderContext: null });
+    });
+    expect(clouds.clearFolderContext).toHaveBeenCalledTimes(1);
+    expect(clouds.selectFolderContext).toHaveBeenCalledTimes(1);
   });
 
   it("clears the rooms of an empty preset and adds a mixed-cloud list one by one", async () => {

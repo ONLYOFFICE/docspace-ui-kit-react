@@ -15,6 +15,7 @@ import {
 import { toastr, type TData } from "../../components/toast";
 import { useTheme } from "../../context/ThemeContext";
 import useContentLoading from "../utils/hooks/useContentLoading";
+import { getListTotal } from "../utils/getListTotal";
 
 import type { GroupsSelectorProps } from "./GroupsSelector.types";
 
@@ -119,7 +120,7 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
         if (!isLatest()) return;
 
         const items = res.data.response ?? [];
-        const total = res.data.count ?? 0;
+        const total = getListTotal(res.data);
 
         const convertedItems: TSelectorItem[] = items.map((group) => ({
           id: group.id,
@@ -135,7 +136,9 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
         } else {
           setItemsList((value) => {
             const arr = [...value, ...convertedItems];
-            setHasNextPage(arr.length < total);
+            // An empty answer ends the list whatever the total says: the
+            // list would ask for that page again and again.
+            setHasNextPage(convertedItems.length > 0 && arr.length < total);
             return arr;
           });
         }

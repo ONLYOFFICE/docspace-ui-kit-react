@@ -36,6 +36,7 @@ import { globalColors } from "../../providers/theme";
 import { toastr } from "../../components/toast";
 import { useTheme } from "../../context/ThemeContext";
 import useContentLoading from "../utils/hooks/useContentLoading";
+import { getListTotal } from "../utils/getListTotal";
 
 import type { PeopleSelectorProps } from "./PeopleSelector.types";
 import StyledSendClockIcon from "./components/SendClockIcon";
@@ -251,7 +252,11 @@ const PeopleSelector = ({
     useContentLoading();
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const afterSearch = useRef(false);
-  const totalRef = useRef(0);
+  // The rows the portal has answered with so far, and how many of them the
+  // list left out: the next page starts after the first, and the total is
+  // short by the second.
+  const loadedRef = useRef(0);
+  const droppedRef = useRef(0);
   const searchTab = useRef(PEOPLE_TAB_ID);
   const abortControllerRef = useRef(new AbortController());
 
@@ -337,158 +342,190 @@ const PeopleSelector = ({
           return abortControllerRef.current.signal;
         })();
 
-        let items: (EmployeeFullDto | GroupDto)[] = [];
-        let responseTotal = 0;
+        const loadPage = async (offset: number) => {
+          let items: (EmployeeFullDto | GroupDto)[] = [];
+          let responseTotal = 0;
 
-        if (!roomId && isGroupsTab) {
-          // No room to scope "shared with" by: the tab lists the portal's
-          // groups, as GroupsSelector does.
-          const res = await groupApi.getGroups(
-            {
-              count: pageCount,
-              startIndex,
-              filterValue,
-            },
-            { signal },
-          );
-          items = res.data.response ?? [];
-          responseTotal = res.data.count ?? 0;
-        } else if (!roomId) {
-          const employeeTypes =
-            currentFilter.role as SearchUsersByExtendedFilterEmployeeTypesEnum[];
+          if (!roomId && isGroupsTab) {
+            // No room to scope "shared with" by: the tab lists the portal's
+            // groups, as GroupsSelector does.
+            const res = await groupApi.getGroups(
+              {
+                count: pageCount,
+                startIndex: offset,
+                filterValue,
+              },
+              { signal },
+            );
+            items = res.data.response ?? [];
+            responseTotal = getListTotal(res.data);
+          } else if (!roomId) {
+            const employeeTypes =
+              currentFilter.role as SearchUsersByExtendedFilterEmployeeTypesEnum[];
 
-          const res = await peopleSearchApi.searchUsersByExtendedFilter(
-            {
-              employeeStatus: currentFilter.employeeStatus,
-              employeeTypes,
-              area,
-              count: pageCount,
-              startIndex,
-              filterValue,
-            },
-            {
-              signal,
-            },
-          );
-          items = res.data.response ?? [];
-          responseTotal = res.data.count ?? 0;
-        } else if (isGroupsTab) {
-          // NOTE: roomId can be string but types cannot be fixed right now, using type assertion
-          const id = roomId as number;
-          const fetcher =
-            targetEntityType === "file"
-              ? groupSearchApi.getGroupsWithFilesShared.bind(groupSearchApi)
-              : targetEntityType === "folder"
-                ? groupSearchApi.getGroupsWithFoldersShared.bind(groupSearchApi)
-                : groupSearchApi.getGroupsWithRoomsShared.bind(groupSearchApi);
+            const res = await peopleSearchApi.searchUsersByExtendedFilter(
+              {
+                employeeStatus: currentFilter.employeeStatus,
+                employeeTypes,
+                area,
+                count: pageCount,
+                startIndex: offset,
+                filterValue,
+              },
+              {
+                signal,
+              },
+            );
+            items = res.data.response ?? [];
+            responseTotal = getListTotal(res.data);
+          } else if (isGroupsTab) {
+            // NOTE: roomId can be string but types cannot be fixed right now, using type assertion
+            const id = roomId as number;
+            const fetcher =
+              targetEntityType === "file"
+                ? groupSearchApi.getGroupsWithFilesShared.bind(groupSearchApi)
+                : targetEntityType === "folder"
+                  ? groupSearchApi.getGroupsWithFoldersShared.bind(
+                      groupSearchApi,
+                    )
+                  : groupSearchApi.getGroupsWithRoomsShared.bind(
+                      groupSearchApi,
+                    );
 
-          const res = await fetcher(
-            {
-              id,
-              count: pageCount,
-              startIndex,
-              filterValue,
-            },
-            { signal },
-          );
-          items = (res.data.response ?? []).map((g) => ({
-            ...g,
-            isGroup: true,
-          }));
-          responseTotal = res.data.count ?? 0;
-        } else {
-          // NOTE: roomId can be string but types cannot be fixed right now, using type assertion
-          const id = roomId as number;
-          const fetcher =
-            targetEntityType === "file"
-              ? peopleSearchApi.getUsersWithFilesShared.bind(peopleSearchApi)
-              : targetEntityType === "folder"
-                ? peopleSearchApi.getUsersWithFoldersShared.bind(
-                    peopleSearchApi,
-                  )
-                : peopleSearchApi.getUsersWithRoomShared.bind(peopleSearchApi);
+            const res = await fetcher(
+              {
+                id,
+                count: pageCount,
+                startIndex: offset,
+                filterValue,
+              },
+              { signal },
+            );
+            items = (res.data.response ?? []).map((g) => ({
+              ...g,
+              isGroup: true,
+            }));
+            responseTotal = getListTotal(res.data);
+          } else {
+            // NOTE: roomId can be string but types cannot be fixed right now, using type assertion
+            const id = roomId as number;
+            const fetcher =
+              targetEntityType === "file"
+                ? peopleSearchApi.getUsersWithFilesShared.bind(peopleSearchApi)
+                : targetEntityType === "folder"
+                  ? peopleSearchApi.getUsersWithFoldersShared.bind(
+                      peopleSearchApi,
+                    )
+                  : peopleSearchApi.getUsersWithRoomShared.bind(
+                      peopleSearchApi,
+                    );
 
-          const res = await fetcher(
-            {
-              id,
-              employeeStatus: currentFilter.employeeStatus,
-              employeeTypes: currentFilter.role
-                ?.map(toSdkEmployeeType)
-                .filter((t): t is SdkEmployeeType => !!t),
-              includeShared,
-              area,
-              count: pageCount,
-              startIndex,
-              filterValue,
-            },
-            { signal },
-          );
-          items = res.data.response ?? [];
-          responseTotal = res.data.count ?? 0;
-        }
+            const res = await fetcher(
+              {
+                id,
+                employeeStatus: currentFilter.employeeStatus,
+                employeeTypes: currentFilter.role
+                  ?.map(toSdkEmployeeType)
+                  .filter((t): t is SdkEmployeeType => !!t),
+                includeShared,
+                area,
+                count: pageCount,
+                startIndex: offset,
+                filterValue,
+              },
+              { signal },
+            );
+            items = res.data.response ?? [];
+            responseTotal = getListTotal(res.data);
+          }
 
-        let totalDifferent = startIndex ? responseTotal - totalRef.current : 0;
-
-        const data = items
-          .filter((item) => {
-            if (
-              (excludeItems && item.id && excludeItems.includes(item.id)) ||
-              ("status" in item && item.status === EmployeeStatus.Terminated)
-            ) {
-              totalDifferent += 1;
-              return false;
-            }
-            return true;
-          })
-          .map((item) =>
-            toListItem(
-              item,
-              baseUrl,
-              t,
-              disableDisabledUsers,
-              disableInvitedUsers,
-              !!roomId,
-              checkIfUserInvited,
-              disabledInvitedText,
-            ),
-          );
+          return { items, responseTotal };
+        };
 
         // The current user is one of the people, never one of the groups:
-        // only a list of people has them to leave out and count off.
+        // only a list of people has them to leave out. They are counted off
+        // on the page they come with - once, and not at all from a list they
+        // are not in, a search that does not match them for one.
         const withoutCurrentUser = withOutCurrentAuthorizedUser && !isGroupsTab;
 
-        const newTotal = withoutCurrentUser
-          ? responseTotal - totalDifferent - 1
-          : responseTotal - totalDifferent;
+        // The Selector asks by the rows it draws. They are fewer than the
+        // rows loaded once any are left out, and one more with the system
+        // group's separator: the portal is asked by the rows it has sent.
+        let loaded = startIndex === 0 ? 0 : loadedRef.current;
+        let dropped = startIndex === 0 ? 0 : droppedRef.current;
+        let pageItems: TSelectorItem[] = [];
+        let responseTotal = 0;
+        let hasMore = true;
+
+        // A page with every row left out brings the list nothing to draw,
+        // and the Selector asks for the next page from the rows it draws: a
+        // first page like that left a loader and no request behind it. The
+        // pages are asked for until one brings a row or the portal has no
+        // more. By the rows loaded, not the rows drawn; an empty answer ends
+        // the list whatever the total says.
+        while (hasMore && pageItems.length === 0) {
+          const page = await loadPage(loaded);
+
+          responseTotal = page.responseTotal;
+
+          const data = page.items
+            .filter((item) => {
+              if (
+                (excludeItems && item.id && excludeItems.includes(item.id)) ||
+                ("status" in item && item.status === EmployeeStatus.Terminated)
+              ) {
+                dropped += 1;
+                return false;
+              }
+              return true;
+            })
+            .map((item) =>
+              toListItem(
+                item,
+                baseUrl,
+                t,
+                disableDisabledUsers,
+                disableInvitedUsers,
+                !!roomId,
+                checkIfUserInvited,
+                disabledInvitedText,
+              ),
+            );
+
+          pageItems = withoutCurrentUser
+            ? removeCurrentUserFromList(data)
+            : data;
+
+          dropped += data.length - pageItems.length;
+          loaded += page.items.length;
+          hasMore = page.items.length > 0 && loaded < responseTotal;
+        }
+
+        const newTotal = responseTotal - dropped;
 
         if (startIndex === 0) {
-          const newItems = withoutCurrentUser
-            ? removeCurrentUserFromList(data)
-            : moveCurrentUserToTopOfList(data);
-
-          setHasNextPage(newItems.length < newTotal);
-          setItemsList(newItems);
+          setItemsList(
+            withoutCurrentUser
+              ? pageItems
+              : moveCurrentUserToTopOfList(pageItems),
+          );
         } else {
           setItemsList((i) => {
-            const tempItems = [...i, ...data];
-
             const ids = new Set();
-            const filteredTempItems = tempItems.filter(
+            const merged = [...i, ...pageItems].filter(
               (item) => !ids.has(item.id) && ids.add(item.id),
             );
 
-            const newItems = withoutCurrentUser
-              ? removeCurrentUserFromList(filteredTempItems)
-              : moveCurrentUserToTopOfList(filteredTempItems);
-
-            setHasNextPage(newItems.length < newTotal);
-
-            return newItems;
+            return withoutCurrentUser
+              ? merged
+              : moveCurrentUserToTopOfList(merged);
           });
         }
 
+        setHasNextPage(hasMore);
         setTotal(newTotal);
-        totalRef.current = newTotal;
+        loadedRef.current = loaded;
+        droppedRef.current = dropped;
 
         setIsNextPageLoading(false);
         setIsFirstLoad(false);
@@ -534,7 +571,8 @@ const PeopleSelector = ({
     setItemsList([]);
     setHasNextPage(true);
     setTotal(-1);
-    totalRef.current = 0;
+    loadedRef.current = 0;
+    droppedRef.current = 0;
     startContentLoading();
   }, [startContentLoading]);
 
