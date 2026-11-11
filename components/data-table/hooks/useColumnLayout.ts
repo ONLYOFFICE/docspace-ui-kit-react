@@ -95,6 +95,7 @@ export const useColumnLayout = (
   if (state.storageId !== storageId) {
     current = restore(widthRef.current);
     pendingSaveRef.current = null;
+    expectedRef.current = null;
     setState(current);
   } else if (state.signature !== signature) {
     const expected = expectedRef.current;
@@ -104,6 +105,10 @@ export const useColumnLayout = (
       expected !== null &&
       has(columns) === expected.visible &&
       has(state.columns) !== expected.visible;
+    // A choice is answered by the very next change of the columns, or never:
+    // one the consumer turned down must not claim a later change that happens
+    // to match it, a socket bringing the same column, say.
+    expectedRef.current = null;
 
     if (byUser || !storage) {
       current = {
@@ -118,10 +123,7 @@ export const useColumnLayout = (
           flexibleTotal,
         ),
       };
-      if (byUser) {
-        expectedRef.current = null;
-        pendingSaveRef.current = current.fractions;
-      }
+      if (byUser) pendingSaveRef.current = current.fractions;
     } else {
       current = restore(widthRef.current);
     }

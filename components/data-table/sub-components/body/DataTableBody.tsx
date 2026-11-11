@@ -133,7 +133,8 @@ export const DataTableBody = <T,>({
     threshold * rowHeight,
   );
 
-  const lastIndex = virtual.rows.at(-1)?.index;
+  // The rows a server renders say nothing of the view, so they ask for no page.
+  const lastIndex = virtual.target ? virtual.rows.at(-1)?.index : undefined;
   const nearEnd = virtualize
     ? lastIndex !== undefined && lastIndex >= loaded - threshold
     : tailInView;

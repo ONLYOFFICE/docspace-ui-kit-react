@@ -753,9 +753,10 @@ export function FilesTable({
   changes any other way (a saved choice read after the first render, a column that a server
   event adds) is not the user's: with `widthStorage` the stored record is restored for the new
   columns and nothing is written, so a reload cannot shift a saved layout; without it the
-  column is shown or hidden by the same rules. Sorting by a hidden column marked `hideable` calls
-  `onColumnVisibilityChange(id, true)` once, when `sort.key` moves to it, so the sorted values
-  are on screen.
+  column is shown or hidden by the same rules. A choice is matched against the next change of
+  the columns only: one the consumer turns down claims no later change. Sorting by a hidden
+  column marked `hideable` calls `onColumnVisibilityChange(id, true)` once, when `sort.key`
+  moves to it, so the sorted values are on screen.
 - The settings menu does not let the last visible flexible column be unticked, and it closes on
   Escape, giving the focus back to its button.
 - `isLast` in the cell context is true for the last rendered column that is not `fixed`, so
@@ -768,7 +769,10 @@ export function FilesTable({
   sits in a `div.table-list-item.window-item` placed with `top` — not a transform — inside a
   container as tall as the whole list, which takes `innerClassName`; the portal's selection area,
   hotkeys and the data room's index separator read exactly that markup. The table carries
-  `aria-rowcount` and each row `aria-rowindex`, the header counting as row 1.
+  `aria-rowcount` and each row `aria-rowindex`, the header counting as row 1. A server has no
+  scroller to measure, so it renders the first 50 rows in that markup at their places; the
+  client hydrates the same ones and virtualises from its next render. A table that only mounts
+  on the client never renders them.
 - The scroller is `virtualize.scrollElement`, else the nearest ancestor whose `overflow-y` is
   `auto`, `scroll` or `overlay`, else the window. A custom scrollbar may switch its overflow on
   only after its first render, past the moment the table looks; so a window found that way is
@@ -782,11 +786,11 @@ export function FilesTable({
   next page is asked for when the last rendered row is within `threshold` (15) of the last
   loaded one — rendered rows include the overscan — or, without `virtualize`, when the skeleton
   rows come within that distance of their scroller's view. One call per loaded count: while a
-  returned promise is pending nothing is asked, a page that brings no rows does not set off
-  another call, and a rejected one is retried only when the view moves, never in a loop. A list
-  that was replaced — fewer rows than before, or another first row, as after a new sort — starts
-  over, even at the count the last call was made at. A
-  page that does not fill the view is followed by the next one as soon as it settles. The body
+  returned promise is pending nothing is asked, and a page that brings no rows or is rejected is
+  asked for again only when the view moves, never in a loop — so a consumer that skips a call
+  while another load of its own runs, and resolves at once, is asked again on the next scroll.
+  A list that was replaced — fewer rows than before, or another first row, as after a new sort —
+  starts over, even at the count the last call was made at. A page that does not fill the view is followed by the next one as soon as it settles. The body
   carries `aria-busy="true"` while a page loads.
 - Skeleton rows are `div.table-container_body-loader` on the same grid as the real rows, with a
   bar in every flexible cell (or the column's `skeleton()`) and fixed cells empty. In a

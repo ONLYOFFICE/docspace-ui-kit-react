@@ -196,6 +196,23 @@ describe("DataTable loading more rows", () => {
     expect(onLoadMore).toHaveBeenCalledTimes(1);
   });
 
+  it("asks again once the view moves after a page that brought nothing", async () => {
+    // A consumer busy with another load of its own resolves without rows.
+    const onLoadMore = vi.fn(() => Promise.resolve());
+    // Rows 0-14 rendered, within 15 of the last loaded one (24).
+    renderTable(makeItems(25), { loadMore: { hasMore: true, onLoadMore } });
+    await act(async () => {});
+    expect(onLoadMore).toHaveBeenCalledTimes(1);
+
+    scrollTo(48 * 3);
+    await act(async () => {});
+    expect(onLoadMore).toHaveBeenCalledTimes(2);
+
+    // Nothing again, and the view stays: no third call.
+    await act(async () => {});
+    expect(onLoadMore).toHaveBeenCalledTimes(2);
+  });
+
   it("asks again at the same count once the list was replaced", async () => {
     const onLoadMore = vi.fn(() => Promise.resolve());
     const { rerenderWith } = renderTable(makeItems(5), {

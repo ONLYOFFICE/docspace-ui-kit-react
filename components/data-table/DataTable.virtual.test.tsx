@@ -1,4 +1,6 @@
 import { createRef } from "react";
+import { type Root, hydrateRoot } from "react-dom/client";
+import { renderToString } from "react-dom/server";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -181,6 +183,63 @@ describe("DataTable virtualisation", () => {
     expect(wrappers()[1].style.top).toBe("40px");
     // 480 px holds 12 rows of 40.
     expect(wrappers()).toHaveLength(17);
+  });
+
+  it("places the rows again when only the row height changes", () => {
+    const ui = (rowHeight: number) => (
+      <div data-testid="scroller" style={{ overflowY: "auto" }}>
+        <DataTable<Item>
+          columns={COLUMNS}
+          rows={ITEMS}
+          getRowKey={(r) => r.id}
+          virtualize={STILL}
+          rowHeight={rowHeight}
+        />
+      </div>
+    );
+    const view = render(ui(48));
+    expect(wrappers()[1].style.top).toBe("48px");
+
+    view.rerender(ui(40));
+    expect(wrappers()[1].style.top).toBe("40px");
+    expect(wrappers()).toHaveLength(17);
+  });
+
+  it("renders the first rows on a server, then hydrates and virtualises", async () => {
+    // Stable across the two renders, as a consumer's would be.
+    const getRowKey = (r: Item) => r.id;
+    const ui = (
+      <div data-testid="scroller" style={{ overflowY: "auto" }}>
+        <DataTable<Item>
+          columns={COLUMNS}
+          rows={ITEMS}
+          getRowKey={getRowKey}
+          virtualize={STILL}
+        />
+      </div>
+    );
+    const container = document.createElement("div");
+    container.innerHTML = renderToString(ui);
+    document.body.appendChild(container);
+    let root: Root | undefined;
+
+    try {
+      expect(indexes()).toEqual(Array.from({ length: 50 }, (_, i) => i));
+      expect(wrappers()[1].style.top).toBe("48px");
+      const inner = wrappers()[0].parentElement as HTMLElement;
+      expect(inner.style.height).toBe(`${ITEMS.length * 48}px`);
+
+      const onRecoverableError = vi.fn();
+      await act(async () => {
+        root = hydrateRoot(container, ui, { onRecoverableError });
+      });
+
+      expect(onRecoverableError).not.toHaveBeenCalled();
+      expect(indexes()).toEqual(Array.from({ length: 15 }, (_, i) => i));
+    } finally {
+      act(() => root?.unmount());
+      container.remove();
+    }
   });
 
   it("scrolls a row to just below the sticky header through apiRef", () => {

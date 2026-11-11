@@ -412,6 +412,42 @@ describe("DataTable visibility and storage", () => {
     );
   });
 
+  it("does not take a later change for a choice the consumer turned down", async () => {
+    const storage = createMemoryWidths({
+      Name: 0.4,
+      Author: 0.2,
+      Modified: 0.2,
+      Size: 0.2,
+    });
+    const save = vi.spyOn(storage, "save");
+    // The consumer keeps its columns as they are.
+    const onColumnVisibilityChange = vi.fn();
+    const { rerenderWith } = renderTable({
+      widthStorage: storage,
+      columns: makeColumns({ Size: { visible: false } }),
+      onColumnVisibilityChange,
+    });
+
+    await userEvent.click(settingsButton());
+    await userEvent.click(
+      within(screen.getByTestId("data-table-settings-Size")).getByRole(
+        "checkbox",
+      ),
+    );
+    expect(onColumnVisibilityChange).toHaveBeenCalledWith("Size", true);
+
+    // Later, on their own: another column goes, then Size comes.
+    rerenderWith({
+      columns: makeColumns({
+        Size: { visible: false },
+        Modified: { visible: false },
+      }),
+    });
+    rerenderWith({ columns: makeColumns({ Modified: { visible: false } }) });
+
+    expect(save).not.toHaveBeenCalled();
+  });
+
   it("turns a hidden column on when the sort moves to it", () => {
     const onColumnVisibilityChange = vi.fn();
     const columns = makeColumns({ Author: { visible: false } });

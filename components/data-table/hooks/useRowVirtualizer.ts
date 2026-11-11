@@ -1,7 +1,13 @@
 "use client";
 
 import type React from "react";
-import { useCallback, useLayoutEffect, useState } from "react";
+import {
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import {
   type Virtualizer,
   elementScroll,
@@ -41,6 +47,19 @@ export type VirtualRow = {
   /** Offset of the row from the top of the body, in pixels. */
   top: number;
 };
+
+/** Rows rendered on the server, and while the client hydrates them. */
+const SERVER_ROWS = 50;
+
+const subscribeNever = () => () => {};
+
+/** True on the server and in the render that hydrates its markup. */
+const useIsServerRender = () =>
+  useSyncExternalStore(
+    subscribeNever,
+    () => false,
+    () => true,
+  );
 
 /** Where the body starts within the scroller's content, in pixels. */
 const measureScrollMargin = (
@@ -127,7 +146,10 @@ export const useRowVirtualizer = ({
     overscan,
     scrollMargin,
     scrollPaddingStart: headerBottom,
-    getItemKey: (index) => getItemKey(index) as string | number,
+    // Passed as is: the virtualiser places every row again whenever this
+    // function changes, which a new one each render would do on every frame
+    // of a scroll.
+    getItemKey: getItemKey as (index: number) => string | number,
     useFlushSync: false,
     ...(isWindow(target)
       ? ({
@@ -142,13 +164,33 @@ export const useRowVirtualizer = ({
         }),
   });
 
-  const rows: VirtualRow[] = enabled
-    ? virtualizer.getVirtualItems().map((item) => ({
-        index: item.index,
-        key: item.key as React.Key,
-        top: item.start - scrollMargin,
+  // The size of a row is read only when the rows are placed, and nothing else
+  // places them again when the height alone changes.
+  const rowHeightRef = useRef(rowHeight);
+  useLayoutEffect(() => {
+    if (rowHeightRef.current === rowHeight) return;
+    rowHeightRef.current = rowHeight;
+    virtualizer.measure();
+  }, [rowHeight, virtualizer]);
+
+  // A server has no scroller to measure, so it renders the first rows at
+  // their places; the client hydrates the same ones, then virtualises.
+  const serverRender = useIsServerRender();
+  const fallback = enabled && target === null && serverRender;
+
+  const rows: VirtualRow[] = fallback
+    ? Array.from({ length: Math.min(count, SERVER_ROWS) }, (_, index) => ({
+        index,
+        key: getItemKey(index),
+        top: index * rowHeight,
       }))
-    : [];
+    : enabled
+      ? virtualizer.getVirtualItems().map((item) => ({
+          index: item.index,
+          key: item.key as React.Key,
+          top: item.start - scrollMargin,
+        }))
+      : [];
 
   const scrollToIndex = useCallback(
     (index: number, align: "start" | "center" | "end" | "auto" = "auto") =>
@@ -156,9 +198,13 @@ export const useRowVirtualizer = ({
     [virtualizer],
   );
 
+  let totalSize = 0;
+  if (fallback) totalSize = count * rowHeight;
+  else if (enabled) totalSize = virtualizer.getTotalSize();
+
   return {
     rows,
-    totalSize: enabled ? virtualizer.getTotalSize() : 0,
+    totalSize,
     scrollToIndex,
     /** The scroller in use, once found. */
     target,
