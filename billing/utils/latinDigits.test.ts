@@ -5,6 +5,7 @@ import {
   formatCurrencyValue,
   formatNumber,
   formatPercentValue,
+  formatRemainingDays,
 } from "./common";
 import {
   formattedBalanceTokens,
@@ -26,6 +27,8 @@ describe("billing formatters in Arabic", () => {
     ["formatPercentValue", formatPercentValue("ar-SA", 5.5)],
     ["formatNumber", formatNumber("ar-SA", 1250)],
     ["formatCompactNumber", formatCompactNumber(2_500_000, "ar-SA")],
+    // A luxon Duration: Western digits without the host's Settings.defaultNumberingSystem.
+    ["formatRemainingDays", formatRemainingDays(15, "ar-SA", (key) => key)],
     [
       "formatterCurrencyWithoutTranction",
       formatterCurrencyWithoutTranction("ar-SA", 0.125, "USD"),
