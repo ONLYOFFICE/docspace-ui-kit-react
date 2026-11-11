@@ -47,7 +47,11 @@ export const formatRemainingDays = (
   t: (key: string) => string,
 ) =>
   days > 1
-    ? Duration.fromObject({ days }, { locale: language }).toHuman()
+    ? Duration.fromObject(
+        { days },
+        // Its own setting, not the host's luxon default: Storybook sets none.
+        { locale: language, numberingSystem: LATIN_NUMBERING_SYSTEM },
+      ).toHuman()
     : t("LessThanOneDay");
 
 // Done in a similar way to server code
