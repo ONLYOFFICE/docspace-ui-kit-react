@@ -32,6 +32,8 @@ export interface DropDownProps {
    * @default "listbox"
    */
   role?: "listbox" | "menu";
+  /** Accessible name of the menu element. */
+  "aria-label"?: string;
   /** Required for specifying the exact width of the component; for example; 100% */
   manualWidth?: string;
   /** (Non portal only) Required for specifying the exact distance from the parent component */

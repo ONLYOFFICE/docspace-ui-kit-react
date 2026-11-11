@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import type React from "react";
 import { observer } from "mobx-react";
 import { useTranslation } from "react-i18next";
 import classNames from "classnames";
@@ -24,6 +25,8 @@ export const VISIBLE_AGENTS_COUNT = 5;
 // The menu's rows are DropDownItem's 32px.
 const ROW_HEIGHT = 32;
 
+const OPTION_SELECTOR = '[role="option"]';
+
 type AiChatAgentPickerProps = {
   /** The title shown while the default agent is picked. */
   title: string;
@@ -35,31 +38,140 @@ type AiChatAgentPickerProps = {
  * rest scroll. Picking one hands its id to the host; the title then names
  * it. The header container renders this only while the host offers at
  * least one agent, and the plain title otherwise.
+ *
+ * Keyboard: Enter, Space or the arrows on the title open the menu with the
+ * focus on the picked agent; the arrows, Home and End move through the
+ * options, Enter or Space picks one, Escape closes the menu and Tab leaves
+ * it - the last two give the focus back to the title.
  */
 const AiChatAgentPicker = observer(({ title }: AiChatAgentPickerProps) => {
   const { t } = useTranslation(["Common"]);
   const store = useAiChatStore();
   const [isOpen, setIsOpen] = useState(false);
+  // Where the focus lands when the menu opens: the picked option, or the
+  // first / last one when the menu was opened with an arrow key.
+  const [initialFocus, setInitialFocus] = useState<
+    "selected" | "first" | "last" | null
+  >(null);
   const anchorRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
+  const agentsLabelId = useId();
 
   const picker = store.agentPicker;
-  if (!picker || picker.agents.length === 0) return null;
+  const hasAgents = !!picker && picker.agents.length > 0;
+
+  // The menu is a portal shown once it is laid out, so the focus moves in
+  // on the next frame.
+  useEffect(() => {
+    if (!isOpen || !initialFocus) return undefined;
+    const frame = requestAnimationFrame(() => {
+      const options = Array.from(
+        menuRef.current?.querySelectorAll<HTMLElement>(OPTION_SELECTOR) ?? [],
+      );
+      const target =
+        initialFocus === "first"
+          ? options[0]
+          : initialFocus === "last"
+            ? options[options.length - 1]
+            : (options.find(
+                (o) => o.getAttribute("aria-selected") === "true",
+              ) ?? options[0]);
+      target?.focus();
+      target?.scrollIntoView?.({ block: "nearest" });
+      setInitialFocus(null);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [isOpen, initialFocus]);
+
+  // The agents leaving while the menu is open close it.
+  useEffect(() => {
+    if (!hasAgents) setIsOpen(false);
+  }, [hasAgents]);
+
+  if (!picker || !hasAgents) return null;
 
   const selected =
     picker.selectedId === null
       ? null
       : (picker.agents.find((agent) => agent.id === picker.selectedId) ?? null);
 
-  const close = () => setIsOpen(false);
+  const open = (focus: "selected" | "first" | "last" | null) => {
+    picker.onOpen?.();
+    setInitialFocus(focus);
+    setIsOpen(true);
+  };
 
-  const select = (id: string | null) => {
-    close();
-    if (id !== picker.selectedId) picker.onSelect(id);
+  const close = (restoreFocus = false) => {
+    setIsOpen(false);
+    if (restoreFocus) anchorRef.current?.focus();
+  };
+
+  // Every pick reaches the host, the current agent's included: a pick of
+  // the agent the chat already runs on is how a slower pick still on its
+  // way is called off.
+  const select = (id: string | null, restoreFocus = false) => {
+    close(restoreFocus);
+    picker.onSelect(id);
+  };
+
+  const onTriggerKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      open(e.key === "ArrowDown" ? "selected" : "last");
+    }
+  };
+
+  const onMenuKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const options = Array.from(
+      menuRef.current?.querySelectorAll<HTMLElement>(OPTION_SELECTOR) ?? [],
+    );
+    const index = options.indexOf(document.activeElement as HTMLElement);
+    const focusAt = (next: number) => {
+      const option = options[(next + options.length) % options.length];
+      option?.focus();
+      option?.scrollIntoView?.({ block: "nearest" });
+    };
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        focusAt(index + 1);
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        focusAt(index < 0 ? options.length - 1 : index - 1);
+        break;
+      case "Home":
+        e.preventDefault();
+        focusAt(0);
+        break;
+      case "End":
+        e.preventDefault();
+        focusAt(options.length - 1);
+        break;
+      case "Enter":
+      case " ":
+        if (index < 0) break;
+        e.preventDefault();
+        options[index].click();
+        break;
+      case "Escape":
+        e.preventDefault();
+        e.stopPropagation();
+        close(true);
+        break;
+      case "Tab":
+        e.preventDefault();
+        close(true);
+        break;
+      default:
+        break;
+    }
   };
 
   const check = (isSelected: boolean) =>
-    isSelected ? <CheckIcon className={styles.check} /> : null;
+    isSelected ? <CheckIcon className={styles.check} aria-hidden /> : null;
 
   return (
     <>
@@ -70,10 +182,13 @@ const AiChatAgentPicker = observer(({ title }: AiChatAgentPickerProps) => {
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-controls={menuId}
-        onClick={() => {
-          if (!isOpen) picker.onOpen?.();
-          setIsOpen(!isOpen);
+        onClick={(e) => {
+          if (isOpen) return close();
+          // A click by the keyboard (Enter, Space) carries no pointer
+          // position: the focus then follows into the menu.
+          open(e.detail === 0 ? "selected" : null);
         }}
+        onKeyDown={onTriggerKeyDown}
         data-testid="ai-chat-agent-picker"
       >
         <Text
@@ -100,49 +215,59 @@ const AiChatAgentPicker = observer(({ title }: AiChatAgentPickerProps) => {
         forwardedRef={anchorRef}
         directionY="bottom"
         manualWidth="240px"
-        clickOutsideAction={close}
+        clickOutsideAction={() => close()}
+        aria-label={t("Common:AIAgents")}
         dataTestId="ai-chat-agent-picker-menu"
       >
-        <DropDownItem
-          isSelected={selected === null}
-          onClick={() => select(null)}
-          additionalElement={check(selected === null)}
-          testId="ai-chat-agent-picker-default"
-        >
-          <span className={styles.row}>
-            <span className={classNames(styles.logo, styles.defaultLogo)}>
-              <AiIcon />
-            </span>
-            <span className={styles.name}>{t("Common:DefaultAIAgent")}</span>
-          </span>
-        </DropDownItem>
-        <DropDownItem isSeparator />
-        <div className={styles.sectionLabel}>{t("Common:Agents")}</div>
-        <Scrollbar
-          className={styles.agents}
-          style={{ maxHeight: VISIBLE_AGENTS_COUNT * ROW_HEIGHT }}
-          translateContentSizeYToHolder
-          noScrollX
-        >
-          {picker.agents.map((agent) => (
-            <DropDownItem
-              key={agent.id}
-              isSelected={agent.id === selected?.id}
-              onClick={() => select(agent.id)}
-              additionalElement={check(agent.id === selected?.id)}
-              testId={`ai-chat-agent-picker-agent-${agent.id}`}
-            >
-              <span className={styles.row}>
-                {agent.icon ? (
-                  <span className={styles.logo}>{agent.icon}</span>
-                ) : null}
-                <span className={styles.name} title={agent.name}>
-                  {agent.name}
-                </span>
+        {/* Keys pressed on an option bubble up here. */}
+        <div ref={menuRef} role="none" onKeyDown={onMenuKeyDown}>
+          <DropDownItem
+            isSelected={selected === null}
+            onClick={() => select(null, true)}
+            additionalElement={check(selected === null)}
+            testId="ai-chat-agent-picker-default"
+          >
+            <span className={styles.row}>
+              <span className={classNames(styles.logo, styles.defaultLogo)}>
+                <AiIcon aria-hidden />
               </span>
-            </DropDownItem>
-          ))}
-        </Scrollbar>
+              <span className={styles.name}>{t("Common:DefaultAIAgent")}</span>
+            </span>
+          </DropDownItem>
+          <DropDownItem isSeparator />
+          <div role="group" aria-labelledby={agentsLabelId}>
+            <div id={agentsLabelId} className={styles.sectionLabel}>
+              {t("Common:Agents")}
+            </div>
+            <Scrollbar
+              className={styles.agents}
+              style={{ maxHeight: VISIBLE_AGENTS_COUNT * ROW_HEIGHT }}
+              translateContentSizeYToHolder
+              noScrollX
+            >
+              {picker.agents.map((agent) => (
+                <DropDownItem
+                  key={agent.id}
+                  isSelected={agent.id === selected?.id}
+                  onClick={() => select(agent.id, true)}
+                  additionalElement={check(agent.id === selected?.id)}
+                  testId={`ai-chat-agent-picker-agent-${agent.id}`}
+                >
+                  <span className={styles.row}>
+                    {agent.icon ? (
+                      <span className={styles.logo} aria-hidden>
+                        {agent.icon}
+                      </span>
+                    ) : null}
+                    <span className={styles.name} title={agent.name}>
+                      {agent.name}
+                    </span>
+                  </span>
+                </DropDownItem>
+              ))}
+            </Scrollbar>
+          </div>
+        </div>
       </DropDown>
     </>
   );

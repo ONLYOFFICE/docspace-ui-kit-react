@@ -109,19 +109,20 @@ describe("AiChatAgentPicker", () => {
     expect(onOpen).toHaveBeenCalledTimes(2);
   });
 
-  it("picks the default agent back, and ignores a pick of the current one", () => {
+  it("hands every pick to the host, the current agent's included", () => {
     const onSelect = vi.fn();
     const store = new AiChatStore();
     store.setAgentPicker({ agents: agents(2), selectedId: "1", onSelect });
     renderPicker(store);
 
+    // The host calls off a slower pick still on its way with it.
     openMenu();
     fireEvent.click(screen.getByTestId("ai-chat-agent-picker-agent-1"));
-    expect(onSelect).not.toHaveBeenCalled();
+    expect(onSelect).toHaveBeenLastCalledWith("1");
 
     openMenu();
     fireEvent.click(screen.getByTestId("ai-chat-agent-picker-default"));
-    expect(onSelect).toHaveBeenCalledWith(null);
+    expect(onSelect).toHaveBeenLastCalledWith(null);
   });
 
   it("caps the agents list at five rows, so the rest scroll", () => {
@@ -143,5 +144,95 @@ describe("AiChatAgentPicker", () => {
     expect(
       list?.contains(screen.getByTestId("ai-chat-agent-picker-default")),
     ).toBe(false);
+  });
+
+  describe("keyboard", () => {
+    // The focus moves into the menu on the next frame.
+    const nextFrame = () =>
+      act(() => new Promise((resolve) => requestAnimationFrame(resolve)));
+
+    const setup = (selectedId: string | null = null) => {
+      const onSelect = vi.fn();
+      const store = new AiChatStore();
+      store.setAgentPicker({ agents: agents(3), selectedId, onSelect });
+      renderPicker(store);
+      return { onSelect, trigger: screen.getByTestId("ai-chat-agent-picker") };
+    };
+
+    it("opens on the picked agent and walks the options with the arrows", async () => {
+      const { trigger } = setup("2");
+      trigger.focus();
+      fireEvent.keyDown(trigger, { key: "ArrowDown" });
+      await nextFrame();
+
+      expect(trigger.getAttribute("aria-expanded")).toBe("true");
+      const agent2 = screen.getByTestId("ai-chat-agent-picker-agent-2");
+      expect(document.activeElement).toBe(agent2);
+
+      fireEvent.keyDown(agent2, { key: "ArrowDown" });
+      expect(document.activeElement).toBe(
+        screen.getByTestId("ai-chat-agent-picker-agent-3"),
+      );
+      // Past the last option the focus wraps to the default agent.
+      fireEvent.keyDown(document.activeElement as Element, {
+        key: "ArrowDown",
+      });
+      expect(document.activeElement).toBe(
+        screen.getByTestId("ai-chat-agent-picker-default"),
+      );
+      fireEvent.keyDown(document.activeElement as Element, { key: "End" });
+      expect(document.activeElement).toBe(
+        screen.getByTestId("ai-chat-agent-picker-agent-3"),
+      );
+      fireEvent.keyDown(document.activeElement as Element, { key: "Home" });
+      expect(document.activeElement).toBe(
+        screen.getByTestId("ai-chat-agent-picker-default"),
+      );
+    });
+
+    it("picks the focused option with Enter and gives the focus back", async () => {
+      const { onSelect, trigger } = setup();
+      fireEvent.keyDown(trigger, { key: "ArrowDown" });
+      await nextFrame();
+
+      fireEvent.keyDown(document.activeElement as Element, {
+        key: "ArrowDown",
+      });
+      fireEvent.keyDown(document.activeElement as Element, { key: "Enter" });
+
+      expect(onSelect).toHaveBeenCalledWith("1");
+      expect(trigger.getAttribute("aria-expanded")).toBe("false");
+      expect(document.activeElement).toBe(trigger);
+    });
+
+    it("closes on Escape without a pick", async () => {
+      const { onSelect, trigger } = setup();
+      fireEvent.keyDown(trigger, { key: "ArrowUp" });
+      await nextFrame();
+      // ArrowUp opens on the last option.
+      expect(document.activeElement).toBe(
+        screen.getByTestId("ai-chat-agent-picker-agent-3"),
+      );
+
+      fireEvent.keyDown(document.activeElement as Element, { key: "Escape" });
+      expect(onSelect).not.toHaveBeenCalled();
+      expect(trigger.getAttribute("aria-expanded")).toBe("false");
+      expect(document.activeElement).toBe(trigger);
+    });
+
+    it("names the menu and the agents group", () => {
+      setup();
+      openMenu();
+      expect(
+        screen
+          .getByTestId("ai-chat-agent-picker-menu")
+          .getAttribute("aria-label"),
+      ).toBe("AI agents");
+      const group = screen.getByRole("group", { hidden: true });
+      const label = document.getElementById(
+        group.getAttribute("aria-labelledby") ?? "",
+      );
+      expect(label?.textContent).toBe("Agents");
+    });
   });
 });

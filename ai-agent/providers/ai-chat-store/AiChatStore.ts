@@ -366,8 +366,9 @@ class AiChatStore {
 
   // Apply a preset to the chat as it stands — the conversation, the panel
   // size and the page stay; only the model and the rooms change. Used by the
-  // model picker's "Choose AI Preset" entry, which is only reachable while
-  // the panel is open.
+  // host's agents menu in the panel title, and by the host to take the chat
+  // off a project. The host must not apply a pick that arrives after the
+  // panel closed.
   applyPreset = (settings: AiChatPresetSettings) => {
     this.pendingPreset = settings;
     this.pendingPresetFresh = false;
