@@ -19,11 +19,7 @@ import {
   windowScroll,
 } from "@tanstack/react-virtual";
 
-import {
-  type ScrollTarget,
-  isWindow,
-  useScrollParent,
-} from "./useScrollParent";
+import { type ScrollTarget, isWindow } from "./useScrollParent";
 
 // The only module that imports the virtualizer, so it can be swapped for
 // another one, or for code of our own, without the table noticing.
@@ -34,8 +30,8 @@ type RowVirtualizerOptions = {
   count: number;
   rowHeight: number;
   overscan: number;
-  /** The scroller the consumer named; found from `bodyRef` when absent. */
-  scrollElement?: HTMLElement | null;
+  /** The table's scroller, once found. */
+  scroller: ScrollTarget | null;
   /** The element the rows are positioned in. */
   bodyRef: React.RefObject<HTMLElement | null>;
   getItemKey: (index: number) => React.Key;
@@ -84,11 +80,11 @@ export const useRowVirtualizer = ({
   count,
   rowHeight,
   overscan,
-  scrollElement,
+  scroller,
   bodyRef,
   getItemKey,
 }: RowVirtualizerOptions) => {
-  const target = useScrollParent(bodyRef, enabled, scrollElement);
+  const target = enabled ? scroller : null;
   const [scrollMargin, setScrollMargin] = useState(0);
   // The sticky header, and whatever it stops below, covers the top of the
   // view, so a row scrolled "to the top" has to land below it.

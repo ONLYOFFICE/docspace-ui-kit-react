@@ -25,7 +25,7 @@ import type {
 import { useFastScroll } from "../../hooks/useFastScroll";
 import { useLoadMore } from "../../hooks/useLoadMore";
 import { useRowVirtualizer } from "../../hooks/useRowVirtualizer";
-import { isWindow, useScrollParent } from "../../hooks/useScrollParent";
+import { type ScrollTarget, isWindow } from "../../hooks/useScrollParent";
 import styles from "../../DataTable.module.scss";
 
 import { RowSlot } from "../row/RowSlot";
@@ -38,6 +38,8 @@ type DataTableBodyProps<T> = {
   renderRow?: (props: DataTableRenderRowProps<T>) => React.ReactNode;
   /** The table's `virtualize`, already told apart from `false`. */
   virtualize: DataTableVirtualize | null;
+  /** The table's scroller, once found. */
+  scroller: ScrollTarget | null;
   loadMore?: DataTableLoadMore;
   rowHeight: number;
   apiRef?: React.Ref<DataTableApi>;
@@ -54,9 +56,10 @@ const useInView = (
   ref: React.RefObject<HTMLElement | null>,
   enabled: boolean,
   margin: number,
+  scroller: ScrollTarget | null,
 ) => {
   const [inView, setInView] = useState(false);
-  const parent = useScrollParent(ref, enabled);
+  const parent = enabled ? scroller : null;
 
   useEffect(() => {
     const element = ref.current;
@@ -90,6 +93,7 @@ export const DataTableBody = <T,>({
   getRowProps,
   renderRow,
   virtualize,
+  scroller,
   loadMore,
   rowHeight,
   apiRef,
@@ -117,7 +121,7 @@ export const DataTableBody = <T,>({
     count: loaded + skeletonCount,
     rowHeight,
     overscan: virtualize?.overscan ?? DATA_TABLE_OVERSCAN,
-    scrollElement: virtualize?.scrollElement,
+    scroller,
     bodyRef,
     getItemKey,
   });
@@ -131,6 +135,7 @@ export const DataTableBody = <T,>({
     tailRef,
     virtualize === null && skeletonCount > 0,
     threshold * rowHeight,
+    scroller,
   );
 
   // The rows a server renders say nothing of the view, so they ask for no page.

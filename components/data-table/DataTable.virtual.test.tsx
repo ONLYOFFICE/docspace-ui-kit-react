@@ -1,7 +1,7 @@
 import { createRef } from "react";
 import { type Root, hydrateRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DataTable } from "./DataTable";
@@ -158,6 +158,29 @@ describe("DataTable virtualisation", () => {
     );
     const row = screen.getByText("File 100").closest('[role="row"]');
     expect(row).toHaveAttribute("aria-rowindex", "102");
+    expect(
+      within(screen.getByTestId("data-table-header")).getByRole("row"),
+    ).toHaveAttribute("aria-rowindex", "1");
+  });
+
+  it("looks for its scroller once, however many parts follow it", () => {
+    const listen = vi.spyOn(document, "addEventListener");
+    vi.spyOn(window, "innerHeight", "get").mockReturnValue(480);
+    // Nothing round the table scrolls: the window is found, and an element
+    // that scrolls first is listened for.
+    render(
+      <DataTable<Item>
+        columns={COLUMNS}
+        rows={ITEMS}
+        getRowKey={(r) => r.id}
+        virtualize={STILL}
+      />,
+    );
+
+    const capturing = listen.mock.calls.filter(
+      ([type, , options]) => type === "scroll" && options === true,
+    );
+    expect(capturing).toHaveLength(1);
   });
 
   it("places rows from the body's own top when content sits above it", () => {

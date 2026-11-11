@@ -1,7 +1,7 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { useScrollParent } from "./useScrollParent";
+import type { ScrollTarget } from "./useScrollParent";
 
 /**
  * Whether the sticky header has stuck, that is, rows are scrolling under it.
@@ -11,10 +11,9 @@ import { useScrollParent } from "./useScrollParent";
  */
 export const useStuckHeader = (
   headerRef: React.RefObject<HTMLElement | null>,
-  scrollElement?: HTMLElement | null,
+  target: ScrollTarget | null,
 ) => {
   const [stuck, setStuck] = useState(false);
-  const target = useScrollParent(headerRef, true, scrollElement);
 
   useEffect(() => {
     const header = headerRef.current;

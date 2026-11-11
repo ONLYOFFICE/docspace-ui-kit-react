@@ -158,6 +158,19 @@ describe("DataTable column settings", () => {
     expect(checkbox("Modified")).not.toBeChecked();
   });
 
+  it("opens a named panel of checkboxes, not a menu", async () => {
+    renderTable({ onColumnVisibilityChange: vi.fn() });
+
+    expect(settingsButton()).toHaveAttribute("aria-haspopup", "dialog");
+    expect(settingsButton()).not.toHaveAttribute("aria-controls");
+
+    await userEvent.click(settingsButton());
+
+    const panel = screen.getByRole("dialog", { name: "Columns" });
+    expect(settingsButton()).toHaveAttribute("aria-controls", panel.id);
+    expect(within(panel).getAllByRole("checkbox").length).toBeGreaterThan(0);
+  });
+
   it("reports a tick and an untick, and hides nothing itself", async () => {
     const onColumnVisibilityChange = vi.fn();
     renderTable({

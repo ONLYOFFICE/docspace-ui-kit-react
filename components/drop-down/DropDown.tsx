@@ -55,6 +55,7 @@ const DropDown = ({
   dataTestId,
   id,
   role = "listbox",
+  ariaLabel,
 }: DropDownProps) => {
   const { isRTL } = useInterfaceDirection();
 
@@ -362,6 +363,7 @@ const DropDown = ({
           data-testid={dataTestId ?? "dropdown"}
           id={id}
           role={role}
+          aria-label={ariaLabel}
         >
           {/* withDynamicScrollbar: use project Scrollbar instead of VirtualList */}
           {useDynamicScrollbar ? (

@@ -288,6 +288,39 @@ describe("DataTable resizing", () => {
     expect(save).not.toHaveBeenCalled();
   });
 
+  it("ends a drag, storing nothing, when the columns change under it", () => {
+    const storage = createMemoryWidths();
+    const save = vi.spyOn(storage, "save");
+    const table = (columns: DataTableColumn<Row>[]) => (
+      <DataTable
+        columns={columns}
+        rows={[{ id: 1 }]}
+        getRowKey={(row) => row.id}
+        widthStorage={storage}
+      />
+    );
+    const view = render(table(COLUMNS));
+    const target = handle("Name");
+
+    fireEvent.pointerDown(target, { pointerId: 1, button: 0, clientX: 500 });
+    fireEvent.pointerMove(target, { pointerId: 1, clientX: 650 });
+    // A column goes on its own mid-drag; Name's handle stays.
+    view.rerender(
+      table(
+        COLUMNS.map((c) => (c.id === "Size" ? { ...c, visible: false } : c)),
+      ),
+    );
+    const rendered = grid();
+
+    fireEvent.pointerMove(target, { pointerId: 1, clientX: 700 });
+    fireEvent.pointerUp(target, { pointerId: 1, clientX: 700 });
+
+    expect(screen.getByTestId("data-table")).not.toHaveClass("isResizing");
+    expect(grid()).toBe(rendered);
+    expect(rowGrids()).toEqual(["", ""]);
+    expect(save).not.toHaveBeenCalled();
+  });
+
   it("ignores another pointer and the right mouse button", () => {
     const { save } = renderTable();
     const target = handle("Name");

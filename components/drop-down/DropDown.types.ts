@@ -28,10 +28,13 @@ export interface DropDownProps {
   id?: string;
   /**
    * ARIA role of the menu element: `listbox` for a list of choices, `menu` for
-   * a list of actions (give the items `role="menuitem"` to match).
+   * a list of actions (give the items `role="menuitem"` to match), `dialog` for
+   * a panel of controls such as checkboxes (name it with `ariaLabel`).
    * @default "listbox"
    */
-  role?: "listbox" | "menu";
+  role?: "listbox" | "menu" | "dialog";
+  /** Accessible name of the menu element; a `dialog` needs one. */
+  ariaLabel?: string;
   /** Required for specifying the exact width of the component; for example; 100% */
   manualWidth?: string;
   /** (Non portal only) Required for specifying the exact distance from the parent component */

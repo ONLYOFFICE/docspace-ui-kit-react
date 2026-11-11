@@ -731,7 +731,8 @@ export function FilesTable({
   A cancelled pointer (`pointercancel`) puts the grid back and stores nothing. The release is
   heard by the window too, so a drag ends wherever the pointer is let go; if the handle went away
   mid-drag — the container narrowed and the table turned compact — the table keeps the grid it
-  renders and stores nothing.
+  renders and stores nothing. So does a drag whose visible columns change under it, a column a
+  server event adds, say: it ends at the next move or at the release.
 - A double click on any edge resets every column to 40/60 and clears the stored record.
 - The table's colours follow the nearest `.light` or `.dark` ancestor, so a `dark` wrapper turns
   the table dark on a light page. The settings and row menus open in a portal on `<body>` and
@@ -899,8 +900,10 @@ sorted column carries `aria-sort="ascending"` or `"descending"`, button or not. 
 decorative (`aria-hidden`).
 
 The settings button is a native `<button>` named by `settingsColumn`'s `title`, with
-`aria-haspopup` and `aria-expanded`; its menu items are the kit's `Checkbox`, labelled with each
-column's `settingsLabel` or text `title`. Without a `title` the button has no accessible name.
+`aria-haspopup="dialog"`, `aria-expanded`, and `aria-controls` while open. What it opens is a
+`role="dialog"` panel named by the same `title`, not a menu: its items are the kit's `Checkbox`,
+labelled with each column's `settingsLabel` or text `title`. Without a `title` neither the button
+nor the panel has an accessible name.
 
 Each resize handle is a focusable `role="separator"` with `aria-orientation="vertical"`, named
 after its column (`title` when it is a string, otherwise the column id) and reporting the column's

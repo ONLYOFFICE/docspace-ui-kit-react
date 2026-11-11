@@ -1,4 +1,5 @@
 import type React from "react";
+import { memo } from "react";
 import classNames from "classnames";
 
 import type {
@@ -31,19 +32,22 @@ type DataTableHeaderProps<T> = {
   resize?: HeaderResize;
   /** Whether rows are scrolling under the header. */
   stuck: boolean;
+  /** With only some rows in the DOM, the header row says it is the first. */
+  virtualized: boolean;
   id?: string;
   className?: string;
   testId: string;
   ref?: React.Ref<HTMLDivElement>;
 };
 
-export const DataTableHeader = <T,>({
+const DataTableHeaderPure = <T,>({
   columns,
   sort,
   onSortChange,
   compact,
   resize,
   stuck,
+  virtualized,
   id,
   className,
   testId,
@@ -66,7 +70,11 @@ export const DataTableHeader = <T,>({
       )}
       data-testid={testId}
     >
-      <div role="row" className={styles.headerRow}>
+      <div
+        role="row"
+        aria-rowindex={virtualized ? 1 : undefined}
+        className={styles.headerRow}
+      >
         {columns.map((column) => (
           <HeaderCell
             key={column.id}
@@ -81,3 +89,9 @@ export const DataTableHeader = <T,>({
     </div>
   );
 };
+
+// Drawn again only when what it shows changes, not on every render of the
+// table: a selection or a row state changing leaves the header alone.
+export const DataTableHeader = memo(
+  DataTableHeaderPure,
+) as typeof DataTableHeaderPure;

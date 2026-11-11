@@ -269,6 +269,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Added
 
+- `DropDown`: `role` also takes `"dialog"`, for a panel of controls rather than a list of
+  choices, and a new `ariaLabel` names the element. Both are optional; nothing changes for a
+  dropdown that sets neither. `DataTable`'s column settings use them.
 - `Navigation`: the block with the AI chat button and the info panel toggle carries the class
   `navigation-buttons-container`, so a host stylesheet can reach it without matching the module
   class name.

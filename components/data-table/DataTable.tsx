@@ -10,6 +10,7 @@ import {
 import type { DataTableProps, DataTableVirtualize } from "./DataTable.types";
 import { useColumnLayout } from "./hooks/useColumnLayout";
 import { useColumnResize } from "./hooks/useColumnResize";
+import { useScrollParent } from "./hooks/useScrollParent";
 import { useStuckHeader } from "./hooks/useStuckHeader";
 import {
   type LayoutColumn,
@@ -158,8 +159,16 @@ export const DataTable = <T,>({
     virtualize === false ? null : virtualize === true ? NO_OPTIONS : virtualize;
   const virtualized = virtualOptions !== null;
 
+  // Looked for once: the sticky header, the virtualised rows and the plain
+  // list's load-more observer all follow this one scroller.
+  const scroller = useScrollParent(
+    containerRef,
+    true,
+    virtualOptions?.scrollElement,
+  );
+
   const headerRef = useRef<HTMLDivElement | null>(null);
-  const headerStuck = useStuckHeader(headerRef, virtualOptions?.scrollElement);
+  const headerStuck = useStuckHeader(headerRef, scroller);
 
   const context = useMemo<DataTableContextValue>(
     () => ({
@@ -209,6 +218,7 @@ export const DataTable = <T,>({
           compact={compact}
           resize={resize}
           stuck={headerStuck}
+          virtualized={virtualized}
           id={headerId}
           className={headerClassName}
           testId={headerTestId}
@@ -220,6 +230,7 @@ export const DataTable = <T,>({
           getRowProps={getRowProps}
           renderRow={renderRow}
           virtualize={virtualOptions}
+          scroller={scroller}
           loadMore={loadMore}
           rowHeight={rowHeight}
           apiRef={apiRef}

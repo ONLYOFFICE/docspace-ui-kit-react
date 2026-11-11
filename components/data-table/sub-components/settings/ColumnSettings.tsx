@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import classNames from "classnames";
 
 import SettingsDescReactSvg from "../../../../assets/settings.desc.react.svg";
@@ -41,6 +41,7 @@ export const ColumnSettings = ({
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const panelId = useId();
 
   const columns = table?.columns ?? [];
   const items = columns.filter((column) => column.hideable);
@@ -90,8 +91,10 @@ export const ColumnSettings = ({
         className={classNames(styles.settingsButton, "not-selectable")}
         aria-label={title}
         title={title}
-        aria-haspopup="true"
+        // A panel of checkboxes, not a menu of actions.
+        aria-haspopup="dialog"
         aria-expanded={open}
+        aria-controls={open ? panelId : undefined}
         disabled={disabled}
         onClick={() => setOpen((value) => !value)}
         data-testid="data-table-settings-button"
@@ -99,6 +102,9 @@ export const ColumnSettings = ({
         <SettingsDescReactSvg aria-hidden="true" />
       </button>
       <DropDown
+        id={panelId}
+        role="dialog"
+        ariaLabel={title}
         directionX="left"
         open={open}
         clickOutsideAction={onClickOutside}
