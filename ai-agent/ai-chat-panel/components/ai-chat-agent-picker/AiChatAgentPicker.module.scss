@@ -49,12 +49,36 @@
     #{colors.$light-blue-main}
   );
   --ai-chat-agent-picker-check: var(--accent-main, #{colors.$light-blue-main});
+  --ai-chat-agent-picker-divider: var(
+    --drop-down-item-divider,
+    #{colors.$gray-light-mid}
+  );
 
   :global(.dark) & {
     --ai-chat-agent-picker-default-bg: #{colors.$gray-dark-strong};
+    --ai-chat-agent-picker-divider: var(
+      --drop-down-item-divider,
+      #{colors.$gray-dark-strong}
+    );
   }
 
   padding-block: 4px;
+}
+
+// The line under the default agent, drawn as DropDownItem's separator is:
+// 1px, 16px in from either side, 4px above and below.
+.agentsGroup {
+  position: relative;
+  margin-top: 9px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -5px;
+    inset-inline: 16px;
+    height: 1px;
+    background-color: var(--ai-chat-agent-picker-divider);
+  }
 }
 
 .sectionLabel {

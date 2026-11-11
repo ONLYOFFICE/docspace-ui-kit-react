@@ -224,6 +224,35 @@ describe("AiChatAgentPicker", () => {
       expect(document.activeElement).toBe(trigger);
     });
 
+    it("closes on Tab and lets the focus go on from the title", async () => {
+      const { onSelect, trigger } = setup();
+      fireEvent.keyDown(trigger, { key: "ArrowDown" });
+      await nextFrame();
+
+      // Not prevented: the browser then moves the focus on from the title,
+      // where the handler has put it back.
+      const notPrevented = fireEvent.keyDown(
+        document.activeElement as Element,
+        {
+          key: "Tab",
+        },
+      );
+      expect(notPrevented).toBe(true);
+      expect(onSelect).not.toHaveBeenCalled();
+      expect(trigger.getAttribute("aria-expanded")).toBe("false");
+      expect(document.activeElement).toBe(trigger);
+    });
+
+    it("holds only options and the agents group in the listbox", () => {
+      setup();
+      openMenu();
+      const menu = screen.getByTestId("ai-chat-agent-picker-menu");
+      expect(menu.querySelector('[role="separator"]')).toBeNull();
+      expect(
+        menu.querySelectorAll('[role="group"] [role="option"]'),
+      ).toHaveLength(3);
+    });
+
     it("names the menu and the agents group", () => {
       setup();
       openMenu();

@@ -41,8 +41,8 @@ type AiChatAgentPickerProps = {
  *
  * Keyboard: Enter, Space or the arrows on the title open the menu with the
  * focus on the picked agent; the arrows, Home and End move through the
- * options, Enter or Space picks one, Escape closes the menu and Tab leaves
- * it - the last two give the focus back to the title.
+ * options, Enter or Space picks one, Escape closes the menu with the focus
+ * back on the title, and Tab closes it and goes on from the title.
  */
 const AiChatAgentPicker = observer(({ title }: AiChatAgentPickerProps) => {
   const { t } = useTranslation(["Common"]);
@@ -162,7 +162,10 @@ const AiChatAgentPicker = observer(({ title }: AiChatAgentPickerProps) => {
         close(true);
         break;
       case "Tab":
-        e.preventDefault();
+        // The menu closes and the focus goes on from the title: it is put
+        // back on the title before the browser moves it, so Tab and
+        // Shift+Tab reach the title's neighbours, not whatever follows the
+        // menu's portal at the end of the page.
         close(true);
         break;
       default:
@@ -234,8 +237,14 @@ const AiChatAgentPicker = observer(({ title }: AiChatAgentPickerProps) => {
               <span className={styles.name}>{t("Common:DefaultAIAgent")}</span>
             </span>
           </DropDownItem>
-          <DropDownItem isSeparator />
-          <div role="group" aria-labelledby={agentsLabelId}>
+          {/* A listbox owns options and groups only, so the line between
+              the default agent and the agents is the group's border, not a
+              separator item. */}
+          <div
+            role="group"
+            aria-labelledby={agentsLabelId}
+            className={styles.agentsGroup}
+          >
             <div id={agentsLabelId} className={styles.sectionLabel}>
               {t("Common:Agents")}
             </div>
