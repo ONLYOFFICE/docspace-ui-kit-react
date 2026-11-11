@@ -121,6 +121,7 @@ import {
 import { CHAT_ATTACHMENT_LIMIT } from "./files/limits";
 import { uploadFilesToChat } from "./files/upload-files";
 import { openAttachedFile } from "./files/open-file";
+import { useComposerSourceLists } from "./files/use-composer-sources";
 
 // The host app (DocSpace) uses `i18n.createInstance()` and provides that
 // instance via `<I18nextProvider>` at the app root. ai-chat, however, calls
@@ -921,6 +922,16 @@ const AiAgentProviders = ({
     return { stores: appStores, ctx: appCtx, serverApiConfig: config };
   }, [isStandalone, platform, aiChatStore, serverOrigin, serverHeadersKey]);
 
+  // The "+" menu's Skill sets and Knowledge bases: the connected rooms and
+  // the room selector that manages them.
+  const { composerSkills, composerKnowledge } = useComposerSourceLists({
+    useCloudsStore: stores.useCloudsStore,
+    onPickContextRooms,
+    onPickKnowledgeRooms,
+    onOpenContextRoom,
+    knowledgePickerHidden,
+  });
+
   // While "Analyze responses" is on, the chat is about that one form: the cap
   // drops to one and the composer's attach actions go away, so the "+" menu
   // stops offering something the cap would then refuse. The mode is state on
@@ -1167,14 +1178,18 @@ const AiAgentProviders = ({
       // AI agents.
       contextRoomScopesRounds: false,
       // The AI project view lists the sources beside the chat, so the
-      // composer drops its own chips and pickers there.
+      // "+" menu drops its Skill sets and Knowledge bases there.
       hideComposerContext: composerContextHidden,
       // With vectorization off on the portal no Knowledge room can be picked
       // for a chat: the composer loses its knowledge base picker.
       hideKnowledgePicker: knowledgePickerHidden,
       // Instructions rooms and knowledge bases are picked in the room
-      // selector, several at once, and a connected one opens in Files from
-      // its pill's menu.
+      // selector, several at once ("Manage" in the "+" menu's Skill sets and
+      // Knowledge bases), and a connected one opens in Files from its row
+      // there. The pickers stay for the library's own Knowledge bases list,
+      // used while knowledge search is off (`composerKnowledge` unset).
+      composerSkills,
+      composerKnowledge,
       onPickContextRooms,
       onOpenContextRoom,
       onPickKnowledgeRooms,
@@ -1206,6 +1221,8 @@ const AiAgentProviders = ({
       onPickContextRooms,
       onPickKnowledgeRooms,
       onOpenContextRoom,
+      composerSkills,
+      composerKnowledge,
       t,
     ],
   );
