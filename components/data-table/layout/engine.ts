@@ -15,8 +15,8 @@
  *   down to its minimum, while the column on the other side grows;
  * - a hidden column hands its width to its left neighbour;
  * - a shown column takes the flexible area divided by the number of flexible
- *   columns, from the widest one, or the layout resets when that breaks a
- *   minimum;
+ *   columns, from its left neighbour as far as that one's minimum allows, else
+ *   from the widest one, or the layout resets when that breaks a minimum;
  * - when the minimums no longer fit, only `fill` and `fixed` columns render.
  */
 
@@ -369,14 +369,23 @@ export const hideColumn = (
  * number of flexible columns the table has, hidden ones included, as the old
  * table divided it; without it, the flexible columns visible once it is shown
  * (the spec's 807 px and four columns give 202 px). A `fixed` one gets its
- * size. Either way the width comes from the widest flexible column, the last
- * of several as wide, and no other column moves. If that leaves either column
- * below its minimum, or only one flexible column was visible before, the
+ * size.
+ *
+ * The width comes first from the nearest flexible column on its left - on its
+ * right when it is the first - the side `hideColumn` sends a hidden column's
+ * width to, so hiding a column and showing it again moves one neighbour only.
+ * That column gives what it has above its own minimum, up to the width asked
+ * for, and the new column takes that much, if it is at least the new column's
+ * minimum (a `fixed` one's whole size). Otherwise the whole width comes from
+ * the widest flexible column, the last of several as wide. Either way no other
+ * column moves. If the widest would drop below its minimum, the new column
+ * would be below its own, or only one flexible column was visible before, the
  * layout resets to the defaults instead.
  *
  * While the layout is compact the same rule runs on the shares, without the
- * minimum check, which only means something at a width where they fit. Before
- * the container is measured the layout resets.
+ * minimums, which only mean something at a width where they fit: the left
+ * neighbour gives the share when it has more than that, the widest otherwise.
+ * Before the container is measured the layout resets.
  */
 export const showColumn = (
   columnsAfter: LayoutColumn[],
@@ -409,14 +418,25 @@ export const showColumn = (
         null,
       );
 
+  // The nearest flexible column on its left, or on its right when it is the
+  // first: where hiding it would have sent its width.
+  const leftNeighbour = () => {
+    const index = columnsAfter.indexOf(column);
+    return (
+      columnsAfter.slice(0, index).reverse().find(isFlexible) ??
+      columnsAfter.slice(index + 1).find(isFlexible)
+    );
+  };
+
   if (isCompact(columnsAfter, containerWidth)) {
     if (!isFlexible(column)) return normalize(columnsAfter, fractions);
 
     const shares = normalize(columnsBefore, fractions);
-    const widest = widestBy(shares);
-    if (!widest || shares[widest.id] <= share) return reset();
+    const left = leftNeighbour();
+    const giver = left && shares[left.id] > share ? left : widestBy(shares);
+    if (!giver || shares[giver.id] <= share) return reset();
 
-    shares[widest.id] -= share;
+    shares[giver.id] -= share;
     shares[column.id] = share;
     return normalize(columnsAfter, shares);
   }
@@ -424,6 +444,22 @@ export const showColumn = (
   const width = isFlexible(column) ? area * share : getMinWidth(column);
 
   const pixels = toPixels(columnsBefore, fractions, containerWidth);
+
+  // The neighbour on the left first, the side a hidden column's width went
+  // to: as much of the width as it can give above its own minimum, if that
+  // is enough for the new column's minimum.
+  const neighbour = leftNeighbour();
+  if (neighbour) {
+    const spare = pixels[neighbour.id] - getMinWidth(neighbour);
+    const taken = Math.min(width, spare);
+    const needed = isFlexible(column) ? getMinWidth(column) : width;
+    if (taken >= needed - EPSILON) {
+      pixels[neighbour.id] -= taken;
+      pixels[column.id] = taken;
+      return toFractions(columnsAfter, pixels);
+    }
+  }
+
   const widest = widestBy(pixels);
   if (!widest) return reset();
 

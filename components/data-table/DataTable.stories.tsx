@@ -197,7 +197,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Name fills 40 % and the other columns share 60 %. A click on a sortable header sorts by it, a second click reverses the order; the table only reports the click, the story sorts the rows. The button at the end of the header shows and hides columns: a hidden column gives its width to its left neighbour, a shown one takes its share from the widest.",
+          "Name fills 40 % and the other columns share 60 %. A click on a sortable header sorts by it, a second click reverses the order; the table only reports the click, the story sorts the rows. The button at the end of the header shows and hides columns: a hidden column gives its width to its left neighbour, and a shown one takes its share back from there first, from the widest when that neighbour is at its minimum.",
       },
       source: {
         code: `const [sort, setSort] = useState<DataTableSort>({ key: "title", desc: false });

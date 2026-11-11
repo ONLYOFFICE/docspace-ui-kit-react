@@ -703,11 +703,15 @@ export function FilesTable({
   `DATA_TABLE_MIN_COLUMN_WIDTH`). Flexible tracks are `minmax(<min>px, <share>fr)`, so a window
   resize keeps the proportions without any script running.
 - A column with `visible: false` renders nothing, in the header or the rows. When a visible
-  column is hidden its share goes to the flexible column on its left; when one appears it takes
-  the flexible space divided by the number of flexible columns in `columns`, hidden ones
-  included, as the old `Table` did. The width comes from the widest column (the last of several
-  as wide) and no other column moves. The layout resets to 40/60 instead when that would break a
-  minimum, or when only one flexible column was visible before.
+  column is hidden its share goes to the flexible column on its left; when one appears it asks
+  for the flexible space divided by the number of flexible columns in `columns`, hidden ones
+  included, as the old `Table` did. That flexible column on its left (on its right for the first
+  column) gives first, as much as it has above its own minimum, so hiding a column and showing it
+  again moves one neighbour only; the new column may then be narrower than asked, never below
+  its minimum. When the neighbour cannot give that minimum, the whole width comes from the widest
+  column (the last of several as wide), as in the old `Table`. Either way no other column moves.
+  The layout resets to 40/60 instead when the widest would break a minimum, or when only one
+  flexible column was visible before.
 - Widths are stored as shares by column id, `{ "v": 2, "widths": { "<id>": <share> } }`. A
   record of another table, of the old `Table` (a pixel string) or one that cannot be parsed reads
   as nothing stored. Storage that is blocked, full or absent is ignored.

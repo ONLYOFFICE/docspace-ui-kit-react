@@ -374,7 +374,7 @@ describe("showColumn", () => {
   const SETTINGS = fixed("Settings", 24);
   const WIDTH = 807 + 24;
 
-  it("takes 807 / 4 = 202 px from the widest column (spec example)", () => {
+  it("takes the width from the column on its left, down to that one's minimum", () => {
     const before = [fill(), flex("Author"), flex("Size"), SETTINGS];
     const after = [
       fill(),
@@ -385,15 +385,41 @@ describe("showColumn", () => {
     ];
     const shares = sharesFor(before, { Name: 449, Author: 239, Size: 119 });
 
+    // 807 / 4 = 201.75 px asked for; Author can give 239 - 110 = 129.
+    expect(
+      round(
+        toPixels(after, showColumn(after, shares, WIDTH, "Modified"), WIDTH),
+      ),
+    ).toEqual({
+      Name: 449,
+      Author: 110,
+      Modified: 129,
+      Size: 119,
+      Settings: 24,
+    });
+  });
+
+  it("takes 807 / 4 = 202 px from the widest column when its left one cannot give a minimum (spec example)", () => {
+    const before = [fill(), flex("Author"), flex("Size"), SETTINGS];
+    const after = [
+      fill(),
+      flex("Author"),
+      flex("Modified"),
+      flex("Size"),
+      SETTINGS,
+    ];
+    // Author can give 150 - 110 = 40 px, short of Modified's 110.
+    const shares = sharesFor(before, { Name: 449, Author: 150, Size: 208 });
+
     expect(
       round(
         toPixels(after, showColumn(after, shares, WIDTH, "Modified"), WIDTH),
       ),
     ).toEqual({
       Name: 247.25,
-      Author: 239,
+      Author: 150,
       Modified: 201.75,
-      Size: 119,
+      Size: 208,
       Settings: 24,
     });
   });
@@ -438,15 +464,15 @@ describe("showColumn", () => {
       flex("Size"),
       SETTINGS,
     ];
-    const shares = sharesFor(before, { Name: 300, Author: 290, Size: 217 });
+    // Author is at its minimum, so the widest gives: 377 - 201.75 < 210.
+    const shares = sharesFor(before, { Name: 377, Author: 110, Size: 320 });
 
-    // 300 - 201.75 < 210.
     expect(showColumn(after, shares, WIDTH, "Modified")).toEqual(
       getDefaultFractions(after, WIDTH),
     );
   });
 
-  it("takes a fixed column's size from the widest column", () => {
+  it("takes a fixed column's size from the flexible column next to it", () => {
     const before = [fill(), flex("Size")];
     const after = [fixed("Index", 40), fill(), flex("Size")];
     const shares = sharesFor(before, { Name: 600, Size: 400 });
@@ -460,10 +486,23 @@ describe("showColumn", () => {
     const after = [fill(), flex("Author"), flex("Modified"), flex("Size")];
     const shares = { Name: 0.5, Author: 0.3, Size: 0.2 };
 
-    // 1 / 4 = 0.25, taken from Name.
+    // 1 / 4 = 0.25, taken from Author on its left, whose share is larger.
     expect(round(showColumn(after, shares, 300, "Modified"), 4)).toEqual({
-      Name: 0.25,
-      Author: 0.3,
+      Name: 0.5,
+      Author: 0.05,
+      Modified: 0.25,
+      Size: 0.2,
+    });
+  });
+
+  it("takes the share from the widest column while compact when its left one has less", () => {
+    const after = [fill(), flex("Author"), flex("Modified"), flex("Size")];
+    const shares = { Name: 0.6, Author: 0.2, Size: 0.2 };
+
+    // Author's 0.2 is not above 0.25, so Name gives it.
+    expect(round(showColumn(after, shares, 300, "Modified"), 4)).toEqual({
+      Name: 0.35,
+      Author: 0.2,
       Modified: 0.25,
       Size: 0.2,
     });
@@ -481,7 +520,7 @@ describe("showColumn", () => {
   // Author, Created and Type hidden - six flexible columns in all.
   const DOCS_WIDTH = 1124 + 24;
 
-  it("divides by every flexible column, hidden ones included, and moves no other", () => {
+  it("divides by every flexible column, hidden ones included, and moves no other than the giver", () => {
     const before = [fill(), flex("Modified"), flex("Size"), SETTINGS];
     const after = [
       fill(),
@@ -492,8 +531,8 @@ describe("showColumn", () => {
     ];
     const shares = sharesFor(before, { Name: 450, Modified: 337, Size: 337 });
 
-    // 1124 / 6 = 187.33 from Name; by the visible count, 1124 / 4 = 281
-    // would take Name below 210 and reset every column.
+    // 1124 / 6 = 187.33 from Size, on Type's left; by the visible count,
+    // 1124 / 4 = 281 would be more than Size can give.
     expect(
       round(
         toPixels(
@@ -503,9 +542,9 @@ describe("showColumn", () => {
         ),
       ),
     ).toEqual({
-      Name: 262.67,
+      Name: 450,
       Modified: 337,
-      Size: 337,
+      Size: 149.67,
       Type: 187.33,
       Settings: 24,
     });
@@ -565,8 +604,9 @@ describe("reconcileColumns", () => {
     });
     const shares = reconcileColumns(SPEC_COLUMNS, next, before, SPEC_WIDTH);
 
-    // Modified's 160 px go to Author. Type then takes 1000 / 4 = 250 px from
-    // the widest, Name.
+    // Modified's 160 px go to Author. Type then asks 1000 / 4 = 250 px; Size,
+    // on its left, has only 50 px above its minimum, so the widest, Name,
+    // gives them.
     expect(round(toPixels(next, shares, SPEC_WIDTH))).toEqual({
       Name: 270,
       Author: 320,
@@ -649,11 +689,12 @@ describe("restoreFractions", () => {
       SPEC_WIDTH,
     );
 
-    // 1000 / 4 = 250 px for Modified, from Name.
+    // 1000 / 4 = 250 px asked for Modified; Author, on its left, gives
+    // 250 - 110 = 140.
     expect(round(pixels)).toEqual({
-      Name: 300,
-      Author: 250,
-      Modified: 250,
+      Name: 550,
+      Author: 110,
+      Modified: 140,
       Size: 200,
       Menu: 68,
     });
