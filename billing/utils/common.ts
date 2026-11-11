@@ -2,6 +2,7 @@ import { Duration } from "luxon";
 
 import { isLanguageRtl } from "../../providers/theme/rtl-utils";
 import { dateDiff, now } from "../../utils/date";
+import { LATIN_NUMBERING_SYSTEM } from "../../utils/latin-digits";
 
 const FIRST_STRONG_ISOLATE = "\u2068";
 const POP_DIRECTIONAL_ISOLATE = "\u2069";
@@ -119,7 +120,7 @@ export const formatCurrencyValue = (
   const truncated = Number(truncatedStr);
 
   const formatter = new Intl.NumberFormat(language, {
-    numberingSystem: "latn",
+    numberingSystem: LATIN_NUMBERING_SYSTEM,
     style: "currency",
     currency,
     minimumFractionDigits: fractionDigits,
@@ -132,16 +133,18 @@ export const formatCurrencyValue = (
 /** Formats a fee percent with the locale's decimal separator, e.g. 5.5 → "5,5". */
 export const formatPercentValue = (language: string, value: number) =>
   new Intl.NumberFormat(language, {
-    numberingSystem: "latn",
+    numberingSystem: LATIN_NUMBERING_SYSTEM,
     maximumFractionDigits: 2,
   }).format(value);
 
 export const formatNumber = (language: string, value: number) =>
-  new Intl.NumberFormat(language, { numberingSystem: "latn" }).format(value);
+  new Intl.NumberFormat(language, {
+    numberingSystem: LATIN_NUMBERING_SYSTEM,
+  }).format(value);
 
 export const formatCompactNumber = (value: number, language = "en"): string =>
   new Intl.NumberFormat(language, {
-    numberingSystem: "latn",
+    numberingSystem: LATIN_NUMBERING_SYSTEM,
     notation: value >= 1_000_000 ? "compact" : "standard",
     maximumFractionDigits: 2,
   }).format(value);
@@ -154,7 +157,11 @@ export const getCurrencySymbol = (
   try {
     return isolateCurrencySymbol(
       language,
-      new Intl.NumberFormat(language, { style: "currency", currency })
+      new Intl.NumberFormat(language, {
+        numberingSystem: LATIN_NUMBERING_SYSTEM,
+        style: "currency",
+        currency,
+      })
         .formatToParts(0)
         .find((part) => part.type === "currency")?.value ?? currency,
     );

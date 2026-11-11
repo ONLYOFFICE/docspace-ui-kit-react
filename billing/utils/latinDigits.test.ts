@@ -15,6 +15,7 @@ const ARABIC_INDIC_DIGIT = /[٠-٩]/;
 
 describe("billing formatters in Arabic", () => {
   it("still gets Arabic-Indic digits from Intl by default", () => {
+    // biome-ignore lint/plugin/no-intl-without-latin-digits: the default is what this test shows
     expect(new Intl.NumberFormat("ar-SA").format(20)).toMatch(
       ARABIC_INDIC_DIGIT,
     );

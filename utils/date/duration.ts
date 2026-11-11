@@ -1,4 +1,5 @@
 import { Duration, DurationLikeObject, DateTime } from "luxon";
+import { LATIN_NUMBERING_SYSTEM } from "../latin-digits";
 
 export type DurationUnit =
   | "years"
@@ -94,10 +95,11 @@ export function humanizeDuration(
     const rtfOptions: Intl.RelativeTimeFormatOptions & {
       numberingSystem?: string;
     } = {
-      numberingSystem: "latn",
+      numberingSystem: LATIN_NUMBERING_SYSTEM,
       numeric: "auto",
       style: "long",
     };
+    // biome-ignore lint/plugin/no-intl-without-latin-digits: rtfOptions above sets numberingSystem
     const rtf = new Intl.RelativeTimeFormat(locale, rtfOptions);
     return rtf.format(significantValue, significantUnit);
   }

@@ -3,6 +3,7 @@ import { formatWithTimezone, getAppTimezone } from "../../../../utils/date";
 import { getCurrencySymbol as getBillingCurrencySymbol } from "../../../utils/common";
 
 import type { TServiceLimitPeriod } from "./types";
+import { LATIN_NUMBERING_SYSTEM } from "../../../../utils/latin-digits";
 
 export const LIMIT_PERIODS: TServiceLimitPeriod[] = [
   "Day",
@@ -66,6 +67,7 @@ export const isCurrencySymbolAfter = (
   if (!currency) return false;
   try {
     const types = new Intl.NumberFormat(language, {
+      numberingSystem: LATIN_NUMBERING_SYSTEM,
       style: "currency",
       currency,
     })

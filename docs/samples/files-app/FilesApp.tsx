@@ -56,6 +56,7 @@ import {
 } from "./source";
 import { useDeviceType } from "./useDeviceType";
 import { useListing } from "./useListing";
+import { LATIN_NUMBERING_SYSTEM } from "../../../utils/latin-digits";
 import styles from "./FilesApp.module.scss";
 
 const noop = () => {};
@@ -97,6 +98,7 @@ const ACCEPT_FULL = "DOCX, XLSX, PPTX, PDF, PNG, JPG, TXT, CSV, ZIP";
 const dateOf = (iso: string) =>
   iso
     ? new Date(iso).toLocaleDateString("en-US", {
+        numberingSystem: LATIN_NUMBERING_SYSTEM,
         day: "numeric",
         month: "short",
         year: "numeric",

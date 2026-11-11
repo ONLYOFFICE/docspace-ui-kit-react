@@ -5,6 +5,7 @@ import {
   isolateCurrencyParts,
   truncateNumberToFraction,
 } from "../../utils/common";
+import { LATIN_NUMBERING_SYSTEM } from "../../../utils/latin-digits";
 
 const truncateNumberToFractionNumeric = (
   value: number,
@@ -26,7 +27,7 @@ export const formattedBalanceTokens = (
   const truncated = Number(truncatedStr);
 
   const formatter = new Intl.NumberFormat(language, {
-    numberingSystem: "latn",
+    numberingSystem: LATIN_NUMBERING_SYSTEM,
     style: "currency",
     currency,
     minimumFractionDigits: maximumFractionDigits,
@@ -93,7 +94,7 @@ export const formatterCurrencyWithoutTranction = (
     : amount;
 
   const formatter = new Intl.NumberFormat(language, {
-    numberingSystem: "latn",
+    numberingSystem: LATIN_NUMBERING_SYSTEM,
     style: "currency",
     currency,
     minimumFractionDigits: effectiveFractionDigits,

@@ -18,6 +18,7 @@ import type {
   ContextMenuRefType,
   HeaderType,
 } from "./ContextMenu.types";
+import { LATIN_NUMBERING_SYSTEM } from "../../utils/latin-digits";
 
 const meta = {
   title: "UI/Overlays/ContextMenu",
@@ -718,7 +719,7 @@ const DynamicModelTemplate = () => {
   const getContextModel = (): ContextMenuModel[] => [
     {
       key: "built",
-      label: `Model built at ${new Date().toLocaleTimeString()}`,
+      label: `Model built at ${new Date().toLocaleTimeString("en-US", { numberingSystem: LATIN_NUMBERING_SYSTEM })}`,
       icon: CatalogFolderReactSvgUrl,
     },
     { key: "sep", isSeparator: true },

@@ -10,6 +10,7 @@ import {
 } from "../../utils/common";
 import { formatterCurrencyWithoutTranction } from "../../wallet/utils";
 import RefreshIconButton from "../refresh-icon-button";
+import { LATIN_NUMBERING_SYSTEM } from "../../../utils/latin-digits";
 import styles from "./BalanceAmount.module.scss";
 
 type BalanceAmountToken = {
@@ -79,7 +80,7 @@ const BalanceAmount = (props: BalanceAmountProps) => {
     const truncated = Number(truncatedStr);
 
     const formatter = new Intl.NumberFormat(language, {
-      numberingSystem: "latn",
+      numberingSystem: LATIN_NUMBERING_SYSTEM,
       style: "currency",
       currency,
       minimumFractionDigits: maximumFractionDigits,
