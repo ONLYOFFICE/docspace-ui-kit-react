@@ -89,6 +89,26 @@ describe("AiChatAgentPicker", () => {
     expect(onSelect).toHaveBeenCalledWith("3");
   });
 
+  it("asks the host to read its agents again each time the menu opens", () => {
+    const onOpen = vi.fn();
+    const store = new AiChatStore();
+    store.setAgentPicker({
+      agents: agents(2),
+      selectedId: null,
+      onSelect: vi.fn(),
+      onOpen,
+    });
+    renderPicker(store);
+
+    openMenu();
+    expect(onOpen).toHaveBeenCalledTimes(1);
+    // Closing it by the title again reads nothing.
+    openMenu();
+    expect(onOpen).toHaveBeenCalledTimes(1);
+    openMenu();
+    expect(onOpen).toHaveBeenCalledTimes(2);
+  });
+
   it("picks the default agent back, and ignores a pick of the current one", () => {
     const onSelect = vi.fn();
     const store = new AiChatStore();

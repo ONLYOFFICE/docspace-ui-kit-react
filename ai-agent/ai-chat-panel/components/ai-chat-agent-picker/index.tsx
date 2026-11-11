@@ -70,7 +70,10 @@ const AiChatAgentPicker = observer(({ title }: AiChatAgentPickerProps) => {
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-controls={menuId}
-        onClick={() => setIsOpen((open) => !open)}
+        onClick={() => {
+          if (!isOpen) picker.onOpen?.();
+          setIsOpen(!isOpen);
+        }}
         data-testid="ai-chat-agent-picker"
       >
         <Text

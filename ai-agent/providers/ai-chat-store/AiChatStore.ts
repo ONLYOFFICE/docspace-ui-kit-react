@@ -101,6 +101,8 @@ export type AiChatAgentPicker = {
   selectedId: string | null;
   /** Called with the picked agent's id, or `null` for the default agent. */
   onSelect: (id: string | null) => void;
+  /** Called each time the menu opens, for the host to read its agents again. */
+  onOpen?: () => void;
 };
 
 /** The preset a project opens as. */
