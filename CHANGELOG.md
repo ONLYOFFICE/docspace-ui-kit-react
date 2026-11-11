@@ -336,6 +336,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   style change below: each frame of a virtual list's scroll or a column drag restyled every
   element in the section. It now looks for a `.chat-container` alone; nothing hides one with an
   inline style any more.
+- **`SelectionArea` no longer stutters while its rectangle shrinks.** The rectangle took pointer
+  events and is redrawn once a frame, so a move back towards the start corner put the pointer
+  inside the rectangle drawn the frame before: hover left the scroller and the rows and came back
+  on every move, and a `:hover` rule on the section scroller restyled all of it (about 1 400
+  elements, 19 ms a move, in a files list). The rectangle now has `pointer-events: none`.
 - **Long lists scroll with less work per frame.** A closed `ContextMenu` no longer calls
   `getContextModel` on every render (a list renders one closed menu per row); the items are built
   when the menu opens, as before. `SectionFilter` reads the scroller once per frame instead of

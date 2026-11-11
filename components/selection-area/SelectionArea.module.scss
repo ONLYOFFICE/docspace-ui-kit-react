@@ -14,6 +14,10 @@
   position: fixed;
   margin: 0;
   display: none;
+  // Never the hover target: while the rectangle shrinks, the pointer is inside
+  // the one drawn last frame, and each move would take :hover off the scroller
+  // and the rows and back, restyling the whole section.
+  pointer-events: none;
   background: var(--selection-area-bg-value);
   border: var(--selection-area-border-value);
   z-index: var(--selection-area-z-index-value);

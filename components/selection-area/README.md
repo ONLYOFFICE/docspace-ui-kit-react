@@ -242,7 +242,9 @@ export function ControlledSelection({ ids }: { ids: string[] }) {
   `scroll` listener on the scrolling element for the duration of a drag, plus a `blur` listener on
   the window that cancels it.
 - **The rectangle is `position: fixed` at `z-index: 1000`** and is painted over everything; it is
-  moved by writing inline styles, not by React.
+  moved by writing inline styles, not by React. It has `pointer-events: none`, so the pointer stays
+  over the items beneath it: hover states hold for the whole drag, and `mouseup` reaches the item
+  under the pointer.
 
 ## CSS variables
 
