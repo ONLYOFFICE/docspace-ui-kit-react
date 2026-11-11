@@ -38,6 +38,11 @@ const SelectionArea = ({
   const scrollEventTarget = React.useRef<null | Element | Document>(null);
   const scrollSpeed = React.useRef({ x: 0, y: 0 });
   const selectableNodes = React.useRef(new Set<Element>());
+  // What the last frame reported, to skip a frame that would report the same.
+  const lastReport = React.useRef<{ added: Element[]; removed: Element[] }>({
+    added: [],
+    removed: [],
+  });
 
   const { isRTL } = useInterfaceDirection();
 
@@ -249,6 +254,13 @@ const SelectionArea = ({
       }
     }
 
+    const last = lastReport.current;
+    const same = (a: Element[], b: Element[]) =>
+      a.length === b.length && a.every((node, i) => node === b[i]);
+
+    if (same(added, last.added) && same(removed, last.removed)) return;
+
+    lastReport.current = { added, removed };
     onMove?.({ added, removed });
   }, [isIntersects, itemClass, onMove, selectableClass, viewAs]);
 
@@ -320,6 +332,7 @@ const SelectionArea = ({
         document.removeEventListener("mousemove", onMoveAction);
 
         // The drag has begun: whatever an earlier drag selected is dropped.
+        lastReport.current = { added: [], removed: [] };
         onMove?.({ added: [], removed: [], clear: true });
 
         document.addEventListener("mousemove", onTapMove, {

@@ -223,11 +223,13 @@ export function ControlledSelection({ ids }: { ids: string[] }) {
   the gaps in `arrayTypes`. A listing whose items differ in height selects the wrong ones.
 - **`added` and `removed` are not deltas.** On each animation frame every selectable element is
   classified afresh: `added` is everything the rectangle covers now, `removed` everything it does
-  not.
+  not. A frame that comes out exactly as the last one reported is not reported again, so while the
+  pointer moves inside the same rows `onMove` stays quiet.
 - **The drag starts after 10px.** Below that threshold the rectangle stays hidden and no `onMove`
   fires, so a plain click never reports anything. The moment the pointer passes it, `onMove` is
   called once with `clear: true` and empty `added` and `removed` — the cue to drop whatever an
-  earlier drag selected — and the per-frame reports follow.
+  earlier drag selected — and the per-frame reports follow, the first of them whatever the last
+  drag ended on.
 - **Without an element carrying `scrollClass` the page's own scroller is used**
   (`document.scrollingElement`): its offsets place the items and its `scroll` events, which arrive
   on the document, move the rectangle's starting corner.

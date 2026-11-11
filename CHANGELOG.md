@@ -341,6 +341,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   inside the rectangle drawn the frame before: hover left the scroller and the rows and came back
   on every move, and a `:hover` rule on the section scroller restyled all of it (about 1 400
   elements, 19 ms a move, in a files list). The rectangle now has `pointer-events: none`.
+- **`SelectionArea` reports a frame only when it differs from the last one.** `onMove` ran on
+  every animation frame of a drag, and a host that rebuilds its selection from `added` and
+  `removed` did that work for each pixel the pointer moved inside the same rows. A frame whose
+  `added` and `removed` hold the same elements as the last report is now skipped; a new drag
+  always reports its first frame.
 - **Long lists scroll with less work per frame.** A closed `ContextMenu` no longer calls
   `getContextModel` on every render (a list renders one closed menu per row); the items are built
   when the menu opens, as before. `SectionFilter` reads the scroller once per frame instead of

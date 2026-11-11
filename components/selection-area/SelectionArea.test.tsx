@@ -137,4 +137,38 @@ describe("SelectionArea", () => {
       ),
     );
   });
+
+  it("reports a frame only when the rows it covers change", async () => {
+    const first = mountRows({ id: "sectionScroll" });
+    // The rectangle is clipped to `containerClass`; jsdom's <html> has no size.
+    const container = document.createElement("div");
+    container.className = "container-class";
+    container.getBoundingClientRect = () =>
+      ({ top: 0, left: 0, right: 400, bottom: 400 }) as DOMRect;
+    document.body.appendChild(container);
+    renderComponent({ viewAs: "row" });
+    const reports = () =>
+      mockOnMove.mock.calls.filter(([report]) => !report.clear).length;
+
+    dragDown(first, 30);
+    await waitFor(() => expect(reports()).toBe(1));
+
+    // Still inside the first row: nothing new to report.
+    fireEvent.mouseMove(document, { clientX: 10, clientY: 35 });
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+    expect(reports()).toBe(1);
+
+    // Into the second row.
+    fireEvent.mouseMove(document, { clientX: 10, clientY: 60 });
+    await waitFor(() => expect(reports()).toBe(2));
+    expect(mockOnMove).toHaveBeenLastCalledWith({
+      added: [first, first.nextElementSibling],
+      removed: [first.nextElementSibling?.nextElementSibling],
+    });
+
+    // A new drag reports again, even over the same rows.
+    fireEvent.mouseUp(document);
+    dragDown(first, 60);
+    await waitFor(() => expect(reports()).toBe(3));
+  });
 });
