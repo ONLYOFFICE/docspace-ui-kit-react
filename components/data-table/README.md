@@ -871,22 +871,24 @@ Set them on any ancestor of the table. Each default has a light and a dark value
 Each of them may also be set on a row, through its `className` or `style`, to recolour that row
 alone: a mode that tints every row sets `--data-table-row-background`.
 
-Six more place and size the header and the strips, and have no theme values. The header's bleeds
+Seven more place and size the header and the strips, and have no theme values. The header's bleeds
 say how far its line reaches past the table, at the start and at the end, once rows scroll under
 it: into the page's gutters, where a selected row's strip already reaches. The rows' bleeds say how
 far a row's strip reaches, and are the header's unless set. The top is for a page that pins
 something above the list in the same scroller, such as a filter bar: the header stops below it, and
 `scrollToIndex` lands rows below both. The font size is for a table set in smaller type than a
-section list, such as one on a settings page.
+section list, such as one on a settings page, and the weight for a product whose column titles are
+not bold.
 
-| Variable                        | Default                    | Effect                                                   |
-| ------------------------------- | -------------------------- | -------------------------------------------------------- |
-| `--data-table-header-top`       | `0px`                      | How far below the scroller's top the header sticks       |
-| `--data-table-header-font-size` | `13px`                     | Size of the column titles                                |
-| `--data-table-bleed-start`      | `0px`                      | How far the stuck header's line runs past the start edge |
-| `--data-table-bleed-end`        | `0px`                      | How far the stuck header's line runs past the end edge   |
-| `--data-table-row-bleed-start`  | `--data-table-bleed-start` | How far a row's strip runs past the start edge           |
-| `--data-table-row-bleed-end`    | `--data-table-bleed-end`   | How far a row's strip runs past the end edge             |
+| Variable                          | Default                    | Effect                                                   |
+| --------------------------------- | -------------------------- | -------------------------------------------------------- |
+| `--data-table-header-top`         | `0px`                      | How far below the scroller's top the header sticks       |
+| `--data-table-header-font-size`   | `13px`                     | Size of the column titles                                |
+| `--data-table-header-font-weight` | `600`                      | Weight of the column titles                              |
+| `--data-table-bleed-start`        | `0px`                      | How far the stuck header's line runs past the start edge |
+| `--data-table-bleed-end`          | `0px`                      | How far the stuck header's line runs past the end edge   |
+| `--data-table-row-bleed-start`    | `--data-table-bleed-start` | How far a row's strip runs past the start edge           |
+| `--data-table-row-bleed-end`      | `--data-table-bleed-end`   | How far a row's strip runs past the end edge             |
 
 Row height is the `rowHeight` prop, not a variable: the virtualiser has to know it too.
 
