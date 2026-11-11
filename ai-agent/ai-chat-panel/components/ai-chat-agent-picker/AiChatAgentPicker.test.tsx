@@ -140,6 +140,10 @@ describe("AiChatAgentPicker", () => {
       .closest<HTMLElement>('[style*="max-height"]');
     expect(VISIBLE_AGENTS_COUNT).toBe(5);
     expect(list?.style.maxHeight).toBe("160px");
+    // Rows as wide as the default agent's: no gutter for the track.
+    expect(list?.style.getPropertyValue("--scrollbar-padding-inline-end")).toBe(
+      "0",
+    );
     // The default agent stays above the scrolling list.
     expect(
       list?.contains(screen.getByTestId("ai-chat-agent-picker-default")),

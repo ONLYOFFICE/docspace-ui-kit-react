@@ -244,6 +244,9 @@ const AiChatAgentPicker = observer(({ title }: AiChatAgentPickerProps) => {
               style={{ maxHeight: VISIBLE_AGENTS_COUNT * ROW_HEIGHT }}
               translateContentSizeYToHolder
               noScrollX
+              // No gutter for the track: the agents' rows, their hover fill
+              // and checkmarks line up with the default agent's above.
+              paddingInlineEnd="0"
             >
               {picker.agents.map((agent) => (
                 <DropDownItem
