@@ -13,6 +13,7 @@ import {
 } from "../../utils/serviceUsage";
 import SpendAmount from "../../shared/spend-amount";
 import type { TServiceUsage } from "../../types";
+import { LATIN_NUMBERING_SYSTEM } from "../../../utils/latin-digits";
 
 import styles from "../Overview.module.scss";
 
@@ -31,9 +32,10 @@ const MonthToDateSpend = ({ onViewUsage }: MonthToDateSpendProps) => {
 
   const monthLabel = useMemo(
     () =>
-      new Intl.DateTimeFormat(language || "en", { month: "long" }).format(
-        new Date(),
-      ),
+      new Intl.DateTimeFormat(language || "en", {
+        numberingSystem: LATIN_NUMBERING_SYSTEM,
+        month: "long",
+      }).format(new Date()),
     [language],
   );
 

@@ -146,6 +146,7 @@ export const updatedAgo = (iso: string, now: Date = new Date()) => {
   if (!then) return "";
 
   const days = Math.round((startOfDay(now) - startOfDay(new Date(then))) / DAY);
+  // biome-ignore lint/plugin/no-intl-without-latin-digits: "en" prints Western digits
   const format = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 
   if (days < 1) return format.format(0, "day");
