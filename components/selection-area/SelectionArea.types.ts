@@ -27,7 +27,7 @@ export type SelectionAreaProps = {
   containerClass: string;
   /** Class every selectable element carries. Each one must also have a `value` attribute shaped `type_…_index`, which is how the component works out where it sits. Required. */
   selectableClass: string;
-  /** Called once with `clear: true` when a drag passes the 10px threshold, then on every animation frame of the drag with the full covered and uncovered sets. */
+  /** Called once with `clear: true` when a drag passes the 10px threshold, then on every animation frame of the drag with the full covered and uncovered sets, skipping a frame whose sets match the last one reported. */
   onMove?: ({ added, removed, clear }: TOnMove) => void;
   /** Class of the scrolling element. The component listens to its `scroll` and shifts the rectangle to match; without a match it uses the page's own scroller. Required. */
   scrollClass: string;

@@ -94,7 +94,7 @@ const meta = {
     onMove: {
       control: false,
       description:
-        "Called once with `clear: true` when a drag passes 10px, then on every animation frame with every covered item (`added`) and every uncovered one (`removed`). The story uses it to highlight the covered items",
+        "Called once with `clear: true` when a drag passes 10px, then on every animation frame whose sets differ from the last one reported, with every covered item (`added`) and every uncovered one (`removed`). The story uses it to highlight the covered items",
     },
     startAreaSelector: {
       control: false,
