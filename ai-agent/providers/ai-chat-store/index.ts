@@ -1,5 +1,7 @@
 export { default as AiChatStore } from "./AiChatStore";
 export type {
+  AiChatAgentPicker,
+  AiChatAgentPickerItem,
   AiChatPresetRoom,
   AiChatContextFolder,
   AiChatPresetSettings,

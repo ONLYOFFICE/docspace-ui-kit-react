@@ -1,3 +1,4 @@
+import type React from "react";
 import { makeAutoObservable, observable, reaction } from "mobx";
 
 import {
@@ -82,6 +83,26 @@ export type AiChatProjectSettings = {
   folderContext?: AiChatContextFolder | null;
 };
 
+/** An agent the panel title's menu offers: an id the host knows it by, a name, a logo. */
+export type AiChatAgentPickerItem = {
+  id: string;
+  name: string;
+  /** The agent's logo, drawn at 20px before the name. */
+  icon?: React.ReactNode;
+};
+
+/**
+ * The agents a host offers in the panel title's menu, under the default
+ * agent. The host owns them: it lists them, says which one the chat runs on
+ * (`null` = the default agent) and applies a pick.
+ */
+export type AiChatAgentPicker = {
+  agents: AiChatAgentPickerItem[];
+  selectedId: string | null;
+  /** Called with the picked agent's id, or `null` for the default agent. */
+  onSelect: (id: string | null) => void;
+};
+
 /** The preset a project opens as. */
 export const projectToPreset = (
   project: AiChatProjectSettings,
@@ -144,6 +165,12 @@ class AiChatStore {
   onSavePreset: ((settings: AiChatPresetSettings) => void) | null = null;
 
   /**
+   * The agents the panel title opens as a menu. `null` (the default), or a
+   * picker with no agents, leaves the title plain text.
+   */
+  agentPicker: AiChatAgentPicker | null = null;
+
+  /**
    * Settings waiting to be applied to the chat stores by AiChatStoresBridge
    * once the panel is up — set by `openPreset`, cleared when applied.
    */
@@ -193,7 +220,12 @@ class AiChatStore {
   constructor() {
     // The save hook is a host callback, kept by reference: wrapping it as an
     // action would hand the button a bound wrapper instead of the function.
-    makeAutoObservable(this, { onSavePreset: observable.ref });
+    // The agent picker carries host callbacks and React nodes (the logos):
+    // kept by reference too, never made deep-observable.
+    makeAutoObservable(this, {
+      onSavePreset: observable.ref,
+      agentPicker: observable.ref,
+    });
   }
 
   get isAnalyzeMode(): boolean {
@@ -301,6 +333,15 @@ class AiChatStore {
   ) => {
     this.onSavePreset = hook;
   };
+
+  setAgentPicker = (picker: AiChatAgentPicker | null) => {
+    this.agentPicker = picker;
+  };
+
+  /** Whether the panel title opens the agents menu: a picker with at least one agent. */
+  get hasAgentPicker(): boolean {
+    return (this.agentPicker?.agents.length ?? 0) > 0;
+  }
 
   // Open the panel fullscreen on a fresh conversation set up as the preset
   // says: the model, the skills room and the knowledge base are applied by

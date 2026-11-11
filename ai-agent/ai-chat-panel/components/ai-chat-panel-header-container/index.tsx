@@ -8,6 +8,7 @@ import { useIsDesktop } from "../../../../hooks/use-is-desktop";
 import { useStores } from "../../../providers";
 import { useAiChatStore } from "../../../providers/ai-chat-store";
 
+import AiChatAgentPicker from "../ai-chat-agent-picker";
 import AiChatPanelHeader from "../ai-chat-panel-header";
 import AiChatPanelSave from "../ai-chat-panel-save";
 
@@ -38,13 +39,20 @@ const AiChatPanelHeaderContainer: React.FC = observer(() => {
     store.close();
   };
 
+  // The title opens the host's agents as a menu while it offers any; the
+  // analyze mode and a project's own chat keep their plain titles.
+  const renderTitle = () => {
+    if (store.isAnalyzeMode) return t("Common:AnalyzeResponsesMode");
+    if (store.projectTitle) return store.projectTitle;
+    if (store.hasAgentPicker) {
+      return <AiChatAgentPicker title={t("Common:AIChatButton")} />;
+    }
+    return t("Common:AIChatButton");
+  };
+
   return (
     <AiChatPanelHeader
-      title={
-        store.isAnalyzeMode
-          ? t("Common:AnalyzeResponsesMode")
-          : (store.projectTitle ?? t("Common:AIChatButton"))
-      }
+      title={renderTitle()}
       onClose={handleClose}
       rightExtras={<AiChatPanelSave />}
       isFullscreen={store.effectiveFullscreen}
