@@ -20,9 +20,11 @@ import { useComposerSourceLists } from "./use-composer-sources";
 
 type Connected = { cloud: string; room: { id: string; name: string } }[];
 
+const clearKnowledgeFolder = vi.fn();
 let state: {
   selectedContextFolders: Connected;
   selectedKnowledgeFolders: Connected;
+  clearKnowledgeFolder: () => void;
 };
 const useCloudsStore = ((selector: (s: typeof state) => unknown) =>
   selector(state)) as unknown as Parameters<
@@ -47,7 +49,11 @@ const lists = (knowledgePickerHidden = false) =>
 describe("useComposerSourceLists", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    state = { selectedContextFolders: [], selectedKnowledgeFolders: [] };
+    state = {
+      selectedContextFolders: [],
+      selectedKnowledgeFolders: [],
+      clearKnowledgeFolder,
+    };
   });
 
   it("offers only Manage while no room is connected", () => {
@@ -80,7 +86,22 @@ describe("useComposerSourceLists", () => {
     expect(onOpenContextRoom).toHaveBeenCalledWith(CONTEXT_ROOM_CLOUD, legal);
   });
 
-  it("leaves the knowledge list to the library while knowledge search is off", () => {
-    expect(lists(true).composerKnowledge).toBeUndefined();
+  it("has no Knowledge bases row while knowledge search is off and none is connected", () => {
+    expect(lists(true).composerKnowledge).toEqual([]);
+  });
+
+  it("offers Disconnect instead of Manage while knowledge search is off", () => {
+    state.selectedKnowledgeFolders = [
+      { cloud: CONTEXT_ROOM_CLOUD, room: { id: "7", name: "Wiki" } },
+    ];
+    const { composerKnowledge, composerSkills } = lists(true);
+    expect(
+      composerKnowledge.map((row) => (row.isSeparator ? "|" : row.text)),
+    ).toEqual(["Wiki", "|", "Disconnect"]);
+    composerKnowledge[2].onClick?.();
+    expect(clearKnowledgeFolder).toHaveBeenCalledTimes(1);
+    expect(onPickKnowledgeRooms).not.toHaveBeenCalled();
+    // Skill sets keep their Manage.
+    expect(composerSkills.at(-1)?.text).toBe("Manage");
   });
 });

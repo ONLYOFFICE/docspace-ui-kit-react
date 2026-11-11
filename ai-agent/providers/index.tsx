@@ -1186,8 +1186,8 @@ const AiAgentProviders = ({
       // Instructions rooms and knowledge bases are picked in the room
       // selector, several at once ("Manage" in the "+" menu's Skill sets and
       // Knowledge bases), and a connected one opens in Files from its row
-      // there. The pickers stay for the library's own Knowledge bases list,
-      // used while knowledge search is off (`composerKnowledge` unset).
+      // there. With knowledge search off, Knowledge bases keeps the bases
+      // connected earlier and "Disconnect" instead of "Manage".
       composerSkills,
       composerKnowledge,
       onPickContextRooms,
