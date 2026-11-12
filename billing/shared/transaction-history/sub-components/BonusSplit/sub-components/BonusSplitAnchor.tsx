@@ -2,7 +2,7 @@ import type React from "react";
 
 import classNames from "classnames";
 
-import GiftIcon from "../../../../../../assets/icons/12/gift.react.svg";
+import GiftIcon from "../../../../../../assets/icons/12/gift.outline.react.svg";
 import { useCommonTranslation } from "../../../../../../utils/i18n";
 
 import type { WalletOperationDto } from "../../../../../store/PaymentStore";
