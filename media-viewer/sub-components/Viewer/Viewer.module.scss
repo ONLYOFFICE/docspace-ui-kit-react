@@ -1,0 +1,107 @@
+:global(.rtl) {
+  :local {
+    .container {
+      & > span {
+        left: 0;
+        margin-left: var(--viewer-rtl-margin-left);
+      }
+
+      .details {
+        right: 0;
+
+        .title {
+          padding-right: 16px;
+        }
+      }
+    }
+  }
+}
+
+:global(.ltr) {
+  :local {
+    .container {
+      & > span {
+        right: 0;
+        margin-right: var(--viewer-rtl-margin-right);
+      }
+
+      .details {
+        left: 0;
+
+        .title {
+          padding-left: 16px;
+        }
+      }
+    }
+  }
+}
+
+.container {
+  color: var(--viewer-color);
+  overflow: hidden;
+  display: block;
+
+  // The container holds the focus only so it stays out of the page behind;
+  // it is no control of its own, so it draws no ring (as ModalDialog's
+  // content does not).
+  &:focus {
+    outline: none;
+  }
+
+  &[data-visible="false"] {
+    display: none;
+  }
+
+  > span {
+    position: fixed;
+    bottom: 5px;
+    z-index: 305;
+  }
+
+  .deleteBtnContainer,
+  .downloadBtnContainer {
+    display: block;
+    width: 16px;
+    height: 16px;
+    margin: 4px 12px;
+    line-height: 19px;
+
+    svg {
+      path {
+        fill: var(--viewer-fill);
+      }
+    }
+  }
+
+  .details {
+    z-index: 307;
+    padding-top: 21px;
+    height: 64px;
+    width: 100%;
+    background: linear-gradient(
+      0deg,
+      var(--media-viewer-tap-highlight) 0%,
+      var(--viewer-details) 100%
+    );
+    position: fixed;
+    top: 0;
+
+    .title {
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      font-size: 20px;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      width: calc(100% - 50px);
+
+      box-sizing: border-box;
+      color: var(--viewer-fill);
+    }
+  }
+
+  .containerVideo {
+    position: fixed;
+    inset: 0;
+  }
+}

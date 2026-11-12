@@ -56,6 +56,7 @@ const SHIPPING_DIRS = [
   "billing",
   "selectors",
   "uploader",
+  "media-viewer",
   "document-editor",
 ];
 

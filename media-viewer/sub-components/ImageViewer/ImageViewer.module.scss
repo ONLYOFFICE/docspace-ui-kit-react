@@ -1,0 +1,32 @@
+.container {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: 300;
+  user-select: none;
+  touch-action: none;
+
+  &.backgroundBlack {
+    background-color: var(--image-viewer-bg-black);
+  }
+
+  &:not(.backgroundBlack) {
+    background-color: var(--image-viewer-bg-transparent);
+  }
+}
+
+.wrapper {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+
+  &.loading {
+    visibility: hidden;
+  }
+}
+
+.image {
+  will-change: opacity, transform, scale;
+}

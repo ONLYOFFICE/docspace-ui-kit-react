@@ -1,0 +1,81 @@
+@use "../../../styles/mixins";
+
+.toolbarWrapper {
+  height: 48px;
+  padding: 10px 24px;
+  border-radius: 18px;
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  z-index: 307;
+  transform: translateX(-50%);
+  text-align: center;
+  transition: all 0.26s ease-out;
+  background: var(--viewer-toolbar-bg);
+
+  &:hover {
+    background: var(--viewer-toolbar-hover-bg);
+  }
+}
+
+.toolsList {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+}
+
+.toolbarItem {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 48px;
+  width: 48px;
+  position: relative;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &.separator {
+    width: 33px;
+
+    &:hover {
+      cursor: default;
+    }
+  }
+
+  .zoomPercent {
+    font-size: 10px;
+    font-weight: 700;
+
+    width: auto;
+    color: var(--viewer-toolbar-percent-color);
+    @include mixins.no-user-select;
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+
+    path,
+    rect {
+      fill: var(--viewer-toolbar-icon-color);
+    }
+
+    &.disabled {
+      path,
+      rect {
+        fill: var(--viewer-toolbar-icon-disabled);
+      }
+    }
+  }
+
+  .zoomOut,
+  .zoomIn,
+  .rotateLeft,
+  .rotateRight {
+    margin-top: 3px;
+  }
+}

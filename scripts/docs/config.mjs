@@ -92,6 +92,7 @@ export const STORY_DIRS = [
   "selectors",
   "document-editor",
   "uploader",
+  "media-viewer",
   "ai-agent",
   "billing",
 ];
@@ -125,6 +126,7 @@ export const PORTAL_DIRS = [
   "docs/sections",
   "document-editor",
   "providers/api",
+  "media-viewer",
   "selectors",
   "uploader",
 ];

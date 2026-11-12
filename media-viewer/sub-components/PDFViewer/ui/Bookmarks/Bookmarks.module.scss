@@ -1,0 +1,30 @@
+.list {
+  padding-inline-start: 16px;
+  padding-inline-end: 30px;
+  list-style: none;
+  margin-top: 0px;
+  display: flex;
+  flex-direction: column;
+}
+
+.item {
+  color: var(--bookmarks-text-color);
+  padding: 1px 16px 0;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 20px;
+  cursor: pointer;
+  margin-top: -1px;
+
+  @media (hover: hover) {
+    &:hover {
+      background: var(--bookmarks-color);
+    }
+  }
+}
+
+.text {
+  margin: 0;
+  border-bottom: 1px solid var(--bookmarks-color);
+  padding: 6px 0;
+}

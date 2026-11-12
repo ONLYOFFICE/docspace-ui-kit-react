@@ -1,0 +1,21 @@
+.wrapper {
+  width: 100%;
+  height: calc(100vh - var(--main-panel-margin-top-mobile));
+  margin-top: var(--main-panel-margin-top-mobile);
+  touch-action: none;
+
+  &.isDesktop {
+    height: calc(100vh - var(--main-panel-margin-top-desktop));
+    margin-top: var(--main-panel-margin-top-desktop);
+  }
+}
+
+.content {
+  &[data-loading="true"] {
+    visibility: hidden;
+  }
+
+  &[data-loading="false"] {
+    visibility: visible;
+  }
+}

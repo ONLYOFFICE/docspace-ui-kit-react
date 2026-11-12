@@ -158,6 +158,7 @@ resolution alone.
 | `billing`         | 68             | Portal tariff/payment flows; depends on the API layer and MobX stores                                   |
 | `selectors`       | 70             | Data-driven pickers (People, Room, Files, Groups, MCPServers, AIAgent) built on the API layer and MobX  |
 | `uploader`        | 7              | Depends on `selectors/Files` and `providers/api`                                                        |
+| `media-viewer`    | 1              | Viewer for portal media files; decryption and the PDF script come from the consumer                     |
 | `document-editor` | 2              | Wrapper around `@onlyoffice/document-editor-react`; external consumers should use that package directly |
 | `api`             | —              | Portal REST client                                                                                      |
 | `providers/api`   | —              | Portal API provider; sole importer of `axios`                                                           |

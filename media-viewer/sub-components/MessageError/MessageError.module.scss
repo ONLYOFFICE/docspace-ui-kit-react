@@ -1,0 +1,65 @@
+.mediaError {
+  position: fixed;
+  z-index: 1006;
+
+  // doesn't require mirroring for RTL
+  left: 50%;
+  top: 50%;
+
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--message-error-bg);
+  opacity: 1;
+  border-radius: var(--message-error-border-radius);
+  padding: var(--message-error-padding);
+
+  .title {
+    color: var(--message-error-text-color);
+  }
+}
+
+.errorToolbar {
+  position: fixed;
+
+  // doesn't require mirroring for RTL
+  z-index: 1006;
+  left: 50%;
+
+  bottom: 24px;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 10px 24px;
+  border-radius: 18px;
+
+  background: var(--message-error-toolbar-background);
+
+  &:hover {
+    background: var(--message-error-toolbar-hover-background);
+  }
+
+  svg {
+    path {
+      fill: var(--message-error-svg);
+    }
+  }
+
+  rect: {
+    stroke: var(--message-error-svg);
+  }
+
+  .toolbarItem {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 48px;
+    width: 48px;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
