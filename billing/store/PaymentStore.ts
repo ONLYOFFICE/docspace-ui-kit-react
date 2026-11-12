@@ -58,7 +58,11 @@ import type {
   TServiceUsage,
   TUsagePeriodKey,
 } from "../types";
-import { formatCurrencyValue, formatPercentValue } from "../utils/common";
+import {
+  daysUntil,
+  formatCurrencyValue,
+  formatPercentValue,
+} from "../utils/common";
 import {
   getCardLinkedOnFreeTariff,
   getCardLinkedOnNonProfit,
@@ -128,6 +132,11 @@ export type TTransactionFilterContact = {
   id: string;
   displayName?: string;
 };
+
+const sumAmounts = (amounts: number[]) =>
+  Number(amounts.reduce((sum, amount) => sum + amount, 0).toFixed(8));
+
+const PROMO_EXPIRY_WARNING_DAYS = 7;
 
 const getTransactionType = (key: string) => ({
   isCredit: key !== "debit",
@@ -506,6 +515,51 @@ class PaymentStore {
 
   get walletBalance(): number {
     return getWalletBalanceAmount(this.balance);
+  }
+
+  get promoLots(): TGoodwillLot[] {
+    return this.goodwill?.lots ?? [];
+  }
+
+  get hasPromoCredits() {
+    return this.promoLots.length > 0;
+  }
+
+  get promoBalance(): number {
+    return sumAmounts(this.promoLots.map((lot) => lot.remaining));
+  }
+
+  get promoGranted(): number {
+    return sumAmounts(this.promoLots.map((lot) => lot.amount));
+  }
+
+  get promoDaysLeft(): number {
+    const lot = this.nextExpiringPromoLot;
+    if (!lot?.expiresAt) return 0;
+
+    return Math.max(0, daysUntil(lot.expiresAt));
+  }
+
+  get nextExpiringPromoLot(): TGoodwillLot | null {
+    let next: TGoodwillLot | null = null;
+
+    for (const lot of this.promoLots) {
+      if (!lot.expiresAt) continue;
+      if (!next || Date.parse(lot.expiresAt) < Date.parse(next.expiresAt!))
+        next = lot;
+    }
+
+    return next;
+  }
+
+  get isPromoExpiringSoon() {
+    if (!this.nextExpiringPromoLot) return false;
+
+    return this.promoDaysLeft <= PROMO_EXPIRY_WARNING_DAYS;
+  }
+
+  get availableCredits(): number {
+    return sumAmounts([this.walletBalance, this.promoBalance]);
   }
 
   get isLowWalletBalance() {
@@ -1715,6 +1769,7 @@ class PaymentStore {
         this.tariff.fetchPortalTariff(),
         this.fetchUpcomingPayments(),
         this.fetchWalletUsage(getUsageRange("thisMonth")),
+        this.fetchGoodwill(),
       );
 
       if (onInit) requests.push(Promise.resolve(onInit()));

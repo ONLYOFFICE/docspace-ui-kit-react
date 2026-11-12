@@ -158,3 +158,140 @@
 .autoPaymentEditing {
   display: flex;
 }
+
+@keyframes promoCreditsGrow {
+  from {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+
+  to {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+}
+
+.promoCredits {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.promoCreditsAnimated {
+  animation: promoCreditsGrow 250ms ease-out;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.promoCreditsLeaving {
+  animation: promoCreditsGrow 250ms ease-in reverse forwards;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+
+.promoCreditsBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow: hidden;
+  padding-block: 12px;
+  margin-block-end: 12px;
+  border-block-start: 1px solid var(--payment-devider-color);
+}
+
+.creditsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.promoBox {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-block-start: 8px;
+}
+
+.promoAmount {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.promoGranted {
+  color: var(--payment-text-color);
+}
+
+.promoBar {
+  height: 4px;
+  border-radius: 2px;
+  overflow: hidden;
+  background: var(--payment-devider-color);
+}
+
+.promoBarFill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--payment-accent-color);
+}
+
+.promoExpiry {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--payment-text-color);
+}
+
+.promoExpiryWarning {
+  .promoExpiryIcon {
+    color: var(--payment-warning-color);
+  }
+}
+
+.promoExpiryIcon {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+
+  circle,
+  path {
+    stroke: currentColor;
+  }
+}
+
+.promoFootnote {
+  margin-block-start: 8px;
+  color: var(--payment-text-color);
+}
+
+.promoExpiryBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  margin-block: 16px 0;
+  max-width: 660px;
+  background: color-mix(in srgb, var(--payment-warning-color) 10%, transparent);
+  border: 1px solid
+    color-mix(in srgb, var(--payment-warning-color) 35%, transparent);
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.promoExpiryBannerIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+
+  path {
+    fill: var(--payment-warning-color);
+  }
+}

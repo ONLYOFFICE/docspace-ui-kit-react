@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { observer } from "mobx-react";
 import { useCommonTranslation } from "../../utils/i18n";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
@@ -17,6 +23,8 @@ import UpcomingPayments from "./sub-components/UpcomingPayments";
 import WalletRefilledModal from "./WalletRefilledModal";
 import AutoPaymentInfo from "./sub-components/AutoPaymentInfo";
 import DelayedPaymentMethodBanner from "./sub-components/DelayedPaymentMethodBanner";
+import PromoCredits from "./sub-components/PromoCredits";
+import PromoExpiryBanner from "./sub-components/PromoExpiryBanner";
 import UnlinkedCardBanner from "../shared/unlinked-card-banner";
 import styles from "./styles/Wallet.module.scss";
 import BalanceAmount from "../shared/balance-amount";
@@ -56,7 +64,9 @@ const Wallet = (props: WalletProps) => {
   const { walletMonthToDateSpend } = useServicesStore();
 
   const {
-    walletBalance,
+    availableCredits,
+    hasPromoCredits,
+    fetchGoodwill,
     walletCodeCurrency,
     isCardLinkedToPortal,
     isVisibleWalletSettings,
@@ -94,6 +104,24 @@ const Wallet = (props: WalletProps) => {
   const [selectedTabId, setSelectedTabId] = useState(getInitialTabId);
 
   const [isAutoSpinning, setIsAutoSpinning] = useState(isAutoTopUpInProgress);
+  const hadPromoOnMount = useRef(hasPromoCredits);
+  const [isPromoShown, setIsPromoShown] = useState(hasPromoCredits);
+  const [isPromoLeaving, setIsPromoLeaving] = useState(false);
+
+  useEffect(() => {
+    if (hasPromoCredits) {
+      setIsPromoShown(true);
+      setIsPromoLeaving(false);
+    } else if (isPromoShown) {
+      setIsPromoLeaving(true);
+    }
+  }, [hasPromoCredits]);
+
+  const onPromoLeft = useCallback(() => {
+    setIsPromoShown(false);
+    setIsPromoLeaving(false);
+  }, []);
+
   const autoStartTimeRef = useRef<number | null>(null);
 
   const monthLabel = useMemo(
@@ -148,7 +176,7 @@ const Wallet = (props: WalletProps) => {
 
     try {
       refreshTransactionHistory();
-      await fetchBalance!(true);
+      await Promise.all([fetchBalance!(true), fetchGoodwill()]);
     } catch (e) {
       toastr.error(e as Error);
     } finally {
@@ -211,6 +239,8 @@ const Wallet = (props: WalletProps) => {
         </Link>
       ) : null}
 
+      <PromoExpiryBanner />
+
       <div className={styles.summaryGrid}>
         <div className={`${styles.summaryCard} ${styles.summaryCardBalance}`}>
           <BalanceAmount
@@ -223,10 +253,18 @@ const Wallet = (props: WalletProps) => {
             progressText={t("TopUpInProgress")}
             isProgressTextVisible={isAutoSpinning}
             onRefresh={onClick}
-            amount={walletBalance}
+            amount={availableCredits}
             currency={walletCodeCurrency}
             language={store.language}
           />
+
+          {isPromoShown ? (
+            <PromoCredits
+              animate={!hadPromoOnMount.current}
+              leaving={isPromoLeaving}
+              onLeft={onPromoLeft}
+            />
+          ) : null}
 
           <div className={styles.cardButtons}>
             <Button
@@ -249,6 +287,16 @@ const Wallet = (props: WalletProps) => {
               />
             ) : null}
           </div>
+
+          {isPromoShown ? (
+            <Text
+              fontSize="11px"
+              lineHeight="16px"
+              className={styles.promoFootnote}
+            >
+              {t("PromoCreditsFootnote")}
+            </Text>
+          ) : null}
         </div>
 
         <div className={`${styles.summaryCard} ${styles.summaryCardSpend}`}>
