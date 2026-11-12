@@ -1,3 +1,8 @@
+// React 18 compatibility for Claude Design templates - see the module. Kept
+// first so it runs before anything renders; re-exported so it is never
+// dropped.
+export { __dsReact18Compat } from "./react18-compat.mjs";
+
 // Design-sync preview context: the data .storybook/preview.tsx feeds its
 // decorators, exported so cfg.provider can reach it as window.AppsUiKit.<name>
 // via {"$ref": ...}. Bundled into _ds_bundle.js through cfg.extraEntries.

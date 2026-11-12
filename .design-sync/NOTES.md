@@ -216,3 +216,29 @@ eager: true })` is expanded to static imports (RoomLogoCoverDialog).
   live under `.design-sync/`: the guideline path mirrors the source path, and a
   dot folder in the project path is treated as local. `docs/guides/` is not in
   `package.json` `files` and Storybook indexes only `.mdx` there.
+
+## Claude Design templates run React 18
+
+- [GENERAL] Templates the design agent creates (`templates/<name>/`) boot
+  Claude Design's own runtime (`support.js`), which loads React 18.3.1 from a
+  CDN when the page has no React. The kit is React 19: `use(context)`,
+  `useEffectEvent` (19.2) and `<Context value>` as a provider. The first
+  template ("Markdown Editor") failed with "d is not a function" at the
+  first provider. Component cards were fine - they load React 19.2.8 from
+  `_vendor/`.
+- Fix: `.design-sync/react18-compat.mjs`, re-exported from
+  `preview-context.mjs` (so `extraEntries` and the grade contract did not
+  change), patches `window.React` when the bundle loads: `use` ->
+  `useContext` (every call in the kit passes a context), a `useEffectEvent`
+  polyfill, and `createElement(Context)` -> `Context.Provider` on React 18
+  only. No-op on React 19.
+- Verified on React 18.3.1 with the providers, Button, TextInput, Scrollbar,
+  an open DropDown and Tooltip: renders with no errors; the same page with
+  `use`/`useEffectEvent` removed reproduces "use is not a function" in
+  `useInterfaceDirection`.
+- Not covered on React 18: `ref` passed as a plain prop to a function
+  component is dropped (refs created inside the kit still work).
+- Re-sync risk: a new React 19-only API in the kit (`useActionState`,
+  `useOptimistic`, `use(promise)`, a `ref` the kit depends on) breaks
+  templates again. Grep the bundle's `import_react*.<name>` list against
+  React 18 after a kit upgrade.
