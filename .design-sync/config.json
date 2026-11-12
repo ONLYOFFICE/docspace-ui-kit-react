@@ -1,0 +1,240 @@
+{
+  "projectId": "d44ca729-67df-4f9a-b452-056b215ace9c",
+  "pkg": "@onlyoffice/apps-ui-kit",
+  "globalName": "AppsUiKit",
+  "shape": "storybook",
+  "storybookConfigDir": ".storybook",
+  "storybookStatic": ".design-sync/sb-reference",
+  "buildCmd": "pnpm build",
+  "entry": "./dist/esm/index.js",
+  "cssEntry": "./dist/styles.css",
+  "extraFonts": ["./css/fonts.css"],
+  "extraEntries": ["./.design-sync/preview-context.mjs"],
+  "provider": {
+    "component": "TranslationProvider",
+    "props": {
+      "locale": "en",
+      "translations": {
+        "$ref": "previewTranslations"
+      }
+    },
+    "inner": {
+      "component": "ThemeProviderComponent",
+      "props": {
+        "theme": {
+          "$ref": "previewTheme"
+        },
+        "currentColorScheme": {
+          "$ref": "previewColorScheme"
+        }
+      }
+    }
+  },
+  "titleMap": {
+    "Circle": "CircleSkeleton",
+    "Rectangle": "RectangleSkeleton",
+    "Filter": "FilterInput",
+    "InfiniteLoader": "InfiniteLoaderComponent",
+    "TopLoader": "TopLoaderService",
+    "ErrorOffline": "ErrorOfflineContainer",
+    "ErrorProvider": "ErrorBoundary",
+    "ArticleItem": null,
+    "GroupMenuItem": null,
+    "TableHeaderCell": null,
+    "TableSettings": null,
+    "TilesSkeleton": null,
+    "AIChat": null,
+    "AISettings": null,
+    "Files": null,
+    "Rooms": null,
+    "Forms": null,
+    "DocumentEditor": null,
+    "AIAgentSelector": null,
+    "FilesSelector": null,
+    "GroupsSelector": null,
+    "MCPServersSelector": null,
+    "PeopleSelector": null,
+    "RoomSelector": null,
+    "ApiProvider": null,
+    "Thecabinet": null,
+    "01.Mymatters": null,
+    "02.Insideamatter": null,
+    "03.Sendingadocument": null,
+    "04.Readingthefirm'sdraft": null,
+    "05.Openingamatter": null,
+    "Connecttoaportal": null,
+    "Whoissignedin": null,
+    "Demodataonyourportal": null,
+    "AsmallFilesapp": null,
+    "Uploader": null
+  },
+  "libOverrides": {
+    "story-imports.mjs": "svgr-compile plain .svg story imports (Storybook uses vite-plugin-svgr); repo-root index.ts is the package barrel"
+  },
+  "storyImports": {
+    "bundle": ["components/room-logo/RoomLogo.tsx"],
+    "shim": ["providers/translation/i18n.ts"]
+  },
+  "overrides": {
+    "ModalDialog": {
+      "cardMode": "single",
+      "primaryStory": "Default"
+    },
+    "PortalLogo": {
+      "cardMode": "column"
+    },
+    "OperationsProgressButton": {
+      "cardMode": "single"
+    },
+    "SnackBar": {
+      "cardMode": "column"
+    },
+    "StatusMessage": {
+      "cardMode": "column"
+    },
+    "TopLoaderService": {
+      "cardMode": "single"
+    },
+    "Calendar": {
+      "cardMode": "column"
+    },
+    "ColorInput": {
+      "cardMode": "column"
+    },
+    "ComboBox": {
+      "cardMode": "column"
+    },
+    "EmailInput": {
+      "cardMode": "column"
+    },
+    "FieldContainer": {
+      "cardMode": "column"
+    },
+    "FileInput": {
+      "cardMode": "column"
+    },
+    "FormWrapper": {
+      "cardMode": "column"
+    },
+    "QuantityPicker": {
+      "cardMode": "column"
+    },
+    "SearchInput": {
+      "cardMode": "column"
+    },
+    "Slider": {
+      "cardMode": "column"
+    },
+    "Textarea": {
+      "cardMode": "column"
+    },
+    "TextInput": {
+      "cardMode": "column"
+    },
+    "DragAndDrop": {
+      "cardMode": "column"
+    },
+    "FloatingButton": {
+      "cardMode": "column"
+    },
+    "ImageEditor": {
+      "cardMode": "column"
+    },
+    "MainButtonMobile": {
+      "cardMode": "single",
+      "primaryStory": "Default"
+    },
+    "Article": {
+      "cardMode": "single"
+    },
+    "Portal": {
+      "cardMode": "single"
+    },
+    "Section": {
+      "cardMode": "single"
+    },
+    "FilterInput": {
+      "cardMode": "single"
+    },
+    "Paging": {
+      "cardMode": "column"
+    },
+    "TabItem": {
+      "cardMode": "column"
+    },
+    "Tabs": {
+      "cardMode": "column"
+    },
+    "TwoStateToggle": {
+      "cardMode": "single"
+    },
+    "Aside": {
+      "cardMode": "single"
+    },
+    "AsideHeader": {
+      "cardMode": "column"
+    },
+    "AvatarEditorDialog": {
+      "cardMode": "single"
+    },
+    "Backdrop": {
+      "cardMode": "single"
+    },
+    "DropDown": {
+      "cardMode": "single",
+      "primaryStory": "CustomWidth"
+    },
+    "RoomLogoCoverDialog": {
+      "cardMode": "single"
+    },
+    "Selector": {
+      "cardMode": "single"
+    },
+    "Tooltip": {
+      "cardMode": "column"
+    },
+    "Row": {
+      "cardMode": "column"
+    },
+    "AppLoader": {
+      "cardMode": "single"
+    },
+    "LoaderWrapper": {
+      "cardMode": "column"
+    },
+    "TableContainer": {
+      "cardMode": "single"
+    },
+    "TableHeader": {
+      "cardMode": "single"
+    },
+    "ToggleButton": {
+      "skip": ["ui-form-controls-togglebutton--right-to-left"]
+    },
+    "AccessRightSelect": {
+      "cardMode": "column"
+    },
+    "DatePicker": {
+      "cardMode": "column"
+    },
+    "HelpButton": {
+      "cardMode": "single",
+      "primaryStory": "Default"
+    },
+    "ContextMenu": {
+      "cardMode": "single",
+      "primaryStory": "DynamicModel"
+    },
+    "MainButton": {
+      "cardMode": "single",
+      "primaryStory": "WithItemDescriptions"
+    },
+    "SelectionArea": {
+      "cardMode": "column"
+    },
+    "Toast": {
+      "cardMode": "single"
+    }
+  },
+  "readmeHeader": ".design-sync/conventions.md"
+}

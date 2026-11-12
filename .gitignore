@@ -35,3 +35,15 @@ audits
 # site-screenshots, so a docs run does not wipe them.
 site-docs
 site-screenshots
+
+# Design sync (claude.ai/design): build artifacts, staged scripts and
+# verification working state. config.json, NOTES.md, conventions.md and
+# previews/ under .design-sync/ are committed.
+.design-sync/sb-reference/
+.design-sync/learnings/
+.design-sync/.cache/
+.design-sync/node_modules
+.design-sync/*.log
+.design-sync/resync.out
+.ds-sync/
+ds-bundle/
