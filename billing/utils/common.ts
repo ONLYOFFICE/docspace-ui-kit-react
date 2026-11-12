@@ -22,6 +22,9 @@ export const formatBillingDate = (
 /**
  * Whole days from now until `date` (negative if the date is in the past).
  */
+export const sumAmounts = (amounts: number[]) =>
+  Number(amounts.reduce((sum, amount) => sum + amount, 0).toFixed(10));
+
 export const daysUntil = (date: Date | string | null | undefined) =>
   Math.floor(dateDiff(date, now(), "days"));
 

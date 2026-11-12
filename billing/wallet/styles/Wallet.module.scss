@@ -64,8 +64,26 @@
     margin: 0;
   }
 
+  .spendAmountAligned {
+    margin-block-start: 11px;
+  }
+
   .viewUsageLink {
     color: var(--color-scheme-main-accent);
+  }
+
+  .viewUsageLinkBottom {
+    margin-block-start: auto;
+    padding-block-start: 8px;
+  }
+
+  .spendDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-block-start: 8px;
+    padding-block-start: 12px;
+    border-block-start: 1px solid var(--payment-devider-color);
   }
   .autoPaymentInformation {
     margin-bottom: 24px;
@@ -265,6 +283,13 @@
   path {
     stroke: currentColor;
   }
+}
+
+.spendSplit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-block-start: 4px;
 }
 
 .promoFootnote {

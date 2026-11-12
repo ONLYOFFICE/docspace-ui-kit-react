@@ -922,12 +922,35 @@ export const serviceUsage = (ops: DemoOperation[]) => {
     const totalAmount = Number(
       list.reduce((sum, op) => sum + op.debit, 0).toFixed(2),
     );
+    const paid = { bonus: 0, wallet: 0 };
+    for (const op of list) {
+      if (!op.sources) {
+        paid.wallet += op.debit;
+        continue;
+      }
+      for (const source of op.sources) {
+        paid[source.isBonus ? "bonus" : "wallet"] += source.amount;
+      }
+    }
+    const sources = [
+      { subAccount: 0, isBonus: false, amount: Number(paid.wallet.toFixed(2)) },
+      ...(paid.bonus > 0
+        ? [
+            {
+              subAccount: 53,
+              isBonus: true,
+              amount: Number(paid.bonus.toFixed(2)),
+            },
+          ]
+        : []),
+    ];
     return {
       service,
       serviceUnit: meta.unit,
       currency: CURRENCY,
       totalQuantity: list.reduce((sum, op) => sum + op.quantity, 0),
       totalAmount,
+      sources,
       operationCount: list.length,
       title: meta.title,
       price: meta.price,

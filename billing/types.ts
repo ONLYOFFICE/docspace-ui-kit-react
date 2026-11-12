@@ -11,6 +11,12 @@ export type TNumericPaymentFeature = TenantQuotaFeatureDto & { value: number };
 /** Feature with a boolean value (e.g. SSO enabled). */
 export type TBooleanPaymentFeature = TenantQuotaFeatureDto & { value: boolean };
 
+export type OperationSource = {
+  subAccount: number;
+  isBonus: boolean;
+  amount: number;
+};
+
 /** Balance from the wallet API — can be a Balance object, 0, or null. */
 export type TBalance = Balance | 0 | null;
 
@@ -214,6 +220,7 @@ export type TServiceUsage = {
   currency: string;
   totalQuantity: number;
   totalAmount: number;
+  sources?: OperationSource[] | null;
   operationCount: number;
   title: string;
   /** Per-unit price for the service. */

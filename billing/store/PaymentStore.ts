@@ -26,12 +26,6 @@ export type OperationTokenUsage = {
   imageTokens: number;
 };
 
-export type OperationSource = {
-  subAccount: number;
-  isBonus: boolean;
-  amount: number;
-};
-
 export type WalletOperationDto = Omit<
   OperationDto,
   "date" | "agentId" | "agentTitle"
@@ -47,6 +41,7 @@ export type WalletOperationDto = Omit<
 import { toastr } from "../../components/toast";
 import type { TData } from "../../components/toast";
 import type {
+  OperationSource,
   TAccountingPrice,
   TActiveService,
   TBalance,
@@ -62,6 +57,7 @@ import {
   daysUntil,
   formatCurrencyValue,
   formatPercentValue,
+  sumAmounts,
 } from "../utils/common";
 import {
   getCardLinkedOnFreeTariff,
@@ -132,9 +128,6 @@ export type TTransactionFilterContact = {
   id: string;
   displayName?: string;
 };
-
-const sumAmounts = (amounts: number[]) =>
-  Number(amounts.reduce((sum, amount) => sum + amount, 0).toFixed(8));
 
 const PROMO_EXPIRY_WARNING_DAYS = 7;
 

@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 import { observer } from "mobx-react";
+import classNames from "classnames";
 import { useCommonTranslation } from "../../utils/i18n";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
 
@@ -61,7 +62,10 @@ const Wallet = (props: WalletProps) => {
   const { isMobile, onViewUsage, onAddonsClick } = props;
 
   const store = usePaymentStore();
-  const { walletMonthToDateSpend } = useServicesStore();
+  const { walletMonthToDateSpend, walletMonthToDatePromoSpend } =
+    useServicesStore();
+  const promoSpend = walletMonthToDatePromoSpend ?? 0;
+  const hasPromoSpend = promoSpend > 0;
 
   const {
     availableCredits,
@@ -313,20 +317,53 @@ const Wallet = (props: WalletProps) => {
             amount={walletMonthToDateSpend}
             currency={walletCodeCurrency}
             language={store.language}
-            mainFontSize="18px"
-            fractionFontSize="12px"
+            mainFontSize={hasPromoSpend ? "22px" : "18px"}
+            fractionFontSize={hasPromoSpend ? "14px" : "12px"}
             withoutMargin
-            className={styles.spendAmount}
+            className={classNames(styles.spendAmount, {
+              [styles.spendAmountAligned]: hasPromoSpend,
+            })}
           />
-          <Text fontSize="12px" lineHeight="16px">
-            {t("ForPeriod", { period: monthLabel })}
-          </Text>
+          {hasPromoSpend ? (
+            <div className={styles.spendDetails}>
+              <Text fontSize="13px" lineHeight="20px">
+                {t("ForPeriod", { period: monthLabel })}
+              </Text>
+              <div className={styles.spendSplit}>
+                <div className={styles.creditsRow}>
+                  <Text fontSize="13px" lineHeight="20px">
+                    {t("SpendFromPurchasedCredits")}
+                  </Text>
+                  <Text fontSize="13px" lineHeight="20px" fontWeight={600}>
+                    {store.formatWalletCurrency(
+                      walletMonthToDateSpend - promoSpend,
+                      2,
+                    )}
+                  </Text>
+                </div>
+                <div className={styles.creditsRow}>
+                  <Text fontSize="13px" lineHeight="20px">
+                    {t("SpendFromPromoCredits")}
+                  </Text>
+                  <Text fontSize="13px" lineHeight="20px" fontWeight={600}>
+                    {store.formatWalletCurrency(promoSpend, 2)}
+                  </Text>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <Text fontSize="12px" lineHeight="16px">
+              {t("ForPeriod", { period: monthLabel })}
+            </Text>
+          )}
           {onViewUsage ? (
             <Link
               onClick={onViewUsage}
               textDecoration="underline"
               color="accent"
-              className={styles.viewUsageLink}
+              className={classNames(styles.viewUsageLink, {
+                [styles.viewUsageLinkBottom]: hasPromoSpend,
+              })}
               dataTestId="wallet_view_usage_link"
               fontWeight={600}
             >
