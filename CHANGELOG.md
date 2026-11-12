@@ -247,6 +247,14 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Added
 
+- **`FolderType.PrivateRooms` (42)**: the root of the Private section. It holds no rooms
+  itself; private rooms stay under the Rooms root and are listed through the `PrivateRooms`
+  search area
+- **`FilesSelector` can list the Private section.** `withPrivateTreeFolder` (off by default) adds a
+  Private entry at the root, after Forms and off the Rooms root. It lists private rooms through
+  the `PrivateRooms` search area, which the Rooms listing never returns, and offers no room
+  creation and no Recent / Favorites rows. With it on, the path of a folder inside a private room
+  starts at that entry in place of Rooms. The host's `Common` namespace needs the `Private` key
 - **`hasTabStop(root)`** (`hooks/useFocusTrap`): whether `root` holds a Tab stop, by the rule of
   `getTabStops`, reading the layout no further than the first one
 - **`markAsDropDownItem(component)`** (`utils/drop-down-item-mark`): marks a component that renders
