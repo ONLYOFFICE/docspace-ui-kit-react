@@ -16,7 +16,7 @@ type ConnectedRoom = { cloud: string; room: { id: string; name: string } };
 /**
  * The rows of the chat "+" menu's Skill sets and Knowledge bases submenus,
  * as DocSpace builds them: the Instructions or Knowledge rooms connected to
- * the chat, ticked — a click opens the room in Files — and below them
+ * the chat, with no tick (only connected ones are listed) — a click opens the room in Files — and below them
  * "Manage sources", the room selector that connects and disconnects them.
  *
  * While knowledge search is off on the portal no knowledge base can be
@@ -72,7 +72,6 @@ export const useComposerSourceLists = ({
           id: `${kind}-room:${room.id}`,
           text: room.name,
           icon: "btn-room",
-          checked: true,
           onClick: () => onOpenContextRoom(cloud, room),
         }));
       if (!footer) return rooms;
@@ -157,7 +156,6 @@ export const useComposerSourceLists = ({
         id: `data-source:${room.id}`,
         text: room.name,
         icon: "source-context",
-        checked: true,
         items: [
           {
             id: `data-source-disconnect:${room.id}`,

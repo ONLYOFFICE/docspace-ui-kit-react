@@ -90,10 +90,9 @@ describe("useComposerSourceLists", () => {
     expect(
       composerSkills.map((row) => (row.isSeparator ? "|" : row.text)),
     ).toEqual(["Legal", "|", "Manage sources"]);
-    expect(composerSkills[0]).toMatchObject({
-      checked: true,
-      icon: "btn-room",
-    });
+    // Only connected rooms are listed, so a tick would say nothing.
+    expect(composerSkills[0].icon).toBe("btn-room");
+    expect(composerSkills[0].checked).toBeUndefined();
 
     composerSkills[0].onClick?.();
     expect(onOpenContextRoom).toHaveBeenCalledWith(CONTEXT_ROOM_CLOUD, legal);
@@ -139,7 +138,7 @@ describe("useComposerSourceLists", () => {
       expect(
         composerDataSources.map((row) => (row.isSeparator ? "|" : row.text)),
       ).toEqual(["Folder 1", "Folder 2", "|", "Manage sources"]);
-      expect(composerDataSources[1].checked).toBe(true);
+      expect(composerDataSources[1].checked).toBeUndefined();
       expect(composerDataSources[1].items?.map((row) => row.text)).toEqual([
         "Disconnect",
       ]);
