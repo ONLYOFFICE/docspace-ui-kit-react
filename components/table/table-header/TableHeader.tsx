@@ -630,7 +630,13 @@ export const TableHeader = (props: TableHeaderProps) => {
         }
       });
 
-      if (containerMinWidth < 0) {
+      // Same rule as resetColumns: with no wide column there is nothing to
+      // collapse to. Disagreeing with it here makes the two flip hideColumns
+      // back and forth from the dependency-less effect below, forever.
+      const hasWideColumn =
+        !withoutWideColumn && columns.some((col) => col.default);
+
+      if (containerMinWidth < 0 && hasWideColumn) {
         hideColumnsConst = true;
       }
 

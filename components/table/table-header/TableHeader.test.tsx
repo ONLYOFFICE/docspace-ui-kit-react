@@ -326,7 +326,11 @@ describe("<TableHeader />", () => {
       const sizes = resetWith(plain, [...plain, { ...extra, default: false }]);
 
       expect(sizes?.slice(0, -1)).not.toContain("0px");
-      expect(screen.getByText(plain[0].title)).toBeInTheDocument();
+      // The settings menu lists every title too, so look for the header's own.
+      const headerTitles = screen
+        .getAllByText(plain[0].title)
+        .filter((el) => el.classList.contains("header-container-text"));
+      expect(headerTitles).toHaveLength(1);
     });
   });
 });
