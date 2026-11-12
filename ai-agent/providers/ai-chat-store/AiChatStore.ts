@@ -193,18 +193,19 @@ class AiChatStore {
   projectTitle: string | null = null;
 
   /**
-   * Whether the composer leaves the connected sources out (no room chips,
-   * no room pickers): set by a host that shows and manages them beside the
-   * chat, as the AI project view does. Mirrored into the widget's
-   * `hideComposerContext`.
+   * Whether the composer's "+" menu leaves the sources out (no Skill sets,
+   * Knowledge bases or Data sources rows): set by a host that shows and
+   * manages them beside the chat, as the AI project view does. Mirrored into
+   * the widget's `hideComposerContext`.
    */
   composerContextHidden = false;
 
   /**
    * Whether the composer leaves the knowledge base picker out: set by the
    * host while knowledge search is off (DocSpace with vectorization
-   * disabled), so no Knowledge room can be picked for a chat. Mirrored into
-   * the widget's `hideKnowledgePicker`.
+   * disabled), so no Knowledge room can be picked for a chat. The "+" menu's
+   * Knowledge bases then lists only the bases connected earlier, with
+   * Disconnect in place of Manage (see `useComposerSourceLists`).
    */
   knowledgePickerHidden = false;
 
