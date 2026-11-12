@@ -65,7 +65,9 @@ const GridComponent = ({
     const itemClassNames = (elem.props as { className?: string })?.className;
 
     const isFolder = itemClassNames?.includes("isFolder");
-    const isRoom = itemClassNames?.includes("isRoom");
+    // A row of agents (AI projects) is a row of rooms with taller tiles.
+    const isRoom =
+      itemClassNames?.includes("isRoom") || itemClassNames?.includes("isAgent");
     const isHeader =
       itemClassNames?.includes("folder_header") ||
       itemClassNames?.includes("files_header");
@@ -124,6 +126,7 @@ const GridComponent = ({
       const isFolder = itemClassNames?.includes("isFolder");
       const isRoom = itemClassNames?.includes("isRoom");
       const isTemplate = itemClassNames?.includes("isTemplate");
+      const isAgent = itemClassNames?.includes("isAgent");
       const isFolderHeader = itemClassNames?.includes("folder_header");
 
       const horizontalGap = 16;
@@ -135,8 +138,11 @@ const GridComponent = ({
       const roomHeight = 104 + verticalRoomGap;
       const fileHeight = 220 + horizontalGap;
       const templateHeight = 126 + verticalRoomGap;
+      // An agent's tile is a template's with a third line below the name.
+      const agentHeight = 154 + verticalRoomGap;
       const titleHeight = 20 + headerMargin + (isFolderHeader ? 0 : 11);
 
+      if (isAgent) return agentHeight;
       if (isRoom) return roomHeight;
       if (isFolder) return folderHeight;
       if (isFile) return fileHeight;
