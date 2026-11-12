@@ -280,8 +280,8 @@ describe("<TableHeader />", () => {
     });
 
     const resetWith = (
-      before: typeof mockColumns,
-      after: typeof mockColumns,
+      before: TableHeaderProps["columns"],
+      after: TableHeaderProps["columns"],
     ) => {
       const { rerender } = render(
         <TableHeaderWithContainerRef {...defaultProps} columns={before} />,
@@ -317,6 +317,16 @@ describe("<TableHeader />", () => {
       const sizes = resetWith(mockColumns, [...mockColumns, extra]);
 
       expect(sizes).toEqual(["376px", "0px", "0px", "0px", "0px", "24px"]);
+    });
+
+    it("keeps every column of a table without a wide column", () => {
+      narrow(400);
+
+      const plain = mockColumns.map(({ default: _, ...col }) => col);
+      const sizes = resetWith(plain, [...plain, { ...extra, default: false }]);
+
+      expect(sizes?.slice(0, -1)).not.toContain("0px");
+      expect(screen.getByText(plain[0].title)).toBeInTheDocument();
     });
   });
 });

@@ -322,16 +322,21 @@ export const TableHeader = (props: TableHeaderProps) => {
       otherColumns = DEFAULT_MIN_COLUMN_SIZE;
     }
 
-    const wideColumnMinWidth =
-      columns.find((col) => col.default)?.minWidth ?? MIN_SIZE_NAME_COLUMN;
+    // A table may have no wide column at all (e.g. billing transaction
+    // history): collapsing to "the wide column alone" would then zero every
+    // column and hide the header titles.
+    const wideColumn = withoutWideColumn
+      ? undefined
+      : columns.find((col) => col.default);
+    const wideColumnMinWidth = wideColumn?.minWidth ?? MIN_SIZE_NAME_COLUMN;
     const onlyWideColumn =
-      !withoutWideColumn &&
+      !!wideColumn &&
       containerWidth - wideColumnMinWidth <
         DEFAULT_MIN_COLUMN_SIZE * enableColumns.length;
 
     if (onlyWideColumn) {
       wideColumnSize = containerWidth;
-    } else if (!withoutWideColumn && wideColumnSize < wideColumnMinWidth) {
+    } else if (wideColumn && wideColumnSize < wideColumnMinWidth) {
       wideColumnSize = wideColumnMinWidth;
       otherColumns =
         (containerWidth - wideColumnMinWidth) / enableColumns.length;
