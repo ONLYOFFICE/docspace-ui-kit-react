@@ -1,0 +1,431 @@
+{
+  "Logos": {
+    "lightsmall.svg": {
+      "blob": "3a0c0aaabdf00515e0713d3b10c203e9",
+      "size": 3275,
+      "type": "image/svg+xml"
+    },
+    "dark_lightsmall.svg": {
+      "blob": "12449cca73efe7a87d05b488da476555",
+      "size": 3273,
+      "type": "image/svg+xml"
+    },
+    "dark_leftmenu.svg": {
+      "blob": "b2236760162f1c669b6806dd5dd81d2c",
+      "size": 1209,
+      "type": "image/svg+xml"
+    }
+  },
+  "Screenshots": {
+    "01-wizard-empty.png": {
+      "blob": "af656e7854bde21fe9bc424fe656a606",
+      "size": 49331,
+      "type": "image/png"
+    },
+    "02-wizard-filled.png": {
+      "blob": "fb21a2b1a9b8638a03e3faa516d19476",
+      "size": 50514,
+      "type": "image/png"
+    },
+    "03-after-wizard.png": {
+      "blob": "104aff0d87b7f23a35725484a705275d",
+      "size": 95447,
+      "type": "image/png"
+    },
+    "05-email-activated.png": {
+      "blob": "a27e4563ef7d781b176ef31f3301a435",
+      "size": 97255,
+      "type": "image/png"
+    },
+    "06-login-page.png": {
+      "blob": "26c1cf3dca09a161fcd4613b3f92207b",
+      "size": 34577,
+      "type": "image/png"
+    },
+    "10-home-dashboard.png": {
+      "blob": "2de6465c49678e0841a67ec86b6b5dd5",
+      "size": 96937,
+      "type": "image/png"
+    },
+    "100-file-context-menu-share.png": {
+      "blob": "f57dd851df29f643ed528431d2d5b376",
+      "size": 90431,
+      "type": "image/png"
+    },
+    "101-file-share-panel.png": {
+      "blob": "3d5c34df7e173310f854dddddc317a23",
+      "size": 113822,
+      "type": "image/png"
+    },
+    "102-file-info-panel.png": {
+      "blob": "4efca3d955b81790be7042967fe699d5",
+      "size": 100933,
+      "type": "image/png"
+    },
+    "103-people-invite-menu.png": {
+      "blob": "bba9a1651295114eb13bd11cd0015ef1",
+      "size": 81371,
+      "type": "image/png"
+    },
+    "104-people-invite-dialog.png": {
+      "blob": "197778456bcb371b1aa551afce59b390",
+      "size": 76641,
+      "type": "image/png"
+    },
+    "105-people-change-type.png": {
+      "blob": "0e55d78e9dcade10b03410e1e52ce949",
+      "size": 88280,
+      "type": "image/png"
+    },
+    "106-people-profile-info.png": {
+      "blob": "1786960a70fc0af7fe763ac67f8302c3",
+      "size": 84897,
+      "type": "image/png"
+    },
+    "107-group-members.png": {
+      "blob": "9bc4525f548932a6fa8365b6dc8db314",
+      "size": 42844,
+      "type": "image/png"
+    },
+    "108-create-group-dialog.png": {
+      "blob": "fd44083e4a900bb6b1d97188f604fd88",
+      "size": 35959,
+      "type": "image/png"
+    },
+    "109-form-context-menu.png": {
+      "blob": "943bb7282920162d25cddb16c7c6ab5a",
+      "size": 64938,
+      "type": "image/png"
+    },
+    "11-files-my-documents.png": {
+      "blob": "96c92b20c79d067679578fe5403a0af1",
+      "size": 77426,
+      "type": "image/png"
+    },
+    "110-document-editor.png": {
+      "blob": "7318d9561dce55600b040d319c142570",
+      "size": 39333,
+      "type": "image/png"
+    },
+    "12-rooms-list.png": {
+      "blob": "cb72584baf6b6528e0630003a0f4c22c",
+      "size": 67293,
+      "type": "image/png"
+    },
+    "120-viewer-home.png": {
+      "blob": "2b946a58541e25257ce9929a9dc57b5f",
+      "size": 89976,
+      "type": "image/png"
+    },
+    "121-viewer-rooms-list.png": {
+      "blob": "9f17d6bbfe4116dd319655bfc97a6c56",
+      "size": 45033,
+      "type": "image/png"
+    },
+    "122-viewer-room-q4-read-only.png": {
+      "blob": "39c733a5c934c0b2a9bb164c4b806085",
+      "size": 56848,
+      "type": "image/png"
+    },
+    "123-viewer-forms-room-filler.png": {
+      "blob": "ea980f7a44ed34c37f44cabb7054d959",
+      "size": 43277,
+      "type": "image/png"
+    },
+    "124-viewer-files-before-email-activation.png": {
+      "blob": "34681470afee5f3a45e77658bf7e9719",
+      "size": 42272,
+      "type": "image/png"
+    },
+    "125-viewer-file-context-menu.png": {
+      "blob": "1dcd1dcd44ddd622699f46e02301fdef",
+      "size": 64871,
+      "type": "image/png"
+    },
+    "13-room-collaboration-contents.png": {
+      "blob": "fd7302c4447277bb384a26853f13100c",
+      "size": 63679,
+      "type": "image/png"
+    },
+    "14-room-custom-vendor-contracts.png": {
+      "blob": "4f9de0360b4d7983a3ebb03a1bb4ee65",
+      "size": 58318,
+      "type": "image/png"
+    },
+    "15-room-vdr-investor.png": {
+      "blob": "ea5ce536d1311a2419826ca8378894d7",
+      "size": 50936,
+      "type": "image/png"
+    },
+    "16-room-public-press-kit.png": {
+      "blob": "3fcfbf882488e74e705c08f8b236fa29",
+      "size": 54641,
+      "type": "image/png"
+    },
+    "17-forms-section.png": {
+      "blob": "72ee769edc486ed0ba7d49d0ca97c98e",
+      "size": 48035,
+      "type": "image/png"
+    },
+    "18-form-filling-room.png": {
+      "blob": "b3d344a5d8faf0b375ad3dd846705156",
+      "size": 54107,
+      "type": "image/png"
+    },
+    "19-rooms-archive.png": {
+      "blob": "8745a0f641b1492245a1e083a08a0a2c",
+      "size": 37972,
+      "type": "image/png"
+    },
+    "20-files-trash.png": {
+      "blob": "6d233813bed93288a18b8198ab4bfa40",
+      "size": 40112,
+      "type": "image/png"
+    },
+    "21-files-favorites.png": {
+      "blob": "4211fffc27e5ef25160c8994553d2f66",
+      "size": 39393,
+      "type": "image/png"
+    },
+    "22-files-recent.png": {
+      "blob": "8937dad86c25d14ea1cf79414ef8504d",
+      "size": 37858,
+      "type": "image/png"
+    },
+    "23-shared-with-me.png": {
+      "blob": "0a10580d85d37f5286557dae651a6834",
+      "size": 41440,
+      "type": "image/png"
+    },
+    "24-rooms-templates.png": {
+      "blob": "f0d9d5e7d5dbf72f36c31aa7e08e8de7",
+      "size": 35512,
+      "type": "image/png"
+    },
+    "25-private-rooms.png": {
+      "blob": "250333c2c54c5382949cb31819400942",
+      "size": 36166,
+      "type": "image/png"
+    },
+    "26-ai-rooms.png": {
+      "blob": "6129f229347442ed420a376f83338507",
+      "size": 48514,
+      "type": "image/png"
+    },
+    "27-rooms-trash.png": {
+      "blob": "ae5c6f71e9fb1afcde869154b14bdd74",
+      "size": 45172,
+      "type": "image/png"
+    },
+    "30-people-members.png": {
+      "blob": "a66913007fba16c010aaa08fbbf23be8",
+      "size": 74949,
+      "type": "image/png"
+    },
+    "31-people-groups.png": {
+      "blob": "80df98c827c5ff97c0320aa3ffe4be5f",
+      "size": 31841,
+      "type": "image/png"
+    },
+    "32-people-guests.png": {
+      "blob": "6c5d61f5969ddea0699b6bd71f03febe",
+      "size": 33035,
+      "type": "image/png"
+    },
+    "33-profile.png": {
+      "blob": "98d03b13f9bdef873767cd9c6b82c585",
+      "size": 76823,
+      "type": "image/png"
+    },
+    "34-profile-notifications.png": {
+      "blob": "7c0160b32ef249adc068067e014fc13f",
+      "size": 98191,
+      "type": "image/png"
+    },
+    "35-profile-menu.png": {
+      "blob": "4226c11b9673636e86f764f632d35c17",
+      "size": 83743,
+      "type": "image/png"
+    },
+    "40-settings-customization-general.png": {
+      "blob": "0fc52fa73622e36d63f8ca9d0f2bdd70",
+      "size": 67747,
+      "type": "image/png"
+    },
+    "41-settings-customization-document-templates.png": {
+      "blob": "1c7fa4c3910cdf90585293b6fbebfd7f",
+      "size": 53436,
+      "type": "image/png"
+    },
+    "42-settings-customization-appearance.png": {
+      "blob": "b5d0ea572cbedf5395f8deabad1fe11a",
+      "size": 53779,
+      "type": "image/png"
+    },
+    "43-settings-security-access.png": {
+      "blob": "5c09950abf436339bd240e778bf7979a",
+      "size": 73050,
+      "type": "image/png"
+    },
+    "44-settings-customization-metadata-templates.png": {
+      "blob": "ce813c1978e2ad9efa554f31d65bb0dc",
+      "size": 42479,
+      "type": "image/png"
+    },
+    "48-settings-security-login-history.png": {
+      "blob": "fddcbf8235f51eeb5a78f700015225c6",
+      "size": 51130,
+      "type": "image/png"
+    },
+    "49-settings-security-audit-trail.png": {
+      "blob": "99de29ece6f3db6b05ff434ea78f16b2",
+      "size": 81172,
+      "type": "image/png"
+    },
+    "50-settings-backup.png": {
+      "blob": "fb6b81af19e1f09ebaa68071e3d1c8f6",
+      "size": 54249,
+      "type": "image/png"
+    },
+    "51-settings-auto-backup.png": {
+      "blob": "74ac7ebb0911e8f1682befceef6a6535",
+      "size": 39905,
+      "type": "image/png"
+    },
+    "52-settings-restore.png": {
+      "blob": "cc7ccfbcede23bbdb641b8be9fd7840d",
+      "size": 47674,
+      "type": "image/png"
+    },
+    "53-settings-integration-ldap.png": {
+      "blob": "fe2caf8800741a7d5f3f5a881d5ede96",
+      "size": 66401,
+      "type": "image/png"
+    },
+    "54-settings-integration-sso.png": {
+      "blob": "a6c9b9c059de5a0e0a2802c1beaf2b10",
+      "size": 51513,
+      "type": "image/png"
+    },
+    "55-settings-integration-third-party.png": {
+      "blob": "82c5dc7e9720a25cda801693f217fc18",
+      "size": 83596,
+      "type": "image/png"
+    },
+    "56-settings-integration-smtp.png": {
+      "blob": "84dcac883688824cec53f6e854ceed48",
+      "size": 59316,
+      "type": "image/png"
+    },
+    "57-settings-integration-plugins.png": {
+      "blob": "e9504bb48639a271a22f4cab873f4545",
+      "size": 53109,
+      "type": "image/png"
+    },
+    "58-settings-integration-document-service.png": {
+      "blob": "54a8d8e8bdaff99657c84a215cfda2f0",
+      "size": 53836,
+      "type": "image/png"
+    },
+    "59-settings-data-import.png": {
+      "blob": "3d5fa0b194b1ca9bebdefe7401a1ed11",
+      "size": 48918,
+      "type": "image/png"
+    },
+    "60-settings-storage-management.png": {
+      "blob": "336c361907d1c223c8c69327d6c8672e",
+      "size": 79449,
+      "type": "image/png"
+    },
+    "61-settings-ai-models.png": {
+      "blob": "9b6d8ccec6f8dd599f1cc1e7e421c792",
+      "size": 38565,
+      "type": "image/png"
+    },
+    "62-settings-apps.png": {
+      "blob": "86256164a2581fa58bd504978c44e148",
+      "size": 54693,
+      "type": "image/png"
+    },
+    "63-settings-upgrade-bonus.png": {
+      "blob": "08d211eedd023899a39ffd595102576d",
+      "size": 87770,
+      "type": "image/png"
+    },
+    "65-about-this-program.png": {
+      "blob": "7bc77030327eaea85380fac64e967e95",
+      "size": 88274,
+      "type": "image/png"
+    },
+    "70-devtools-js-sdk.png": {
+      "blob": "a03ac087c82bed09974d9699c1c68118",
+      "size": 96979,
+      "type": "image/png"
+    },
+    "71-devtools-plugin-sdk.png": {
+      "blob": "7cdd74e3b83d3522f39ce927c5cedc4c",
+      "size": 38810,
+      "type": "image/png"
+    },
+    "72-devtools-webhooks.png": {
+      "blob": "861acb655307e8c8213d6bfa0c076ebc",
+      "size": 36032,
+      "type": "image/png"
+    },
+    "73-devtools-oauth.png": {
+      "blob": "eb7da13ac5e3961323e2f1a9e3799cd0",
+      "size": 33481,
+      "type": "image/png"
+    },
+    "74-devtools-api-keys.png": {
+      "blob": "9136ff6180f4305b067a1a500b736f1e",
+      "size": 41484,
+      "type": "image/png"
+    },
+    "91-create-room-choose-type.png": {
+      "blob": "86a415d6474205f4fcf589778b391c96",
+      "size": 88792,
+      "type": "image/png"
+    },
+    "92-create-room-collaboration-form.png": {
+      "blob": "011758710c40bdb6c5e104804687521f",
+      "size": 68083,
+      "type": "image/png"
+    },
+    "93-room-info-members.png": {
+      "blob": "e1504c940d28dff20b1e2d958c91a5db",
+      "size": 100425,
+      "type": "image/png"
+    },
+    "94-room-info-history.png": {
+      "blob": "c9819091c524d51b785e043eda34918c",
+      "size": 113797,
+      "type": "image/png"
+    },
+    "95-room-info-details.png": {
+      "blob": "0bf85659e1824d85fa97e52018857923",
+      "size": 86476,
+      "type": "image/png"
+    },
+    "96-room-context-menu.png": {
+      "blob": "a14b78fdd87823407eff24003dc5f64e",
+      "size": 72102,
+      "type": "image/png"
+    },
+    "97-room-invite-dialog.png": {
+      "blob": "5e8d25ba985475d8d6e53371bdd2e87f",
+      "size": 79096,
+      "type": "image/png"
+    },
+    "98-public-room-links.png": {
+      "blob": "5c7676494d7a82dee7ba4754fecc9095",
+      "size": 91278,
+      "type": "image/png"
+    },
+    "99-vdr-room-info-members.png": {
+      "blob": "362cb1712b9d14161d704b251279d2a8",
+      "size": 90321,
+      "type": "image/png"
+    }
+  }
+}

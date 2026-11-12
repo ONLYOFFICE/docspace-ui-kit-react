@@ -1,0 +1,114 @@
+<!-- @dsCard height=300 -->
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+      }
+      body {
+        background: var(--background-color, #ffffff);
+        color: var(--text-color, #333333);
+        font-family: "Open Sans", sans-serif, Arial;
+      }
+      .cover {
+        position: relative;
+        width: 960px;
+        height: 300px;
+        overflow: hidden;
+      }
+      .band {
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+      .accent {
+        fill: var(--light-blue-main);
+      }
+      .orange {
+        fill: var(--main-orange);
+      }
+      .green {
+        fill: var(--main-green);
+      }
+      .sky {
+        fill: var(--main-blue-light);
+      }
+      .ink {
+        fill: var(--gray-strong);
+      }
+      .layer {
+        rx: var(--radius-layer);
+      }
+      .tile {
+        rx: var(--radius-control);
+      }
+      .text {
+        position: absolute;
+        left: 40px;
+        right: 40px;
+        bottom: 36px;
+      }
+      .name {
+        margin: 0;
+        font-size: 64px;
+        line-height: 1;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+      }
+      .tag {
+        margin: 12px 0 0;
+        max-width: 440px;
+        font-size: 14px;
+        line-height: 20px;
+        color: var(--light-gray-dark);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="cover">
+      <svg
+        class="band"
+        width="960"
+        height="120"
+        viewBox="0 0 960 120"
+        aria-hidden="true"
+      >
+        <!--
+      blocks: light-blue-main 264x136 slab (the accent the product is known by, bleeding off the top),
+              main-orange 200x32, main-green 184x32, main-blue-light 200x32 - the logo's three layers
+      arrangement: top band (the name is too wide for a 440px zone); the three layers stacked and
+              staggered across the slab, like the ONLYOFFICE mark's offset sheets
+      pattern: modular tiles (dense UI: 32px controls, 48px rows) - 24px tiles, some merged two-wide, at an 8px gap
+      scales: radius-layer 6px on slab and layers (menus, dialogs), radius-control 3px on tiles (buttons, inputs)
+    -->
+        <rect class="accent layer" x="616" y="-24" width="264" height="136" />
+        <rect class="orange layer" x="560" y="8" width="200" height="32" />
+        <rect class="green layer" x="584" y="48" width="184" height="32" />
+        <rect class="sky layer" x="576" y="88" width="200" height="32" />
+        <g class="ink">
+          <rect class="tile" x="40" y="24" width="24" height="24" />
+          <rect class="tile" x="72" y="24" width="24" height="24" />
+          <rect class="tile" x="104" y="24" width="56" height="24" />
+          <rect class="tile" x="40" y="56" width="56" height="24" />
+          <rect class="tile" x="104" y="56" width="24" height="24" />
+          <rect class="tile" x="136" y="56" width="24" height="24" />
+          <rect class="tile" x="896" y="24" width="24" height="24" />
+          <rect class="tile" x="896" y="56" width="24" height="24" />
+          <rect class="tile" x="896" y="88" width="24" height="24" />
+        </g>
+      </svg>
+      <div class="text">
+        <p class="name">ONLYOFFICE Apps UI Kit</p>
+        <p class="tag">
+          A quiet, dense work UI: neutral surfaces, one accent, Open Sans at
+          13px.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
