@@ -725,6 +725,7 @@ const AiAgentProviders = ({
     composerActions: attachActions,
     onPickContextRooms,
     onPickKnowledgeRooms,
+    onAddContextFolder,
     onOpenContextRoom,
     onSaveAsFile,
     exportFormats,
@@ -924,13 +925,15 @@ const AiAgentProviders = ({
 
   // The "+" menu's Skill sets and Knowledge bases: the connected rooms and
   // the room selector that manages them.
-  const { composerSkills, composerKnowledge } = useComposerSourceLists({
-    useCloudsStore: stores.useCloudsStore,
-    onPickContextRooms,
-    onPickKnowledgeRooms,
-    onOpenContextRoom,
-    knowledgePickerHidden,
-  });
+  const { composerSkills, composerKnowledge, composerDataSources } =
+    useComposerSourceLists({
+      useCloudsStore: stores.useCloudsStore,
+      onPickContextRooms,
+      onPickKnowledgeRooms,
+      onOpenContextRoom,
+      onAddContextFolder,
+      knowledgePickerHidden,
+    });
 
   // While "Analyze responses" is on, the chat is about that one form: the cap
   // drops to one and the composer's attach actions go away, so the "+" menu
@@ -1190,6 +1193,10 @@ const AiAgentProviders = ({
       // connected earlier and "Disconnect" instead of "Manage sources".
       composerSkills,
       composerKnowledge,
+      // Data sources: any folders and rooms of the portal as the chat's
+      // context, up to the library's limit; the AI service tells the model
+      // which they are.
+      composerDataSources,
       onPickContextRooms,
       onOpenContextRoom,
       onPickKnowledgeRooms,
@@ -1223,6 +1230,7 @@ const AiAgentProviders = ({
       onOpenContextRoom,
       composerSkills,
       composerKnowledge,
+      composerDataSources,
       t,
     ],
   );

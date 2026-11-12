@@ -2,7 +2,11 @@
 
 import React from "react";
 import { useTranslation } from "react-i18next";
-import type { ComposerMenuItem, useStores } from "@onlyoffice/ai-chat";
+import {
+  FOLDER_CONTEXTS_LIMIT,
+  type ComposerMenuItem,
+  type useStores,
+} from "@onlyoffice/ai-chat";
 
 import { CONTEXT_ROOM_CLOUD } from "../context-room/ContextRoomSync";
 
@@ -25,6 +29,7 @@ export const useComposerSourceLists = ({
   onPickContextRooms,
   onPickKnowledgeRooms,
   onOpenContextRoom,
+  onAddContextFolder,
   knowledgePickerHidden,
 }: {
   useCloudsStore: CloudsStore;
@@ -34,15 +39,19 @@ export const useComposerSourceLists = ({
     cloud: string,
     room: { id: string; name: string },
   ) => void;
+  onAddContextFolder: () => void;
   knowledgePickerHidden: boolean;
 }): {
   composerSkills: ComposerMenuItem[];
   composerKnowledge: ComposerMenuItem[];
+  composerDataSources: ComposerMenuItem[];
 } => {
   const { t, i18n } = useTranslation(["Common"]);
   const skillsRooms = useCloudsStore((s) => s.selectedContextFolders);
   const knowledgeRooms = useCloudsStore((s) => s.selectedKnowledgeFolders);
   const clearKnowledgeFolder = useCloudsStore((s) => s.clearKnowledgeFolder);
+  const contextFolders = useCloudsStore((s) => s.selectedFolderContexts);
+  const deselectFolderContext = useCloudsStore((s) => s.deselectFolderContext);
 
   const build = React.useCallback(
     (
@@ -114,5 +123,45 @@ export const useComposerSourceLists = ({
     clearKnowledgeFolder,
   ]);
 
-  return { composerSkills, composerKnowledge };
+  // Data sources: the folders and rooms the user connected as the chat's
+  // context - any of the portal, several at once. Each opens a second level
+  // with its way out; "Add folder" connects one more until the limit.
+  const composerDataSources = React.useMemo(() => {
+    const folders = contextFolders
+      .filter((item) => item.cloud === CONTEXT_ROOM_CLOUD)
+      .map(({ cloud, room }): ComposerMenuItem => ({
+        id: `data-source:${room.id}`,
+        text: room.name,
+        icon: "source-context",
+        checked: true,
+        items: [
+          {
+            id: `data-source-disconnect:${room.id}`,
+            text: t("Common:Disconnect", { defaultValue: "Disconnect" }),
+            icon: "btn-close",
+            onClick: () => deselectFolderContext(cloud, room.id),
+          },
+        ],
+      }));
+    const rows: ComposerMenuItem[] = [...folders];
+    if (folders.length < FOLDER_CONTEXTS_LIMIT) {
+      if (folders.length > 0)
+        rows.push({ id: "data-source-separator", text: "", isSeparator: true });
+      rows.push({
+        id: "data-source-add",
+        text: t("Common:AIProjectAddFolder", { defaultValue: "Add folder" }),
+        icon: "btn-settings",
+        onClick: onAddContextFolder,
+      });
+    }
+    return rows;
+  }, [
+    contextFolders,
+    deselectFolderContext,
+    onAddContextFolder,
+    t,
+    i18n.language,
+  ]);
+
+  return { composerSkills, composerKnowledge, composerDataSources };
 };

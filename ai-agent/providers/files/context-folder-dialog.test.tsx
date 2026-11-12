@@ -2,7 +2,7 @@ import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, render } from "@testing-library/react";
 
-const clouds = { selectFolderContext: vi.fn() };
+const clouds = { selectFolderContext: vi.fn(), addFolderContext: vi.fn() };
 const useCloudsStore = { getState: () => clouds };
 
 vi.mock("@onlyoffice/ai-chat", () => ({
@@ -89,6 +89,22 @@ describe("ContextFolderDialog", () => {
       { id: "5", name: "Q3 reports", path: "My documents / Q3 reports" },
     );
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("adds the folder to the others in add mode", () => {
+    render(<ContextFolderDialog mode="add" onClose={vi.fn()} />);
+    act(() =>
+      selector().onSubmit(5, "Q3 reports", false, [
+        { id: 1, label: "My documents" },
+        { id: 5, label: "Q3 reports" },
+      ]),
+    );
+    expect(clouds.addFolderContext).toHaveBeenCalledWith(CONTEXT_ROOM_CLOUD, {
+      id: "5",
+      name: "Q3 reports",
+      path: "My documents / Q3 reports",
+    });
+    expect(clouds.selectFolderContext).not.toHaveBeenCalled();
   });
 
   it("names the folder after the last breadcrumb when the selector has no title", () => {

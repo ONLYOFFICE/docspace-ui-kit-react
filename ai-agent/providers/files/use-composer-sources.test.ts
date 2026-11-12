@@ -5,6 +5,7 @@ import { renderHook } from "@testing-library/react";
 // jsdom cannot load; the hook under test needs nothing from it.
 vi.mock("@onlyoffice/ai-chat", () => ({
   useStores: () => ({}),
+  FOLDER_CONTEXTS_LIMIT: 20,
 }));
 
 vi.mock("react-i18next", () => ({
@@ -25,7 +26,11 @@ let state: {
   selectedContextFolders: Connected;
   selectedKnowledgeFolders: Connected;
   clearKnowledgeFolder: () => void;
+  selectedFolderContexts: Connected;
+  deselectFolderContext: (cloud: string, id: string) => void;
 };
+const deselectFolderContext = vi.fn();
+const onAddContextFolder = vi.fn();
 const useCloudsStore = ((selector: (s: typeof state) => unknown) =>
   selector(state)) as unknown as Parameters<
   typeof useComposerSourceLists
@@ -42,6 +47,7 @@ const lists = (knowledgePickerHidden = false) =>
       onPickContextRooms,
       onPickKnowledgeRooms,
       onOpenContextRoom,
+      onAddContextFolder,
       knowledgePickerHidden,
     }),
   ).result.current;
@@ -53,6 +59,8 @@ describe("useComposerSourceLists", () => {
       selectedContextFolders: [],
       selectedKnowledgeFolders: [],
       clearKnowledgeFolder,
+      selectedFolderContexts: [],
+      deselectFolderContext,
     };
   });
 
@@ -105,5 +113,49 @@ describe("useComposerSourceLists", () => {
     expect(onPickKnowledgeRooms).not.toHaveBeenCalled();
     // Skill sets keep their Manage sources.
     expect(composerSkills.at(-1)?.text).toBe("Manage sources");
+  });
+
+  describe("Data sources", () => {
+    const folder = (id: number) => ({
+      cloud: CONTEXT_ROOM_CLOUD,
+      room: { id: String(id), name: `Folder ${id}` },
+    });
+
+    it("offers only Add folder while no folder is connected", () => {
+      const { composerDataSources } = lists();
+      expect(composerDataSources.map((row) => row.text)).toEqual([
+        "Add folder",
+      ]);
+      composerDataSources[0].onClick?.();
+      expect(onAddContextFolder).toHaveBeenCalledTimes(1);
+    });
+
+    it("lists every connected folder, each with its way out one level down", () => {
+      state.selectedFolderContexts = [folder(1), folder(2)];
+      const { composerDataSources } = lists();
+      expect(
+        composerDataSources.map((row) => (row.isSeparator ? "|" : row.text)),
+      ).toEqual(["Folder 1", "Folder 2", "|", "Add folder"]);
+      expect(composerDataSources[1].checked).toBe(true);
+      expect(composerDataSources[1].items?.map((row) => row.text)).toEqual([
+        "Disconnect",
+      ]);
+      composerDataSources[1].items?.[0].onClick?.();
+      expect(deselectFolderContext).toHaveBeenCalledWith(
+        CONTEXT_ROOM_CLOUD,
+        "2",
+      );
+    });
+
+    it("stops offering Add folder at the limit", () => {
+      state.selectedFolderContexts = Array.from({ length: 20 }, (_, i) =>
+        folder(i + 1),
+      );
+      const { composerDataSources } = lists();
+      expect(composerDataSources).toHaveLength(20);
+      expect(composerDataSources.some((row) => row.text === "Add folder")).toBe(
+        false,
+      );
+    });
   });
 });

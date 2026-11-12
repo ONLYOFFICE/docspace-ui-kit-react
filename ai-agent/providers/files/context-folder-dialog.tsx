@@ -13,17 +13,25 @@ import useDeviceType from "./use-device-type";
 
 type ContextFolderDialogProps = {
   onClose: () => void;
+  /**
+   * What the pick does to the chat's context folders: `"replace"` (default)
+   * makes the folder the only one, as an AI project's Folder card does;
+   * `"add"` connects it next to the others, as the chat's Data sources do
+   * (the chat library holds the limit).
+   */
+  mode?: "replace" | "add";
 };
 
-// The folder picker of an AI project's Folder card (the chat's own composer
-// has no Folder slot): any folder of the portal, rooms and their subfolders
-// included, handed to the chat library's clouds store as the round's
-// context folder. Rendered inside <AiAgentProviders> so
+// The folder picker of an AI project's Folder card and of the chat's Data
+// sources: any folder of the portal, rooms and their subfolders included,
+// handed to the chat library's clouds store as a context folder of the
+// rounds. Rendered inside <AiAgentProviders> so
 // `useStores()` resolves the store from the widget's context. The selector
 // submits the folder the user is standing in, so the list shows folders
 // only and the button is live as soon as the first level has loaded.
 const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
   onClose,
+  mode = "replace",
 }) => {
   const { t } = useTranslation(["Common"]);
   const { currentDeviceType } = useDeviceType();
@@ -50,14 +58,17 @@ const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
         .filter((crumb) => crumb.id !== "" && crumb.label)
         .map((crumb) => crumb.label);
       if (crumbs[crumbs.length - 1] !== name) crumbs.push(String(name));
-      useCloudsStore.getState().selectFolderContext(CONTEXT_ROOM_CLOUD, {
+      const folder = {
         id: String(selectedItemId),
         name: String(name),
         path: crumbs.join(" / "),
-      });
+      };
+      const clouds = useCloudsStore.getState();
+      if (mode === "add") clouds.addFolderContext(CONTEXT_ROOM_CLOUD, folder);
+      else clouds.selectFolderContext(CONTEXT_ROOM_CLOUD, folder);
       onClose();
     },
-    [onClose, useCloudsStore],
+    [onClose, useCloudsStore, mode],
   );
 
   const getIsDisabled = React.useCallback<

@@ -14,6 +14,7 @@ import type { SaveAsFileHandler } from "../platform";
 import DeviceUploader, { type DeviceUploaderHandle } from "./device-uploader";
 import type { OnFilesAttached } from "./attach-files";
 import AttachDialog from "./attach-dialog";
+import ContextFolderDialog from "./context-folder-dialog";
 import ContextRoomsDialog, {
   type ContextRoomsKind,
 } from "./context-rooms-dialog";
@@ -29,6 +30,9 @@ export type FilesIntegration = {
   onPickContextRooms: () => void;
   // Opens the Knowledge room picker behind the composer's knowledge slot.
   onPickKnowledgeRooms: () => void;
+  // Opens the folder picker that adds one more folder or room to the chat's
+  // context (the "+" menu's Data sources).
+  onAddContextFolder: () => void;
   // Opens a connected Instructions or Knowledge room from the composer's
   // rooms menus.
   onOpenContextRoom: (
@@ -77,6 +81,15 @@ export const useFilesIntegration = ({
   );
   const onPickKnowledgeRooms = React.useCallback(
     () => setRoomsPicker("knowledge"),
+    [],
+  );
+  const [folderPickerVisible, setFolderPickerVisible] = React.useState(false);
+  const closeFolderPicker = React.useCallback(
+    () => setFolderPickerVisible(false),
+    [],
+  );
+  const onAddContextFolder = React.useCallback(
+    () => setFolderPickerVisible(true),
     [],
   );
   // A room of this portal opens in Files; the chat panel stays as it is.
@@ -179,6 +192,9 @@ export const useFilesIntegration = ({
       {roomsPicker ? (
         <ContextRoomsDialog kind={roomsPicker} onClose={closeRoomsPicker} />
       ) : null}
+      {folderPickerVisible ? (
+        <ContextFolderDialog mode="add" onClose={closeFolderPicker} />
+      ) : null}
       {saveRequest ? (
         <SaveDialog
           content={saveRequest.content}
@@ -199,6 +215,7 @@ export const useFilesIntegration = ({
     composerActions,
     onPickContextRooms,
     onPickKnowledgeRooms,
+    onAddContextFolder,
     onOpenContextRoom,
     onSaveAsFile,
     exportFormats,
