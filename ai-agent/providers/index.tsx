@@ -1184,10 +1184,10 @@ const AiAgentProviders = ({
       // for a chat: the composer loses its knowledge base picker.
       hideKnowledgePicker: knowledgePickerHidden,
       // Instructions rooms and knowledge bases are picked in the room
-      // selector, several at once ("Manage" in the "+" menu's Skill sets and
+      // selector, several at once ("Manage sources" in the "+" menu's Skill sets and
       // Knowledge bases), and a connected one opens in Files from its row
       // there. With knowledge search off, Knowledge bases keeps the bases
-      // connected earlier and "Disconnect" instead of "Manage".
+      // connected earlier and "Disconnect" instead of "Manage sources".
       composerSkills,
       composerKnowledge,
       onPickContextRooms,

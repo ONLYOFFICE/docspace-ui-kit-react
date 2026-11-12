@@ -205,7 +205,7 @@ class AiChatStore {
    * host while knowledge search is off (DocSpace with vectorization
    * disabled), so no Knowledge room can be picked for a chat. The "+" menu's
    * Knowledge bases then lists only the bases connected earlier, with
-   * Disconnect in place of Manage (see `useComposerSourceLists`).
+   * Disconnect in place of Manage sources (see `useComposerSourceLists`).
    */
   knowledgePickerHidden = false;
 

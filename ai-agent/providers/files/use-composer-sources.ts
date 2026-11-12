@@ -13,11 +13,11 @@ type ConnectedRoom = { cloud: string; room: { id: string; name: string } };
  * The rows of the chat "+" menu's Skill sets and Knowledge bases submenus,
  * as DocSpace builds them: the Instructions or Knowledge rooms connected to
  * the chat, ticked — a click opens the room in Files — and below them
- * "Manage", the room selector that connects and disconnects them.
+ * "Manage sources", the room selector that connects and disconnects them.
  *
  * While knowledge search is off on the portal no knowledge base can be
  * picked: the Knowledge bases list keeps the bases connected earlier and
- * offers "Disconnect" in place of "Manage", and with none connected it is
+ * offers "Disconnect" in place of "Manage sources", and with none connected it is
  * empty, which drops the row.
  */
 export const useComposerSourceLists = ({
@@ -74,7 +74,7 @@ export const useComposerSourceLists = ({
   const manage = React.useCallback(
     (kind: "skills" | "knowledge", onClick: () => void): ComposerMenuItem => ({
       id: `${kind}-manage`,
-      text: t("Common:Manage", { defaultValue: "Manage" }),
+      text: t("Common:ManageSources", { defaultValue: "Manage sources" }),
       icon: "btn-settings",
       onClick,
     }),

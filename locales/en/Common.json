@@ -355,6 +355,7 @@
   "ManageGroupRooms": "Manage group of rooms",
   "ManageGroupSpaces": "Manage group of spaces",
   "ManagerTypesDescription": "Admin account types and their privileges",
+  "ManageSources": "Manage sources",
   "ManyEmails": "Too many email addresses parsed",
   "MaxCurrency": "max {{currency}}",
   "MaxLengthExceeded": "The maximum length of a user name or another local part is 64 characters.",

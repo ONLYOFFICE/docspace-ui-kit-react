@@ -56,10 +56,12 @@ describe("useComposerSourceLists", () => {
     };
   });
 
-  it("offers only Manage while no room is connected", () => {
+  it("offers only Manage sources while no room is connected", () => {
     const { composerSkills, composerKnowledge } = lists();
-    expect(composerSkills.map((row) => row.text)).toEqual(["Manage"]);
-    expect(composerKnowledge?.map((row) => row.text)).toEqual(["Manage"]);
+    expect(composerSkills.map((row) => row.text)).toEqual(["Manage sources"]);
+    expect(composerKnowledge?.map((row) => row.text)).toEqual([
+      "Manage sources",
+    ]);
 
     composerSkills[0].onClick?.();
     expect(onPickContextRooms).toHaveBeenCalledTimes(1);
@@ -67,7 +69,7 @@ describe("useComposerSourceLists", () => {
     expect(onPickKnowledgeRooms).toHaveBeenCalledTimes(1);
   });
 
-  it("lists the connected rooms of the portal, ticked, above Manage", () => {
+  it("lists the connected rooms of the portal, ticked, above Manage sources", () => {
     const legal = { id: "12", name: "Legal" };
     state.selectedContextFolders = [
       { cloud: CONTEXT_ROOM_CLOUD, room: legal },
@@ -76,7 +78,7 @@ describe("useComposerSourceLists", () => {
     const { composerSkills } = lists();
     expect(
       composerSkills.map((row) => (row.isSeparator ? "|" : row.text)),
-    ).toEqual(["Legal", "|", "Manage"]);
+    ).toEqual(["Legal", "|", "Manage sources"]);
     expect(composerSkills[0]).toMatchObject({
       checked: true,
       icon: "btn-room",
@@ -90,7 +92,7 @@ describe("useComposerSourceLists", () => {
     expect(lists(true).composerKnowledge).toEqual([]);
   });
 
-  it("offers Disconnect instead of Manage while knowledge search is off", () => {
+  it("offers Disconnect instead of Manage sources while knowledge search is off", () => {
     state.selectedKnowledgeFolders = [
       { cloud: CONTEXT_ROOM_CLOUD, room: { id: "7", name: "Wiki" } },
     ];
@@ -101,7 +103,7 @@ describe("useComposerSourceLists", () => {
     composerKnowledge[2].onClick?.();
     expect(clearKnowledgeFolder).toHaveBeenCalledTimes(1);
     expect(onPickKnowledgeRooms).not.toHaveBeenCalled();
-    // Skill sets keep their Manage.
-    expect(composerSkills.at(-1)?.text).toBe("Manage");
+    // Skill sets keep their Manage sources.
+    expect(composerSkills.at(-1)?.text).toBe("Manage sources");
   });
 });
