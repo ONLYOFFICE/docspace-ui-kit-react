@@ -126,6 +126,12 @@ const panelWidthStorage = createPanelWidthStorage("chatPanelWidth", {
 // presence. Computed getters express every derived UI decision so
 // consumers can `observer` the store and stay reactive without any local
 // useEffect bridging.
+/** Who manages the chat's Skill sets and Knowledge bases in place of the chat itself. */
+export type AiChatSourcesManager = {
+  /** Opens the owner's settings of those sources; `null` when the user may not change them. */
+  onManage: (() => void) | null;
+};
+
 class AiChatStore {
   isVisible = false;
 
@@ -171,6 +177,16 @@ class AiChatStore {
    * picker with no agents, leaves the title plain text.
    */
   agentPicker: AiChatAgentPicker | null = null;
+
+  /**
+   * Set while the chat's Skill sets and Knowledge bases belong to something
+   * the host manages - an AI project, whose rooms are its settings, not the
+   * chat's own pick. The "+" menu then lists them as they are and its
+   * "Manage sources" calls `onManage` (the project's settings) instead of
+   * the room selector; with `onManage: null` (a member who cannot change the
+   * project) the lists have no such row. `null` for an ordinary chat.
+   */
+  sourcesManager: AiChatSourcesManager | null = null;
 
   /**
    * Settings waiting to be applied to the chat stores by AiChatStoresBridge
@@ -228,6 +244,7 @@ class AiChatStore {
     makeAutoObservable(this, {
       onSavePreset: observable.ref,
       agentPicker: observable.ref,
+      sourcesManager: observable.ref,
     });
   }
 
@@ -386,6 +403,10 @@ class AiChatStore {
 
   setComposerContextHidden = (value: boolean) => {
     this.composerContextHidden = value;
+  };
+
+  setSourcesManager = (manager: AiChatSourcesManager | null) => {
+    this.sourcesManager = manager;
   };
 
   setKnowledgePickerHidden = (value: boolean) => {

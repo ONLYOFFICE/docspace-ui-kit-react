@@ -31,6 +31,7 @@ export const useComposerSourceLists = ({
   onOpenContextRoom,
   onAddContextFolder,
   knowledgePickerHidden,
+  sourcesManager,
 }: {
   useCloudsStore: CloudsStore;
   onPickContextRooms: () => void;
@@ -41,6 +42,12 @@ export const useComposerSourceLists = ({
   ) => void;
   onAddContextFolder: () => void;
   knowledgePickerHidden: boolean;
+  /**
+   * Set inside an AI project, whose rooms are its settings: "Manage sources"
+   * opens those settings (`onManage`), or is left out when the user may not
+   * change them. `null` for an ordinary chat, which picks its own rooms.
+   */
+  sourcesManager?: { onManage: (() => void) | null } | null;
 }): {
   composerSkills: ComposerMenuItem[];
   composerKnowledge: ComposerMenuItem[];
@@ -57,7 +64,7 @@ export const useComposerSourceLists = ({
     (
       kind: "skills" | "knowledge",
       connected: ConnectedRoom[],
-      footer: ComposerMenuItem,
+      footer: ComposerMenuItem | null,
     ): ComposerMenuItem[] => {
       const rooms = connected
         .filter((item) => item.cloud === CONTEXT_ROOM_CLOUD)
@@ -68,6 +75,7 @@ export const useComposerSourceLists = ({
           checked: true,
           onClick: () => onOpenContextRoom(cloud, room),
         }));
+      if (!footer) return rooms;
       return [
         ...rooms,
         ...(rooms.length > 0
@@ -90,11 +98,25 @@ export const useComposerSourceLists = ({
     [t, i18n.language],
   );
 
-  const composerSkills = React.useMemo(
-    () => build("skills", skillsRooms, manage("skills", onPickContextRooms)),
-    [build, manage, skillsRooms, onPickContextRooms],
-  );
+  const onManageOwned = sourcesManager?.onManage ?? null;
+  const owned = !!sourcesManager;
+
+  const composerSkills = React.useMemo(() => {
+    if (owned)
+      return build(
+        "skills",
+        skillsRooms,
+        onManageOwned ? manage("skills", onManageOwned) : null,
+      );
+    return build("skills", skillsRooms, manage("skills", onPickContextRooms));
+  }, [build, manage, skillsRooms, onPickContextRooms, owned, onManageOwned]);
   const composerKnowledge = React.useMemo(() => {
+    if (owned)
+      return build(
+        "knowledge",
+        knowledgeRooms,
+        onManageOwned ? manage("knowledge", onManageOwned) : null,
+      );
     if (!knowledgePickerHidden) {
       return build(
         "knowledge",
@@ -121,6 +143,8 @@ export const useComposerSourceLists = ({
     onPickKnowledgeRooms,
     knowledgePickerHidden,
     clearKnowledgeFolder,
+    owned,
+    onManageOwned,
   ]);
 
   // Data sources: the folders and rooms the user connected as the chat's

@@ -40,6 +40,7 @@ const onPickContextRooms = vi.fn();
 const onPickKnowledgeRooms = vi.fn();
 const onOpenContextRoom = vi.fn();
 
+let sourcesManager: { onManage: (() => void) | null } | null = null;
 const lists = (knowledgePickerHidden = false) =>
   renderHook(() =>
     useComposerSourceLists({
@@ -49,12 +50,14 @@ const lists = (knowledgePickerHidden = false) =>
       onOpenContextRoom,
       onAddContextFolder,
       knowledgePickerHidden,
+      sourcesManager,
     }),
   ).result.current;
 
 describe("useComposerSourceLists", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    sourcesManager = null;
     state = {
       selectedContextFolders: [],
       selectedKnowledgeFolders: [],
@@ -156,6 +159,34 @@ describe("useComposerSourceLists", () => {
       expect(composerDataSources.some((row) => row.text === "Add folder")).toBe(
         false,
       );
+    });
+  });
+
+  describe("inside an AI project", () => {
+    const room = {
+      cloud: CONTEXT_ROOM_CLOUD,
+      room: { id: "12", name: "Legal" },
+    };
+
+    it("opens the project's settings from Manage sources, not the room selector", () => {
+      const onManage = vi.fn();
+      sourcesManager = { onManage };
+      state.selectedContextFolders = [room];
+      state.selectedKnowledgeFolders = [room];
+      const { composerSkills, composerKnowledge } = lists();
+      composerSkills.at(-1)?.onClick?.();
+      composerKnowledge.at(-1)?.onClick?.();
+      expect(onManage).toHaveBeenCalledTimes(2);
+      expect(onPickContextRooms).not.toHaveBeenCalled();
+      expect(onPickKnowledgeRooms).not.toHaveBeenCalled();
+    });
+
+    it("only lists the rooms for a member who cannot change the project", () => {
+      sourcesManager = { onManage: null };
+      state.selectedContextFolders = [room];
+      const { composerSkills, composerKnowledge } = lists();
+      expect(composerSkills.map((row) => row.text)).toEqual(["Legal"]);
+      expect(composerKnowledge).toEqual([]);
     });
   });
 });

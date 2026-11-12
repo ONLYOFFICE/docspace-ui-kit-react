@@ -662,6 +662,7 @@ const AiAgentProviders = ({
     analyzeFileName,
     composerContextHidden,
     knowledgePickerHidden,
+    sourcesManager,
   } = useObservedFields(() => ({
     analyzeActive: aiChatStore.isAnalyzeMode,
     analyzePending: aiChatStore.isAnalyzePending,
@@ -669,6 +670,7 @@ const AiAgentProviders = ({
     analyzeFileName: aiChatStore.analyzeFormTitle,
     composerContextHidden: aiChatStore.composerContextHidden,
     knowledgePickerHidden: aiChatStore.knowledgePickerHidden,
+    sourcesManager: aiChatStore.sourcesManager,
   }));
 
   // Ids of attached files the backend flagged as analyzable. The attachments
@@ -933,6 +935,7 @@ const AiAgentProviders = ({
       onOpenContextRoom,
       onAddContextFolder,
       knowledgePickerHidden,
+      sourcesManager,
     });
 
   // While "Analyze responses" is on, the chat is about that one form: the cap
