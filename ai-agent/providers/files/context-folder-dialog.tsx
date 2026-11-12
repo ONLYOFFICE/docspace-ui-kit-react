@@ -3,9 +3,10 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { FilterType, FolderType } from "@onlyoffice/docspace-api-sdk";
-import { useStores } from "@onlyoffice/ai-chat";
+import { FOLDER_CONTEXTS_LIMIT, useStores } from "@onlyoffice/ai-chat";
 
 import FilesSelector from "../../../selectors/Files";
+import type { TSelectorItem } from "../../../components/selector";
 import useGetIcon from "../../hooks/useGetIcon";
 
 import { CONTEXT_ROOM_CLOUD } from "../context-room/ContextRoomSync";
@@ -17,7 +18,7 @@ type ContextFolderDialogProps = {
    * What the pick does to the chat's context folders: `"replace"` (default)
    * makes the folder the only one, as an AI project's Folder card does;
    * `"add"` connects it next to the others, as the chat's Data sources do
-   * (the chat library holds the limit).
+   * (the chat library holds the limit) - and lets several be ticked at once.
    */
   mode?: "replace" | "add";
 };
@@ -28,7 +29,10 @@ type ContextFolderDialogProps = {
 // rounds. Rendered inside <AiAgentProviders> so
 // `useStores()` resolves the store from the widget's context. The selector
 // submits the folder the user is standing in, so the list shows folders
-// only and the button is live as soon as the first level has loaded.
+// only and the button is live as soon as the first level has loaded. In
+// `"add"` mode the folders also carry checkboxes: the ticked ones, from any
+// number of places, are all connected, and the open folder is the pick only
+// while nothing is ticked.
 const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
   onClose,
   mode = "replace",
@@ -38,10 +42,54 @@ const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
   const { getIcon } = useGetIcon();
   const { useCloudsStore } = useStores();
 
+  const isAdd = mode === "add";
+  // The folders ticked so far, by id, with the path each was ticked under.
+  const pickedRef = React.useRef(
+    new Map<string, { id: string; name: string; path: string }>(),
+  );
+  const [pickedCount, setPickedCount] = React.useState(0);
+  // How many more folders the chat takes; read once, when the dialog opens.
+  const freeSlots = React.useMemo(
+    () =>
+      Math.max(
+        FOLDER_CONTEXTS_LIMIT -
+          (useCloudsStore.getState().selectedFolderContexts?.length ?? 0),
+        0,
+      ),
+    [useCloudsStore],
+  );
+
+  const onFolderToggle = React.useCallback<
+    NonNullable<React.ComponentProps<typeof FilesSelector>["onFolderToggle"]>
+  >(
+    (item: TSelectorItem, breadCrumbs) => {
+      if (item.id === undefined || item.id === null || item.id === "") return;
+      const picked = pickedRef.current;
+      const id = String(item.id);
+      if (item.isSelected) picked.delete(id);
+      else if (picked.size < freeSlots) {
+        const name = String(item.label ?? "");
+        const crumbs = breadCrumbs
+          .filter((crumb) => crumb.id !== "" && crumb.label)
+          .map((crumb) => crumb.label);
+        picked.set(id, { id, name, path: [...crumbs, name].join(" / ") });
+      }
+      setPickedCount(picked.size);
+    },
+    [freeSlots],
+  );
+
   const onSubmit = React.useCallback<
     React.ComponentProps<typeof FilesSelector>["onSubmit"]
   >(
     (selectedItemId, folderTitle, _isPublic, breadCrumbs) => {
+      const clouds = useCloudsStore.getState();
+      if (isAdd && pickedRef.current.size > 0) {
+        for (const folder of pickedRef.current.values())
+          clouds.addFolderContext(CONTEXT_ROOM_CLOUD, folder);
+        onClose();
+        return;
+      }
       // The selector opens on the virtual root, whose id is empty: that is
       // no folder to scope a round to.
       if (
@@ -63,12 +111,11 @@ const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
         name: String(name),
         path: crumbs.join(" / "),
       };
-      const clouds = useCloudsStore.getState();
-      if (mode === "add") clouds.addFolderContext(CONTEXT_ROOM_CLOUD, folder);
+      if (isAdd) clouds.addFolderContext(CONTEXT_ROOM_CLOUD, folder);
       else clouds.selectFolderContext(CONTEXT_ROOM_CLOUD, folder);
       onClose();
     },
-    [onClose, useCloudsStore, mode],
+    [onClose, useCloudsStore, isAdd],
   );
 
   const getIsDisabled = React.useCallback<
@@ -80,8 +127,9 @@ const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
       _selectedItemId,
       _itemType,
       isRoot,
-    ) => isFirstLoad || isRoot,
-    [],
+      // Ticked folders are a pick wherever the user stands, the root too.
+    ) => isFirstLoad || (isRoot && pickedCount === 0),
+    [pickedCount],
   );
 
   return (
@@ -99,6 +147,10 @@ const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
       withCancelButton
       withFooterInput={false}
       withFooterCheckbox={false}
+      isMultiSelect={isAdd}
+      withFolderSelection={isAdd}
+      maxSelectedItems={isAdd ? freeSlots : undefined}
+      onFolderToggle={onFolderToggle}
       onCancel={onClose}
       onSubmit={onSubmit}
       getIcon={getIcon}

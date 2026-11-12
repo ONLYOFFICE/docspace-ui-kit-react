@@ -2,10 +2,15 @@ import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, render } from "@testing-library/react";
 
-const clouds = { selectFolderContext: vi.fn(), addFolderContext: vi.fn() };
+const clouds = {
+  selectFolderContext: vi.fn(),
+  addFolderContext: vi.fn(),
+  selectedFolderContexts: [] as unknown[],
+};
 const useCloudsStore = { getState: () => clouds };
 
 vi.mock("@onlyoffice/ai-chat", () => ({
+  FOLDER_CONTEXTS_LIMIT: 3,
   useStores: () => ({ useCloudsStore }),
 }));
 
@@ -26,6 +31,10 @@ type SelectorProps = Record<string, unknown> & {
     id: string | number | null | undefined,
     title: string,
     isPublic: boolean,
+    breadCrumbs: Crumb[],
+  ) => void;
+  onFolderToggle: (
+    item: { id: string | number; label: string; isSelected?: boolean },
     breadCrumbs: Crumb[],
   ) => void;
   getIsDisabled: (
@@ -57,6 +66,7 @@ describe("ContextFolderDialog", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     selectorProps = null;
+    clouds.selectedFolderContexts = [];
   });
 
   it("offers folders only, rooms included, without the virtual root", () => {
@@ -105,6 +115,63 @@ describe("ContextFolderDialog", () => {
       path: "My documents / Q3 reports",
     });
     expect(clouds.selectFolderContext).not.toHaveBeenCalled();
+  });
+
+  it("ticks folders only in add mode, up to what the chat still takes", () => {
+    clouds.selectedFolderContexts = [{}];
+    const { unmount } = render(
+      <ContextFolderDialog mode="add" onClose={vi.fn()} />,
+    );
+    expect(selector().isMultiSelect).toBe(true);
+    expect(selector().withFolderSelection).toBe(true);
+    expect(selector().maxSelectedItems).toBe(2);
+    unmount();
+    render(<ContextFolderDialog onClose={vi.fn()} />);
+    expect(selector().isMultiSelect).toBe(false);
+    expect(selector().withFolderSelection).toBe(false);
+  });
+
+  it("adds every ticked folder, from wherever each was ticked, instead of the open one", () => {
+    const onClose = vi.fn();
+    render(<ContextFolderDialog mode="add" onClose={onClose} />);
+    const docs = [
+      { id: "", label: "" },
+      { id: 1, label: "My documents" },
+    ];
+    act(() => {
+      selector().onFolderToggle({ id: 5, label: "Q3" }, docs);
+      selector().onFolderToggle({ id: 6, label: "Q4" }, docs);
+      selector().onFolderToggle({ id: 9, label: "Sales" }, [
+        { id: 2, label: "Rooms" },
+      ]);
+      // Cleared again: the selector reports the state before the click.
+      selector().onFolderToggle({ id: 6, label: "Q4", isSelected: true }, docs);
+    });
+    // Ticked folders are a pick on the root too.
+    expect(selector().getIsDisabled(false, false, "", undefined, true)).toBe(
+      false,
+    );
+    act(() =>
+      selector().onSubmit(2, "Rooms", false, [{ id: 2, label: "Rooms" }]),
+    );
+    expect(clouds.addFolderContext.mock.calls).toEqual([
+      [CONTEXT_ROOM_CLOUD, { id: "5", name: "Q3", path: "My documents / Q3" }],
+      [CONTEXT_ROOM_CLOUD, { id: "9", name: "Sales", path: "Rooms / Sales" }],
+    ]);
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("takes no more ticks than the chat has room for", () => {
+    clouds.selectedFolderContexts = [{}, {}];
+    render(<ContextFolderDialog mode="add" onClose={vi.fn()} />);
+    act(() => {
+      selector().onFolderToggle({ id: 5, label: "Q3" }, []);
+      selector().onFolderToggle({ id: 6, label: "Q4" }, []);
+    });
+    act(() =>
+      selector().onSubmit(1, "Docs", false, [{ id: 1, label: "Docs" }]),
+    );
+    expect(clouds.addFolderContext).toHaveBeenCalledTimes(1);
   });
 
   it("names the folder after the last breadcrumb when the selector has no title", () => {
