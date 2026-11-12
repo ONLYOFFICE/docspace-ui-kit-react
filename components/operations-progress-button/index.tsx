@@ -278,6 +278,15 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
       : panelOperations[0].errorCount;
   };
 
+  // The name of the button and of its progress bar: what is running.
+  const getButtonLabel = () => {
+    if (isSeveralOperations) {
+      return t("Processes", { count: allOperationsLength });
+    }
+
+    return operationsLength ? operations[0].label : panelOperations[0]?.label;
+  };
+
   const getTooltipLabel = () => {
     if (isSeveralOperations) {
       return (
@@ -472,6 +481,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
               })}
               icon={getIcons()}
               iconUrl={getIconUrl()}
+              label={getButtonLabel()}
               alert={operationsAlert}
               completed={operationsCompleted}
               stopped={isStopped}

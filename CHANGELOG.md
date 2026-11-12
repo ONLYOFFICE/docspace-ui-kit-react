@@ -290,6 +290,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`OperationsProgressButton` names its button after what is running.** The button and its
+  progress bar were named after the icon ("dots button", "upload button"); they carry the
+  operation's label now, or the count of processes when several run.
 - **`PeopleSelector` and `GroupsSelector` load past their first page.** Both took the list's
   size from the answer's `count`, which is the items in that answer - one page of 100 at most -
   so the list never had a next page and scrolling to its end loaded nothing. They read the
