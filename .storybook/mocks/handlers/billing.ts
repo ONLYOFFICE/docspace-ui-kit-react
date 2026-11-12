@@ -1,6 +1,6 @@
 import { http, type AnyHandler } from "msw";
 
-import { api, ok } from "../demoPortal";
+import { api, fail, ok } from "../demoPortal";
 import {
   ADMIN_PRICE,
   CURRENCY,
@@ -14,10 +14,12 @@ import {
   createBillingState,
   currentQuota,
   customerBalance,
+  customerGoodwill,
   customerInfo,
   monthlyUsage,
   paymentQuotas,
   paymentSettings,
+  redeemPromoCode,
   serviceUsage,
   tariff,
   topUpOperation,
@@ -233,6 +235,14 @@ export const billingHandlers: AnyHandler[] = [
   http.get(api("portal/payment/customer/balance"), () =>
     ok(customerBalance(state)),
   ),
+  http.get(api("portal/payment/customer/goodwill"), () =>
+    ok(customerGoodwill(state)),
+  ),
+  http.post(api("portal/payment/promoCode"), async ({ request }) => {
+    const body = await readJson<{ promoCode?: string }>(request);
+    const result = redeemPromoCode(state, body.promoCode ?? "");
+    return typeof result === "string" ? fail(400, result) : ok(result);
+  }),
   http.get(api("portal/payment/topupsettings"), () =>
     ok(walletSettings(state)),
   ),

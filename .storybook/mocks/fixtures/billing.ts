@@ -109,7 +109,24 @@ export type DemoBillingState = {
   };
   restrictedModels: string[];
   operations: DemoOperation[];
+  promoLots: DemoPromoLot[];
+  redeemedPromoCodes: string[];
 };
+
+export type DemoPromoLot = {
+  operationId: number;
+  amount: number;
+  remaining: number;
+  currency: string;
+  date: string;
+  expiresAt: string | null;
+};
+
+/** The one promo code the demo portal accepts, once. */
+export const DEMO_PROMO_CODE = "WELCOME10";
+
+export const normalizePromoCode = (code: string) =>
+  code.replace(/[\s-]/g, "").toUpperCase();
 
 export const createBillingState = (): DemoBillingState => ({
   balance: 148.5,
@@ -121,6 +138,17 @@ export const createBillingState = (): DemoBillingState => ({
   autoTopUp: { enabled: true, minBalance: 20, upToBalance: 100 },
   restrictedModels: ["deepseek-v3.2"],
   operations: createOperations(),
+  promoLots: [
+    {
+      operationId: 900101,
+      amount: 100,
+      remaining: 62.8,
+      currency: CURRENCY,
+      date: daysAgo(4),
+      expiresAt: daysAhead(26, 23),
+    },
+  ],
+  redeemedPromoCodes: [],
 });
 
 // --- Tariff and quotas -----------------------------------------------------
@@ -420,6 +448,57 @@ export const customerBalance = (state: DemoBillingState) => ({
   },
 });
 
+/** `portal/payment/customer/goodwill`: the promo credits with money left. */
+export const customerGoodwill = (state: DemoBillingState) => {
+  const last = state.promoLots[state.promoLots.length - 1];
+  return {
+    accountNumber: 100483,
+    subAccountNumber: 2,
+    accountName: "goodwill",
+    accountCurrency: CURRENCY,
+    subAccounts: [
+      {
+        currency: CURRENCY,
+        amount: Number(
+          state.promoLots
+            .reduce((sum, lot) => sum + lot.remaining, 0)
+            .toFixed(2),
+        ),
+      },
+    ],
+    lastCredit: last
+      ? { date: last.date, amount: last.amount, currency: CURRENCY }
+      : null,
+    lots: state.promoLots,
+  };
+};
+
+/** `portal/payment/promoCode`: credits the demo code once, refuses the rest. */
+export const redeemPromoCode = (state: DemoBillingState, code: string) => {
+  const normalized = normalizePromoCode(code);
+  if (normalized !== DEMO_PROMO_CODE) return "promo_not_found";
+  if (state.redeemedPromoCodes.includes(normalized))
+    return "promo_already_used";
+
+  state.redeemedPromoCodes.push(normalized);
+  const lot: DemoPromoLot = {
+    operationId: 900200 + state.promoLots.length,
+    amount: 10,
+    remaining: 10,
+    currency: CURRENCY,
+    date: new Date().toISOString(),
+    expiresAt: daysAhead(90, 23),
+  };
+  state.promoLots.push(lot);
+
+  return {
+    status: "Completed" as const,
+    amount: lot.amount,
+    currency: lot.currency,
+    expiresAt: lot.expiresAt,
+  };
+};
+
 export const walletSettings = (state: DemoBillingState) => ({
   ...state.autoTopUp,
   currency: CURRENCY,
@@ -632,6 +711,17 @@ export type DemoOperation = {
   participantDisplayName: string | null;
   sourceType: "Agent" | "File" | "Folder" | "Room" | "Form" | null;
   sourceTitle: string | null;
+  sources?: { subAccount: number; isBonus: boolean; amount: number }[];
+};
+
+/** How a charge was paid: from the promo credit, the wallet, or both. */
+const paidFrom = (debit: number, bonusShare: number) => {
+  const bonus = Number((debit * bonusShare).toFixed(10));
+  const wallet = Number((debit - bonus).toFixed(10));
+  return [
+    ...(bonus > 0 ? [{ subAccount: 53, isBonus: true, amount: bonus }] : []),
+    ...(wallet > 0 ? [{ subAccount: 0, isBonus: false, amount: wallet }] : []),
+  ];
 };
 
 const person = (index: number) => DEMO_PEOPLE[index] ?? DEMO_SELF;
@@ -717,6 +807,11 @@ const createOperations = (): DemoOperation[] => {
           participantDisplayName: who.displayName,
           sourceType: source.type,
           sourceTitle: source.title,
+          // The promo credit is four days old, so only recent charges touch it.
+          sources: paidFrom(
+            tokenCost(tokens),
+            day > 4 ? 0 : day % 2 === 0 ? 1 : 0.4,
+          ),
         }),
       );
     }
@@ -824,14 +919,15 @@ export const serviceUsage = (ops: DemoOperation[]) => {
   }
   return [...byService.entries()].map(([service, list]) => {
     const meta = USAGE_META[service];
+    const totalAmount = Number(
+      list.reduce((sum, op) => sum + op.debit, 0).toFixed(2),
+    );
     return {
       service,
       serviceUnit: meta.unit,
       currency: CURRENCY,
       totalQuantity: list.reduce((sum, op) => sum + op.quantity, 0),
-      totalAmount: Number(
-        list.reduce((sum, op) => sum + op.debit, 0).toFixed(2),
-      ),
+      totalAmount,
       operationCount: list.length,
       title: meta.title,
       price: meta.price,
