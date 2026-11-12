@@ -132,5 +132,17 @@
         "noStaticElementInteractions": "off"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["**/.design-sync/previews/**"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    }
+  ]
 }
