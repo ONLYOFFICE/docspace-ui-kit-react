@@ -149,7 +149,7 @@ export const useComposerSourceLists = ({
 
   // Data sources: the folders and rooms the user connected as the chat's
   // context - any of the portal, several at once. Each opens a second level
-  // with its way out; "Add folder" connects one more until the limit.
+  // with its way out; "Manage sources" connects one more until the limit.
   const composerDataSources = React.useMemo(() => {
     const folders = contextFolders
       .filter((item) => item.cloud === CONTEXT_ROOM_CLOUD)
@@ -173,7 +173,9 @@ export const useComposerSourceLists = ({
         rows.push({ id: "data-source-separator", text: "", isSeparator: true });
       rows.push({
         id: "data-source-add",
-        text: t("Common:AIProjectAddFolder", { defaultValue: "Add folder" }),
+        text: t("Common:ManageSources", {
+          defaultValue: "Manage sources",
+        }),
         icon: "btn-settings",
         onClick: onAddContextFolder,
       });

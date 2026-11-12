@@ -124,10 +124,10 @@ describe("useComposerSourceLists", () => {
       room: { id: String(id), name: `Folder ${id}` },
     });
 
-    it("offers only Add folder while no folder is connected", () => {
+    it("offers only Manage sources while no folder is connected", () => {
       const { composerDataSources } = lists();
       expect(composerDataSources.map((row) => row.text)).toEqual([
-        "Add folder",
+        "Manage sources",
       ]);
       composerDataSources[0].onClick?.();
       expect(onAddContextFolder).toHaveBeenCalledTimes(1);
@@ -138,7 +138,7 @@ describe("useComposerSourceLists", () => {
       const { composerDataSources } = lists();
       expect(
         composerDataSources.map((row) => (row.isSeparator ? "|" : row.text)),
-      ).toEqual(["Folder 1", "Folder 2", "|", "Add folder"]);
+      ).toEqual(["Folder 1", "Folder 2", "|", "Manage sources"]);
       expect(composerDataSources[1].checked).toBe(true);
       expect(composerDataSources[1].items?.map((row) => row.text)).toEqual([
         "Disconnect",
@@ -150,15 +150,15 @@ describe("useComposerSourceLists", () => {
       );
     });
 
-    it("stops offering Add folder at the limit", () => {
+    it("stops offering Manage sources at the limit", () => {
       state.selectedFolderContexts = Array.from({ length: 20 }, (_, i) =>
         folder(i + 1),
       );
       const { composerDataSources } = lists();
       expect(composerDataSources).toHaveLength(20);
-      expect(composerDataSources.some((row) => row.text === "Add folder")).toBe(
-        false,
-      );
+      expect(
+        composerDataSources.some((row) => row.text === "Manage sources"),
+      ).toBe(false);
     });
   });
 
