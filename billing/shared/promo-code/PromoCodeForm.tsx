@@ -171,7 +171,12 @@ const PromoCodeForm = () => {
           data-testid="wallet_promo_code_form"
           aria-hidden={isLeaving || undefined}
         >
-          <div className={styles.promoCodeRow}>
+          <div
+            className={styles.promoCodeRow}
+            onKeyUp={(e) => {
+              if (e.key === "Escape") e.stopPropagation();
+            }}
+          >
             <Text
               as="label"
               htmlFor="wallet_promo_code"
