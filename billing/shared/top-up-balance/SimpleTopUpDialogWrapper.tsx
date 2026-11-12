@@ -2,6 +2,7 @@ import React from "react";
 
 import { useApi } from "../../../providers/api";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
+import PromoCodeForm from "../promo-code/PromoCodeForm";
 import SimpleTopUpDialog, {
   type SimpleTopUpDialogProps,
   type TSimpleTopUpDeps,
@@ -9,7 +10,7 @@ import SimpleTopUpDialog, {
 
 type SimpleTopUpDialogWrapperProps = Omit<
   SimpleTopUpDialogProps,
-  keyof TSimpleTopUpDeps
+  keyof TSimpleTopUpDeps | "promoCodeSlot"
 >;
 
 const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
@@ -23,6 +24,7 @@ const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
     refreshTransactionHistory,
     language,
     walletBalance,
+    isCardLinkedToPortal,
   } = store;
   const {
     walletCustomerStatusNotActive,
@@ -58,6 +60,7 @@ const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
       fetchCardLinked={fetchCardLinked}
       walletBalance={walletBalance ?? 0}
       fetchCustomerInfo={fetchCustomerInfo}
+      promoCodeSlot={isCardLinkedToPortal ? <PromoCodeForm /> : null}
     />
   );
 };

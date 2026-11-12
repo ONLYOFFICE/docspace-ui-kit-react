@@ -1,6 +1,23 @@
 import { Duration } from "luxon";
 
-import { dateDiff, now } from "../../utils/date";
+import {
+  dateDiff,
+  formatDateLocalized,
+  getAppTimezone,
+  now,
+} from "../../utils/date";
+
+type DatePreset = Parameters<typeof formatDateLocalized>[1];
+
+export const formatBillingDate = (
+  date: Parameters<typeof formatDateLocalized>[0],
+  language: string,
+  preset: DatePreset = "DATE_MED",
+) =>
+  formatDateLocalized(date, preset, {
+    locale: language,
+    timezone: getAppTimezone(),
+  });
 
 /**
  * Whole days from now until `date` (negative if the date is in the past).

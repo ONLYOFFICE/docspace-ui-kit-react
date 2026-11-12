@@ -1,0 +1,136 @@
+@keyframes promoCodeReveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes promoCodeRevealRtl {
+  from {
+    clip-path: inset(0 0 0 100%);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes promoCodeHide {
+  from {
+    clip-path: inset(0 0 0 0);
+  }
+
+  to {
+    clip-path: inset(0 100% 0 0);
+  }
+}
+
+@keyframes promoCodeHideRtl {
+  from {
+    clip-path: inset(0 0 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 100%);
+  }
+}
+
+@keyframes promoCodeCollapse {
+  from {
+    grid-template-rows: 1fr;
+  }
+
+  to {
+    grid-template-rows: 0fr;
+  }
+}
+
+.promoCodeSlot {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 32px;
+  box-sizing: border-box;
+}
+
+.promoCodeToggle {
+  width: fit-content;
+  color: var(--payment-text-color);
+}
+
+.promoCodeFormGrow {
+  display: grid;
+  grid-template-rows: 1fr;
+
+  > .promoCodeForm {
+    min-height: 0;
+  }
+}
+
+.promoCodeFormLeaving {
+  animation: promoCodeCollapse 100ms ease-in 150ms forwards;
+  pointer-events: none;
+
+  > .promoCodeForm {
+    overflow: hidden;
+    animation: promoCodeHide 150ms ease-in forwards;
+
+    [data-dir="rtl"] & {
+      animation-name: promoCodeHideRtl;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    grid-template-rows: 0fr;
+
+    > .promoCodeForm {
+      animation: none;
+      opacity: 0;
+    }
+  }
+}
+
+.promoCodeForm {
+  position: relative;
+  animation: promoCodeReveal 200ms ease-out;
+
+  [data-dir="rtl"] & {
+    animation-name: promoCodeRevealRtl;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.promoCodeRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.promoCodeField {
+  flex: 1 1 200px;
+  min-width: 200px;
+}
+
+.promoCodeError {
+  position: absolute;
+  inset-block-start: calc(100% + 2px);
+  inset-inline-start: 0;
+  color: var(--payment-error-color);
+}

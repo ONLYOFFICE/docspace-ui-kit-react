@@ -50,7 +50,10 @@ import type {
   TAccountingPrice,
   TActiveService,
   TBalance,
+  TGoodwill,
+  TGoodwillLot,
   TInvoice,
+  TPromoCodeResult,
   TInvoicesPage,
   TServiceUsage,
   TUsagePeriodKey,
@@ -254,6 +257,8 @@ class PaymentStore {
   balance: TBalance = 0;
 
   previousBalance: TBalance = 0;
+
+  goodwill: TGoodwill | null = null;
 
   cardLinked = "";
 
@@ -972,6 +977,81 @@ class PaymentStore {
     } catch (e: unknown) {
       if (e instanceof Error && e.name === "CanceledError") return;
       throw e;
+    }
+  };
+
+  fetchGoodwill = async () => {
+    const abortController = new AbortController();
+    this.addAbortController(abortController);
+
+    try {
+      const { data } = await this.#rawApiClient.instance.get(
+        "api/2.0/portal/payment/customer/goodwill",
+        { signal: abortController.signal },
+      );
+
+      const goodwill = (data?.response as TGoodwill | null) ?? null;
+
+      runInAction(() => {
+        this.goodwill = goodwill;
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      runInAction(() => {
+        this.goodwill = null;
+      });
+      console.error(error);
+    }
+  };
+
+  applyPromoCode = async (promoCode: string): Promise<TPromoCodeResult> => {
+    try {
+      const { data } = await this.#rawApiClient.instance.post(
+        "api/2.0/portal/payment/promoCode",
+        { promoCode },
+      );
+
+      const response = data?.response as
+        | {
+            status?: string;
+            amount?: number;
+            currency?: string;
+            expiresAt?: string | null;
+          }
+        | undefined;
+
+      const isPending = response?.status === "Pending";
+
+      await Promise.all([
+        isPending ? Promise.resolve() : this.fetchGoodwill(),
+        this.refreshTransactionHistory(),
+      ]);
+
+      return {
+        status: isPending ? "pending" : "applied",
+        amount: response?.amount ?? 0,
+        currency: response?.currency ?? this.walletCodeCurrency,
+        expiresAt: response?.expiresAt ?? null,
+      };
+    } catch (error: unknown) {
+      const response = (
+        error as {
+          response?: {
+            status?: number;
+            data?: { error?: { message?: string } };
+          };
+        }
+      )?.response;
+
+      if (response?.status === 400)
+        return {
+          status: "refused",
+          reason: response.data?.error?.message?.trim().toLowerCase() ?? "",
+        };
+      if (response?.status === 429) return { status: "rateLimited" };
+
+      console.error(error);
+      return { status: "failed" };
     }
   };
 

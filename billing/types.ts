@@ -14,6 +14,27 @@ export type TBooleanPaymentFeature = TenantQuotaFeatureDto & { value: boolean };
 /** Balance from the wallet API — can be a Balance object, 0, or null. */
 export type TBalance = Balance | 0 | null;
 
+export type TGoodwillLot = {
+  operationId: number;
+  amount: number;
+  remaining: number;
+  currency: string;
+  date: string;
+  expiresAt: string | null;
+};
+
+export type TGoodwill = Balance & { lots?: TGoodwillLot[] | null };
+
+export type TPromoCodeResult =
+  | {
+      status: "applied" | "pending";
+      amount: number;
+      currency: string;
+      expiresAt: string | null;
+    }
+  | { status: "refused"; reason: string }
+  | { status: "rateLimited" | "failed" };
+
 /** QuotaDto extended with serviceName (returned by wallet service endpoints). */
 export type TWalletServiceQuota = QuotaDto & { serviceName?: string };
 

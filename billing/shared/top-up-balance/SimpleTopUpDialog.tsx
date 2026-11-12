@@ -63,6 +63,8 @@ type SimpleTopUpDialogBaseProps = {
   descriptionText?: React.ReactNode;
   /** overrides the default helper text under the amount input */
   helperText?: React.ReactNode;
+  /** rendered under the helper text, where a promo code can be redeemed */
+  promoCodeSlot?: React.ReactNode;
 };
 
 export type SimpleTopUpDialogProps = SimpleTopUpDialogBaseProps &
@@ -92,6 +94,7 @@ const SimpleTopUpDialogContent = observer(
     isPurchaseCompleted,
     descriptionText,
     helperText,
+    promoCodeSlot,
   }: SimpleTopUpDialogProps) => {
     const t = useCommonTranslation();
 
@@ -253,6 +256,10 @@ const SimpleTopUpDialogContent = observer(
                   ? t("TopUpCreditsChargeHint")
                   : t("TopUpTakeSomeTimeToComplete"))}
             </Text>
+
+            {promoCodeSlot ? (
+              <div className={styles.promoCode}>{promoCodeSlot}</div>
+            ) : null}
           </div>
         </ModalDialog.Body>
 
