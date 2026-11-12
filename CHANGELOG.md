@@ -247,6 +247,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Added
 
+- **`ComboBox` and `AccessRightSelect` take `ariaLabel`**, the accessible name of the button.
+  Without it the button is still named by the option it shows.
 - **`FolderType.PrivateRooms` (42)**: the root of the Private section. It holds no rooms
   itself; private rooms stay under the Rooms root and are listed through the `PrivateRooms`
   search area

@@ -691,6 +691,14 @@ describe("ComboBox", () => {
     dropDownSpy.mockRestore();
   });
 
+  it("names the button with ariaLabel instead of the option it shows", () => {
+    render(<ComboBox {...baseProps} ariaLabel="Role of Carol Jones: Viewer" />);
+
+    expect(
+      screen.getByRole("button", { name: "Role of Carol Jones: Viewer" }),
+    ).toBeInTheDocument();
+  });
+
   it("sets correct tabIndex", () => {
     render(<ComboBox {...baseProps} />);
     const button = screen.getByRole("button");
