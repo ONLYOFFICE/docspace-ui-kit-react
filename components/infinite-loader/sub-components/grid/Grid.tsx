@@ -138,8 +138,8 @@ const GridComponent = ({
       const roomHeight = 104 + verticalRoomGap;
       const fileHeight = 220 + horizontalGap;
       const templateHeight = 126 + verticalRoomGap;
-      // An agent's tile is a template's with a third line below the name.
-      const agentHeight = 154 + verticalRoomGap;
+      // An agent's tile is a template's with two more lines below the name.
+      const agentHeight = 182 + verticalRoomGap;
       const titleHeight = 20 + headerMargin + (isFolderHeader ? 0 : 11);
 
       if (isAgent) return agentHeight;
