@@ -301,4 +301,38 @@ describe("useRoomsHelper", () => {
     expect(requestedSearchArea()).toBe("AiHub");
     expect(setItems).toHaveBeenCalledWith([]);
   });
+
+  it("lists the Private section through its search area, without a type filter, a create row or Recent", async () => {
+    mocks.getRoomsFolder.mockResolvedValue({
+      data: {
+        response: {
+          folders: [],
+          total: 0,
+          count: 0,
+          current: { id: 2, title: "Rooms", security: { Create: true } },
+        },
+      },
+    });
+
+    const setItems = vi.fn();
+    const setTotal = vi.fn();
+    const { result } = setup({
+      formsSection: false,
+      privateSection: true,
+      withCreate: true,
+      withRecentTreeFolder: true,
+      recentFolder: { id: 9, title: "Recent" },
+      setItems,
+      setTotal,
+    });
+
+    await act(async () => {
+      await result.current.rooms.getRoomList(0);
+    });
+
+    expect(requestedTypes()).toBeUndefined();
+    expect(requestedSearchArea()).toBe("PrivateRooms");
+    expect(setItems).toHaveBeenCalledWith([]);
+    expect(setTotal).toHaveBeenCalledWith(0);
+  });
 });

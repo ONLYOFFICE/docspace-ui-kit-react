@@ -497,6 +497,7 @@
   "PriceDetailsNextBill": "Your next monthly bill will be <1>{{price}}</1> starting from <2>{{date}}</2>",
   "PricePerAdmin": "Price per admin",
   "PricePerGB": "Price per GB",
+  "Private": "Private",
   "Processes": "Processes: {{count}}",
   "PublicRoom": "Public room",
   "PublicRoomCreationDisabled": "Public Rooms cannot be created because external sharing is disabled.",

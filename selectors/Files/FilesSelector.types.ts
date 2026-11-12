@@ -81,6 +81,7 @@ export interface UseRootHelperProps {
   withAIRoomsTreeFolder?: boolean;
   withRoomsTreeFolder?: boolean;
   withFormsTreeFolder?: boolean;
+  withPrivateTreeFolder?: boolean;
   isUserOnly?: boolean;
   setRecentFolder?: (folder?: FolderDtoInteger) => void;
   setFavoritesFolder?: (folder?: FolderDtoInteger) => void;
@@ -190,6 +191,8 @@ export type UseFilesHelpersProps = {
   withFavoritesTreeFolder?: boolean;
   activeSpecialScope?: SpecialFolderScope | null;
   formsSection?: boolean;
+  /** The host lists the "Private" section, so a private room's path starts at it. */
+  withPrivateTreeFolder?: boolean;
   onFilesLoaded?: (
     files: TFilesSelectorFile[],
     context: TFilesSelectorLoadedFiles,
@@ -259,6 +262,13 @@ export type FilesSelectorProps = TInfoBar &
     withAIRoomsTreeFolder?: boolean;
     withRoomsTreeFolder?: boolean;
     withFormsTreeFolder?: boolean;
+    /**
+     * Lists the "Private" section at the root, off the Rooms root: private
+     * rooms are never part of the Rooms listing. Off by default; a host turns
+     * it on where a private room may be picked. The section offers no room
+     * creation and no Recent / Favorites rows.
+     */
+    withPrivateTreeFolder?: boolean;
     /**
      * The room types the Rooms section lists when no `roomType` is given.
      * Defaults to the ordinary rooms; pass Instructions or Knowledge rooms
