@@ -14,4 +14,4 @@ interface MobileDetailsProps {
   contextModel: () => ContextMenuModel[];
 }
 
-export default MobileDetailsProps;
+export type { MobileDetailsProps as default };

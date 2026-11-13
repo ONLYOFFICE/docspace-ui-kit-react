@@ -21,4 +21,4 @@ export type ImperativeHandle = {
   setPercentValue: (percent: number) => void;
 };
 
-export default ImageViewerToolbarProps;
+export type { ImageViewerToolbarProps as default };

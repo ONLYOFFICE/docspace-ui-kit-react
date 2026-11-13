@@ -3,4 +3,4 @@ interface PlayerBigPlayButtonProps {
   visible: boolean;
 }
 
-export default PlayerBigPlayButtonProps;
+export type { PlayerBigPlayButtonProps as default };

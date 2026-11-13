@@ -33,4 +33,4 @@ export type BookMarkType = {
   y: number;
 };
 
-export default PDFViewerProps;
+export type { PDFViewerProps as default };

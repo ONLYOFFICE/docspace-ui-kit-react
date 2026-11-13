@@ -8,4 +8,4 @@ interface PlayerMessageErrorProps {
   className?: string;
 }
 
-export default PlayerMessageErrorProps;
+export type { PlayerMessageErrorProps as default };

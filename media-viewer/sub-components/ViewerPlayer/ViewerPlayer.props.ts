@@ -40,4 +40,4 @@ interface ViewerPlayerProps {
   ) => JSX.Element | null;
 }
 
-export default ViewerPlayerProps;
+export type { ViewerPlayerProps as default };

@@ -12,4 +12,4 @@ interface PlayerDesktopContextMenuProps {
   onDownloadClick?: VoidFunction;
 }
 
-export default PlayerDesktopContextMenuProps;
+export type { PlayerDesktopContextMenuProps as default };

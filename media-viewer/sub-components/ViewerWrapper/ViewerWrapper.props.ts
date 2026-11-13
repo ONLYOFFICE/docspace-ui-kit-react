@@ -38,4 +38,4 @@ interface ViewerWrapperProps {
   pluginViewerContent?: React.ReactNode;
 }
 
-export default ViewerWrapperProps;
+export type { ViewerWrapperProps as default };

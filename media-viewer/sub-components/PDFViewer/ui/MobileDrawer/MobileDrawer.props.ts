@@ -9,4 +9,4 @@ interface MobileDrawerProps {
   resizePDFThumbnail: VoidFunction;
 }
 
-export default MobileDrawerProps;
+export type { MobileDrawerProps as default };

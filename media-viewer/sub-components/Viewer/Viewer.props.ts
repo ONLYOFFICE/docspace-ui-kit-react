@@ -44,4 +44,4 @@ interface ViewerProps {
   pluginViewerContent?: React.ReactNode;
 }
 
-export default ViewerProps;
+export type { ViewerProps as default };

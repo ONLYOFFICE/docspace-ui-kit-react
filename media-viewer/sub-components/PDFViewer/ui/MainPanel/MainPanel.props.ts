@@ -11,4 +11,4 @@ interface MainPanelProps {
   onNext?: VoidFunction;
 }
 
-export default MainPanelProps;
+export type { MainPanelProps as default };

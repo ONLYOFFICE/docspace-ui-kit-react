@@ -5,4 +5,4 @@ interface BookmarksProps {
   navigate: (page: number) => void;
 }
 
-export default BookmarksProps;
+export type { BookmarksProps as default };

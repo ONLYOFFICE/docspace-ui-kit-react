@@ -35,4 +35,4 @@ interface ImageViewerProps {
   ) => JSX.Element | null;
 }
 
-export default ImageViewerProps;
+export type { ImageViewerProps as default };

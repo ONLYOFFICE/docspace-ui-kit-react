@@ -8,7 +8,7 @@ interface PageCountProps {
   setIsOpenMobileDrawer: Dispatch<SetStateAction<boolean>>;
 }
 
-export default PageCountProps;
+export type { PageCountProps as default };
 
 export type PageCountRef = {
   setPageNumber: (pageNumber: number) => void;

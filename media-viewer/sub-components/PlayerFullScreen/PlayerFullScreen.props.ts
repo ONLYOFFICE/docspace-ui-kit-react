@@ -4,4 +4,4 @@ interface PlayerFullSceenProps {
   onClick: VoidFunction;
 }
 
-export default PlayerFullSceenProps;
+export type { PlayerFullSceenProps as default };
