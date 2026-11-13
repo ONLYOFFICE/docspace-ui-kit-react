@@ -1,5 +1,53 @@
 # MediaViewer
 
+The module has two layers. `MediaViewer` shows a playlist it is handed and makes no request of its own. `MediaGallery` sits on top of it: given a folder, it reads the folder from the portal and drives the viewer itself.
+
+## MediaGallery
+
+The media files of one portal folder or room in the viewer, with previous / next navigation. It needs an `ApiProvider` above it and reads `GET /api/2.0/files/{folderId}` through `useApi().apiClient`, files only, `pageSize` at a time: the first page on mount, the next one when the viewer is three items from the end of what is loaded. Media is picked on the client by `viewAccessibility`, so a folder whose first pages hold none keeps loading until one turns up or the folder ends.
+
+- The viewer is read-only (`isPublicFile`): no rename, delete, move or copy.
+- Navigation does not wrap: the arrows do nothing on the first and the last file.
+- `startFileId` is found only among the files already loaded; otherwise the first media file opens.
+- A failed first request calls `onLoadError` and renders nothing; a failed later page keeps what is loaded and stops asking.
+- A change of `folderId` or `requestToken` starts over.
+- It renders the loader until the first answer, so the viewer itself never renders on the server.
+
+| Property                | Type                                                            | Required | Default | Description                                                                |
+| ----------------------- | --------------------------------------------------------------- | -------- | ------- | -------------------------------------------------------------------------- |
+| `folderId`              | `NumberOrString`                                                | Yes      | -       | The folder or room whose media files are shown.                            |
+| `t`                     | `TranslationType`                                               | Yes      | -       | Function for translating text.                                             |
+| `getIcon`               | `(size: number, ext: string, ...arg: unknown[]) => string`      | Yes      | -       | Function to get the icon for a file based on its size and extension.       |
+| `extsImagePreviewed`    | `string[]`                                                      | Yes      | -       | List of file extensions that can be previewed as images.                   |
+| `requestToken`          | `string`                                                        | No       | -       | The key of a public room link, sent with every request as `Request-Token`. |
+| `startFileId`           | `NumberOrString`                                                | No       | -       | The file to open first.                                                    |
+| `pageSize`              | `number`                                                        | No       | `100`   | How many files one request asks for.                                       |
+| `emptyContent`          | `React.ReactNode`                                               | No       | -       | Shown when the folder has no media files.                                  |
+| `onDownload`            | `(file: TFile) => void`                                         | No       | -       | Called with the file to download. By default its `viewUrl` opens in place. |
+| `onLoadError`           | `(error: unknown) => void`                                      | No       | -       | Called when the first request for the folder fails.                        |
+| `currentDeviceType`     | `DeviceType`                                                    | No       | -       | Type of the current device.                                                |
+| `autoPlay`              | `boolean`                                                       | No       | -       | Starts video and audio as soon as they open.                               |
+| `decryptFile`           | `(params: DecryptFileParams) => Promise<DecryptedFile \| null>` | No       | -       | Decrypts an encrypted item, as for `MediaViewer`.                          |
+| `resolveTitle`          | `(item) => string`                                              | No       | -       | Returns the title to show for an item, as for `MediaViewer`.               |
+| `getPdfViewerScriptUrl` | `() => Promise<string>`                                         | No       | -       | Resolves the URL of the PDF viewer script, as for `MediaViewer`.           |
+| `onClose`               | `VoidFunction`                                                  | No       | -       | Shows the close button and is called by it.                                |
+
+```tsx
+import { MediaGallery } from "@onlyoffice/apps-ui-kit/media-viewer";
+
+<MediaGallery
+  t={t}
+  folderId={folderId}
+  requestToken={publicRoomKey}
+  getIcon={getIcon}
+  extsImagePreviewed={filesSettings.extsImagePreviewed}
+  emptyContent={<EmptyState />}
+  onLoadError={showError}
+/>;
+```
+
+## MediaViewer
+
 A full-screen viewer for the images, video, audio and PDF files of a playlist, with previous / next navigation, a toolbar and a context menu. It is portal-internal: it reads portal file objects, but it makes no request of its own -- the playlist, the icons and the callbacks all come from the consumer.
 
 ## What the consumer supplies

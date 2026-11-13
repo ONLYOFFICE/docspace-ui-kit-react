@@ -177,6 +177,11 @@ export type DemoFile = {
   size: number;
   isForm?: boolean;
   isFavorite?: boolean;
+  /**
+   * Content the browser can show, for the files a viewer opens. The demo
+   * portal answers API calls only, so it has to be a `data:` URL.
+   */
+  viewUrl?: string;
   author: DemoEmployee;
   createdDays: number;
   updatedDays: number;
@@ -366,6 +371,12 @@ const file = (
   ...extra,
 });
 
+/** A drawn stand-in for a picture: a coloured card with its name on it. */
+const picture = (label: string, color: string) =>
+  `data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800"><rect width="1200" height="800" fill="#${color}"/><text x="600" y="420" font-family="sans-serif" font-size="64" fill="#FFFFFF" text-anchor="middle">${label}</text></svg>`,
+  )}`;
+
 export const files: DemoFile[] = [
   // My documents
   file(1001, "Meeting notes.docx", MY_DOCUMENTS_ID, 38 * KB, ALEX, 20, 1, {
@@ -388,8 +399,16 @@ export const files: DemoFile[] = [
   file(1201, "Campaign brief.docx", 102, 47 * KB, MARIA, 58, 2),
   file(1202, "Budget Q3.xlsx", 102, 64 * KB, AMARA, 50, 4),
   file(1203, "Launch presentation.pptx", 102, 5.8 * MB, MARIA, 30, 2),
-  file(1204, "Banner mockup.png", 203, 820 * KB, MARIA, 20, 20),
+  file(1204, "Banner mockup.png", 203, 820 * KB, MARIA, 20, 20, {
+    viewUrl: picture("Banner mockup", "4781D1"),
+  }),
   file(1205, "Teaser video.mp4", 203, 48 * MB, LUCAS, 15, 15),
+  file(1206, "Poster draft.png", 203, 640 * KB, MARIA, 22, 21, {
+    viewUrl: picture("Poster draft", "FF8541"),
+  }),
+  file(1207, "Social card.png", 203, 310 * KB, LUCAS, 24, 22, {
+    viewUrl: picture("Social card", "5CC3A7"),
+  }),
 
   // Client onboarding kit
   file(1301, "Welcome guide.pdf", 103, 1.6 * MB, ALEX, 88, 6),
@@ -657,7 +676,14 @@ export const fileDto = (entry: DemoFile) => {
   const section = sectionOf(parent);
   const fileExst = extensionOf(entry.title);
   const parentRoom = roomOf(parent);
-  const viewUrl = `${DEMO_PORTAL_URL}/filehandler.ashx?action=view&fileid=${entry.id}`;
+  const viewUrl =
+    entry.viewUrl ??
+    `${DEMO_PORTAL_URL}/filehandler.ashx?action=view&fileid=${entry.id}`;
+  // Only a file with content of its own opens in a viewer; the rest have
+  // nothing behind their address.
+  const viewAccessibility = entry.viewUrl
+    ? { ImageView: fileTypeOf(entry.title) === FileType.Image }
+    : {};
   return {
     ...entryCommon(entry, section),
     id: entry.id,
@@ -682,7 +708,7 @@ export const fileDto = (entry: DemoFile) => {
     hasDraft: false,
     isForm: entry.isForm ?? false,
     customFilterEnabled: false,
-    viewAccessibility: {},
+    viewAccessibility,
     security: entry.isForm ? FORM_SECURITY : FILE_SECURITY,
     fileEntryType: 2,
     isFavorite: entry.isFavorite ?? false,
