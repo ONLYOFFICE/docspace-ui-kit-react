@@ -432,7 +432,7 @@ describe("MediaViewer", () => {
     }
   });
 
-  it("reports a file both playable and previewable as an image once", async () => {
+  it("reports each file both playable and previewable as an image once", async () => {
     const extensionOf = vi.mocked(getFileExtension);
     extensionOf.mockImplementation(
       (name: string) => `.${name.split(".").pop()}`,
@@ -440,21 +440,39 @@ describe("MediaViewer", () => {
 
     try {
       const onError = vi.fn();
+      const playlist = [
+        { ...mockPlaylistItem, id: 0, fileId: 1, title: "first.mp4" },
+        { ...mockPlaylistItem, id: 1, fileId: 2, title: "second.mp4" },
+      ];
       const props = createMockProps({
-        playlist: [{ ...mockPlaylistItem, title: "clip.mp4", src: "clip.mp4" }],
-        files: [{ ...mockFile, title: "clip.mp4", fileExst: ".mp4" }],
+        playlist,
+        files: playlist.map((item) => ({
+          ...mockFile,
+          id: item.fileId,
+          title: item.title,
+          fileExst: ".mp4",
+        })),
         extsImagePreviewed: [".mp4"],
-        onError,
       });
 
-      const { rerender } = render(<MediaViewer {...props} />);
+      const view = (overrides: Partial<MediaViewerProps> = {}) => (
+        <React.StrictMode>
+          <MediaViewer {...props} onError={() => onError()} {...overrides} />
+        </React.StrictMode>
+      );
+
+      const { rerender } = render(view());
 
       await waitFor(() => expect(onError).toHaveBeenCalledTimes(1));
 
-      rerender(<MediaViewer {...props} deleteDialogVisible />);
-      rerender(<MediaViewer {...props} />);
+      rerender(view({ deleteDialogVisible: true }));
+      rerender(view());
 
       expect(onError).toHaveBeenCalledTimes(1);
+
+      rerender(view({ playlistPos: 1, currentFileId: 2 }));
+
+      await waitFor(() => expect(onError).toHaveBeenCalledTimes(2));
     } finally {
       extensionOf.mockImplementation(
         (name: string) => name.split(".").pop() ?? "",

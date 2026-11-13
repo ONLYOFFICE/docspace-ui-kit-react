@@ -583,10 +583,19 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
 
   const isPlayableImage =
     !pluginViewerContent && canPlay(ext) && canImageView(ext);
+  const reportedFileIdRef = useRef<typeof fileId>(undefined);
 
   useEffect(() => {
-    if (isPlayableImage) onError?.();
-  }, [isPlayableImage, ext, onError]);
+    if (!isPlayableImage) {
+      reportedFileIdRef.current = undefined;
+      return;
+    }
+
+    if (reportedFileIdRef.current === fileId) return;
+
+    reportedFileIdRef.current = fileId;
+    onError?.();
+  }, [isPlayableImage, fileId, onError]);
 
   if (pluginViewerContent) {
     canOpen = true;
