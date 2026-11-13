@@ -27,6 +27,8 @@ import {
   getPDFContextModel,
 } from "./MediaViewer.helpers";
 
+import "./MediaViewer.theme.scss";
+
 const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
   const {
     files,

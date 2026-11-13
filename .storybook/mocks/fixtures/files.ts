@@ -179,7 +179,8 @@ export type DemoFile = {
   isFavorite?: boolean;
   /**
    * Content the browser can show, for the files a viewer opens. The demo
-   * portal answers API calls only, so it has to be a `data:` URL.
+   * portal answers API calls only, so it is a `data:` URL or a file under
+   * `.storybook/public`.
    */
   viewUrl?: string;
   author: DemoEmployee;
@@ -371,11 +372,36 @@ const file = (
   ...extra,
 });
 
-/** A drawn stand-in for a picture: a coloured card with its name on it. */
-const picture = (label: string, color: string) =>
+/**
+ * A drawn stand-in for a photograph: a sky fading into a glow, a sun and two
+ * ridges of hills. Colours are in the portal's own format (no leading sign).
+ */
+const picture = (
+  sky: string,
+  glow: string,
+  ridge: string,
+  ground: string,
+  sunX: number,
+) =>
   `data:image/svg+xml,${encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800"><rect width="1200" height="800" fill="#${color}"/><text x="600" y="420" font-family="sans-serif" font-size="64" fill="#FFFFFF" text-anchor="middle">${label}</text></svg>`,
+    [
+      `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">`,
+      `<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">`,
+      `<stop offset="0" stop-color="#${sky}"/><stop offset="1" stop-color="#${glow}"/>`,
+      `</linearGradient></defs>`,
+      `<rect width="1200" height="800" fill="url(#sky)"/>`,
+      `<circle cx="${sunX}" cy="300" r="90" fill="#FFFFFF" opacity="0.85"/>`,
+      `<path d="M0 560 L220 380 L420 520 L640 330 L860 500 L1040 400 L1200 520 L1200 800 L0 800 Z" fill="#${ridge}"/>`,
+      `<path d="M0 680 L300 520 L560 660 L820 540 L1200 700 L1200 800 L0 800 Z" fill="#${ground}"/>`,
+      `</svg>`,
+    ].join(""),
   )}`;
+
+/** A file under `.storybook/public`, wherever this Storybook is served from. */
+const publicFile = (path: string) =>
+  typeof document === "undefined"
+    ? path
+    : new URL(path, document.baseURI).toString();
 
 export const files: DemoFile[] = [
   // My documents
@@ -400,14 +426,16 @@ export const files: DemoFile[] = [
   file(1202, "Budget Q3.xlsx", 102, 64 * KB, AMARA, 50, 4),
   file(1203, "Launch presentation.pptx", 102, 5.8 * MB, MARIA, 30, 2),
   file(1204, "Banner mockup.png", 203, 820 * KB, MARIA, 20, 20, {
-    viewUrl: picture("Banner mockup", "4781D1"),
+    viewUrl: picture("4781D1", "BFD9F5", "5B7FB0", "2F4A73", 880),
   }),
-  file(1205, "Teaser video.mp4", 203, 48 * MB, LUCAS, 15, 15),
+  file(1205, "Teaser video.webm", 203, 68 * KB, LUCAS, 24, 23, {
+    viewUrl: publicFile("demo/teaser.webm"),
+  }),
   file(1206, "Poster draft.png", 203, 640 * KB, MARIA, 22, 21, {
-    viewUrl: picture("Poster draft", "FF8541"),
+    viewUrl: picture("E5622B", "FFD9A0", "8A4A3A", "4A2A2A", 320),
   }),
   file(1207, "Social card.png", 203, 310 * KB, LUCAS, 24, 22, {
-    viewUrl: picture("Social card", "5CC3A7"),
+    viewUrl: picture("2E8C77", "CFF0DE", "3F7A63", "23473B", 600),
   }),
 
   // Client onboarding kit
@@ -581,6 +609,7 @@ const FILE_TYPES: Record<string, number> = {
   ".webp": FileType.Image,
   ".mp4": FileType.Video,
   ".mov": FileType.Video,
+  ".webm": FileType.Video,
   ".mp3": FileType.Audio,
   ".wav": FileType.Audio,
 };
@@ -682,7 +711,10 @@ export const fileDto = (entry: DemoFile) => {
   // Only a file with content of its own opens in a viewer; the rest have
   // nothing behind their address.
   const viewAccessibility = entry.viewUrl
-    ? { ImageView: fileTypeOf(entry.title) === FileType.Image }
+    ? {
+        ImageView: fileTypeOf(entry.title) === FileType.Image,
+        MediaView: fileTypeOf(entry.title) === FileType.Video,
+      }
     : {};
   return {
     ...entryCommon(entry, section),

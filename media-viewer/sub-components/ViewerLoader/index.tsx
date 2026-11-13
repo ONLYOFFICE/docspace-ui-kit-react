@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import "../../MediaViewer.theme.scss";
 import styles from "./ViewerLoader.module.scss";
 import type { ViewerLoaderProps } from "./ViewerLoader.types";
 

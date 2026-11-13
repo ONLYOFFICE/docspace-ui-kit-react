@@ -237,6 +237,15 @@ describe("<DropDownItem /> icon source", () => {
     );
   });
 
+  it("renders an element as it is, without fetching anything", () => {
+    render(
+      <DropDownItem {...baseProps} icon={<svg data-testid="own-icon" />} />,
+    );
+
+    expect(screen.getByTestId("own-icon")).toBeInTheDocument();
+    expect(screen.queryByTestId("mocked-react-svg")).not.toBeInTheDocument();
+  });
+
   it("draws a cross-origin .svg as an image, without fetching it", () => {
     const foreignSvg = "https://cdn.example.com/icon.svg";
 
