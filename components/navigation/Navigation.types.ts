@@ -259,6 +259,8 @@ export type TNavigationProps = Omit<
     showText: boolean;
     /** Name of the current folder, shown as the header's heading and used as the context menu's title. */
     title: string;
+    /** Drawn in place of the current folder's heading: a host control that is the title, such as a menu to switch to a sibling. It gets no click handler of the navigation, so the breadcrumb drop box does not open from it. */
+    titleContent?: React.ReactNode;
     /** Called with a crumb's id when one is chosen from the drop box, and when the room title above the heading is clicked. */
     onClickFolder: TOnNavigationItemClick;
 

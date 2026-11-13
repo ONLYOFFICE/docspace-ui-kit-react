@@ -20,6 +20,7 @@ import Badges from "./sub-components/Badges";
 const Navigation = ({
   isRootFolder,
   title,
+  titleContent,
   canCreate,
   onClickFolder,
   navigationItems,
@@ -159,7 +160,11 @@ const Navigation = ({
     ((navigationItems && navigationItems.length > 1) || rootRoomTitle) &&
     currentDeviceType !== DeviceType.mobile;
 
-  const navigationTitleNode = (
+  const navigationTitleNode = titleContent ? (
+    <div className="title-block" data-testid="navigation-title-content">
+      {titleContent}
+    </div>
+  ) : (
     <div className="title-block">
       <NavigationText
         className="title-block-text"

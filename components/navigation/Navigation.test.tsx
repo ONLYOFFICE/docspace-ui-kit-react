@@ -73,6 +73,18 @@ describe("Navigation Component", () => {
     expect(screen.getByText("My Documents")).toBeInTheDocument();
   });
 
+  it("draws the host's title content in place of the heading", () => {
+    render(
+      <Navigation
+        {...defaultProps}
+        titleContent={<button type="button">Switch agent</button>}
+      />,
+    );
+    expect(screen.getByTestId("navigation-title-content")).toBeTruthy();
+    expect(screen.getByText("Switch agent")).toBeTruthy();
+    expect(screen.queryByText(defaultProps.title)).toBeNull();
+  });
+
   it("renders tariff bar when provided", () => {
     render(<Navigation {...defaultProps} />);
     expect(screen.getByTestId("tariff-bar")).toBeInTheDocument();
