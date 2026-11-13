@@ -2,9 +2,21 @@ import React from "react";
 import { describe, it, expect, vi } from "vitest";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 
-// The store's barrel reaches the chat library's stores, which this
-// component does not use.
-vi.mock("@onlyoffice/ai-chat", () => ({ useStores: () => ({}) }));
+// The chat library's stores, read for what "Save as new agent" hands over.
+vi.mock("@onlyoffice/ai-chat", () => {
+  const profile = { id: "p1", name: "Claude" };
+  return {
+    useStores: () => ({
+      useProfilesStore: Object.assign(
+        (selector: (s: unknown) => unknown) => selector({}),
+        { getState: () => ({ getProfileById: () => profile }) },
+      ),
+      useCloudsStore: (selector: (s: unknown) => unknown) =>
+        selector({ selectedContextFolders: [], selectedKnowledgeFolders: [] }),
+      selectCurrentChatProfile: () => profile,
+    }),
+  };
+});
 
 import {
   AiChatStore,
@@ -41,6 +53,45 @@ describe("AiChatAgentPicker", () => {
     );
     expect(store.hasAgentPicker).toBe(false);
     expect(screen.queryByTestId("ai-chat-agent-picker")).toBeNull();
+  });
+
+  it("ends with Save as new agent for a host that saves the chat, and hands it the setup", () => {
+    const onSave = vi.fn();
+    const store = new AiChatStore();
+    store.setAgentPicker({
+      agents: agents(2),
+      selectedId: null,
+      onSelect: vi.fn(),
+    });
+    renderPicker(store);
+    openMenu();
+    expect(screen.queryByTestId("ai-chat-agent-picker-save")).toBeNull();
+
+    act(() => store.setOnSavePreset(onSave));
+    fireEvent.click(screen.getByTestId("ai-chat-agent-picker-save"));
+    expect(onSave).toHaveBeenCalledWith({
+      profileId: "p1",
+      profileName: "Claude",
+      contextRooms: [],
+      knowledgeRooms: [],
+    });
+    // The menu closes behind the pick.
+    expect(
+      screen.getByTestId("ai-chat-agent-picker").getAttribute("aria-expanded"),
+    ).toBe("false");
+  });
+
+  it("is a menu of the default agent and the save alone for a user with no agents", () => {
+    const store = new AiChatStore();
+    store.setAgentPicker({ agents: [], selectedId: null, onSelect: vi.fn() });
+    store.setOnSavePreset(vi.fn());
+    renderPicker(store);
+    expect(store.hasAgentPicker).toBe(true);
+    openMenu();
+
+    expect(screen.getByTestId("ai-chat-agent-picker-default")).toBeTruthy();
+    expect(screen.getByTestId("ai-chat-agent-picker-save")).toBeTruthy();
+    expect(screen.getByRole("group", { hidden: true }).hidden).toBe(true);
   });
 
   it("shows the chat title while the default agent is picked", () => {

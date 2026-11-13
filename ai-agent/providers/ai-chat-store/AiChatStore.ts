@@ -372,9 +372,14 @@ class AiChatStore {
     this.agentPicker = picker;
   };
 
-  /** Whether the panel title opens the agents menu: a picker with at least one agent. */
+  /**
+   * Whether the panel title opens the agents menu: a picker with at least
+   * one agent, or one of a host that can save the chat as a new agent -
+   * the menu is then where "Save as new agent" lives.
+   */
   get hasAgentPicker(): boolean {
-    return (this.agentPicker?.agents.length ?? 0) > 0;
+    if (!this.agentPicker) return false;
+    return this.agentPicker.agents.length > 0 || !!this.onSavePreset;
   }
 
   // Open the panel fullscreen on a fresh conversation set up as the preset

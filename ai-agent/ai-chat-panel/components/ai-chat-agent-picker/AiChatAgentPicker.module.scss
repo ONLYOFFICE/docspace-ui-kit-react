@@ -65,9 +65,11 @@
   padding-block: 4px;
 }
 
-// The line under the default agent, drawn as DropDownItem's separator is:
-// 1px, 16px in from either side, 4px above and below.
-.agentsGroup {
+// The line under the default agent, and the one above "Save as new agent",
+// drawn as DropDownItem's separator is: 1px, 16px in from either side, 4px
+// above and below.
+.agentsGroup,
+.saveGroup {
   position: relative;
   margin-top: 9px;
 
@@ -122,6 +124,20 @@
 
     path {
       fill: var(--ai-chat-agent-picker-default-fg);
+    }
+  }
+}
+
+// "Save as new agent": an action, in the link colour with its plus.
+.saveRow {
+  color: var(--ai-chat-agent-picker-check);
+
+  svg {
+    width: 12px;
+    height: 12px;
+
+    path {
+      fill: currentColor;
     }
   }
 }

@@ -12,10 +12,12 @@ import { Scrollbar } from "../../../../components/scrollbar";
 import { Text } from "../../../../components/text";
 
 import { useAiChatStore } from "../../../providers/ai-chat-store";
+import { useSaveChatAsAgent } from "../ai-chat-panel-save";
 
 import ExpanderDownIcon from "../../../../assets/expander-down.react.svg";
 import CheckIcon from "../../../../assets/check.edit.react.svg";
 import AiIcon from "../../../../assets/icons/16/AI.svg";
+import PlusIcon from "../../../../assets/icons/16/plus.svg";
 
 import styles from "./AiChatAgentPicker.module.scss";
 
@@ -36,8 +38,10 @@ type AiChatAgentPickerProps = {
  * The panel title as a menu of agents: the default one, then the host's
  * agents (`AiChatStore.agentPicker`), of which the first five show and the
  * rest scroll. Picking one hands its id to the host; the title then names
- * it. The header container renders this only while the host offers at
- * least one agent, and the plain title otherwise.
+ * it. For a host that keeps the chat's setup as an agent
+ * (`AiChatStore.onSavePreset`) the menu ends with "Save as new agent". The
+ * header container renders this only while the host offers at least one
+ * agent or that save, and the plain title otherwise.
  *
  * Keyboard: Enter, Space or the arrows on the title open the menu with the
  * focus on the picked agent; the arrows, Home and End move through the
@@ -60,6 +64,8 @@ const AiChatAgentPicker = observer(({ title }: AiChatAgentPickerProps) => {
 
   const picker = store.agentPicker;
   const hasAgents = !!picker && picker.agents.length > 0;
+  const hasMenu = store.hasAgentPicker;
+  const saveAsAgent = useSaveChatAsAgent();
 
   // The menu is a portal shown once it is laid out, so the focus moves in
   // on the next frame.
@@ -84,12 +90,12 @@ const AiChatAgentPicker = observer(({ title }: AiChatAgentPickerProps) => {
     return () => cancelAnimationFrame(frame);
   }, [isOpen, initialFocus]);
 
-  // The agents leaving while the menu is open close it.
+  // The menu losing all it offers while it is open closes it.
   useEffect(() => {
-    if (!hasAgents) setIsOpen(false);
-  }, [hasAgents]);
+    if (!hasMenu) setIsOpen(false);
+  }, [hasMenu]);
 
-  if (!picker || !hasAgents) return null;
+  if (!picker || !hasMenu) return null;
 
   const selected =
     picker.selectedId === null
@@ -244,6 +250,7 @@ const AiChatAgentPicker = observer(({ title }: AiChatAgentPickerProps) => {
             role="group"
             aria-labelledby={agentsLabelId}
             className={styles.agentsGroup}
+            hidden={!hasAgents}
           >
             <div id={agentsLabelId} className={styles.sectionLabel}>
               {t("Common:Agents")}
@@ -279,6 +286,30 @@ const AiChatAgentPicker = observer(({ title }: AiChatAgentPickerProps) => {
               ))}
             </Scrollbar>
           </div>
+          {saveAsAgent ? (
+            // Divided from the rows above by its own border, as the agents
+            // are from the default agent.
+            <div role="none" className={styles.saveGroup}>
+              <DropDownItem
+                onClick={() => {
+                  close(true);
+                  saveAsAgent();
+                }}
+                testId="ai-chat-agent-picker-save"
+              >
+                <span className={classNames(styles.row, styles.saveRow)}>
+                  <span className={styles.logo}>
+                    <PlusIcon aria-hidden />
+                  </span>
+                  <span className={styles.name}>
+                    {t("Common:SaveAsNewAgent", {
+                      defaultValue: "Save as new agent",
+                    })}
+                  </span>
+                </span>
+              </DropDownItem>
+            </div>
+          ) : null}
         </div>
       </DropDown>
     </>
