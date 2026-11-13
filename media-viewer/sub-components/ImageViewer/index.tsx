@@ -921,12 +921,12 @@ export const ImageViewer = ({
   }, []);
 
   useLayoutEffect(() => {
-    return () => {
-      if (imgRef.current) {
-        // abort img loading
+    const image = imgRef.current;
 
-        imgRef.current.src = "";
-      }
+    return () => {
+      setTimeout(() => {
+        if (image && !image.isConnected) image.src = "";
+      });
     };
   }, []);
 

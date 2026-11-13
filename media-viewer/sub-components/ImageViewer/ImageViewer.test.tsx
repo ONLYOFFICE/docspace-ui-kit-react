@@ -1,3 +1,4 @@
+import { StrictMode } from "react";
 import { describe, it, expect, vi } from "vitest";
 import { render, fireEvent } from "@testing-library/react";
 import type { TFile } from "../../MediaViewer.types";
@@ -129,6 +130,28 @@ describe("ImageViewer", () => {
     );
     fireEvent.error(getByTestId("image-content"));
     expect(getByTestId("message-error-title")).toHaveTextContent(errorTitle);
+  });
+
+  it("keeps the image source through a StrictMode remount", async () => {
+    const { getByTestId } = render(
+      <StrictMode>
+        <ImageViewer {...mockProps} />
+      </StrictMode>,
+    );
+
+    await new Promise((resolve) => setTimeout(resolve));
+
+    expect(getByTestId("image-content")).toHaveAttribute("src", mockProps.src);
+  });
+
+  it("stops loading the image once it is unmounted", async () => {
+    const { getByTestId, unmount } = render(<ImageViewer {...mockProps} />);
+    const image = getByTestId("image-content");
+
+    unmount();
+    await new Promise((resolve) => setTimeout(resolve));
+
+    expect(image).toHaveAttribute("src", "");
   });
 
   it("calls onMask callback when image is clicked", () => {
