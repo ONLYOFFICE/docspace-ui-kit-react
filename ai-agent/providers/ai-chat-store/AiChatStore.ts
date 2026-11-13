@@ -105,6 +105,21 @@ export type AiChatAgentPicker = {
   onOpen?: () => void;
 };
 
+/**
+ * An action the host offers for the agent the chat runs on, in the panel
+ * header's "Agent actions" menu: the host knows what the user may do with
+ * the agent and owns what the action opens.
+ */
+export type AiChatAgentAction = {
+  id: string;
+  label: string;
+  /** URL of the item's icon. */
+  icon?: string;
+  onClick: () => void;
+  /** Listed last, after a separator (Delete agent). */
+  isDanger?: boolean;
+};
+
 /** The preset a project opens as. */
 export const projectToPreset = (
   project: AiChatProjectSettings,
@@ -193,6 +208,13 @@ class AiChatStore {
   agentPicker: AiChatAgentPicker | null = null;
 
   /**
+   * The host's actions for the agent picked in the title, shown in the
+   * header's "Agent actions" menu beside the panel's own (Expand, "Save as
+   * new agent"). `null` (the default) leaves the menu to the panel's own.
+   */
+  agentActions: AiChatAgentAction[] | null = null;
+
+  /**
    * Set while the chat's Skill sets and Knowledge bases belong to something
    * the host manages - an AI project, whose rooms are its settings, not the
    * chat's own pick. The "+" menu then lists them as they are and its
@@ -258,6 +280,7 @@ class AiChatStore {
     makeAutoObservable(this, {
       onSavePreset: observable.ref,
       agentPicker: observable.ref,
+      agentActions: observable.ref,
       sourcesManager: observable.ref,
     });
   }
@@ -371,6 +394,17 @@ class AiChatStore {
   setAgentPicker = (picker: AiChatAgentPicker | null) => {
     this.agentPicker = picker;
   };
+
+  setAgentActions = (actions: AiChatAgentAction[] | null) => {
+    this.agentActions = actions;
+  };
+
+  /** Whether the chat runs on an agent picked in the panel title's menu. */
+  get isAgentPicked(): boolean {
+    return (
+      this.hasAgentPicker && (this.agentPicker?.selectedId ?? null) !== null
+    );
+  }
 
   /**
    * Whether the panel title opens the agents menu: a picker with at least

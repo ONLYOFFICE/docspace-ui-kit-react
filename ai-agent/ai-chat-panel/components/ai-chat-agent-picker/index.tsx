@@ -200,6 +200,15 @@ const AiChatAgentPicker = observer(({ title }: AiChatAgentPickerProps) => {
         onKeyDown={onTriggerKeyDown}
         data-testid="ai-chat-agent-picker"
       >
+        {selected?.icon ? (
+          <span
+            className={styles.logo}
+            aria-hidden
+            data-testid="ai-chat-agent-picker-logo"
+          >
+            {selected.icon}
+          </span>
+        ) : null}
         <Text
           as="span"
           className={styles.title}

@@ -9,6 +9,7 @@ import { useStores } from "../../../providers";
 import { useAiChatStore } from "../../../providers/ai-chat-store";
 
 import AiChatAgentPicker from "../ai-chat-agent-picker";
+import AiChatAgentActions from "../ai-chat-agent-actions";
 import AiChatPanelHeader from "../ai-chat-panel-header";
 
 // Store-connected AI chat panel header: wires the shared AiChatStore to the
@@ -49,12 +50,35 @@ const AiChatPanelHeaderContainer: React.FC = observer(() => {
     return t("Common:AIChatButton");
   };
 
+  // The agent's actions belong to the agent menu's title: not in the analyze
+  // mode nor in a project's own chat, which keep their plain titles.
+  const showAgentActions =
+    !store.isAnalyzeMode && !store.projectTitle && store.isAgentPicked;
+
   return (
     <AiChatPanelHeader
       title={renderTitle()}
       onClose={handleClose}
+      // With an agent picked, its actions menu follows the toolbar and
+      // holds Expand, which then has no button of its own. A fullscreen
+      // panel keeps its button: that is the way back.
+      extras={
+        showAgentActions ? (
+          <AiChatAgentActions
+            onExpand={
+              isDesktop && !store.effectiveFullscreen
+                ? store.toggleFullscreen
+                : undefined
+            }
+          />
+        ) : undefined
+      }
       isFullscreen={store.effectiveFullscreen}
-      onToggleFullscreen={isDesktop ? store.toggleFullscreen : undefined}
+      onToggleFullscreen={
+        isDesktop && (!showAgentActions || store.effectiveFullscreen)
+          ? store.toggleFullscreen
+          : undefined
+      }
     />
   );
 });

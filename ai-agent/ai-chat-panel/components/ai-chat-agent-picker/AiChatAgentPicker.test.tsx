@@ -120,6 +120,12 @@ describe("AiChatAgentPicker", () => {
     expect(screen.getByTestId("ai-chat-agent-picker").textContent).toContain(
       "Agent 2",
     );
+    // Its logo comes before the name.
+    expect(
+      screen
+        .getByTestId("ai-chat-agent-picker-logo")
+        .querySelector('[data-testid="logo-2"]'),
+    ).toBeTruthy();
   });
 
   it("lists the default agent and every agent, and hands a pick to the host", () => {
