@@ -53,7 +53,6 @@ const AiChatAgentActions = observer(() => {
       getData={getData}
       title={t("Common:AgentActions", { defaultValue: "Agent actions" })}
       directionX="right"
-      displayIconBorder
       testId="ai-chat-agent-actions"
     />
   );

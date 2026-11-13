@@ -13,15 +13,17 @@
     --ai-chat-agent-actions-color: #{colors.$dark-gray-dark};
   }
 
-  --cmb-size: 32px;
-  --cmb-radius: 6px;
-  --cmb-icon-padding: 8px;
-  --cmb-border: none;
-
+  // The box is drawn here, around the 16px icon button centred in it, not
+  // by the menu button's own bordered variant: that one pads the glyph
+  // inside the 16px button, which lands off-centre in a flex box.
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  box-sizing: border-box;
+  border-radius: 6px;
 
   // The header steps 16px between the toolbar and what follows it.
   margin-inline-start: -8px;
