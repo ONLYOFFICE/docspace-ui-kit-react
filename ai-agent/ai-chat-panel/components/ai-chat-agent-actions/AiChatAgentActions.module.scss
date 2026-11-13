@@ -1,3 +1,43 @@
+@use "../../../../styles/variables/colors";
+
+// One more button of the header's toolbar: its 32px box, its 8px step from
+// the button before it, its hover fill and icon colour.
 .button {
+  --ai-chat-agent-actions-bg-hover: #{colors.$light-gray-hover};
+  --ai-chat-agent-actions-bg-active: #{colors.$gray-light-mid};
+  --ai-chat-agent-actions-color: #{colors.$gray-text};
+
+  :global(.dark) & {
+    --ai-chat-agent-actions-bg-hover: #{colors.$light-dark-gray-hover};
+    --ai-chat-agent-actions-bg-active: #{colors.$gray-dark-mid};
+    --ai-chat-agent-actions-color: #{colors.$dark-gray-dark};
+  }
+
+  --cmb-size: 32px;
+  --cmb-radius: 6px;
+  --cmb-icon-padding: 8px;
+  --cmb-border: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+
+  // The header steps 16px between the toolbar and what follows it.
+  margin-inline-start: -8px;
+
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: var(--ai-chat-agent-actions-bg-hover);
+  }
+
+  // The menu is open.
+  &:has([aria-expanded="true"]) {
+    background-color: var(--ai-chat-agent-actions-bg-active);
+  }
+
+  svg path {
+    fill: var(--ai-chat-agent-actions-color);
+  }
 }
