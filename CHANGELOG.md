@@ -290,6 +290,14 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`PasswordInput` generates passwords from the cryptographic generator.** The generate link
+  and the handle's `onGeneratePassword` drew every character and the final shuffle from
+  `Math.random`, which is predictable, while consumers use the result as an account password
+  and as the passphrase of an encryption key. They draw from `crypto.getRandomValues` now, with
+  no fallback, without the bias of a modulo, and shuffle with Fisher-Yates. The free characters
+  come evenly from every allowed character; before, a character set was picked first, so each
+  of the eight symbols came up about three times as often as each letter. Length and rules are
+  unchanged
 - **`OperationsProgressButton` names its button after what is running.** The button and its
   progress bar were named after the icon ("dots button", "upload button"); they carry the
   operation's label now, or the count of processes when several run.
