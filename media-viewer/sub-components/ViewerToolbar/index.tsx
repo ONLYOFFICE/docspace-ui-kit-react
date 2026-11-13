@@ -90,8 +90,6 @@ const ViewerToolbar = ({
       <li
         className={classNames(styles.toolbarItem, {
           [styles.separator]: item.actionType === -1,
-          [styles.percent]: item.percent ? percent : 100,
-          [styles.disabled]: item.percent ? percent === 25 : false,
         })}
         key={item.key}
         onClick={() => toolbarEvent(item)}
