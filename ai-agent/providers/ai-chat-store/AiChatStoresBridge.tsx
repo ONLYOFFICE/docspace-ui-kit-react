@@ -130,10 +130,20 @@ const AiChatStoresBridge = () => {
           clouds.selectKnowledgeFolder,
           clouds.clearKnowledgeFolder,
         );
-        // A preset holds no context folder: a fresh conversation starts
-        // without one, whatever the previous chat had connected; applied in
-        // place, the chat keeps the folder the user connected.
-        if (fresh) clouds.clearFolderContext();
+        // A fresh conversation starts with the folder the preset remembers
+        // (an AI project's last one), else without one, whatever the
+        // previous chat had connected; applied in place, the chat keeps the
+        // folder the user connected.
+        if (fresh) {
+          const folder = preset.folderContext;
+          if (folder)
+            clouds.selectFolderContext(folder.cloud, {
+              id: folder.id,
+              name: folder.name,
+              path: folder.path,
+            });
+          else clouds.clearFolderContext();
+        }
         // The model is looked up among the loaded profiles: opened before
         // they arrive (a deep link to the projects page), the lookup would
         // miss and the chat would fall back to the default model, so the

@@ -84,6 +84,11 @@ describe("useFilesIntegration: the composer's source pickers", () => {
     expect(screen.queryByTestId("rooms-dialog")).toBeNull();
   });
 
+  it("offers no folder picker: the composer has no Folder slot", () => {
+    render(<Host />);
+    expect(integration()).not.toHaveProperty("onPickFolderContext");
+  });
+
   it("opens a room of this portal in the AI rooms section of Files", () => {
     render(<Host />);
     integration().onOpenContextRoom(CONTEXT_ROOM_CLOUD, {

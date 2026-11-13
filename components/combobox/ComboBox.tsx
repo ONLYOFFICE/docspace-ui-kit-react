@@ -266,6 +266,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     topSpace,
     usePortalBackdrop,
     tabIndex,
+    ariaLabel,
     onClickSelectedItem,
     shouldShowBackdrop,
     dropDownClassName,
@@ -678,6 +679,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
         modernView={modernView}
         fillIcon={selectedOption?.fillIcon ?? fillIcon}
         tabIndex={tabIndex}
+        ariaLabel={ariaLabel}
         isLoading={isLoading}
         type={type}
         plusBadgeValue={plusBadgeValue}

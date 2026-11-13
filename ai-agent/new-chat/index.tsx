@@ -8,6 +8,7 @@ import { useIsDesktop } from "../../hooks/use-is-desktop";
 import { useVirtualKeyboardInset } from "../../hooks/useVirtualKeyboardInset";
 
 import { ChatToolbar } from "../chat-toolbar";
+import { AnalyzeBanner } from "./components/analyze-banner";
 import { ChatNoAccessScreen } from "./components/chat-no-access-screen";
 import { useAiChatStore } from "../providers/ai-chat-store/AiChatStoreProvider";
 import ContextRoomSync from "../providers/context-room/ContextRoomSync";
@@ -36,6 +37,12 @@ const NewChat: React.FC<ChatProps> = observer(
     const aiChatStore = useAiChatStore();
 
     const isFullScreen = aiChatStore.effectiveFullscreen;
+
+    // "Analyze responses" names its form in a bar above the chat
+    // (AnalyzeBanner) instead of a chip on the composer, so the chip row is
+    // hidden for the whole mode. The mode takes no other attachment, so the
+    // row holds nothing else to lose.
+    const isAnalyzeMode = aiChatStore.isAnalyzeMode;
 
     // On mobile/tablet the virtual keyboard covers the bottom of the layout
     // viewport, hiding the composer. Reserve the covered height inside the
@@ -97,6 +104,7 @@ const NewChat: React.FC<ChatProps> = observer(
             holds a skill file (see ContextRoomSync). */}
         <ContextRoomSync />
         {showToolbar ? <ChatToolbar /> : null}
+        {showActivationScreen ? null : <AnalyzeBanner />}
         {chatBody}
       </>
     );
@@ -142,7 +150,13 @@ const NewChat: React.FC<ChatProps> = observer(
                 className={styles.chatListWrapper}
               />
             </div>
-            <div className={styles.chatPanel}>{chatPanel}</div>
+            <div
+              className={classNames(styles.chatPanel, {
+                [styles.analyzeMode]: isAnalyzeMode,
+              })}
+            >
+              {chatPanel}
+            </div>
           </section>
         );
 
@@ -153,7 +167,12 @@ const NewChat: React.FC<ChatProps> = observer(
       // an empty panel with no way back (hosts without `noAccessProps`).
       default:
         return (
-          <section className={styles.chatPanel} style={keyboardInsetStyle}>
+          <section
+            className={classNames(styles.chatPanel, {
+              [styles.analyzeMode]: isAnalyzeMode,
+            })}
+            style={keyboardInsetStyle}
+          >
             {chatPanel}
           </section>
         );

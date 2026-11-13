@@ -12,6 +12,8 @@ import { getDefaultBreadCrumb } from "../../utils";
 import {
   AI_HUB_ROOT_FOLDER_TYPE,
   FORMS_ROOT_FOLDER_TYPE,
+  PRIVATE_ROOMS_ROOT_FOLDER_TYPE,
+  PRIVATE_SECTION_ID,
   FORMS_SECTION_ID,
 } from "../../utils/constants";
 import { LoadersContext } from "../../utils/contexts/Loaders";
@@ -73,6 +75,7 @@ const useRootHelper = ({
   withAIRoomsTreeFolder,
   withRoomsTreeFolder,
   withFormsTreeFolder,
+  withPrivateTreeFolder,
   setRecentFolder,
   setFavoritesFolder,
 
@@ -153,7 +156,7 @@ const useRootHelper = ({
               title = t("Rooms");
               break;
             case AI_HUB_ROOT_FOLDER_TYPE as FolderType:
-              title = t("AiRooms");
+              title = t("AiWorkspace");
               break;
             default:
               break;
@@ -189,6 +192,23 @@ const useRootHelper = ({
             disableMultiSelect: true,
           });
         }
+
+        // Private rooms sit under the rooms root too, and the Rooms listing
+        // never returns them: they are reached through an entry of their own.
+        if (withPrivateTreeFolder && isRoomsRoot) {
+          newItems.push({
+            label: t("Private"),
+            id: PRIVATE_SECTION_ID,
+            parentId: folder.parentId!,
+            rootFolderType: PRIVATE_ROOMS_ROOT_FOLDER_TYPE as FolderType,
+            filesCount: folder.filesCount!,
+            foldersCount: folder.foldersCount!,
+            security: folder.security!,
+            isFolder: true,
+            avatar: <CatalogPrivateSvg />,
+            disableMultiSelect: true,
+          });
+        }
       });
 
       setItems(newItems);
@@ -218,6 +238,7 @@ const useRootHelper = ({
     withAIRoomsTreeFolder,
     withRoomsTreeFolder,
     withFormsTreeFolder,
+    withPrivateTreeFolder,
     setRecentFolder,
     setFavoritesFolder,
   ]);

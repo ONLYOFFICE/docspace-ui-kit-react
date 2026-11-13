@@ -23,6 +23,7 @@ import TableView from "./TableView";
 import RowView from "./RowView";
 import { TokenUsageTooltip } from "./TokenUsage";
 import { BonusSplitTooltip } from "./BonusSplit/sub-components/BonusSplitTooltip";
+import { ByokMarkTooltip } from "./ByokMark/sub-components/ByokMarkTooltip";
 
 type TransactionHistoryProps = {
   isTransactionHistoryExist: boolean;
@@ -126,6 +127,7 @@ const TransactionBody = ({
       {isTransactionHistoryExist ? renderContent : emptyView}
       <TokenUsageTooltip />
       <BonusSplitTooltip />
+      <ByokMarkTooltip />
     </div>
   );
 };

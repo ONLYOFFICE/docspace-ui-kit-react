@@ -3,6 +3,7 @@ import { act, render, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { TSelectorItem } from "../../components/selector";
+import { apiPage, names } from "../../test/apiPage";
 
 /** The subset of the Selector contract these tests observe. */
 type CapturedProps = {
@@ -12,7 +13,7 @@ type CapturedProps = {
   isLoading: boolean;
   isContentLoading?: boolean;
   disableFirstFetch?: boolean;
-  loadNextPage: (startIndex: number) => void;
+  loadNextPage: (startIndex: number) => void | Promise<void>;
   onSearch: (value: string, callback?: () => void) => void;
   onClearSearch: (callback?: () => void) => void;
 };
@@ -65,12 +66,12 @@ vi.mock("../../components/selector", async (importOriginal) => {
 
 const { default: GroupsSelector } = await import("./index");
 
-const groupsPage = (names: string[], total = names.length) => ({
-  data: {
-    response: names.map((name) => ({ id: name, name })),
-    count: total,
-  },
-});
+// Shaped as the portal answers: `count` is this page, `total` all matches.
+const groupsPage = (list: string[], total = list.length) =>
+  apiPage(
+    list.map((name) => ({ id: name, name })),
+    total,
+  );
 
 const labels = () => mocks.lastProps.items.map((item) => item.label);
 
@@ -114,6 +115,8 @@ describe("<GroupsSelector />", () => {
     await waitFor(() => expect(labels()).toEqual(["Alpha", "Beta"]));
   });
 
+  // The selector used to take the page's `count` for the total, not `total`,
+  // and stopped after the first page.
   it("recomputes hasNextPage from the searched page, not the merged list", async () => {
     mocks.getGroups.mockResolvedValueOnce(groupsPage(["Alpha", "Beta"], 50));
 
@@ -209,5 +212,38 @@ describe("<GroupsSelector />", () => {
 
     await waitFor(() => expect(mocks.lastProps.isContentLoading).toBe(false));
     expect(labels()).toEqual(["Abacus"]);
+  });
+});
+
+// The portal pages by 100 and reports the page in `count` and all the matches
+// in `total`. Reading `count` as the total ends the list after the first page.
+describe("<GroupsSelector /> paging", () => {
+  beforeEach(() => {
+    mocks.getGroups.mockReset();
+    mocks.getGroups.mockResolvedValue(groupsPage([]));
+  });
+
+  // The selector used to take the page's `count` for the total, not `total`,
+  // and stopped after the first page.
+  it("goes on past the first page of 100", async () => {
+    mocks.getGroups
+      .mockResolvedValueOnce(groupsPage(names(100, "Group"), 327))
+      .mockResolvedValueOnce(groupsPage(names(100, "Group", 101), 327));
+
+    renderSelector();
+    await waitFor(() => expect(labels()).toHaveLength(100));
+    expect(mocks.lastProps.totalItems).toBe(327);
+    expect(mocks.lastProps.hasNextPage).toBe(true);
+
+    await act(async () => {
+      await mocks.lastProps.loadNextPage(100);
+    });
+
+    await waitFor(() => expect(labels()).toHaveLength(200));
+    expect(mocks.getGroups).toHaveBeenLastCalledWith(
+      expect.objectContaining({ startIndex: 100, count: 100 }),
+    );
+    expect(labels()[100]).toBe("Group 101");
+    expect(mocks.lastProps.hasNextPage).toBe(true);
   });
 });

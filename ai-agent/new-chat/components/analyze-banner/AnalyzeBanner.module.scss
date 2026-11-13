@@ -1,0 +1,35 @@
+.analyzeBanner {
+  // Overridable metrics, so a host embedding the chat in a tighter panel can
+  // scale the bar without touching the markup.
+  --analyze-banner-margin: 12px 16px 0;
+  --analyze-banner-padding: 10px 16px;
+  --analyze-banner-gap: 12px;
+  --analyze-banner-radius: 6px;
+
+  box-sizing: border-box;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--analyze-banner-gap);
+
+  margin: var(--analyze-banner-margin);
+  padding: var(--analyze-banner-padding);
+  border-radius: var(--analyze-banner-radius);
+
+  // A tint of the portal's accent, so the bar follows the color scheme and
+  // stays readable in light and dark themes alike.
+  background-color: color-mix(in srgb, var(--accent-main) 14%, transparent);
+}
+
+.icon {
+  flex: none;
+
+  path[fill]:not([fill="none"]) {
+    fill: var(--accent-main);
+  }
+}
+
+.text {
+  min-width: 0;
+  color: var(--text-color);
+}

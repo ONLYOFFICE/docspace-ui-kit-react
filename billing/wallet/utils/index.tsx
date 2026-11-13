@@ -1,5 +1,11 @@
 import type { TTranslation } from "../../../utils/common";
-import { formatNumber, truncateNumberToFraction } from "../../utils/common";
+import {
+  formatCurrencyIsolated,
+  formatNumber,
+  isolateCurrencyParts,
+  truncateNumberToFraction,
+} from "../../utils/common";
+import { LATIN_NUMBERING_SYSTEM } from "../../../utils/latin-digits";
 
 const truncateNumberToFractionNumeric = (
   value: number,
@@ -21,13 +27,14 @@ export const formattedBalanceTokens = (
   const truncated = Number(truncatedStr);
 
   const formatter = new Intl.NumberFormat(language, {
+    numberingSystem: LATIN_NUMBERING_SYSTEM,
     style: "currency",
     currency,
     minimumFractionDigits: maximumFractionDigits,
     maximumFractionDigits,
   });
 
-  return formatter.formatToParts(truncated);
+  return isolateCurrencyParts(language, formatter.formatToParts(truncated));
 };
 
 export const getEffectiveFraction = (
@@ -87,13 +94,14 @@ export const formatterCurrencyWithoutTranction = (
     : amount;
 
   const formatter = new Intl.NumberFormat(language, {
+    numberingSystem: LATIN_NUMBERING_SYSTEM,
     style: "currency",
     currency,
     minimumFractionDigits: effectiveFractionDigits,
     maximumFractionDigits: effectiveFractionDigits,
   });
 
-  return formatter.format(truncated);
+  return formatCurrencyIsolated(language, formatter, truncated);
 };
 
 export const accountingLedgersFormat = (

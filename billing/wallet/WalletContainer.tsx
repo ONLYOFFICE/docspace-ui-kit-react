@@ -33,6 +33,7 @@ import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useServicesStore } from "../store/ServicesStoreProvider";
 import { getBrandName } from "../../constants/brands";
 import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
+import { LATIN_NUMBERING_SYSTEM } from "../../utils/latin-digits";
 
 const WALLET_TAB_IDS = ["transaction-history", "upcoming-payments"];
 
@@ -131,6 +132,7 @@ const Wallet = (props: WalletProps) => {
   const monthLabel = useMemo(
     () =>
       new Intl.DateTimeFormat(store.language || "en", {
+        numberingSystem: LATIN_NUMBERING_SYSTEM,
         month: "long",
         year: "numeric",
       }).format(new Date()),

@@ -67,7 +67,8 @@ describe("ContextRoomsDialog", () => {
     expect(props.forceIsMultiSelect).toBe(true);
     expect(props.sortSelectedFirst).toBe(true);
     expect(props.useAside).toBe(true);
-    expect(props.selectedItems).toEqual([{ id: "12", label: "Skills" }]);
+    // The rows carry numeric ids, and the selector ticks on a strict match.
+    expect(props.selectedItems).toEqual([{ id: 12, label: "Skills" }]);
     expect(props.headerProps?.headerLabel).toBe("Instructions rooms");
   });
 
@@ -78,7 +79,7 @@ describe("ContextRoomsDialog", () => {
     render(<ContextRoomsDialog kind="knowledge" onClose={vi.fn()} />);
     const props = selector();
     expect(props.roomType).toBe(RoomsType.KnowledgeRoom);
-    expect(props.selectedItems).toEqual([{ id: "9", label: "Docs" }]);
+    expect(props.selectedItems).toEqual([{ id: 9, label: "Docs" }]);
     expect(props.headerProps?.headerLabel).toBe("Knowledge bases");
   });
 
@@ -100,6 +101,26 @@ describe("ContextRoomsDialog", () => {
     );
     expect(clouds.selectKnowledgeFolders).not.toHaveBeenCalled();
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("sends a room once however many times the pick lists it", () => {
+    // A connected room ticked again came as the preselection and the row.
+    render(<ContextRoomsDialog kind="skills" onClose={vi.fn()} />);
+    act(() => {
+      selector().onSubmit([
+        { id: "12", label: "Skills" },
+        { id: 12, label: "Skills" },
+        { id: 13, label: "Legal" },
+        { id: "13", label: "Legal" },
+      ]);
+    });
+    expect(clouds.selectContextFolders).toHaveBeenCalledWith(
+      CONTEXT_ROOM_CLOUD,
+      [
+        { id: "12", name: "Skills" },
+        { id: "13", name: "Legal" },
+      ],
+    );
   });
 
   it("an empty pick disconnects every knowledge base", () => {

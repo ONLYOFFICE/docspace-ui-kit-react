@@ -1179,6 +1179,9 @@ const AiAgentProviders = ({
       onOpenContextRoom,
       onPickKnowledgeRooms,
       onOpenKnowledgeRoom: onOpenContextRoom,
+      // No folder picker (`onPickFolderContext`): the composer has no Folder
+      // slot. In a chat the folder is the one the user is in
+      // (`contextEntityId`); an AI project sets its own beside the chat.
     }),
     [
       composerActions,

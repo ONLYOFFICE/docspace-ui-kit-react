@@ -15,9 +15,10 @@ type ContextFolderDialogProps = {
   onClose: () => void;
 };
 
-// The composer's "Add context" picker: any folder of the portal, rooms and
-// their subfolders included, handed to the chat library's clouds store as
-// the round's context folder. Rendered inside <AiAgentProviders> so
+// The folder picker of an AI project's Folder card (the chat's own composer
+// has no Folder slot): any folder of the portal, rooms and their subfolders
+// included, handed to the chat library's clouds store as the round's
+// context folder. Rendered inside <AiAgentProviders> so
 // `useStores()` resolves the store from the widget's context. The selector
 // submits the folder the user is standing in, so the list shows folders
 // only and the button is live as soon as the first level has loaded.
@@ -43,9 +44,16 @@ const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
         return;
       const name =
         folderTitle || breadCrumbs[breadCrumbs.length - 1]?.label || "";
+      // Where the folder sits, for its pill: the crumbs above it, the
+      // folder itself last. The virtual root crumb is not a place.
+      const crumbs = breadCrumbs
+        .filter((crumb) => crumb.id !== "" && crumb.label)
+        .map((crumb) => crumb.label);
+      if (crumbs[crumbs.length - 1] !== name) crumbs.push(String(name));
       useCloudsStore.getState().selectFolderContext(CONTEXT_ROOM_CLOUD, {
         id: String(selectedItemId),
         name: String(name),
+        path: crumbs.join(" / "),
       });
       onClose();
     },

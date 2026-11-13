@@ -247,6 +247,16 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Added
 
+- **`ComboBox` and `AccessRightSelect` take `ariaLabel`**, the accessible name of the button.
+  Without it the button is still named by the option it shows.
+- **`FolderType.PrivateRooms` (42)**: the root of the Private section. It holds no rooms
+  itself; private rooms stay under the Rooms root and are listed through the `PrivateRooms`
+  search area
+- **`FilesSelector` can list the Private section.** `withPrivateTreeFolder` (off by default) adds a
+  Private entry at the root, after Forms and off the Rooms root. It lists private rooms through
+  the `PrivateRooms` search area, which the Rooms listing never returns, and offers no room
+  creation and no Recent / Favorites rows. With it on, the path of a folder inside a private room
+  starts at that entry in place of Rooms. The host's `Common` namespace needs the `Private` key
 - **`hasTabStop(root)`** (`hooks/useFocusTrap`): whether `root` holds a Tab stop, by the rule of
   `getTabStops`, reading the layout no further than the first one
 - **`markAsDropDownItem(component)`** (`utils/drop-down-item-mark`): marks a component that renders
@@ -280,6 +290,45 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`PasswordInput` generates passwords from the cryptographic generator.** The generate link
+  and the handle's `onGeneratePassword` drew every character and the final shuffle from
+  `Math.random`, which is predictable, while consumers use the result as an account password
+  and as the passphrase of an encryption key. They draw from `crypto.getRandomValues` now, with
+  no fallback, without the bias of a modulo, and shuffle with Fisher-Yates. The free characters
+  come evenly from every allowed character; before, a character set was picked first, so each
+  of the eight symbols came up about three times as often as each letter. Length and rules are
+  unchanged
+- **`OperationsProgressButton` names its button after what is running.** The button and its
+  progress bar were named after the icon ("dots button", "upload button"); they carry the
+  operation's label now, or the count of processes when several run.
+- **`PeopleSelector` and `GroupsSelector` load past their first page.** Both took the list's
+  size from the answer's `count`, which is the items in that answer - one page of 100 at most -
+  so the list never had a next page and scrolling to its end loaded nothing. They read the
+  envelope's `total` now, through `getListTotal` (`selectors/utils/getListTotal`).
+- **`PeopleSelector` counts the rows it leaves out once, and pages by the rows loaded.** It asked
+  for the next page by the rows drawn, fewer than the rows loaded once the current user, an
+  excluded or a disabled account was left out, so pages overlapped and the rows left out were
+  counted again; with `withOutCurrentAuthorizedUser` the user was also counted off on every
+  page, and off lists they are not in. The total ran short and the list could end before its
+  last rows. Pages now start after the rows the portal has sent, the user is counted off on the
+  page they come with, and the list ends when the portal has no more rows.
+- **`PeopleSelector` loads on past a page with every row left out.** `Selector` asks for the
+  next page from the rows it draws, so a first page whose every account was excluded or
+  disabled left a loader and no request behind it. The pages are now asked for until one brings
+  a row or the portal has no more.
+- **`Selector` keeps its place when a page moves a row up the list.** `PeopleSelector` puts the
+  current user first on whichever page they come with, and a list with another first row counted
+  as a new list: with the focus on it, as it is from mount, the list scrolled back to its top.
+  A list that holds every row it held before is the same list - nothing scrolls, and the
+  keyboard follows its row to its new index.
+- **`Selector` asks for a next page of one row.** The row after the loaded ones draws the loader,
+  and the list asks for the row after that one. With `totalItems` one above the loaded rows - 101
+  items after a page of 100 - or counted short by the caller, no such row was in range, and the
+  list ended on its loader. While `hasNextPage` is set the row is always in range, so
+  `loadNextPage` is now also called where `hasNextPage` stays set at exactly `totalItems` rows.
+- **`Filter`'s button keeps its icon while the panel is open.** The open button turned its icon
+  white but lost the grey background it had before the move from the client, so the icon vanished
+  on the light theme. The background is back, and `--filter-btn-open-bg` overrides it.
 - **Secondary `Tabs` in a row too narrow for one tab between the arrows keep their width.** No
   tab fit between the two arrows, the tab size was divided by that zero, and every tab got an
   `Infinity` width the browser dropped. The tabs now keep the width they were measured at.
@@ -723,6 +772,7 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   windows open the portal's `/doceditor`, so the calls are now addressed to
   `window.location.origin` and the browser drops one whose window holds any other page.
 - Table: a column reset no longer squeezes the name column below its own minimum. With many columns on and a narrow list, for instance beside the AI chat, the reset took every other column's minimum out of the name column's share, down to a negative width that broke the grid: the header lost its title and the rows came out empty. The name column now keeps its minimum, and when the other columns cannot fit next to it the table shows the name column alone, as a resize already does
+- Table: a column reset no longer empties a table that has no name column, such as the billing transaction history. In a narrow list the reset fell back to showing the name column alone, so with no name column every column got zero width: the header lost its titles and the cells piled on top of each other. That fallback now applies only when the table has a name column
 
 ## 4.1.0
 

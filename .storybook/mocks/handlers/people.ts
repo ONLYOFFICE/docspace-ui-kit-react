@@ -3,6 +3,8 @@ import { http } from "msw";
 import { api, ok, page } from "../demoPortal";
 import {
   DEMO_GROUPS,
+  DEMO_LARGE_ROOM_ID,
+  DEMO_LARGE_ROOM_PEOPLE,
   DEMO_PEOPLE,
   DEMO_SELF,
   type DemoEmployee,
@@ -90,6 +92,18 @@ export const peopleHandlers = [
   http.get(api("group"), groupsList),
   // "Shared with" lists for a room, folder or file: nobody has it yet, so
   // the selector offers every group.
+  // "Shared with" list of people for a room. `count` is the size of the page
+  // and `total` all the matches, as UserController.GetUsersWithRoomShared
+  // sets them; DEMO_LARGE_ROOM_ID holds more than one page of them.
+  http.get(api("people/room/:id"), ({ request, params }) => {
+    const url = new URL(request.url);
+    const people =
+      Number(params.id) === DEMO_LARGE_ROOM_ID
+        ? DEMO_LARGE_ROOM_PEOPLE
+        : filterPeople(url);
+    const { slice, total } = page(people, url);
+    return ok(slice, { count: slice.length, total });
+  }),
   http.get(api("group/room/:id"), groupsList),
   http.get(api("group/folder/:id"), groupsList),
   http.get(api("group/file/:id"), groupsList),
