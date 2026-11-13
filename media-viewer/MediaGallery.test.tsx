@@ -180,7 +180,7 @@ describe("MediaGallery", () => {
     expect(screen.getByTestId("playlist-length")).toHaveTextContent("2");
   });
 
-  it("asks for the files of the folder, page by page", async () => {
+  it("asks for the files of the folder itself, page by page", async () => {
     get.mockResolvedValueOnce(answer([file(1, "image")], 1));
 
     renderGallery({ folderId: "sbox-12", pageSize: 25 });
@@ -189,7 +189,12 @@ describe("MediaGallery", () => {
 
     expect(get).toHaveBeenCalledTimes(1);
     expect(get).toHaveBeenCalledWith("/api/2.0/files/sbox-12", {
-      params: { startIndex: 0, count: 25, filterType: 1 },
+      params: {
+        startIndex: 0,
+        count: 25,
+        filterType: 1,
+        withsubfolders: false,
+      },
       headers: undefined,
     });
   });

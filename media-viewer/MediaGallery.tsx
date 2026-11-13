@@ -142,6 +142,7 @@ const Gallery = ({
             startIndex: loaded,
             count: pageSize,
             filterType: FilterType.FilesOnly,
+            withsubfolders: false,
           },
           headers: requestToken ? { "Request-Token": requestToken } : undefined,
         },
