@@ -12,6 +12,8 @@ The media files of one portal folder or room in the viewer, with previous / next
 - A failed first request calls `onLoadError` and renders nothing; a failed later page keeps what is loaded and stops asking.
 - A change of `folderId` or `requestToken` starts over.
 - It renders the loader until the first answer, so the viewer itself never renders on the server.
+- `folderId` takes the portal's alias `@my` for the user's own documents.
+- On the portal's own origin the files are shown straight from their `viewUrl`: the browser sends the session with the request. When the `ApiProvider` points at a portal on another origin, a media element cannot carry the key and the portal answers 403, so each file is read through the API client and shown from memory. The whole file is downloaded before it plays, TIFF and HEIC are not converted on that path, and a failed read shows the viewer's decryption error.
 
 | Property                | Type                                                            | Required | Default | Description                                                                |
 | ----------------------- | --------------------------------------------------------------- | -------- | ------- | -------------------------------------------------------------------------- |

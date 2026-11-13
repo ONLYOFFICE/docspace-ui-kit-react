@@ -7,13 +7,17 @@ import type { MediaGalleryProps } from "./MediaGallery.types";
 import type { MediaViewerProps } from "./MediaViewer.types";
 
 const get = vi.fn();
+let baseUrl = "";
+let viewerProps: MediaViewerProps | undefined;
 
 vi.mock("../providers/api", () => ({
-  useApi: () => ({ apiClient: { instance: { get } } }),
+  useApi: () => ({ apiClient: { instance: { get } }, baseUrl }),
 }));
 
-vi.mock("./MediaViewer", () => ({
-  default: ({
+const Viewer = (props: MediaViewerProps) => {
+  viewerProps = props;
+
+  const {
     files,
     playlist,
     currentFileId,
@@ -21,7 +25,9 @@ vi.mock("./MediaViewer", () => ({
     prevMedia,
     onDownload,
     onClickDownload,
-  }: MediaViewerProps) => (
+  } = props;
+
+  return (
     <div data-testid="viewer" data-current={currentFileId}>
       <span data-testid="playlist-length">{playlist.length}</span>
       <button type="button" onClick={nextMedia}>
@@ -40,7 +46,11 @@ vi.mock("./MediaViewer", () => ({
         download first
       </button>
     </div>
-  ),
+  );
+};
+
+vi.mock("./MediaViewer", () => ({
+  default: (props: MediaViewerProps) => <Viewer {...props} />,
 }));
 
 const file = (id: number, kind: "image" | "media" | "document") => ({
@@ -57,7 +67,10 @@ const file = (id: number, kind: "image" | "media" | "document") => ({
   },
 });
 
-const answer = (files: ReturnType<typeof file>[], total = files.length) => ({
+const answer = (
+  files: (ReturnType<typeof file> & { encrypted?: boolean })[],
+  total = files.length,
+) => ({
   data: { response: { files, total } },
 });
 
@@ -79,6 +92,79 @@ const current = () => screen.getByTestId("viewer").getAttribute("data-current");
 describe("MediaGallery", () => {
   beforeEach(() => {
     get.mockReset();
+    baseUrl = "";
+    viewerProps = undefined;
+  });
+
+  it("hands the viewer the files as they are on the portal's own origin", async () => {
+    baseUrl = window.location.origin;
+    get.mockResolvedValueOnce(answer([file(1, "image")]));
+
+    renderGallery();
+
+    await waitFor(() => expect(current()).toBe("1"));
+    expect(viewerProps?.playlist[0].encrypted).toBe(false);
+  });
+
+  it("reads the files of a portal on another origin through the API client", async () => {
+    baseUrl = "https://portal.test";
+    get.mockResolvedValueOnce(answer([file(1, "image")]));
+
+    renderGallery();
+
+    await waitFor(() => expect(current()).toBe("1"));
+    expect(viewerProps?.playlist[0].encrypted).toBe(true);
+
+    const blob = new Blob(["picture"]);
+    const { signal } = new AbortController();
+    get.mockResolvedValueOnce({ data: blob });
+
+    const read = await viewerProps?.decryptFile?.({
+      src: "https://portal.test/view/1",
+      fileId: 1,
+      title: "File 1",
+      signal,
+    });
+
+    expect(read).toEqual({ data: blob });
+    expect(get).toHaveBeenLastCalledWith("https://portal.test/view/1", {
+      responseType: "blob",
+      signal,
+    });
+  });
+
+  it("leaves a really encrypted file to the consumer's decryptFile", async () => {
+    baseUrl = "https://portal.test";
+    const decryptFile = vi.fn().mockResolvedValue({ data: "plain" });
+    get.mockResolvedValueOnce(
+      answer([{ ...file(1, "image"), encrypted: true }]),
+    );
+
+    renderGallery({ decryptFile });
+
+    await waitFor(() => expect(current()).toBe("1"));
+
+    const params = {
+      src: "https://portal.test/view/1",
+      fileId: 1,
+      title: "File 1",
+      signal: new AbortController().signal,
+    };
+
+    await expect(viewerProps?.decryptFile?.(params)).resolves.toEqual({
+      data: "plain",
+    });
+    expect(decryptFile).toHaveBeenCalledWith(params);
+    expect(get).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the alias of the user's own documents readable in the request", async () => {
+    get.mockResolvedValueOnce(answer([file(1, "image")]));
+
+    renderGallery({ folderId: "@my" });
+
+    await waitFor(() => expect(current()).toBe("1"));
+    expect(get.mock.calls[0][0]).toBe("/api/2.0/files/@my");
   });
 
   it("shows the loader until the folder answers, then the first media file", async () => {

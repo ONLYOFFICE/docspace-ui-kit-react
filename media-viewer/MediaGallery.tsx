@@ -7,7 +7,11 @@ import MediaViewer from "./MediaViewer";
 import { ViewerLoader } from "./sub-components/ViewerLoader";
 import { getPlaylist } from "./utils/getPlaylist";
 import type { MediaGalleryProps } from "./MediaGallery.types";
-import type { NumberOrString, TFile } from "./MediaViewer.types";
+import type {
+  DecryptFileParams,
+  NumberOrString,
+  TFile,
+} from "./MediaViewer.types";
 
 const DEFAULT_PAGE_SIZE = 100;
 
@@ -29,9 +33,11 @@ const Gallery = ({
   emptyContent = null,
   onDownload,
   onLoadError,
+  decryptFile,
+  resolveTitle,
   ...viewerProps
 }: MediaGalleryProps) => {
-  const { apiClient } = useApi();
+  const { apiClient, baseUrl } = useApi();
 
   const [files, setFiles] = useState<TFile[]>([]);
   const [canLoadMore, setCanLoadMore] = useState(true);
@@ -45,7 +51,63 @@ const Gallery = ({
   const onLoadErrorRef = useRef(onLoadError);
   onLoadErrorRef.current = onLoadError;
 
-  const playlist = useMemo(() => getPlaylist(files), [files]);
+  const filesRef = useRef(files);
+  filesRef.current = files;
+
+  // On the portal's own origin the browser sends the session with every
+  // `<img>` and `<video>` request. An application on another origin signs in
+  // with a key, which a media element cannot carry, so the portal answers its
+  // files with 403: those are read through the API client instead and shown
+  // from memory. The whole file is downloaded before it plays.
+  const needsApiClient = useMemo(() => {
+    if (typeof window === "undefined" || !baseUrl) return () => false;
+
+    const portalOrigin = new URL(baseUrl, window.location.href).origin;
+
+    if (portalOrigin === window.location.origin) return () => false;
+
+    return (src: string) =>
+      URL.canParse(src) && new URL(src).origin === portalOrigin;
+  }, [baseUrl]);
+
+  // The viewer already has one way to take a file's bytes from its consumer:
+  // the hook for encrypted files. A file read through the API client goes the
+  // same way, marked `encrypted` in the playlist only.
+  const playlist = useMemo(
+    () =>
+      getPlaylist(files).map((item) =>
+        needsApiClient(item.src) ? { ...item, encrypted: true } : item,
+      ),
+    [files, needsApiClient],
+  );
+
+  const isEncrypted = (fileId: number) =>
+    filesRef.current.find((file) => file.id === fileId)?.encrypted === true;
+
+  const readFile = useCallback(
+    async (params: DecryptFileParams) => {
+      if (isEncrypted(params.fileId)) {
+        if (!decryptFile) throw new Error("File decryption is not available");
+
+        return decryptFile(params);
+      }
+
+      const { data } = await apiClient.instance.get<Blob>(params.src, {
+        responseType: "blob",
+        signal: params.signal,
+      });
+
+      return { data };
+    },
+    [apiClient, decryptFile],
+  );
+
+  const resolveItemTitle = useMemo(() => {
+    if (!resolveTitle) return undefined;
+
+    return (item: { id: number; title: string }) =>
+      resolveTitle({ ...item, encrypted: isEncrypted(item.id) });
+  }, [resolveTitle]);
 
   const currentItem =
     playlist.find((item) => String(item.fileId) === String(mediaId)) ??
@@ -73,7 +135,8 @@ const Gallery = ({
 
     apiClient.instance
       .get<FolderContent>(
-        `/api/2.0/files/${encodeURIComponent(String(folderId))}`,
+        // "@my" is the portal's alias for the user's own documents.
+        `/api/2.0/files/${encodeURIComponent(String(folderId)).replace(/^%40/, "@")}`,
         {
           params: {
             startIndex: loaded,
@@ -161,6 +224,8 @@ const Gallery = ({
   return (
     <MediaViewer
       {...viewerProps}
+      decryptFile={readFile}
+      resolveTitle={resolveItemTitle}
       visible
       isPublicFile
       files={files}
