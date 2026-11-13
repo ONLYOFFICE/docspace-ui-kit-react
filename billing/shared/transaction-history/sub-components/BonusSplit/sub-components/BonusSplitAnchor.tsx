@@ -2,7 +2,7 @@ import type React from "react";
 
 import classNames from "classnames";
 
-import GiftIcon from "../../../../../../assets/icons/12/gift.outline.react.svg";
+import CoinIcon from "../../../../../../assets/icons/12/coin.star.react.svg";
 import { useCommonTranslation } from "../../../../../../utils/i18n";
 
 import type { WalletOperationDto } from "../../../../../store/PaymentStore";
@@ -42,7 +42,7 @@ export const BonusSplitAnchor = ({
       data-partial={split.wallet > 0}
     >
       {children}
-      <GiftIcon
+      <CoinIcon
         className={styles.icon}
         role="img"
         aria-label={

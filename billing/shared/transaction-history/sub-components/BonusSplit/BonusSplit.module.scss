@@ -12,9 +12,8 @@
   height: 12px;
   cursor: pointer;
 
-  rect,
   path {
-    stroke: var(--payment-icon-color);
+    fill: var(--payment-icon-color);
   }
 }
 
