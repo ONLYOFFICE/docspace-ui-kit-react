@@ -209,8 +209,8 @@ class AiChatStore {
 
   /**
    * The host's actions for the agent picked in the title, shown in the
-   * header's "Agent actions" menu beside the panel's own (Expand, "Save as
-   * new agent"). `null` (the default) leaves the menu to the panel's own.
+   * header's "Agent actions" menu. With `null` (the default), or none, the
+   * header has no such menu.
    */
   agentActions: AiChatAgentAction[] | null = null;
 

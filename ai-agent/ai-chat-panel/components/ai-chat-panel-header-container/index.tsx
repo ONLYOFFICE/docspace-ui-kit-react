@@ -59,26 +59,10 @@ const AiChatPanelHeaderContainer: React.FC = observer(() => {
     <AiChatPanelHeader
       title={renderTitle()}
       onClose={handleClose}
-      // With an agent picked, its actions menu follows the toolbar and
-      // holds Expand, which then has no button of its own. A fullscreen
-      // panel keeps its button: that is the way back.
-      extras={
-        showAgentActions ? (
-          <AiChatAgentActions
-            onExpand={
-              isDesktop && !store.effectiveFullscreen
-                ? store.toggleFullscreen
-                : undefined
-            }
-          />
-        ) : undefined
-      }
+      // With an agent picked, its actions menu follows the toolbar.
+      extras={showAgentActions ? <AiChatAgentActions /> : undefined}
       isFullscreen={store.effectiveFullscreen}
-      onToggleFullscreen={
-        isDesktop && (!showAgentActions || store.effectiveFullscreen)
-          ? store.toggleFullscreen
-          : undefined
-      }
+      onToggleFullscreen={isDesktop ? store.toggleFullscreen : undefined}
     />
   );
 });

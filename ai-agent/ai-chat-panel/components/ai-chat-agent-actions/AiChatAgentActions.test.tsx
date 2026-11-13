@@ -2,21 +2,9 @@ import React from "react";
 import { describe, it, expect, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
-// The chat library's stores, read for what "Save as new agent" hands over.
-vi.mock("@onlyoffice/ai-chat", () => {
-  const profile = { id: "p1", name: "Claude" };
-  return {
-    useStores: () => ({
-      useProfilesStore: Object.assign(
-        (selector: (s: unknown) => unknown) => selector({}),
-        { getState: () => ({ getProfileById: () => profile }) },
-      ),
-      useCloudsStore: (selector: (s: unknown) => unknown) =>
-        selector({ selectedContextFolders: [], selectedKnowledgeFolders: [] }),
-      selectCurrentChatProfile: () => profile,
-    }),
-  };
-});
+// The store's barrel reaches the chat library's stores, which this
+// component does not use.
+vi.mock("@onlyoffice/ai-chat", () => ({ useStores: () => ({}) }));
 
 import {
   AiChatStore,
@@ -35,10 +23,10 @@ const pickedStore = (selectedId: string | null = "1") => {
   return store;
 };
 
-const renderActions = (store: AiChatStore, onExpand?: () => void) =>
+const renderActions = (store: AiChatStore) =>
   render(
     <AiChatStoreProvider store={store}>
-      <AiChatAgentActions onExpand={onExpand} />
+      <AiChatAgentActions />
     </AiChatStoreProvider>,
   );
 
@@ -59,22 +47,22 @@ describe("AiChatAgentActions", () => {
   it("renders nothing on the default agent", () => {
     const store = pickedStore(null);
     store.setAgentActions([{ id: "edit", label: "Edit", onClick: vi.fn() }]);
-    renderActions(store, vi.fn());
+    renderActions(store);
     expect(screen.queryByTestId("ai-chat-agent-actions")).toBeNull();
   });
 
-  it("renders nothing with nothing to offer", () => {
-    renderActions(pickedStore());
+  it("renders nothing when the host offers nothing, even where it can save the chat", () => {
+    const store = pickedStore();
+    store.setOnSavePreset(vi.fn());
+    renderActions(store);
     expect(screen.queryByTestId("ai-chat-agent-actions")).toBeNull();
   });
 
-  it("lists the host's actions, then Expand and the save, then the dangerous ones", () => {
+  it("lists the host's actions, the dangerous ones last, and nothing of its own", () => {
     const onEdit = vi.fn();
     const onDelete = vi.fn();
-    const onExpand = vi.fn();
-    const onSave = vi.fn();
     const store = pickedStore();
-    store.setOnSavePreset(onSave);
+    store.setOnSavePreset(vi.fn());
     store.setAgentActions([
       {
         id: "delete",
@@ -83,37 +71,18 @@ describe("AiChatAgentActions", () => {
         isDanger: true,
       },
       { id: "edit", label: "Edit agent", onClick: onEdit },
+      { id: "info", label: "Agent info", onClick: vi.fn() },
     ]);
-    renderActions(store, onExpand);
+    renderActions(store);
     openMenu();
 
-    expect(itemIds()).toEqual(["edit", "expand", "save", "delete"]);
+    expect(itemIds()).toEqual(["edit", "info", "delete"]);
 
     fireEvent.click(screen.getByTestId("ai-chat-agent-action-edit"));
     expect(onEdit).toHaveBeenCalledTimes(1);
 
     openMenu();
-    fireEvent.click(screen.getByTestId("ai-chat-agent-action-expand"));
-    expect(onExpand).toHaveBeenCalledTimes(1);
-
-    openMenu();
-    fireEvent.click(screen.getByTestId("ai-chat-agent-action-save"));
-    expect(onSave).toHaveBeenCalledWith(
-      expect.objectContaining({ profileId: "p1" }),
-    );
-
-    openMenu();
     fireEvent.click(screen.getByTestId("ai-chat-agent-action-delete"));
     expect(onDelete).toHaveBeenCalledTimes(1);
-  });
-
-  it("leaves Expand out where the panel cannot expand, and the save out without the host's hook", () => {
-    const store = pickedStore();
-    store.setAgentActions([
-      { id: "info", label: "Agent info", onClick: vi.fn() },
-    ]);
-    renderActions(store);
-    openMenu();
-    expect(itemIds()).toEqual(["info"]);
   });
 });
