@@ -130,6 +130,20 @@ const panelWidthStorage = createPanelWidthStorage("chatPanelWidth", {
 export type AiChatSourcesManager = {
   /** Opens the owner's settings of those sources; `null` when the user may not change them. */
   onManage: (() => void) | null;
+  /**
+   * Saves a change of the Skill sets made in the composer's slash menu - a
+   * set disconnected from its row, or the pick of its "Manage skill sets"
+   * selector. Only what changed is handed over, so the rooms the owner keeps
+   * and the chat does not list (a set without skills) stay. Omitted → such
+   * a change stays in the chat.
+   */
+  onSkillRoomsChange?: (change: AiChatSkillRoomsChange) => void;
+};
+
+/** The Skill sets the user connected and disconnected in the chat. */
+export type AiChatSkillRoomsChange = {
+  added: { id: string; name: string }[];
+  removed: string[];
 };
 
 class AiChatStore {

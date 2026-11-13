@@ -3,6 +3,7 @@ export type {
   AiChatAgentPicker,
   AiChatAgentPickerItem,
   AiChatSourcesManager,
+  AiChatSkillRoomsChange,
   AiChatPresetRoom,
   AiChatContextFolder,
   AiChatPresetSettings,

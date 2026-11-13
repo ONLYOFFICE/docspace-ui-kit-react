@@ -98,6 +98,7 @@ import { addDialogSubmitInterceptor } from "./components-overrides/dialog-footer
 import { useApi as useFilesApi } from "../../providers/api";
 import { ContextRoomProvider, type ContextRoom } from "./context-room";
 import ContextRoomWatcher from "./context-room/ContextRoomWatcher";
+import { CONTEXT_ROOM_CLOUD } from "./context-room/ContextRoomSync";
 import {
   useAnalyzeQuestions,
   useComposerTyping,
@@ -735,7 +736,22 @@ const AiAgentProviders = ({
   } = useFilesIntegration({
     entityId: uploadFolderId,
     onFilesAttached,
+    onSkillRoomsChange: sourcesManager?.onSkillRoomsChange,
   });
+
+  // The composer's slash menu changes the Skill sets too. Inside an AI
+  // project they are its settings: a user who may not change them gets no
+  // "Manage skill sets" and no way to disconnect a set, and a change by one
+  // who may is saved through the project (`onSkillRoomsChange`).
+  const skillSetsLocked = !!sourcesManager && !sourcesManager.onManage;
+  const onSkillSetDisconnected = sourcesManager?.onSkillRoomsChange;
+  const onDisconnectContextRoom = useCallback(
+    (cloud: string, roomId: string) => {
+      if (cloud !== CONTEXT_ROOM_CLOUD) return;
+      onSkillSetDisconnected?.({ added: [], removed: [roomId] });
+    },
+    [onSkillSetDisconnected],
+  );
 
   // Platform adapter passed downstream. Its `file` adapter is wired to the
   // host's save handler, and it tracks the host locale/theme internally (the
@@ -1200,7 +1216,9 @@ const AiAgentProviders = ({
       // context, up to the library's limit; the AI service tells the model
       // which they are.
       composerDataSources,
-      onPickContextRooms,
+      onPickContextRooms: skillSetsLocked ? undefined : onPickContextRooms,
+      hideContextRoomDisconnect: skillSetsLocked,
+      onDisconnectContextRoom,
       onOpenContextRoom,
       onPickKnowledgeRooms,
       onOpenKnowledgeRoom: onOpenContextRoom,
@@ -1229,6 +1247,8 @@ const AiAgentProviders = ({
       composerContextHidden,
       knowledgePickerHidden,
       onPickContextRooms,
+      skillSetsLocked,
+      onDisconnectContextRoom,
       onPickKnowledgeRooms,
       onOpenContextRoom,
       composerSkills,

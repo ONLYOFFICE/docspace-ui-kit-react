@@ -58,12 +58,19 @@ export type FilesIntegration = {
 export const useFilesIntegration = ({
   entityId,
   onFilesAttached,
+  onSkillRoomsChange,
 }: {
   entityId?: string;
   // Reports every file attached through the dialog or a device upload, so the
   // caller can keep the record flags the attachments store drops
   // (`canAnalyze`).
   onFilesAttached?: OnFilesAttached;
+  // Hears what the skills room picker connected and disconnected, for a host
+  // that saves the chat's Skill sets (an AI project).
+  onSkillRoomsChange?: (change: {
+    added: { id: string; name: string }[];
+    removed: string[];
+  }) => void;
 } = {}): FilesIntegration => {
   const { t, i18n } = useTranslation(["Common"]);
 
@@ -190,7 +197,11 @@ export const useFilesIntegration = ({
         <AttachDialog onClose={closePicker} onFilesAttached={onFilesAttached} />
       ) : null}
       {roomsPicker ? (
-        <ContextRoomsDialog kind={roomsPicker} onClose={closeRoomsPicker} />
+        <ContextRoomsDialog
+          kind={roomsPicker}
+          onClose={closeRoomsPicker}
+          onSkillRoomsChange={onSkillRoomsChange}
+        />
       ) : null}
       {folderPickerVisible ? (
         <ContextFolderDialog mode="add" onClose={closeFolderPicker} />

@@ -103,6 +103,48 @@ describe("ContextRoomsDialog", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  it("tells the host what the skills pick connected and disconnected", () => {
+    clouds.selectedContextFolders = [
+      { cloud: CONTEXT_ROOM_CLOUD, room: { id: "12", name: "Skills" } },
+      { cloud: CONTEXT_ROOM_CLOUD, room: { id: "14", name: "Sales" } },
+    ];
+    const onSkillRoomsChange = vi.fn();
+    const { rerender } = render(
+      <ContextRoomsDialog
+        kind="skills"
+        onClose={vi.fn()}
+        onSkillRoomsChange={onSkillRoomsChange}
+      />,
+    );
+    act(() => {
+      selector().onSubmit([
+        { id: 12, label: "Skills" },
+        { id: 13, label: "Legal" },
+      ]);
+    });
+    expect(onSkillRoomsChange).toHaveBeenCalledWith({
+      added: [{ id: "13", name: "Legal" }],
+      removed: ["14"],
+    });
+
+    // The same rooms again: nothing to save.
+    onSkillRoomsChange.mockClear();
+    rerender(
+      <ContextRoomsDialog
+        kind="skills"
+        onClose={vi.fn()}
+        onSkillRoomsChange={onSkillRoomsChange}
+      />,
+    );
+    act(() => {
+      selector().onSubmit([
+        { id: 12, label: "Skills" },
+        { id: 14, label: "Sales" },
+      ]);
+    });
+    expect(onSkillRoomsChange).not.toHaveBeenCalled();
+  });
+
   it("sends a room once however many times the pick lists it", () => {
     // A connected room ticked again came as the preselection and the row.
     render(<ContextRoomsDialog kind="skills" onClose={vi.fn()} />);
