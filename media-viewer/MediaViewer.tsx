@@ -57,6 +57,7 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
     getIcon,
     onClose,
     onDelete,
+    onError,
     nextMedia,
     prevMedia,
     onDownload,
@@ -71,6 +72,9 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
   const TiffAbortSignalRef = useRef<AbortController>(undefined);
   const HeicAbortSignalRef = useRef<AbortController>(undefined);
   const EncryptedAbortSignalRef = useRef<AbortController>(undefined);
+
+  const filesRef = useRef(files);
+  filesRef.current = files;
 
   const isWillUnmountRef = useRef(false);
   const lastRemovedFileIdRefRef = useRef<number>(undefined);
@@ -513,7 +517,7 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
       // Trash views). For files opened inside their home private room it is
       // undefined, so we fall back to the caller-provided currentRoomId from
       // the navigation context.
-      const fileForRoom = files.find((file) => file.id === fileId);
+      const fileForRoom = filesRef.current.find((file) => file.id === fileId);
       fetchAndDecryptFile(
         src,
         fileId,
@@ -535,13 +539,6 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
       fetchAndSetTiffDataURL(src);
     }
 
-    const foundFile = files.find((file) => file.id === fileId);
-
-    if (!isNullOrUndefined(foundFile)) {
-      setTargetFile(foundFile);
-      setBufferSelection?.(foundFile);
-    }
-
     setTitle(
       resolveTitle
         ? resolveTitle({
@@ -553,12 +550,10 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
     );
   }, [
     src,
-    files,
     fileId,
     currentTitle,
     isEncrypted,
     currentRoomId,
-    setBufferSelection,
     onEmptyPlaylistError,
     fetchAndSetTiffDataURL,
     fetchAndSetHeicDataURL,
@@ -570,6 +565,15 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
   ]);
 
   useEffect(() => {
+    const foundFile = files.find((file) => file.id === fileId);
+
+    if (!isNullOrUndefined(foundFile)) {
+      setTargetFile(foundFile);
+      setBufferSelection?.(foundFile);
+    }
+  }, [files, fileId, setBufferSelection]);
+
+  useEffect(() => {
     document.addEventListener("keydown", onKeydown);
 
     return () => {
@@ -577,13 +581,17 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
     };
   }, [onKeydown]);
 
+  const isPlayableImage =
+    !pluginViewerContent && canPlay(ext) && canImageView(ext);
+
+  useEffect(() => {
+    if (isPlayableImage) onError?.();
+  }, [isPlayableImage, ext, onError]);
+
   if (pluginViewerContent) {
     canOpen = true;
   } else {
-    if (canPlay(ext) && canImageView(ext)) {
-      canOpen = false;
-      other.onError?.();
-    }
+    if (isPlayableImage) canOpen = false;
 
     if (canImageView(ext)) {
       isImage = true;

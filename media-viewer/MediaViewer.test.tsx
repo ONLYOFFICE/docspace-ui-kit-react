@@ -10,6 +10,7 @@ import {
 } from "@testing-library/react";
 
 import MediaViewer from "./MediaViewer";
+import { getFileExtension } from "./utils/common";
 import {
   getDesktopMediaContextModel,
   getMobileMediaContextModel,
@@ -394,6 +395,71 @@ describe("MediaViewer", () => {
     }
     // Button may not be rendered in mocked component
     expect(contextMenuButton).toBeDefined();
+  });
+
+  it("reads the current file once while more files arrive", async () => {
+    Object.defineProperty(URL, "createObjectURL", {
+      value: vi.fn(() => "blob:file"),
+      configurable: true,
+    });
+    Object.defineProperty(URL, "revokeObjectURL", {
+      value: vi.fn(),
+      configurable: true,
+    });
+
+    try {
+      const decryptFile = vi.fn().mockResolvedValue({ data: new Blob(["x"]) });
+      const props = createMockProps({
+        playlist: [{ ...mockPlaylistItem, encrypted: true }],
+        decryptFile,
+      });
+
+      const { rerender } = render(<MediaViewer {...props} />);
+
+      await waitFor(() => expect(decryptFile).toHaveBeenCalledTimes(1));
+
+      const files = [...props.files, { ...mockFile, id: 2, title: "next.jpg" }];
+
+      await act(async () => {
+        rerender(<MediaViewer {...props} files={files} />);
+      });
+
+      expect(decryptFile).toHaveBeenCalledTimes(1);
+      expect(props.setBufferSelection).toHaveBeenLastCalledWith(files[0]);
+    } finally {
+      Reflect.deleteProperty(URL, "createObjectURL");
+      Reflect.deleteProperty(URL, "revokeObjectURL");
+    }
+  });
+
+  it("reports a file both playable and previewable as an image once", async () => {
+    const extensionOf = vi.mocked(getFileExtension);
+    extensionOf.mockImplementation(
+      (name: string) => `.${name.split(".").pop()}`,
+    );
+
+    try {
+      const onError = vi.fn();
+      const props = createMockProps({
+        playlist: [{ ...mockPlaylistItem, title: "clip.mp4", src: "clip.mp4" }],
+        files: [{ ...mockFile, title: "clip.mp4", fileExst: ".mp4" }],
+        extsImagePreviewed: [".mp4"],
+        onError,
+      });
+
+      const { rerender } = render(<MediaViewer {...props} />);
+
+      await waitFor(() => expect(onError).toHaveBeenCalledTimes(1));
+
+      rerender(<MediaViewer {...props} deleteDialogVisible />);
+      rerender(<MediaViewer {...props} />);
+
+      expect(onError).toHaveBeenCalledTimes(1);
+    } finally {
+      extensionOf.mockImplementation(
+        (name: string) => name.split(".").pop() ?? "",
+      );
+    }
   });
 });
 
