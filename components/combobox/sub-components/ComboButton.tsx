@@ -42,6 +42,7 @@ export const ComboButton: React.FC<TComboButtonProps> = ({
   // `aria-haspopup`. Defaulting to -1 made every combo box unreachable by
   // keyboard unless the caller passed a tab index of its own.
   tabIndex = 0,
+  ariaLabel,
   isLoading = false,
   displayArrow: displayArrowProp,
   noSelect,
@@ -114,6 +115,7 @@ export const ComboButton: React.FC<TComboButtonProps> = ({
       // control is no tab stop.
       tabIndex={isDisabled ? -1 : tabIndex}
       aria-disabled={isDisabled}
+      aria-label={ariaLabel}
       aria-expanded={isOpen}
       aria-pressed={isOpen}
       aria-haspopup="listbox"

@@ -189,6 +189,11 @@ export type TComboboxProps = {
   /** Applied to the wrapper and, again, to the list. */
   style?: React.CSSProperties;
   /**
+   * Accessible name of the button. Without it the button is named by the
+   * option it shows, which says what is chosen and not what is being chosen.
+   */
+  ariaLabel?: string;
+  /**
    * Position of the button in the tab order. It is `0` by default, so the
    * control is reachable; pass `-1` to take it off the tab order.
    * @default 0
@@ -299,6 +304,8 @@ export type TComboButtonProps = {
   modernView?: boolean;
   /** Tab index */
   tabIndex?: number;
+  /** Accessible name of the button */
+  ariaLabel?: string;
   /** Indicates if the button is loading */
   isLoading?: boolean;
   /** Type of the combo box */

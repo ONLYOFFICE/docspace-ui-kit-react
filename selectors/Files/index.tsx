@@ -46,6 +46,7 @@ import {
   AI_ROOMS_SECTION_TYPES,
   FORMS_ROOT_FOLDER_TYPE,
   FORMS_SECTION_ID,
+  PRIVATE_ROOMS_ROOT_FOLDER_TYPE,
 } from "../utils/constants";
 
 const FilesSelectorComponent = (props: FilesSelectorProps) => {
@@ -63,6 +64,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     withAIRoomsTreeFolder = true,
     withRoomsTreeFolder = true,
     withFormsTreeFolder = true,
+    withPrivateTreeFolder = false,
 
     onSetBaseFolderPath,
     roomType,
@@ -236,6 +238,12 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     () => Number(rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE,
   );
 
+  // The "Private" section, as the Forms one, is entered by a click on its
+  // root entry or seeded from the caller's root.
+  const [isPrivateSection, setIsPrivateSection] = React.useState(
+    () => Number(rootFolderType) === PRIVATE_ROOMS_ROOT_FOLDER_TYPE,
+  );
+
   const [recentFolder, setRecentFolder] = React.useState<
     FolderDtoInteger | undefined
   >(undefined);
@@ -268,6 +276,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     withAIRoomsTreeFolder: withAIRooms,
     withRoomsTreeFolder,
     withFormsTreeFolder,
+    withPrivateTreeFolder,
     setRecentFolder,
     setFavoritesFolder,
   });
@@ -303,6 +312,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     aiRoomsSectionTypes:
       withAIRooms && isAiRoomsSection ? aiRoomsSectionTypes : undefined,
     formsSection: withFormsTreeFolder ? isFormsSection : undefined,
+    privateSection: withPrivateTreeFolder && isPrivateSection,
     isRoomsOnly,
     isInit,
     withCreate: withCreateState,
@@ -368,6 +378,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     withFavoritesTreeFolder,
     activeSpecialScope,
     formsSection: withFormsTreeFolder ? isFormsSection : undefined,
+    withPrivateTreeFolder,
   });
 
   const onClickBreadCrumb = React.useCallback(
@@ -430,6 +441,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
           if (specialScope) {
             setIsFormsSection(false);
             setIsAiRoomsSection(false);
+            setIsPrivateSection(false);
             setSelectedItemType("files");
           } else if (item.isRoom) {
             setIsFormsSection(
@@ -437,6 +449,9 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
             );
             setIsAiRoomsSection(
               Number(item.rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE,
+            );
+            setIsPrivateSection(
+              Number(item.rootFolderType) === PRIVATE_ROOMS_ROOT_FOLDER_TYPE,
             );
             setSelectedItemType("rooms");
           } else {
@@ -520,7 +535,8 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
               item.parentId === 0 &&
               (item.rootFolderType === FolderType.VirtualRooms ||
                 Number(item.rootFolderType) === FORMS_ROOT_FOLDER_TYPE ||
-                Number(item.rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE),
+                Number(item.rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE ||
+                Number(item.rootFolderType) === PRIVATE_ROOMS_ROOT_FOLDER_TYPE),
             roomType: item.roomType,
             shared: item.shared,
             rootFolderType: item.rootFolderType,
@@ -535,13 +551,17 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
           item.parentId === 0 &&
           (item.rootFolderType === FolderType.VirtualRooms ||
             Number(item.rootFolderType) === FORMS_ROOT_FOLDER_TYPE ||
-            Number(item.rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE)
+            Number(item.rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE ||
+            Number(item.rootFolderType) === PRIVATE_ROOMS_ROOT_FOLDER_TYPE)
         ) {
           setIsFormsSection(
             Number(item.rootFolderType) === FORMS_ROOT_FOLDER_TYPE,
           );
           setIsAiRoomsSection(
             Number(item.rootFolderType) === AI_HUB_ROOT_FOLDER_TYPE,
+          );
+          setIsPrivateSection(
+            Number(item.rootFolderType) === PRIVATE_ROOMS_ROOT_FOLDER_TYPE,
           );
           setSelectedItemType("rooms");
         } else {

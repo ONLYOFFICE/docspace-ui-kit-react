@@ -29,6 +29,7 @@ type PropsFromCombobox = Pick<
   | "showDisabledItems"
   | "withBackdrop"
   | "title"
+  | "ariaLabel"
   | "displaySelectedOption"
 >;
 

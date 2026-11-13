@@ -15,6 +15,13 @@
   --dropdown-item-padding-end-control: 12px;
 }
 
+// The analyzed form is named by AnalyzeBanner, not by a chip on the composer.
+// The widget offers no option to leave a file off the chip row, so the row is
+// hidden by the test id the widget gives it.
+.analyzeMode :global([data-testid="composer-attachments"]) {
+  display: none;
+}
+
 .chatPanel {
   container-name: chat-panel;
   container-type: inline-size;
