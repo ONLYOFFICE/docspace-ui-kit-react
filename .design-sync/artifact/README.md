@@ -110,14 +110,66 @@ states - is in the **Screens** section, measured from 82 product
 screenshots. The screenshots themselves are in the **Screenshots** asset
 group; open the one closest to what you are building.
 
+## Building a screen: rules
+
+A design made from this system is read as a picture of the product, and is
+handed on to developers and to other tools (exports, Figma). These rules keep
+it truthful. They apply to every region of the screen, the background behind
+a dialog included - a simplified background is still read as the product.
+
+1. **Start from a screenshot.** Find the closest picture in the
+   **Screenshots** group (index at the end of **Screens**) and open it before
+   drawing anything. When the request is a screen the product already has,
+   the screenshot is the reference, not your memory of the product.
+2. **Match it, do not paraphrase it.** The same items, in the same order,
+   with the same labels, icons positions and nesting: navigation entries and
+   their sub-items, header controls, toolbar buttons, table columns, panel
+   sections. Do not add an entry the screenshot lacks, drop one it has, or
+   move one. The left navigation tree is written out in **Screens** - copy
+   it from there.
+3. **Show the state the screenshot shows** unless the request names another.
+   Other states (filled, empty, error, loading) are extra artboards beside
+   it, each named for its state - not a replacement for the reference.
+4. **Use the kit's component for every region it has one for**: `Article`
+   for the left navigation, `Navigation` for a room or folder header,
+   `FilterInput` for the search toolbar, `TableContainer` / `TableHeader` /
+   `TableRow` for lists, `Aside` + `Backdrop` for side panels, `ModalDialog`
+   for centred dialogs, `EmptyView` for empty states. Plain markup is for
+   layout glue and for the parts that are not kit components (the create
+   tiles above a file list). A hand-drawn look-alike of a kit component is a
+   defect, even when it looks close.
+5. **Take icons from the Icons group, and mark what you could not source.**
+   Navigation, action, file-type, room and template icons are all there
+   (see **Iconography and assets**). An icon that is not in that group, and
+   any copy that is in neither the screenshot nor the kit's translations,
+   is a placeholder or an assumption. Draw an icon placeholder at the real
+   size, and write copy that you made up only where the screen cannot do
+   without it.
+6. **Report the differences.** End every hand-over with three short lists:
+   where the design differs from its reference screenshot, which parts are
+   placeholders, and which behaviour or copy you assumed. Say so even when
+   the difference was deliberate. Nobody should have to compare the
+   pictures to find out.
+
+There is no Figma library of these components. Whatever a design is exported
+to arrives as plain layers that link back to nothing here, so a deviation
+from the product travels with it unnoticed - which is why rules 2 and 6
+matter more than polish.
+
 ## Iconography and assets
 
 - **Logos**: the ONLYOFFICE mark for light and dark surfaces
   (`lightsmall.svg`, `dark_lightsmall.svg`, `dark_leftmenu.svg`). Use them as
   given; `PortalLogo` renders the portal's own logo.
 - **Icons**: the kit draws its icons inside components (16px, single ink
-  following the text colour). Of the icon set only the 22 icons re-exported
-  by `QuickActions` and `NavMenu` are public; the rest are not synced here.
+  following the text colour). For icons you place yourself, the **Icons**
+  asset group holds every file of the kit's `assets/icons/`, named by size
+  folder: `16/catalog.*` for the left navigation, `24/` and `32/` file
+  types for lists and tables, `64/` and `96/` for tiles, `32/room/` and
+  `32/template/` for room types. The group's README says which to use where,
+  and how to colour a single-ink icon (it is an uploaded picture, so an
+  `<img>` keeps its grey). In code, only the 22 icons re-exported by
+  `QuickActions` and `NavMenu` are public API.
 
 ## Not synced
 

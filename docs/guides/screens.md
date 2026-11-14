@@ -30,6 +30,36 @@ hex values.
   Group captions ("Apps") 12px grey; `Badge` "BETA" as a violet pill. Footer:
   a 40px light-blue "Developer Tools" bar, then a 72px user block - `Avatar`
   40px, name, `ContextMenuButton` (its menu opens upward).
+- The tree, exactly as the owner sees it with Rooms open
+  (`screenshots/97-room-invite-dialog.png`). Copy it as written - entries,
+  order, nesting and the gaps between groups - rather than from memory:
+
+  ```
+  [logo]                         [collapse]
+  Home
+  Apps                           (group caption)
+  Files
+  Rooms                          (active)
+      Recent files
+      Favorite files
+      Templates
+                                 (gap)
+      Archive
+      Trash
+                                 (gap)
+  Forms
+  Private                        [BETA]
+  AI rooms
+  ...
+  [Developer Tools            >]
+  [avatar] Emma Carter          [...]
+  ```
+
+  People is not in this tree. Which entries appear depends on the role and
+  on the apps enabled in Settings > Apps: a User sees fewer
+  (`screenshots/121-viewer-rooms-list.png`), so check the screenshot of the
+  role you are drawing.
+
 - People and Settings swap the tree for a "Back" item plus a flat list of
   their sections, same item styles.
 - **Content** starts 20px right of the nav (x=272) with a 20px right gutter.

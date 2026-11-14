@@ -6,8 +6,8 @@
 // Run from the repository root, after a design-sync build has produced
 // ds-bundle/ (see .design-sync/README.md). Writes <dir>/project/... in the
 // artifact's file layout; publishing is a separate step. --assets is the
-// record of uploaded logos and screenshots ({group: {file: {blob, size,
-// type}}}); without it the index is written with no asset groups.
+// record of uploaded logos, screenshots and icons ({group: {file: {blob,
+// size, type}}}); without it the index is written with no asset groups.
 import fs from "node:fs";
 import path from "node:path";
 
@@ -366,12 +366,60 @@ write("screens.md", screens);
 const assets = arg("assets")
   ? JSON.parse(fs.readFileSync(arg("assets"), "utf8"))
   : {};
+
+// The Icons group mirrors assets/icons/ file by file. Its uploads are made by
+// hand, so a refresh of the icons (copy-images.js) leaves the record behind
+// without anyone noticing: refuse to build until every icon on disk has an
+// upload of the same size, and nothing is recorded that is gone from disk.
+// Sizes are compared with CRLF folded to LF, so a checkout's line endings do
+// not count as a change. The recorded `size` is the source file's (LF), not
+// the one the upload reports: the store counts a few bytes more per file,
+// apparently line endings converted on upload.
+if (assets.Icons) {
+  const ICONS = path.join(REPO, "assets", "icons");
+  const onDisk = new Map();
+  const walk = (dir) => {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, e.name);
+      if (e.isDirectory()) walk(full);
+      else if (e.name.endsWith(".svg"))
+        onDisk.set(
+          path.relative(ICONS, full).split(path.sep).join("/"),
+          Buffer.byteLength(
+            fs.readFileSync(full, "utf8").replace(/\r\n/g, "\n"),
+          ),
+        );
+    }
+  };
+  walk(ICONS);
+  const problems = [];
+  for (const [name, size] of onDisk) {
+    const rec = assets.Icons[name];
+    if (!rec) problems.push(`not uploaded: assets/icons/${name}`);
+    else if (rec.size !== size)
+      problems.push(`changed since upload: assets/icons/${name}`);
+  }
+  for (const name of Object.keys(assets.Icons))
+    if (!onDisk.has(name))
+      problems.push(`gone from disk: assets/icons/${name}`);
+  if (problems.length)
+    throw new Error(
+      `the Icons record in ${arg("assets")} is out of date ` +
+        `(see "Icons" in .design-sync/README.md):\n  ${problems.join("\n  ")}`,
+    );
+  write(
+    "assets/Icons/README.md",
+    fs.readFileSync(path.join(HERE, "icons-readme.md")),
+  );
+}
+
+const TILES = { Logos: "l", Icons: "xs" };
 const assetGroups = {};
 for (const [group, files] of Object.entries(assets)) {
   const names = Object.keys(files).sort();
   assetGroups[group] = {
     name: group,
-    tile: group === "Logos" ? "l" : "m",
+    tile: TILES[group] || "m",
     order: names,
     files: Object.fromEntries(
       names.map((n) => [
