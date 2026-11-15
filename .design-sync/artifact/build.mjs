@@ -11,6 +11,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { GROUPS, diffGroup } from "./asset-groups.mjs";
+
 const arg = (name) => {
   const i = process.argv.indexOf(`--${name}`);
   return i > 0 ? process.argv[i + 1] : undefined;
@@ -367,57 +369,40 @@ const assets = arg("assets")
   ? JSON.parse(fs.readFileSync(arg("assets"), "utf8"))
   : {};
 
-// The Icons group mirrors assets/icons/ file by file. Its uploads are made by
-// hand, so a refresh of the icons (copy-images.js) leaves the record behind
-// without anyone noticing: refuse to build until every icon on disk has an
-// upload of the same size, and nothing is recorded that is gone from disk.
-// Sizes are compared with CRLF folded to LF, so a checkout's line endings do
-// not count as a change. The recorded `size` is the source file's (LF), not
-// the one the upload reports: the store counts a few bytes more per file,
-// apparently line endings converted on upload.
+// Every asset group mirrors a folder of this repository (asset-groups.mjs),
+// and its uploads are made by hand (assets.mjs), so a refresh of a folder
+// leaves the record behind without anyone noticing: refuse to build until
+// every file on disk has an upload of the same size, and nothing is recorded
+// that is gone from disk. Sizes are compared with CRLF folded to LF, so a
+// checkout's line endings do not count as a change.
 //
-// The Navigation group is checked the same way against nav-icons/, which
-// sync-nav-icons.mjs fills from the client's map of navigation icons.
-const checkMirror = (group, dir, readme) => {
-  if (!assets[group]) return;
-  const root = path.join(REPO, ...dir.split("/"));
-  const onDisk = new Map();
-  const walk = (d) => {
-    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
-      const full = path.join(d, e.name);
-      if (e.isDirectory()) walk(full);
-      else if (e.name.endsWith(".svg"))
-        onDisk.set(
-          path.relative(root, full).split(path.sep).join("/"),
-          Buffer.byteLength(
-            fs.readFileSync(full, "utf8").replace(/\r\n/g, "\n"),
-          ),
-        );
-    }
-  };
-  walk(root);
-  const problems = [];
-  for (const [name, size] of onDisk) {
-    const rec = assets[group][name];
-    if (!rec) problems.push(`not uploaded: ${dir}/${name}`);
-    else if (rec.size !== size)
-      problems.push(`changed since upload: ${dir}/${name}`);
-  }
-  for (const name of Object.keys(assets[group]))
-    if (!onDisk.has(name)) problems.push(`gone from disk: ${dir}/${name}`);
+// Logos are not checked yet: the artifact holds another revision of the three
+// logos (re-serialized, `></path>` for `/>`), and the check would refuse the
+// build until they are uploaded again from assets/logo.
+const README_OF = {
+  Icons: "icons-readme.md",
+  Navigation: "nav-icons-readme.md",
+};
+for (const group of ["Screenshots", "Icons", "Navigation"]) {
+  if (!assets[group]) continue;
+  const { missing, changed, gone } = diffGroup(REPO, group, assets[group]);
+  const dir = GROUPS[group].dir;
+  const problems = [
+    ...missing.map((n) => `not uploaded: ${dir}/${n}`),
+    ...changed.map((n) => `changed since upload: ${dir}/${n}`),
+    ...gone.map((n) => `gone from disk: ${dir}/${n}`),
+  ];
   if (problems.length)
     throw new Error(
       `the ${group} record in ${arg("assets")} is out of date ` +
-        `(see "Icons" in .design-sync/README.md):\n  ${problems.join("\n  ")}`,
+        `(run assets.mjs plan; see .design-sync/README.md):\n  ${problems.join("\n  ")}`,
     );
-  write(`assets/${group}/README.md`, fs.readFileSync(path.join(HERE, readme)));
-};
-checkMirror("Icons", "assets/icons", "icons-readme.md");
-checkMirror(
-  "Navigation",
-  ".design-sync/artifact/nav-icons",
-  "nav-icons-readme.md",
-);
+  if (README_OF[group])
+    write(
+      `assets/${group}/README.md`,
+      fs.readFileSync(path.join(HERE, README_OF[group])),
+    );
+}
 
 const TILES = { Logos: "l", Icons: "xs", Navigation: "xs" };
 const assetGroups = {};

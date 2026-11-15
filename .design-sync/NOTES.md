@@ -210,8 +210,10 @@ eager: true })` is expanded to static imports (RoomLogoCoverDialog).
   bundled with Claude Code 2.1.321.
 - The screen layout guide lives at `docs/guides/screens.md` (picked up by the
   converter's default `guidelinesGlob`). It is distilled from the product
-  screenshots in `../DocSpace/screenshots` (taken 2026-11-12, fake data),
-  which are uploaded to the project under `screenshots/` - outside every path
+  screenshots in `../DocSpace/screenshots` (taken 2026-11-12, fake data).
+  The 82 of them in the Screenshots asset group are committed at
+  `.design-sync/screenshots/`, so an artifact can be filled without that
+  checkout; they were uploaded to the project under `screenshots/` - outside every path
   this sync writes or deletes, so re-syncs leave them alone. The guide cannot
   live under `.design-sync/`: the guideline path mirrors the source path, and a
   dot folder in the project path is treated as local. `docs/guides/` is not in

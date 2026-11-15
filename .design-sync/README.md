@@ -25,16 +25,17 @@ the last sync).
 
 ## What is here
 
-| Path                          | What                                                                                                                                                                                                                                                                                                                                                     |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `config.json`                 | converter settings: project, Storybook, provider chain, title map, exclusions, card layouts                                                                                                                                                                                                                                                              |
-| `NOTES.md`                    | every problem found and its fix, grading conventions, **Re-sync risks** - read before a sync                                                                                                                                                                                                                                                             |
-| `conventions.md`              | the README header the design agent reads first (Claude Design)                                                                                                                                                                                                                                                                                           |
-| `preview-context.mjs`         | translations, theme and brand lookup the previews' providers use                                                                                                                                                                                                                                                                                         |
-| `react18-compat.mjs`          | lets the bundle run on React 18 (Claude Design templates)                                                                                                                                                                                                                                                                                                |
-| `overrides/story-imports.mjs` | fork of the converter's story-import rules (svgr, kebab-case folders, root barrel, story styles, `import.meta.glob`, react-i18next)                                                                                                                                                                                                                      |
-| `previews/*.tsx`              | hand-written preview overrides (open overlays, single-card heights)                                                                                                                                                                                                                                                                                      |
-| `artifact/`                   | the Design System artifact: `build.mjs` (converts `ds-bundle/` to the artifact's files), `README.md` (its brand book), `cover.html`, `assets.json` (ids of the uploaded logos, screenshots and icons), `icons-readme.md` (README of the Icons group), `sync-nav-icons.mjs`, `nav-icons/` and `nav-icons-readme.md` (the Navigation group and its README) |
+| Path                          | What                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `config.json`                 | converter settings: project, Storybook, provider chain, title map, exclusions, card layouts                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `NOTES.md`                    | every problem found and its fix, grading conventions, **Re-sync risks** - read before a sync                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `conventions.md`              | the README header the design agent reads first (Claude Design)                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `preview-context.mjs`         | translations, theme and brand lookup the previews' providers use                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `react18-compat.mjs`          | lets the bundle run on React 18 (Claude Design templates)                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `overrides/story-imports.mjs` | fork of the converter's story-import rules (svgr, kebab-case folders, root barrel, story styles, `import.meta.glob`, react-i18next)                                                                                                                                                                                                                                                                                                                                                                      |
+| `previews/*.tsx`              | hand-written preview overrides (open overlays, single-card heights)                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `artifact/`                   | the Design System artifact: `build.mjs` (converts `ds-bundle/` to the artifact's files), `README.md` (its brand book), `cover.html`, `asset-groups.mjs` (which folder each asset group mirrors), `assets.mjs` (plans uploads and records their ids), `assets.json` (the record of OUR artifact's uploads), `export.mjs` (a complete copy in a folder), `icons-readme.md` (README of the Icons group), `sync-nav-icons.mjs`, `nav-icons/` and `nav-icons-readme.md` (the Navigation group and its README) |
+| `screenshots/`                | the 82 product screenshots of the Screenshots asset group, which `docs/guides/screens.md` was measured from                                                                                                                                                                                                                                                                                                                                                                                              |
 
 ## Updating after a change to the kit
 
@@ -54,36 +55,89 @@ merged, one person with Can edit on the artifact:
 Two people publishing at once: the second publish is refused and has to be
 repeated, so agree on who publishes.
 
-## Icons
+## Assets
 
-The artifact's **Icons** asset group is every SVG under `assets/icons/`,
-uploaded one for one and recorded in `artifact/assets.json` under `Icons`,
-keyed by the path below `assets/icons/` (`32/word.svg`). Uploads are made by
-hand, so step 2 refuses to build while that record disagrees with the disk:
-an icon not uploaded, one whose size changed since its upload, or a record
-whose file is gone. After `copy-images.js` refreshes the icons:
+Every asset group mirrors one folder of this repository, file for file
+(`artifact/asset-groups.mjs`):
 
-1. Upload each new or changed file to the artifact as an asset (Claude
-   Code's Artifact tool, `asset: true`, at most 25 files per call). The
-   asset store fails a call now and then with `store_unavailable`; repeat
-   only the files the result says were not stored.
-2. Put each returned id in `assets.json`: `{"blob": "<id>", "size": <bytes>,
-"type": "image/svg+xml"}`, with `size` taken from the file on disk, not
-   from the upload result (the store reports a few bytes more), and delete
-   the entries of removed files.
-3. Rebuild (step 2 above) and publish as usual. An old upload that nothing
+| Group       | Folder                                                                |
+| ----------- | --------------------------------------------------------------------- |
+| Logos       | `assets/logo/`                                                        |
+| Screenshots | `.design-sync/screenshots/`                                           |
+| Icons       | `assets/icons/` (refreshed by `copy-images.js`)                       |
+| Navigation  | `.design-sync/artifact/nav-icons/` (by `artifact/sync-nav-icons.mjs`) |
+
+Assets are uploads, kept by id, and an id resolves only in the artifact it
+was uploaded to - so each artifact has its own **record** of them
+(`{group: {name: {blob, size, type}}}`). Ours is `artifact/assets.json`.
+Step 2 refuses to build while a record disagrees with the disk: a file not
+uploaded, one whose size changed since its upload, or a record whose file is
+gone. After a folder changes:
+
+1. `node .design-sync/artifact/assets.mjs plan --assets .design-sync/artifact/assets.json --out <plan.json>`
+   lists each file to upload and the path to upload it from.
+2. Upload them to the artifact as assets (Claude Code's Artifact tool,
+   `asset: true`, at most 25 files per call; nothing else can). The asset
+   store fails a call now and then with `store_unavailable`; repeat only the
+   files the result says were not stored.
+3. Write the returned ids to a file, `{"<group>/<name>": "<id>"}`, and run
+   `node .design-sync/artifact/assets.mjs record --assets .design-sync/artifact/assets.json --ids <ids.json>`.
+   It takes each size from the disk (the upload result counts CRLF line
+   endings) and drops the records of removed files.
+4. Rebuild (step 2 above) and publish as usual. An old upload that nothing
    names any more stays in the store; delete it only when you mean to.
 
-The **Navigation** group works the same way against `artifact/nav-icons/`
-(record under `Navigation`, keyed by file name). It holds every icon the
-portal's left navigation draws - the kit does not ship several of them -
-and `artifact/nav-icons-readme.md` is its README: which entry uses which
-file. Both are generated by `artifact/sync-nav-icons.mjs` from the client's
-map (`packages/shared/utils/catalogIconHelper.ts`) and committed, so a build
+Known gap: our artifact holds another revision of the three logos
+(re-serialized, `></path>` for `/>`), so `plan` lists them and step 2 does
+not check the Logos group until they are uploaded again.
+
+The Navigation group holds every icon the portal's left navigation draws -
+the kit does not ship several of them - and `artifact/nav-icons-readme.md`
+is its README: which entry uses which file. Both are generated by
+`artifact/sync-nav-icons.mjs` from the client's map
+(`packages/shared/utils/catalogIconHelper.ts`) and committed, so a build
 never needs the client. After the client changes its navigation icons, run
 `node .design-sync/artifact/sync-nav-icons.mjs` (it needs
-`DOCSPACE_CLIENT_ROOT`, default `../DocSpace/client`), then steps 1-3 for
-the files it changed.
+`DOCSPACE_CLIENT_ROOT`, default `../DocSpace/client`), then steps 1-4.
+
+## Publishing in another organization
+
+An artifact can be opened only by people its owner's organization lets in,
+so a team in another organization publishes its **own** Design System
+artifact from this same code. Nothing here is tied to ours except
+`assets.json` and the URL above. In Claude Code, at the repository root:
+
+1. Build `ds-bundle/` from the kit (it is not in git). `/design-sync` does
+   it and also re-grades the previews; the build alone is four commands,
+   checked on a fresh worktree, about two minutes:
+   - `pnpm install --frozen-lockfile` (with `CI=1` in a second worktree, so
+     `prepare` does not install git hooks into the shared `.git`)
+   - `pnpm build`
+   - `npx --no-install storybook build -c .storybook -o .design-sync/sb-reference`
+   - `node .ds-sync/package-build.mjs --config .design-sync/config.json --node-modules ./node_modules --entry ./dist/esm/index.js --out ./ds-bundle`
+     with `NODE_OPTIONS=--max-old-space-size=8192`. `.ds-sync/` is the
+     converter Claude Code stages on the first `/design-sync`; it is not in
+     git.
+2. Create the artifact: ask Claude Code for a new artifact of the Design
+   System type, titled as you like; keep its URL.
+3. Make its asset record: `node .design-sync/artifact/assets.mjs plan --assets .design-sync/artifact/assets.<team>.json --out <plan.json>`
+   (a record that does not exist yet means "upload everything": 323 files),
+   upload every file in the plan to the new artifact, and run `assets.mjs record`
+   with the ids, as in Assets above.
+4. Build with that record and publish to the new URL, as in steps 2-3 of
+   "Updating after a change to the kit".
+
+The page then matches ours, apart from the URL. Every later update repeats
+1, 3 (only what changed) and 4.
+
+## A copy in a folder
+
+`node .design-sync/artifact/export.mjs --out <dir>` writes everything the
+artifact holds to `<dir>/project/`: the 540 files a publish sends,
+`design-system.json` included, and every asset at
+`project/assets/<Group>/<file>`, copied from its folder. It needs
+`ds-bundle/` like step 2, and nothing from claude.ai. The type's own page
+(`index.html`, `SKILL.md`, `artifact-type/`) is not part of a copy.
 
 ## Not in git
 
