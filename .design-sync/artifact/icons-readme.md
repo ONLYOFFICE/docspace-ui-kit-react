@@ -7,7 +7,7 @@ group: the folder is the size in pixels.
 
 | Folder              | What is in it                                                                           | Where the product uses it                                      |
 | ------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| `16/catalog.*`      | left navigation: rooms, documents, favorites, archive, trash, private, developer tools  | `Article` items, 16px beside the label                         |
+| `16/catalog.*`      | some left-navigation icons - the full set is the **Navigation** group                   | use **Navigation** instead: the kit lacks several of them      |
 | `16/`, `24/` others | actions (copy, move, download, upload, delete, refresh, dots) and small file types      | context menus, toolbars, group menus                           |
 | `24/`, `32/`        | file types: `word`, `cell`, `slide`, `pdf`, `form`, `folder`, `image`, `video` and more | table rows (32px) and compact lists (24px)                     |
 | `64/`, `96/`        | the same file types, large                                                              | tiles and empty states                                         |

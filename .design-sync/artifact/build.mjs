@@ -375,45 +375,51 @@ const assets = arg("assets")
 // not count as a change. The recorded `size` is the source file's (LF), not
 // the one the upload reports: the store counts a few bytes more per file,
 // apparently line endings converted on upload.
-if (assets.Icons) {
-  const ICONS = path.join(REPO, "assets", "icons");
+//
+// The Navigation group is checked the same way against nav-icons/, which
+// sync-nav-icons.mjs fills from the client's map of navigation icons.
+const checkMirror = (group, dir, readme) => {
+  if (!assets[group]) return;
+  const root = path.join(REPO, ...dir.split("/"));
   const onDisk = new Map();
-  const walk = (dir) => {
-    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, e.name);
+  const walk = (d) => {
+    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+      const full = path.join(d, e.name);
       if (e.isDirectory()) walk(full);
       else if (e.name.endsWith(".svg"))
         onDisk.set(
-          path.relative(ICONS, full).split(path.sep).join("/"),
+          path.relative(root, full).split(path.sep).join("/"),
           Buffer.byteLength(
             fs.readFileSync(full, "utf8").replace(/\r\n/g, "\n"),
           ),
         );
     }
   };
-  walk(ICONS);
+  walk(root);
   const problems = [];
   for (const [name, size] of onDisk) {
-    const rec = assets.Icons[name];
-    if (!rec) problems.push(`not uploaded: assets/icons/${name}`);
+    const rec = assets[group][name];
+    if (!rec) problems.push(`not uploaded: ${dir}/${name}`);
     else if (rec.size !== size)
-      problems.push(`changed since upload: assets/icons/${name}`);
+      problems.push(`changed since upload: ${dir}/${name}`);
   }
-  for (const name of Object.keys(assets.Icons))
-    if (!onDisk.has(name))
-      problems.push(`gone from disk: assets/icons/${name}`);
+  for (const name of Object.keys(assets[group]))
+    if (!onDisk.has(name)) problems.push(`gone from disk: ${dir}/${name}`);
   if (problems.length)
     throw new Error(
-      `the Icons record in ${arg("assets")} is out of date ` +
+      `the ${group} record in ${arg("assets")} is out of date ` +
         `(see "Icons" in .design-sync/README.md):\n  ${problems.join("\n  ")}`,
     );
-  write(
-    "assets/Icons/README.md",
-    fs.readFileSync(path.join(HERE, "icons-readme.md")),
-  );
-}
+  write(`assets/${group}/README.md`, fs.readFileSync(path.join(HERE, readme)));
+};
+checkMirror("Icons", "assets/icons", "icons-readme.md");
+checkMirror(
+  "Navigation",
+  ".design-sync/artifact/nav-icons",
+  "nav-icons-readme.md",
+);
 
-const TILES = { Logos: "l", Icons: "xs" };
+const TILES = { Logos: "l", Icons: "xs", Navigation: "xs" };
 const assetGroups = {};
 for (const [group, files] of Object.entries(assets)) {
   const names = Object.keys(files).sort();

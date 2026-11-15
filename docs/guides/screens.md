@@ -61,7 +61,37 @@ hex values.
   role you are drawing.
 
 - People and Settings swap the tree for a "Back" item plus a flat list of
-  their sections, same item styles.
+  their sections, same item styles. Settings as the owner of a Community
+  edition portal sees it (`screenshots/49-settings-security-audit-trail.png`),
+  each entry with its file in the **Navigation** icon group:
+
+  ```
+  [logo]                         [collapse]   article-hide-menu.react.svg
+  Back                                        arrow-left.react.svg
+                                 (gap)
+  Customization                               catalog-settings-common.svg
+  Security                                    catalog-settings-security.svg
+  Backup                                      catalog-settings-data-management.svg
+  Restore                                     catalog-settings-restore.svg
+  Integration                                 catalog-settings-integration.svg
+  Data import                                 catalog.import.react.svg
+  Storage management                          catalog-settings-storage-management.svg
+  AI settings                                 AI.svg
+  Apps                                        catalog.devtools-plugin-sdk.react.svg
+  Upgrade                                     gift.react.svg
+  ...
+  [Developer Tools            >]              catalog.developer.react.svg, arrow.right.react.svg
+  [avatar] Emma Carter          [...]
+  ```
+
+  Developer Tools (`screenshots/74-devtools-api-keys.png`): Back, then
+  Overview (`catalog-settings-integration.svg`), Embed SDK
+  (`catalog.devtools-javascript-sdk.react.svg`), Plugin SDK
+  (`catalog.devtools-plugin-sdk.react.svg`), Webhooks
+  (`catalog.devtools-webhooks.react.svg`), OAuth 2.0
+  (`catalog.devtools-oauth.react.svg`), API keys
+  (`catalog.devtools-api-keys.react.svg`); no Developer Tools bar.
+
 - **Content** starts 20px right of the nav (x=272) with a 20px right gutter.
 
 ## Section header (70px)

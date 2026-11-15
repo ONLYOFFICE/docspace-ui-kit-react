@@ -25,16 +25,16 @@ the last sync).
 
 ## What is here
 
-| Path                          | What                                                                                                                                                                                                                                                 |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `config.json`                 | converter settings: project, Storybook, provider chain, title map, exclusions, card layouts                                                                                                                                                          |
-| `NOTES.md`                    | every problem found and its fix, grading conventions, **Re-sync risks** - read before a sync                                                                                                                                                         |
-| `conventions.md`              | the README header the design agent reads first (Claude Design)                                                                                                                                                                                       |
-| `preview-context.mjs`         | translations, theme and brand lookup the previews' providers use                                                                                                                                                                                     |
-| `react18-compat.mjs`          | lets the bundle run on React 18 (Claude Design templates)                                                                                                                                                                                            |
-| `overrides/story-imports.mjs` | fork of the converter's story-import rules (svgr, kebab-case folders, root barrel, story styles, `import.meta.glob`, react-i18next)                                                                                                                  |
-| `previews/*.tsx`              | hand-written preview overrides (open overlays, single-card heights)                                                                                                                                                                                  |
-| `artifact/`                   | the Design System artifact: `build.mjs` (converts `ds-bundle/` to the artifact's files), `README.md` (its brand book), `cover.html`, `assets.json` (ids of the uploaded logos, screenshots and icons), `icons-readme.md` (README of the Icons group) |
+| Path                          | What                                                                                                                                                                                                                                                                                                                                                     |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `config.json`                 | converter settings: project, Storybook, provider chain, title map, exclusions, card layouts                                                                                                                                                                                                                                                              |
+| `NOTES.md`                    | every problem found and its fix, grading conventions, **Re-sync risks** - read before a sync                                                                                                                                                                                                                                                             |
+| `conventions.md`              | the README header the design agent reads first (Claude Design)                                                                                                                                                                                                                                                                                           |
+| `preview-context.mjs`         | translations, theme and brand lookup the previews' providers use                                                                                                                                                                                                                                                                                         |
+| `react18-compat.mjs`          | lets the bundle run on React 18 (Claude Design templates)                                                                                                                                                                                                                                                                                                |
+| `overrides/story-imports.mjs` | fork of the converter's story-import rules (svgr, kebab-case folders, root barrel, story styles, `import.meta.glob`, react-i18next)                                                                                                                                                                                                                      |
+| `previews/*.tsx`              | hand-written preview overrides (open overlays, single-card heights)                                                                                                                                                                                                                                                                                      |
+| `artifact/`                   | the Design System artifact: `build.mjs` (converts `ds-bundle/` to the artifact's files), `README.md` (its brand book), `cover.html`, `assets.json` (ids of the uploaded logos, screenshots and icons), `icons-readme.md` (README of the Icons group), `sync-nav-icons.mjs`, `nav-icons/` and `nav-icons-readme.md` (the Navigation group and its README) |
 
 ## Updating after a change to the kit
 
@@ -73,6 +73,17 @@ whose file is gone. After `copy-images.js` refreshes the icons:
    the entries of removed files.
 3. Rebuild (step 2 above) and publish as usual. An old upload that nothing
    names any more stays in the store; delete it only when you mean to.
+
+The **Navigation** group works the same way against `artifact/nav-icons/`
+(record under `Navigation`, keyed by file name). It holds every icon the
+portal's left navigation draws - the kit does not ship several of them -
+and `artifact/nav-icons-readme.md` is its README: which entry uses which
+file. Both are generated by `artifact/sync-nav-icons.mjs` from the client's
+map (`packages/shared/utils/catalogIconHelper.ts`) and committed, so a build
+never needs the client. After the client changes its navigation icons, run
+`node .design-sync/artifact/sync-nav-icons.mjs` (it needs
+`DOCSPACE_CLIENT_ROOT`, default `../DocSpace/client`), then steps 1-3 for
+the files it changed.
 
 ## Not in git
 

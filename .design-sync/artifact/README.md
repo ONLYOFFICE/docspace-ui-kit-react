@@ -101,6 +101,38 @@ properties (`margin-inline-start`, `padding-block`) so RTL works.
 - The kit targets React 19. On React 18 the bundle patches `use`,
   `useEffectEvent` and context providers itself; a `ref` passed as a plain
   prop to a function component is dropped there.
+- `SearchInput` with `showClearButton` shows a cross in an empty field; leave
+  it off to get the search loupe.
+
+### On a Design canvas
+
+A canvas mounts each component through `<x-import>` and wraps every one in a
+`<div style="display: contents">`. Most components do not notice; these do:
+
+- **`Article` renders an empty panel.** It finds its `Article.Header`,
+  `Article.MainButton` and `Article.Body` slots by `displayName`, and the
+  wrapper hides them, so every slot is dropped. On a canvas draw the left
+  navigation as markup: items 36px, 16px icon from the **Navigation** group
+  plus a 13px semi-bold label, the active item a grey pill (radius 3px) in
+  the accent colour. Say in the hand-over that it stands in for `Article`.
+- **A table needs 25px of room above it, and no scrolling box around it.**
+  `TableContainer` has `margin-top: -25px` and `TableHeader` is
+  `position: fixed`; without the room the header covers whatever is above
+  the table, and inside an `overflow` box it is clipped. Give the header and
+  the body the same `columnStorageName` and `columnInfoPanelStorageName`,
+  and `withoutWideColumn` when no column should take 40% of the width.
+- **A ref that ends up holding a DOM node breaks the artboard** with
+  "Maximum call stack size exceeded": the runtime walks what `renderVals()`
+  returns, and a DOM node leads back to itself through React's fields. Give
+  `TableContainer`/`TableHeader` a ref whose `current` is a non-enumerable
+  accessor (`Object.defineProperty(ref, "current", { get, set,
+enumerable: false })`).
+- **Fonts: pick the file by its `style` in `tokens.json`, not by its name.**
+  The `memvY…` files are Open Sans normal and `memtY…` italic; the Latin
+  subset is the one without a script suffix
+  (`memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS-muw.woff2`). Copy it into the
+  canvas and declare it in an `@font-face` with weights 300-800; without it
+  the page falls back to Arial.
 
 ## Screens
 
@@ -138,14 +170,23 @@ a dialog included - a simplified background is still read as the product.
    layout glue and for the parts that are not kit components (the create
    tiles above a file list). A hand-drawn look-alike of a kit component is a
    defect, even when it looks close.
-5. **Take icons from the Icons group, and mark what you could not source.**
-   Navigation, action, file-type, room and template icons are all there
-   (see **Iconography and assets**). An icon that is not in that group, and
-   any copy that is in neither the screenshot nor the kit's translations,
-   is a placeholder or an assumption. Draw an icon placeholder at the real
-   size, and write copy that you made up only where the screen cannot do
-   without it.
-6. **Report the differences.** End every hand-over with three short lists:
+5. **Take icons from the Navigation and Icons groups, and mark what you
+   could not source.** Every left-navigation icon - Files, Rooms, People,
+   each Settings and Developer Tools entry, the panel's back, hide-menu and
+   Developer Tools arrow - is in **Navigation**, with a table of which entry
+   uses which file; action, file-type, room and template icons are in
+   **Icons** (see **Iconography and assets**). An icon that is in neither,
+   and any copy that is in neither the screenshot nor the kit's
+   translations, is a placeholder or an assumption. Draw an icon placeholder
+   at the real size, and write copy that you made up only where the screen
+   cannot do without it.
+6. **Look at what you made before handing it over.** Render the design, take
+   a screenshot at the reference's size, and compare it with the reference
+   screenshot region by region: nothing overlapping or clipped, no label
+   truncated that the reference shows whole, the right font (not italic, not
+   a fallback), every icon present. "It renders without errors" is not this
+   check. Fix what the comparison shows, and look again.
+7. **Report the differences.** End every hand-over with three short lists:
    where the design differs from its reference screenshot, which parts are
    placeholders, and which behaviour or copy you assumed. Say so even when
    the difference was deliberate. Nobody should have to compare the
@@ -153,7 +194,7 @@ a dialog included - a simplified background is still read as the product.
 
 There is no Figma library of these components. Whatever a design is exported
 to arrives as plain layers that link back to nothing here, so a deviation
-from the product travels with it unnoticed - which is why rules 2 and 6
+from the product travels with it unnoticed - which is why rules 2, 6 and 7
 matter more than polish.
 
 ## Iconography and assets
@@ -164,12 +205,18 @@ matter more than polish.
 - **Icons**: the kit draws its icons inside components (16px, single ink
   following the text colour). For icons you place yourself, the **Icons**
   asset group holds every file of the kit's `assets/icons/`, named by size
-  folder: `16/catalog.*` for the left navigation, `24/` and `32/` file
+  folder: `24/` and `32/` file
   types for lists and tables, `64/` and `96/` for tiles, `32/room/` and
   `32/template/` for room types. The group's README says which to use where,
   and how to colour a single-ink icon (it is an uploaded picture, so an
   `<img>` keeps its grey). In code, only the 22 icons re-exported by
   `QuickActions` and `NavMenu` are public API.
+- **Navigation**: every icon the left navigation draws, taken from the
+  product's own map of navigation entries to icons, plus the panel's
+  controls. The kit does not ship several of them (Integration, Data import,
+  Apps, every Developer Tools entry, the Upgrade gift), so they are not in
+  **Icons**; take navigation icons from here. Its README is the table of
+  which entry uses which file.
 
 ## Not synced
 
