@@ -132,15 +132,40 @@ The page then matches ours, apart from the URL. Every later update repeats
 
 ## A copy in a folder
 
-`node .design-sync/artifact/export.mjs --out <dir>` writes everything the
+The quickest way to the design system on your own machine, artifact or no
+artifact: run `/design-system-init` in Claude Code at the repository root
+(`.claude/skills/design-system-init/`). It checks for the converter, builds
+`ds-bundle/` (step 1 of the previous section), exports the copy to
+`../ds-export/project/` and checks it - about two minutes **once the converter
+is in place**. The converter is the one thing it cannot provide: without
+`.ds-sync/` it stops and asks for one `/design-sync`, which stages it. That
+run diffs against the committed anchor (see "Not in git"), so it grades only
+what changed since the last verified sync, not all 123 components.
+
+By hand, `node .design-sync/artifact/export.mjs --out <dir>` writes everything the
 artifact holds to `<dir>/project/`: the 540 files a publish sends,
 `design-system.json` included, and every asset at
 `project/assets/<Group>/<file>`, copied from its folder. It needs
 `ds-bundle/` like step 2, and nothing from claude.ai. The type's own page
 (`index.html`, `SKILL.md`, `artifact-type/`) is not part of a copy.
 
+The copy stands on its own: its `design-system.json` names each asset by
+that local path (`file`) instead of an upload id, every path in it is
+relative to `project/`, and the export fails if one has no file behind it.
+Zip the folder to hand the design system to someone who cannot open the
+artifact, or point an agent at it ("read `project/README.md` first"). It is
+not a way to publish: an artifact's index needs that artifact's upload ids,
+so a team that wants its own artifact follows the previous section.
+
 ## Not in git
 
 `ds-bundle/`, `.ds-sync/` (staged converter scripts), `sb-reference/` (the
 reference Storybook), `.cache/` (grades and comparisons), `learnings/` and
-logs. Verification state is carried by the published project, not by git.
+logs.
+
+What **is** in git is the verification anchor, `sync-anchor.json`: which
+version of every component was last verified. A re-sync diffs against it
+and grades only the components whose sources moved since, so a fresh
+checkout - on any machine, in any organization - grades nothing it has not
+changed. Whoever re-syncs refreshes it after grading (`NOTES.md`,
+"Verification anchor").

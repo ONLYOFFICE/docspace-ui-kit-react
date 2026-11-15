@@ -14,6 +14,33 @@ Read before every re-sync.
   locally first and approve the upload later. The project
   (`projectId` in config.json) was created empty and stays empty until then.
 
+## Verification anchor (committed - read before step 2 of a re-sync)
+
+- This repository departs from the skill's "verification state is never
+  committed" on purpose: the repository is the source of truth, so the
+  anchor of the last verified upload is committed as
+  `.design-sync/sync-anchor.json` (the `_ds_sync.json` sidecar: render
+  hashes, source keys and source hashes of the 123 components). The
+  project's copy is not used: claude.ai/design closes on 14 December 2026,
+  and nobody outside our organization can read it.
+- On a re-sync, do NOT fetch the anchor with `DesignSync get_file`. Use the
+  committed one: `--remote .design-sync/sync-anchor.json` for `resync.mjs`
+  (or copy it to `.design-sync/.cache/remote-sync.json` where the skill
+  expects that file). Only components whose sources moved since the anchor
+  are graded; on an untouched checkout that is none.
+- After grading and publishing, copy `ds-bundle/_ds_sync.json` over
+  `.design-sync/sync-anchor.json` and commit it with the rest of the sync.
+  Never refresh it before every pending grade is done: the anchor vouches
+  that what it lists was verified.
+- Checked 2026-11-16: the committed file equals the project's `_ds_sync.json`
+  (control fields and counts), and a `resync.mjs --remote` run on a fresh
+  worktree of `12442893` reported 123 unchanged, 0 changed or added, and a
+  canary of two churned renders - `RoomLogoCoverDialog` and
+  `TranslationProvider`, whose previews gained the `Private` string after the
+  last sync. Those two are the open grades.
+- A different converter version may change `keyRecipe` (now 7); the diff then
+  falls back to render hashes, and more components may come up for grading.
+
 ## Fixes
 
 - [GENERAL] Decorator bundle fails: `.storybook/mocks/handlers/portal.ts`

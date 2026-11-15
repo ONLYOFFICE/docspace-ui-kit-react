@@ -11,7 +11,12 @@
 // file whose size differs from its upload is copied and reported, because the
 // artifact then holds another revision of it. Output: <dir>/project/ in the
 // artifact's layout, design-system.json included, each asset at
-// project/assets/<Group>/<file> beside that group's README.md.
+// project/assets/<Group>/<file> beside that group's README.md. The copy's
+// index names each asset by that path (`file`) instead of its upload id, and
+// every path in it is relative to project/, so the folder stands on its own
+// and is checked to: an index path with no file behind it fails the export.
+// It is a copy to read and share, not something to publish: a published
+// artifact needs upload ids (see "Publishing in another organization").
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
@@ -81,7 +86,49 @@ for (const [group, files] of Object.entries(record)) {
   }
 }
 
+// 3. Point the index at the copies. In the artifact an asset is named by its
+// upload id, which resolves in that one artifact only; here each copied asset
+// gets a `file` path instead, relative to project/ like `libraries[].file`.
+// An asset that was not copied keeps its id, and is reported above.
+const indexPath = path.join(OUT, "project", "design-system.json");
+const index = JSON.parse(fs.readFileSync(indexPath, "utf8"));
+let relinked = 0;
+for (const [group, { files }] of Object.entries(index.assetGroups || {}))
+  for (const [name, entry] of Object.entries(files)) {
+    const file = `assets/${group}/${name}`;
+    const copy = path.join(OUT, "project", ...file.split("/"));
+    if (!fs.existsSync(copy)) continue;
+    delete entry.blob;
+    entry.file = file;
+    // The size of the file in the copy, which differs from the upload's for
+    // an asset reported above as another revision.
+    entry.size = fs.statSync(copy).size;
+    relinked++;
+  }
+// build.mjs names the README from the artifact's root (project/README.md);
+// the copy's index sits inside project/, so every path is relative to it.
+if (index.docs?.readme?.startsWith("project/"))
+  index.docs.readme = index.docs.readme.slice("project/".length);
+fs.writeFileSync(indexPath, `${JSON.stringify(index, null, 2)}\n`);
+
+// 4. Every path the index names has to exist in the copy.
+const named = [
+  ...(index.libraries || []).map((l) => l.file),
+  index.docs?.readme,
+  ...Object.values(index.assetGroups || {}).flatMap(({ files }) =>
+    Object.values(files)
+      .map((f) => f.file)
+      .filter(Boolean),
+  ),
+].filter(Boolean);
+for (const file of named)
+  if (!fs.existsSync(path.join(OUT, "project", ...file.split("/"))))
+    problems.push(`design-system.json names ${file}, which is not in the copy`);
+
 console.log(`${copied} asset files copied into ${path.join(OUT, "project")}`);
+console.log(
+  `${relinked} assets linked by local path in design-system.json, ${named.length} paths checked`,
+);
 if (differs.length)
   console.warn(
     `${differs.length} copied from the repository but not byte-identical to the upload ` +
