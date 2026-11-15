@@ -15,7 +15,7 @@
 // client maps each navigation entry to its icon in
 // packages/shared/utils/catalogIconHelper.ts; this script reads that map, so
 // the group is exactly what the product draws. Article's own controls (back,
-// hide and show menu, the Developer Tools arrow) come from this kit's assets/.
+// the collapse toggle, the Developer Tools arrow) come from this kit's assets/.
 import fs from "node:fs";
 import path from "node:path";
 
@@ -89,8 +89,13 @@ const KIT = [
     "arrow-left.react.svg",
     "Back (top of the People, Settings and Developer Tools trees)",
   ],
-  ["article-hide-menu.react.svg", "Hide menu (beside the logo)"],
-  ["article-show-menu.react.svg", "Show menu (collapsed panel)"],
+  // The client's AppsSidebar/CollapseButton draws this one icon in both
+  // states; article-hide-menu and article-show-menu are older arrows that the
+  // product no longer shows.
+  [
+    "article-hide-menu-icon.react.svg",
+    "Collapse and expand the panel (beside the logo)",
+  ],
   ["arrow.right.react.svg", "Developer Tools bar: arrow at its end"],
 ];
 

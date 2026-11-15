@@ -66,7 +66,7 @@ hex values.
   each entry with its file in the **Navigation** icon group:
 
   ```
-  [logo]                         [collapse]   article-hide-menu.react.svg
+  [logo]                         [collapse]   article-hide-menu-icon.react.svg
   Back                                        arrow-left.react.svg
                                  (gap)
   Customization                               catalog-settings-common.svg
@@ -108,8 +108,14 @@ hex values.
   then three 32px square `IconButton`s - filter, sort, view switch - 8px gaps.
 - `TableContainer` / `TableHeader` / `TableRow`: header labels 12-13px
   semi-bold grey with column resize ticks and a settings gear at the end; rows
-  48px with a 1px light divider. First cell: 32px file icon / `RoomLogo` /
-  `Avatar` + 14px semi-bold name; other cells 12-13px semi-bold grey. Row end:
+  48px with a 1px light divider. First cell: 32px file icon / `RoomLogo` +
+  the name as `Link` (page type, 13px, weight 600, the text colour). Every
+  other cell is `Text` at 12px, weight 600, grey (`#A3A9AE`, the theme's
+  table side colour) - numbers, ids and dates alike; a date carries its time
+  (`11/15/2026 4:08 PM`). A person column (Owner, Author, Created by) is
+  **not** a 32px avatar with a dark name: it is a 16px `Avatar` - the
+  person's photo, or `isDefaultSource` for the grey silhouette, never
+  initials - 8px before the name in the same 12px grey `Text`. Row end:
   quick action (link, star) + `ContextMenuButton`. Hover and selection paint
   the full row light grey; selecting rows replaces the header with
   `TableGroupMenu`.
@@ -145,8 +151,14 @@ hex values.
 
 ## Settings pages
 
-- Page title at the top, `Tabs` under it (13-14px, active = accent blue with a
-  3px underline, full-width divider below).
+- Page title at the top: `Heading type="content"` (18px bold, the section
+  header the portal draws) - not a `level`/`size` pair. `Tabs` under it
+  (13-14px, active = accent blue with a 3px underline, full-width divider
+  below).
+- The intro under the tabs is `Text` (13px, regular) in the settings
+  description colour, `var(--settings-common-description-color)` - the kit
+  does not define it, so give the fallback `#657077` (`#858585` dark) - capped
+  at 660px with 12px below it. A table under it keeps its 25px of room.
 - Content column capped at ~660-700px. Each tab: 13px grey description + an
   underlined `Link` "Learn more", then sections with 16px bold headings,
   1px dividers, ~30-35px vertical rhythm.

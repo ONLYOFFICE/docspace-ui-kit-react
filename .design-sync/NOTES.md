@@ -242,3 +242,15 @@ eager: true })` is expanded to static imports (RoomLogoCoverDialog).
   `useOptimistic`, `use(promise)`, a `ref` the kit depends on) breaks
   templates again. Grep the bundle's `import_react*.<name>` list against
   React 18 after a kit upgrade.
+- A table on a Design canvas failed with "Maximum call stack size exceeded"
+  as soon as anything re-rendered it (a `FilterInput` above it was enough).
+  React 18 puts an enumerable `_owner` (the fiber) on every element, and
+  `TableRow`, `TableGroupMenu`, `DragAndDrop` and `Section` are memoised with
+  plain `fast-deep-equal`, which walks from `children[i]._owner` round the
+  fiber's `alternate` cycle. React 19 production leaves `_owner` null, so the
+  product never sees it. Fix: `react18-compat.mjs` wraps `React.memo`
+  comparators on React 18 so they get props whose elements carry no
+  `_owner` - what `fast-deep-equal/react` skips anyway. Verified on the
+  Skills canvas page with the real canvas runtime: the overflow reproduced
+  with an instrumented `fast-deep-equal` (path `children.13._owner.alternate…`)
+  and is gone with the patch.

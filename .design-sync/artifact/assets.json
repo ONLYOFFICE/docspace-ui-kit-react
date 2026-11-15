@@ -1449,5 +1449,177 @@
       "size": 1024,
       "type": "image/svg+xml"
     }
+  },
+  "Navigation": {
+    "AI.svg": {
+      "blob": "ac27fa28af541b79c804eb220f599741",
+      "size": 1950,
+      "type": "image/svg+xml"
+    },
+    "arrow-left.react.svg": {
+      "blob": "91f65a66b52df1f0c7d69ac09f9d3b33",
+      "size": 370,
+      "type": "image/svg+xml"
+    },
+    "arrow.right.react.svg": {
+      "blob": "38a6bf3a17c16abce799d84570a13569",
+      "size": 553,
+      "type": "image/svg+xml"
+    },
+    "article-hide-menu-icon.react.svg": {
+      "blob": "d66357ce8a6657da4a66d18bd79e567c",
+      "size": 395,
+      "type": "image/svg+xml"
+    },
+    "catalog-settings-common.svg": {
+      "blob": "76a8100fb75bdeadfae7e2a561dfcf39",
+      "size": 3224,
+      "type": "image/svg+xml"
+    },
+    "catalog-settings-data-management.svg": {
+      "blob": "2f1d6e54d2d250264721f909f749e315",
+      "size": 563,
+      "type": "image/svg+xml"
+    },
+    "catalog-settings-integration.svg": {
+      "blob": "19c76d4bee0e874114f91406ae95acea",
+      "size": 1188,
+      "type": "image/svg+xml"
+    },
+    "catalog-settings-payment.svg": {
+      "blob": "de63c7649994d809a5a7e6ddf087c507",
+      "size": 1617,
+      "type": "image/svg+xml"
+    },
+    "catalog-settings-restore.svg": {
+      "blob": "f6a5c3e602adbc7831a14ded21cdfa3c",
+      "size": 822,
+      "type": "image/svg+xml"
+    },
+    "catalog-settings-security.svg": {
+      "blob": "a4c47f7faa8664d8c34da95ab9c4fea1",
+      "size": 1504,
+      "type": "image/svg+xml"
+    },
+    "catalog-settings-services.svg": {
+      "blob": "97a927d15d95694a713c8e0e230bcaf4",
+      "size": 857,
+      "type": "image/svg+xml"
+    },
+    "catalog-settings-storage-management.svg": {
+      "blob": "01b50c341c354c13b7e9739521d655f6",
+      "size": 1189,
+      "type": "image/svg+xml"
+    },
+    "catalog.archive.react.svg": {
+      "blob": "e9eae15e675ac57a5fe1bba255b3700d",
+      "size": 598,
+      "type": "image/svg+xml"
+    },
+    "catalog.developer.react.svg": {
+      "blob": "4145f6fe1fa642a9baeeb59c5c4b7415",
+      "size": 3697,
+      "type": "image/svg+xml"
+    },
+    "catalog.devtools-api-keys.react.svg": {
+      "blob": "491f0b7d5a6959d6f107950b3bc0eb45",
+      "size": 939,
+      "type": "image/svg+xml"
+    },
+    "catalog.devtools-javascript-sdk.react.svg": {
+      "blob": "ba5c5842081e592f36cf0a7614b4b454",
+      "size": 725,
+      "type": "image/svg+xml"
+    },
+    "catalog.devtools-oauth.react.svg": {
+      "blob": "ee916889254bd1ab195dae3bd4b766e1",
+      "size": 1493,
+      "type": "image/svg+xml"
+    },
+    "catalog.devtools-plugin-sdk.react.svg": {
+      "blob": "cd52181aa3d253ace32cb56ae213a88e",
+      "size": 2384,
+      "type": "image/svg+xml"
+    },
+    "catalog.devtools-webhooks.react.svg": {
+      "blob": "2ac28bd5066ab7841d2ac71ea716cc48",
+      "size": 332,
+      "type": "image/svg+xml"
+    },
+    "catalog.documents.react.svg": {
+      "blob": "0d6c48da54d9f4a46b93d94cfb431e74",
+      "size": 441,
+      "type": "image/svg+xml"
+    },
+    "catalog.favorites.react.svg": {
+      "blob": "f21f1f1065b4007ae2196147d3b3404b",
+      "size": 1365,
+      "type": "image/svg+xml"
+    },
+    "catalog.folder.react.svg": {
+      "blob": "df71bd73fa81d82f113e2e491a786527",
+      "size": 771,
+      "type": "image/svg+xml"
+    },
+    "catalog.form.react.svg": {
+      "blob": "ec1ef2b1596cb56fd146d417ee7c3cd2",
+      "size": 352,
+      "type": "image/svg+xml"
+    },
+    "catalog.guest.react.svg": {
+      "blob": "b746f5d55ebf774d5b4d235436bb0d3d",
+      "size": 773,
+      "type": "image/svg+xml"
+    },
+    "catalog.import.react.svg": {
+      "blob": "d9cffb2b8c1a109edd736c347f08c745",
+      "size": 574,
+      "type": "image/svg+xml"
+    },
+    "catalog.portfolio.react.svg": {
+      "blob": "48261ec4d3a521a779b62e101e05f2a8",
+      "size": 663,
+      "type": "image/svg+xml"
+    },
+    "catalog.private.react.svg": {
+      "blob": "76333e7a52cee1b026aeebb9ceed2a69",
+      "size": 873,
+      "type": "image/svg+xml"
+    },
+    "catalog.rooms.react.svg": {
+      "blob": "796f0ad280f7d7b37ee65025af44bfae",
+      "size": 1024,
+      "type": "image/svg+xml"
+    },
+    "catalog.shared.outline.svg": {
+      "blob": "d058b8d71d6c8324aa0373378f236d35",
+      "size": 752,
+      "type": "image/svg+xml"
+    },
+    "catalog.template.react.svg": {
+      "blob": "7f2d3115ce4cd212c0eb93b0f207a46a",
+      "size": 366,
+      "type": "image/svg+xml"
+    },
+    "catalog.trash.react.svg": {
+      "blob": "3312b96e8ae65ce50268213a8217781d",
+      "size": 881,
+      "type": "image/svg+xml"
+    },
+    "catalog.user.react.svg": {
+      "blob": "6f56739643accbb171943e21a99ff8d1",
+      "size": 3066,
+      "type": "image/svg+xml"
+    },
+    "departments.react.svg": {
+      "blob": "c66a7b7d337c7d52c267f013bdd37607",
+      "size": 2411,
+      "type": "image/svg+xml"
+    },
+    "gift.react.svg": {
+      "blob": "738ddb00ae0808e8bdb6a17270a9c846",
+      "size": 1682,
+      "type": "image/svg+xml"
+    }
   }
 }

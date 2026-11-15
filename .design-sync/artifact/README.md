@@ -109,12 +109,22 @@ properties (`margin-inline-start`, `padding-block`) so RTL works.
 A canvas mounts each component through `<x-import>` and wraps every one in a
 `<div style="display: contents">`. Most components do not notice; these do:
 
-- **`Article` renders an empty panel.** It finds its `Article.Header`,
-  `Article.MainButton` and `Article.Body` slots by `displayName`, and the
-  wrapper hides them, so every slot is dropped. On a canvas draw the left
-  navigation as markup: items 36px, 16px icon from the **Navigation** group
-  plus a 13px semi-bold label, the active item a grey pill (radius 3px) in
-  the accent colour. Say in the hand-over that it stands in for `Article`.
+- **Slot components get their slots as the `children` prop, not as child
+  markup.** `Article` finds `Article.Header`, `Article.MainButton` and
+  `Article.Body` by `displayName`, and the wrapper hides child markup, so
+  written inside the `<x-import>` they are dropped and the panel is empty.
+  Build the slots in the logic class and pass them as a prop -
+  `children="{{articleSlots}}"`, where `articleSlots(K)` returns
+  `[h(K.Article.Header, {key: "header"}, …), h(K.Article.Body, {key:
+"body"}, …)]` with `h = window.React.createElement`. `Article` then draws
+  its own back button (`showBackButton`), Developer Tools bar (`isAdmin`)
+  and profile block (`user`, `getActions`); set `hideAppsBlock` and
+  `withCustomArticleHeader`, and put the logo `<img>` and an `IconButton`
+  with `iconNode={h(K.ArticleHideMenuIcon)}`, `size: 20`, `isStroke` in the
+  header slot, as the kit's Article story does. The nav items inside the body
+  are markup - `ArticleItem` is not exported: items 36px, a 16px
+  **Navigation** icon and a 13px semi-bold label, the active item a grey
+  pill (radius 3px) in the accent colour.
 - **A table needs 25px of room above it, and no scrolling box around it.**
   `TableContainer` has `margin-top: -25px` and `TableHeader` is
   `position: fixed`; without the room the header covers whatever is above
@@ -153,6 +163,14 @@ a dialog included - a simplified background is still read as the product.
    **Screenshots** group (index at the end of **Screens**) and open it before
    drawing anything. When the request is a screen the product already has,
    the screenshot is the reference, not your memory of the product.
+   A picture of **another** product (a competitor's page, a mock-up from
+   elsewhere) is a list of what the screen must do, never a layout to copy:
+   take its content - the data, the columns, the actions - and build it
+   from the closest ONLYOFFICE Apps screenshot and the patterns in
+   **Screens**, with the kit's controls in the kit's styles. Its toolbar
+   becomes `FilterInput`, its tabs `Tabs`, its table `TableContainer`; an
+   action that has no place in those patterns is left out and named in the
+   hand-over, not drawn in the other product's style.
 2. **Match it, do not paraphrase it.** The same items, in the same order,
    with the same labels, icons positions and nesting: navigation entries and
    their sub-items, header controls, toolbar buttons, table columns, panel
@@ -169,10 +187,14 @@ a dialog included - a simplified background is still read as the product.
    for centred dialogs, `EmptyView` for empty states. Plain markup is for
    layout glue and for the parts that are not kit components (the create
    tiles above a file list). A hand-drawn look-alike of a kit component is a
-   defect, even when it looks close.
+   defect, even when it looks close. Using the component is not enough:
+   give it the props the product gives it. Take sizes, colours and variants
+   from **Screens** and from the component's own README examples rather
+   than picking a plausible `size` - a person column is a 16px `Avatar`
+   with a grey 12px name, not a 32px one with initials.
 5. **Take icons from the Navigation and Icons groups, and mark what you
    could not source.** Every left-navigation icon - Files, Rooms, People,
-   each Settings and Developer Tools entry, the panel's back, hide-menu and
+   each Settings and Developer Tools entry, the panel's back, collapse toggle and
    Developer Tools arrow - is in **Navigation**, with a table of which entry
    uses which file; action, file-type, room and template icons are in
    **Icons** (see **Iconography and assets**). An icon that is in neither,
