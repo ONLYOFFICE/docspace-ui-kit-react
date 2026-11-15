@@ -47,3 +47,5 @@ site-screenshots
 .design-sync/resync.out
 .ds-sync/
 ds-bundle/
+# The local copy of the design system (export.mjs, /design-system-init).
+ds-export/

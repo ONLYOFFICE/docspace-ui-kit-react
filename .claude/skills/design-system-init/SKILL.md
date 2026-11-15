@@ -6,8 +6,8 @@ argument-hint: "[--out <dir>] [--skip-build]"
 
 # Design system, locally
 
-The result is one folder, `<out>/project/` (default `../ds-export/project/`,
-a sibling of this checkout), holding everything the published Design System
+The result is one folder, `<out>/project/` (default `ds-export/project/` at
+the repository root, gitignored), holding everything the published Design System
 artifact holds: the brand book (`README.md`), screen recipes (`screens.md`),
 `tokens.json`, the compiled kit with a card, preview and `.d.ts` per component
 (`components/`), fonts, and every logo, screenshot and icon under `assets/`.
@@ -27,10 +27,12 @@ failure and report it with its output; do not work around a failed step.
 - `.design-sync/artifact/export.mjs` must exist. If it does not, this branch
   predates the local copy: say so and stop.
 - `node --version` (20 or newer) and `pnpm --version` must both answer.
-- Work out the output directory: `--out <dir>` if given, else `../ds-export`.
+- Work out the output directory: `--out <dir>` if given, else `ds-export`
+  (at the repository root; `.gitignore` and `biome.json` already leave it out).
   If `<out>/project/` already exists, it is replaced: say so in one line before
-  step 5, and never point `--out` at the repository itself or at a folder that
-  holds anything but an earlier copy (look first).
+  step 5, and never point `--out` at the repository root itself or at a folder
+  that holds anything but an earlier copy (look first). A `--out` inside the
+  repository other than `ds-export` is not ignored by git or lint: say so.
 
 ## 2 -- the converter
 

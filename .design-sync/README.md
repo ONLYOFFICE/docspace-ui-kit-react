@@ -136,13 +136,14 @@ The quickest way to the design system on your own machine, artifact or no
 artifact: run `/design-system-init` in Claude Code at the repository root
 (`.claude/skills/design-system-init/`). It checks for the converter, builds
 `ds-bundle/` (step 1 of the previous section), exports the copy to
-`../ds-export/project/` and checks it - about two minutes **once the converter
+`ds-export/project/` (gitignored) and checks it - about two minutes **once the converter
 is in place**. The converter is the one thing it cannot provide: without
 `.ds-sync/` it stops and asks for one `/design-sync`, which stages it. That
 run diffs against the committed anchor (see "Not in git"), so it grades only
 what changed since the last verified sync, not all 123 components.
 
-By hand, `node .design-sync/artifact/export.mjs --out <dir>` writes everything the
+By hand, `node .design-sync/artifact/export.mjs [--out <dir>]` (default
+`ds-export`) writes everything the
 artifact holds to `<dir>/project/`: the 540 files a publish sends,
 `design-system.json` included, and every asset at
 `project/assets/<Group>/<file>`, copied from its folder. It needs

@@ -2,7 +2,9 @@
 // file build.mjs publishes, plus the file behind each uploaded asset, so the
 // copy needs neither claude.ai nor the asset store.
 //
-//   node .design-sync/artifact/export.mjs --out <dir> [--assets <record>]
+//   node .design-sync/artifact/export.mjs [--out <dir>] [--assets <record>]
+//
+// <dir> defaults to ds-export/ at the repository root (gitignored).
 //
 // Run from the repository root. It needs ds-bundle/ (a design-sync build; see
 // .design-sync/README.md) because build.mjs does. Each asset is copied from
@@ -29,8 +31,8 @@ const arg = (name) => {
 };
 const REPO = process.cwd();
 const HERE = path.join(REPO, ".design-sync", "artifact");
-const OUT = arg("out");
-if (!OUT) throw new Error("--out <dir> is required");
+// Default: ds-export/ at the repository root, gitignored like ds-bundle/.
+const OUT = arg("out") || path.join(REPO, "ds-export");
 const RECORD = arg("assets") || path.join(HERE, "assets.json");
 if (!fs.existsSync(path.join(REPO, "ds-bundle", "_ds_bundle.js")))
   throw new Error("ds-bundle/ is missing: run /design-sync first");

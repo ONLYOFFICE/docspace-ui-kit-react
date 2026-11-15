@@ -17,6 +17,7 @@
       "!**/dist",
       "!**/storybook-static",
       "!**/site-docs",
+      "!**/ds-export",
       "!**/playwright-report",
       "!**/test-results",
       "!**/.git",
