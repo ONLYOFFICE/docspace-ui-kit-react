@@ -46,8 +46,13 @@
   margin-top: 6px;
 }
 
-.promoCode {
-  margin-top: 16px;
+.tabs {
+  --tabs-primary-bg: var(--modal-dialog-bg, var(--modal-dialog-bg-color));
+}
+
+.panel {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .footerButtons {

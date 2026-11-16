@@ -1,8 +1,10 @@
 import React from "react";
 
 import { useApi } from "../../../providers/api";
+import { toastr } from "../../../components/toast";
+import { useCommonTranslation } from "../../../utils/i18n";
+import { toAbsoluteUrl } from "../../utils/url";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
-import PromoCodeForm from "../promo-code/PromoCodeForm";
 import SimpleTopUpDialog, {
   type SimpleTopUpDialogProps,
   type TSimpleTopUpDeps,
@@ -10,12 +12,13 @@ import SimpleTopUpDialog, {
 
 type SimpleTopUpDialogWrapperProps = Omit<
   SimpleTopUpDialogProps,
-  keyof TSimpleTopUpDeps | "promoCodeSlot"
+  keyof TSimpleTopUpDeps
 >;
 
 const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
   props,
 ) => {
+  const t = useCommonTranslation();
   const { paymentApi } = useApi();
   const store = usePaymentStore();
   const {
@@ -45,6 +48,23 @@ const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
     return store.fetchCardLinked(backUrl, successUrl, false);
   };
 
+  const onLinkCard = () => {
+    const tab = window.open("", "_blank");
+
+    const onCardLinkUrl = (url: string | null | undefined) => {
+      if (!url) {
+        tab?.close();
+        toastr.error(t("UnexpectedError"));
+        return;
+      }
+
+      if (tab) tab.location.href = toAbsoluteUrl(url);
+    };
+
+    if (store.cardLinked) onCardLinkUrl(store.cardLinked);
+    else store.fetchCardLinked().then(onCardLinkUrl);
+  };
+
   return (
     <SimpleTopUpDialog
       {...props}
@@ -60,7 +80,9 @@ const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
       fetchCardLinked={fetchCardLinked}
       walletBalance={walletBalance ?? 0}
       fetchCustomerInfo={fetchCustomerInfo}
-      promoCodeSlot={isCardLinkedToPortal ? <PromoCodeForm /> : null}
+      applyPromoCode={store.applyPromoCode}
+      isCardLinked={isCardLinkedToPortal}
+      onLinkCard={onLinkCard}
     />
   );
 };

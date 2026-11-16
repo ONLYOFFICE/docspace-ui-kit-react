@@ -39,7 +39,7 @@ export type TPromoCodeResult =
       expiresAt: string | null;
     }
   | { status: "refused"; reason: string }
-  | { status: "rateLimited" | "failed" };
+  | { status: "needsCard" | "rateLimited" | "failed" };
 
 /** QuotaDto extended with serviceName (returned by wallet service endpoints). */
 export type TWalletServiceQuota = QuotaDto & { serviceName?: string };
