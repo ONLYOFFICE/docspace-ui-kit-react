@@ -131,7 +131,11 @@ const ImageEditorDemo = ({
   }, []);
 
   const handleSetPreview = useCallback((value: string) => {
-    setPreview(value ? <img src={value} alt="Preview" /> : null);
+    // Sized, as the README's example is: the data URL is the 648px canvas
+    // times the device pixel ratio, and an unsized <img> shows all of it.
+    setPreview(
+      value ? <img src={value} alt="Preview" width={96} height={96} /> : null,
+    );
   }, []);
 
   return (

@@ -169,6 +169,14 @@ export const MDX_PAGES = {
 export const STORY_CHROME = ["storyWrapper"];
 
 /**
+ * The attribute a story puts on scaffolding of its own -- a control that
+ * feeds the component and is not part of it, as the folder picker above the
+ * Uploader is. An element carrying it is left out of the pictures; Storybook
+ * shows it as before.
+ */
+export const STORY_SCAFFOLD_ATTRIBUTE = "data-story-scaffold";
+
+/**
  * Plain Markdown pages outside the Storybook tree that README links point at,
  * published so those links resolve on the site instead of leaving it.
  */

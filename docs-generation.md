@@ -151,8 +151,14 @@ wrapper and the TranslationProvider photograph as nothing a reader learns from.
 Stories are opened with `globals=canvas:transparent`, a global `.storybook/preview.tsx` declares
 to drop the white or black page the decorator otherwise paints; the picture is the union of
 everything that paints anywhere in the body, so what a portal renders is in it too, with an 8px
-margin, clamped to the viewport, taken at 2x and shown at 1x. The demo-data banner and the
-dashed story frames (`STORY_CHROME`, matched by CSS-module class prefix) are hidden first: they
+margin, clamped to the viewport, taken at 2x and shown at 1x. An element counts for the
+part of it that can be seen -- its box cut to the viewport and to every ancestor that clips it
+with `overflow` -- not for the whole box: a closed panel parked past the edge, as the folder
+selector in the Uploader's stories is, and the rows of a list scrolled out of its frame
+otherwise stretched the picture to the viewport's height with nothing in it. The demo-data
+banner, the dashed story frames (`STORY_CHROME`, matched by CSS-module class prefix) and
+whatever a story marks `data-story-scaffold` (`STORY_SCAFFOLD_ATTRIBUTE`) -- a control that
+feeds the component, as the folder picker above the Uploader does -- are hidden first: they
 are scenery, not the component. A block is photographed as the element Storybook rendered,
 matched to the MDX by position among the page's non-Markdown blocks.
 The cursor is parked outside the viewport before every picture: a page keeps its mouse position

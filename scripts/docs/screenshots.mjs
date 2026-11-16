@@ -31,6 +31,7 @@ import {
   SHOT_SCALE,
   SHOT_WORKERS,
   STORY_CHROME,
+  STORY_SCAFFOLD_ATTRIBUTE,
 } from "./config.mjs";
 import {
   NO_PICTURE_TAG,
@@ -191,6 +192,9 @@ const newContext = async (browser, theme) => {
 const TRANSPARENT =
   "html, body, .sb-show-main, #storybook-docs, .sbdocs, .sbdocs-wrapper, .sbdocs-content { background: transparent !important; }" +
   ' [data-testid="demo-banner"] { display: none !important; }' +
+  // What a story marks as its own scaffolding -- the folder picker the
+  // Uploader's stories put above it -- is not the component either.
+  ` [${STORY_SCAFFOLD_ATTRIBUTE}] { display: none !important; }` +
   STORY_CHROME.map(
     (name) =>
       ` [class*="_${name}_"] { border: none !important; padding: 0 !important; }`,
@@ -299,8 +303,24 @@ const shootStory = async (page, base, id, recipe, file) => {
         (node) =>
           node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== "",
       );
+    const intersect = (a, b) => ({
+      left: Math.max(a.left, b.left),
+      top: Math.max(a.top, b.top),
+      right: Math.min(a.right, b.right),
+      bottom: Math.min(a.bottom, b.bottom),
+    });
     let box = null;
-    const visit = (el) => {
+    // An element counts for the part of it that can be seen, not for its
+    // whole box: a closed panel parked past the viewport's edge, as the
+    // folder selector in the Uploader's stories is, stretched the picture to
+    // the viewport's height with nothing in it, and so did the rows of a
+    // list scrolled out of a frame with `overflow: hidden`. `clips` is what
+    // the ancestors leave visible, kept three ways because an ancestor only
+    // clips a descendant whose containing block is inside it: `flow` for an
+    // element in the flow, `abs` for an absolutely positioned one (as of the
+    // nearest positioned ancestor), `fixed` for a fixed one (as of the
+    // nearest transformed ancestor, else the viewport).
+    const visit = (el, clips) => {
       const style = getComputedStyle(el);
       if (
         style.display === "none" ||
@@ -309,29 +329,61 @@ const shootStory = async (page, base, id, recipe, file) => {
       ) {
         return;
       }
+      const clip =
+        style.position === "fixed"
+          ? clips.fixed
+          : style.position === "absolute"
+            ? clips.abs
+            : clips.flow;
       const rect = el.getBoundingClientRect();
-      if (rect.width > 0 && rect.height > 0 && paints(el, style)) {
+      const seen = intersect(rect, clip);
+      if (
+        rect.width > 0 &&
+        rect.height > 0 &&
+        seen.right > seen.left &&
+        seen.bottom > seen.top &&
+        paints(el, style)
+      ) {
         box = box
           ? {
-              left: Math.min(box.left, rect.left),
-              top: Math.min(box.top, rect.top),
-              right: Math.max(box.right, rect.right),
-              bottom: Math.max(box.bottom, rect.bottom),
+              left: Math.min(box.left, seen.left),
+              top: Math.min(box.top, seen.top),
+              right: Math.max(box.right, seen.right),
+              bottom: Math.max(box.bottom, seen.bottom),
             }
-          : {
-              left: rect.left,
-              top: rect.top,
-              right: rect.right,
-              bottom: rect.bottom,
-            };
+          : seen;
       }
-      if (el.tagName.toUpperCase() !== "SVG") {
-        for (const child of el.children) visit(child);
-      }
+      if (el.tagName.toUpperCase() === "SVG") return;
+      // `display: contents` and an inline box clip nothing, whatever their
+      // `overflow` says.
+      const clipsChildren =
+        (style.overflowX !== "visible" || style.overflowY !== "visible") &&
+        style.display !== "contents" &&
+        style.display !== "inline";
+      const flow = clipsChildren ? intersect(clip, rect) : clip;
+      const transformed =
+        style.transform !== "none" ||
+        style.filter !== "none" ||
+        style.perspective !== "none" ||
+        style.contain === "paint" ||
+        style.contain === "strict" ||
+        style.contain === "content";
+      const inner = {
+        flow,
+        abs: style.position !== "static" || transformed ? flow : clips.abs,
+        fixed: transformed ? flow : clips.fixed,
+      };
+      for (const child of el.children) visit(child, inner);
+    };
+    const viewport = {
+      left: 0,
+      top: 0,
+      right: window.innerWidth,
+      bottom: window.innerHeight,
     };
     for (const child of document.body.children) {
       if (child.tagName === "SCRIPT" || child.tagName === "STYLE") continue;
-      visit(child);
+      visit(child, { flow: viewport, abs: viewport, fixed: viewport });
     }
     return box;
   });
