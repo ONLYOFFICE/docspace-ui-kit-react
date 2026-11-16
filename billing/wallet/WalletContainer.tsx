@@ -100,7 +100,9 @@ const Wallet = (props: WalletProps) => {
 
   const { isNotPaidPeriod, isDelayedPaymentMethod } = store.tariff;
 
-  const canRedeemPromoCode = canUpdateTariff && !isNotPaidPeriod;
+  const hasPayer = Boolean(store.tariff.walletCustomerEmail);
+  const canRedeemPromoCode =
+    (store.isPayer || !hasPayer) && canUpdateTariff && !isNotPaidPeriod;
 
   const t = useCommonTranslation();
 
