@@ -57,7 +57,11 @@ const UploaderWithFolderUrl = (args: StoryArgs) => {
 
   return (
     <>
+      {/* Left out of the API-site pictures (STORY_SCAFFOLD_ATTRIBUTE in
+          scripts/docs/config.mjs): the picker feeds the story, it is not
+          the Uploader. */}
       <div
+        data-story-scaffold
         style={{
           marginBottom: 16,
           display: "flex",
