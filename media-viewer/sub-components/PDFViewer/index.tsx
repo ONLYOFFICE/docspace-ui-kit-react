@@ -126,7 +126,15 @@ export const PDFViewer = ({
       return;
     }
 
-    const scriptUrl = await getScriptUrl();
+    let scriptUrl: string;
+
+    try {
+      scriptUrl = await getScriptUrl();
+    } catch (error) {
+      setIsError(true);
+      console.error(error);
+      return;
+    }
 
     setIsLoadingScript(true);
     loadScript(

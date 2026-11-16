@@ -1,6 +1,8 @@
-import UTIF from "utif";
+export const decodeTiff = async (
+  arrayBuffer: ArrayBuffer,
+): Promise<Blob | null> => {
+  const { default: UTIF } = await import("utif");
 
-export const decodeTiff = (arrayBuffer: ArrayBuffer): Promise<Blob | null> => {
   const ifds = UTIF.decode(arrayBuffer);
   UTIF.decodeImage(arrayBuffer, ifds[0]);
 

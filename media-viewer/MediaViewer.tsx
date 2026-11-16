@@ -80,6 +80,7 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
   const lastRemovedFileIdRefRef = useRef<number>(undefined);
 
   const [title, setTitle] = useState<string>("");
+  const [titleFileId, setTitleFileId] = useState<number>();
   const prevBlobUrlRef = useRef<string | null>(null);
 
   const setFileUrl_ = useCallback((url: string | undefined) => {
@@ -458,7 +459,13 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
           ogg: "audio/ogg",
           pdf: "application/pdf",
         };
-        const mimeType = mimeTypes[ext] || "application/octet-stream";
+        const blobType =
+          decryptedBlob instanceof Blob &&
+          decryptedBlob.type !== "application/octet-stream"
+            ? decryptedBlob.type
+            : "";
+        const mimeType =
+          blobType || mimeTypes[ext] || "application/octet-stream";
 
         const typedBlob = new Blob([decryptedBlob], { type: mimeType });
         setFileUrl(URL.createObjectURL(typedBlob));
@@ -548,6 +555,7 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
           })
         : currentTitle,
     );
+    setTitleFileId(fileId);
   }, [
     src,
     fileId,
@@ -586,6 +594,8 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
   const reportedFileIdRef = useRef<typeof fileId>(undefined);
 
   useEffect(() => {
+    if (titleFileId !== fileId) return;
+
     if (!isPlayableImage) {
       reportedFileIdRef.current = undefined;
       return;
@@ -595,7 +605,7 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
 
     reportedFileIdRef.current = fileId;
     onError?.();
-  }, [isPlayableImage, fileId, onError]);
+  }, [isPlayableImage, fileId, titleFileId, onError]);
 
   if (pluginViewerContent) {
     canOpen = true;

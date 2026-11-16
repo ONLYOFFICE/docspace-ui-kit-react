@@ -24,7 +24,7 @@ export type MediaGalleryProps = Pick<
    */
   requestToken?: string;
   /**
-   * The file to open first. Found only among the files already loaded;
+   * The file to open first. Pages are loaded until it turns up, ten at most;
    * otherwise the first media file opens.
    */
   startFileId?: NumberOrString;

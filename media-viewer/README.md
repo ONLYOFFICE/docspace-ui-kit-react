@@ -8,7 +8,7 @@ The media files of one portal folder or room in the viewer, with previous / next
 
 - The viewer is read-only (`isPublicFile`): no rename, delete, move or copy.
 - Navigation does not wrap: the arrows do nothing on the first and the last file.
-- `startFileId` is found only among the files already loaded; otherwise the first media file opens.
+- For `startFileId` the gallery keeps loading pages under the loader until the file turns up, ten pages at most; otherwise the first media file opens.
 - A failed first request calls `onLoadError` and renders nothing; a failed later page keeps what is loaded and stops asking.
 - A change of `folderId` or `requestToken` starts over.
 - It renders the loader until the first answer, so the viewer itself never renders on the server.

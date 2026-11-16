@@ -479,6 +479,45 @@ describe("MediaViewer", () => {
       );
     }
   });
+
+  it("does not report the next file for the extension of the previous one", async () => {
+    const extensionOf = vi.mocked(getFileExtension);
+    extensionOf.mockImplementation(
+      (name: string) => `.${name.split(".").pop()}`,
+    );
+
+    try {
+      const onError = vi.fn();
+      const playlist = [
+        { ...mockPlaylistItem, id: 0, fileId: 1, title: "first.mp4" },
+        { ...mockPlaylistItem, id: 1, fileId: 2, title: "second.png" },
+      ];
+      const props = createMockProps({
+        playlist,
+        files: playlist.map((item) => ({
+          ...mockFile,
+          id: item.fileId,
+          title: item.title,
+        })),
+        extsImagePreviewed: [".mp4", ".png"],
+        onError,
+      });
+
+      const { rerender } = render(<MediaViewer {...props} />);
+
+      await waitFor(() => expect(onError).toHaveBeenCalledTimes(1));
+
+      await act(async () => {
+        rerender(<MediaViewer {...props} playlistPos={1} currentFileId={2} />);
+      });
+
+      expect(onError).toHaveBeenCalledTimes(1);
+    } finally {
+      extensionOf.mockImplementation(
+        (name: string) => name.split(".").pop() ?? "",
+      );
+    }
+  });
 });
 
 describe("Media viewer menu models", () => {

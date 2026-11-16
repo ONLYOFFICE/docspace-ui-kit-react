@@ -221,6 +221,43 @@ describe("MediaGallery", () => {
     await waitFor(() => expect(current()).toBe("3"));
   });
 
+  it("loads pages under the loader until the start file turns up", async () => {
+    get
+      .mockResolvedValueOnce(
+        answer(
+          [1, 2, 3, 4, 5].map((id) => file(id, "image")),
+          6,
+        ),
+      )
+      .mockResolvedValueOnce(answer([file(6, "image")], 6));
+
+    renderGallery({ startFileId: 6, pageSize: 5 });
+
+    await waitFor(() => expect(current()).toBe("6"));
+    expect(get).toHaveBeenCalledTimes(2);
+  });
+
+  it("opens the first media file when the start file is not in the folder", async () => {
+    get.mockResolvedValueOnce(
+      answer([1, 2, 3, 4, 5].map((id) => file(id, "image"))),
+    );
+
+    renderGallery({ startFileId: 99 });
+
+    await waitFor(() => expect(current()).toBe("1"));
+  });
+
+  it("stops looking for the start file after ten pages", async () => {
+    get.mockImplementation((_url, { params }) =>
+      Promise.resolve(answer([file(params.startIndex + 1, "image")], 50)),
+    );
+
+    renderGallery({ startFileId: 99, pageSize: 1 });
+
+    await waitFor(() => expect(current()).toBe("1"));
+    expect(get).toHaveBeenCalledTimes(10);
+  });
+
   it("moves between the files and stops at both ends", async () => {
     get.mockResolvedValueOnce(answer([file(1, "image"), file(2, "image")]));
 

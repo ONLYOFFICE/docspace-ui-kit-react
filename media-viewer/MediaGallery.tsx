@@ -18,6 +18,8 @@ const DEFAULT_PAGE_SIZE = 100;
 // The next page is asked for this many items before the end of the playlist.
 const PRELOAD_OFFSET = 3;
 
+const START_FILE_SEARCH_PAGES = 10;
+
 type FolderContent = {
   response: {
     files: TFile[];
@@ -109,10 +111,22 @@ const Gallery = ({
       resolveTitle({ ...item, encrypted: isEncrypted(item.id) });
   }, [resolveTitle]);
 
-  const currentItem =
-    playlist.find((item) => String(item.fileId) === String(mediaId)) ??
-    playlist[0];
+  const matchedItem = playlist.find(
+    (item) => String(item.fileId) === String(mediaId),
+  );
+  const isSearchingStartFile =
+    mediaId !== undefined &&
+    !matchedItem &&
+    canLoadMore &&
+    files.length < pageSize * START_FILE_SEARCH_PAGES;
+  const currentItem = matchedItem ?? playlist[0];
   const playlistPos = currentItem?.id ?? 0;
+  const fallbackFileId =
+    matchedItem || isSearchingStartFile ? undefined : currentItem?.fileId;
+
+  useEffect(() => {
+    if (fallbackFileId !== undefined) setMediaId(fallbackFileId);
+  }, [fallbackFileId]);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -127,7 +141,8 @@ const Gallery = ({
   // first pages hold no media keeps loading until one turns up.
   useEffect(() => {
     if (!canLoadMore || isLoadingRef.current) return;
-    if (playlistPos < playlist.length - PRELOAD_OFFSET) return;
+    if (!isSearchingStartFile && playlistPos < playlist.length - PRELOAD_OFFSET)
+      return;
 
     const loaded = files.length;
 
@@ -175,6 +190,7 @@ const Gallery = ({
     canLoadMore,
     files.length,
     folderId,
+    isSearchingStartFile,
     pageSize,
     playlist.length,
     playlistPos,
@@ -216,7 +232,7 @@ const Gallery = ({
 
   if (isFailed) return null;
 
-  if (!currentItem) {
+  if (!currentItem || isSearchingStartFile) {
     if (canLoadMore) return <ViewerLoader isLoading />;
 
     return emptyContent;
