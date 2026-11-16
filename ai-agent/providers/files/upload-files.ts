@@ -145,7 +145,7 @@ export const uploadFilesToChat = async (
   // may lack Create rights there (e.g. chat-only access to an AI agent room),
   // which surfaces as a 403 when the upload session is created — then the
   // whole batch falls back to the My documents section (404 too: a scope
-  // folder that disappeared mid-flight).
+  // folder that disappeared mid-flight). A 400 sends that one file there.
   let targetFolderId = entityId ? Number(entityId) : undefined;
 
   // The server rejects chunks above its configured limit, so the chunk size
@@ -201,16 +201,7 @@ export const uploadFilesToChat = async (
     };
   };
 
-  const uploadOne = async (file: File): Promise<UploadedPortalFile> => {
-    if (targetFolderId !== undefined) {
-      try {
-        return await uploadToFolder(file, targetFolderId);
-      } catch (err) {
-        const status = getHttpStatus(err);
-        if (status !== 403 && status !== 404) throw err;
-        targetFolderId = undefined;
-      }
-    }
+  const uploadToMy = async (file: File): Promise<UploadedPortalFile> => {
     const res = await foldersApi.insertFileToMyFromBody({
       file,
       title: file.name,
@@ -220,6 +211,23 @@ export const uploadFilesToChat = async (
       id: res.data.response?.id,
       title: res.data.response?.title,
     };
+  };
+
+  const uploadOne = async (file: File): Promise<UploadedPortalFile> => {
+    if (targetFolderId !== undefined) {
+      try {
+        return await uploadToFolder(file, targetFolderId);
+      } catch (err) {
+        const status = getHttpStatus(err);
+        // A 400 is this file's own refusal: an agent's room takes only the
+        // formats it can read, so the file goes to My documents and the
+        // room stays the target of the rest.
+        if (status === 400) return uploadToMy(file);
+        if (status !== 403 && status !== 404) throw err;
+        targetFolderId = undefined;
+      }
+    }
+    return uploadToMy(file);
   };
 
   // Sequential on purpose: parallel multi-file uploads of large documents gain

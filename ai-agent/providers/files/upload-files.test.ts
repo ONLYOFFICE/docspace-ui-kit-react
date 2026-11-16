@@ -156,6 +156,20 @@ describe("uploadFilesToChat", () => {
     expect(settledIds).toEqual(["pnd-1"]);
   });
 
+  it("sends a file the folder refuses (400) to My documents and keeps the folder for the rest", async () => {
+    createUploadSessionInFolder.mockRejectedValueOnce(
+      Object.assign(new Error("format"), { response: { status: 400 } }),
+    );
+    await uploadFilesToChat(
+      [makeFile("a.mp4"), makeFile("b.docx")],
+      makeDeps(),
+    );
+    expect(insertFileToMyFromBody).toHaveBeenCalledTimes(1);
+    // The second file still goes to the folder.
+    expect(createUploadSessionInFolder).toHaveBeenCalledTimes(2);
+    expect(failPendingAttachments).not.toHaveBeenCalled();
+  });
+
   it("fails the settled leases when the final attach throws", async () => {
     mockAttachFilesToChat.mockRejectedValueOnce(new Error("attach failed"));
     await uploadFilesToChat([makeFile("a.docx")], makeDeps());
