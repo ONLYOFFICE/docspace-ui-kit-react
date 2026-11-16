@@ -64,6 +64,7 @@ const createStore = (overrides: {
     canDowngradeTariff: true,
     fetchBalance: vi.fn(),
     walletBalance,
+    availableCredits: walletBalance,
     tariffDueTodayAmount: null,
     isTariffDueTodayCalculating: false,
     isCardLinkedToPortal,

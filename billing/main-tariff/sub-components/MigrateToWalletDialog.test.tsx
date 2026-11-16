@@ -50,6 +50,7 @@ const createStore = () => {
     futureSubscriptionAmount: 100,
     language: "en",
     walletBalance: 541.4,
+    availableCredits: 541.4,
     walletCodeCurrency: "USD",
     managersCount: 5,
     fetchBalance: vi.fn(),
