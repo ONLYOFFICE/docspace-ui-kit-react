@@ -49,7 +49,7 @@ export type TSimpleTopUpDeps = {
   /** without a linked card the Promo code tab offers to link one instead of the field */
   isCardLinked?: boolean;
   /** opens the card linking flow; the dialog closes right after */
-  onLinkCard?: () => void;
+  onLinkCard?: () => Promise<void>;
 };
 
 const MIN_AMOUNT = "10";
@@ -115,6 +115,7 @@ const SimpleTopUpDialogContent = observer(
     const { amount, hasError } = useAmountValue();
 
     const [isLoading, setIsLoading] = useState(false);
+    const [isLinkingCard, setIsLinkingCard] = useState(false);
     const [tabId, setTabId] = useState<TopUpTab>(initialTab);
     const [panelMinHeight, setPanelMinHeight] = useState(0);
 
@@ -236,9 +237,20 @@ const SimpleTopUpDialogContent = observer(
       setTabId(item.id as TopUpTab);
     };
 
-    const onLinkCardClick = () => {
-      onLinkCard?.();
-      onClose();
+    const onLinkCardClick = async () => {
+      if (!onLinkCard) return;
+
+      setIsLinkingCard(true);
+
+      try {
+        await onLinkCard();
+        onClose();
+      } catch (error) {
+        console.error(error);
+        toastr.error(t("UnexpectedError"));
+      } finally {
+        setIsLinkingCard(false);
+      }
     };
 
     const onContinue = async () => {
@@ -352,6 +364,7 @@ const SimpleTopUpDialogContent = observer(
                 primary
                 scale
                 onClick={onLinkCardClick}
+                isLoading={isLinkingCard}
                 testId="wallet_promo_code_link_card"
               />
             ) : isPromoTab ? (
@@ -385,7 +398,7 @@ const SimpleTopUpDialogContent = observer(
               size={ButtonSize.normal}
               scale
               onClick={onClose}
-              isDisabled={isLoading || promoCode.isSubmitting}
+              isDisabled={isLoading || isLinkingCard || promoCode.isSubmitting}
               testId="first_topup_cancel"
             />
           </div>

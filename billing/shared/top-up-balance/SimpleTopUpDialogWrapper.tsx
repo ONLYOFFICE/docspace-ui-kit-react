@@ -1,8 +1,7 @@
 import React from "react";
+import { isIOS } from "react-device-detect";
 
 import { useApi } from "../../../providers/api";
-import { toastr } from "../../../components/toast";
-import { useCommonTranslation } from "../../../utils/i18n";
 import { toAbsoluteUrl } from "../../utils/url";
 import { combineUrl } from "../../../utils/combineUrl";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
@@ -19,7 +18,6 @@ type SimpleTopUpDialogWrapperProps = Omit<
 const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
   props,
 ) => {
-  const t = useCommonTranslation();
   const { paymentApi } = useApi();
   const store = usePaymentStore();
   const {
@@ -49,19 +47,7 @@ const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
     return store.fetchCardLinked(backUrl, successUrl, false);
   };
 
-  const onLinkCard = () => {
-    const tab = window.open("", "_blank");
-
-    const onCardLinkUrl = (url: string | null | undefined) => {
-      if (!url) {
-        tab?.close();
-        toastr.error(t("UnexpectedError"));
-        return;
-      }
-
-      if (tab) tab.location.href = toAbsoluteUrl(url);
-    };
-
+  const onLinkCard = async () => {
     const backUrl = combineUrl(
       window.location.origin,
       "/billing/wallet?open=true&topup=promo",
@@ -71,7 +57,14 @@ const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
       "/billing/wallet?complete=true&type=wallet&topup=promo",
     );
 
-    store.fetchCardLinked(backUrl, successUrl, false).then(onCardLinkUrl);
+    const linkUrl = await store.fetchCardLinked(backUrl, successUrl, false);
+
+    if (!linkUrl) throw new Error("Missing Stripe checkout URL");
+
+    const checkoutUrl = toAbsoluteUrl(linkUrl);
+
+    if (isIOS) window.location.href = checkoutUrl;
+    else window.open(checkoutUrl, "_blank");
   };
 
   return (
