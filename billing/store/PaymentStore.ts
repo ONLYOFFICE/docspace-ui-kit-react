@@ -294,6 +294,8 @@ class PaymentStore {
 
   isVisibleWalletSettings = false;
 
+  topUpDialogTab: "purchase" | "promo" = "purchase";
+
   upToBalanceError = false;
 
   minBalanceError = false;
@@ -724,6 +726,10 @@ class PaymentStore {
 
   setVisibleWalletSetting = (isVisibleWalletSettings: boolean) => {
     this.isVisibleWalletSettings = isVisibleWalletSettings;
+  };
+
+  setTopUpDialogTab = (tab: "purchase" | "promo") => {
+    this.topUpDialogTab = tab;
   };
 
   setIsShowTariffDeactivatedModal = (value: boolean) => {
@@ -1810,6 +1816,10 @@ class PaymentStore {
       } else {
         this.setRecommendedAmount("");
       }
+
+      this.setTopUpDialogTab(
+        params.get("topup") === "promo" ? "promo" : "purchase",
+      );
 
       if (
         window.location.href.includes("complete=true") ||

@@ -4,6 +4,7 @@ import { useApi } from "../../../providers/api";
 import { toastr } from "../../../components/toast";
 import { useCommonTranslation } from "../../../utils/i18n";
 import { toAbsoluteUrl } from "../../utils/url";
+import { combineUrl } from "../../../utils/combineUrl";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import SimpleTopUpDialog, {
   type SimpleTopUpDialogProps,
@@ -61,8 +62,16 @@ const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
       if (tab) tab.location.href = toAbsoluteUrl(url);
     };
 
-    if (store.cardLinked) onCardLinkUrl(store.cardLinked);
-    else store.fetchCardLinked().then(onCardLinkUrl);
+    const backUrl = combineUrl(
+      window.location.origin,
+      "/billing/wallet?open=true&topup=promo",
+    );
+    const successUrl = combineUrl(
+      window.location.origin,
+      "/billing/wallet?complete=true&type=wallet&topup=promo",
+    );
+
+    store.fetchCardLinked(backUrl, successUrl, false).then(onCardLinkUrl);
   };
 
   return (

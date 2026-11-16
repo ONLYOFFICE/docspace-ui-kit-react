@@ -109,7 +109,7 @@ const Wallet = (props: WalletProps) => {
   const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(
     isVisibleWalletSettings,
   );
-  const [topUpTab, setTopUpTab] = useState<TopUpTab>("purchase");
+  const [topUpTab, setTopUpTab] = useState<TopUpTab>(store.topUpDialogTab);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isWalletRefilledOpen, setIsWalletRefilledOpen] = useState(false);
   const [selectedTabId, setSelectedTabId] = useState(getInitialTabId);
