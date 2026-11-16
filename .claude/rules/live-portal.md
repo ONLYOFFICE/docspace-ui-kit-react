@@ -179,7 +179,7 @@ createFileJsonElement: { title } })` makes an office document through the docume
   `createNewIfExist` and `keepConvertStatus`, and takes the first file part whatever it is named.
   Post a `FormData` with `file`, `title` and `createNewIfExist` through `apiClient.instance` to
   `/api/2.0/files/{folderId}/insert`; `seed.ts` does. The generated docs
-  (`api.teamlab.info/docspace/api-backend/llms.txt`, moving to `api.onlyoffice.com`) repeat the
+  (`api.onlyoffice.com/docspace/api-backend/llms.txt`) repeat the
   SDK's OpenAPI, so when both agree and the portal still refuses, the server source under
   `../DocSpace/server` (a sibling of the Gitea checkouts) is what decides.
 - **`Uploader` takes two routes, and the type of `targetId` picks one.** A `number`, which is

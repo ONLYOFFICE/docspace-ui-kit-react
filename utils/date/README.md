@@ -1,6 +1,6 @@
 # date
 
-Date utilities built on [luxon](https://moment.github.io/luxon/): parsing, arithmetic, comparison, duration formatting, and timezone handling. Re-exports every function from the barrel `index.ts`.
+Date utilities built on [luxon](https://moment.github.io/luxon): parsing, arithmetic, comparison, duration formatting, and timezone handling. Re-exports every function from the barrel `index.ts`.
 
 ## What It Does
 

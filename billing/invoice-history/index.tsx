@@ -25,7 +25,6 @@ const InvoiceHistory = () => {
   const {
     invoices,
     isInitInvoices,
-    isStripePortalAvailable,
     invoiceHistoryInit,
     openInvoice,
     mobileBreakpoint,
@@ -67,8 +66,6 @@ const InvoiceHistory = () => {
       </div>
     );
   }
-
-  if (!isStripePortalAvailable) return null;
 
   if (!invoices.length) {
     return (

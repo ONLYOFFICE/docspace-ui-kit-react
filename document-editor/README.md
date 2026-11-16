@@ -146,7 +146,7 @@ config={{
 }}
 ```
 
-For complete configuration options, refer to the [ONLYOFFICE API Documentation](https://api.onlyoffice.com/editors/config/).
+For complete configuration options, refer to the [ONLYOFFICE API Documentation](https://api.onlyoffice.com/docs/docs-api/usage-api/config).
 
 ## Examples
 

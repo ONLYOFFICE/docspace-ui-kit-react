@@ -31,6 +31,7 @@ import {
   SHOT_SCALE,
   SHOT_WORKERS,
   STORY_CHROME,
+  STORY_SCAFFOLD_ATTRIBUTE,
 } from "./config.mjs";
 import {
   NO_PICTURE_TAG,
@@ -191,14 +192,28 @@ const newContext = async (browser, theme) => {
 const TRANSPARENT =
   "html, body, .sb-show-main, #storybook-docs, .sbdocs, .sbdocs-wrapper, .sbdocs-content { background: transparent !important; }" +
   ' [data-testid="demo-banner"] { display: none !important; }' +
+  // What a story marks as its own scaffolding -- the folder picker the
+  // Uploader's stories put above it -- is not the component either.
+  ` [${STORY_SCAFFOLD_ATTRIBUTE}] { display: none !important; }` +
   STORY_CHROME.map(
     (name) =>
       ` [class*="_${name}_"] { border: none !important; padding: 0 !important; }`,
   ).join("");
 
+/**
+ * Parks the cursor outside the viewport. A page keeps its mouse position
+ * across navigations, and Chromium gives `:hover` to whatever the next
+ * document lays out under it: after a recipe's click or hover on a trigger,
+ * the component photographed next in the same page was in its hover state
+ * -- a tile with its hover background -- and which one that was depended on
+ * the worker the job landed in, so the pictures changed from run to run.
+ */
+const parkMouse = (page) => page.mouse.move(-1, -1);
+
 /** A story in story view, cropped to what it paints. */
 const shootStory = async (page, base, id, recipe, file) => {
   await page.setViewportSize(VIEWPORT);
+  await parkMouse(page);
   await page.goto(
     `${base}/iframe.html?id=${id}&viewMode=story&globals=canvas:transparent`,
     { waitUntil: "networkidle" },
@@ -288,8 +303,24 @@ const shootStory = async (page, base, id, recipe, file) => {
         (node) =>
           node.nodeType === Node.TEXT_NODE && node.textContent.trim() !== "",
       );
+    const intersect = (a, b) => ({
+      left: Math.max(a.left, b.left),
+      top: Math.max(a.top, b.top),
+      right: Math.min(a.right, b.right),
+      bottom: Math.min(a.bottom, b.bottom),
+    });
     let box = null;
-    const visit = (el) => {
+    // An element counts for the part of it that can be seen, not for its
+    // whole box: a closed panel parked past the viewport's edge, as the
+    // folder selector in the Uploader's stories is, stretched the picture to
+    // the viewport's height with nothing in it, and so did the rows of a
+    // list scrolled out of a frame with `overflow: hidden`. `clips` is what
+    // the ancestors leave visible, kept three ways because an ancestor only
+    // clips a descendant whose containing block is inside it: `flow` for an
+    // element in the flow, `abs` for an absolutely positioned one (as of the
+    // nearest positioned ancestor), `fixed` for a fixed one (as of the
+    // nearest transformed ancestor, else the viewport).
+    const visit = (el, clips) => {
       const style = getComputedStyle(el);
       if (
         style.display === "none" ||
@@ -298,29 +329,61 @@ const shootStory = async (page, base, id, recipe, file) => {
       ) {
         return;
       }
+      const clip =
+        style.position === "fixed"
+          ? clips.fixed
+          : style.position === "absolute"
+            ? clips.abs
+            : clips.flow;
       const rect = el.getBoundingClientRect();
-      if (rect.width > 0 && rect.height > 0 && paints(el, style)) {
+      const seen = intersect(rect, clip);
+      if (
+        rect.width > 0 &&
+        rect.height > 0 &&
+        seen.right > seen.left &&
+        seen.bottom > seen.top &&
+        paints(el, style)
+      ) {
         box = box
           ? {
-              left: Math.min(box.left, rect.left),
-              top: Math.min(box.top, rect.top),
-              right: Math.max(box.right, rect.right),
-              bottom: Math.max(box.bottom, rect.bottom),
+              left: Math.min(box.left, seen.left),
+              top: Math.min(box.top, seen.top),
+              right: Math.max(box.right, seen.right),
+              bottom: Math.max(box.bottom, seen.bottom),
             }
-          : {
-              left: rect.left,
-              top: rect.top,
-              right: rect.right,
-              bottom: rect.bottom,
-            };
+          : seen;
       }
-      if (el.tagName.toUpperCase() !== "SVG") {
-        for (const child of el.children) visit(child);
-      }
+      if (el.tagName.toUpperCase() === "SVG") return;
+      // `display: contents` and an inline box clip nothing, whatever their
+      // `overflow` says.
+      const clipsChildren =
+        (style.overflowX !== "visible" || style.overflowY !== "visible") &&
+        style.display !== "contents" &&
+        style.display !== "inline";
+      const flow = clipsChildren ? intersect(clip, rect) : clip;
+      const transformed =
+        style.transform !== "none" ||
+        style.filter !== "none" ||
+        style.perspective !== "none" ||
+        style.contain === "paint" ||
+        style.contain === "strict" ||
+        style.contain === "content";
+      const inner = {
+        flow,
+        abs: style.position !== "static" || transformed ? flow : clips.abs,
+        fixed: transformed ? flow : clips.fixed,
+      };
+      for (const child of el.children) visit(child, inner);
+    };
+    const viewport = {
+      left: 0,
+      top: 0,
+      right: window.innerWidth,
+      bottom: window.innerHeight,
     };
     for (const child of document.body.children) {
       if (child.tagName === "SCRIPT" || child.tagName === "STYLE") continue;
-      visit(child);
+      visit(child, { flow: viewport, abs: viewport, fixed: viewport });
     }
     return box;
   });
@@ -343,6 +406,7 @@ const shootStory = async (page, base, id, recipe, file) => {
 /** A Docs page, ready: its content rendered and settled. */
 const openDocs = async (page, base, docsId) => {
   await page.setViewportSize(DOCS_VIEWPORT);
+  await parkMouse(page);
   // Not `networkidle`: a page with the AI chat on it polls, and the network
   // never goes quiet. Rendered content is the signal.
   await page.goto(
@@ -556,16 +620,23 @@ console.log(`Taking ${total} picture(s) with ${SHOT_WORKERS} workers...`);
 // fifty pictures can take longer than that, and a quiet log reads as a hang.
 const heartbeat = setInterval(() => console.log(progress()), HEARTBEAT_MS);
 
+// A picture is tried this many times before it is given up on.
+const ATTEMPTS = 2;
+
 // One context per theme for the worker's whole run: the preview bundle is
-// fetched and parsed once per context, then served from its cache. A page
-// is replaced after a failure, whatever state the failure left it in.
+// fetched and parsed once per context, then served from its cache. A failure
+// replaces the context, not just the page: on a loaded runner a renderer
+// dies mid-run ("Unable to capture screenshot", then every wait in that
+// context times out), and a new page in the same context inherits the dead
+// renderer. The picture is then tried once more in the fresh context.
 const worker = async () => {
   const contexts = {};
   const pages = {};
-  for (const [name, theme] of Object.entries(THEMES)) {
-    contexts[name] = await newContext(browser, theme);
+  const open = async (name) => {
+    contexts[name] = await newContext(browser, THEMES[name]);
     pages[name] = await contexts[name].newPage();
-  }
+  };
+  for (const name of Object.keys(THEMES)) await open(name);
   while (queue.length > 0) {
     const job = queue.shift();
     inFlight.add(job);
@@ -575,12 +646,18 @@ const worker = async () => {
       const themes =
         job.shot.kind === "controls" ? ["light"] : Object.keys(THEMES);
       for (const [i, name] of themes.entries()) {
-        try {
-          await job.run(pages[name], served.url, job.files[i]);
-        } catch (error) {
-          await pages[name].close().catch(() => {});
-          pages[name] = await contexts[name].newPage();
-          throw error;
+        for (let attempt = 1; ; attempt += 1) {
+          try {
+            await job.run(pages[name], served.url, job.files[i]);
+            break;
+          } catch (error) {
+            await contexts[name].close().catch(() => {});
+            await open(name);
+            if (attempt === ATTEMPTS) throw error;
+            console.warn(
+              `[retry] ${job.page.source} (${job.shot.name}, ${name}): ${error.message.split("\n")[0]}`,
+            );
+          }
         }
       }
       done += 1;

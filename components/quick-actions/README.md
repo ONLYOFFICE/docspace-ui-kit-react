@@ -208,7 +208,7 @@ export function StartHereMixed({ canCreateRoom }: { canCreateRoom: boolean }) {
           id: "templates",
           label: "Browse templates",
           icon: <svg viewBox="0 0 81 75" aria-hidden="true" />,
-          href: "https://www.onlyoffice.com/templates.aspx",
+          href: "https://templates.onlyoffice.com",
           target: "_blank",
         },
         {
