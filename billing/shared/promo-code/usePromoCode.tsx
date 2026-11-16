@@ -41,10 +41,26 @@ export const usePromoCode = ({
     switch (reason) {
       case "promo_not_found":
         return t("PromoCodeNotFound");
-      case "promo_already_used":
-        return t("PromoCodeAlreadyUsed");
+      case "promo_not_started":
+        return t("PromoCodeNotStarted");
       case "promo_expired":
         return t("PromoCodeExpired");
+      case "promo_limit_reached":
+        return t("PromoCodeLimitReached");
+      case "promo_already_used":
+        return t("PromoCodeAlreadyUsed");
+      case "promo_bonus_already_received":
+        return t("PromoCodeBonusAlreadyReceived");
+      case "promo_not_eligible":
+        return t("PromoCodeNotEligible");
+      case "promo_no_account":
+        return t("PromoCodeNeedsCard");
+      case "promo_currency_mismatch":
+        return t("PromoCodeCurrencyMismatch");
+      case "promo_too_many_attempts":
+        return t("PromoCodeTooManyAttempts");
+      case "promo_failed":
+        return t("UnexpectedError");
       default:
         return t("PromoCodeInvalid");
     }
