@@ -753,6 +753,16 @@ const AiAgentProviders = ({
     [onSkillSetDisconnected],
   );
 
+  // The slash menu's Knowledge bases follow the same owner. In an AI project
+  // they are saved with it, so a base cannot be dropped from the chat alone
+  // and "Manage knowledge bases" opens the project's settings - or is left
+  // out for a user who may not change them. An ordinary chat picks its own
+  // in the room selector.
+  const knowledgeOwned = !!sourcesManager;
+  const onManageKnowledge = sourcesManager
+    ? (sourcesManager.onManage ?? undefined)
+    : onPickKnowledgeRooms;
+
   // Platform adapter passed downstream. Its `file` adapter is wired to the
   // host's save handler, and it tracks the host locale/theme internally (the
   // adapter identity stays stable, so chat stores aren't rebuilt).
@@ -1220,11 +1230,16 @@ const AiAgentProviders = ({
       hideContextRoomDisconnect: skillSetsLocked,
       onDisconnectContextRoom,
       onOpenContextRoom,
-      onPickKnowledgeRooms,
+      // The slash menu's "Manage knowledge bases" (the "+" menu's list is
+      // built above, in `composerKnowledge`).
+      onPickKnowledgeRooms: onManageKnowledge,
+      hideKnowledgeDisconnect: knowledgeOwned,
       onOpenKnowledgeRoom: onOpenContextRoom,
-      // No folder picker (`onPickFolderContext`): the composer has no Folder
-      // slot. In a chat the folder is the one the user is in
-      // (`contextEntityId`); an AI project sets its own beside the chat.
+      // The slash menu's "Manage sources": one more folder or room as a
+      // data source, the same selector the "+" menu's Data sources opens.
+      // The "+" menu's own list is `composerDataSources`, so this adds no
+      // Folder slot to it.
+      onPickFolderContext: onAddContextFolder,
     }),
     [
       composerActions,
@@ -1249,7 +1264,9 @@ const AiAgentProviders = ({
       onPickContextRooms,
       skillSetsLocked,
       onDisconnectContextRoom,
-      onPickKnowledgeRooms,
+      onManageKnowledge,
+      knowledgeOwned,
+      onAddContextFolder,
       onOpenContextRoom,
       composerSkills,
       composerKnowledge,
