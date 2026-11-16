@@ -1610,13 +1610,17 @@ class PaymentStore {
           }
         }
 
-        requests.push(
-          this.fetchAutoPayments(),
-          this.fetchTransactionHistory(),
-          this.fetchServiceFeePercent(AI_TOOLS),
-          this.fetchServiceFeePercent(AI_SEARCH),
-          this.fetchServiceFeePercent(AI_TOOLS_BYOK),
-        );
+        requests.push(this.fetchAutoPayments(), this.fetchTransactionHistory());
+
+        // An unpaid portal reaches the wallet only to top up; the accounting
+        // service is not asked for AI fee rates there.
+        if (!this.tariff.isNotPaidPeriod) {
+          requests.push(
+            this.fetchServiceFeePercent(AI_TOOLS),
+            this.fetchServiceFeePercent(AI_SEARCH),
+            this.fetchServiceFeePercent(AI_TOOLS_BYOK),
+          );
+        }
       } else {
         requests.push(this.fetchCardLinked(integrationUrl));
         runInAction(() => {
