@@ -33,6 +33,7 @@ import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useServicesStore } from "../store/ServicesStoreProvider";
 import { getBrandName } from "../../constants/brands";
 import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
+import type { TopUpTab } from "../shared/top-up-balance/SimpleTopUpDialog";
 import { LATIN_NUMBERING_SYSTEM } from "../../utils/latin-digits";
 
 const WALLET_TAB_IDS = ["transaction-history", "upcoming-payments"];
@@ -99,11 +100,14 @@ const Wallet = (props: WalletProps) => {
 
   const { isNotPaidPeriod, isDelayedPaymentMethod } = store.tariff;
 
+  const canRedeemPromoCode = canUpdateTariff && !isNotPaidPeriod;
+
   const t = useCommonTranslation();
 
   const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(
     isVisibleWalletSettings,
   );
+  const [topUpTab, setTopUpTab] = useState<TopUpTab>("purchase");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isWalletRefilledOpen, setIsWalletRefilledOpen] = useState(false);
   const [selectedTabId, setSelectedTabId] = useState(getInitialTabId);
@@ -171,6 +175,12 @@ const Wallet = (props: WalletProps) => {
   };
 
   const onOpen = () => {
+    setTopUpTab("purchase");
+    setIsTopUpDialogVisible(true);
+  };
+
+  const onPromoCodeClick = () => {
+    setTopUpTab("promo");
     setIsTopUpDialogVisible(true);
   };
 
@@ -272,6 +282,18 @@ const Wallet = (props: WalletProps) => {
               leaving={isPromoLeaving}
               onLeft={onPromoLeft}
             />
+          ) : canRedeemPromoCode ? (
+            <Link
+              onClick={onPromoCodeClick}
+              textDecoration="underline"
+              fontSize="13px"
+              fontWeight={600}
+              color="accent"
+              className={styles.promoCodeLink}
+              dataTestId="wallet_promo_code_link"
+            >
+              {t("HavePromoCode")}
+            </Link>
           ) : null}
 
           <div className={styles.cardButtons}>
@@ -303,6 +325,22 @@ const Wallet = (props: WalletProps) => {
               className={styles.promoFootnote}
             >
               {t("PromoCreditsFootnote")}
+              {canRedeemPromoCode ? (
+                <>
+                  {" "}
+                  <Link
+                    onClick={onPromoCodeClick}
+                    textDecoration="underline"
+                    fontSize="11px"
+                    lineHeight="16px"
+                    fontWeight={600}
+                    color="accent"
+                    dataTestId="wallet_promo_code_link"
+                  >
+                    {t("HavePromoCode")}
+                  </Link>
+                </>
+              ) : null}
             </Text>
           ) : null}
         </div>
@@ -390,6 +428,7 @@ const Wallet = (props: WalletProps) => {
           visible={isTopUpDialogVisible}
           onClose={onClose}
           recommendedAmount={recommendedAmount}
+          initialTab={topUpTab}
         />
       ) : null}
 

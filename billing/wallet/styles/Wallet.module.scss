@@ -292,6 +292,11 @@
   margin-block-start: 4px;
 }
 
+.promoCodeLink {
+  align-self: flex-start;
+  margin-block-end: 16px;
+}
+
 .promoFootnote {
   margin-block-start: 8px;
   color: var(--payment-text-color);

@@ -54,7 +54,7 @@ export type TSimpleTopUpDeps = {
 
 const MIN_AMOUNT = "10";
 
-type TopUpTab = "purchase" | "promo";
+export type TopUpTab = "purchase" | "promo";
 
 type SimpleTopUpDialogBaseProps = {
   visible: boolean;
@@ -75,6 +75,7 @@ type SimpleTopUpDialogBaseProps = {
   descriptionText?: React.ReactNode;
   /** overrides the default helper text under the amount input */
   helperText?: React.ReactNode;
+  initialTab?: TopUpTab;
 };
 
 export type SimpleTopUpDialogProps = SimpleTopUpDialogBaseProps &
@@ -104,6 +105,7 @@ const SimpleTopUpDialogContent = observer(
     isPurchaseCompleted,
     descriptionText,
     helperText,
+    initialTab = "purchase",
     applyPromoCode,
     isCardLinked = true,
     onLinkCard,
@@ -113,7 +115,7 @@ const SimpleTopUpDialogContent = observer(
     const { amount, hasError } = useAmountValue();
 
     const [isLoading, setIsLoading] = useState(false);
-    const [tabId, setTabId] = useState<TopUpTab>("purchase");
+    const [tabId, setTabId] = useState<TopUpTab>(initialTab);
     const [panelMinHeight, setPanelMinHeight] = useState(0);
 
     const purchasePanelRef = useCallback((node: HTMLDivElement) => {
