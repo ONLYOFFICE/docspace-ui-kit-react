@@ -31,7 +31,7 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
 
   const {
     formatPaymentCurrency,
-    walletBalance,
+    availableCredits,
     walletCodeCurrency,
     isCardLinkedToPortal,
     isPayer,
@@ -49,7 +49,7 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
 
   const { isNotPaidPeriod, isGracePeriod, gracePeriodEndDate } = store.tariff;
   const overduePlanCost = store.quotas.currentPlanCost?.value ?? 0;
-  const graceShortfall = overduePlanCost - walletBalance;
+  const graceShortfall = overduePlanCost - availableCredits;
 
   const toDueDay = (dueDate: string) =>
     DateTime.fromISO(dueDate).setZone(getAppTimezone()).toISODate();
@@ -59,7 +59,7 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
   const nextPaymentsTotal = upcomingPayments
     .filter((item) => toDueDay(item.dueDate) === nextDueDay)
     .reduce((sum, item) => sum + item.amount, 0);
-  const topUpShortfall = nextPayment ? nextPaymentsTotal - walletBalance : 0;
+  const topUpShortfall = nextPayment ? nextPaymentsTotal - availableCredits : 0;
 
   const isNextPayment = nextPayment && topUpShortfall > 0;
 
@@ -167,7 +167,7 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
           showRefresh={!isNotPaidPeriod && isCardLinkedToPortal}
           isRefreshing={isRefreshing}
           onRefresh={onRefreshBalance}
-          amount={walletBalance}
+          amount={availableCredits}
           currency={walletCodeCurrency}
           language={language}
           withoutMargin

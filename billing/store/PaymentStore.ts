@@ -566,7 +566,7 @@ class PaymentStore {
 
     if (!this.isAiToolsServiceOn) return false;
 
-    return this.walletBalance < 1;
+    return this.availableCredits < 1;
   }
 
   get wasFirstTopUp() {
@@ -669,8 +669,8 @@ class PaymentStore {
 
   get availableBackupsCount() {
     if (this.backupServicePrice === 0) return 0;
-    if (this.walletBalance === 0) return 0;
-    return Math.floor(this.walletBalance / this.backupServicePrice);
+    if (this.availableCredits === 0) return 0;
+    return Math.floor(this.availableCredits / this.backupServicePrice);
   }
 
   get allowedStorageSizeByQuota() {
@@ -986,7 +986,7 @@ class PaymentStore {
     fractionDigits: number = 2,
     currency?: string,
   ) => {
-    const amount = item ?? this.walletBalance;
+    const amount = item ?? this.availableCredits;
 
     return formatCurrencyValue(
       this.language,
@@ -997,7 +997,7 @@ class PaymentStore {
   };
 
   formatPaymentCurrency = (item?: number, fractionDigits: number = 0) => {
-    const amount = item ?? this.walletBalance;
+    const amount = item ?? this.availableCredits;
     const { isoCurrencySymbol } = this.paymentQuotas.planCost;
 
     return formatCurrencyValue(
@@ -1012,7 +1012,7 @@ class PaymentStore {
     this.formatPaymentCurrency(amount, Number.isInteger(amount) ? 0 : 2);
 
   formatFuturePaymentCurrency = (item?: number, fractionDigits: number = 0) => {
-    const amount = item ?? this.walletBalance;
+    const amount = item ?? this.availableCredits;
     const { isoCurrencySymbol } = this.paymentQuotas.futurePlanCost;
 
     return formatCurrencyValue(
@@ -1808,7 +1808,7 @@ class PaymentStore {
       const priceParam = params.get("price");
 
       if (priceParam) {
-        const recommendedAmount = this.walletBalance - Number(priceParam);
+        const recommendedAmount = this.availableCredits - Number(priceParam);
         if (recommendedAmount < 0)
           this.setRecommendedAmount(
             Math.ceil(Math.abs(recommendedAmount)).toString(),
@@ -1925,7 +1925,7 @@ class PaymentStore {
 
     try {
       const dueTodayAmount = this.tariffDueTodayAmount ?? this.totalPrice;
-      const isBalanceInsufficient = this.walletBalance < dueTodayAmount;
+      const isBalanceInsufficient = this.availableCredits < dueTodayAmount;
 
       if (
         type === ProductQuantityType.Add &&
@@ -1933,7 +1933,7 @@ class PaymentStore {
         !this.tariff.isDelayedPaymentMethod
       ) {
         const recommendedAmount = Math.ceil(
-          dueTodayAmount - this.walletBalance,
+          dueTodayAmount - this.availableCredits,
         );
         if (recommendedAmount > 0) {
           await this.paymentApi.topUpDeposit({
@@ -1997,7 +1997,7 @@ class PaymentStore {
     const isTheSameCount =
       !isFreeTariff && this.managersCount === maxCountManagersByQuota;
     const dueTodayAmount = this.tariffDueTodayAmount ?? this.totalPrice;
-    const isBalanceInsufficient = this.walletBalance < dueTodayAmount;
+    const isBalanceInsufficient = this.availableCredits < dueTodayAmount;
 
     if (this.isTariffDueTodayCalculating) return t("UpgradeNow");
 

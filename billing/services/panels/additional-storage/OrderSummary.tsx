@@ -48,7 +48,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
   const {
     formatWalletCurrency,
     storagePriceIncrement,
-    walletBalance,
+    availableCredits,
     language,
   } = paymentStore;
   const { currentStoragePlanSize, hasStorageSubscription, storageExpiryDate } =
@@ -145,8 +145,8 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
     currentStoragePlanSize!,
   );
   const remainingBalance = partialUpgradeFee
-    ? walletBalance - partialUpgradeFee
-    : walletBalance - totalPrice;
+    ? availableCredits - partialUpgradeFee
+    : availableCredits - totalPrice;
   const daysDisplay = formatRemainingDays(daysUntilStorageExpiry, language, t);
 
   return (

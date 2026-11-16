@@ -45,7 +45,7 @@ const PriceDetailsDialog = observer(
       formatDueTodayAmount,
       formatWalletCurrency,
       language,
-      walletBalance,
+      availableCredits,
       getConfirmButtonLabel,
     } = store;
     const { maxCountManagersByQuota } = store.quotas;
@@ -74,7 +74,7 @@ const PriceDetailsDialog = observer(
       t,
     );
 
-    const topUpShortfall = Math.max(0, Math.ceil(dueToday - walletBalance));
+    const topUpShortfall = Math.max(0, Math.ceil(dueToday - availableCredits));
     const isDelayedPaymentTopUp =
       !isDowngradePlan && isDelayedPaymentMethod && topUpShortfall > 0;
 

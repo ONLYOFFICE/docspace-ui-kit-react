@@ -36,7 +36,7 @@ const UpdatePlanButtonContainer = ({
     formatPaymentCurrency,
     canDowngradeTariff,
     fetchBalance,
-    walletBalance,
+    availableCredits,
     tariffDueTodayAmount,
     isTariffDueTodayCalculating,
     isCardLinkedToPortal,
@@ -99,8 +99,11 @@ const UpdatePlanButtonContainer = ({
     : managersCount - maxCountManagersByQuota;
 
   const dueTodayAmount = tariffDueTodayAmount ?? totalPrice;
-  const isBalanceInsufficient = walletBalance < dueTodayAmount;
-  const topUpShortfall = Math.max(0, Math.ceil(dueTodayAmount - walletBalance));
+  const isBalanceInsufficient = availableCredits < dueTodayAmount;
+  const topUpShortfall = Math.max(
+    0,
+    Math.ceil(dueTodayAmount - availableCredits),
+  );
   const isDelayedPaymentTopUp = isDelayedPaymentMethod && isBalanceInsufficient;
   const isCardMissingTopUp = isCardMissingOrInactive && isBalanceInsufficient;
 
