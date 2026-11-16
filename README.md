@@ -28,10 +28,10 @@
 
 - **TypeScript-first** - Full type definitions included out of the box
 - **Color system** - Built-in `globalColors` palette with named color tokens for light and dark UI states
-- **Interactive docs** - Every component is documented with [Storybook](https://storybook.js.org/) stories and controls
+- **Interactive docs** - Every component is documented with [Storybook](https://storybook.js.org) stories and controls
 - **Tree-shakeable** - ESM only, one module per source file; import only what you use
-- **Well-tested** - Components are tested with [Vitest](https://vitest.dev/) and [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
-- **Modern tooling** - Built with Rollup, linted and formatted with [Biome](https://biomejs.dev/)
+- **Well-tested** - Components are tested with [Vitest](https://vitest.dev) and [React Testing Library](https://testing-library.com/docs/react-testing-library/intro)
+- **Modern tooling** - Built with Rollup, linted and formatted with [Biome](https://biomejs.dev)
 
 ## Requirements
 

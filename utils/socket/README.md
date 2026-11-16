@@ -1,6 +1,6 @@
 # socket
 
-`SocketHelper` — a singleton managing the portal's WebSocket connection ([socket.io-client](https://socket.io/docs/v4/client-api/)), with typed events and commands.
+`SocketHelper` — a singleton managing the portal's WebSocket connection ([socket.io-client](https://socket.io/docs/v4/client-api)), with typed events and commands.
 
 ## What It Does
 
