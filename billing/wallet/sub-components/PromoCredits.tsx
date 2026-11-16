@@ -13,12 +13,14 @@ const LEAVE_DURATION_MS = 250;
 
 type PromoCreditsProps = {
   animate?: boolean;
+  keepEmpty?: boolean;
   leaving?: boolean;
   onLeft?: () => void;
 };
 
 const PromoCredits = ({
   animate = false,
+  keepEmpty = false,
   leaving = false,
   onLeft,
 }: PromoCreditsProps) => {
@@ -44,7 +46,7 @@ const PromoCredits = ({
     isPromoExpiringSoon,
   };
   const shown = useRef(current);
-  if (!leaving && hasPromoCredits) shown.current = current;
+  if (!leaving && (hasPromoCredits || keepEmpty)) shown.current = current;
   const view = shown.current;
 
   useEffect(() => {
@@ -103,30 +105,34 @@ const PromoCredits = ({
               <Text fontSize="13px" lineHeight="20px" fontWeight={600}>
                 {remaining}
               </Text>
-              <Text
-                fontSize="11px"
-                lineHeight="16px"
-                className={styles.promoGranted}
-              >
-                {t("PromoCreditsOf", { granted })}
-              </Text>
+              {view.promoGranted > 0 ? (
+                <Text
+                  fontSize="11px"
+                  lineHeight="16px"
+                  className={styles.promoGranted}
+                >
+                  {t("PromoCreditsOf", { granted })}
+                </Text>
+              ) : null}
             </div>
           </div>
 
-          <div
-            className={styles.promoBar}
-            role="meter"
-            aria-label={t("PromoCredits")}
-            aria-valuemin={0}
-            aria-valuemax={view.promoGranted}
-            aria-valuenow={view.promoBalance}
-            aria-valuetext={`${remaining} / ${granted}`}
-          >
+          {view.promoGranted > 0 ? (
             <div
-              className={styles.promoBarFill}
-              style={{ width: `${percent}%` }}
-            />
-          </div>
+              className={styles.promoBar}
+              role="meter"
+              aria-label={t("PromoCredits")}
+              aria-valuemin={0}
+              aria-valuemax={view.promoGranted}
+              aria-valuenow={view.promoBalance}
+              aria-valuetext={`${remaining} / ${granted}`}
+            >
+              <div
+                className={styles.promoBarFill}
+                style={{ width: `${percent}%` }}
+              />
+            </div>
+          ) : null}
 
           {expiry ? (
             <div

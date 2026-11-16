@@ -109,18 +109,19 @@ const Wallet = (props: WalletProps) => {
   const [selectedTabId, setSelectedTabId] = useState(getInitialTabId);
 
   const [isAutoSpinning, setIsAutoSpinning] = useState(isAutoTopUpInProgress);
-  const hadPromoOnMount = useRef(hasPromoCredits);
-  const [isPromoShown, setIsPromoShown] = useState(hasPromoCredits);
+  const hasPromoSection = hasPromoCredits || hasPromoSpend;
+  const hadPromoOnMount = useRef(hasPromoSection);
+  const [isPromoShown, setIsPromoShown] = useState(hasPromoSection);
   const [isPromoLeaving, setIsPromoLeaving] = useState(false);
 
   useEffect(() => {
-    if (hasPromoCredits) {
+    if (hasPromoSection) {
       setIsPromoShown(true);
       setIsPromoLeaving(false);
     } else if (isPromoShown) {
       setIsPromoLeaving(true);
     }
-  }, [hasPromoCredits]);
+  }, [hasPromoSection]);
 
   const onPromoLeft = useCallback(() => {
     setIsPromoShown(false);
@@ -267,6 +268,7 @@ const Wallet = (props: WalletProps) => {
           {isPromoShown ? (
             <PromoCredits
               animate={!hadPromoOnMount.current}
+              keepEmpty={hasPromoSpend}
               leaving={isPromoLeaving}
               onLeft={onPromoLeft}
             />
