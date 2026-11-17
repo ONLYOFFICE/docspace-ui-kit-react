@@ -1072,6 +1072,14 @@ class PaymentStore {
     }
   };
 
+  refreshBalance = async () => {
+    await Promise.all([
+      this.fetchBalance(true),
+      this.fetchGoodwill(),
+      this.tariff.fetchCustomerInfo(true),
+    ]);
+  };
+
   applyPromoCode = async (promoCode: string): Promise<TPromoCodeResult> => {
     try {
       const { data } = await this.#rawApiClient.instance.post(

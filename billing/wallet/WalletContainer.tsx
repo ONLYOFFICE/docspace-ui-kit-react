@@ -14,10 +14,10 @@ import { toAbsoluteUrl } from "../utils/url";
 
 import { Text } from "../../components/text";
 import { Button, ButtonSize } from "../../components/button";
-import { toastr } from "../../components/toast";
 import { Link } from "../../components/link";
 import { Tabs, type TTabItem } from "../../components/tabs";
 import { finishRefreshingWithMinCycle } from "../utils/refreshing";
+import { useBalanceRefresh } from "../shared/balance-amount/useBalanceRefresh";
 
 import TransactionHistory from "../shared/transaction-history";
 import UpcomingPayments from "./sub-components/UpcomingPayments";
@@ -72,12 +72,10 @@ const Wallet = (props: WalletProps) => {
   const {
     availableCredits,
     hasPromoCredits,
-    fetchGoodwill,
     walletCodeCurrency,
     isCardLinkedToPortal,
     isVisibleWalletSettings,
     wasChangeBalance,
-    fetchBalance,
     refreshTransactionHistory,
     canUpdateTariff,
     recommendedAmount,
@@ -106,11 +104,13 @@ const Wallet = (props: WalletProps) => {
 
   const t = useCommonTranslation();
 
+  const { isRefreshing, onRefresh } = useBalanceRefresh(
+    refreshTransactionHistory,
+  );
   const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(
     isVisibleWalletSettings,
   );
   const [topUpTab, setTopUpTab] = useState<TopUpTab>(store.topUpDialogTab);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [isWalletRefilledOpen, setIsWalletRefilledOpen] = useState(false);
   const [selectedTabId, setSelectedTabId] = useState(getInitialTabId);
 
@@ -186,26 +186,6 @@ const Wallet = (props: WalletProps) => {
     setIsTopUpDialogVisible(true);
   };
 
-  const onClick = async () => {
-    if (isRefreshing) return;
-
-    setIsRefreshing(true);
-
-    const startTime = Date.now();
-
-    try {
-      refreshTransactionHistory();
-      await Promise.all([fetchBalance!(true), fetchGoodwill()]);
-    } catch (e) {
-      toastr.error(e as Error);
-    } finally {
-      finishRefreshingWithMinCycle({
-        startTime,
-        setRefreshing: setIsRefreshing,
-      });
-    }
-  };
-
   const onSelectTab = (item: TTabItem) => {
     setSelectedTabId(item.id);
     setTabIdToUrl(item.id);
@@ -271,7 +251,7 @@ const Wallet = (props: WalletProps) => {
             isRefreshing={isRefreshing || isAutoSpinning}
             progressText={t("TopUpInProgress")}
             isProgressTextVisible={isAutoSpinning}
-            onRefresh={onClick}
+            onRefresh={onRefresh}
             amount={availableCredits}
             currency={walletCodeCurrency}
             language={store.language}

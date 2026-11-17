@@ -4,13 +4,12 @@ import { DateTime } from "luxon";
 
 import { Button, ButtonSize } from "../../../components/button";
 import { Text } from "../../../components/text";
-import { toastr } from "../../../components/toast";
 import { useCommonTranslation } from "../../../utils/i18n";
 import { CommonTrans } from "../../../utils/i18n/CommonTrans";
 import { getAppTimezone } from "../../../utils/date";
 
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
-import { finishRefreshingWithMinCycle } from "../../utils/refreshing";
+import { useBalanceRefresh } from "../../shared/balance-amount/useBalanceRefresh";
 import BalanceAmount from "../../shared/balance-amount";
 import UnlinkedCardBanner from "../../shared/unlinked-card-banner";
 import AutoPaymentInfo from "../../wallet/sub-components/AutoPaymentInfo";
@@ -36,7 +35,6 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
     isCardLinkedToPortal,
     isPayer,
     recommendedAmount,
-    fetchBalance,
     isAutoPaymentExist,
     autoPayments,
     wasFirstTopUp,
@@ -65,7 +63,7 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
 
   const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(false);
   const [isWalletRefilledOpen, setIsWalletRefilledOpen] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { isRefreshing, onRefresh } = useBalanceRefresh();
 
   const isAutoPaymentSetup = Boolean(
     isAutoPaymentExist &&
@@ -74,26 +72,6 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
     autoPayments?.minBalance &&
     autoPayments?.upToBalance,
   );
-
-  const onRefreshBalance = async () => {
-    if (isRefreshing) return;
-    setIsRefreshing(true);
-    const startTime = Date.now();
-
-    try {
-      await Promise.all([
-        fetchBalance?.(true),
-        store.tariff.fetchCustomerInfo(true),
-      ]);
-    } catch (e) {
-      toastr.error(e as Error);
-    } finally {
-      finishRefreshingWithMinCycle({
-        startTime,
-        setRefreshing: setIsRefreshing,
-      });
-    }
-  };
 
   const renderStatusBanner = () => {
     if (showUnlinkedCardBanner)
@@ -166,7 +144,7 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
           fractionFontSize="20px"
           showRefresh={!isNotPaidPeriod && isCardLinkedToPortal}
           isRefreshing={isRefreshing}
-          onRefresh={onRefreshBalance}
+          onRefresh={onRefresh}
           amount={availableCredits}
           currency={walletCodeCurrency}
           language={language}
