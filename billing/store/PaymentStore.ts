@@ -1492,6 +1492,7 @@ class PaymentStore {
     const requests: Promise<unknown>[] = [
       this.tariff.fetchCustomerInfo(isRefresh),
       this.fetchBalance(isRefresh),
+      this.fetchGoodwill(),
     ];
 
     if (!this.quotas.isLoaded)
@@ -1611,7 +1612,11 @@ class PaymentStore {
       requests.push(this.getBasicPaymentLink(this.quotas.addedManagersCount));
     }
 
-    requests.push(this.tariff.fetchPortalTariff(), this.fetchBalance());
+    requests.push(
+      this.tariff.fetchPortalTariff(),
+      this.fetchBalance(),
+      this.fetchGoodwill(),
+    );
 
     try {
       await Promise.all(requests);
@@ -1652,6 +1657,7 @@ class PaymentStore {
       this.getSettingsPayment(),
       this.paymentQuotas.fetchPaymentQuotas(),
       this.fetchBalance(isRefresh),
+      this.fetchGoodwill(),
     );
 
     if (this.isAlreadyPaid && this.isStripePortalAvailable) {
@@ -1796,7 +1802,6 @@ class PaymentStore {
           ...getUsageRange("thisMonth"),
           mergeByok: true,
         }),
-        this.fetchGoodwill(),
       );
 
       if (onInit) requests.push(Promise.resolve(onInit()));
