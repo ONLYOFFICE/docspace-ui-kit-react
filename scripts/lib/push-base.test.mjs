@@ -129,6 +129,15 @@ describe("changesSince", () => {
     ]);
   });
 
+  // check-readme's `--base HEAD^1`: in CI, the first parent of a pull
+  // request's merge commit.
+  it("takes a revision as well as a sha", () => {
+    commit("a");
+    commit("components/x.ts");
+
+    expect(changesSince(dir, "HEAD^1")).toEqual(["components/x.ts"]);
+  });
+
   it("returns null for a commit git does not know", () => {
     commit("a");
     expect(changesSince(dir, "0".repeat(40))).toBeNull();

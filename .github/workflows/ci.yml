@@ -24,7 +24,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      # Two commits deep, so "Check the READMEs" can reach HEAD^1: on a pull
+      # request that is the tip of the target branch.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       # No `version` input: action-setup reads it from the `packageManager`
       # field in package.json, which is the single source of truth.
@@ -62,8 +66,11 @@ jobs:
       # The full pass: everything the pre-push gate checks, plus type-checking
       # every ```tsx block in every README. "Copy this and it works" is the one
       # promise these files make, and this is the only thing that keeps it.
+      # On a pull request `--base HEAD^1` scopes the style warnings to what the
+      # pull request changed; the checkout has no origin branches to find that
+      # from. They never fail the step.
       - name: Check the READMEs
-        run: pnpm check:readme:full
+        run: pnpm check:readme:full ${{ github.event_name == 'pull_request' && '--base HEAD^1' || '' }}
 
       - name: Check the generated README blocks
         run: pnpm readme:props:check && pnpm readme:catalogue:check

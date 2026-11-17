@@ -4,6 +4,7 @@
 //   pnpm check:readme --only button       one, folder name or path
 //   pnpm check:readme --json              machine-readable findings
 //   pnpm check:readme --style-all         style warnings for every folder
+//   pnpm check:readme --base HEAD^1       style warnings for what changed since a ref
 //
 // Everything it checks is something a reader of the README would otherwise get
 // wrong. The metadata block is derived truth wherever it can be: whether the
@@ -24,6 +25,11 @@
 // predates that rule, so by default they are printed only for the folders the
 // branch changed, and the rest are counted in one line: text is brought within
 // the limits when its component is touched, not in one sweep.
+//
+// Where the branch began is found from the long-lived branches on origin, which
+// a CI checkout does not have: it is one merge commit deep. `--base` names the
+// starting point instead -- CI passes `HEAD^1`, the first parent of a pull
+// request's merge commit, which is the tip of the branch it targets.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -107,20 +113,29 @@ const FORBIDDEN = [
 
 const usage = () => {
   console.error(
-    "usage: node scripts/check-readme.mjs [--only <folder>...] [--compile] [--json] [--style-all]",
+    "usage: node scripts/check-readme.mjs [--only <folder>...] [--compile] [--json] [--style-all] [--base <ref>]",
   );
   process.exit(2);
 };
 
 const parseArgs = (argv) => {
-  const options = { only: [], json: false, compile: false, styleAll: false };
+  const options = {
+    only: [],
+    json: false,
+    compile: false,
+    styleAll: false,
+    base: null,
+  };
 
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--json") options.json = true;
     else if (arg === "--compile") options.compile = true;
     else if (arg === "--style-all") options.styleAll = true;
-    else if (arg === "--only") {
+    else if (arg === "--base") {
+      if (!argv[i + 1] || argv[i + 1].startsWith("--")) usage();
+      options.base = argv[(i += 1)];
+    } else if (arg === "--only") {
       while (argv[i + 1] && !argv[i + 1].startsWith("--")) {
         options.only.push(argv[(i += 1)]);
       }
@@ -583,12 +598,28 @@ const storyStyle = (folder, component) =>
 
 /**
  * The documented folders the branch changed, each file credited to the deepest
- * folder holding it -- `rows/row` rather than `rows`. Empty when git cannot say,
- * which leaves every style warning in the summary line rather than failing.
+ * folder holding it -- `rows/row` rather than `rows`. Without `--base`, empty
+ * when git cannot find the branch's parent, which leaves every style warning in
+ * the summary line. A `--base` git cannot resolve is a broken invocation, not
+ * a clean branch, and stops the run: CI would otherwise hide the warnings for
+ * good and say nothing.
  */
-const touchedFolders = (folders) => {
-  const base = findBranchBase(ROOT);
-  const changed = base ? changesSince(ROOT, base.sha) : null;
+const touchedFolders = (folders, baseRef) => {
+  let changed;
+
+  if (baseRef) {
+    changed = changesSince(ROOT, baseRef);
+    if (!changed) {
+      console.error(
+        `--base ${baseRef}: git cannot resolve it here (a shallow checkout needs fetch-depth: 2 for HEAD^1)`,
+      );
+      process.exit(2);
+    }
+  } else {
+    const base = findBranchBase(ROOT);
+    changed = base ? changesSince(ROOT, base.sha) : null;
+  }
+
   if (!changed) return new Set();
 
   const deepestFirst = [...folders].sort((a, b) => b.length - a.length);
@@ -1141,7 +1172,8 @@ const main = async () => {
 
   // --- the style warnings, for the folders in scope ---
 
-  const touched = options.styleAll || named ? null : touchedFolders(folders);
+  const touched =
+    options.styleAll || named ? null : touchedFolders(folders, options.base);
   const inScope = (finding) => touched === null || touched.has(finding.folder);
   const hidden = style.filter((finding) => !inScope(finding));
 
