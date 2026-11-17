@@ -166,6 +166,7 @@ const AiChatStoresBridge = () => {
               id: folder.id,
               name: folder.name,
               path: folder.path,
+              kind: folder.kind,
             });
           else clouds.clearFolderContext();
         }

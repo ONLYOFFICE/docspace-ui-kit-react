@@ -25,7 +25,7 @@ vi.mock("../../hooks/useGetIcon", () => ({
   default: () => ({ getIcon: () => "" }),
 }));
 
-type Crumb = { id?: string | number; label: string };
+type Crumb = { id?: string | number; label: string; roomType?: number };
 type SelectorProps = Record<string, unknown> & {
   onSubmit: (
     id: string | number | null | undefined,
@@ -34,7 +34,12 @@ type SelectorProps = Record<string, unknown> & {
     breadCrumbs: Crumb[],
   ) => void;
   onFolderToggle: (
-    item: { id: string | number; label: string; isSelected?: boolean },
+    item: {
+      id: string | number;
+      label: string;
+      isSelected?: boolean;
+      roomType?: number;
+    },
     breadCrumbs: Crumb[],
   ) => void;
   getIsDisabled: (
@@ -98,9 +103,28 @@ describe("ContextFolderDialog", () => {
     // The path skips the virtual root and ends with the folder itself.
     expect(clouds.selectFolderContext).toHaveBeenCalledWith(
       CONTEXT_ROOM_CLOUD,
-      { id: "5", name: "Q3 reports", path: "My documents / Q3 reports" },
+      {
+        id: "5",
+        name: "Q3 reports",
+        path: "My documents / Q3 reports",
+        kind: "folder",
+      },
     );
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("tells the chat that the open folder is a room", () => {
+    render(<ContextFolderDialog onClose={vi.fn()} />);
+    act(() =>
+      selector().onSubmit(9, "Design", false, [
+        { id: 2, label: "Rooms" },
+        { id: 9, label: "Design", roomType: 6 },
+      ]),
+    );
+    expect(clouds.selectFolderContext).toHaveBeenCalledWith(
+      CONTEXT_ROOM_CLOUD,
+      { id: "9", name: "Design", path: "Rooms / Design", kind: "room" },
+    );
   });
 
   it("has a title and a close button of its own", () => {
@@ -167,7 +191,7 @@ describe("ContextFolderDialog", () => {
     act(() => {
       selector().onFolderToggle({ id: 5, label: "Q3" }, docs);
       selector().onFolderToggle({ id: 6, label: "Q4" }, docs);
-      selector().onFolderToggle({ id: 9, label: "Sales" }, [
+      selector().onFolderToggle({ id: 9, label: "Sales", roomType: 6 }, [
         { id: 2, label: "Rooms" },
       ]);
       // Cleared again: the selector reports the state before the click.
@@ -180,9 +204,16 @@ describe("ContextFolderDialog", () => {
     act(() =>
       selector().onSubmit(2, "Rooms", false, [{ id: 2, label: "Rooms" }]),
     );
+    // A ticked room is told from a folder, for its icon and its label.
     expect(clouds.addFolderContext.mock.calls).toEqual([
-      [CONTEXT_ROOM_CLOUD, { id: "5", name: "Q3", path: "My documents / Q3" }],
-      [CONTEXT_ROOM_CLOUD, { id: "9", name: "Sales", path: "Rooms / Sales" }],
+      [
+        CONTEXT_ROOM_CLOUD,
+        { id: "5", name: "Q3", path: "My documents / Q3", kind: "folder" },
+      ],
+      [
+        CONTEXT_ROOM_CLOUD,
+        { id: "9", name: "Sales", path: "Rooms / Sales", kind: "room" },
+      ],
     ]);
     expect(onClose).toHaveBeenCalledTimes(1);
   });
@@ -210,7 +241,7 @@ describe("ContextFolderDialog", () => {
     );
     expect(clouds.selectFolderContext).toHaveBeenCalledWith(
       CONTEXT_ROOM_CLOUD,
-      { id: "7", name: "Sales", path: "Rooms / Sales" },
+      { id: "7", name: "Sales", path: "Rooms / Sales", kind: "folder" },
     );
   });
 

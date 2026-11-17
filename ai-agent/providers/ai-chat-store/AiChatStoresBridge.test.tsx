@@ -204,6 +204,7 @@ describe("AiChatStoresBridge", () => {
           id: "77",
           name: "Reports",
           path: "My documents / Reports",
+          kind: "room",
         },
       });
     });
@@ -211,6 +212,7 @@ describe("AiChatStoresBridge", () => {
       id: "77",
       name: "Reports",
       path: "My documents / Reports",
+      kind: "room",
     });
     expect(clouds.clearFolderContext).not.toHaveBeenCalled();
 

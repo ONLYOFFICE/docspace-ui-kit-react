@@ -47,8 +47,15 @@ export const DEFAULT_CHAT_PANEL_WIDTH = 400;
 /** A room as a preset remembers it: the chat library's cloud + id pair, plus the name to show. */
 export type AiChatPresetRoom = { cloud: string; id: string; name: string };
 
-/** A folder connected as the chat's context, with where it sits for its pill. */
-export type AiChatContextFolder = AiChatPresetRoom & { path?: string };
+/**
+ * A folder connected as the chat's context, with where it sits for its pill
+ * and whether it is a room (drawn with the room icon) or a folder; one
+ * remembered before the kind existed has none and is drawn as a folder.
+ */
+export type AiChatContextFolder = AiChatPresetRoom & {
+  path?: string;
+  kind?: "room" | "folder";
+};
 
 /**
  * The chat settings a host saves as a preset and hands back to open one: the

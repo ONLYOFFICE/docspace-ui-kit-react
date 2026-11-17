@@ -3,10 +3,15 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { FilterType, FolderType } from "@onlyoffice/docspace-api-sdk";
-import { FOLDER_CONTEXTS_LIMIT, useStores } from "@onlyoffice/ai-chat";
+import {
+  FOLDER_CONTEXTS_LIMIT,
+  useStores,
+  type ContextRoom,
+  type ContextRoomKind,
+} from "@onlyoffice/ai-chat";
 
 import FilesSelector from "../../../selectors/Files";
-import type { TSelectorItem } from "../../../components/selector";
+import type { TBreadCrumb, TSelectorItem } from "../../../components/selector";
 import useGetIcon from "../../hooks/useGetIcon";
 
 import { CONTEXT_ROOM_CLOUD } from "../context-room/ContextRoomSync";
@@ -22,6 +27,16 @@ type ContextFolderDialogProps = {
    */
   mode?: "replace" | "add";
 };
+
+/**
+ * Whether a picked entry is a room or a folder, for the chat to draw its
+ * icon and word its remove control by: the selector marks a room, as a row
+ * and as a crumb, with its room type.
+ */
+const kindOf = (
+  entry: TSelectorItem | TBreadCrumb | undefined,
+): ContextRoomKind =>
+  entry && "roomType" in entry && entry.roomType != null ? "room" : "folder";
 
 // The folder picker of an AI project's Folder card and of the chat's Data
 // sources: any folder of the portal, rooms and their subfolders included,
@@ -45,10 +60,9 @@ const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
   const { useCloudsStore } = useStores();
 
   const isAdd = mode === "add";
-  // The folders ticked so far, by id, with the path each was ticked under.
-  const pickedRef = React.useRef(
-    new Map<string, { id: string; name: string; path: string }>(),
-  );
+  // The folders ticked so far, by id, with the path each was ticked under
+  // and whether it is a room.
+  const pickedRef = React.useRef(new Map<string, ContextRoom>());
   const [pickedCount, setPickedCount] = React.useState(0);
   // How many more folders the chat takes; read once, when the dialog opens.
   const freeSlots = React.useMemo(
@@ -74,7 +88,12 @@ const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
         const crumbs = breadCrumbs
           .filter((crumb) => crumb.id !== "" && crumb.label)
           .map((crumb) => crumb.label);
-        picked.set(id, { id, name, path: [...crumbs, name].join(" / ") });
+        picked.set(id, {
+          id,
+          name,
+          path: [...crumbs, name].join(" / "),
+          kind: kindOf(item),
+        });
       }
       setPickedCount(picked.size);
     },
@@ -109,10 +128,17 @@ const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
         .filter((crumb) => crumb.id !== "" && crumb.label)
         .map((crumb) => crumb.label);
       if (crumbs[crumbs.length - 1] !== name) crumbs.push(String(name));
-      const folder = {
+      // The open folder is the last crumb, which says whether it is a room.
+      const openCrumb = breadCrumbs[breadCrumbs.length - 1];
+      const folder: ContextRoom = {
         id: String(selectedItemId),
         name: String(name),
         path: crumbs.join(" / "),
+        kind: kindOf(
+          openCrumb && String(openCrumb.id) === String(selectedItemId)
+            ? openCrumb
+            : undefined,
+        ),
       };
       clouds.selectFolderContext(CONTEXT_ROOM_CLOUD, folder);
       onClose();
