@@ -59,6 +59,7 @@ const ControlButtons = ({
   isPlusButtonVisible,
   contextMenuHeader,
   analyzeResponsesButton,
+  beforeContextButton,
 
   // AI chat button props
   toggleChatPanel,
@@ -185,6 +186,22 @@ const ControlButtons = ({
     );
   };
 
+  // The host's controls before the context button (an agent's chat toolbar)
+  // make one group with that button and the navigation button, in reading
+  // order, right after the title. Below the desktop breakpoint the row is
+  // `row-reverse` (see the comment below), so the group is its last child
+  // there, and it stays in order inside because it is a row of its own.
+  const leadingControls = beforeContextButton ? (
+    <div
+      className={styles.leadingControls}
+      data-testid="navigation-leading-controls"
+    >
+      {beforeContextButton}
+      {renderContextButton((isContextButtonVisible && !isPublicRoom) ?? false)}
+      {renderNavigationButton()}
+    </div>
+  ) : null;
+
   return (
     <div
       id="control-buttons-container"
@@ -199,14 +216,20 @@ const ControlButtons = ({
           buttons that reserve width while rendering nothing visible. */}
       {renderAiChatButton()}
       {isPlusButtonVisible ? renderPlusButton() : null}
-      {renderContextButton((isContextButtonVisible && !isPublicRoom) ?? false)}
+      {leadingControls && isDesktop ? leadingControls : null}
+      {!leadingControls
+        ? renderContextButton(
+            (isContextButtonVisible && !isPublicRoom) ?? false,
+          )
+        : null}
       {renderToggleInfoPanel()}
       {renderContextButton((isPublicRoom && containVisible) ?? false)}
       {renderWarning()}
-      {!isTabletView ? renderNavigationButton() : null}
+      {!leadingControls && !isTabletView ? renderNavigationButton() : null}
       {renderTariffBar()}
       {analyzeResponsesButton ?? null}
-      {isTabletView ? renderNavigationButton() : null}
+      {!leadingControls && isTabletView ? renderNavigationButton() : null}
+      {leadingControls && !isDesktop ? leadingControls : null}
     </div>
   );
 };

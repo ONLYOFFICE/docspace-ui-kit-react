@@ -181,6 +181,8 @@ export type TControlButtonProps = Omit<TToggleInfoPanelButtonProps, "id"> &
     isEmptyPage?: boolean;
     /** Rendered as-is at the end of the button row, after the tariff notice. */
     analyzeResponsesButton?: React.ReactNode;
+    /** Host controls drawn right before the context button, such as an agent's chat toolbar. They, that button and the navigation button then stay in this order right after the title at every width. */
+    beforeContextButton?: React.ReactNode;
     /** Opens/closes the AI chat panel. The button is not rendered without it,
      * which keeps every host that has no AI chat surface unchanged. */
     toggleChatPanel?: (e?: React.MouseEvent) => void;
@@ -213,6 +215,7 @@ export type TDropBoxProps = TArrowButtonProps &
     | "showTitle"
     | "isMobile"
     | "analyzeResponsesButton"
+    | "beforeContextButton"
   > &
   TRowParam & {
     /** Ref of the drop box element. Supplied internally, so a ref you pass never reaches the DOM. */

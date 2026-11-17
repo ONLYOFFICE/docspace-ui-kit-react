@@ -197,6 +197,16 @@
   }
 }
 
+// The host's controls before the context button, that button and the
+// navigation button as one group in reading order (see ControlBtn). It does
+// not shrink: the title gives way first (see `.container`).
+.leadingControls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
 .heading {
   --navigation-heading-weight-v: var(--navigation-heading-weight, 700);
   --navigation-heading-size-v: var(--navigation-heading-size, 18px);
@@ -921,6 +931,37 @@
 
     &[data-is-root-folder="true"][data-is-frame="true"][data-with-logo="true"] {
       grid-template-columns: 59px minmax(0, auto) minmax(0, auto) 1fr;
+    }
+  }
+
+  // A header with host controls before the context button (an agent's
+  // page). In the grid the title's `auto` track takes its whole width first
+  // and the control column only what is left, so the controls were cut ("Share
+  // ag...", "Try Busin...") while the name still had room to truncate. As a
+  // row the title shrinks first - the far larger shrink factor, as `.container`
+  // has against `.buttonsContainer` - and the controls only once the title is
+  // down to nothing; the controls still take the rest of the row, so the
+  // tariff notice keeps its place at the trailing edge.
+  &[data-with-leading-controls="true"] {
+    display: flex;
+
+    > :global(.navigation-arrow-container) {
+      // The arrow's grid column in the rules above.
+      flex: 0 0 49px;
+
+      @include mixins.mobile {
+        flex-basis: 29px;
+      }
+    }
+
+    > :global(.badges-container),
+    > :global(.title-container) {
+      flex: 0 1000 auto;
+      min-width: 0;
+    }
+
+    > .controlButtonContainer {
+      flex: 1 1 auto;
     }
   }
 

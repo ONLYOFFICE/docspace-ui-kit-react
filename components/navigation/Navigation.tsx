@@ -63,6 +63,7 @@ const Navigation = ({
   showBackButton,
   contextMenuHeader,
   analyzeResponsesButton,
+  beforeContextButton,
   titleTooltip,
   toggleChatPanel,
   isChatPanelVisible,
@@ -277,6 +278,7 @@ const Navigation = ({
             data-show-navigation-button={
               showNavigationButton ? "true" : "false"
             }
+            data-with-leading-controls={beforeContextButton ? "true" : "false"}
             data-is-drop-box-component="false"
           >
             {withLogo ? (
@@ -327,6 +329,7 @@ const Navigation = ({
               isPlusButtonVisible={isPlusButtonVisible}
               contextMenuHeader={contextMenuHeader}
               analyzeResponsesButton={analyzeResponsesButton}
+              beforeContextButton={beforeContextButton}
               toggleChatPanel={toggleChatPanel}
               isChatPanelVisible={isChatPanelVisible}
               hideChatButton={hideChatButton}
