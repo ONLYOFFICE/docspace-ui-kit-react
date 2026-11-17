@@ -120,6 +120,10 @@ import type {
   TWalletServiceQuota,
 } from "../types";
 import type { TApiClient } from "../../providers/api/ApiProvider";
+import {
+  clearPromoCodeReturn,
+  isPromoCodeReturn,
+} from "../shared/promo-code/promoCodeReturn";
 import CurrentTariffStatusStore from "./CurrentTariffStatusStore";
 import CurrentQuotasStore from "./CurrentQuotasStore";
 import PaymentQuotasStore from "./PaymentQuotasStore";
@@ -730,6 +734,14 @@ class PaymentStore {
 
   setTopUpDialogTab = (tab: "purchase" | "promo") => {
     this.topUpDialogTab = tab;
+  };
+
+  applyPromoCodeReturn = () => {
+    if (!isPromoCodeReturn()) return;
+
+    this.setTopUpDialogTab("promo");
+    this.setVisibleWalletSetting(true);
+    clearPromoCodeReturn();
   };
 
   setIsShowTariffDeactivatedModal = (value: boolean) => {
@@ -1699,6 +1711,7 @@ class PaymentStore {
       return;
     }
 
+    this.applyPromoCodeReturn();
     this.setIsInitPaymentPage(true);
   };
 
@@ -1833,9 +1846,7 @@ class PaymentStore {
         this.setRecommendedAmount("");
       }
 
-      this.setTopUpDialogTab(
-        params.get("topup") === "promo" ? "promo" : "purchase",
-      );
+      this.applyPromoCodeReturn();
 
       if (
         window.location.href.includes("complete=true") ||

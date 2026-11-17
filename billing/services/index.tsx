@@ -45,6 +45,7 @@ import StoragePlanCancel from "./panels/additional-storage/StoragePlanCancel";
 import GracePeriodModal from "./panels/additional-storage/GracePeriodModal";
 import ConfirmationDialog from "./sub-components/ConfirmationDialog";
 import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
+import { useTopUpDialogVisible } from "../shared/top-up-balance/useTopUpDialogVisible";
 
 const AI_FEATURES_DIALOG_SHOWN_KEY = "aiFeaturesDialogShown";
 
@@ -131,7 +132,8 @@ const Services = observer(
       useState(false);
     const [previousValue, setPreviousValue] = useState("");
 
-    const [isTopUpBalanceVisible, setIsTopUpBalanceVisible] = useState(false);
+    const [isTopUpBalanceVisible, setIsTopUpBalanceVisible] =
+      useTopUpDialogVisible();
     const [isFirstTopUpDialogVisible, setIsFirstTopUpDialogVisible] =
       useState(false);
 

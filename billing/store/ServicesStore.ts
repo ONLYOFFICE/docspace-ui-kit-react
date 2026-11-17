@@ -624,6 +624,7 @@ class ServicesStore {
         await fetchCardLinked();
       }
 
+      this.paymentStore.applyPromoCodeReturn();
       this.setIsInitServicesPage(true);
 
       if (!isRefresh) {

@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { isIOS } from "react-device-detect";
 
 import { useApi } from "../../../providers/api";
 import { toAbsoluteUrl } from "../../utils/url";
-import { combineUrl } from "../../../utils/combineUrl";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
+import { getPromoCodeReturnUrls } from "../promo-code/promoCodeReturn";
 import SimpleTopUpDialog, {
   type SimpleTopUpDialogProps,
   type TSimpleTopUpDeps,
@@ -47,15 +47,19 @@ const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
     return store.fetchCardLinked(backUrl, successUrl, false);
   };
 
+  const onClose = () => {
+    store.setTopUpDialogTab("purchase");
+    props.onClose();
+  };
+
+  useEffect(() => {
+    return () => {
+      store.setVisibleWalletSetting(false);
+    };
+  }, [store]);
+
   const onLinkCard = async () => {
-    const backUrl = combineUrl(
-      window.location.origin,
-      "/billing/wallet?open=true&topup=promo",
-    );
-    const successUrl = combineUrl(
-      window.location.origin,
-      "/billing/wallet?complete=true&type=wallet&topup=promo",
-    );
+    const { backUrl, successUrl } = getPromoCodeReturnUrls();
 
     const linkUrl = await store.fetchCardLinked(backUrl, successUrl, false);
 
@@ -85,6 +89,8 @@ const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
       applyPromoCode={store.applyPromoCode}
       isCardLinked={isCardLinkedToPortal}
       onLinkCard={onLinkCard}
+      initialTab={props.initialTab ?? store.topUpDialogTab}
+      onClose={onClose}
     />
   );
 };

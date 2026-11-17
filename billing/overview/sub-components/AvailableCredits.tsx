@@ -14,6 +14,7 @@ import BalanceAmount from "../../shared/balance-amount";
 import UnlinkedCardBanner from "../../shared/unlinked-card-banner";
 import AutoPaymentInfo from "../../wallet/sub-components/AutoPaymentInfo";
 import SimpleTopUpDialog from "../../shared/top-up-balance/SimpleTopUpDialogWrapper";
+import { useTopUpDialogVisible } from "../../shared/top-up-balance/useTopUpDialogVisible";
 import WalletRefilledModal from "../../wallet/WalletRefilledModal";
 
 import WarningIcon from "../../../assets/danger.toast.react.svg";
@@ -61,7 +62,8 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
 
   const isNextPayment = nextPayment && topUpShortfall > 0;
 
-  const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(false);
+  const [isTopUpDialogVisible, setIsTopUpDialogVisible] =
+    useTopUpDialogVisible();
   const [isWalletRefilledOpen, setIsWalletRefilledOpen] = useState(false);
   const { isRefreshing, onRefresh } = useBalanceRefresh();
 
