@@ -140,7 +140,7 @@ The `index` module exports a wrapped component, so these are accepted on top of 
 
 ## Recipes
 
-### Loading
+### Show a loading state while an action runs
 
 `isLoading` is yours to drive around the await — the button does not track the promise.
 
@@ -169,7 +169,7 @@ export function DeleteButton({ onDelete }: { onDelete: () => Promise<void> }) {
 }
 ```
 
-### Disabled
+### Disable the button until a form is valid
 
 ```tsx
 import { Button } from "@onlyoffice/apps-ui-kit/components/button";
@@ -179,7 +179,7 @@ export function SubmitButton({ isValid }: { isValid: boolean }) {
 }
 ```
 
-### With an icon
+### Add an icon to the button
 
 `icon` takes a node, and the node is yours: the package does not publish its icon set, so
 import the SVG through your own bundler. There is no `iconName` prop.
@@ -195,7 +195,7 @@ export function DownloadButton({ onDownload }: { onDownload: () => void }) {
 }
 ```
 
-### A row of buttons in a dialog footer
+### Lay out the buttons of a dialog footer
 
 Primary first, then the secondary action; `scale` makes them share the width evenly.
 
@@ -225,6 +225,31 @@ export function DialogFooter({
         onClick={onCancel}
       />
     </div>
+  );
+}
+```
+
+### Make a destructive (red) button
+
+There is no destructive variant. A delete confirmation is a `primary` button with
+`--accent-button` set through its own `style`. Do not set the variable on the dialog or panel
+around the button: that recolours everything accented inside, the close button included.
+
+```tsx
+import type { CSSProperties } from "react";
+import { Button } from "@onlyoffice/apps-ui-kit/components/button";
+
+// The primary variant reads it for its background and border.
+const destructive = { "--accent-button": "#f21c0e" } as CSSProperties;
+
+export function DeleteForeverButton({ onDelete }: { onDelete: () => void }) {
+  return (
+    <Button
+      primary
+      label="Delete forever"
+      style={destructive}
+      onClick={onDelete}
+    />
   );
 }
 ```
@@ -286,11 +311,8 @@ their colours are set on the button itself, out of a wrapper's reach.
 | `--button-primary-bg-active`, `-color-active`, `-border-active`            | theme   | Primary background and text colour while pressed and under `isClicked`; the border takes a colour, not a shorthand |
 | `--button-primary-bg-disabled`, `-color-disabled`, `-border-disabled`      | theme   | The same three while disabled or loading                                                                           |
 
-**There is no destructive variant.** A delete confirmation is an ordinary `primary` button; to
-make it red, override `--accent-button`. Set it through the button's own `style`:
-`style={{ "--accent-button": "#f21c0e" } as CSSProperties}`. Do not set it on the dialog or
-panel around the button, which would recolour everything accented inside, the close button
-included.
+**There is no destructive variant.** Override `--accent-button` on the button itself, as in
+[Make a destructive (red) button](#make-a-destructive-red-button).
 
 Use a wrapper element only when one variable has to cover several buttons. Avoid it inside a
 row that shares its width: a wrapped `scale` button stops being an equal flex item and shrinks

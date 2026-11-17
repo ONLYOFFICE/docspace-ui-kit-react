@@ -254,7 +254,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The secondary button, for any action that is not the main one of a view. Click it to see `onClick` in the Actions panel, and change any other prop in the Controls panel below.",
+          "The secondary button, for any action that is not the main one of a view.",
       },
       source: {
         code: `<Button size={ButtonSize.small} label="Button" onClick={handleClick} />`,
@@ -513,6 +513,7 @@ const TooltipTemplate = () => {
 };
 
 export const PrimaryButtons: Story = {
+  name: "Primary",
   render: () => <PrimaryTemplate />,
   play: async (context) => {
     const buttons = row(context, "Primary");
@@ -542,6 +543,7 @@ export const PrimaryButtons: Story = {
 };
 
 export const SecondaryButtons: Story = {
+  name: "Secondary",
   render: () => <SecondaryTemplate />,
   play: async (context) => {
     const buttons = row(context, "Secondary");
@@ -569,6 +571,7 @@ export const SecondaryButtons: Story = {
 };
 
 export const WithIconButtons: Story = {
+  name: "With icon",
   render: () => <WithIconTemplate />,
   play: async ({ canvas }) => {
     // The icon comes before the label.
@@ -598,7 +601,7 @@ export const WithIconButtons: Story = {
 };
 
 export const IsLoadingButtons: Story = {
-  name: "Loading Buttons",
+  name: "Loading",
   render: () => <IsLoadingTemplate />,
   play: async ({ canvas }) => {
     for (const button of canvas.getAllByRole("button")) {
@@ -623,6 +626,7 @@ export const IsLoadingButtons: Story = {
 };
 
 export const ScaleButtons: Story = {
+  name: "Full width",
   render: () => <ScaleTemplate />,
   play: async ({ canvas }) => {
     // As wide as the column the grid gives them.
@@ -652,6 +656,7 @@ export const ScaleButtons: Story = {
 };
 
 export const DisabledButtons: Story = {
+  name: "Disabled",
   render: () => <DisabledTemplate />,
   play: async ({ canvas }) => {
     for (const button of canvas.getAllByRole("button")) {
@@ -676,6 +681,7 @@ export const DisabledButtons: Story = {
 };
 
 export const ClickedButtons: Story = {
+  name: "Pressed look",
   render: () => <ClickedTemplate />,
   play: async (context) => {
     // Drawn pressed with nothing pressing them.
@@ -700,6 +706,7 @@ export const ClickedButtons: Story = {
 };
 
 export const HoveredButtons: Story = {
+  name: "Hover look",
   render: () => <HoveredTemplate />,
   play: async (context) => {
     // Drawn hovered with the pointer elsewhere.
@@ -724,6 +731,7 @@ export const HoveredButtons: Story = {
 };
 
 export const FilledButtons: Story = {
+  name: "Filled",
   render: () => <FilledTemplate />,
   play: async ({ canvas }) => {
     // No border, and the icon repainted in the text colour.
@@ -752,6 +760,7 @@ export const FilledButtons: Story = {
 };
 
 export const FilledStrokeButtons: Story = {
+  name: "Filled with an outline icon",
   render: () => <FilledStrokeTemplate />,
   play: async ({ canvas }) => {
     // The plain filled button paints the outline icon solid; filledStroke
@@ -782,6 +791,7 @@ export const FilledStrokeButtons: Story = {
 };
 
 export const WithTooltip: Story = {
+  name: "With tooltip",
   render: () => <TooltipTemplate />,
   play: async ({ canvas, userEvent }) => {
     await userEvent.hover(canvas.getByRole("button", { name: "Hover me" }));
@@ -799,7 +809,7 @@ export const WithTooltip: Story = {
     docs: {
       description: {
         story:
-          "A hint below the button on hover, for an action its label cannot fully explain (`tooltipText`). Hover the buttons to see it.",
+          "A hint below the button on hover, for an action its label cannot fully explain (`tooltipText`).",
       },
       source: {
         code: `<Button primary size={ButtonSize.small} label="Hover me" tooltipText="This is a primary button with a tooltip" />
@@ -835,6 +845,7 @@ const AccentTemplate = () => {
 };
 
 export const AccentButtons: Story = {
+  name: "Accent",
   render: () => <AccentTemplate />,
   play: async ({ canvas }) => {
     // Accent text on a tint, with the icon repainted to match.
@@ -908,6 +919,7 @@ const CustomizationTemplate = () => {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   render: () => <CustomizationTemplate />,
   play: async ({ canvas }) => {
     const [secondary, disabled] = [
@@ -933,7 +945,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable on one wrapper; CSS variables below lists them. Hover and press the buttons for those states.
+        story: `Every overridable variable on one wrapper, the hover and pressed colours included; the CSS variables section lists them.
 
 - **Secondary** — the \`--button-root-*\` colours, radius, weight, height and font size.
 - **Primary** — the \`--button-primary-*\` colours.
