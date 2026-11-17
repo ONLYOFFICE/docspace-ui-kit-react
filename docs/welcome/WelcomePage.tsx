@@ -233,7 +233,7 @@ const references = [
     id: "apps-api",
     icon: <DeveloperIcon />,
     name: "ONLYOFFICE Apps API",
-    href: "https://api.onlyoffice.com/docspace/",
+    href: "https://api.onlyoffice.com/docspace",
     external: true,
   },
 ];

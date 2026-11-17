@@ -28,10 +28,10 @@
 
 - **TypeScript-first** - Full type definitions included out of the box
 - **Color system** - Built-in `globalColors` palette with named color tokens for light and dark UI states
-- **Interactive docs** - Every component is documented with [Storybook](https://storybook.js.org/) stories and controls
+- **Interactive docs** - Every component is documented with [Storybook](https://storybook.js.org) stories and controls
 - **Tree-shakeable** - ESM only, one module per source file; import only what you use
-- **Well-tested** - Components are tested with [Vitest](https://vitest.dev/) and [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
-- **Modern tooling** - Built with Rollup, linted and formatted with [Biome](https://biomejs.dev/)
+- **Well-tested** - Components are tested with [Vitest](https://vitest.dev) and [React Testing Library](https://testing-library.com/docs/react-testing-library/intro)
+- **Modern tooling** - Built with Rollup, linted and formatted with [Biome](https://biomejs.dev)
 
 ## Requirements
 
@@ -952,7 +952,7 @@ everything works out of the box.
 
 > `css/fonts.css` and `fonts/` are vendored here too, for the same reason: Storybook
 > imports the stylesheet, so a fresh clone has to have it. `pnpm sync-locales` (with
-> `DOCSPACE_CLIENT_ROOT` pointing at a DocSpace client checkout) refreshes them along
+> `DOCSPACE_CLIENT_ROOT` pointing at a checkout of the ONLYOFFICE Apps client) refreshes them along
 > with the non-English locales — run it when the upstream fonts or strings change.
 
 ### Line endings (Windows: one-time migration)
@@ -1052,7 +1052,7 @@ pnpm test:e2e:docker:clear         # drop the image
 differ between macOS and Linux, so a baseline taken on the host fails everywhere else. The
 image carries the same fonts and the same pinned Chromium for everyone.
 
-Both the report layout and the reporters match the DocSpace client's packages: `dot` for the
+Both the report layout and the reporters match the ONLYOFFICE Apps client's packages: `dot` for the
 console, an HTML report and `test-results.json`, all under `playwright-report/`.
 
 ```bash
