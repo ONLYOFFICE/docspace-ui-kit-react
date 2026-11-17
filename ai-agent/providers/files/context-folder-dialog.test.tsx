@@ -101,6 +101,23 @@ describe("ContextFolderDialog", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  it("has a title and a close button of its own", () => {
+    const onClose = vi.fn();
+    const { unmount } = render(<ContextFolderDialog onClose={onClose} />);
+    expect(selector().withHeader).toBe(true);
+    expect(selector().headerProps).toEqual({
+      headerLabel: "Select folder",
+      onCloseClick: onClose,
+      isCloseable: true,
+    });
+    unmount();
+    render(<ContextFolderDialog mode="add" onClose={onClose} />);
+    expect(selector().headerProps).toMatchObject({
+      headerLabel: "Select",
+      onCloseClick: onClose,
+    });
+  });
+
   it("adds the folder to the others in add mode", () => {
     render(<ContextFolderDialog mode="add" onClose={vi.fn()} />);
     act(() =>

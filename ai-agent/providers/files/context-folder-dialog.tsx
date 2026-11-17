@@ -141,6 +141,17 @@ const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
       isRoomsOnly={false}
       isThirdParty={false}
       withCreate={false}
+      // A title and a close button of its own, as the product's other
+      // selectors have: without them the root crumb stands in the title's
+      // place. Several folders can be ticked for the Data sources.
+      withHeader
+      headerProps={{
+        headerLabel: isAdd
+          ? t("Common:SelectAction", { defaultValue: "Select" })
+          : t("Common:SelectFolder", { defaultValue: "Select folder" }),
+        onCloseClick: onClose,
+        isCloseable: true,
+      }}
       withSearch
       withBreadCrumbs
       withoutBackButton
