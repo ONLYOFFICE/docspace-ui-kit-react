@@ -127,6 +127,22 @@ export type AiChatAgentAction = {
   isDanger?: boolean;
 };
 
+/**
+ * The agent the chat runs on, as its replies show it. The host sets it for
+ * a chat on an agent (on the agent's page or picked in the panel) and
+ * clears it for the default agent, whose replies carry neither.
+ */
+export type AiChatAgent = {
+  /** The agent's name, on the documents its replies create ("created by ..."). */
+  name: string;
+  /**
+   * The agent's logo at the start of every reply, in a 24px box with 6px
+   * corners: an image URL, or an element drawn at that size (the room's
+   * logo tile with its colour and initials).
+   */
+  logo?: string | React.ReactElement;
+};
+
 /** The preset a project opens as. */
 export const projectToPreset = (
   project: AiChatProjectSettings,
@@ -235,6 +251,13 @@ class AiChatStore {
   sourcesManager: AiChatSourcesManager | null = null;
 
   /**
+   * The agent the chat runs on, as its replies show it: its logo beside
+   * each reply and its name on the documents they create. `null` (the
+   * default) for the default agent.
+   */
+  chatAgent: AiChatAgent | null = null;
+
+  /**
    * Settings waiting to be applied to the chat stores by AiChatStoresBridge
    * once the panel is up — set by `openPreset`, cleared when applied.
    */
@@ -287,12 +310,14 @@ class AiChatStore {
     // The save hook is a host callback, kept by reference: wrapping it as an
     // action would hand the button a bound wrapper instead of the function.
     // The agent picker carries host callbacks and React nodes (the logos):
-    // kept by reference too, never made deep-observable.
+    // kept by reference too, never made deep-observable, as is the agent the
+    // chat runs on, whose logo may be an element.
     makeAutoObservable(this, {
       onSavePreset: observable.ref,
       agentPicker: observable.ref,
       agentActions: observable.ref,
       sourcesManager: observable.ref,
+      chatAgent: observable.ref,
     });
   }
 
@@ -475,6 +500,10 @@ class AiChatStore {
 
   setKnowledgePickerHidden = (value: boolean) => {
     this.knowledgePickerHidden = value;
+  };
+
+  setChatAgent = (agent: AiChatAgent | null) => {
+    this.chatAgent = agent;
   };
 
   close = () => {

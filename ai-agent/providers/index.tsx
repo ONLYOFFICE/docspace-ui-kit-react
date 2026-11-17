@@ -679,6 +679,7 @@ const AiAgentProviders = ({
     composerContextHidden,
     knowledgePickerHidden,
     sourcesManager,
+    chatAgent,
   } = useObservedFields(() => ({
     analyzeActive: aiChatStore.isAnalyzeMode,
     analyzePending: aiChatStore.isAnalyzePending,
@@ -687,6 +688,7 @@ const AiAgentProviders = ({
     composerContextHidden: aiChatStore.composerContextHidden,
     knowledgePickerHidden: aiChatStore.knowledgePickerHidden,
     sourcesManager: aiChatStore.sourcesManager,
+    chatAgent: aiChatStore.chatAgent,
   }));
 
   // Ids of attached files the backend flagged as analyzable. The attachments
@@ -1282,6 +1284,9 @@ const AiAgentProviders = ({
       // bring back its own copy of them. Its data sources stay the user's
       // own and come back with it.
       hostOwnedSources: sourcesOwned ? HOST_OWNED_SOURCES : undefined,
+      // Every reply of a chat on an agent starts with the agent's logo; the
+      // default agent's replies carry none.
+      assistantLogo: chatAgent?.logo,
     }),
     [
       composerActions,
@@ -1311,6 +1316,7 @@ const AiAgentProviders = ({
       onAddContextFolder,
       onOpenContextRoom,
       sourcesManager,
+      chatAgent,
       composerKnowledge,
       composerDataSources,
       t,
@@ -1437,4 +1443,4 @@ export {
   AiChatStoreProvider,
   useAiChatStore,
 } from "./ai-chat-store";
-export type { AiChatRouterPage } from "./ai-chat-store";
+export type { AiChatAgent, AiChatRouterPage } from "./ai-chat-store";
