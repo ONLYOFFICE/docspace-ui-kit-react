@@ -59,14 +59,14 @@ export const daysUntil = (date: Date | string | null | undefined) =>
 
 /**
  * Human-readable remaining period, e.g. "15 days" (localized).
- * Falls back to the "< 1 day" label when there is one day or less left.
+ * Falls back to the "< 1 day" label when less than a full day is left.
  */
 export const formatRemainingDays = (
   days: number,
   language: string,
   t: (key: string) => string,
 ) =>
-  days > 1
+  days >= 1
     ? Duration.fromObject(
         { days },
         // Its own setting, not the host's luxon default: Storybook sets none.
