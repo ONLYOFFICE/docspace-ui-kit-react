@@ -298,9 +298,10 @@ const stringProperty = (object, keys) => {
 };
 
 /**
- * The stories a CSF file exports, in order: `{ exportName, description,
- * tags }`, the description being `parameters.docs.description.story` when
- * it is a string literal. An export the meta's `excludeStories` names -- as
+ * The stories a CSF file exports, in order: `{ exportName, name,
+ * description, tags }`, `name` being the story's own `name` -- the label
+ * Storybook shows in place of the export's -- and the description
+ * `parameters.docs.description.story`, each when it is a string literal. An export the meta's `excludeStories` names -- as
  * a string or a regex literal -- is not a story, as in Storybook.
  */
 export const csfStories = (text, fileName = "story.tsx") => {
@@ -336,6 +337,7 @@ export const csfStories = (text, fileName = "story.tsx") => {
       );
       stories.push({
         exportName: declaration.name.text,
+        name: stringProperty(init, ["name"]),
         description: stringProperty(init, [
           "parameters",
           "docs",

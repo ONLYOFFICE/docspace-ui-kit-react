@@ -198,7 +198,10 @@ every story and docs entry, so nothing is guessed; the export-to-id rule (`WithI
    tables are then wrapped in; as in the SDK, they get a `name` only when their row ids collide.
    The primary picture goes under the intro. A Stories section, listing each story's name,
    description (`docs.description.story`) and picture, is placed before the Minimal example
-   heading, where Storybook shows them.
+   heading, where Storybook shows them. A story's heading is its own `name` when it has one, as
+   in Storybook's sidebar, and its export name spaced out otherwise. A picture's alt text is the
+   component's name and the first sentence of the text it illustrates -- the story's
+   description, the page's summary -- or the story's name when there is none.
 2. **MDX pages.** Imports and `<Meta>` go; every other React element at the top level is
    replaced by its picture, a `<Story of>` by the story's. A trailing rule and the paragraph after
    it -- the version and licence line under Welcome -- is the page's Storybook footer and goes
@@ -206,7 +209,13 @@ every story and docs entry, so nothing is guessed; the export-to-id rule (`WithI
 3. **Front matter**: `description` from the metadata `summary` (or the component description),
    and `custom_edit_url` pointing at the source file on `master` (`EDIT_BRANCH` in
    `scripts/docs/config.mjs`), whatever `DOCS_REVISION` the pages were built from: an edit is a
-   pull request against `master`, and a feature branch is deleted once it is merged.
+   pull request against `master`, and a feature branch is deleted once it is merged. A
+   component's page -- a README or an `autodocs` page -- also gets `title`, as
+   `<Name> – React component | ONLYOFFICE Apps UI Kit`, for search results and assistants, and
+   `sidebar_label` with the bare name, which the H1 keeps too. Its `description` is the summary
+   followed by the package (" A React component from @onlyoffice/apps-ui-kit."), shortened or
+   left out when it would pass 160 characters; the README's own summary stays as it is, because
+   it is also the catalogue's line.
 4. **Portal-only pages.** A README whose `status` is `portal-internal`, or a page whose source
    is under a directory in `PORTAL_DIRS` (`scripts/docs/config.mjs`), opens with a warning
    admonition that says so and links to the tiers section of the Installation page.
