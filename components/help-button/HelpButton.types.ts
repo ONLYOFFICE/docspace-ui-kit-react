@@ -6,11 +6,21 @@ import type {
 } from "../tooltip";
 
 // `role` and `ariaLabel` stay out: the info icon is rendered with props of its
-// own choosing, so they would never reach it.
+// own choosing, so they would never reach it. `className`, `size` and
+// `isClickable` are declared again for HelpButton's own defaults.
 export type HelpButtonProps = Omit<
   IconButtonProps,
-  "tooltipContent" | "role" | "ariaLabel"
+  "tooltipContent" | "role" | "ariaLabel" | "className" | "size" | "isClickable"
 > & {
+  /** Class of the info icon, or of the element around `children`.
+   * @default "icon-button" */
+  className?: string;
+  /** Width and height of the info icon; same forms as `IconButton`'s `size`.
+   * @default 12 */
+  size?: IconButtonProps["size"];
+  /** Shows the pointer cursor over the info icon.
+   * @default true */
+  isClickable?: boolean;
   /**
    * Anchor to use instead of the info icon. The whole element becomes the
    * thing the tooltip opens from.
@@ -22,7 +32,7 @@ export type HelpButtonProps = Omit<
    * one for a button that re-renders.
    */
   id?: string;
-  /** Sets the data-tip attribute for the component. */
+  /** Value of the legacy `data-tip` attribute on the info icon. */
   dataTip?: string;
   /**
    * Builds the tooltip's content. Returning a string routes the text through

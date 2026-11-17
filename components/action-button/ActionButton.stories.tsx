@@ -25,17 +25,18 @@ const meta = {
   argTypes: {
     label: {
       control: "text",
-      description: "Text of the button; anything passed as children is dropped",
+      description:
+        "Text of the button. Anything else you pass as `children` is dropped.",
     },
     icon: {
       control: false,
       description:
-        "Icon node drawn at 12px before the label and filled with the text colour",
+        "Icon node rendered before the label text. It is drawn at 12px and filled with the text colour.",
     },
     as: {
       control: false,
       description:
-        "Element or component to render instead of a button; its props are then accepted",
+        "Element or component to render instead of a `<button>`; its props are then accepted and type-checked.",
       table: {
         defaultValue: { summary: "button" },
       },
@@ -43,7 +44,7 @@ const meta = {
     className: {
       control: "text",
       description:
-        "Class applied to the rendered element after the component's own",
+        "Applied to the rendered element, after the component's own class.",
     },
     disabled: {
       control: "boolean",
@@ -83,7 +84,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The plain text button for a secondary action; click it to see \`onClick\` in the Actions panel, and change any other prop live in the Controls panel below.",
+          "The plain text button for a secondary action, such as clearing a filter. A click, Enter or Space calls \`onClick\`.",
       },
       source: {
         code: `<ActionButton label="Clear filter" onClick={handleClick} />`,
@@ -93,6 +94,7 @@ export const Default: Story = {
 };
 
 export const WithIcon: Story = {
+  name: "With icon",
   args: {
     icon: <FilterIcon />,
   },
@@ -115,6 +117,7 @@ export const WithIcon: Story = {
 };
 
 export const AsLink: Story = {
+  name: "As a link",
   args: {
     as: "a",
     href: "#",
@@ -141,6 +144,7 @@ export const AsLink: Story = {
 };
 
 export const DisabledState: Story = {
+  name: "Disabled",
   args: {
     icon: <FilterIcon />,
     disabled: true,

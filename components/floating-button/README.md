@@ -28,8 +28,8 @@ the disc that appears in the bottom corner of the portal while files are uploadi
 
 ## Use this when / not when
 
-- Use for one long operation running in the background — an upload, a conversion, a bulk move —
-  that the user should be able to watch and come back to.
+- Use for one long background operation the user watches and comes back to: an upload, a
+  conversion, a bulk move.
 - Not for the progress of a single row; [`LoadingButton`](../loading-button/README.md) is the
   16px version that sits inline.
 - Not for a determinate bar inside a panel — [`ProgressBar`](../progress-bar/README.md) is that.
@@ -44,9 +44,9 @@ import { FloatingButton } from "@onlyoffice/apps-ui-kit/components/floating-butt
 
 Also exported from the root barrel `@onlyoffice/apps-ui-kit`.
 
-Needs `ThemeProvider` from `@onlyoffice/apps-ui-kit/providers/theme`, and specifically its
-colour scheme: the circle's background is the accent colour, and without one it has no
-background at all unless you pass `color`.
+Needs `ThemeProvider` from `@onlyoffice/apps-ui-kit/providers/theme`, with a colour scheme. The
+circle's background is the scheme's accent colour; without one it has no background unless you
+pass `color`.
 
 ## Minimal example
 
@@ -108,13 +108,13 @@ The `index` module exports a wrapped component, so these are accepted on top of 
 
 <!-- props:end -->
 
-`icon` is a key of `FloatingButtonIcons`, which is exported beside the component:
-`upload`, `trash`, `move`, `duplicate`, `plus`, `minus`, `refresh`, `exportIndex`, `dots`,
+`icon` is a key of `FloatingButtonIcons`, exported beside the component. The keys are `upload`,
+`trash`, `move`, `duplicate`, `plus`, `minus`, `refresh`, `exportIndex`, `dots`,
 `arrow`, `deletePermanently`, `download`, `copy`, `markAsRead`, `other`, `backup`.
 
 ## Recipes
 
-### Finished
+### Show that the operation finished
 
 `completed` fades the ring out, plays a one-off brightening of the circle and turns the badge
 into a tick.
@@ -131,7 +131,7 @@ export function UploadDone({ onOpen }: { onOpen: () => void }) {
 }
 ```
 
-### Failed or aborted
+### Show that the operation failed or was aborted
 
 `alert` draws the warning triangle and `stopped` the "aborted" mark, which wins over both
 `alert` and `completed`.
@@ -148,7 +148,7 @@ export function UploadFailed({ onOpen }: { onOpen: () => void }) {
 }
 ```
 
-### Cancellable
+### Let the user cancel the operation
 
 `showCancelButton` adds a cross beside the circle, which calls `clearUploadedFilesHistory`. It
 only appears on hover unless `showCloseIcon` keeps it out.
@@ -181,10 +181,10 @@ export function CancellableUpload({
 
 ## Behaviour the types don't state
 
-- **The component positions itself.** From the desktop breakpoint up its wrapper is
-  `position: absolute`, 100×70, pinned to the bottom trailing corner of the nearest positioned
-  ancestor, at `z-index: 300`; the circle inside it is `z-index: 500`. Give it a
-  `position: relative` parent, or it will pin itself to something further up the page.
+- **The component positions itself.** From the desktop breakpoint up, its 100×70 wrapper is
+  `position: absolute` in the bottom trailing corner of the nearest positioned ancestor. The
+  wrapper sits at `z-index: 300` and the circle at `500`. Give it a `position: relative` parent,
+  or it pins itself to something further up the page.
 - **The background is `!important` and comes from the theme's colour scheme.** Without a colour
   scheme — and without `color` — the declaration resolves to nothing and the circle is drawn
   transparent, icon and ring floating on the page.
@@ -195,16 +195,16 @@ export function CancellableUpload({
   `0` and many never report a value in between; an empty ring would look stalled.
 - **`withoutProgress` removes the ring, not the animation** — the circle is drawn on its own,
   and `percent` then has nothing to show.
-- **The cancel cross lives outside the circle**, 77px from the trailing edge and 33px from the
-  bottom of the wrapper, and fades in on hover or on keyboard focus. Until then it is transparent
-  and ignores the pointer. On a device with no hover it is invisible unless `showCloseIcon` is
-  set. Its handler is `clearUploadedFilesHistory`, not `onClick`.
+- **The cancel cross lives outside the circle**, 77px from the wrapper's trailing edge and 33px
+  from its bottom. It fades in on hover or keyboard focus; until then it ignores the pointer.
+- On a device with no hover the cross stays invisible unless `showCloseIcon` is set. Its handler
+  is `clearUploadedFilesHistory`, not `onClick`.
 - **`showCancelButton` and `showCloseIcon` are two different switches.** The first decides
   whether the cross exists; the second whether it is visible without hovering.
 - **The status badge has a fixed precedence**: `stopped`, then `alert`, then `completed`.
   `withoutStatus` suppresses all three.
-- **`iconUrl` is rendered as a plain `<img width={20}>`** with an empty `alt` (the circle carries
-  the name), so it is not recoloured by the theme the way the built-in icons are.
+- **`iconUrl` is rendered as a plain `<img width={20}>`**, so the theme does not recolour it
+  the way it does the built-in icons. Its `alt` is empty, since the circle carries the name.
 - **`id`, `className` and `style` go on the circle, not on the wrapper** that carries the
   position — so `className` cannot be used to move the button.
 - The circle is 48px, the ring 38px and the icon box 38px. There is no size prop, and
@@ -224,9 +224,8 @@ Set them on any ancestor.
 The accent icons are `upload`, `trash`, `deletePermanently` and `other`: their shapes are painted
 in the circle's colour, so `--floating-button-icon` does not reach them.
 
-`--floating-button-button-size` resizes nothing but the clickable disc — the ring, the icon box
-and the status badge are laid out in a fixed 48px box in its top corner, so any other value puts
-them out of line with it.
+`--floating-button-button-size` resizes nothing but the clickable disc. The ring, the icon box and
+the status badge stay in a fixed 48px box in its top corner. Another value puts them out of line.
 
 `color` writes the first of these inline, so it wins over an ancestor's value.
 
@@ -237,9 +236,10 @@ them out of line with it.
   It keeps `data-role="button"` for existing selectors.
 - Its name is `label`. Without one it falls back to the icon's name followed by the word
   "button" (`"upload button"`), in English — pass a translated `label` in a localised UI.
-- **The progress is a `role="progressbar"`**, visually hidden beside the circle and named like it:
-  `aria-valuenow` is the clamped `percent`, 100 once `completed`, and absent while the ring spins.
-  `withoutProgress` removes it with the ring.
+- **The progress is a `role="progressbar"`**, visually hidden beside the circle and named like it.
+  Its `aria-valuenow` is the clamped `percent`, 100 once `completed`, and absent while the ring
+  spins. `withoutProgress` removes it with the ring.
+- The component takes no `aria-*` props; the circle's name comes from `label` alone.
 - An `iconUrl` image is decorative (`alt=""`).
 - The cancel cross is a `<button type="button">` named by `cancelLabel` — the translated
   "Cancel" by default — reachable with Tab even while it is faded out.

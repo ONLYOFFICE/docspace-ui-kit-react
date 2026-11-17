@@ -7,7 +7,7 @@ export interface LoadingButtonProps {
   style?: React.CSSProperties;
   /** How much of the ring is filled, 0–100, clamped to that range. At `0` the ring spins instead of showing an arc, and the progress bar reports no value. */
   percent?: number;
-  /** Called when anything inside the 16px square is clicked, including the cross, and when the cancel control is pressed with Enter or Space. Without it there is no cancel control. */
+  /** Called, with no arguments, on a click anywhere in the 16px square and on Enter or Space on the cancel control. Without it there is no cancel control. */
   onClick?: VoidFunction;
   /** Accessible name of the cancel control. Defaults to the translated "Cancel". */
   cancelLabel?: string;

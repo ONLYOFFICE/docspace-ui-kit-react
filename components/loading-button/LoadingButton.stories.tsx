@@ -15,20 +15,22 @@ const meta = {
   argTypes: {
     id: {
       control: false,
-      description: "DOM `id` of the outer 16px square",
+      description: "DOM `id` of the outer 16px square.",
     },
     className: {
       control: false,
-      description: "Added to the outer 16px square",
+      description:
+        "Added to the outer 16px square, after the component's own class.",
     },
     style: {
       control: false,
-      description: "Inline style of the outer 16px square",
+      description:
+        "Inline style of the outer 16px square. `loaderColor` is merged over it.",
     },
     percent: {
       control: { type: "number", min: 0, max: 100 },
       description:
-        "How much of the ring is filled, 0-100; at 0 a half ring spins instead of showing an arc",
+        "How much of the ring is filled, 0–100, clamped to that range. At `0` the ring spins instead of showing an arc, and the progress bar reports no value.",
       table: {
         defaultValue: { summary: "0" },
       },
@@ -36,7 +38,7 @@ const meta = {
     inConversion: {
       control: "boolean",
       description:
-        "Whether the cross in the middle is dropped, leaving the ring on its own",
+        "Whether the cross in the middle is dropped, leaving the ring on its own.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -44,7 +46,7 @@ const meta = {
     isDefaultMode: {
       control: "boolean",
       description:
-        "Whether the ring and the cross are drawn in the theme's grey instead of the accent colour, with the cross changing colour on hover",
+        "Whether the ring is drawn in the idle grey instead of the accent colour, and lightens on hover.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -52,25 +54,25 @@ const meta = {
     loaderColor: {
       control: "color",
       description:
-        "CSS colour of the ring and of the cross; overrides the accent colour",
+        "CSS colour of the ring and of the cross. Overrides the accent colour.",
     },
     backgroundColor: {
       control: "color",
-      description: "CSS colour of the disc behind the cross",
+      description: "CSS colour of the disc behind the cross.",
     },
     onClick: {
       action: "onClick",
       description:
-        "Called with no arguments when anything inside the 16px square is clicked, including the cross, and when the cancel control is pressed with Enter or Space",
+        "Called, with no arguments, on a click anywhere in the 16px square and on Enter or Space on the cancel control. Without it there is no cancel control.",
     },
     cancelLabel: {
       control: "text",
       description:
-        'Accessible name of the cancel control; the translated "Cancel" by default',
+        'Accessible name of the cancel control. Defaults to the translated "Cancel".',
     },
     progressLabel: {
       control: "text",
-      description: "Accessible name of the ring's progress bar",
+      description: "Accessible name of the ring's progress bar.",
     },
   },
 } satisfies Meta<typeof LoadingButton>;
@@ -144,7 +146,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The ring as it first appears, before any progress is known: at the default `percent` of 0 a half ring spins. Change the percentage, drop the cross or pick colours live in the Controls panel below.",
+          "The ring as it first appears, before any progress is known: at a `percent` of 0 a half ring spins.",
       },
       source: {
         code: `<LoadingButton percent={0} onClick={() => cancelUpload()} />`,
@@ -176,6 +178,7 @@ const ProgressStagesTemplate = () => {
 };
 
 export const ProgressStages: Story = {
+  name: "Progress stages",
   render: () => <ProgressStagesTemplate />,
   play: async ({ canvas, canvasElement }) => {
     await expect(ringsOf(canvasElement).map(percentOf)).toEqual([
@@ -196,7 +199,7 @@ export const ProgressStages: Story = {
     docs: {
       description: {
         story:
-          "Five rings labelled with their `percent`, to show how far the arc reaches at each stage: at 0% a half ring spins, the look for an operation whose size is not known yet, and from 25% on the arc grows clockwise until it closes at 100%.",
+          "Five rings labelled with their `percent`, showing how far the arc reaches at each stage. At 0% a half ring spins; from 25% the arc grows clockwise until it closes at 100%.",
       },
       source: {
         code: `<LoadingButton percent={0} />
@@ -220,6 +223,7 @@ const InConversionTemplate = () => {
 };
 
 export const InConversion: Story = {
+  name: "Without the cross",
   render: () => <InConversionTemplate />,
   play: async ({ canvasElement }) => {
     // inConversion drops the cross from every ring.
@@ -231,7 +235,7 @@ export const InConversion: Story = {
     docs: {
       description: {
         story:
-          "The same rings with no cross in the middle (`inConversion`), for a marker that shows progress and nothing else: at 0% the ring spins, at 50% it is half filled, at 100% it is closed.",
+          "Rings with no cross in the middle (`inConversion`), for a marker that shows progress and nothing else. At 0% the ring spins, at 50% it is half filled, at 100% closed.",
       },
       source: {
         code: `<LoadingButton percent={0} inConversion />
@@ -251,6 +255,7 @@ const DefaultModeTemplate = () => {
 };
 
 export const DefaultMode: Story = {
+  name: "Queued",
   render: () => <DefaultModeTemplate />,
   play: async ({ canvasElement }) => {
     const [ring] = ringsOf(canvasElement);
@@ -261,7 +266,7 @@ export const DefaultMode: Story = {
     docs: {
       description: {
         story:
-          "The ring and the cross in the theme's grey instead of the accent colour (`isDefaultMode`), for an item that is waiting rather than running. Hover the ring to see the cross change colour.",
+          "The ring and the cross in the theme's grey instead of the accent colour (`isDefaultMode`), for an item that is waiting rather than running. The cross lightens on hover.",
       },
       source: {
         code: `<LoadingButton percent={45} isDefaultMode />`,
@@ -286,6 +291,7 @@ const CustomColorsTemplate = () => {
 };
 
 export const CustomColors: Story = {
+  name: "Custom colours",
   render: () => <CustomColorsTemplate />,
   play: async ({ canvasElement }) => {
     // loaderColor is handed to the ring as --circle-fill-color.
@@ -305,7 +311,7 @@ export const CustomColors: Story = {
     docs: {
       description: {
         story:
-          "Colours set per instance, for a ring that has to match its surroundings rather than the theme: the first three change the ring and the cross (`loaderColor`), the last also tints the disc behind the cross (`backgroundColor`).",
+          "Rings in colours of their own, to match their surroundings rather than the theme. The first three change the ring and cross (`loaderColor`); the last also tints the disc (`backgroundColor`).",
       },
       source: {
         code: `<LoadingButton percent={60} loaderColor="#2DA7DB" />
@@ -318,6 +324,7 @@ export const CustomColors: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   render: () => (
     <div
       style={
@@ -347,7 +354,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The first ring shows the accent and the disc colours; the second sets \`isDefaultMode\` to show the idle colour, and hovering it shows the hover colour.`,
+        story: `Every overridable variable, set on one wrapper. The first ring shows the accent and disc colours. The second, under \`isDefaultMode\`, shows the idle colour, and the hover colour under the pointer.`,
       },
       source: {
         code: `<div

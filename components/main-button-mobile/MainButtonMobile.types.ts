@@ -114,7 +114,7 @@ export type MainButtonMobileProps = {
   manualWidth?: string;
   /** Applied to the wrapper that carries the button and the menu. */
   className?: string;
-  /** Whether the menu is open. It is copied into state whenever it changes; the button, the backdrop, an item, Escape and Back change that state too and report it through `onOpen` and `onClose`. */
+  /** Whether the menu is open, copied into state whenever it changes. The button, the backdrop, an item, Escape and Back change that state too, reported through `onOpen` and `onClose`. */
   opened?: boolean;
   /** Called when the button opens the menu. Handle it with `onClose` to keep `opened` in step. */
   onOpen?: () => void;
