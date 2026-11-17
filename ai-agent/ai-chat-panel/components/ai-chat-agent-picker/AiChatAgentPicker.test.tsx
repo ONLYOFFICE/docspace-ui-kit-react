@@ -281,6 +281,31 @@ describe("AiChatAgentPicker", () => {
       expect(document.activeElement).toBe(trigger);
     });
 
+    it("closes on the first Escape after a click, with the focus on the title", () => {
+      const { onSelect, trigger } = setup();
+      trigger.focus();
+      openMenu();
+      expect(trigger.getAttribute("aria-expanded")).toBe("true");
+
+      const notPrevented = fireEvent.keyDown(trigger, { key: "Escape" });
+      expect(notPrevented).toBe(false);
+      expect(onSelect).not.toHaveBeenCalled();
+      expect(trigger.getAttribute("aria-expanded")).toBe("false");
+      expect(document.activeElement).toBe(trigger);
+    });
+
+    it("keeps the Escape that closed it from the page's own listeners", () => {
+      const { trigger } = setup();
+      openMenu();
+      const pageListener = vi.fn();
+      document.addEventListener("keydown", pageListener);
+      fireEvent.keyDown(document.body, { key: "Escape" });
+      document.removeEventListener("keydown", pageListener);
+
+      expect(pageListener).not.toHaveBeenCalled();
+      expect(trigger.getAttribute("aria-expanded")).toBe("false");
+    });
+
     it("closes on Tab and lets the focus go on from the title", async () => {
       const { onSelect, trigger } = setup();
       fireEvent.keyDown(trigger, { key: "ArrowDown" });
@@ -323,6 +348,55 @@ describe("AiChatAgentPicker", () => {
         group.getAttribute("aria-labelledby") ?? "",
       );
       expect(label?.textContent).toBe("Agents");
+    });
+  });
+
+  describe("click outside", () => {
+    const setup = () => {
+      const onSelect = vi.fn();
+      const onOutside = vi.fn();
+      const store = new AiChatStore();
+      store.setAgentPicker({ agents: agents(2), selectedId: null, onSelect });
+      render(
+        <AiChatStoreProvider store={store}>
+          <AiChatAgentPicker title="AI Chat" />
+          <button type="button" data-testid="outside" onClick={onOutside} />
+        </AiChatStoreProvider>,
+      );
+      return {
+        onOutside,
+        trigger: screen.getByTestId("ai-chat-agent-picker"),
+        outside: screen.getByTestId("outside"),
+      };
+    };
+
+    it("closes the menu and still reaches what it was aimed at", () => {
+      const { onOutside, trigger, outside } = setup();
+      openMenu();
+      expect(trigger.getAttribute("aria-expanded")).toBe("true");
+      // No backdrop lies over the page to take the click.
+      expect(screen.queryByTestId("backdrop")).toBeNull();
+
+      fireEvent.mouseDown(outside);
+      expect(trigger.getAttribute("aria-expanded")).toBe("false");
+      fireEvent.click(outside);
+      expect(onOutside).toHaveBeenCalledTimes(1);
+    });
+
+    it("leaves a press on the title to the title, which closes the menu", () => {
+      const { trigger } = setup();
+      openMenu();
+      fireEvent.mouseDown(trigger);
+      expect(trigger.getAttribute("aria-expanded")).toBe("true");
+      fireEvent.click(trigger);
+      expect(trigger.getAttribute("aria-expanded")).toBe("false");
+    });
+
+    it("keeps the menu open on a press inside it", () => {
+      const { trigger } = setup();
+      openMenu();
+      fireEvent.mouseDown(screen.getByTestId("ai-chat-agent-picker-agent-1"));
+      expect(trigger.getAttribute("aria-expanded")).toBe("true");
     });
   });
 });

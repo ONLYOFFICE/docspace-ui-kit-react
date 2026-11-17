@@ -10,6 +10,7 @@ import { DropDown } from "../../../../components/drop-down";
 import { DropDownItem } from "../../../../components/drop-down-item";
 import { Scrollbar } from "../../../../components/scrollbar";
 import { Text } from "../../../../components/text";
+import { consumeKey } from "../../../../utils/consume-key";
 
 import { useAiChatStore } from "../../../providers/ai-chat-store";
 import { useSaveChatAsAgent } from "../ai-chat-panel-save";
@@ -46,7 +47,9 @@ type AiChatAgentPickerProps = {
  * Keyboard: Enter, Space or the arrows on the title open the menu with the
  * focus on the picked agent; the arrows, Home and End move through the
  * options, Enter or Space picks one, Escape closes the menu with the focus
- * back on the title, and Tab closes it and goes on from the title.
+ * back on the title, and Tab closes it and goes on from the title. Escape
+ * closes it wherever the focus is, and a click outside closes it and still
+ * reaches what it was aimed at, as with the product's context menus.
  */
 const AiChatAgentPicker = observer(({ title }: AiChatAgentPickerProps) => {
   const { t } = useTranslation(["Common"]);
@@ -94,6 +97,23 @@ const AiChatAgentPicker = observer(({ title }: AiChatAgentPickerProps) => {
   useEffect(() => {
     if (!hasMenu) setIsOpen(false);
   }, [hasMenu]);
+
+  // Escape is taken on the window, before anything else: a click opens the
+  // menu with the focus left on the title (or, in Safari, on the page),
+  // where the menu's own keys never see the press. Consumed, so the page's
+  // hotkeys and a dialog around the chat do not act on it too.
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      e.preventDefault();
+      consumeKey(e);
+      setIsOpen(false);
+      anchorRef.current?.focus();
+    };
+    window.addEventListener("keydown", onKeyDown, true);
+    return () => window.removeEventListener("keydown", onKeyDown, true);
+  }, [isOpen]);
 
   if (!picker || !hasMenu) return null;
 
@@ -162,11 +182,6 @@ const AiChatAgentPicker = observer(({ title }: AiChatAgentPickerProps) => {
         e.preventDefault();
         options[index].click();
         break;
-      case "Escape":
-        e.preventDefault();
-        e.stopPropagation();
-        close(true);
-        break;
       case "Tab":
         // The menu closes and the focus goes on from the title: it is put
         // back on the title before the browser moves it, so Tab and
@@ -233,7 +248,14 @@ const AiChatAgentPicker = observer(({ title }: AiChatAgentPickerProps) => {
         forwardedRef={anchorRef}
         directionY="bottom"
         manualWidth="240px"
-        clickOutsideAction={() => close()}
+        // No backdrop to catch the click: a press outside closes the menu
+        // and goes on to its target. The title toggles the menu itself.
+        withBackdrop={false}
+        eventTypes={["mousedown"]}
+        clickOutsideAction={(e) => {
+          if (anchorRef.current?.contains(e.target as Node)) return;
+          close();
+        }}
         aria-label={t("Common:AIAgents")}
         dataTestId="ai-chat-agent-picker-menu"
       >
