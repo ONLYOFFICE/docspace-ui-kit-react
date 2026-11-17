@@ -1,11 +1,9 @@
 ---
 paths:
-  - "components/**"
-  - "errors/**"
-  - "providers/**"
   - "**/README.md"
   - "**/*.stories.tsx"
   - "**/*.types.ts"
+  - "**/*.types.tsx"
 ---
 
 # How long documentation text runs, and what it says
@@ -65,7 +63,8 @@ apart, and nothing measured favours the long one.
 | the Effect cell of `## CSS variables`      | one phrase                                                              | 20 words                         |
 | any sentence                               | 15–20 words                                                             | 25 words                         |
 
-The ceilings sit near the library's p90 on the day they were set (2026-11-17). They mark the
+The ceilings sit near the library's p85 on the day they were set (2026-11-17): about one
+sentence, bullet or story text in seven runs past its ceiling. They mark the
 tail, not the norm, so text written today aims at the Norm column. A bullet that needs more is
 usually two facts, or a recipe.
 

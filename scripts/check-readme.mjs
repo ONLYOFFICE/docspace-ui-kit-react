@@ -598,9 +598,10 @@ const storyStyle = (folder, component) =>
 
 /**
  * The documented folders the branch changed, each file credited to the deepest
- * folder holding it -- `rows/row` rather than `rows`. Without `--base`, empty
- * when git cannot find the branch's parent, which leaves every style warning in
- * the summary line. A `--base` git cannot resolve is a broken invocation, not
+ * folder holding it -- `rows/row` rather than `rows`. Without `--base`, null
+ * when git cannot find the branch's parent: the summary line then says so
+ * rather than call every folder unchanged. A `--base` git cannot resolve is a
+ * broken invocation, not
  * a clean branch, and stops the run: CI would otherwise hide the warnings for
  * good and say nothing.
  */
@@ -620,7 +621,7 @@ const touchedFolders = (folders, baseRef) => {
     changed = base ? changesSince(ROOT, base.sha) : null;
   }
 
-  if (!changed) return new Set();
+  if (!changed) return null;
 
   const deepestFirst = [...folders].sort((a, b) => b.length - a.length);
   const touched = new Set();
@@ -1172,9 +1173,12 @@ const main = async () => {
 
   // --- the style warnings, for the folders in scope ---
 
-  const touched =
-    options.styleAll || named ? null : touchedFolders(folders, options.base);
-  const inScope = (finding) => touched === null || touched.has(finding.folder);
+  // Every folder is in scope when asked for; otherwise the branch's folders,
+  // and none when the branch's parent could not be found (`touched` is null).
+  const scoped = !(options.styleAll || named);
+  const touched = scoped ? touchedFolders(folders, options.base) : null;
+  const inScope = (finding) =>
+    !scoped || (touched?.has(finding.folder) ?? false);
   const hidden = style.filter((finding) => !inScope(finding));
 
   for (const { folder: _folder, ...finding } of style.filter(inScope)) {
@@ -1219,8 +1223,12 @@ const main = async () => {
     if (hidden.length > 0) {
       const others = new Set(hidden.map((finding) => finding.folder)).size;
       console.log(
-        `${hidden.length} style warning(s) in ${others} folder(s) this branch did not change; ` +
-          "`--style-all` lists them (.claude/rules/doc-writing.md).",
+        touched === null
+          ? `${hidden.length} style warning(s) in ${others} folder(s) not shown: the branch's parent ` +
+              "was not found, so what it changed is unknown; `--base <ref>` names it, " +
+              "`--style-all` lists them all (.claude/rules/doc-writing.md)."
+          : `${hidden.length} style warning(s) in ${others} folder(s) this branch did not change; ` +
+              "`--style-all` lists them (.claude/rules/doc-writing.md).",
       );
     }
   }

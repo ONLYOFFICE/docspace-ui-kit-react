@@ -10,9 +10,9 @@
 import * as ts from "typescript";
 
 /**
- * Ceilings in words. They sit near the library's p90-p95 on the day they were
- * set, so a warning marks the tail rather than half the library; the norms the
- * rule asks for are lower.
+ * Ceilings in words. They sit near the library's p85 on the day they were set,
+ * so a warning marks the tail rather than half the library; the norms the rule
+ * asks for are lower.
  */
 export const LIMITS = {
   sentence: 25,

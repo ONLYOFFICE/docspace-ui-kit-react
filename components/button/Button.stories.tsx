@@ -26,7 +26,7 @@ const meta = {
       control: "select",
       options: Object.values(ButtonSize),
       description:
-        "Height of the button: 24px for `extraSmall`, 32px for `small`, 40px for `normal`, 44px for `medium`",
+        "Height of the button: 24px for `extraSmall`, 32px for `small`, 40px for `normal`, 44px for `medium`.",
       table: {
         defaultValue: { summary: "normal" },
       },
@@ -34,7 +34,7 @@ const meta = {
     primary: {
       control: "boolean",
       description:
-        "Draws the button in the accent colour, for the main action of a view",
+        "Draws the button in the accent colour, for the main action of a view.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -42,14 +42,14 @@ const meta = {
     accent: {
       control: "boolean",
       description:
-        "Draws the button on a light tint of the accent colour, with the text and icon in the accent colour",
+        "Draws the button on a light tint of the accent colour, with the text and icon in the accent colour.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     scale: {
       control: "boolean",
-      description: "Stretches the button to the full width of its container",
+      description: "Stretches the button to the full width of its container.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -57,7 +57,7 @@ const meta = {
     filled: {
       control: "boolean",
       description:
-        "Draws the button on a neutral grey surface with no border and paints its icon in one colour, the label's hover colour",
+        "Draws the button on a neutral grey surface with no border and paints its icon in one colour, the label's hover colour, for toolbar actions.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -65,7 +65,7 @@ const meta = {
     filledStroke: {
       control: "boolean",
       description:
-        "Used together with `filled`: outlines the icon's shapes instead of filling them, for outline-style icons; does nothing on its own",
+        "With `filled`, outlines the icon's shapes instead of filling them, for outline-style icons. Does nothing on its own.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -73,7 +73,7 @@ const meta = {
     isDisabled: {
       control: "boolean",
       description:
-        "Greys the button out, takes it out of the tab order and blocks clicks",
+        "Greys the button out, takes it out of the tab order and blocks clicks.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -81,22 +81,22 @@ const meta = {
     isLoading: {
       control: "boolean",
       description:
-        "Hides the content behind a spinner, keeping the button's width, and disables it",
+        "Covers the content with a spinner, keeping the button's width, and disables the button.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isHovered: {
       control: "boolean",
-      description:
-        "Draws the hover look while the pointer is not over the button",
+      description: "Draws the hover look without a pointer over the button.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isClicked: {
       control: "boolean",
-      description: "Draws the pressed look while nothing presses the button",
+      description:
+        "Draws the pressed look without anything pressing the button.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -104,85 +104,90 @@ const meta = {
     label: {
       control: "text",
       description:
-        "Text of the button, which is also its accessible name; when empty, the children are shown instead",
+        "Text of the button and its accessible name. When empty, the children are shown instead.",
     },
     children: {
       control: false,
-      description: "Content shown in place of `label` when `label` is empty",
+      description:
+        "Rendered in place of `label` when `label` is empty or unset. A non-empty `label` wins and the children are dropped.",
     },
     icon: {
       control: false,
-      description: "Icon node shown before the label",
+      description:
+        "Shown before the label. Any node, such as an SVG component from your own bundler.",
     },
     minWidth: {
       control: "text",
       description:
-        "Smallest width of the button as a CSS length, such as `120px`",
+        "Smallest width of the button as a CSS length, such as `120px`.",
     },
     tooltipText: {
       control: "text",
-      description: "Text of a tooltip shown below the button on hover",
+      description:
+        "Text of a tooltip shown below the button on hover. The button renders it itself, apart from the `title` tooltip.",
     },
     title: {
       control: "text",
       description:
-        "Text of a tooltip shown on hover; it becomes a native `title` attribute only under `NODE_ENV=test`",
+        "Tooltip text shown on hover by the `withTooltip` wrapper. It becomes a native `title` attribute only under `NODE_ENV=test`.",
     },
     type: {
       control: "select",
       options: ["button", "submit"],
       description:
-        "Native button type: `submit` submits the surrounding form, any other value renders `button`",
+        "`submit` submits the surrounding form. Any other value, `reset` included, renders a plain `button`.",
       table: {
         defaultValue: { summary: "button" },
       },
     },
     onClick: {
       action: "onClick",
-      description: "Called with the mouse event when the button is clicked",
+      description:
+        "Called with the mouse event on a click, Enter or Space. Never called while the button is disabled or loading.",
     },
     tabIndex: {
       control: "number",
-      description: "Position of the button in the keyboard tab order",
+      description: "Position of the button in the keyboard tab order.",
     },
     id: {
       control: "text",
       description:
-        "HTML id of the button; also names its `tooltipText` tooltip",
+        "HTML id of the button. It also names the `tooltipText` tooltip.",
     },
     className: {
       control: "text",
-      description: "Class applied to the button after the component's own",
+      description: "Class applied to the button after the component's own.",
     },
     style: {
       control: "object",
-      description: "Inline styles of the button",
+      description:
+        "Inline styles of the button. `minWidth` is applied over them.",
     },
     testId: {
       control: "text",
-      description: "Value of the button's `data-testid` attribute",
+      description: "Value of the button's `data-testid` attribute.",
       table: {
         defaultValue: { summary: "button" },
       },
     },
     ref: {
       control: false,
-      description: "Ref to the rendered `<button>` element",
+      description: "Ref to the rendered `<button>` element.",
     },
     "aria-label": {
       control: false,
       description:
-        "Replaced by `label` on every render, so a value passed here never reaches the button",
+        "Overwritten by `label` on every render, so a value passed here never reaches the button.",
     },
     "aria-disabled": {
       control: false,
       description:
-        "Replaced on every render: set to `true` while `isDisabled`, removed otherwise",
+        "Overwritten on every render: `true` while `isDisabled`, absent otherwise.",
     },
     "aria-busy": {
       control: false,
       description:
-        "Replaced on every render: set to `true` while `isLoading`, removed otherwise",
+        "Overwritten on every render: `true` while `isLoading`, absent otherwise.",
     },
   },
 } satisfies Meta<typeof Button>;
