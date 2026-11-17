@@ -1116,7 +1116,10 @@ class PaymentStore {
           status: "refused",
           reason: response.data?.error?.message?.trim().toLowerCase() ?? "",
         };
-      if (response?.status === 402) return { status: "needsCard" };
+      if (response?.status === 402) {
+        await this.fetchGoodwill().catch(() => undefined);
+        return { status: "unconfirmed" };
+      }
       if (response?.status === 429) return { status: "rateLimited" };
 
       console.error(error);

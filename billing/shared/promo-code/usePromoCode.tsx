@@ -127,7 +127,8 @@ export const usePromoCode = ({
     }
 
     if (result.status === "refused") setError(refusalText(result.reason));
-    else if (result.status === "needsCard") setError(t("PromoCodeNeedsCard"));
+    else if (result.status === "unconfirmed")
+      setError(t("PromoCodeUnconfirmed"));
     else setError(t("PromoCodeTooManyAttempts"));
   };
 
