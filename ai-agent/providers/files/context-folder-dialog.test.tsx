@@ -120,20 +120,27 @@ describe("ContextFolderDialog", () => {
     });
   });
 
-  it("adds the folder to the others in add mode", () => {
-    render(<ContextFolderDialog mode="add" onClose={vi.fn()} />);
+  it("keeps Select off in add mode until a folder is ticked, wherever the user stands", () => {
+    const onClose = vi.fn();
+    render(<ContextFolderDialog mode="add" onClose={onClose} />);
+    expect(selector().getIsDisabled(false, false, "5", undefined, false)).toBe(
+      true,
+    );
+    // The open folder is not connected on its own.
     act(() =>
       selector().onSubmit(5, "Q3 reports", false, [
         { id: 1, label: "My documents" },
         { id: 5, label: "Q3 reports" },
       ]),
     );
-    expect(clouds.addFolderContext).toHaveBeenCalledWith(CONTEXT_ROOM_CLOUD, {
-      id: "5",
-      name: "Q3 reports",
-      path: "My documents / Q3 reports",
-    });
+    expect(clouds.addFolderContext).not.toHaveBeenCalled();
     expect(clouds.selectFolderContext).not.toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
+
+    act(() => selector().onFolderToggle({ id: 5, label: "Q3" }, []));
+    expect(selector().getIsDisabled(false, false, "5", undefined, false)).toBe(
+      false,
+    );
   });
 
   it("ticks folders only in add mode, up to what the chat still takes", () => {
