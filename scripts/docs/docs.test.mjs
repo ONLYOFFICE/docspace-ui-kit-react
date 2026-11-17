@@ -488,6 +488,29 @@ describe("renderMdx", () => {
     expect(out).not.toMatch(/---\n*$/);
   });
 
+  it("describes a <Story of> picture by the story's own name and text", () => {
+    const shot = { light: "l.png", dark: "d.png", width: 100 };
+    const out = renderMdx(
+      "<Meta of={S} />\n\n<Story of={S.IsLoadingButtons} />\n\n<Story of={S.Other} />\n",
+      {
+        ...context("components/button/Button.docs.mdx"),
+        page: {
+          label: "Button",
+          source: "components/button/Button.docs.mdx",
+          options: {},
+          stories: [{ exportName: "IsLoadingButtons", name: "Loading" }],
+        },
+        pictures: new Map([
+          ["is-loading-buttons", shot],
+          ["other", shot],
+        ]),
+      },
+    );
+    expect(out).toContain('alt="Button: Loading"');
+    expect(out).toContain('alt="Button: Other"');
+    expect(out).not.toContain("Is Loading Buttons");
+  });
+
   it("sends an edit to master, whatever revision the page was built from", () => {
     const out = renderMdx("# Welcome\n\nText.\n", {
       ...context("docs/Welcome.mdx"),

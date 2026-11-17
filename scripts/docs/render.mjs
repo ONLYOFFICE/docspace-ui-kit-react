@@ -566,11 +566,18 @@ export const renderMdx = (raw, context) => {
     }
     let picture;
     if (block.tag === "Story" && block.of) {
+      // A docs page's stories are its CSF file's, so a story there is
+      // described as in the Stories section; a page of its own has none.
       const exportName = block.of.split(".").at(-1);
+      const story = page.stories?.find((s) => s.exportName === exportName);
       picture = pictureOf(
         pictures,
         storyKey(exportName),
-        storyNameFromExport(exportName),
+        altText(
+          page.label,
+          story?.description,
+          story?.name ?? storyNameFromExport(exportName),
+        ),
       );
     } else if (block.tag === "Controls") {
       const rows = pictures?.get("args-table")?.rows;
