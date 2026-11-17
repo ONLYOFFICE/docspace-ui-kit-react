@@ -32,6 +32,7 @@ Path-scoped detail that does not belong here, loaded when the matching files are
 | `source-checks.md`       | the client-side checks that used to cover this source (hex, ASCII, indentation, assets, deps, licence headers), why none of them run here now, and AGPL-3.0-only without per-file headers                                        |
 | `cross-platform.md`      | why every command has to run on Windows too, what `package.json` scripts may not contain, and why `path.sep` does not make an id POSIX                                                                                           |
 | `vscode-tasks.md`        | the three layers behind the status-bar buttons in `ui-kit.code-workspace`                                                                                                                                                        |
+| `doc-writing.md`         | how long a README's lead and bullets, a prop's JSDoc and a story's text run, what order they say things in, what they leave to the generated tables; the `W_*` style warnings `check:readme` prints                              |
 | `product-naming.md`      | DocSpace is now ONLYOFFICE Apps: what to rename in user-facing text, which names stay, and the grep that finds leftovers                                                                                                         |
 
 ## Tech Stack

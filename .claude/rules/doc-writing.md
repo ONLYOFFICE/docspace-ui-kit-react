@@ -1,0 +1,128 @@
+---
+paths:
+  - "components/**"
+  - "errors/**"
+  - "providers/**"
+  - "**/README.md"
+  - "**/*.stories.tsx"
+  - "**/*.types.ts"
+---
+
+# How long documentation text runs, and what it says
+
+`COMPONENT_README_TEMPLATE.md` says which sections a README has and `STORY_TEMPLATE.md` what a
+story file carries. This file is about the text inside them -- a prop's JSDoc, an `argTypes`
+description, a story's `description.story`, a README's lead and bullets: how long each runs,
+what order it says things in, and what it leaves to the generated tables.
+
+It has two readers, and they want the same text. A person reads the Docs page in Storybook or
+the README on api.onlyoffice.com and looks for "what does it do" in the first line. An agent
+reads the same README from the package and the `ui-kit` skill, and from the JSDoc in
+`dist/types`. Research on tool descriptions finds nothing gained beyond three to six sentences.
+The context an agent pays for grows with every word, and a longer description among short ones
+is picked more often whether it fits or not.
+
+So there is one text, not a short one for people and a long one for agents. Two texts drift
+apart, and nothing measured favours the long one.
+
+## A. Every piece of prose
+
+1. **The first sentence stands on its own.** It says what the thing is for, in the present
+   tense, without "This component…" or "This prop…". The README's first sentence is the
+   catalogue's `summary`, and a truncated listing shows nothing else.
+2. **A sentence runs at most 25 words; aim for 15–20.** One fact per sentence. A condition and
+   its consequence glued with ", and…, so…, which…" are two sentences.
+3. **Only what the reader cannot see elsewhere.** The props table and the Controls panel already
+   print the type, whether a prop is required, its default and an enum's members. The
+   `## Test ids` table holds the test ids. A prop's description repeats none of them, and names no
+   CSS variable; that belongs in `## CSS variables`. Say what a bound _means_ ("the field stops
+   growing and scrolls"), not its number.
+4. **One term per concept, in the kit's words.** A "room" in one prop and a "workspace" in the
+   next read as two things. The kit does not know what a room is either: `audit-stories` has the
+   rule on product terms.
+5. **Neighbours match.** The props of one component, and the stories of one file, have the
+   same length and tone. A description twice as long as its siblings draws the agent to it.
+   Two props that differ by one state get parallel sentences.
+6. **No internals.** No MobX store names, DocSpace-client paths, task numbers or names of
+   private helpers. A consumer can see none of them.
+7. **Deprecation is a tag.** `@deprecated Use X instead.` on the prop. The generator prints
+   **Deprecated.** in front of it, so the prose does not say so again.
+8. **A scenario is a recipe.** Anything that takes three steps to explain is a compiling block
+   under `## Recipes`, or a page under `docs/`, not a long bullet.
+
+## B. How long each piece runs
+
+| Piece                                      | Norm                                                                    | Warning above                    |
+| ------------------------------------------ | ----------------------------------------------------------------------- | -------------------------------- |
+| README `summary` (the first sentence)      | one sentence                                                            | 160 characters, an error already |
+| README lead paragraph                      | one to three sentences                                                  | 60 words                         |
+| a `Use this when / not when` bullet        | one sentence; a "not" bullet links the sibling                          | 30 words                         |
+| a prop's JSDoc                             | one sentence; a boolean switch says what both values do, in two at most | 40 words                         |
+| an `argTypes` description                  | as the JSDoc, and never contradicting it                                | 40 words                         |
+| a `description.story`                      | one or two sentences on _why_, or one short bullet per visible item     | 50 words                         |
+| a `Behaviour the types don't state` bullet | one or two sentences, in the order of section C                         | 50 words                         |
+| an `Accessibility` bullet                  | one or two sentences                                                    | 50 words                         |
+| the Effect cell of `## CSS variables`      | one phrase                                                              | 20 words                         |
+| any sentence                               | 15–20 words                                                             | 25 words                         |
+
+The ceilings sit near the library's p90 on the day they were set (2026-11-17). They mark the
+tail, not the norm, so text written today aims at the Norm column. A bullet that needs more is
+usually two facts, or a recipe.
+
+## C. The order inside a behaviour bullet
+
+The same three layers the API report recommends for an endpoint description:
+
+1. **What happens** -- a statement, not advice: "`type="reset"` is coerced to `"button"`."
+2. **When it matters, or what to use instead** -- "use a `<form>` reset handler to clear the
+   fields."
+3. **The trap**, only if there is one -- the case where following the obvious path fails
+   silently.
+
+Most bullets need only the first layer. The second is the most valuable after it.
+
+## D. Smells
+
+| Smell      | What it looks like here                                                                                    |
+| ---------- | ---------------------------------------------------------------------------------------------------------- |
+| Tautology  | `label` -- "Button text"; `tabIndex` -- "Button tab index"; `onClose` -- "Called on close".                |
+| Bloated    | the props table retold in prose; a story description that lists every prop the story sets                  |
+| Tangled    | a 40-word sentence carrying the behaviour, its exception and the workaround                                |
+| Fragmented | half a fact in the JSDoc, the other half in a story description that does not ship                         |
+| Untrue     | a sentence describing the component before its last fix. Wrong text is worse than none: an agent trusts it |
+| Leaky      | a store name, a client path, an internal helper the consumer cannot see                                    |
+
+A tautological JSDoc is fixed by answering one of three questions. What does the value change on
+screen? Where does a valid value come from? What do both values of a boolean do?
+
+## What checks this
+
+`pnpm check:readme` measures sections A2, B and the tautology smell, and reports them as
+warnings, which never fail the gate:
+
+- `W_LONG_SENTENCE` -- a sentence over 25 words, in a README's prose, a prop's JSDoc or a
+  story's text;
+- `W_LONG_TEXT` -- a piece over its ceiling in table B;
+- `W_TAUTOLOGICAL_PROP` -- a JSDoc or `argTypes` description that adds at most one word to the
+  prop's and the component's names. `id`, `className`, `style`, `ref`, `forwardedRef`, `testId`
+  and `dataTestId` are exempt: their meaning is fixed by React or by the kit.
+
+Most of the library predates this rule, so by default the warnings are printed only for the
+folders the branch changed, and the rest are counted in one closing line. `--only <folder>`
+prints them for that folder, and `--style-all` prints all of them. Bring a folder's text within the
+limits when you touch the component. Do not sweep the library in one pass: a rewrite done for
+length alone, without reading the code, is how a sentence turns untrue.
+
+The counting lives in `scripts/lib/doc-style.mjs`. It masks code spans before splitting, so the
+dots in `ModalDialog.Header` end no sentence. The sentence split and the tautology threshold are
+those of the server's `openapi-desc-opt` scan, so both repositories measure text the same way. The
+checks see length and wording only. Whether a sentence is _true_ is still the job of reading the
+code, and of `audit-stories`.
+
+## Where this came from
+
+The API-descriptions report of 2026-11-02 measured the DocSpace OpenAPI contract against Stripe,
+GitHub, Google, Microsoft Graph, Twilio and Slack. It also drew on Anthropic's and OpenAI's
+tool-definition guidance and on three studies: Hsieh et al. 2023, Hasan et al. 2026 ("MCP Tool
+Descriptions Are Smelly!") and Faghih et al. 2025. The server's endpoint rule still asks for 150–200
+words per operation, and the report argues against that number; nothing here carries it over.

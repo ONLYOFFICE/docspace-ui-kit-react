@@ -679,6 +679,10 @@ export function createReadmeProgram(folders = documentedFolders()) {
               : "external",
       ownerFolder: owner,
       declaredFile: relative(declaration.getSourceFile().fileName),
+      declaredLine:
+        declaration
+          .getSourceFile()
+          .getLineAndCharacterOfPosition(declaration.getStart()).line + 1,
       // The type that declares the prop, which is what a group heading and the
       // closing React line name: `AsideHeaderProps`, `InputHTMLAttributes`.
       declaredIn: declaringTypeName(declaration),

@@ -87,6 +87,11 @@ keeps the fixed shape below with only the `### Template` section.
      every row of the README's `## CSS variables` table names a
      variable some rule reads, and the example sets every row a
      rendered instance can show;
+   - texts stay within the limits of `.claude/rules/doc-writing.md`: every
+     `W_LONG_SENTENCE`, `W_LONG_TEXT` and `W_TAUTOLOGICAL_PROP` that
+     `pnpm check:readme --only <folder>` prints for a story file is a
+     template item, and one for the README or the types file is an
+     `Outside the stories` item;
    - comments are one line and explain only what the code cannot show;
    - `Default` opens the file and `CssCustomization` is the last
      story, with `RightToLeft`, when there is one, right before it:

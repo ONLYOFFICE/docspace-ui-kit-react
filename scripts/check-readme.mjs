@@ -3,6 +3,7 @@
 //   pnpm check:readme                     every component
 //   pnpm check:readme --only button       one, folder name or path
 //   pnpm check:readme --json              machine-readable findings
+//   pnpm check:readme --style-all         style warnings for every folder
 //
 // Everything it checks is something a reader of the README would otherwise get
 // wrong. The metadata block is derived truth wherever it can be: whether the
@@ -17,12 +18,28 @@
 // source of truth for what a component's documentation says; the authoring rule
 // and the `component-docs` skill were rewritten to match rather than the other
 // way round.
+//
+// The style warnings -- W_LONG_SENTENCE, W_LONG_TEXT, W_TAUTOLOGICAL_PROP --
+// measure the prose against `.claude/rules/doc-writing.md`. Most of the library
+// predates that rule, so by default they are printed only for the folders the
+// branch changed, and the rest are counted in one line: text is brought within
+// the limits when its component is touched, not in one sweep.
 
 import fs from "node:fs";
 import path from "node:path";
 
 import * as ts from "typescript";
 
+import {
+  LIMITS,
+  excerpt,
+  isTautological,
+  longSentences,
+  markdownProse,
+  storyTexts,
+  wordCount,
+} from "./lib/doc-style.mjs";
+import { changesSince, findPushBase } from "./lib/push-base.mjs";
 import {
   ROOT,
   createExampleProgram,
@@ -90,18 +107,19 @@ const FORBIDDEN = [
 
 const usage = () => {
   console.error(
-    "usage: node scripts/check-readme.mjs [--only <folder>...] [--compile] [--json]",
+    "usage: node scripts/check-readme.mjs [--only <folder>...] [--compile] [--json] [--style-all]",
   );
   process.exit(2);
 };
 
 const parseArgs = (argv) => {
-  const options = { only: [], json: false, compile: false };
+  const options = { only: [], json: false, compile: false, styleAll: false };
 
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--json") options.json = true;
     else if (arg === "--compile") options.compile = true;
+    else if (arg === "--style-all") options.styleAll = true;
     else if (arg === "--only") {
       while (argv[i + 1] && !argv[i + 1].startsWith("--")) {
         options.only.push(argv[(i += 1)]);
@@ -406,6 +424,167 @@ const wrappedInlineCode = (readme) => {
   return found;
 };
 
+// The README blocks a ceiling applies to, from `.claude/rules/doc-writing.md`.
+// A block no entry matches is still checked sentence by sentence.
+const PROSE_LIMITS = [
+  {
+    applies: (block) => block.section === null && block.kind === "paragraph",
+    limit: LIMITS.lead,
+    what: "the lead paragraph",
+  },
+  {
+    applies: (block) =>
+      block.section === "Use this when / not when" && block.kind === "bullet",
+    limit: LIMITS.whenBullet,
+    what: "a “Use this when” bullet",
+  },
+  {
+    applies: (block) =>
+      block.section === "Behaviour the types don't state" &&
+      block.kind === "bullet",
+    limit: LIMITS.behaviourBullet,
+    what: "a behaviour bullet",
+  },
+  {
+    applies: (block) => block.section === "Accessibility",
+    limit: LIMITS.accessibility,
+    what: "an accessibility bullet",
+  },
+  {
+    applies: (block) => block.kind === "cell",
+    limit: LIMITS.cssEffect,
+    what: "a CSS variable's Effect",
+  },
+];
+
+const sentenceFindings = (text, file, line) =>
+  longSentences(text).map(({ sentence, words }) => ({
+    code: "W_LONG_SENTENCE",
+    file,
+    line,
+    message: `a sentence of ${words} words, over ${LIMITS.sentence}: “${excerpt(sentence)}”`,
+  }));
+
+const lengthFinding = (text, limit, what, file, line) => {
+  const words = wordCount(text);
+  return words > limit
+    ? [
+        {
+          code: "W_LONG_TEXT",
+          file,
+          line,
+          message: `${what} runs ${words} words, over ${limit}`,
+        },
+      ]
+    : [];
+};
+
+/** Style findings for a README's own prose. */
+const readmeStyle = (folder, readme) => {
+  const file = `${folder}/README.md`;
+
+  return markdownProse(readme).flatMap((block) => {
+    const rule = PROSE_LIMITS.find((entry) => entry.applies(block));
+    return [
+      ...(rule
+        ? lengthFinding(block.text, rule.limit, rule.what, file, block.line)
+        : []),
+      ...sentenceFindings(block.text, file, block.line),
+    ];
+  });
+};
+
+/** Style findings for one prop's JSDoc, reported where the JSDoc is written. */
+const propStyle = (prop, component) => {
+  const { description: text, declaredFile: file, declaredLine: line } = prop;
+  if (!text) return [];
+
+  return [
+    ...lengthFinding(text, LIMITS.prop, `\`${prop.name}\`'s JSDoc`, file, line),
+    ...sentenceFindings(text, file, line),
+    ...(isTautological(prop.name, text, component)
+      ? [
+          {
+            code: "W_TAUTOLOGICAL_PROP",
+            file,
+            line,
+            message: `\`${prop.name}\`'s JSDoc restates its name; say what the value changes, where a valid one comes from, or what both values of a boolean do`,
+          },
+        ]
+      : []),
+  ];
+};
+
+/** Style findings for the story files beside a README. */
+const storyStyle = (folder, component) => {
+  const dir = path.join(ROOT, folder);
+  if (!fs.existsSync(dir)) return [];
+
+  return fs
+    .readdirSync(dir)
+    .filter((name) => name.endsWith(".stories.tsx"))
+    .flatMap((name) => {
+      const file = `${folder}/${name}`;
+      const source = fs.readFileSync(path.join(dir, name), "utf8");
+
+      return storyTexts(source, name).flatMap(
+        ({ kind, name: owner, text, line }) =>
+          kind === "story"
+            ? [
+                ...lengthFinding(
+                  text,
+                  LIMITS.story,
+                  `\`${owner}\`'s story description`,
+                  file,
+                  line,
+                ),
+                ...sentenceFindings(text, file, line),
+              ]
+            : [
+                ...lengthFinding(
+                  text,
+                  LIMITS.argType,
+                  `the \`${owner}\` argTypes description`,
+                  file,
+                  line,
+                ),
+                ...sentenceFindings(text, file, line),
+                ...(owner && isTautological(owner, text, component)
+                  ? [
+                      {
+                        code: "W_TAUTOLOGICAL_PROP",
+                        file,
+                        line,
+                        message: `the \`${owner}\` argTypes description restates the prop's name`,
+                      },
+                    ]
+                  : []),
+              ],
+      );
+    });
+};
+
+/**
+ * The documented folders the branch changed, each file credited to the deepest
+ * folder holding it -- `rows/row` rather than `rows`. Empty when git cannot say,
+ * which leaves every style warning in the summary line rather than failing.
+ */
+const touchedFolders = (folders) => {
+  const base = findPushBase(ROOT);
+  const changed = base ? changesSince(ROOT, base.sha) : null;
+  if (!changed) return new Set();
+
+  const deepestFirst = [...folders].sort((a, b) => b.length - a.length);
+  const touched = new Set();
+
+  for (const file of changed) {
+    const owner = deepestFirst.find((folder) => file.startsWith(`${folder}/`));
+    if (owner) touched.add(owner);
+  }
+
+  return touched;
+};
+
 const main = async () => {
   const options = parseArgs(process.argv.slice(2));
   const allowlist = readAllowlist();
@@ -428,6 +607,10 @@ const main = async () => {
 
   const error = (...args) => report("error", ...args);
   const warn = (...args) => report("warning", ...args);
+
+  // Held apart from `findings` until the end, when the scope is known.
+  const style = [];
+  const seenProps = new Set();
 
   // The whole program, never only the folders asked for: what the checker
   // prints depends on which files are loaded, so a narrowed run would compare
@@ -735,6 +918,16 @@ const main = async () => {
           );
         }
 
+        // A prop shared by several blocks or folders is judged once, where
+        // its JSDoc is written.
+        const key = `${prop.declaredFile}:${prop.declaredLine}`;
+        if (prop.origin === "own" && !seenProps.has(key)) {
+          seenProps.add(key);
+          for (const finding of propStyle(prop, meta.name ?? "")) {
+            style.push({ folder, ...finding });
+          }
+        }
+
         if (prop.defaultConflict) {
           warn(
             "W_DEFAULT_MISMATCH",
@@ -771,6 +964,13 @@ const main = async () => {
       if (match) {
         error("E_FORBIDDEN_TEXT", folder, lineOf(readme, match.index), message);
       }
+    }
+
+    for (const finding of [
+      ...readmeStyle(folder, readme),
+      ...storyStyle(folder, meta.name ?? ""),
+    ]) {
+      style.push({ folder, ...finding });
     }
 
     for (const link of unshippedLinks(readme, `${folder}/README.md`, shipped)) {
@@ -922,12 +1122,27 @@ const main = async () => {
     }
   }
 
+  // --- the style warnings, for the folders in scope ---
+
+  const touched = options.styleAll || named ? null : touchedFolders(folders);
+  const inScope = (finding) => touched === null || touched.has(finding.folder);
+  const hidden = style.filter((finding) => !inScope(finding));
+
+  for (const { folder: _folder, ...finding } of style.filter(inScope)) {
+    findings.push({ severity: "warning", ...finding });
+  }
+
   const errors = findings.filter((finding) => finding.severity === "error");
 
   if (options.json) {
     console.log(
       JSON.stringify(
-        { checked: folders.length, pages: pages.length, findings },
+        {
+          checked: folders.length,
+          pages: pages.length,
+          findings,
+          styleHidden: hidden.length,
+        },
         null,
         2,
       ),
@@ -951,6 +1166,14 @@ const main = async () => {
       `\n${folders.length} README(s)${docs} checked${skipped}: ` +
         `${errors.length} error(s), ${findings.length - errors.length} warning(s).`,
     );
+
+    if (hidden.length > 0) {
+      const others = new Set(hidden.map((finding) => finding.folder)).size;
+      console.log(
+        `${hidden.length} style warning(s) in ${others} folder(s) this branch did not change; ` +
+          "`--style-all` lists them (.claude/rules/doc-writing.md).",
+      );
+    }
   }
 
   process.exit(errors.length > 0 ? 1 : 0);
