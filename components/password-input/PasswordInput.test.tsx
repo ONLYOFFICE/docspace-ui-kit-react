@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { screen, render, fireEvent } from "@testing-library/react";
+import { screen, render, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { InputSize, InputType } from "../text-input";
@@ -281,6 +281,37 @@ describe("<PasswordInput />", () => {
     expect(
       screen.queryByText("Password must contain:"),
     ).not.toBeInTheDocument();
+  });
+
+  describe("tooltipPasswordPlace", () => {
+    const openRulesTooltip = async (
+      props: Partial<React.ComponentProps<typeof PasswordInput>> = {},
+    ) => {
+      const user = userEvent.setup();
+      render(<PasswordInput {...baseProps} id="placed-password" {...props} />);
+
+      const input = screen.getByTestId("password-input").querySelector("input");
+      await user.type(input!, "abc");
+
+      const title = await screen.findByText("Password must contain:");
+      return title.closest(".react-tooltip") as HTMLElement;
+    };
+
+    it("opens the rules tooltip above the field by default", async () => {
+      const tooltip = await openRulesTooltip();
+
+      await waitFor(() =>
+        expect(tooltip).toHaveClass("react-tooltip__place-top"),
+      );
+    });
+
+    it("opens the rules tooltip on the side it is given", async () => {
+      const tooltip = await openRulesTooltip({ tooltipPasswordPlace: "right" });
+
+      await waitFor(() =>
+        expect(tooltip).toHaveClass("react-tooltip__place-right"),
+      );
+    });
   });
 
   it("handles custom autocomplete attribute", () => {

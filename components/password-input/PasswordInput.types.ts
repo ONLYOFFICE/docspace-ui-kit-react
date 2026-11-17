@@ -2,6 +2,7 @@ import React, { MouseEvent } from "react";
 
 import { InputType } from "../text-input";
 import { InputBlockProps } from "../input-block";
+import type { TTooltipPlace } from "../tooltip";
 
 export type TPasswordSettings = {
   /** Minimum length requirement for the password */
@@ -77,6 +78,11 @@ export type TPasswordTooltipProps = {
   tooltipAllowedCharacters?: string;
   /** Allows to hide Tooltip */
   isDisableTooltip?: boolean;
+  /**
+   * Side of the field the rules tooltip opens on. Where that side has no room, the
+   * tooltip flips to another one (see Tooltip).
+   */
+  tooltipPasswordPlace?: TTooltipPlace;
   /** Title of the password generation button */
   generatePasswordTitle?: string;
 };

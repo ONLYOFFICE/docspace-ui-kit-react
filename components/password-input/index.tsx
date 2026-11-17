@@ -77,6 +77,7 @@ const PasswordInput = ({
   autoComplete = "new-password",
   forwardedRef,
   isDisableTooltip = false,
+  tooltipPasswordPlace = "top",
   inputWidth,
   className = "",
   style,
@@ -419,7 +420,7 @@ const PasswordInput = ({
 
         {!isDisableTooltip && !isDisabled ? (
           <Tooltip
-            place="top"
+            place={tooltipPasswordPlace}
             clickable
             openOnClick
             anchorSelect={`div[id='tooltipContent-${id || inputName}'] input`}
