@@ -223,11 +223,14 @@ class AiChatStore {
 
   /**
    * Set while the chat's Skill sets and Knowledge bases belong to something
-   * the host manages - an AI project, whose rooms are its settings, not the
-   * chat's own pick. The "+" menu then lists them as they are and its
-   * "Manage sources" calls `onManage` (the project's settings) instead of
-   * the room selector; with `onManage: null` (a member who cannot change the
-   * project) the lists have no such row. `null` for an ordinary chat.
+   * the host manages - an agent, whose rooms are its settings, not the
+   * chat's own pick. The "+" menu then lists them as they are, with no
+   * remove control on a knowledge base, and its "Manage skill sets..." and
+   * "Manage knowledge bases..." call `onManage` (the agent's settings)
+   * instead of the room selector; with `onManage: null` (a member who
+   * cannot change the agent) the lists have no such rows and the skill sets
+   * no remove control. A conversation opened again does not bring back its
+   * own copy of these two lists. `null` for an ordinary chat.
    */
   sourcesManager: AiChatSourcesManager | null = null;
 
@@ -263,8 +266,9 @@ class AiChatStore {
    * Whether the composer leaves the knowledge base picker out: set by the
    * host while knowledge search is off (DocSpace with vectorization
    * disabled), so no Knowledge room can be picked for a chat. The "+" menu's
-   * Knowledge bases then lists only the bases connected earlier, with
-   * Disconnect in place of Manage sources (see `useComposerSourceLists`).
+   * Knowledge bases then lists only the bases connected earlier, each with
+   * its remove control, and no "Manage knowledge bases..." (see
+   * `useComposerSourceLists`).
    */
   knowledgePickerHidden = false;
 

@@ -982,18 +982,16 @@ const AiAgentProviders = ({
     userId,
   ]);
 
-  // The "+" menu's Skill sets and Knowledge bases: the connected rooms and
-  // the room selector that manages them.
-  const { composerSkills, composerKnowledge, composerDataSources } =
-    useComposerSourceLists({
-      useCloudsStore: stores.useCloudsStore,
-      onPickContextRooms,
-      onPickKnowledgeRooms,
-      onOpenContextRoom,
-      onAddContextFolder,
-      knowledgePickerHidden,
-      sourcesManager,
-    });
+  // The "+" menu's Knowledge bases and Data sources: the connected sources,
+  // each with its remove control, and the "Manage ..." row of each list.
+  const { composerKnowledge, composerDataSources } = useComposerSourceLists({
+    useCloudsStore: stores.useCloudsStore,
+    onPickKnowledgeRooms,
+    onOpenContextRoom,
+    onAddContextFolder,
+    knowledgePickerHidden,
+    sourcesManager,
+  });
 
   // While "Analyze responses" is on, the chat is about that one form: the cap
   // drops to one and the composer's attach actions go away, so the "+" menu
@@ -1246,12 +1244,20 @@ const AiAgentProviders = ({
       // With vectorization off on the portal no Knowledge room can be picked
       // for a chat: the composer loses its knowledge base picker.
       hideKnowledgePicker: knowledgePickerHidden,
-      // Instructions rooms and knowledge bases are picked in the room
-      // selector, several at once ("Manage sources" in the "+" menu's Skill sets and
-      // Knowledge bases), and a connected one opens in Files from its row
-      // there. With knowledge search off, Knowledge bases keeps the bases
-      // connected earlier and "Disconnect" instead of "Manage sources".
-      composerSkills,
+      // The "+" menu's Skill sets open the slash menu's skill list: the
+      // connected sets as groups with their skills, a bin per set and
+      // "Manage skill sets...". Inside an agent that row opens the agent's
+      // form for those who may change it (the slash menu's own opens the
+      // Instructions room picker, `onPickContextRooms`); a member who may
+      // not gets neither the row nor the bins.
+      composerSkillList: true,
+      onManageSkillSets: sourcesManager
+        ? (sourcesManager.onManage ?? undefined)
+        : undefined,
+      // Knowledge bases are picked in the room selector, several at once
+      // ("Manage knowledge bases..."), and a connected one opens in Files
+      // from its row. With knowledge search off the list keeps the bases
+      // connected earlier, each removable, and nothing to add one.
       composerKnowledge,
       // Data sources: any folders and rooms of the portal as the chat's
       // context, up to the library's limit; the AI service tells the model
@@ -1304,7 +1310,7 @@ const AiAgentProviders = ({
       sourcesOwned,
       onAddContextFolder,
       onOpenContextRoom,
-      composerSkills,
+      sourcesManager,
       composerKnowledge,
       composerDataSources,
       t,

@@ -11,22 +11,33 @@ import {
 import { CONTEXT_ROOM_CLOUD } from "../context-room/ContextRoomSync";
 
 type CloudsStore = ReturnType<typeof useStores>["useCloudsStore"];
-type ConnectedRoom = { cloud: string; room: { id: string; name: string } };
 
 /**
- * The rows of the chat "+" menu's Skill sets and Knowledge bases submenus,
- * as DocSpace builds them: the Instructions or Knowledge rooms connected to
- * the chat, with no tick (only connected ones are listed) — a click opens the room in Files — and below them
- * "Manage sources", the room selector that connects and disconnects them.
+ * The rows of the chat "+" menu's Knowledge bases and Data sources lists, as
+ * DocSpace builds them (the Skill sets entry opens the chat's own skill
+ * list, see `WidgetConfig.composerSkillList`). Each list is flat: one row per
+ * connected source, with no tick (only connected ones are listed) and a
+ * trailing "Remove <name>" control that disconnects it and keeps the menu
+ * open, then, right under the rows and with no separator, its own "Manage
+ * ..." row in the link colour with a gear.
  *
- * While knowledge search is off on the portal no knowledge base can be
- * picked: the Knowledge bases list keeps the bases connected earlier and
- * offers "Disconnect" in place of "Manage sources", and with none connected it is
- * empty, which drops the row.
+ * - Knowledge bases: the Knowledge rooms connected to the chat; a click on
+ *   one opens it in Files, and "Manage knowledge bases..." opens the room
+ *   selector. While knowledge search is off on the portal no base can be
+ *   picked: the list keeps the bases connected earlier, still removable,
+ *   has no "Manage" row, and with none connected it is empty, which drops
+ *   the entry.
+ * - Data sources: the folders and rooms connected as the chat's context,
+ *   a room with the room icon and a folder with the folder icon, and
+ *   "Manage sources..." to connect one more until the library's limit.
+ *
+ * Inside an agent its knowledge bases are its settings: nobody removes one
+ * from the chat, and "Manage knowledge bases..." opens the agent's form
+ * (`sourcesManager.onManage`), or is left out for a user who may not change
+ * it. The data sources stay the user's own there.
  */
 export const useComposerSourceLists = ({
   useCloudsStore,
-  onPickContextRooms,
   onPickKnowledgeRooms,
   onOpenContextRoom,
   onAddContextFolder,
@@ -34,7 +45,6 @@ export const useComposerSourceLists = ({
   sourcesManager,
 }: {
   useCloudsStore: CloudsStore;
-  onPickContextRooms: () => void;
   onPickKnowledgeRooms: () => void;
   onOpenContextRoom: (
     cloud: string,
@@ -43,55 +53,35 @@ export const useComposerSourceLists = ({
   onAddContextFolder: () => void;
   knowledgePickerHidden: boolean;
   /**
-   * Set inside an AI project, whose rooms are its settings: "Manage sources"
-   * opens those settings (`onManage`), or is left out when the user may not
-   * change them. `null` for an ordinary chat, which picks its own rooms.
+   * Set inside an agent, whose knowledge bases are its settings:
+   * "Manage knowledge bases..." opens those settings (`onManage`), or is
+   * left out when the user may not change them. `null` for an ordinary
+   * chat, which picks its own rooms.
    */
   sourcesManager?: { onManage: (() => void) | null } | null;
 }): {
-  composerSkills: ComposerMenuItem[];
   composerKnowledge: ComposerMenuItem[];
   composerDataSources: ComposerMenuItem[];
 } => {
   const { t, i18n } = useTranslation(["Common"]);
-  const skillsRooms = useCloudsStore((s) => s.selectedContextFolders);
   const knowledgeRooms = useCloudsStore((s) => s.selectedKnowledgeFolders);
-  const clearKnowledgeFolder = useCloudsStore((s) => s.clearKnowledgeFolder);
+  const deselectKnowledgeFolder = useCloudsStore(
+    (s) => s.deselectKnowledgeFolder,
+  );
   const contextFolders = useCloudsStore((s) => s.selectedFolderContexts);
   const deselectFolderContext = useCloudsStore((s) => s.deselectFolderContext);
 
-  const build = React.useCallback(
-    (
-      kind: "skills" | "knowledge",
-      connected: ConnectedRoom[],
-      footer: ComposerMenuItem | null,
-    ): ComposerMenuItem[] => {
-      const rooms = connected
-        .filter((item) => item.cloud === CONTEXT_ROOM_CLOUD)
-        .map(({ cloud, room }): ComposerMenuItem => ({
-          id: `${kind}-room:${room.id}`,
-          text: room.name,
-          icon: "btn-room",
-          onClick: () => onOpenContextRoom(cloud, room),
-        }));
-      if (!footer) return rooms;
-      return [
-        ...rooms,
-        ...(rooms.length > 0
-          ? [{ id: `${kind}-separator`, text: "", isSeparator: true }]
-          : []),
-        footer,
-      ];
-    },
-    [onOpenContextRoom],
-  );
-
   // The labels are ours, so the rows are rebuilt on a language change.
-  const manage = React.useCallback(
-    (kind: "skills" | "knowledge", onClick: () => void): ComposerMenuItem => ({
-      id: `${kind}-manage`,
-      text: t("Common:ManageSources", { defaultValue: "Manage sources" }),
-      icon: "btn-settings",
+  const removeAction = React.useCallback(
+    (
+      name: string,
+      onClick: () => void,
+    ): ComposerMenuItem["trailingAction"] => ({
+      icon: "btn-remove",
+      label: t("Common:RemoveSource", {
+        name,
+        defaultValue: "Remove {{name}}",
+      }),
       onClick,
     }),
     [t, i18n.language],
@@ -100,92 +90,87 @@ export const useComposerSourceLists = ({
   const onManageOwned = sourcesManager?.onManage ?? null;
   const owned = !!sourcesManager;
 
-  const composerSkills = React.useMemo(() => {
-    if (owned)
-      return build(
-        "skills",
-        skillsRooms,
-        onManageOwned ? manage("skills", onManageOwned) : null,
-      );
-    return build("skills", skillsRooms, manage("skills", onPickContextRooms));
-  }, [build, manage, skillsRooms, onPickContextRooms, owned, onManageOwned]);
   const composerKnowledge = React.useMemo(() => {
-    if (owned)
-      return build(
-        "knowledge",
-        knowledgeRooms,
-        onManageOwned ? manage("knowledge", onManageOwned) : null,
-      );
-    if (!knowledgePickerHidden) {
-      return build(
-        "knowledge",
-        knowledgeRooms,
-        manage("knowledge", onPickKnowledgeRooms),
-      );
-    }
-    const connected = knowledgeRooms.some(
-      (item) => item.cloud === CONTEXT_ROOM_CLOUD,
-    );
-    return connected
-      ? build("knowledge", knowledgeRooms, {
-          id: "knowledge-disconnect",
-          text: t("Common:Disconnect", { defaultValue: "Disconnect" }),
-          icon: "btn-close",
-          onClick: clearKnowledgeFolder,
-        })
-      : [];
-  }, [
-    build,
-    manage,
-    t,
-    knowledgeRooms,
-    onPickKnowledgeRooms,
-    knowledgePickerHidden,
-    clearKnowledgeFolder,
-    owned,
-    onManageOwned,
-  ]);
-
-  // Data sources: the folders and rooms the user connected as the chat's
-  // context - any of the portal, several at once. Each opens a second level
-  // with its way out; "Manage sources" connects one more until the limit.
-  const composerDataSources = React.useMemo(() => {
-    const folders = contextFolders
+    const rows = knowledgeRooms
       .filter((item) => item.cloud === CONTEXT_ROOM_CLOUD)
       .map(({ cloud, room }): ComposerMenuItem => ({
-        id: `data-source:${room.id}`,
+        id: `knowledge-room:${room.id}`,
         text: room.name,
-        icon: "source-context",
-        items: [
-          {
-            id: `data-source-disconnect:${room.id}`,
-            text: t("Common:Disconnect", { defaultValue: "Disconnect" }),
-            icon: "btn-close",
-            onClick: () => deselectFolderContext(cloud, room.id),
-          },
-        ],
+        icon: "btn-room",
+        onClick: () => onOpenContextRoom(cloud, room),
+        trailingAction: owned
+          ? undefined
+          : removeAction(room.name, () =>
+              deselectKnowledgeFolder(cloud, room.id),
+            ),
       }));
-    const rows: ComposerMenuItem[] = [...folders];
-    if (folders.length < FOLDER_CONTEXTS_LIMIT) {
-      if (folders.length > 0)
-        rows.push({ id: "data-source-separator", text: "", isSeparator: true });
-      rows.push({
-        id: "data-source-add",
-        text: t("Common:ManageSources", {
-          defaultValue: "Manage sources",
+    // No base can be picked while knowledge search is off, not even
+    // through the agent's form.
+    const onManage = knowledgePickerHidden
+      ? null
+      : owned
+        ? onManageOwned
+        : onPickKnowledgeRooms;
+    if (!onManage) return rows;
+    return [
+      ...rows,
+      {
+        id: "knowledge-manage",
+        text: t("Common:ManageKnowledgeBases", {
+          defaultValue: "Manage knowledge bases...",
         }),
-        icon: "btn-settings",
-        onClick: onAddContextFolder,
-      });
-    }
-    return rows;
+        icon: "btn-gear",
+        tone: "link",
+        onClick: onManage,
+      } satisfies ComposerMenuItem,
+    ];
   }, [
-    contextFolders,
-    deselectFolderContext,
-    onAddContextFolder,
+    knowledgeRooms,
+    knowledgePickerHidden,
+    owned,
+    onManageOwned,
+    onPickKnowledgeRooms,
+    onOpenContextRoom,
+    deselectKnowledgeFolder,
+    removeAction,
     t,
     i18n.language,
   ]);
 
-  return { composerSkills, composerKnowledge, composerDataSources };
+  // Data sources: the folders and rooms the user connected as the chat's
+  // context - any of the portal, several at once, each removed from its
+  // own row; "Manage sources..." connects one more until the limit.
+  const composerDataSources = React.useMemo(() => {
+    const rows = contextFolders
+      .filter((item) => item.cloud === CONTEXT_ROOM_CLOUD)
+      .map(({ cloud, room }): ComposerMenuItem => ({
+        id: `data-source:${room.id}`,
+        text: room.name,
+        // A source picked before the kind was recorded is a folder.
+        icon: room.kind === "room" ? "btn-room" : "source-context",
+        trailingAction: removeAction(room.name, () =>
+          deselectFolderContext(cloud, room.id),
+        ),
+      }));
+    if (rows.length >= FOLDER_CONTEXTS_LIMIT) return rows;
+    return [
+      ...rows,
+      {
+        id: "data-source-manage",
+        text: t("Common:ManageSources", { defaultValue: "Manage sources..." }),
+        icon: "btn-gear",
+        tone: "link",
+        onClick: onAddContextFolder,
+      } satisfies ComposerMenuItem,
+    ];
+  }, [
+    contextFolders,
+    deselectFolderContext,
+    onAddContextFolder,
+    removeAction,
+    t,
+    i18n.language,
+  ]);
+
+  return { composerKnowledge, composerDataSources };
 };
