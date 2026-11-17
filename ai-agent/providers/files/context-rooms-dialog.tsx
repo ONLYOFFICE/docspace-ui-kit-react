@@ -114,9 +114,7 @@ const ContextRoomsDialog: React.FC<ContextRoomsDialogProps> = ({
           ? t("Common:AIProjectKnowledgeRooms", {
               defaultValue: "Knowledge bases",
             })
-          : t("Common:InstructionsRooms", {
-              defaultValue: "Instructions rooms",
-            }),
+          : t("Common:SkillSets", { defaultValue: "Skill sets" }),
         onCloseClick: onClose,
         isCloseable: true,
       }}

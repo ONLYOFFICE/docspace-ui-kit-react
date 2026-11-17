@@ -69,7 +69,8 @@ describe("ContextRoomsDialog", () => {
     expect(props.useAside).toBe(true);
     // The rows carry numeric ids, and the selector ticks on a strict match.
     expect(props.selectedItems).toEqual([{ id: 12, label: "Skills" }]);
-    expect(props.headerProps?.headerLabel).toBe("Instructions rooms");
+    // Named as the composer names them: Skill sets and Knowledge bases.
+    expect(props.headerProps?.headerLabel).toBe("Skill sets");
   });
 
   it("picks Knowledge rooms for the knowledge slot", () => {
