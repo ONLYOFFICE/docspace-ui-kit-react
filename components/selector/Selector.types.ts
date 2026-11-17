@@ -1018,8 +1018,9 @@ export type TSelectorItem = TSelectorItemType & {
   /** Text shown at the end of a disabled row, saying why. */
   disabledText?: string;
   /**
-   * A text after the name that leaves the row selectable, with its reason
-   * as the row's description.
+   * A badge after the name that leaves the row selectable, with its reason
+   * as the row's description. A `renderCustomItem` receives it as its last
+   * argument and places it.
    */
   mark?: TSelectorItemMark;
   /** Tooltip about the file's lifetime. */
