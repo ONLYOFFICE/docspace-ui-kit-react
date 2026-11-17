@@ -86,8 +86,9 @@ export const imageOverrides: ImageOverrides = {
   // draws it as a room) and the room rows inside it: the rooms glyph of the
   // DocSpace catalog.
   "btn-room": makeIcon(RoomsIcon),
-  // The connected knowledge base chip: a knowledge room, so the same glyph.
-  documents: makeIcon(RoomsIcon),
+  // No "documents": it is the file-format image of every text document (the
+  // chip of an attached file draws it), not a knowledge base's - those rows
+  // use "source-knowledge".
   // The connected context folder chip: the folder glyph of the catalog.
   folder: makeIcon(FolderIcon),
   eye: makeIcon(EyeIcon),
