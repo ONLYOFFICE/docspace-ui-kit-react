@@ -309,3 +309,14 @@ eager: true })` is expanded to static imports (RoomLogoCoverDialog).
   Skills canvas page with the real canvas runtime: the overflow reproduced
   with an instrumented `fast-deep-equal` (path `children.13._owner.alternate…`)
   and is gone with the patch.
+- `Navigation` rendered nothing on a Design canvas: its body is
+  `<Consumer>{(context) => …}</Consumer>` (`utils/context`), and React 18
+  makes a context its own Consumer (`Context.Consumer === Context` in
+  production). The provider mapping above turned that Consumer into a
+  Provider with a function child, which renders nothing, with no error.
+  Fix: map `createElement(Context, props)` to the Provider only when the
+  props carry `value`; a Consumer never does. Verified with the real canvas
+  runtime on the AI Workspace Skills canvas: header title, plus button and
+  info-panel toggle render, providers still work. Component cards never saw
+  it (React 19), so no grade changed and only the shared bundle was
+  uploaded.

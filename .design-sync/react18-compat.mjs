@@ -52,11 +52,18 @@ if (R && !R.__dsContextAsProvider && !/^19\./.test(String(R.version))) {
   R.createElement = function patchedCreateElement(type, ...rest) {
     // React 18: Context.Provider is a separate object. React 19: the
     // context is its own provider, so Provider === type and nothing changes.
+    // React 18 also makes the context its own Consumer (`Context.Consumer
+    // === Context` in production), so only an element given a `value` is a
+    // provider; mapping `<Consumer>{fn}</Consumer>` too renders nothing
+    // (Navigation's header vanished that way).
+    const props = rest[0];
     if (
       type &&
       type.$$typeof === CONTEXT &&
       type.Provider &&
-      type.Provider !== type
+      type.Provider !== type &&
+      props &&
+      Object.prototype.hasOwnProperty.call(props, "value")
     ) {
       return createElement.call(this, type.Provider, ...rest);
     }
