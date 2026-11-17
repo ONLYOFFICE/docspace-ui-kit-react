@@ -32,7 +32,9 @@ type ContextFolderDialogProps = {
 // only and the button is live as soon as the first level has loaded. In
 // `"add"` mode the folders also carry checkboxes: the ticked ones, from any
 // number of places, are all connected, and the open folder is the pick only
-// while nothing is ticked.
+// while nothing is ticked. The AI section is left out: its Instructions and
+// Knowledge rooms are the chat's Skill sets and Knowledge bases, picked in
+// lists of their own, not data sources.
 const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
   onClose,
   mode = "replace",
@@ -138,6 +140,7 @@ const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
       openRoot
       withRecentTreeFolder={false}
       withFavoritesTreeFolder={false}
+      withAIRoomsTreeFolder={false}
       isRoomsOnly={false}
       isThirdParty={false}
       withCreate={false}

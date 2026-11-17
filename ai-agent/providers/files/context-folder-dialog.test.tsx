@@ -73,7 +73,9 @@ describe("ContextFolderDialog", () => {
     render(<ContextFolderDialog onClose={vi.fn()} />);
     const props = selector();
     expect(props.isRoomsOnly).toBe(false);
-    expect(props.withAIRoomsTreeFolder).not.toBe(false);
+    // The Instructions and Knowledge rooms are the Skill sets and Knowledge
+    // bases, picked in lists of their own.
+    expect(props.withAIRoomsTreeFolder).toBe(false);
     expect(props.withCreate).toBe(false);
     expect(props.openRoot).toBe(true);
     expect(props.getIsDisabled(true, false, "5", undefined, false)).toBe(true);
