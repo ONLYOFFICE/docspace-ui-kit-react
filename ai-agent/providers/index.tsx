@@ -1287,6 +1287,10 @@ const AiAgentProviders = ({
       // Every reply of a chat on an agent starts with the agent's logo; the
       // default agent's replies carry none.
       assistantLogo: chatAgent?.logo,
+      // A sent message shows its attachments inside its bubble, under the
+      // text: an image as a preview with its name, any other file as a chip
+      // with its type icon and name.
+      userAttachmentsPlacement: "inside",
     }),
     [
       composerActions,
