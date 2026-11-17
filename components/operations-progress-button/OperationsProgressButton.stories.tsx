@@ -363,7 +363,7 @@ export const UploadInProgress: Story = {
     // hover reveals it, which a play function cannot produce, so it is
     // pressed from the keyboard here: Tab past the circle, then Enter.
     const cancel = canvas.getByRole("button", { name: "Cancel" });
-    canvas.getByRole("button", { name: "upload button" }).focus();
+    canvas.getByRole("button", { name: "Uploading files" }).focus();
     await userEvent.tab();
     await expect(cancel).toHaveFocus();
     await expect(getComputedStyle(cancel).pointerEvents).toBe("auto");
