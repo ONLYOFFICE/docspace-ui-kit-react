@@ -38,6 +38,20 @@ Read before every re-sync.
   canary of two churned renders - `RoomLogoCoverDialog` and
   `TranslationProvider`, whose previews gained the `Private` string after the
   last sync. Those two are the open grades.
+- Re-sync 2026-11-17 (converter from Claude Code 2.1.325, still `keyRecipe`
+  7): 123 unchanged, the same two canaries, now graded - RoomLogoCoverDialog
+  all `match` (against full-viewport reference shots), TranslationProvider
+  Default `close` (its `play` clicks "Deutsch"; previews stay English),
+  Without Translations `match`. Uploaded; the anchor here was refreshed from
+  the uploaded `_ds_sync.json`.
+- Upload only what changed. On an anchored re-sync, write the shared files
+  (bundle, CSS, styles, README, guidelines, fonts, `_vendor/`) and only the
+  `components/` and `_preview/` files of the components the verdict lists in
+  `upload.components`, then the sentinel and `_ds_sync.json`. The user asked
+  for this on 2026-11-17: re-sending 120 unchanged components costs time and
+  changes nothing, because the anchor's render hashes already prove the
+  project holds those exact bytes. `upload.deletePaths` still goes in
+  verbatim.
 - A different converter version may change `keyRecipe` (now 7); the diff then
   falls back to render hashes, and more components may come up for grading.
 
@@ -194,6 +208,10 @@ eager: true })` is expanded to static imports (RoomLogoCoverDialog).
   `top: 35%` in the single card). Css Customization `close` - 24px inset.
 - RowsSkeleton / CircleSkeleton / RectangleSkeleton `[RENDER_THIN]` are
   validator false positives: skeletons have no text; both sides paint.
+- HelpButton / MainButton `[RENDER_THIN]` (0px measured height) are benign
+  too: single-card owned previews whose open overlay is `position: fixed`,
+  so the measured wrapper collapses. The render check still counts them
+  clean and their grades carry.
 - InfiniteLoaderComponent Right To Left `close` - same fixed-LTR provider
   cause as TwoStateToggle.
 - [GENERAL] Stories whose only content is `position: fixed`
@@ -210,6 +228,14 @@ eager: true })` is expanded to static imports (RoomLogoCoverDialog).
   OperationsProgressButton (MainButtonMobile: 640).
 
 ## Re-sync risks
+
+- A git worktree nested in this checkout (`.claude/worktrees/...`, left by
+  another session) breaks `pnpm build`: `scripts/check-dist.mjs` walks the
+  whole tree, counts the worktree's `"use client"` sources and fails with
+  "missing from N built module(s)" on paths under `.claude/worktrees/`. The
+  dist itself is fine. Remove the stale worktree (`git worktree list`) before
+  building. Storybook's `stories` globs are rooted, so the reference is not
+  affected.
 
 - `.design-sync/overrides/story-imports.mjs` is a fork of the converter's
   `lib/story-imports.mjs`. A converter update can change the stock module;

@@ -84,7 +84,7 @@
     "RectangleSkeleton": "ef3dcf12b0a0b285",
     "RoomIcon": "b780f9dc270db272",
     "RoomLogo": "65cb67eb870e9e84",
-    "RoomLogoCoverDialog": "251c1f836f6df098",
+    "RoomLogoCoverDialog": "846e75478fbff14b",
     "RoomTile": "9095dec4e5afadaf",
     "RoomType": "b962ef8a0e4e8916",
     "Row": "e9f38b55e1aaf07a",
@@ -123,7 +123,7 @@
     "ToggleButton": "33b32b6dc8713e13",
     "Tooltip": "649d596774407aa2",
     "TopLoaderService": "1f28460e39743a9e",
-    "TranslationProvider": "05f3b05f45dc06d7",
+    "TranslationProvider": "1773090ac07b7c60",
     "TwoStateToggle": "829b61fcb02d06b2"
   },
   "sourceKeys": {
@@ -252,7 +252,7 @@
     "TwoStateToggle": "04d792ad4c6fd0f9"
   },
   "keyRecipe": 7,
-  "scriptsSha": "e67dd09e1420a029",
+  "scriptsSha": "273dc710f5f499df",
   "sourceHashes": {
     "components/errors/AccessRestricted/AccessRestricted.jsx": "e9066fe84def",
     "components/errors/AccessRestricted/AccessRestricted.d.ts": "dbc9748faa76",
@@ -624,6 +624,6 @@
     "components/navigation/TwoStateToggle/TwoStateToggle.d.ts": "58a0967014ba",
     "components/navigation/TwoStateToggle/TwoStateToggle.prompt.md": "0a812ff906a3"
   },
-  "auxSha": "365c97922d411436",
-  "bundleSha12": "c611cb2f5bae"
+  "auxSha": "d46535b076ea2c6f",
+  "bundleSha12": "d0d5422388c7"
 }
