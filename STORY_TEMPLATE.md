@@ -114,7 +114,7 @@ export const VariantStory: Story = {
 10. [ ] **Wrapper** - Use a layout wrapper for stories with multiple items
 11. [ ] **Story order** - `Default` first, `CssCustomization` last; `RightToLeft`, when present, right before it
 12. [ ] **`CssCustomization` has no table** - It demonstrates the variables; the README's `## CSS variables` lists them
-13. [ ] **Text length** - `description.story` within 50 words, an `argTypes` description within 40, no sentence over 25, no description that restates its prop's name (`.claude/rules/doc-writing.md`; `pnpm check:readme --only <folder>` warns)
+13. [ ] **Text length** - `description.story` and `argTypes` descriptions within the limits of `.claude/rules/doc-writing.md`, none restating its prop's name (`pnpm check:readme --only <folder>` warns)
 
 ## Where the description lives
 

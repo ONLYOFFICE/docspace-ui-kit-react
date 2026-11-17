@@ -190,9 +190,8 @@ warning, not an error, because the story is the side that is wrong more often.
 ## Section rules
 
 How long the text in each section runs, the order a behaviour bullet says things in, and what
-prose leaves to the generated tables are in [`.claude/rules/doc-writing.md`](.claude/rules/doc-writing.md):
-a lead of one to three sentences, a bullet of one or two, no sentence over 25 words.
-`pnpm check:readme --only components/<folder>` warns where the text runs past those limits.
+prose leaves to the generated tables are in [`.claude/rules/doc-writing.md`](.claude/rules/doc-writing.md).
+`pnpm check:readme --only components/<folder>` warns where the text runs past its limits.
 
 **`# Name` + paragraph.** What the component is for. No feature list — features are props,
 and props are in the table.
@@ -340,8 +339,8 @@ being checked, not how a deadline is met.
 - [ ] No Default cell claims a default the code does not apply
 - [ ] Recipes cover the states the metadata declares, and only those
 - [ ] At least three behaviour bullets, each from the source, stylesheet or tests
-- [ ] No `W_LONG_SENTENCE`, `W_LONG_TEXT` or `W_TAUTOLOGICAL_PROP` for the folder
-      (`.claude/rules/doc-writing.md`)
+- [ ] A full rewrite leaves no `W_LONG_SENTENCE`, `W_LONG_TEXT` or `W_TAUTOLOGICAL_PROP` for the
+      folder; a smaller edit, none on the lines it touched (`.claude/rules/doc-writing.md`)
 - [ ] CSS variables table lists only consumer-settable properties
 - [ ] Test ids table matches `metadata.testIds`
 - [ ] No `PUBLIC_DIR`, no `dist/` path, no `@docspace/ui-kit`, no styled-components

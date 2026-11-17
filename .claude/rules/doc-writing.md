@@ -107,21 +107,35 @@ warnings, which never fail the gate:
   prop's and the component's names. `id`, `className`, `style`, `ref`, `forwardedRef`, `testId`
   and `dataTestId` are exempt: their meaning is fixed by React or by the kit.
 
-Most of the library predates this rule, so by default the warnings are printed only for the
-folders the branch changed, and the rest are counted in one closing line. `--only <folder>`
-prints them for that folder, and `--style-all` prints all of them. Bring a folder's text within the
-limits when you touch the component. Do not sweep the library in one pass: a rewrite done for
-length alone, without reading the code, is how a sentence turns untrue.
+A README's warnings include its story files, those in subfolders without a README of their own
+too -- the table's parts, the skeletons.
 
-The counting lives in `scripts/lib/doc-style.mjs`. It masks code spans before splitting, so the
-dots in `ModalDialog.Header` end no sentence. The sentence split and the tautology threshold are
-those of the server's `openapi-desc-opt` scan, so both repositories measure text the same way. The
+Most of the library predates this rule, so by default the warnings are printed only for the
+folders the branch changed since it left its parent branch (`master`, `release/*`, `hotfix/*`),
+however many times it was pushed. The rest are counted in one closing line. `--only <folder>`
+prints them for that folder, and `--style-all` prints all of them.
+
+How much of a folder's text to bring within the limits depends on the change:
+
+- **A README or story file rewritten in full** -- `COMPONENT_README_TEMPLATE.md`'s procedure, an
+  `audit-stories` fix -- clears every warning for the folder. The code is being read anyway.
+- **A smaller change** clears the warnings on the lines it touches, and leaves the rest.
+
+Do not sweep the library in one pass: a rewrite done for length alone, without reading the code, is
+how a sentence turns untrue.
+
+The counting lives in `scripts/lib/doc-style.mjs`, and `LIMITS` there is the one copy of the
+ceilings; a test keeps table B above in step with it. It masks code spans before splitting, so the
+dots in `ModalDialog.Header` end no sentence. The sentence split and the tautology threshold follow
+the DocSpace server's `openapi-desc-opt` scan, in a server checkout next to the client
+(`../DocSpace/server/.claude/skills/openapi-desc-opt/scan.py` from this repository). The
 checks see length and wording only. Whether a sentence is _true_ is still the job of reading the
 code, and of `audit-stories`.
 
 ## Where this came from
 
-The API-descriptions report of 2026-11-02 measured the DocSpace OpenAPI contract against Stripe,
+A report on API descriptions, dated 2026-11-02 and not kept in this repository, measured the
+DocSpace OpenAPI contract against Stripe,
 GitHub, Google, Microsoft Graph, Twilio and Slack. It also drew on Anthropic's and OpenAI's
 tool-definition guidance and on three studies: Hsieh et al. 2023, Hasan et al. 2026 ("MCP Tool
 Descriptions Are Smelly!") and Faghih et al. 2025. The server's endpoint rule still asks for 150–200
