@@ -38,6 +38,7 @@ const compareFunction = (prevProps: ItemProps, nextProps: ItemProps) => {
   return (
     prevItem?.id === nextItem?.id &&
     prevItem?.label === nextItem?.label &&
+    prevItem?.mark === nextItem?.mark &&
     prevItem?.isSelected === nextItem?.isSelected &&
     nextData?.inputItemVisible === prevData?.inputItemVisible &&
     nextData?.listHeight === prevData?.listHeight &&
@@ -72,6 +73,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
   const isActive = activeIndex === index;
 
   const { isBase } = useTheme();
+  const [isMarkHovered, setIsMarkHovered] = React.useState(false);
 
   const isLoaded = isItemLoaded(index);
 
@@ -120,6 +122,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
       isMCP,
       isFolder,
       id,
+      mark,
     } = item;
 
     if (isSeparator) {
@@ -229,6 +232,8 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
       </Text>
     );
 
+    const markId = `${optionId ?? `selector-item-${index}`}-mark`;
+
     const itemAvatar =
       avatar ?? (isGroup && isSystem ? <EveryoneIconUrl /> : "");
 
@@ -245,6 +250,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
         role={optionId ? "option" : undefined}
         aria-selected={optionId ? !!isSelected : undefined}
         aria-disabled={optionId && isItemDisabled ? true : undefined}
+        aria-describedby={mark ? `${markId}-description` : undefined}
         className={classNames(styles.selectorItem, {
           [styles.keyboardActive]: isActive,
           [styles.disabled]: isItemDisabled,
@@ -353,6 +359,37 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
             ) : null}
           </div>
         )}
+
+        {mark ? (
+          <>
+            <Text
+              className={styles.itemMark}
+              fontWeight={600}
+              fontSize="12px"
+              lineHeight="16px"
+              noSelect
+              data-tooltip-id={markId}
+              dataTestId={`selector-item-${index}-mark`}
+            >
+              {mark.label}
+            </Text>
+            <span id={`${markId}-description`} hidden>
+              {mark.description}
+            </span>
+            <Tooltip
+              id={markId}
+              place="bottom"
+              maxWidth="300px"
+              // The active row of the keyboard shows it as a hover does.
+              isOpen={isActive || isMarkHovered}
+              setIsOpen={setIsMarkHovered}
+            >
+              <Text fontSize="12px" fontWeight={400} noSelect>
+                {mark.description}
+              </Text>
+            </Tooltip>
+          </>
+        ) : null}
 
         {isDisabled && disabledText ? (
           <Text

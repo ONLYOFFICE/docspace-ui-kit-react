@@ -1,4 +1,10 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Selector } from "./Selector";
@@ -457,5 +463,58 @@ describe("<Selector /> keyboard", () => {
       ).toHaveBeenCalledOnce();
       expect(keyup).not.toHaveBeenCalled();
     });
+  });
+});
+
+describe("<Selector /> item mark", () => {
+  const marked = [
+    {
+      id: "1",
+      label: "First item",
+      mark: { label: "No key", description: "Cannot be invited yet." },
+    },
+    { id: "2", label: "Second item" },
+  ] as TSelectorItem[];
+
+  it("shows the label after the name of a marked row only", () => {
+    renderSelector({ items: marked, totalItems: 2 });
+
+    expect(screen.getByTestId("selector-item-0-mark")).toHaveTextContent(
+      "No key",
+    );
+    expect(screen.queryByTestId("selector-item-1-mark")).toBeNull();
+  });
+
+  it("describes the row with the reason", () => {
+    renderSelector({ items: marked, totalItems: 2 });
+
+    expect(screen.getByTestId("selector-item-0")).toHaveAccessibleDescription(
+      "Cannot be invited yet.",
+    );
+    expect(screen.getByTestId("selector-item-1")).not.toHaveAttribute(
+      "aria-describedby",
+    );
+  });
+
+  it("shows the reason on hovering the label", async () => {
+    renderSelector({ items: marked, totalItems: 2 });
+
+    fireEvent.mouseEnter(screen.getByTestId("selector-item-0-mark"));
+
+    await waitFor(() =>
+      expect(screen.getByRole("tooltip")).toHaveTextContent(
+        "Cannot be invited yet.",
+      ),
+    );
+  });
+
+  it("leaves a marked row selectable", () => {
+    const onSelect = vi.fn();
+    renderSelector({ items: marked, totalItems: 2, onSelect });
+
+    fireEvent.click(screen.getByTestId("selector-item-0"));
+
+    expect(onSelect).toHaveBeenCalledOnce();
+    expect(onSelect.mock.calls[0][0]).toMatchObject({ id: "1" });
   });
 });

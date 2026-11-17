@@ -2,7 +2,7 @@ import EmptyScreenPersonsLight from "../../assets/emptyFilter/empty.filter.peopl
 import EmptyScreenPersonsDark from "../../assets/emptyFilter/empty.filter.people.dark.svg";
 
 import axios from "axios";
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 
 import {
   Selector,
@@ -15,6 +15,7 @@ import {
   type TSelectorHeader,
   type TSelectorInfo,
   type TSelectorItem,
+  type TSelectorItemMark,
   type TSelectorSearch,
   type TSelectorTabs,
   type TSelectorWithAside,
@@ -209,6 +210,7 @@ const PeopleSelector = ({
   roomId,
 
   checkIfUserInvited,
+  getItemMarks,
 
   withGroups,
   isGroupsOnly,
@@ -243,6 +245,23 @@ const PeopleSelector = ({
   );
 
   const [itemsList, setItemsList] = useState<TSelectorItem[]>([]);
+  const [marks, setMarks] = useState<Record<string, TSelectorItemMark>>({});
+  const getItemMarksRef = useRef(getItemMarks);
+  getItemMarksRef.current = getItemMarks;
+
+  // The marks of a page are asked for once it is drawn; a page whose answer
+  // fails, or has not come yet, shows none.
+  const requestMarks = useCallback((people: EmployeeFullDto[]) => {
+    const getMarks = getItemMarksRef.current;
+    if (!getMarks || people.length === 0) return;
+    getMarks(people).then(
+      (pageMarks) => {
+        if (pageMarks && Object.keys(pageMarks).length > 0)
+          setMarks((current) => ({ ...current, ...pageMarks }));
+      },
+      () => {},
+    );
+  }, []);
   const [searchValue, setSearchValue] = useState("");
   const [total, setTotal] = useState<number>(-1);
   const [hasNextPage, setHasNextPage] = useState(true);
@@ -463,10 +482,15 @@ const PeopleSelector = ({
         // pages are asked for until one brings a row or the portal has no
         // more. By the rows loaded, not the rows drawn; an empty answer ends
         // the list whatever the total says.
+        const pagePeople = new Map<string, EmployeeFullDto>();
+
         while (hasMore && pageItems.length === 0) {
           const page = await loadPage(loaded);
 
           responseTotal = page.responseTotal;
+
+          for (const item of page.items)
+            if ("displayName" in item && item.id) pagePeople.set(item.id, item);
 
           const data = page.items
             .filter((item) => {
@@ -502,6 +526,13 @@ const PeopleSelector = ({
         }
 
         const newTotal = responseTotal - dropped;
+
+        requestMarks(
+          pageItems.flatMap((item) => {
+            const person = item.id ? pagePeople.get(String(item.id)) : null;
+            return person ? [person] : [];
+          }),
+        );
 
         if (startIndex === 0) {
           setItemsList(
@@ -563,8 +594,18 @@ const PeopleSelector = ({
       groupSearchApi,
       groupApi,
       disabledInvitedText,
+      requestMarks,
       t,
     ],
+  );
+
+  const markedItems = useMemo(
+    () =>
+      itemsList.map((item) => {
+        const mark = item.id != null ? marks[String(item.id)] : undefined;
+        return mark ? { ...item, mark } : item;
+      }),
+    [itemsList, marks],
   );
 
   const resetSelectorList = useCallback(() => {
@@ -790,7 +831,7 @@ const PeopleSelector = ({
       aria-label={ariaLabel || "People Selector"}
       data-selector-type={dataSelectorType || "people"}
       dataTestId={dataTestId || "people-selector"}
-      items={itemsList}
+      items={markedItems}
       submitButtonLabel={submitButtonLabel || t("SelectAction")}
       onSubmit={onSubmit}
       disableSubmitButton={disableSubmitButton || !selectedItems.length}

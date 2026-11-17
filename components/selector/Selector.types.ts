@@ -979,6 +979,17 @@ type TSelectorItemType =
   | TSelectorItemInput
   | TSelectorItemMCP;
 
+/** A short text shown after the name of a row, and the reason for it. */
+export type TSelectorItemMark = {
+  /** Shown in the row, after the name. */
+  label: string;
+  /**
+   * The row's description for assistive technology, and the tooltip of the
+   * label.
+   */
+  description: string;
+};
+
 export type TSelectorItem = TSelectorItemType & {
   /** Text of the row. The only field every kind of item must carry. */
   label: string;
@@ -1001,6 +1012,11 @@ export type TSelectorItem = TSelectorItemType & {
   isDisabled?: boolean;
   /** Text shown at the end of a disabled row, saying why. */
   disabledText?: string;
+  /**
+   * A text after the name that leaves the row selectable, with its reason
+   * as the row's description.
+   */
+  mark?: TSelectorItemMark;
   /** Tooltip about the file's lifetime. */
   lifetimeTooltip?: string | null;
   /** Link the row's title opens. */
