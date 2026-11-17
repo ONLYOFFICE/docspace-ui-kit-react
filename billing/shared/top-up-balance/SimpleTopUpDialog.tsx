@@ -127,16 +127,11 @@ const SimpleTopUpDialogContent = observer(
       return () => observer.disconnect();
     }, []);
 
-    const onPromoCodeApplied = async (isPending: boolean) => {
-      if (!isPending) await onConfirm?.();
-      onClose();
-    };
-
     const promoCode = usePromoCode({
       applyPromoCode,
       formatWalletCurrency,
       language,
-      onApplied: onPromoCodeApplied,
+      onApplied: onClose,
     });
 
     const hasPromoTab = Boolean(applyPromoCode);
