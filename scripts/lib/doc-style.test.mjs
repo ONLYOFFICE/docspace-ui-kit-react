@@ -1,6 +1,9 @@
 // The style warnings are only as good as the counting under them: a split that
 // breaks on `ModalDialog.Header` makes every sentence look short, and a
 // tautology test that misses a stem lets "Disables the button" through.
+import fs from "node:fs";
+import path from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import {
@@ -13,6 +16,35 @@ import {
   storyTexts,
   wordCount,
 } from "./doc-style.mjs";
+
+// Table B of the rule is what a writer reads, LIMITS what the check applies;
+// the two are kept in step here rather than trusted to.
+describe("LIMITS", () => {
+  const rule = fs.readFileSync(
+    path.resolve(import.meta.dirname, "../../.claude/rules/doc-writing.md"),
+    "utf8",
+  );
+  const ceilingOf = (piece) => {
+    const row = rule
+      .split("\n")
+      .find((line) => line.startsWith("|") && line.includes(piece));
+    return Number(/(\d+) words\s*\|\s*$/.exec(row ?? "")?.[1]);
+  };
+
+  it.each([
+    ["README lead paragraph", "lead"],
+    ["`Use this when / not when` bullet", "whenBullet"],
+    ["a prop's JSDoc", "prop"],
+    ["an `argTypes` description", "argType"],
+    ["a `description.story`", "story"],
+    ["`Behaviour the types don't state` bullet", "behaviourBullet"],
+    ["an `Accessibility` bullet", "accessibility"],
+    ["Effect cell", "cssEffect"],
+    ["any sentence", "sentence"],
+  ])("matches table B for %s", (piece, key) => {
+    expect(ceilingOf(piece)).toBe(LIMITS[key]);
+  });
+});
 
 describe("wordCount", () => {
   it("counts a code span as one word and a link by its text", () => {
@@ -33,6 +65,18 @@ describe("sentences", () => {
         "Reads `api/2.0/files` once, e.g. on mount. Then it waits for `onClose`.",
       ),
     ).toHaveLength(2);
+  });
+
+  it("ends a sentence at a list item and a blank line", () => {
+    expect(
+      sentences(
+        "Two kinds of button:\n\n- **Primary** the main one\n- Secondary all the rest",
+      ),
+    ).toEqual([
+      "Two kinds of button:",
+      "Primary the main one",
+      "Secondary all the rest",
+    ]);
   });
 
   it("drops one-word fragments", () => {

@@ -61,10 +61,19 @@ export const wordCount = (text) =>
     .split(" ")
     .filter((word) => /[\p{L}\p{N}]/u.test(word)).length;
 
-/** The sentences of a text; a fragment of fewer than two words is dropped. */
+/**
+ * The sentences of a text; a fragment of fewer than two words is dropped. A
+ * blank line and a list item end a sentence too, so a story description whose
+ * bullets carry no full stop is not read as one long sentence.
+ */
 export const sentences = (text) =>
-  plain(text)
-    .split(/(?<=[.!?])\s+(?=[\p{Lu}\p{N}"(])/u)
+  text
+    .split(/\n\s*\n|\n(?=\s*(?:[-*+]|\d+\.)\s)/)
+    .flatMap((block) =>
+      plain(block.replace(/^\s*(?:[-*+]|\d+\.)\s+/, "")).split(
+        /(?<=[.!?])\s+(?=[\p{Lu}\p{N}"(])/u,
+      ),
+    )
     .map((part) => part.trim())
     .filter((part) => wordCount(part) >= 2);
 

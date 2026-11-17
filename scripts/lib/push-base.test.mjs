@@ -9,7 +9,7 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { touchesBuild } from "./build-inputs.mjs";
-import { changesSince, findPushBase } from "./push-base.mjs";
+import { changesSince, findBranchBase, findPushBase } from "./push-base.mjs";
 
 let dir;
 
@@ -91,6 +91,27 @@ describe("findPushBase", () => {
   it("returns null with nothing to compare with", () => {
     commit("a");
     expect(findPushBase(dir)).toBeNull();
+  });
+});
+
+describe("findBranchBase", () => {
+  it("ignores the upstream and returns the branch's parent", () => {
+    const root = commit("a");
+    remoteRef("origin/master", root);
+    git("switch", "-q", "-c", "feature");
+    const pushed = commit("b");
+    remoteRef("origin/feature", pushed);
+    git("config", "remote.origin.url", dir);
+    git("config", "remote.origin.fetch", "+refs/heads/*:refs/remotes/origin/*");
+    git("config", "branch.feature.remote", "origin");
+    git("config", "branch.feature.merge", "refs/heads/feature");
+    commit("c");
+
+    expect(findBranchBase(dir)).toEqual({
+      sha: root,
+      ref: "origin/master",
+      ahead: 2,
+    });
   });
 });
 

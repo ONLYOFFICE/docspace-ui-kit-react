@@ -39,7 +39,7 @@ import {
   storyTexts,
   wordCount,
 } from "./lib/doc-style.mjs";
-import { changesSince, findPushBase } from "./lib/push-base.mjs";
+import { changesSince, findBranchBase } from "./lib/push-base.mjs";
 import {
   ROOT,
   createExampleProgram,
@@ -515,54 +515,71 @@ const propStyle = (prop, component) => {
   ];
 };
 
-/** Style findings for the story files beside a README. */
-const storyStyle = (folder, component) => {
-  const dir = path.join(ROOT, folder);
-  if (!fs.existsSync(dir)) return [];
+/**
+ * The story files a README documents: its own folder's and those of every
+ * subfolder without a README of its own -- the table's parts and the
+ * skeletons keep theirs a level or two down. A subfolder with a README is a
+ * documented folder of its own and is checked as one.
+ */
+const storyFilesOf = (folder) => {
+  const found = [];
 
-  return fs
-    .readdirSync(dir)
-    .filter((name) => name.endsWith(".stories.tsx"))
-    .flatMap((name) => {
-      const file = `${folder}/${name}`;
-      const source = fs.readFileSync(path.join(dir, name), "utf8");
+  const walk = (relative) => {
+    const dir = path.join(ROOT, relative);
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const child = `${relative}/${entry.name}`;
+      if (entry.isDirectory()) {
+        if (!fs.existsSync(path.join(ROOT, child, "README.md"))) walk(child);
+      } else if (entry.name.endsWith(".stories.tsx")) {
+        found.push(child);
+      }
+    }
+  };
 
-      return storyTexts(source, name).flatMap(
-        ({ kind, name: owner, text, line }) =>
-          kind === "story"
-            ? [
-                ...lengthFinding(
-                  text,
-                  LIMITS.story,
-                  `\`${owner}\`'s story description`,
-                  file,
-                  line,
-                ),
-                ...sentenceFindings(text, file, line),
-              ]
-            : [
-                ...lengthFinding(
-                  text,
-                  LIMITS.argType,
-                  `the \`${owner}\` argTypes description`,
-                  file,
-                  line,
-                ),
-                ...sentenceFindings(text, file, line),
-                ...(owner && isTautological(owner, text, component)
-                  ? [
-                      {
-                        code: "W_TAUTOLOGICAL_PROP",
-                        file,
-                        line,
-                        message: `the \`${owner}\` argTypes description restates the prop's name`,
-                      },
-                    ]
-                  : []),
-              ],
-      );
-    });
+  if (fs.existsSync(path.join(ROOT, folder))) walk(folder);
+  return found;
 };
+
+/** Style findings for the story files a README documents. */
+const storyStyle = (folder, component) =>
+  storyFilesOf(folder).flatMap((file) => {
+    const source = fs.readFileSync(path.join(ROOT, file), "utf8");
+
+    return storyTexts(source, path.posix.basename(file)).flatMap(
+      ({ kind, name: owner, text, line }) =>
+        kind === "story"
+          ? [
+              ...lengthFinding(
+                text,
+                LIMITS.story,
+                `\`${owner}\`'s story description`,
+                file,
+                line,
+              ),
+              ...sentenceFindings(text, file, line),
+            ]
+          : [
+              ...lengthFinding(
+                text,
+                LIMITS.argType,
+                `the \`${owner}\` argTypes description`,
+                file,
+                line,
+              ),
+              ...sentenceFindings(text, file, line),
+              ...(owner && isTautological(owner, text, component)
+                ? [
+                    {
+                      code: "W_TAUTOLOGICAL_PROP",
+                      file,
+                      line,
+                      message: `the \`${owner}\` argTypes description restates the prop's name`,
+                    },
+                  ]
+                : []),
+            ],
+    );
+  });
 
 /**
  * The documented folders the branch changed, each file credited to the deepest
@@ -570,7 +587,7 @@ const storyStyle = (folder, component) => {
  * which leaves every style warning in the summary line rather than failing.
  */
 const touchedFolders = (folders) => {
-  const base = findPushBase(ROOT);
+  const base = findBranchBase(ROOT);
   const changed = base ? changesSince(ROOT, base.sha) : null;
   if (!changed) return new Set();
 
