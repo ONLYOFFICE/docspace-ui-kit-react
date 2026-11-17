@@ -33,7 +33,7 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
     availableCredits,
     walletCodeCurrency,
     isCardLinkedToPortal,
-    isPayer,
+    canUpdateTariff,
     recommendedAmount,
     isAutoPaymentExist,
     autoPayments,
@@ -150,7 +150,7 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
           language={language}
           withoutMargin
         />
-        {isPayer ? (
+        {canUpdateTariff ? (
           <div className={styles.cardButtons}>
             <Button
               size={isMobile ? ButtonSize.normal : ButtonSize.small}
