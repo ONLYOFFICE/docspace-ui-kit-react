@@ -15,6 +15,18 @@ const IMAGE_EXTENSIONS = new Set([
 ]);
 
 /**
+ * The portal file id an attachment's `path` names: ASC.AI.Chat stores a
+ * portal file as `"<fileId>/<title>"`. `null` for a path that names none
+ * (a device upload kept inline, or no path at all).
+ */
+export const fileIdOfPath = (path: string | undefined): number | null => {
+  if (!path) return null;
+  const [idPart] = path.split(/[\\/]/, 1);
+  const fileId = Number(idPart);
+  return Number.isInteger(fileId) && fileId > 0 ? fileId : null;
+};
+
+/**
  * Opens a chat attachment in the portal. Wired into the chat library's
  * `platform.file.openFile`, which fires when the user clicks a file chip
  * on a sent message.
@@ -28,9 +40,8 @@ const IMAGE_EXTENSIONS = new Set([
 export const openAttachedFile = (path: string, name: string): void => {
   if (typeof window === "undefined") return;
 
-  const [idPart] = path.split(/[\\/]/, 1);
-  const fileId = Number(idPart);
-  if (!Number.isInteger(fileId) || fileId <= 0) {
+  const fileId = fileIdOfPath(path);
+  if (fileId === null) {
     console.warn(
       `[ai-agent] openFile: cannot parse a file id from path "${path}"`,
     );

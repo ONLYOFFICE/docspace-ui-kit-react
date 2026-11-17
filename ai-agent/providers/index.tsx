@@ -40,6 +40,7 @@ import {
 } from "@onlyoffice/ai-chat";
 import type {
   ChatCallbacks,
+  GeneratedImageAction,
   HostTool,
   Profile,
   ProfilePickerAction,
@@ -124,6 +125,7 @@ import {
 import { CHAT_ATTACHMENT_LIMIT } from "./files/limits";
 import { uploadFilesToChat } from "./files/upload-files";
 import { openAttachedFile } from "./files/open-file";
+import { saveToRoomImageAction } from "./files/save-to-room";
 import { useComposerSourceLists } from "./files/use-composer-sources";
 
 // The host app (DocSpace) uses `i18n.createInstance()` and provides that
@@ -748,6 +750,7 @@ const AiAgentProviders = ({
     onAddContextFolder,
     onOpenContextRoom,
     onSaveAsFile,
+    onSaveToRoom,
     exportFormats,
     overlay,
   } = useFilesIntegration({
@@ -1178,6 +1181,17 @@ const AiAgentProviders = ({
     ],
   );
 
+  // The footer of a generated image's card, after its Download.
+  const generatedImageActions = useMemo<GeneratedImageAction[]>(
+    () => [
+      saveToRoomImageAction(
+        t("Common:SaveToRoom", { defaultValue: "Save to room..." }),
+        onSaveToRoom,
+      ),
+    ],
+    [t, onSaveToRoom],
+  );
+
   const ownCallbacks = useMemo<ChatCallbacks>(
     () => analyzeModeCallbacks(aiChatStore),
     [aiChatStore],
@@ -1291,6 +1305,7 @@ const AiAgentProviders = ({
       // text: an image as a preview with its name, any other file as a chip
       // with its type icon and name.
       userAttachmentsPlacement: "inside",
+      generatedImageActions,
     }),
     [
       composerActions,
@@ -1321,6 +1336,7 @@ const AiAgentProviders = ({
       onOpenContextRoom,
       sourcesManager,
       chatAgent,
+      generatedImageActions,
       composerKnowledge,
       composerDataSources,
       t,

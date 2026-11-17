@@ -19,6 +19,7 @@ import ContextRoomsDialog, {
   type ContextRoomsKind,
 } from "./context-rooms-dialog";
 import SaveDialog from "./save-dialog";
+import CopyToRoomDialog, { type CopyToRoomFile } from "./copy-to-room-dialog";
 import { CONTEXT_ROOM_CLOUD } from "../context-room/ContextRoomSync";
 import { EXPORT_FORMAT_IDS, EXTENSION_BY_FORMAT } from "./export-format";
 import styles from "./styles.module.scss";
@@ -41,6 +42,9 @@ export type FilesIntegration = {
   ) => void;
   // Message "Save as file" handler, wired into platform.file.saveAsFile.
   onSaveAsFile: SaveAsFileHandler;
+  // "Save to room..." on a file a reply produced: the folder selector, then
+  // a copy of the file in the room or folder picked.
+  onSaveToRoom: (file: CopyToRoomFile) => void;
   // Thread export formats, wired into platform.file.getExportFormats.
   exportFormats: ExportFormat[];
   // Dialogs + hidden device-upload input; render inside <AiAgentProviders> so
@@ -159,6 +163,16 @@ export const useFilesIntegration = ({
     [t, i18n.language],
   );
 
+  // The file "Save to room..." is copying; `null` while the selector is closed.
+  const [copyRequest, setCopyRequest] = React.useState<CopyToRoomFile | null>(
+    null,
+  );
+  const onSaveToRoom = React.useCallback(
+    (file: CopyToRoomFile) => setCopyRequest(file),
+    [],
+  );
+  const closeCopy = React.useCallback(() => setCopyRequest(null), []);
+
   const finishSave = React.useCallback(() => {
     setSaveRequest((prev) => {
       prev?.resolve();
@@ -214,6 +228,9 @@ export const useFilesIntegration = ({
           onFinish={finishSave}
         />
       ) : null}
+      {copyRequest ? (
+        <CopyToRoomDialog file={copyRequest} onClose={closeCopy} />
+      ) : null}
       <DeviceUploader
         ref={deviceUploaderRef}
         entityId={entityId}
@@ -229,6 +246,7 @@ export const useFilesIntegration = ({
     onAddContextFolder,
     onOpenContextRoom,
     onSaveAsFile,
+    onSaveToRoom,
     exportFormats,
     overlay,
   };
