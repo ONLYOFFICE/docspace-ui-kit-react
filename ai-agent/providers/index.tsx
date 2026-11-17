@@ -46,6 +46,7 @@ import type {
   ProviderType,
   ServerAPIConfig,
   Suggestion,
+  ThreadSourceList,
   ToolCallApproveContext,
   WebSearchProviderId,
 } from "@onlyoffice/ai-chat";
@@ -68,6 +69,7 @@ import { AiChatAvailabilityContext } from "./availability";
 import { ChatIntro } from "../chat-intro";
 import { AnalyzeIntro } from "../new-chat/components/analyze-intro";
 import { storageAdapter } from "./storage";
+import { settingsAdapter } from "./settings";
 import { usePlatformAdapter } from "./platform";
 import { componentOverrides } from "./components-overrides";
 import { imageOverrides } from "./images-overrides";
@@ -320,6 +322,14 @@ type AiAgentProvidersProps = {
    * travel as a header.
    */
   serverApi?: AiServerApi;
+  /**
+   * The signed-in user's id. The chat remembers the skill sets, knowledge
+   * bases and data sources connected to each conversation in the browser's
+   * storage, and brings them back when the conversation is opened again,
+   * after a reload as well; the id keeps the records of the users of one
+   * browser profile apart. Without it one set of records serves them all.
+   */
+  userId?: string;
   children: ReactNode;
 };
 
@@ -468,6 +478,10 @@ const EDITOR_TOOL_NAME_BY_CHAT_TOOL: Record<string, string> = {
 // returns it in the tool result. We hide the "Always allow" checkbox for them
 // (one-off confirmation only) and open the generated file once approved.
 const GENERATE_TOOL_NAMES = Object.keys(EDITOR_TOOL_NAME_BY_CHAT_TOOL);
+
+// The lists an agent sets for every conversation it runs: its skill sets and
+// knowledge bases (`WidgetConfig.hostOwnedSources`).
+const HOST_OWNED_SOURCES: ThreadSourceList[] = ["skillSets", "knowledgeBases"];
 
 // The chat tool name of the tool-call the approval dialog is currently
 // showing, or undefined when no call is pending.
@@ -634,6 +648,7 @@ const AiAgentProviders = ({
   contextRoom,
   attachmentLimit,
   serverApi,
+  userId,
   children,
 }: AiAgentProvidersProps) => {
   const { t } = useTranslation("Common");
@@ -758,7 +773,7 @@ const AiAgentProviders = ({
   // and "Manage knowledge bases" opens the project's settings - or is left
   // out for a user who may not change them. An ordinary chat picks its own
   // in the room selector.
-  const knowledgeOwned = !!sourcesManager;
+  const sourcesOwned = !!sourcesManager;
   const onManageKnowledge = sourcesManager
     ? (sourcesManager.onManage ?? undefined)
     : onPickKnowledgeRooms;
@@ -946,10 +961,26 @@ const AiAgentProviders = ({
       // has to be set here — `WidgetConfig.enablePagination` only reaches
       // the stores the library builds for itself.
       enablePagination: true,
+      // The skill sets, knowledge bases and data sources of each
+      // conversation are kept in the browser's storage, per user, and come
+      // back when the conversation is opened again (or the page reloads);
+      // the thread storage has no field for them. Not during SSR, which
+      // has no storage to read.
+      threadSources:
+        typeof window === "undefined"
+          ? undefined
+          : { storage: settingsAdapter, scope: userId || undefined },
     });
 
     return { stores: appStores, ctx: appCtx, serverApiConfig: config };
-  }, [isStandalone, platform, aiChatStore, serverOrigin, serverHeadersKey]);
+  }, [
+    isStandalone,
+    platform,
+    aiChatStore,
+    serverOrigin,
+    serverHeadersKey,
+    userId,
+  ]);
 
   // The "+" menu's Skill sets and Knowledge bases: the connected rooms and
   // the room selector that manages them.
@@ -1233,13 +1264,18 @@ const AiAgentProviders = ({
       // The slash menu's "Manage knowledge bases" (the "+" menu's list is
       // built above, in `composerKnowledge`).
       onPickKnowledgeRooms: onManageKnowledge,
-      hideKnowledgeDisconnect: knowledgeOwned,
+      hideKnowledgeDisconnect: sourcesOwned,
       onOpenKnowledgeRoom: onOpenContextRoom,
       // The slash menu's "Manage sources": one more folder or room as a
       // data source, the same selector the "+" menu's Data sources opens.
       // The "+" menu's own list is `composerDataSources`, so this adds no
       // Folder slot to it.
       onPickFolderContext: onAddContextFolder,
+      // Inside an agent its skill sets and knowledge bases are its settings,
+      // set for every conversation: a conversation opened again does not
+      // bring back its own copy of them. Its data sources stay the user's
+      // own and come back with it.
+      hostOwnedSources: sourcesOwned ? HOST_OWNED_SOURCES : undefined,
     }),
     [
       composerActions,
@@ -1265,7 +1301,7 @@ const AiAgentProviders = ({
       skillSetsLocked,
       onDisconnectContextRoom,
       onManageKnowledge,
-      knowledgeOwned,
+      sourcesOwned,
       onAddContextFolder,
       onOpenContextRoom,
       composerSkills,
