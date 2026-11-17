@@ -1,7 +1,7 @@
 {
   "entry": "index.ts",
   "package": "@onlyoffice/apps-ui-kit",
-  "total": 718,
+  "total": 719,
   "values": 467,
   "exports": {
     "ADMIN": {
@@ -1863,6 +1863,10 @@
       "origin": "components/selector"
     },
     "TSelectorItemMCP": {
+      "kind": "type",
+      "origin": "components/selector"
+    },
+    "TSelectorItemMark": {
       "kind": "type",
       "origin": "components/selector"
     },
