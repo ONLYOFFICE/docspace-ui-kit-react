@@ -303,6 +303,8 @@ export function PasswordWithButton() {
 - **Two fields on one page need distinct `id`s.** The tooltip is anchored by a selector built
   from `id` or, failing that, `inputName` — which defaults to `passwordInput` for everyone. Two
   fields without ids share one anchor and the tooltip attaches to the wrong field.
+- **The tooltip is anchored to the whole field**, reveal button included, so on the right or the
+  left (`tooltipPasswordPlace`) it opens past the button rather than over it.
 - **`simpleView` disables validation, not just the tooltip.** The change handler stores the value
   and returns before checking, so `onValidateInput` never fires and the strength state stays at
   its initial value.

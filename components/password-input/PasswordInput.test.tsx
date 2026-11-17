@@ -312,6 +312,68 @@ describe("<PasswordInput />", () => {
         expect(tooltip).toHaveClass("react-tooltip__place-right"),
       );
     });
+
+    it("anchors the rules tooltip to the whole field, reveal button included", async () => {
+      // jsdom lays nothing out: in a 1024 x 768 page the field is 300px wide,
+      // its text input the first 260px of it, the reveal button the rest.
+      const rect = (width: number, height: number) =>
+        ({
+          x: 0,
+          y: 0,
+          top: 0,
+          left: 0,
+          right: width,
+          bottom: height,
+          width,
+          height,
+          toJSON: () => ({}),
+        }) as DOMRect;
+      // floating-ui watches a laid-out anchor with an IntersectionObserver,
+      // which jsdom does not provide.
+      vi.stubGlobal(
+        "IntersectionObserver",
+        class {
+          observe() {}
+
+          unobserve() {}
+
+          disconnect() {}
+
+          takeRecords() {
+            return [];
+          }
+        },
+      );
+      const root = document.documentElement;
+      const page = { clientWidth: 1024, clientHeight: 768 };
+      for (const [key, value] of Object.entries(page))
+        Object.defineProperty(root, key, { configurable: true, value });
+      const original = Element.prototype.getBoundingClientRect;
+      Element.prototype.getBoundingClientRect = function getRect(
+        this: Element,
+      ) {
+        if (this === root || this === document.body) return rect(1024, 768);
+        if (this.getAttribute("data-testid") === "tooltipContent")
+          return rect(300, 32);
+        if (this.tagName === "INPUT") return rect(260, 32);
+        return rect(100, 50);
+      };
+
+      try {
+        const tooltip = await openRulesTooltip({
+          tooltipPasswordPlace: "right",
+        });
+
+        await waitFor(() =>
+          expect(parseFloat(tooltip.style.left)).toBeGreaterThanOrEqual(300),
+        );
+      } finally {
+        Element.prototype.getBoundingClientRect = original;
+        for (const key of Object.keys(page))
+          delete (root as unknown as Record<string, unknown>)[key];
+        vi.unstubAllGlobals();
+      }
+    });
   });
 
   it("handles custom autocomplete attribute", () => {

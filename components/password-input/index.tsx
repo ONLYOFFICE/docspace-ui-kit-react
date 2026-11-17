@@ -423,7 +423,7 @@ const PasswordInput = ({
             place={tooltipPasswordPlace}
             clickable
             openOnClick
-            anchorSelect={`div[id='tooltipContent-${id || inputName}'] input`}
+            anchorSelect={`div[id='tooltipContent-${id || inputName}']`}
             ref={refTooltip}
             imperativeModeOnly
           >
