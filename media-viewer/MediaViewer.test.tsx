@@ -11,6 +11,8 @@ import {
 
 import MediaViewer from "./MediaViewer";
 import { getFileExtension } from "./utils/common";
+import { decodeTiff } from "./utils/decodeTiff";
+import { ViewerWrapper } from "./sub-components/ViewerWrapper";
 import {
   getDesktopMediaContextModel,
   getMobileMediaContextModel,
@@ -31,6 +33,8 @@ vi.mock("./utils/common", async () => {
     getFileExtension: vi.fn((filename) => filename.split(".").pop()),
   };
 });
+
+vi.mock("./utils/decodeTiff", () => ({ decodeTiff: vi.fn() }));
 
 vi.mock("./sub-components/ViewerWrapper", () => ({
   ViewerWrapper: vi.fn(
@@ -517,6 +521,150 @@ describe("MediaViewer", () => {
         (name: string) => name.split(".").pop() ?? "",
       );
     }
+  });
+});
+
+describe("MediaViewer reading a file", () => {
+  const lastWrapperProps = () => vi.mocked(ViewerWrapper).mock.lastCall?.[0];
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(getFileExtension).mockImplementation(
+      (name: string) => `.${name.split(".").pop()}`,
+    );
+    Object.defineProperty(URL, "createObjectURL", {
+      value: vi.fn(() => "blob:file"),
+      configurable: true,
+    });
+    Object.defineProperty(URL, "revokeObjectURL", {
+      value: vi.fn(),
+      configurable: true,
+    });
+  });
+
+  afterEach(() => {
+    vi.mocked(getFileExtension).mockImplementation(
+      (name: string) => name.split(".").pop() ?? "",
+    );
+    Reflect.deleteProperty(URL, "createObjectURL");
+    Reflect.deleteProperty(URL, "revokeObjectURL");
+    vi.unstubAllGlobals();
+  });
+
+  const encryptedItem = (title: string) =>
+    createMockProps({
+      playlist: [{ ...mockPlaylistItem, id: 0, title, encrypted: true }],
+      files: [{ ...mockFile, title }],
+      playlistPos: 0,
+    });
+
+  it("converts a TIFF that comes through decryptFile", async () => {
+    const decoded = new Blob(["png"], { type: "image/png" });
+    vi.mocked(decodeTiff).mockResolvedValue(decoded);
+    const decryptFile = vi.fn().mockResolvedValue({ data: new Blob(["x"]) });
+    const bytes = new ArrayBuffer(1);
+    Object.defineProperty(Blob.prototype, "arrayBuffer", {
+      value: async () => bytes,
+      configurable: true,
+    });
+
+    try {
+      render(
+        <MediaViewer
+          {...encryptedItem("scan.tiff")}
+          decryptFile={decryptFile}
+        />,
+      );
+
+      await waitFor(() =>
+        expect(URL.createObjectURL).toHaveBeenCalledWith(decoded),
+      );
+      expect(decodeTiff).toHaveBeenCalledWith(bytes);
+    } finally {
+      Reflect.deleteProperty(Blob.prototype, "arrayBuffer");
+    }
+  });
+
+  it("shows the media error for a file that is only read through decryptFile", async () => {
+    const onDecryptionError = vi.fn();
+    const decryptFile = vi.fn().mockRejectedValue(new Error("Forbidden"));
+
+    render(
+      <MediaViewer
+        {...encryptedItem("photo.jpg")}
+        decryptFile={decryptFile}
+        onDecryptionError={onDecryptionError}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(lastWrapperProps()?.decryptionError).toBe("Common:MediaError"),
+    );
+    expect(onDecryptionError).not.toHaveBeenCalled();
+  });
+
+  it("shows the decryption error for an encrypted file", async () => {
+    const onDecryptionError = vi.fn();
+    const decryptFile = vi.fn().mockRejectedValue(new Error("Bad key"));
+    const props = encryptedItem("photo.jpg");
+
+    render(
+      <MediaViewer
+        {...props}
+        files={[{ ...props.files[0], encrypted: true }]}
+        decryptFile={decryptFile}
+        onDecryptionError={onDecryptionError}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(onDecryptionError).toHaveBeenCalledWith("Bad key"),
+    );
+    expect(lastWrapperProps()?.decryptionError).toBe(
+      "Common:EncryptionDecryptPartialFailed",
+    );
+  });
+
+  it("drops a TIFF decoded after the viewer moved to the next file", async () => {
+    let finishDecoding: (blob: Blob) => void = () => {};
+    vi.mocked(decodeTiff).mockReturnValue(
+      new Promise((resolve) => {
+        finishDecoding = resolve;
+      }),
+    );
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValue({ arrayBuffer: async () => new ArrayBuffer(1) }),
+    );
+
+    const playlist = [
+      { ...mockPlaylistItem, id: 0, fileId: 1, src: "a.tiff", title: "a.tiff" },
+      { ...mockPlaylistItem, id: 1, fileId: 2, src: "b.jpg", title: "b.jpg" },
+    ];
+    const props = createMockProps({
+      playlist,
+      files: playlist.map((item) => ({
+        ...mockFile,
+        id: item.fileId,
+        title: item.title,
+      })),
+      playlistPos: 0,
+    });
+
+    const { rerender } = render(<MediaViewer {...props} />);
+
+    await waitFor(() => expect(decodeTiff).toHaveBeenCalledTimes(1));
+
+    rerender(<MediaViewer {...props} playlistPos={1} currentFileId={2} />);
+
+    await act(async () => {
+      finishDecoding(new Blob(["a"]));
+    });
+
+    expect(URL.createObjectURL).not.toHaveBeenCalled();
+    expect(lastWrapperProps()?.fileUrl).toBe("b.jpg");
   });
 });
 

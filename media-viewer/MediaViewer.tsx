@@ -29,6 +29,19 @@ import {
 
 import "./MediaViewer.theme.scss";
 
+const convertImage = async (blob: Blob, extension: string) => {
+  if (isTiff(extension)) return decodeTiff(await blob.arrayBuffer());
+
+  if (isHeic(extension)) {
+    const { default: heic2any } = await import("heic2any");
+    const result = await heic2any({ blob });
+
+    return Array.isArray(result) ? null : result;
+  }
+
+  return blob;
+};
+
 const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
   const {
     files,
@@ -331,12 +344,15 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
 
   const fetchAndSetTiffDataURL = useCallback((src: string) => {
     TiffAbortSignalRef.current?.abort();
-    TiffAbortSignalRef.current = new AbortController();
+    const controller = new AbortController();
+    TiffAbortSignalRef.current = controller;
 
-    fetch(src, { signal: TiffAbortSignalRef.current.signal })
+    fetch(src, { signal: controller.signal })
       .then((response) => response.arrayBuffer())
       .then(async (response) => {
         const blob = await decodeTiff(response);
+
+        if (controller.signal.aborted) return;
 
         if (blob) {
           setFileUrl(URL.createObjectURL(blob));
@@ -353,15 +369,16 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
 
   const fetchAndSetHeicDataURL = useCallback(async (src: string) => {
     HeicAbortSignalRef.current?.abort();
-    HeicAbortSignalRef.current = new AbortController();
+    const controller = new AbortController();
+    HeicAbortSignalRef.current = controller;
 
     try {
       const { default: heic2any } = await import("heic2any");
-      const response = await fetch(src, {
-        signal: HeicAbortSignalRef.current.signal,
-      });
+      const response = await fetch(src, { signal: controller.signal });
       const blob = await response.blob();
       const conversionResult = await heic2any({ blob });
+
+      if (controller.signal.aborted) return;
 
       if (conversionResult && !Array.isArray(conversionResult)) {
         setFileUrl(URL.createObjectURL(conversionResult));
@@ -465,16 +482,35 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
             ? decryptedBlob.type
             : "";
         const mimeType =
-          blobType || mimeTypes[ext] || "application/octet-stream";
+          blobType ||
+          mimeTypes[ext.replace(/^\./, "")] ||
+          "application/octet-stream";
 
         const typedBlob = new Blob([decryptedBlob], { type: mimeType });
-        setFileUrl(URL.createObjectURL(typedBlob));
+        const viewableBlob = await convertImage(typedBlob, ext);
+        if (isStale()) return;
+        if (!viewableBlob) {
+          throw new Error("The image could not be converted");
+        }
+
+        setFileUrl(URL.createObjectURL(viewableBlob));
       } catch (error) {
         if (isStale()) return;
         if (error instanceof Error) {
           if (error.name === "AbortError") {
             return;
           }
+
+          const isEncryptedFile =
+            filesRef.current.find((file) => file.id === fileId)?.encrypted ===
+            true;
+
+          if (!isEncryptedFile) {
+            console.error("[MediaViewer] File read error:", error.message);
+            setDecryptionError(t("Common:MediaError"));
+            return;
+          }
+
           console.error("[MediaViewer] Decryption error:", error.message);
           onDecryptionError?.(error.message);
           setDecryptionError(

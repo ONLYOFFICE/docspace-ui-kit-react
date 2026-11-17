@@ -13,7 +13,7 @@ The media files of one portal folder or room in the viewer, with previous / next
 - A change of `folderId` or `requestToken` starts over.
 - It renders the loader until the first answer, so the viewer itself never renders on the server.
 - `folderId` takes the portal's alias `@my` for the user's own documents.
-- On the portal's own origin the files are shown straight from their `viewUrl`: the browser sends the session with the request. When the `ApiProvider` points at a portal on another origin, a media element cannot carry the key and the portal answers 403, so each file is read through the API client and shown from memory. The whole file is downloaded before it plays, TIFF and HEIC are not converted on that path, and a failed read shows the viewer's decryption error.
+- On the portal's own origin the files are shown straight from their `viewUrl`: the browser sends the session with the request. When the `ApiProvider` points at a portal on another origin, a media element cannot carry the key and the portal answers 403, so each file is read through the API client and shown from memory. The whole file is downloaded before it plays, TIFF and HEIC are converted as on the portal's own origin, and a failed read shows the viewer's media error.
 
 | Property                | Type                                                            | Required | Default | Description                                                                |
 | ----------------------- | --------------------------------------------------------------- | -------- | ------- | -------------------------------------------------------------------------- |
@@ -54,7 +54,7 @@ A full-screen viewer for the images, video, audio and PDF files of a playlist, w
 
 ## What the consumer supplies
 
-- **Encrypted files.** The viewer holds no cryptography. For a playlist item marked `encrypted` it calls `decryptFile({ src, fileId, title, roomId, signal })` and shows the bytes that come back. Resolve with `null` to close the viewer, reject to show the decryption error. Without `decryptFile` an encrypted item shows that error.
+- **Encrypted files.** The viewer holds no cryptography. For a playlist item marked `encrypted` it calls `decryptFile({ src, fileId, title, roomId, signal })` and shows the bytes that come back, TIFF and HEIC converted as usual. Resolve with `null` to close the viewer, reject to show the decryption error. Without `decryptFile` an encrypted item shows that error. An item marked `encrypted` whose file in `files` is not `encrypted` is only read through the hook, so its failure shows the media error and does not call `onDecryptionError`.
 - **Titles.** `resolveTitle` returns the title to show for an item when the consumer knows a better one than the playlist carries. Pass a stable reference: it is a dependency of the effect that loads the item.
 - **PDF.** `getPdfViewerScriptUrl` resolves the URL of the PDF viewer script. Without it a PDF item shows the loading error.
 - **Optional peers.** `@react-spring/web`, `@use-gesture/react`, `heic2any` and `utif` are optional peer dependencies of the package; an application that renders the viewer declares them.
