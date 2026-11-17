@@ -23,7 +23,11 @@ export const CONTEXT_ROOM_CLOUD = "docspace";
  * Coming to a room (or opening the chat there for the first time) connects
  * it if it holds a `.ai` folder: one `GET /files/rooms/{id}/ai` decides. The
  * skills themselves are then read by the library's clouds store through the
- * AI service. Coming to a place without such a room drops any connection.
+ * AI service. Leaving the rooms it connected for a place without such a
+ * room drops the connection. Nothing else is taken away: on its first sync,
+ * or coming from a place with no such room, the skill sets the chat has
+ * (the ones it brought back for the open conversation, or the user's own
+ * picks) stay as they are.
  *
  * What the user does after that stands until the room changes: a Disconnect
  * in the room button, or another room picked from the composer's list, is
@@ -74,9 +78,15 @@ const ContextRoomSync = () => {
       return undefined;
     }
 
+    // Only rooms this sync connected are its to take away: the previous
+    // key is a set of rooms it was handed. `undefined` (no sync yet, or one
+    // whose check never landed) and `null` (a place with no such room) left
+    // nothing of its own connected.
+    const previous = synced.current;
+    const leavesOwnRooms = typeof previous === "string";
     synced.current = here;
     if (rooms.length === 0) {
-      clouds.clearContextFolder();
+      if (leavesOwnRooms) clouds.clearContextFolder();
       return undefined;
     }
 
@@ -90,7 +100,7 @@ const ContextRoomSync = () => {
       const current = useCloudsStore.getState();
       const withSkills = rooms.filter((_, index) => flags[index]);
       if (withSkills.length === 0) {
-        current.clearContextFolder();
+        if (leavesOwnRooms) current.clearContextFolder();
         return;
       }
       // The store reads the skills of a changed list itself (it compares
@@ -113,8 +123,10 @@ const ContextRoomSync = () => {
 
     return () => {
       cancelled = true;
+      // A check that never landed is made again next time, from where the
+      // sync stood before it.
       if (!settled && synced.current === here) {
-        synced.current = undefined;
+        synced.current = previous;
       }
     };
   }, [aiApi, idsKey, namesKey, synced, useCloudsStore]);
