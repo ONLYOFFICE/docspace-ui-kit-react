@@ -49,6 +49,7 @@ import type {
   Suggestion,
   ThreadSourceList,
   ToolCallApproveContext,
+  ToolResultRenderer,
   WebSearchProviderId,
 } from "@onlyoffice/ai-chat";
 
@@ -126,6 +127,11 @@ import { CHAT_ATTACHMENT_LIMIT } from "./files/limits";
 import { uploadFilesToChat } from "./files/upload-files";
 import { openAttachedFile } from "./files/open-file";
 import { saveToRoomImageAction } from "./files/save-to-room";
+import { CreatedDocumentsRenderer } from "./files/created-document-card";
+import {
+  CreatedDocumentsContext,
+  type CreatedDocumentsContextValue,
+} from "./files/created-documents";
 import { useComposerSourceLists } from "./files/use-composer-sources";
 
 // The host app (DocSpace) uses `i18n.createInstance()` and provides that
@@ -480,6 +486,19 @@ const EDITOR_TOOL_NAME_BY_CHAT_TOOL: Record<string, string> = {
 // returns it in the tool result. We hide the "Always allow" checkbox for them
 // (one-off confirmation only) and open the generated file once approved.
 const GENERATE_TOOL_NAMES = Object.keys(EDITOR_TOOL_NAME_BY_CHAT_TOOL);
+
+// The tools whose result names documents they created, drawn as document
+// cards under their row (`WidgetConfig.toolResultRenderers`): the document
+// agent of ASC.AI.Chat and the editor's generate tools, which take its place
+// while it is not configured. A module constant, so the record the library
+// keys by never changes.
+const DOCUMENT_TOOL_RENDERERS: Record<string, ToolResultRenderer> =
+  Object.fromEntries(
+    ["document_agent", ...GENERATE_TOOL_NAMES].map((name) => [
+      name,
+      CreatedDocumentsRenderer,
+    ]),
+  );
 
 // The lists an agent sets for every conversation it runs: its skill sets and
 // knowledge bases (`WidgetConfig.hostOwnedSources`).
@@ -1192,6 +1211,14 @@ const AiAgentProviders = ({
     [t, onSaveToRoom],
   );
 
+  // What the cards of created documents take from the chat: the agent's
+  // name for "created by" and "Save to room...".
+  const agentName = chatAgent?.name ?? null;
+  const createdDocuments = useMemo<CreatedDocumentsContextValue>(
+    () => ({ agentName, onSaveToRoom }),
+    [agentName, onSaveToRoom],
+  );
+
   const ownCallbacks = useMemo<ChatCallbacks>(
     () => analyzeModeCallbacks(aiChatStore),
     [aiChatStore],
@@ -1306,6 +1333,10 @@ const AiAgentProviders = ({
       // with its type icon and name.
       userAttachmentsPlacement: "inside",
       generatedImageActions,
+      // A document a reply created is a card under its tool call: its type
+      // icon and name, "created by <agent>" in a chat on an agent, a click
+      // that opens it and "Save to room...".
+      toolResultRenderers: DOCUMENT_TOOL_RENDERERS,
     }),
     [
       composerActions,
@@ -1420,7 +1451,14 @@ const AiAgentProviders = ({
                                 <OnFilesAttachedContext.Provider
                                   value={onFilesAttached}
                                 >
-                                  {children}
+                                  {/* The cards the chat draws for created
+                                      documents read the agent and the copy
+                                      action from here. */}
+                                  <CreatedDocumentsContext.Provider
+                                    value={createdDocuments}
+                                  >
+                                    {children}
+                                  </CreatedDocumentsContext.Provider>
                                 </OnFilesAttachedContext.Provider>
                                 {overlay}
                               </AttachmentLimitContext.Provider>

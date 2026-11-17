@@ -17,7 +17,7 @@ import useDeviceType from "./use-device-type";
 /** A file a reply produced, as "Save to room..." copies it. */
 export type CopyToRoomFile = {
   /** The portal file id. */
-  id: number;
+  id: number | string;
   /** The file's name, extension included, for the toast. */
   title: string;
 };

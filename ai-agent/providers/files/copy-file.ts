@@ -25,7 +25,7 @@ const wait = (ms: number) =>
  */
 export const copyFileToFolder = async (
   operationsApi: Pick<OperationsApi, "copyBatchItems" | "getOperationStatuses">,
-  fileId: number,
+  fileId: number | string,
   folderId: number | string,
   { interval = POLL_INTERVAL_MS, attempts = POLL_ATTEMPTS } = {},
 ): Promise<boolean> => {
