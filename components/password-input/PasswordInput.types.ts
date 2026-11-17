@@ -99,10 +99,16 @@ type PasswordInputBaseProps = {
   /** Ignored. It only sets an internal flag for a copy button that is not rendered. */
   emailInputName?: string;
   /**
-   * The rules the generator and the checker use. Left out, only a minimum
-   * length of 8 is required — digits, capitals and symbols are all off.
+   * The rules the checker uses, and the generator too unless
+   * `generatorSettings` is given. Left out, only a minimum length of 8 is
+   * required — digits, capitals and symbols are all off.
    */
   passwordSettings?: TPasswordSettings;
+  /**
+   * The settings the generator draws by, when they differ from the rules the
+   * input checks. Left out, the generator uses `passwordSettings`.
+   */
+  generatorSettings?: TPasswordSettings;
   /**
    * Called after every change with whether every rule passes, and with each
    * rule's own result. It never fires in `simpleView`, which skips checking.

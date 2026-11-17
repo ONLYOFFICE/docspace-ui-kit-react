@@ -1,6 +1,12 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { screen, render, fireEvent, waitFor } from "@testing-library/react";
+import {
+  act,
+  screen,
+  render,
+  fireEvent,
+  waitFor,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { InputSize, InputType } from "../text-input";
@@ -504,5 +510,58 @@ describe("<PasswordInput />", () => {
       const wrapper = screen.getByTestId("password-input");
       expect(wrapper).toHaveAttribute("data-scale", "true");
     });
+  });
+});
+
+describe("<PasswordInput /> generator settings", () => {
+  type Handle = { onGeneratePassword: (e: React.MouseEvent) => void };
+
+  const generate = (props: object) => {
+    const ref = React.createRef<Handle>();
+    render(
+      <PasswordInput
+        {...baseProps}
+        {...props}
+        ref={ref as unknown as React.RefObject<never>}
+      />,
+    );
+    act(() => {
+      ref.current?.onGeneratePassword({
+        preventDefault: () => {},
+      } as unknown as React.MouseEvent);
+    });
+    return (
+      screen
+        .getByTestId("password-input")
+        .querySelector("input") as HTMLInputElement
+    ).value;
+  };
+
+  const strict = {
+    ...basePasswordSettings,
+    minLength: 12,
+    upperCase: true,
+    digits: true,
+    specSymbols: true,
+  };
+
+  it("draws by generatorSettings when they are given", () => {
+    const value = generate({
+      passwordSettings: { ...basePasswordSettings, minLength: 12 },
+      generatorSettings: strict,
+    });
+
+    expect(value).toHaveLength(12);
+    expect(value).toMatch(/[A-Z]/);
+    expect(value).toMatch(/\d/);
+    expect(value).toMatch(/[!@#$%^&*]/);
+  });
+
+  it("draws by passwordSettings otherwise", () => {
+    const value = generate({
+      passwordSettings: { ...basePasswordSettings, minLength: 10 },
+    });
+
+    expect(value).toMatch(/^[a-z]{10}$/);
   });
 });

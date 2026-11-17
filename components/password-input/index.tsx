@@ -51,6 +51,7 @@ const PasswordInput = ({
   clipActionResource,
   emailInputName,
   passwordSettings = DEFAULT_PASSWROD_SETTINGS,
+  generatorSettings,
   onBlur,
   onKeyDown,
   onValidateInput,
@@ -130,7 +131,7 @@ const PasswordInput = ({
 
   const { onGeneratePassword } = usePasswordGenerator(
     generatorSpecial,
-    passwordSettings,
+    generatorSettings ?? passwordSettings,
     isDisabled,
     state.type,
     onChangeAction,
