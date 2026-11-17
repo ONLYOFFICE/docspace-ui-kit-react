@@ -14,7 +14,7 @@ type UsePromoCodeDeps = {
   applyPromoCode?: PaymentStore["applyPromoCode"];
   formatWalletCurrency: PaymentStore["formatWalletCurrency"];
   language: string;
-  onApplied?: () => void;
+  onApplied?: (isPending: boolean) => void | Promise<void>;
 };
 
 export const usePromoCode = ({
@@ -117,7 +117,7 @@ export const usePromoCode = ({
 
       toastr.success(<Text as="div">{body}</Text>, title);
       setCode("");
-      onApplied?.();
+      await onApplied?.(isPending);
       return;
     }
 
