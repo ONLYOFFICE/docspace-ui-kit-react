@@ -113,8 +113,8 @@ Most of the library predates this rule, so by default the warnings are printed o
 folders the branch changed since it left its parent branch (`master`, `release/*`, `hotfix/*`),
 however many times it was pushed. The rest are counted in one closing line. `--only <folder>`
 prints them for that folder, and `--style-all` prints all of them. CI's checkout has no origin
-branches to find the parent from, so on a pull request it passes `--base HEAD^1`, the target
-branch's tip.
+branches to find the parent from, so on a pull request it fetches the target branch and passes
+`--base origin/<target>`; the scope starts where the pull request left it.
 
 How much of a folder's text to bring within the limits depends on the change:
 

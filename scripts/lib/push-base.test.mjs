@@ -9,7 +9,13 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { touchesBuild } from "./build-inputs.mjs";
-import { changesSince, findBranchBase, findPushBase } from "./push-base.mjs";
+import {
+  baseAgainst,
+  changesSince,
+  findBranchBase,
+  findPushBase,
+  isCommit,
+} from "./push-base.mjs";
 
 let dir;
 
@@ -91,6 +97,43 @@ describe("findPushBase", () => {
   it("returns null with nothing to compare with", () => {
     commit("a");
     expect(findPushBase(dir)).toBeNull();
+  });
+});
+
+// check-readme's `--base origin/<target>` in CI.
+describe("baseAgainst", () => {
+  it("starts after the target branch merged into the feature", () => {
+    commit("a");
+    git("switch", "-q", "-c", "feature");
+    commit("components/mine.ts");
+    git("switch", "-q", "master");
+    const target = commit("components/theirs.ts");
+    remoteRef("origin/release/v1", target);
+    git("switch", "-q", "feature");
+    git("merge", "-q", "--no-edit", "master");
+
+    const base = baseAgainst(dir, "origin/release/v1");
+
+    expect(base?.sha).toBe(target);
+    expect(changesSince(dir, base?.sha ?? "")).toEqual(["components/mine.ts"]);
+  });
+
+  it("returns null when the history at hand has no common commit", () => {
+    commit("a");
+    git("switch", "-q", "--orphan", "other");
+    remoteRef("origin/other", commit("b"));
+    git("switch", "-q", "master");
+
+    expect(baseAgainst(dir, "origin/other")).toBeNull();
+  });
+});
+
+describe("isCommit", () => {
+  it("tells a branch from a typo", () => {
+    remoteRef("origin/release/v1", commit("a"));
+
+    expect(isCommit(dir, "origin/release/v1")).toBe(true);
+    expect(isCommit(dir, "origin/relase/v1")).toBe(false);
   });
 });
 

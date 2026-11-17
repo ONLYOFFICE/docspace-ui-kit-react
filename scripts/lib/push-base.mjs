@@ -19,7 +19,9 @@
 // changed" rather than guess.
 //
 // `findBranchBase` is the second half alone, for check-readme.mjs: its style
-// warnings cover what the branch changed, not what one push sends.
+// warnings cover what the branch changed, not what one push sends. CI has no
+// origin branches to search, so it names the target branch and check-readme
+// asks `baseAgainst` for the point where HEAD left it.
 
 import { spawnSync } from "node:child_process";
 
@@ -36,7 +38,16 @@ const LONG_LIVED = [
   "refs/remotes/origin/hotfix",
 ];
 
-const baseAgainst = (cwd, ref) => {
+/** Whether `ref` names a commit git has here. */
+export const isCommit = (cwd, ref) =>
+  git(cwd, "rev-parse", "--verify", "--quiet", `${ref}^{commit}`) !== null;
+
+/**
+ * Where HEAD left `ref`: their merge base, and how far HEAD is ahead of it.
+ * Null when there is none in the history at hand -- a shallow clone may stop
+ * short of it.
+ */
+export const baseAgainst = (cwd, ref) => {
   const sha = git(cwd, "merge-base", "HEAD", ref);
   if (!sha) return null;
   const count = git(cwd, "rev-list", "--count", `${sha}..HEAD`);

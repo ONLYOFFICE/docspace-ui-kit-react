@@ -27,9 +27,10 @@
 // the limits when its component is touched, not in one sweep.
 //
 // Where the branch began is found from the long-lived branches on origin, which
-// a CI checkout does not have: it is one merge commit deep. `--base` names the
-// starting point instead -- CI passes `HEAD^1`, the first parent of a pull
-// request's merge commit, which is the tip of the branch it targets.
+// a CI checkout does not have. `--base` names the branch it left instead -- CI
+// passes the pull request's target, `origin/<base_ref>` -- and the scope starts
+// at their merge base. That holds whether the checkout is the pull request's
+// head (Gitea) or a merge commit (GitHub), and after a merge from the target.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -45,7 +46,12 @@ import {
   storyTexts,
   wordCount,
 } from "./lib/doc-style.mjs";
-import { changesSince, findBranchBase } from "./lib/push-base.mjs";
+import {
+  baseAgainst,
+  changesSince,
+  findBranchBase,
+  isCommit,
+} from "./lib/push-base.mjs";
 import {
   ROOT,
   createExampleProgram,
@@ -598,28 +604,23 @@ const storyStyle = (folder, component) =>
 
 /**
  * The documented folders the branch changed, each file credited to the deepest
- * folder holding it -- `rows/row` rather than `rows`. Without `--base`, null
- * when git cannot find the branch's parent: the summary line then says so
- * rather than call every folder unchanged. A `--base` git cannot resolve is a
- * broken invocation, not
- * a clean branch, and stops the run: CI would otherwise hide the warnings for
- * good and say nothing.
+ * folder holding it -- `rows/row` rather than `rows`. Null when the start of
+ * the branch is not in the history at hand -- no parent among the origin
+ * branches, or a shallow CI checkout that stops short of the merge base: the
+ * summary line then says so rather than call every folder unchanged. A
+ * `--base` that names no commit at all is a broken invocation, not a short
+ * history, and stops the run: CI would otherwise hide the warnings for good.
  */
 const touchedFolders = (folders, baseRef) => {
-  let changed;
-
-  if (baseRef) {
-    changed = changesSince(ROOT, baseRef);
-    if (!changed) {
-      console.error(
-        `--base ${baseRef}: git cannot resolve it here (a shallow checkout needs fetch-depth: 2 for HEAD^1)`,
-      );
-      process.exit(2);
-    }
-  } else {
-    const base = findBranchBase(ROOT);
-    changed = base ? changesSince(ROOT, base.sha) : null;
+  if (baseRef && !isCommit(ROOT, baseRef)) {
+    console.error(
+      `--base ${baseRef}: no such branch or commit here; CI has to fetch the target branch first`,
+    );
+    process.exit(2);
   }
+
+  const base = baseRef ? baseAgainst(ROOT, baseRef) : findBranchBase(ROOT);
+  const changed = base ? changesSince(ROOT, base.sha) : null;
 
   if (!changed) return null;
 
@@ -1224,8 +1225,10 @@ const main = async () => {
       const others = new Set(hidden.map((finding) => finding.folder)).size;
       console.log(
         touched === null
-          ? `${hidden.length} style warning(s) in ${others} folder(s) not shown: the branch's parent ` +
-              "was not found, so what it changed is unknown; `--base <ref>` names it, " +
+          ? `${hidden.length} style warning(s) in ${others} folder(s) not shown: ` +
+              (options.base
+                ? `no common commit with \`${options.base}\` in the history at hand, so what the branch changed is unknown -- a shallow checkout may stop short of it; `
+                : "the branch's parent was not found, so what it changed is unknown; `--base <branch>` names it, ") +
               "`--style-all` lists them all (.claude/rules/doc-writing.md)."
           : `${hidden.length} style warning(s) in ${others} folder(s) this branch did not change; ` +
               "`--style-all` lists them (.claude/rules/doc-writing.md).",
