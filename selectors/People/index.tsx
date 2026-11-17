@@ -2,7 +2,14 @@ import EmptyScreenPersonsLight from "../../assets/emptyFilter/empty.filter.peopl
 import EmptyScreenPersonsDark from "../../assets/emptyFilter/empty.filter.people.dark.svg";
 
 import axios from "axios";
-import { useState, useCallback, useRef, useEffect, useMemo } from "react";
+import {
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+  useMemo,
+  type ReactNode,
+} from "react";
 
 import {
   Selector,
@@ -700,6 +707,7 @@ const PeopleSelector = ({
     isGroup?: boolean,
     status?: EmployeeStatus,
     id?: string | number,
+    mark?: ReactNode,
   ) => {
     return (
       <div
@@ -733,6 +741,7 @@ const PeopleSelector = ({
             </Text>
           ) : null}
           {status === EmployeeStatus.Pending ? <StyledSendClockIcon /> : null}
+          {mark}
         </div>
         {!isGroup ? (
           <div style={{ display: "flex" }}>

@@ -521,10 +521,11 @@
   }
 
   .itemMark {
+    display: inline-flex;
     flex-shrink: 0;
-    margin-inline-end: 12px;
+    align-items: center;
+    margin-inline-start: 6px;
     white-space: nowrap;
-    color: var(--selector-body-description-text);
   }
 
   &:not(.isAvatar) {

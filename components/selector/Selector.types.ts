@@ -551,6 +551,11 @@ export type TRenderCustomItem = (
   isGroup?: boolean,
   status?: EmployeeStatus,
   id?: string | number,
+  /**
+   * The badge of the row's `mark` with its tooltip, or null. A custom row
+   * places it after the name; a renderer that drops it hides the mark.
+   */
+  mark?: React.ReactNode,
 ) => React.ReactNode | null;
 
 export type SelectorProps = TSelectorHeader &

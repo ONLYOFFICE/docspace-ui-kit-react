@@ -13,6 +13,7 @@ import { Text } from "../../text";
 import { Checkbox } from "../../checkbox";
 import { RoomIcon } from "../../room-icon";
 import { Tooltip } from "../../tooltip";
+import { Badge } from "../../badge";
 import { MCPIcon, MCPIconSize } from "../../mcp-icon";
 
 import type { Data, ItemProps, TSelectorItem } from "../Selector.types";
@@ -234,6 +235,39 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
 
     const markId = `${optionId ?? `selector-item-${index}`}-mark`;
 
+    const markNode = mark ? (
+      <>
+        <span
+          className={styles.itemMark}
+          data-tooltip-id={markId}
+          data-testid={`selector-item-${index}-mark`}
+        >
+          <Badge
+            label={mark.label}
+            backgroundColor={globalColors.mainOrange}
+            color={globalColors.black}
+            maxWidth="none"
+            noHover
+          />
+        </span>
+        <span id={`${markId}-description`} hidden>
+          {mark.description}
+        </span>
+        <Tooltip
+          id={markId}
+          place="bottom"
+          maxWidth="300px"
+          // The active row of the keyboard shows it as a hover does.
+          isOpen={isActive || isMarkHovered}
+          setIsOpen={setIsMarkHovered}
+        >
+          <Text fontSize="12px" fontWeight={400} noSelect>
+            {mark.description}
+          </Text>
+        </Tooltip>
+      </>
+    ) : null;
+
     const itemAvatar =
       avatar ?? (isGroup && isSystem ? <EveryoneIconUrl /> : "");
 
@@ -318,7 +352,15 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
           )
         ) : null}
         {renderCustomItem ? (
-          renderCustomItem(label, typeLabel, email, isGroup, status, id)
+          renderCustomItem(
+            label,
+            typeLabel,
+            email,
+            isGroup,
+            status,
+            id,
+            markNode,
+          )
         ) : (
           <div
             className={
@@ -357,39 +399,9 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
                 />
               </>
             ) : null}
+            {markNode}
           </div>
         )}
-
-        {mark ? (
-          <>
-            <Text
-              className={styles.itemMark}
-              fontWeight={600}
-              fontSize="12px"
-              lineHeight="16px"
-              noSelect
-              data-tooltip-id={markId}
-              dataTestId={`selector-item-${index}-mark`}
-            >
-              {mark.label}
-            </Text>
-            <span id={`${markId}-description`} hidden>
-              {mark.description}
-            </span>
-            <Tooltip
-              id={markId}
-              place="bottom"
-              maxWidth="300px"
-              // The active row of the keyboard shows it as a hover does.
-              isOpen={isActive || isMarkHovered}
-              setIsOpen={setIsMarkHovered}
-            >
-              <Text fontSize="12px" fontWeight={400} noSelect>
-                {mark.description}
-              </Text>
-            </Tooltip>
-          </>
-        ) : null}
 
         {isDisabled && disabledText ? (
           <Text

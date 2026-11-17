@@ -485,6 +485,47 @@ describe("<Selector /> item mark", () => {
     expect(screen.queryByTestId("selector-item-1-mark")).toBeNull();
   });
 
+  it("draws the mark as a badge after the label, inside the label block", () => {
+    renderSelector({ items: marked, totalItems: 2 });
+
+    const mark = screen.getByTestId("selector-item-0-mark");
+    const label = screen.getByText("First item");
+    expect(mark.firstElementChild).not.toBeNull();
+    expect(mark.parentElement?.contains(label)).toBe(true);
+    expect(
+      label.compareDocumentPosition(mark) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it("hands the mark to a custom row and draws it nowhere else", () => {
+    renderSelector({
+      items: marked,
+      totalItems: 2,
+      renderCustomItem: (
+        label: string,
+        _role?: string,
+        _email?: string,
+        _isGroup?: boolean,
+        _status?: unknown,
+        _id?: string | number,
+        mark?: React.ReactNode,
+      ) => (
+        <div data-testid={`custom-${label}`}>
+          {label}
+          {mark}
+        </div>
+      ),
+    });
+
+    expect(screen.getAllByTestId("selector-item-0-mark")).toHaveLength(1);
+    expect(
+      screen
+        .getByTestId("custom-First item")
+        .contains(screen.getByTestId("selector-item-0-mark")),
+    ).toBe(true);
+    expect(screen.queryByTestId("selector-item-1-mark")).toBeNull();
+  });
+
   it("describes the row with the reason", () => {
     renderSelector({ items: marked, totalItems: 2 });
 
