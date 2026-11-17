@@ -110,6 +110,23 @@ export const contentWords = (text) =>
       .map(stem),
   );
 
+// What only a live Storybook can answer: its panels, and a sentence that opens
+// by telling the reader to act on the canvas. The API site prints a story's
+// description under a still picture, where neither means anything.
+const LIVE_ONLY = [
+  /\b(?:Controls|Actions|Interactions) panel\b/,
+  /(?:^|[.!?]\s+|—\s*)(?:Hover|Click|Press|Drag|Scroll|Resize|Type|Right[- ]click)\b[^.!?\n]*/i,
+];
+
+/** The phrase of a story's description that needs a live canvas, or null. */
+export const liveOnlyPhrase = (text) => {
+  for (const pattern of LIVE_ONLY) {
+    const match = pattern.exec(text);
+    if (match) return match[0].replace(/^[.!?—\s]+/, "");
+  }
+  return null;
+};
+
 // Props whose meaning React or the kit's own convention fixes, so a description
 // that names the element they land on is all there is to say.
 const PLUMBING = new Set([

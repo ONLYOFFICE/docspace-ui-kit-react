@@ -94,9 +94,42 @@ Most bullets need only the first layer. The second is the most valuable after it
 A tautological JSDoc is fixed by answering one of three questions. What does the value change on
 screen? Where does a valid value come from? What do both values of a boolean do?
 
+## E. Text that leaves its page
+
+The README and the story texts are also pages on api.onlyoffice.com (`docs-generation.md`), and
+assistants fetch those pages and quote one paragraph at a time. Write so that a paragraph lifted
+out on its own is still true.
+
+1. **No live Storybook in a story's description.** The site prints it under a still picture, so
+   "the Controls panel", "the Actions panel" and "Hover the buttons to see it" mean nothing there.
+   Say what happens instead: "A hint below the button on hover". A canvas that needs a gesture
+   says so in its own JSX, which the picture shows.
+2. **The first sentence of a story's description is also its picture's alt text.** The generator
+   uses it, so open with what the picture shows, not with how to use the story.
+3. **A story's shown name is plain words for the state**, set with `name`: "Loading", "With icon",
+   "Pressed look". The export keeps its name: it is the story's id, and the screenshot baselines
+   and the site's picture files are keyed by it.
+4. **A recipe's heading is the task a reader would type into search**: "Show a loading state while
+   an action runs", "Make a destructive (red) button" -- not "Loading" or "Destructive". Advice that
+   answers a task and sits in another section gets a recipe, and the section links to it.
+5. **A snippet's component is named for what it is** (`DeleteButton`, `DialogFooter`), never
+   `Example` or `Demo`. Labels and handlers are real (`label="Save"`, `onClick={save}`); an empty
+   `() => {}` only where doing nothing is the point.
+6. **No time-relative words**: "new", "recently", "soon", "no longer", "used to". Describe what is
+   true now; a change and its version belong in `CHANGELOG.md`.
+7. **CSS variables say which variants read each one** and where it must be set: on the component's
+   own `style`, on an ancestor, or on the theme provider.
+8. **Accessibility says, for every `aria-*` a consumer may pass, whether it is kept or
+   overwritten**, and names each gap together with what the consumer has to add.
+9. **Every sibling a reader may confuse the component with gets a "not when" bullet**, linked, with
+   the reason in one clause.
+
+What the site page gets on top -- its `<title>`, a meta description that names the package, the
+alt texts -- is written by the generator (`scripts/docs/render.mjs`), not by hand in each README.
+
 ## What checks this
 
-`pnpm check:readme` measures sections A2, B and the tautology smell, and reports them as
+`pnpm check:readme` measures sections A2, B, E1 and the tautology smell, and reports them as
 warnings, which never fail the gate:
 
 - `W_LONG_SENTENCE` -- a sentence over 25 words, in a README's prose, a prop's JSDoc or a
@@ -104,7 +137,9 @@ warnings, which never fail the gate:
 - `W_LONG_TEXT` -- a piece over its ceiling in table B;
 - `W_TAUTOLOGICAL_PROP` -- a JSDoc or `argTypes` description that adds at most one word to the
   prop's and the component's names. `id`, `className`, `style`, `ref`, `forwardedRef`, `testId`
-  and `dataTestId` are exempt: their meaning is fixed by React or by the kit.
+  and `dataTestId` are exempt: their meaning is fixed by React or by the kit;
+- `W_LIVE_ONLY_TEXT` -- a story's description that names a Storybook panel or opens a sentence
+  with an instruction to act on the canvas ("Hover…", "Click…", "Right click…").
 
 A README's warnings include its story files, those in subfolders without a README of their own
 too -- the table's parts, the skeletons.

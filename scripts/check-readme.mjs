@@ -20,7 +20,8 @@
 // and the `component-docs` skill were rewritten to match rather than the other
 // way round.
 //
-// The style warnings -- W_LONG_SENTENCE, W_LONG_TEXT, W_TAUTOLOGICAL_PROP --
+// The style warnings -- W_LONG_SENTENCE, W_LONG_TEXT, W_TAUTOLOGICAL_PROP,
+// W_LIVE_ONLY_TEXT --
 // measure the prose against `.claude/rules/doc-writing.md`. Most of the library
 // predates that rule, so by default they are printed only for the folders the
 // branch changed, and the rest are counted in one line: text is brought within
@@ -41,6 +42,7 @@ import {
   LIMITS,
   excerpt,
   isTautological,
+  liveOnlyPhrase,
   longSentences,
   markdownProse,
   storyTexts,
@@ -500,6 +502,21 @@ const lengthFinding = (text, limit, what, file, line) => {
     : [];
 };
 
+/** A story description that asks for a live Storybook, which the site is not. */
+const liveOnlyFinding = (owner, text, file, line) => {
+  const phrase = liveOnlyPhrase(text);
+  return phrase
+    ? [
+        {
+          code: "W_LIVE_ONLY_TEXT",
+          file,
+          line,
+          message: `\`${owner}\`'s story description needs a live Storybook (“${excerpt(phrase)}”); the API site prints it under a still picture, so say what happens instead`,
+        },
+      ]
+    : [];
+};
+
 /** Style findings for a README's own prose. */
 const readmeStyle = (folder, readme) => {
   const file = `${folder}/README.md`;
@@ -578,6 +595,7 @@ const storyStyle = (folder, component) =>
                 line,
               ),
               ...sentenceFindings(text, file, line),
+              ...liveOnlyFinding(owner, text, file, line),
             ]
           : [
               ...lengthFinding(

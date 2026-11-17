@@ -10,6 +10,7 @@ import {
   LIMITS,
   contentWords,
   isTautological,
+  liveOnlyPhrase,
   longSentences,
   markdownProse,
   sentences,
@@ -127,6 +128,27 @@ describe("isTautological", () => {
 
   it("stems so that two forms of one word are one word", () => {
     expect([...contentWords("disabled disables")]).toHaveLength(1);
+  });
+});
+
+describe("liveOnlyPhrase", () => {
+  it("finds Storybook's panels and an instruction to act on the canvas", () => {
+    expect(
+      liveOnlyPhrase("The default. Change any prop in the Controls panel."),
+    ).toBe("Controls panel");
+    expect(
+      liveOnlyPhrase("A hint on hover. Hover the buttons to see it."),
+    ).toBe("Hover the buttons to see it");
+    expect(liveOnlyPhrase("No trigger here — right click anywhere")).toBe(
+      "right click anywhere",
+    );
+  });
+
+  it("passes a description that says what happens", () => {
+    expect(
+      liveOnlyPhrase("A hint below the button on hover (`tooltipText`)."),
+    ).toBeNull();
+    expect(liveOnlyPhrase("Clicking the row selects it.")).toBeNull();
   });
 });
 

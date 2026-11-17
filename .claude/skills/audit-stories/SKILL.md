@@ -272,17 +272,22 @@ follows it:
   never for the mechanism behind it: "Global Right Click" tells a reader
   nothing until the code is open, "Attached To Document" — the JSDoc of
   the prop it shows — does. Interactive canvases say what to do in
-  their own text ("No trigger here — right click anywhere").
+  their own text ("No trigger here — right click anywhere"). The export
+  stays as it is -- it is the story's id -- and the name Storybook and
+  the API site show is set with `name` in plain words ("Loading", not
+  "Is Loading Buttons"; `STORY_TEMPLATE.md`).
 - **A story description reads from the screen, not from the types.** It
   says what the reader sees and then names the prop behind it, in
-  parentheses: "**Auto-save** — the same switch, disabled; hover it to
-  read why (`getTooltipContent`)". A story that shows several variants
+  parentheses: "**Auto-save** — the same switch, disabled; its tooltip
+  says why (`getTooltipContent`)". A story that shows several variants
   gets one bullet per visible item, labelled by the item's own text,
   never a bullet per prop with a chain of prop names ("`withToggle` +
-  `checked`: a switch…"). When it points the reader at the Controls
-  panel, it says what to do there in plain words — "change any other
-  prop live in the Controls panel below" — never in terms of the
-  mechanism ("the Controls panel drives every other prop").
+  `checked`: a switch…"). The API site prints the description under a
+  still picture and uses its first sentence as the picture's alt text,
+  so it names no Storybook panel and asks for no gesture ("hover it",
+  "click it", "change any prop in the Controls panel"): it says what
+  happens instead (`.claude/rules/doc-writing.md` §E,
+  `W_LIVE_ONLY_TEXT`).
 - **Sample data is neutral.** Labels and texts in a story show the
   component, not the product: realistic for a document hub ("Anyone
   with the link", "Move to archive") but never product roles, access
@@ -410,7 +415,7 @@ follows it:
   shown only when the text says which variables survive it; otherwise
   it demonstrates nothing and reads as a defect. Hover and focus
   variables need no instance of their own: set them in the wrapper and
-  tell the reader to hover and focus. Two instances that show the same
+  say that the wrapper sets them, without asking the reader to hover. Two instances that show the same
   variables are one too many. The story text names each instance and
   the variable it is there for. Two checks on the values: neighbouring
   shades of one colour do not read apart on a one-pixel border, so the
