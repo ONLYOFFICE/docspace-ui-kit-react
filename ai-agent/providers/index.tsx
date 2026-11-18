@@ -107,6 +107,7 @@ import {
   useAnalyzeQuestions,
   useComposerTyping,
   useFilesIntegration,
+  useSkillSetMenu,
   type AttachedFileInfo,
   type ReadSuggestedQuestions,
   type SuggestedQuestion,
@@ -782,15 +783,7 @@ const AiAgentProviders = ({
   // project they are its settings: a user who may not change them gets no
   // "Manage skill sets" and no way to disconnect a set, and a change by one
   // who may is saved through the project (`onSkillRoomsChange`).
-  const skillSetsLocked = !!sourcesManager && !sourcesManager.onManage;
-  const onSkillSetDisconnected = sourcesManager?.onSkillRoomsChange;
-  const onDisconnectContextRoom = useCallback(
-    (cloud: string, roomId: string) => {
-      if (cloud !== CONTEXT_ROOM_CLOUD) return;
-      onSkillSetDisconnected?.({ added: [], removed: [roomId] });
-    },
-    [onSkillSetDisconnected],
-  );
+  const skillSetMenu = useSkillSetMenu({ sourcesManager, onPickContextRooms });
 
   // The slash menu's Knowledge bases follow the same owner. In an AI project
   // they are saved with it, so a base cannot be dropped from the chat alone
@@ -1294,9 +1287,7 @@ const AiAgentProviders = ({
       // Instructions room picker, `onPickContextRooms`); a member who may
       // not gets neither the row nor the bins.
       composerSkillList: true,
-      onManageSkillSets: sourcesManager
-        ? (sourcesManager.onManage ?? undefined)
-        : undefined,
+      onManageSkillSets: skillSetMenu.onManageSkillSets,
       // Knowledge bases are picked in the room selector, several at once
       // ("Manage knowledge bases..."), and a connected one opens in Files
       // from its row. With knowledge search off the list keeps the bases
@@ -1306,9 +1297,9 @@ const AiAgentProviders = ({
       // context, up to the library's limit; the AI service tells the model
       // which they are.
       composerDataSources,
-      onPickContextRooms: skillSetsLocked ? undefined : onPickContextRooms,
-      hideContextRoomDisconnect: skillSetsLocked,
-      onDisconnectContextRoom,
+      onPickContextRooms: skillSetMenu.onPickContextRooms,
+      hideContextRoomDisconnect: skillSetMenu.hideContextRoomDisconnect,
+      onDisconnectContextRoom: skillSetMenu.onDisconnectContextRoom,
       onOpenContextRoom,
       // The slash menu's "Manage knowledge bases" (the "+" menu's list is
       // built above, in `composerKnowledge`).
@@ -1358,9 +1349,10 @@ const AiAgentProviders = ({
       chatIntro,
       composerContextHidden,
       knowledgePickerHidden,
-      onPickContextRooms,
-      skillSetsLocked,
-      onDisconnectContextRoom,
+      skillSetMenu.onPickContextRooms,
+      skillSetMenu.hideContextRoomDisconnect,
+      skillSetMenu.onDisconnectContextRoom,
+      skillSetMenu.onManageSkillSets,
       onManageKnowledge,
       sourcesOwned,
       onAddContextFolder,
