@@ -84,7 +84,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Press **Start Loading** and a thin bar grows along the top of the viewport and stops at 90%; **End Loading** runs it to the full width and clears it, **Cancel** clears it at once (\`start\`, \`end\`, \`cancel\`). Use it to see how long a wait looks before the work finishes.",
+          "Three buttons driving the service (`start`, `end`, `cancel`). **Start Loading** grows a thin bar along the top of the viewport, up to 90%.\n\n**End Loading** runs it to the full width and clears it; **Cancel** clears it at once.",
       },
       source: {
         code: `// Add to HTML: <div id="ipl-progress-indicator" />
@@ -148,6 +148,7 @@ const CssCustomizationTemplate = () => {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => <CssCustomizationTemplate />,
   play: async () => {
     const bar = document.getElementById(
@@ -164,8 +165,8 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `\`TopLoaderService\` defines no CSS custom properties -- the element's own style does all of it, as the recipe "The element, and its style" on this page describes.
-This story renders a static demo bar under a different id, purely for visual reference -- it is not driven by \`TopLoaderService\`.`,
+        story: `\`TopLoaderService\` defines no CSS custom properties; the element's own style does all of it.
+This story renders a static bar under a different id, for reference only; the service does not drive it.`,
       },
       source: {
         code: `<div

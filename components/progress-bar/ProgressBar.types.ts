@@ -1,9 +1,9 @@
 export type ProgressBarProps = {
   /** How far along the operation is, 0 to 100. The value is clamped to that range, and a non-number (`NaN`, `Infinity`) counts as 0. */
   percent: number;
-  /** Line of text above the bar. It is also the bar's `title` and its `aria-label`, so without it the progress bar has no accessible name. */
+  /** Line of text above the bar, and the bar's `aria-label`; without it the bar has no accessible name. A truncated label shows in full in the kit's tooltip. */
   label?: string;
-  /** Replaces the filled portion with a strip that slides across the track for ever, and marks the bar indeterminate: `aria-valuenow` is left out and `aria-busy` is set, so `percent` is not announced. */
+  /** Replaces the fill with a strip that slides across the track for ever. The bar is then indeterminate: no `aria-valuenow`, and `aria-busy` set. */
   isInfiniteProgress?: boolean;
   /** Added after the component's own class on the bar element, not on the outer container. */
   className?: string;

@@ -62,7 +62,7 @@ export type TagType = {
   maxWidth?: string;
   /** Labels listed in the overflow drop-down. `Tags` fills this in for the overflow tag itself. */
   advancedOptions?: string[];
-  /** Whether the tag is inert. */
+  /** Draws the tag with a dashed border and stops it answering the pointer. */
   isDisabled?: boolean;
   /** Passed back through `onSelectTag`. */
   roomType?: number;

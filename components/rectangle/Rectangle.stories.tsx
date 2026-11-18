@@ -11,7 +11,7 @@ const meta = {
     width: {
       control: "text",
       description:
-        "Width of the SVG element and of the rectangle drawn in it. The default fills the parent's width",
+        "Width of the `<svg>` element and of the rectangle inside it. Any SVG length, so a percentage of the parent works.",
       table: {
         defaultValue: { summary: "100%" },
       },
@@ -19,31 +19,28 @@ const meta = {
     height: {
       control: "text",
       description:
-        "Height of the SVG element and of the rectangle drawn in it. A percentage needs a parent with a height, or the skeleton collapses",
+        "How tall the placeholder stands, as an SVG length; it sizes both the `<svg>` and the rectangle inside.",
       table: {
         defaultValue: { summary: "32px" },
       },
     },
     x: {
       control: "text",
-      description:
-        "Left edge of the rectangle inside the SVG, in pixels. A value above zero cuts off the rectangle's right side, since the rectangle keeps the full width",
+      description: "Left edge of the rectangle inside the SVG, in user units.",
       table: {
         defaultValue: { summary: "0" },
       },
     },
     y: {
       control: "text",
-      description:
-        "Top edge of the rectangle inside the SVG, in pixels. A value above zero cuts off the rectangle's bottom, since the rectangle keeps the full height",
+      description: "Top edge of the rectangle inside the SVG, in user units.",
       table: {
         defaultValue: { summary: "0" },
       },
     },
     borderRadius: {
       control: "text",
-      description:
-        "Corner radius of the rectangle, in pixels or as a percentage of the element's width; 50% on a square gives a circle",
+      description: "Corner radius of the rectangle, in user units.",
       table: {
         defaultValue: { summary: "3" },
       },
@@ -51,37 +48,35 @@ const meta = {
     backgroundColor: {
       control: "color",
       description:
-        "Colour of the rectangle at rest. Black by default in every theme",
+        "Colour of the skeleton at rest. Fixed black, not a theme colour.",
       table: {
         defaultValue: { summary: "#000" },
       },
     },
     foregroundColor: {
       control: "color",
-      description:
-        "Colour of the lighter band that sweeps across the rectangle",
+      description: "Colour of the band that sweeps across the skeleton.",
       table: {
         defaultValue: { summary: "#000" },
       },
     },
     backgroundOpacity: {
       control: { type: "range", min: 0, max: 1, step: 0.1 },
-      description: "Opacity of the resting colour",
+      description: "How strongly the resting colour shows, from 0 to 1.",
       table: {
         defaultValue: { summary: "0.1" },
       },
     },
     foregroundOpacity: {
       control: { type: "range", min: 0, max: 1, step: 0.1 },
-      description: "Opacity of the sweeping band's colour",
+      description: "How strongly the sweeping band shows, from 0 to 1.",
       table: {
         defaultValue: { summary: "0.15" },
       },
     },
     speed: {
       control: { type: "range", min: 0.5, max: 3, step: 0.1 },
-      description:
-        "Duration of one sweep, in seconds: a larger value moves the band more slowly",
+      description: "Duration of one sweep, in seconds.",
       table: {
         defaultValue: { summary: "2" },
       },
@@ -89,7 +84,7 @@ const meta = {
     animate: {
       control: "boolean",
       description:
-        "Whether the band sweeps at all. Off, the rectangle is a still shape",
+        "Whether the band sweeps at all. Turn it off for a static placeholder.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -97,7 +92,7 @@ const meta = {
     title: {
       control: "text",
       description:
-        "Accessible name of the placeholder, read by screen readers and shown as the browser's tooltip on hover. Empty by default, which leaves the placeholder unnamed",
+        'Accessible name of the skeleton, rendered as the SVG\'s `<title>`. It is empty by default, which leaves the `role="img"` element unnamed.',
       table: {
         defaultValue: { summary: '""' },
       },
@@ -105,15 +100,15 @@ const meta = {
     uniqueKey: {
       control: "text",
       description:
-        "Fixed id for the SVG's internal gradient and clip path, so server and client render the same markup. Generated per instance when left out",
+        "Stable id for the SVG's gradient and clip path. Without it a `useId()` value is used, so server and client render the same ids.",
     },
     className: {
       control: "text",
-      description: "Class name added to the SVG element",
+      description: "Applied to the `<svg>` element.",
     },
     style: {
       control: "object",
-      description: "Inline style applied to the SVG element",
+      description: "Applied to the `<svg>` element.",
     },
   },
   parameters: {
@@ -151,7 +146,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A single placeholder with slightly rounded corners and the sweeping band; change any prop live in the Controls panel below.",
+          "A single placeholder with slightly rounded corners and the sweeping band.",
       },
       source: {
         code: `<RectangleSkeleton width="200px" height="100px" />`,
@@ -161,6 +156,7 @@ export const Default: Story = {
 };
 
 export const SmallCircle: Story = {
+  name: "Circle from a square",
   render: (args) => <RectangleSkeleton {...args} />,
   args: {
     width: "40px",
@@ -178,7 +174,7 @@ export const SmallCircle: Story = {
     docs: {
       description: {
         story:
-          "A square with half its width as the corner radius turns into a circle (`borderRadius`), for an avatar placeholder drawn with the same API as the rectangles around it.",
+          "A square whose corner radius is half its width, so it draws a circle (`borderRadius`). It suits an avatar beside rectangle placeholders.",
       },
       source: {
         code: `<RectangleSkeleton width="40px" height="40px" borderRadius="50%" />`,
@@ -188,6 +184,7 @@ export const SmallCircle: Story = {
 };
 
 export const CustomColors: Story = {
+  name: "Custom colours",
   render: (args) => <RectangleSkeleton {...args} />,
   args: {
     width: "200px",
@@ -208,7 +205,7 @@ export const CustomColors: Story = {
     docs: {
       description: {
         story:
-          "A light grey rectangle with a paler band, for a surface where the default black at low opacity does not read, such as a dark theme (`backgroundColor`, `foregroundColor` and their opacities).",
+          "A light grey rectangle with a paler band, for a dark surface where the default black does not read (`backgroundColor`, `foregroundColor`, their opacities).",
       },
       source: {
         code: `<RectangleSkeleton
@@ -225,6 +222,7 @@ export const CustomColors: Story = {
 };
 
 export const NoAnimation: Story = {
+  name: "Still",
   render: (args) => <RectangleSkeleton {...args} />,
   args: {
     width: "200px",
@@ -242,7 +240,7 @@ export const NoAnimation: Story = {
     docs: {
       description: {
         story:
-          "The same rectangle without the sweep, for a page that must not animate, such as one shown to a user who asked for reduced motion (`animate`).",
+          "The same rectangle without the sweep (`animate`), for a user who asked for reduced motion.",
       },
       source: {
         code: `<RectangleSkeleton width="200px" height="100px" animate={false} />`,
@@ -252,6 +250,7 @@ export const NoAnimation: Story = {
 };
 
 export const SlowAnimation: Story = {
+  name: "Slow sweep",
   render: (args) => <RectangleSkeleton {...args} />,
   args: {
     width: "200px",
@@ -280,6 +279,7 @@ export const SlowAnimation: Story = {
 };
 
 export const Grid: Story = {
+  name: "Grid",
   render: () => (
     <div
       style={{
@@ -329,6 +329,7 @@ export const Grid: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "Styled with props",
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
       <RectangleSkeleton
@@ -369,7 +370,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `There are no CSS variables to list on this page: the component reads none, as "Behaviour the types don't state" explains, so this example styles three pills of different widths with the same five props: \`backgroundColor\`, \`foregroundColor\`, their opacities and \`borderRadius\`.`,
+        story: `The component reads no CSS variables. These three pills are styled with five props instead: \`backgroundColor\`, \`foregroundColor\`, their opacities and \`borderRadius\`.`,
       },
       source: {
         code: `<RectangleSkeleton

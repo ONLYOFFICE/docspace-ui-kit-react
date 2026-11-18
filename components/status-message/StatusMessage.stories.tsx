@@ -20,12 +20,12 @@ const meta = {
     message: {
       control: "text",
       description:
-        "The text or nodes shown in the bar. An empty value fades the bar out and removes it; a new value appears once the previous one has faded out",
+        "The text or nodes in the bar, and the switch that shows and hides it: an empty message fades the bar out and unmounts it. A new one is painted once the fade of the previous one ends.",
     },
     isWarning: {
       control: "boolean",
       description:
-        "Paints the bar in the warning colours instead of the error ones. Takes effect together with the next change of `message`",
+        "Paints the bar in the warning colours instead of the error ones, and makes it a polite `status` instead of an `alert`. A change repaints at once, with or without a new `message`.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -59,7 +59,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The error bar as a form shows it after a failed action. Type a new text in the Controls panel below to watch the old one fade out first; the warning switch there repaints the bar at once (`isWarning`).",
+          "The error bar as a form shows it after a failed action. A new message fades the old one out first.",
       },
       source: {
         code: `<StatusMessage message="This is a status message" />`,
@@ -120,6 +120,7 @@ const MessageSwapTemplate = () => {
 };
 
 export const WarningMessage: Story = {
+  name: "Warning",
   render: () => <WarningTemplate />,
   play: async ({ canvas }) => {
     const text = await canvas.findByText("This is a warning message");
@@ -143,6 +144,7 @@ export const WarningMessage: Story = {
 };
 
 export const ToggleVisibility: Story = {
+  name: "Hide and show",
   render: () => <ToggleTemplate />,
   play: async ({ canvas, userEvent }) => {
     await canvas.findByText("Click the button to dismiss");
@@ -169,7 +171,7 @@ export const ToggleVisibility: Story = {
     docs: {
       description: {
         story:
-          "Use this to see how the bar leaves and returns: **Hide Message** fades it out and removes it, **Show Message** brings it back (`message` set to an empty string and back).",
+          "A bar with two buttons: **Hide Message** fades it out and removes it, **Show Message** brings it back. They set `message` to an empty string and back.",
       },
       source: {
         code: `const [message, setMessage] = useState("Click the button to dismiss");
@@ -183,6 +185,7 @@ export const ToggleVisibility: Story = {
 };
 
 export const MessageSwap: Story = {
+  name: "Message swap",
   render: () => <MessageSwapTemplate />,
   play: async ({ canvas, userEvent }) => {
     await canvas.findByText("First message");
@@ -209,7 +212,7 @@ export const MessageSwap: Story = {
     docs: {
       description: {
         story:
-          "Use this to see what a user sees when one message replaces another: **Message A** and **Message B** fade the current text out before the new one fades in, **Clear** hides the bar.",
+          "One message replacing another: **Message A** and **Message B** fade the current text out before the new one fades in. **Clear** hides the bar.",
       },
       source: {
         code: `const [message, setMessage] = useState("First message");
@@ -241,6 +244,7 @@ const QuickChangeTemplate = () => {
 };
 
 export const QuickChange: Story = {
+  name: "Change faster than the fade",
   render: () => <QuickChangeTemplate />,
   play: async ({ canvas, userEvent }) => {
     await canvas.findByText("Saving failed");
@@ -274,6 +278,7 @@ requestAnimationFrame(() => setMessage(""));`,
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={
@@ -317,7 +322,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The first bar shows the shared variables; the second, with \`isWarning\`, is there for the three warning variables, and the gap between the two is the bottom margin. The max width caps both bars below the 400px wrapper.`,
+        story: `Two bars under a 400px wrapper that sets every variable. The second, with \`isWarning\`, shows the warning ones; the gap between them is the bottom margin.`,
       },
       source: {
         code: `<div

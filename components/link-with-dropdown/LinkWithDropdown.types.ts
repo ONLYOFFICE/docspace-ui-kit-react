@@ -4,11 +4,11 @@ import { type TDirectionX, TDirectionY } from "../../types";
 export type TDropdownType = "alwaysDashed" | "appearDashedAfterHover";
 
 export type SimpleLinkWithDropdownProps = {
-  /** Whether the text is bold. */
+  /** Sets the weight to 700, over `fontWeight`. */
   isBold?: boolean;
   /** Font size of the text, as a CSS length. */
   fontSize?: string;
-  /** Font weight of the text. */
+  /** Weight of the text, such as `600`; ignored while `isBold` is set. */
   fontWeight?: number;
   /** Whether the text is truncated with an ellipsis at 200px instead of wrapping. */
   isTextOverflow?: boolean;
@@ -18,7 +18,7 @@ export type SimpleLinkWithDropdownProps = {
   isSemitransparent?: boolean;
   /** CSS colour of the text. */
   color?: string;
-  /** `title` attribute of the text — the browser's own tooltip for a truncated label. */
+  /** Text of the kit's shared tooltip on the label, for a truncated one. It shows only while `RootTooltip` is mounted. */
   title?: string;
   /** Whether the link is inert: it greys out and clicking no longer opens the menu. */
   isDisabled?: boolean;
@@ -26,7 +26,7 @@ export type SimpleLinkWithDropdownProps = {
   dropdownType?: TDropdownType;
   /** Entries of the menu. Each is a `DropDownItem`'s props; `key` is required, and `onClick` is called with the event. */
   data?: ContextMenuModel[];
-  /** Text of the link. */
+  /** Label of the link, usually the value the menu changes. */
   children?: React.ReactNode;
 };
 

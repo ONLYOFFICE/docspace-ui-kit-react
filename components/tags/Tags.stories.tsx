@@ -22,18 +22,17 @@ const meta = {
   },
   argTypes: {
     tags: {
-      description:
-        "Tags to lay out: plain strings, or objects with a label and an optional icon, suffix or icon-only look",
+      description: "Tags to lay out. A bare string is treated as `{ label }`.",
     },
     columnCount: {
       control: "number",
       description:
-        "How many tags are drawn before the rest collapse into one overflow tag; -1 draws all of them",
+        "How many tags are drawn before the rest collapse into one overflow tag. `-1` draws all of them.",
     },
     showCreateTag: {
       control: "boolean",
       description:
-        "Draws a plus tag after the others (after the overflow tag when they overflow), or before them when every tag is shown",
+        "Whether a plus tag is drawn for creating a new one. It comes after the overflow tag when the tags overflow.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -41,7 +40,7 @@ const meta = {
     removeTagIcon: {
       control: "boolean",
       description:
-        "Removes the leading margin of each entry in the overflow drop-down, so the entry text starts at the menu's edge",
+        "Passed to the overflow drop-down, where it removes the leading margin of each entry.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -49,30 +48,31 @@ const meta = {
     onSelectTag: {
       action: "tag selected",
       description:
-        "Called with the tag's label (and its passed-through numbers) when a tag or an entry of the overflow drop-down is clicked",
+        "Called with `{ label, roomType, providerType }` when a tag, or an entry of the overflow drop-down, is clicked or activated with Enter or Space. A tag with its own `TagType.onClick` calls that instead.",
     },
     onMouseEnter: {
       action: "mouse enter",
       description:
-        "Called when the pointer enters any tag; it is not told which one",
+        "Called when the pointer enters any tag. It is not told which one.",
     },
     onMouseLeave: {
       action: "mouse leave",
-      description: "Called when the pointer leaves any tag",
+      description: "Called when the pointer leaves any tag.",
     },
     onOptionTagClick: {
       control: false,
       description:
-        "Called when the overflow tag or the plus tag is clicked; passing it turns the overflow tag into a +N count with no drop-down",
+        'Called when the overflow tag or the create tag is clicked, with `"overflow"` or `"create"` to say which. Passing it replaces the built-in drop-down.',
     },
     optionTagRef: {
       control: false,
       description:
-        "Ref to the overflow tag, for anchoring a menu of your own to it",
+        "Ref to the overflow tag, for a menu of your own anchored to it. When there is no overflow tag it points at the create tag.",
     },
     ariaLabel: {
       control: "text",
-      description: "Accessible name of the row, which is a group",
+      description:
+        'Accessible name of the row, which is a `role="group"`. Defaults to the translated `Common:Tags` ("Tags").',
       table: {
         defaultValue: { summary: '"Tags" (translated)' },
       },
@@ -80,20 +80,19 @@ const meta = {
     createTagLabel: {
       control: "text",
       description:
-        'Accessible name and tooltip of the plus tag; the translated "Add" by default',
+        'Accessible name and `title` of the plus tag drawn by `showCreateTag`. Defaults to the translated "Add".',
     },
     id: {
       control: "text",
-      description: "Applied to the outermost element",
+      description: "Applied to the outermost element.",
     },
     className: {
       control: "text",
-      description: "Applied to the outermost element",
+      description: "Applied to the outermost element.",
     },
     style: {
       control: "object",
-      description:
-        "Inline style of the outermost element; its width is the width the tags share",
+      description: "Applied to the outermost element as inline style.",
     },
   },
   args: {
@@ -143,6 +142,7 @@ const withRoomBelow = (height: number) => (Story: () => ReactElement) => (
 );
 
 export const MultipleTags: Story = {
+  name: "Five tags",
   render: (args) => <Tags {...args} />,
   args: {
     tags: ["Draft", "Review", "Contract", "Invoice", "Archive"],
@@ -171,6 +171,7 @@ export const MultipleTags: Story = {
 };
 
 export const WithOverflow: Story = {
+  name: "With overflow",
   render: (args) => <Tags {...args} />,
   decorators: [withRoomBelow(150)],
   args: {
@@ -224,7 +225,7 @@ export const WithOverflow: Story = {
     docs: {
       description: {
         story:
-          "Three tags and a `...` tag; click it to list the other three in a drop-down, and click an entry to select it (`onSelectTag`). Switch `removeTagIcon` in the Controls panel below to see the entries lose their leading margin.",
+          "Three tags and a `...` tag, which lists the other three in a drop-down. Picking an entry calls `onSelectTag`.",
       },
       source: {
         code: `<Tags
@@ -239,6 +240,7 @@ export const WithOverflow: Story = {
 };
 
 export const WithTagObjects: Story = {
+  name: "Tag objects",
   render: (args) => <Tags {...args} />,
   args: {
     tags: [
@@ -261,7 +263,7 @@ export const WithTagObjects: Story = {
     docs: {
       description: {
         story:
-          "**Design** carries an icon before its label, **Review** a suffix after it, and the third tag is only its icon at a fixed width (`isThirdParty`) — the looks a plain string cannot ask for.",
+          "Tags built from objects, for looks a plain string cannot ask for. **Design** has an icon, **Review** a suffix, and the third is only its icon (`isThirdParty`).",
       },
       source: {
         code: `<Tags
@@ -279,6 +281,7 @@ export const WithTagObjects: Story = {
 };
 
 export const ShowAll: Story = {
+  name: "All shown",
   render: (args) => <Tags {...args} />,
   args: {
     tags: ["Tag1", "Tag2", "Tag3", "Tag4", "Tag5"],
@@ -293,7 +296,7 @@ export const ShowAll: Story = {
     docs: {
       description: {
         story:
-          "All five tags at their natural width with no overflow tag, for a place where every tag must stay visible (`columnCount={-1}`); tags that do not fit are cut off at the container edge.",
+          "All five tags at their natural width, with no overflow tag (`columnCount={-1}`). Tags that do not fit are cut off at the container edge.",
       },
       source: {
         code: `<Tags tags={["Tag1", "Tag2", "Tag3", "Tag4", "Tag5"]} columnCount={-1} onSelectTag={handleSelect} />`,
@@ -303,6 +306,7 @@ export const ShowAll: Story = {
 };
 
 export const WithCreateTag: Story = {
+  name: "With a create tag",
   render: (args) => <Tags {...args} />,
   args: {
     tags: ["Design", "Development"],
@@ -326,7 +330,7 @@ export const WithCreateTag: Story = {
     docs: {
       description: {
         story:
-          "A plus tag after the two tags, for offering to add one more (`showCreateTag`); clicking it calls `onOptionTagClick`, and once the tags overflow it stays, after the overflow tag.",
+          "A plus tag after the two tags, which calls `onOptionTagClick` (`showCreateTag`). Once the tags overflow it stays, after the overflow tag.",
       },
       source: {
         code: `<Tags
@@ -342,6 +346,7 @@ export const WithCreateTag: Story = {
 };
 
 export const WithCustomOptionTag: Story = {
+  name: "Own overflow menu",
   render: (args) => <CustomOptionTagTemplate {...args} />,
   decorators: [withRoomBelow(100)],
   args: {
@@ -360,7 +365,7 @@ export const WithCustomOptionTag: Story = {
     docs: {
       description: {
         story:
-          "Two tags and a `+1` count instead of `...`, for when the hidden tags belong in a menu of your own: clicking the count opens no drop-down and calls `onOptionTagClick`, and `optionTagRef` points at it for anchoring.",
+          "Two tags and a `+1` count instead of `...`, for hidden tags in a menu of your own. The count calls `onOptionTagClick`, and `optionTagRef` points at it.",
       },
       source: {
         code: `const optionRef = useRef(null);
@@ -390,6 +395,7 @@ const CssCustomizationTemplate = (args: ComponentProps<typeof Tags>) => {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: (args) => <CssCustomizationTemplate {...args} />,
   args: {
     tags: ["Draft", "Review", "Contract", "Invoice"],
@@ -407,7 +413,7 @@ export const CssCustomization: Story = {
       // Own document: the variable is set on <html> and would indent every story's drop-down.
       story: { inline: false, height: "180px" },
       description: {
-        story: `The variable is listed under CSS variables on this page. The example sets it to 24px on the document; click the \`...\` tag to see the entry **Invoice** start further from the menu's edge.`,
+        story: `A row whose overflow menu entries start 24px from the menu's edge, from the variable set on the document.`,
       },
       source: {
         code: `:root {

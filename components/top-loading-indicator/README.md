@@ -25,9 +25,8 @@ nothing: it finds an element you put in the document by id and writes a width on
 ## Use this when / not when
 
 - Use for a navigation or a fetch whose length you do not know, when the page should stay usable.
-- **You must supply the element yourself**, with the literal id `ipl-progress-indicator`, and style
-  it yourself. Nothing in this package renders it and no stylesheet ships with this folder, so
-  without both the calls succeed silently and nothing appears.
+- **You must supply and style the element yourself**, with the literal id
+  `ipl-progress-indicator`. Nothing in this package renders it, and without it nothing appears.
 - **It is a module-level singleton.** One bar per page, one progression at a time; a second caller
   does not get a second bar.
 - Not for a determinate operation — the bar's numbers are invented from a timer, not from your
@@ -93,7 +92,7 @@ export function Page() {
 
 ## Recipes
 
-### Loading
+### Show a page-wide bar while a request runs
 
 `start()` opens the bar and `end()` closes it. Always pair them, and call `cancel()` when the work
 is abandoned — a progression with no `end()` sits at 90% for ever.
@@ -124,11 +123,10 @@ export function SaveButton({ save }: { save: () => Promise<void> }) {
 }
 ```
 
-### The element, and its style
+### Render and style the bar's element
 
-Every visible property is yours. The service writes `width` in per cent and nothing else, so the
-element needs a height, a colour and a position of its own, and a `transition` on `width` if the
-steps are not to jump.
+Every visible property is yours. The service writes `width` in per cent and nothing else. The
+element needs a height, a colour, a position, and a `transition` on `width` for smooth steps.
 
 ```tsx
 export function TopLoaderElement() {
@@ -160,14 +158,14 @@ export function TopLoaderElement() {
 - **The numbers are a timer, not your progress.** The bar goes from 0 to 50% over the first second,
   then adds 10% a second, and **stops at 90%** until `end()` is called.
 - **`end()` does not leave a full bar on screen.** It animates from where it stands to 100% over one
-  second, and the next tick 50ms later sets the width back to `0px`. Nothing fades it out — add a
-  transition or an opacity rule of your own if the finish should be visible.
+  second, and the next tick sets the width back to `0px`.
+- Nothing fades it out; add a transition or an opacity rule of your own for a visible finish.
 - **`cancel()` does not animate.** It stops the timer and sets the width to `0px` and
   `aria-valuenow` to `0` at once, whether the bar is still growing or already closing.
 - **`end()` before `start()` is ignored**, because there is no timer to end.
-- **A second `start()` does not restart the bar.** The interval is already running, so the width
-  keeps being computed from the original start time; only `cancel()` then `start()` begins again.
-  A `start()` during the closing animation cancels that animation and snaps the bar backwards.
+- **A second `start()` does not restart the bar.** The interval is already running, and the width
+  is computed from the original start time. Only `cancel()` then `start()` begins again.
+- A `start()` during the closing animation cancels that animation and snaps the bar backwards.
 - **State lives in the module, not in an instance.** Two features that both call `start()` share one
   progression, and whichever calls `end()` first finishes it for both.
 - **Nothing cleans up after you.** The interval runs until `end()` completes or `cancel()` is
@@ -179,9 +177,10 @@ export function TopLoaderElement() {
 
 ## Accessibility
 
-- On the first `start()` the element is given `role="progressbar"` with `aria-valuemin="0"`,
-  `aria-valuemax="100"` and an `aria-valuenow` updated on every tick. It has **no accessible name**;
-  add an `aria-label` to the element yourself.
+- On the first `start()` the element is given `role="progressbar"`, `aria-valuemin="0"`,
+  `aria-valuemax="100"` and an `aria-valuenow` updated on every tick.
+- It has **no accessible name**; add an `aria-label` to the element yourself. The service keeps
+  any `aria-*` on it that it does not write.
 - The reported value is invented by the timer, so a screen reader is told a percentage that has
   nothing to do with the work. For a wait whose length matters, announce the outcome in a live
   region instead of relying on the bar.

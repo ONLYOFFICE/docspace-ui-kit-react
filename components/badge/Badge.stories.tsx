@@ -21,7 +21,7 @@ const meta = {
     label: {
       control: "text",
       description:
-        'What the badge says, a number or a short text. `0`, `"0"` and an empty string hide the badge',
+        'What the badge says. `0`, `"0"` and an empty string hide the badge entirely — the element stays in the DOM with `display: none`.',
       table: {
         defaultValue: { summary: "0" },
       },
@@ -30,7 +30,7 @@ const meta = {
       control: "select",
       options: [undefined, "high"],
       description:
-        "`high` switches to the emphasised preset: 6px corners and 3px 10px padding around the label",
+        "Switches to the emphasised preset: a 6px radius, roomier padding and 13px text at weight 400.",
     },
     backgroundColor: {
       control: "color",
@@ -63,7 +63,7 @@ const meta = {
     borderRadius: {
       control: "text",
       description:
-        "Corner radius of the badge and its pill. The pill keeps 6px corners while `type` is `high`",
+        'Corner radius of both the outer element and the pill inside it. The pill ignores it while `type` is `"high"`.',
       table: {
         defaultValue: { summary: "11px" },
       },
@@ -71,7 +71,7 @@ const meta = {
     padding: {
       control: "text",
       description:
-        "Space inside the pill around the label. Replaced by 3px 10px while `type` is `high`",
+        'Padding of the pill inside the badge. Ignored while `type` is `"high"`.',
       table: {
         defaultValue: { summary: "0px 5px" },
       },
@@ -79,7 +79,7 @@ const meta = {
     maxWidth: {
       control: "text",
       description:
-        "Widest the pill may be; a longer label is cut off without an ellipsis. Not applied while `isPaidBadge` is set",
+        "Widest the pill may be. Longer text is clipped without an ellipsis. Not applied at all while `isPaidBadge` is set.",
       table: {
         defaultValue: { summary: "50px" },
       },
@@ -87,17 +87,17 @@ const meta = {
     height: {
       control: "text",
       description:
-        "Height of the badge. Without it the badge is as tall as its label",
+        "Height of the outer element. Without it the badge is as tall as its text.",
     },
     border: {
       control: "text",
       description:
-        "CSS `border` shorthand drawn around the badge. The badge draws no border of its own",
+        "CSS `border` shorthand for the outer element. The badge draws none of its own.",
     },
     noHover: {
       control: "boolean",
       description:
-        "Keeps the arrow cursor and a fixed colour on hover and press, for a badge that is only a marker",
+        "Drops the pointer cursor and the hover and active background shifts, for a badge that is only a marker.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -105,7 +105,7 @@ const meta = {
     isHovered: {
       control: "boolean",
       description:
-        "Shows the pointer cursor and makes a `border` transparent without the pointer being there. It does not draw the hover colour",
+        "Draws the hover background without a pointer being there, for a badge inside a row that is itself hovered.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -113,7 +113,7 @@ const meta = {
     isVersionBadge: {
       control: "boolean",
       description:
-        "On tablet-width screens and narrower, lets the badge fill the width of its container; the pill stays centred at its own width",
+        "Lets the badge grow to its content width at tablet widths and below, where it is otherwise held to the pill's width.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -121,7 +121,7 @@ const meta = {
     isPaidBadge: {
       control: "boolean",
       description:
-        "Keeps the label white whatever `color` says and lifts `maxWidth`, so a long label is never cut off",
+        "Forces white text, overriding `color`, and removes `maxWidth` so the label is never clipped.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -129,7 +129,7 @@ const meta = {
     isMutedBadge: {
       control: "boolean",
       description:
-        "Paints the pill grey over `backgroundColor`, for something inactive",
+        "Paints the badge grey, overriding `backgroundColor`, for something inactive.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -141,11 +141,12 @@ const meta = {
     },
     onMouseOver: {
       control: false,
-      description: "Called when the pointer enters the badge or moves over it",
+      description:
+        "Called with the event when the pointer enters the badge or moves within it.",
     },
     onMouseLeave: {
       control: false,
-      description: "Called when the pointer leaves the badge",
+      description: "Called with the event when the pointer leaves the badge.",
     },
     className: {
       control: "text",
@@ -153,7 +154,7 @@ const meta = {
     },
     dataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the outer element",
+      description: "Value of `data-testid` on the outer element.",
       table: {
         defaultValue: { summary: "badge" },
       },
@@ -203,7 +204,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The badge as it usually appears: a count on the accent colour. Change any prop live in the Controls panel below, and set the label to 0 to see the badge disappear.",
+          "The badge as it usually appears: a count on the accent colour. A label of 0 hides it.",
       },
       source: {
         code: `<Badge label={24} />`,
@@ -281,6 +282,7 @@ const CustomStyledTemplate = () => {
 };
 
 export const BadgeTypes: Story = {
+  name: "Types",
   render: () => <BadgeTypesTemplate />,
   play: async ({ canvas }) => {
     // The name is the label followed by the type, when there is one.
@@ -307,6 +309,7 @@ export const BadgeTypes: Story = {
 };
 
 export const SpecialBadges: Story = {
+  name: "Paid, muted and version",
   render: () => <SpecialBadgesTemplate />,
   play: async ({ canvas }) => {
     await expect(badge(canvas, "v1.2.3").text).toHaveTextContent("v1.2.3");
@@ -336,6 +339,7 @@ export const SpecialBadges: Story = {
 };
 
 export const HoverStates: Story = {
+  name: "Hover states",
   render: () => <HoverStatesTemplate />,
   play: async ({ canvas }) => {
     await expect(
@@ -348,11 +352,11 @@ export const HoverStates: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Hover and press each badge to compare:
+        story: `Three badges that answer the pointer differently:
 
-- **Default** — the pill lightens on hover and darkens while pressed
-- **Hovered** — shows the pointer cursor before the pointer arrives (\`isHovered\`); the colour still changes only under the real pointer
-- **No Hover** — keeps the arrow cursor and its colour, for a badge that is only a marker (\`noHover\`)`,
+- **Default** — lightens on hover and darkens while pressed
+- **Hovered** — the pointer cursor without a pointer (\`isHovered\`); the colour changes only under a real one
+- **No Hover** — the arrow cursor and a steady colour, for a marker (\`noHover\`)`,
       },
       source: {
         code: `<Badge label="Default" />
@@ -364,6 +368,7 @@ export const HoverStates: Story = {
 };
 
 export const CustomStyled: Story = {
+  name: "Custom colours and size",
   render: () => <CustomStyledTemplate />,
   play: async ({ canvas }) => {
     const custom = badge(canvas, "Custom");
@@ -405,6 +410,7 @@ export const CustomStyled: Story = {
 };
 
 export const InteractiveBadge: Story = {
+  name: "Clickable",
   render: (args) => <Badge {...args} />,
   args: {
     label: "Click me",
@@ -418,7 +424,7 @@ export const InteractiveBadge: Story = {
     docs: {
       description: {
         story:
-          "A badge that opens something when clicked: click it and watch the Actions panel (`onClick`). It takes no keyboard focus, so offer the same action somewhere a keyboard user can reach it.",
+          "A badge that opens something when clicked (`onClick`). It takes no keyboard focus, so offer the same action where a keyboard user can reach it.",
       },
       source: {
         code: `<Badge label="Click me" onClick={onOpen} />`,
@@ -428,6 +434,7 @@ export const InteractiveBadge: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   play: async ({ canvas }) => {
     await expect(badge(canvas, "Premium").pill).toHaveStyle({
       backgroundColor: "rgb(123, 79, 191)",
@@ -451,7 +458,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The variables are listed under CSS variables on this page. The example is one \`high\` badge, because two of the three variables apply only to that type.`,
+        story: `One \`high\` badge under a wrapper that sets the variables; two of the three apply only to that type.`,
       },
       source: {
         code: `<div

@@ -7,9 +7,8 @@ export type CircleSkeletonProps = {
    */
   title?: string;
   /**
-   * Centre of the circle on the horizontal axis, in user units — the SVG's `cx`.
-   * It is not an offset: a value below `radius` cuts the circle off at the left
-   * edge. The default equals the default `radius`, so the default circle fits.
+   * Centre of the circle on the horizontal axis, in user units: the SVG's `cx`.
+   * A value below `radius` cuts the circle off at the left edge.
    */
   x?: string;
   /** Centre of the circle on the vertical axis, in user units — the SVG's `cy`. */
@@ -24,9 +23,9 @@ export type CircleSkeletonProps = {
   backgroundColor?: string;
   /** Colour of the band that sweeps across the skeleton. */
   foregroundColor?: string;
-  /** Opacity of `backgroundColor`. */
+  /** How strongly the resting colour shows, from 0 to 1. */
   backgroundOpacity?: number;
-  /** Opacity of `foregroundColor`. */
+  /** How strongly the sweeping band shows, from 0 to 1. */
   foregroundOpacity?: number;
   /** Duration of one sweep, in seconds. */
   speed?: number;
