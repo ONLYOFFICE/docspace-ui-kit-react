@@ -117,6 +117,13 @@ const AiChatStoresBridge = () => {
           // the history the chat was left on.
           leaveHistory(stores);
         }
+        // Set after the switch, so it is the fresh conversation's draft and
+        // not dropped with the previous one's. The chat applies it once its
+        // composer is mounted: the panel opened by this preset mounts it
+        // only later.
+        if (preset.draft !== undefined) {
+          stores.useThreadsStore.getState().setDraft(preset.draft);
+        }
         const clouds = stores.useCloudsStore.getState();
         // The rooms of a preset share one cloud (the portal); a mixed
         // list is connected one room at a time.

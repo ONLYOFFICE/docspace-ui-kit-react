@@ -22,7 +22,7 @@ const { clouds, profiles, threads, router } = vi.hoisted(() => ({
     getProfileById: vi.fn(),
     setSessionChatProfile: vi.fn(),
   },
-  threads: { onSwitchToNewThread: vi.fn() },
+  threads: { onSwitchToNewThread: vi.fn(), setDraft: vi.fn() },
   router: {
     currentPage: "chat" as "chat" | "history" | "initial-setup",
     goToChat: vi.fn(),
@@ -285,6 +285,46 @@ describe("AiChatStoresBridge", () => {
       store.toggle();
     });
     expect(router.goToChat).not.toHaveBeenCalled();
+  });
+
+  it("puts a fresh preset's draft into the new conversation, after the switch, once", () => {
+    profiles.initialized = true;
+    const store = new AiChatStore();
+    renderBridge(store);
+    act(() => {
+      store.openPreset({ ...PRESET, draft: "/document-summary " });
+    });
+    expect(threads.setDraft).toHaveBeenCalledTimes(1);
+    expect(threads.setDraft).toHaveBeenCalledWith("/document-summary ");
+    expect(
+      threads.onSwitchToNewThread.mock.invocationCallOrder[0],
+    ).toBeLessThan(threads.setDraft.mock.invocationCallOrder[0]);
+    // The preset is consumed: nothing applies the draft a second time.
+    expect(store.pendingPreset).toBeNull();
+  });
+
+  it("replaces the open chat's draft with an applied preset's one", () => {
+    profiles.initialized = true;
+    const store = new AiChatStore();
+    renderBridge(store);
+    act(() => {
+      store.applyPreset({ ...PRESET, draft: "/translate " });
+    });
+    expect(threads.onSwitchToNewThread).not.toHaveBeenCalled();
+    expect(threads.setDraft).toHaveBeenCalledWith("/translate ");
+  });
+
+  it("leaves the draft alone for a preset without one", () => {
+    profiles.initialized = true;
+    const store = new AiChatStore();
+    renderBridge(store);
+    act(() => {
+      store.openPreset(PRESET);
+    });
+    act(() => {
+      store.applyPreset(PRESET);
+    });
+    expect(threads.setDraft).not.toHaveBeenCalled();
   });
 
   it("opens a fresh preset on the conversation, an applied one on the page it is on", () => {

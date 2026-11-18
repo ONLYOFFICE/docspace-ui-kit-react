@@ -74,6 +74,14 @@ export type AiChatPresetSettings = {
    * it opens without one.
    */
   folderContext?: AiChatContextFolder | null;
+  /**
+   * The text the chat's composer is to hold, replacing the unsent draft,
+   * such as a skill's call (`"/skill-name "`) for "Use in chat". With
+   * `openPreset` it is the fresh conversation's draft, with `applyPreset`
+   * it replaces the open chat's one. The chat applies it once, as soon as
+   * its composer is mounted. Absent, the draft is left as it is.
+   */
+  draft?: string;
 };
 
 /**
