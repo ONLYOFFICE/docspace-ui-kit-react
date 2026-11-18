@@ -25,6 +25,7 @@ export type EmptyScreenContainerProps = {
   imageStyle?: CSSProperties;
   /** Inline style of the row that holds `buttons`. */
   buttonStyle?: CSSProperties;
-  /** Adds the height of the filter bar to the top padding — 91px in place of 52px — for a screen that has no filter above it. It removes nothing. */
+  /** Adds the height of a filter bar to the top padding, for a screen with no
+   * filter above it. It removes nothing. */
   withoutFilter?: boolean;
 };

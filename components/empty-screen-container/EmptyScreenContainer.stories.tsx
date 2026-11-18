@@ -21,33 +21,37 @@ const meta = {
   argTypes: {
     imageSrc: {
       control: "text",
-      description: "URL source for the empty state image",
+      description:
+        "Source of the illustration. The stylesheet pins the image to 200×140, and to 150×105 below 600px, so supply artwork of that shape.",
     },
     imageAlt: {
       control: "text",
-      description: "Alternative text for the image for accessibility",
+      description:
+        "Alternative text for the illustration. Pass an empty string when the artwork repeats what the text below already says.",
     },
     headerText: {
       control: "text",
-      description: "Main header text displayed below the image",
+      description:
+        "The heading under the image, 19px and bold, rendered as an `<h3>` unless `headingLevel` says otherwise.",
     },
     subheadingText: {
       control: "text",
-      description: "Optional subheading text displayed below the header",
+      description:
+        "Optional 600-weight line between the header and the description. It has no styling of its own beyond that weight.",
     },
     descriptionText: {
       control: "text",
-      description:
-        "Optional description text or React node displayed below the subheading",
+      description: "Optional explanatory line at 12px, in the muted colour.",
     },
     buttons: {
-      description: "Optional action buttons or interactive elements",
+      description:
+        "Actions under the text, stacked in a 16px column and centred.",
       control: false,
     },
     withoutFilter: {
       control: "boolean",
       description:
-        "Adds the height of a filter bar to the space above the image, 91px instead of 52px on desktop, for a screen that has no filter bar above it",
+        "Adds the height of a filter bar to the top padding, for a screen with no filter above it. It removes nothing.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -55,24 +59,24 @@ const meta = {
     imageStyle: {
       control: "object",
       description:
-        "Inline styles for the image and the only way past its fixed size; ignored on windows between 601px and 1023px wide",
+        "Inline style of the `<img>`, and the only way past its fixed size. It is dropped between 601px and 1023px, where the component passes an empty object instead.",
     },
     buttonStyle: {
       control: "object",
-      description: "Custom CSS styles for the buttons container",
+      description: "Inline style of the row that holds `buttons`.",
     },
     className: {
       control: "text",
-      description: "Additional CSS class name",
+      description:
+        "Added after the component's own classes on the outer element.",
     },
     id: {
       control: false,
-      description: "Accepted by the type but ignored: it never reaches the DOM",
+      description: "Value of `id` on the outer element.",
     },
     style: {
       control: false,
-      description:
-        "Accepted by the type but ignored; style the outer element through `className`",
+      description: "Inline style of the outer element.",
     },
   },
 } satisfies Meta<typeof EmptyScreenContainer>;
@@ -141,7 +145,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The full layout, for a list a filter has emptied: a header, a subheading and a description explain why nothing is shown, and a reset action under them offers the way back.",
+          "The full layout, for a list a filter has emptied. A header, a subheading and a description explain why nothing is shown; a reset action below offers the way back.",
       },
       source: {
         code: `<EmptyScreenContainer
@@ -158,6 +162,7 @@ export const Default: Story = {
 };
 
 export const MinimalContent: Story = {
+  name: "Heading and one action",
   render: (args) => <EmptyScreenContainer {...args} />,
   args: {
     imageSrc: EmptyImageReactSvg,
@@ -193,6 +198,7 @@ export const MinimalContent: Story = {
 };
 
 export const CustomStyles: Story = {
+  name: "Custom styles",
   render: (args) => <EmptyScreenContainer {...args} />,
   args: {
     imageSrc: EmptyImageReactSvg,
@@ -237,6 +243,7 @@ export const CustomStyles: Story = {
 };
 
 export const WithoutFilter: Story = {
+  name: "No filter above",
   render: (args) => <EmptyScreenContainer {...args} />,
   args: {
     imageSrc: EmptyImageReactSvg,
@@ -258,7 +265,7 @@ export const WithoutFilter: Story = {
     docs: {
       description: {
         story:
-          "For a screen with no filter bar above it, such as a first-run view: the content starts 91px from the top instead of 52px (`withoutFilter`), so it sits as low as it would under a filter bar.",
+          "A screen with no filter bar above it, such as a first-run view (`withoutFilter`). The content starts 91px from the top instead of 52px, as low as under a filter bar.",
       },
       source: {
         code: `<EmptyScreenContainer
@@ -275,6 +282,7 @@ export const WithoutFilter: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   play: async ({ canvas }) => {
     await expect(canvas.getByText("No files found")).toHaveStyle({
       color: "rgb(0, 130, 201)",
@@ -316,7 +324,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The reset action shows the link colour on both its icon and its text, the line under it the plain-text colour; the width applies only on a window wider than 1424px.`,
+        story: `Every overridable variable set on one wrapper. The reset action shows the link colour on its icon and text, and the line under it the plain-text colour. The width applies only above 1424px.`,
       },
       source: {
         code: `<div

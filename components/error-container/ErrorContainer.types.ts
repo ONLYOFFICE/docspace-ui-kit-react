@@ -20,7 +20,8 @@ export type ErrorContainerProps = {
   customizedBodyText?: string;
   /** Called when the action button is clicked. The button appears only when `buttonText` is set as well. */
   onClickButton?: VoidFunction;
-  /** Takes the container out of the flow — `position: absolute` at full width — for the document editor, which mounts it over a layout of its own.
+  /** Lays the page over its positioned parent at full width instead of in the
+   * flow, for a host such as the document editor.
    * @default false */
   isEditor?: boolean;
   /** Hides the portal logo above the illustration. Set it outside an ONLYOFFICE Apps portal, where the logo endpoint does not resolve.

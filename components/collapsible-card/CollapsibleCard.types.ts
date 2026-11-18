@@ -8,9 +8,8 @@ export interface CollapsibleCardProps {
   /** Body, rendered only while the card is open. Without it the card opens to nothing. */
   children?: React.ReactNode;
   /**
-   * Whether the card is open. Passing it — even as `false` — takes control away
-   * from the component for good: it then opens and closes only when you change
-   * this value from `onToggle`.
+   * Whether the card is open. Passing it, even as `false`, makes the card
+   * controlled: it opens and closes only when you change this value.
    */
   isOpen?: boolean;
   /** Whether the card starts open. Read once, on the first render, and only while `isOpen` is unset.

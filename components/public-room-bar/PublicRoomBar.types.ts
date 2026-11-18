@@ -17,11 +17,14 @@ export interface PublicRoomBarProps {
   closeLabel?: string;
   /** Added after the component's own classes on the outer element. */
   className?: string;
-  /** Inline style of the outer element, and where the `--public-room-bar-*` custom properties go. */
+  /** Inline style of the outer element, and the place for the bar's CSS
+   * variables. */
   style?: React.CSSProperties;
   /** Removes the bar's own 20px top margin, for a bar that already sits under something. It shows and hides nothing, whatever the name suggests. */
   barIsVisible?: boolean;
-  /** Announces the bar's text to screen readers when the bar appears and when the text changes, through a visually hidden status region. Set it for a bar that shows up in response to something; leave it off for one that is part of a panel or dialog from the start, which is read with the rest of the page. */
+  /** Announces the bar's text to screen readers when it appears and when the
+   * text changes. Set it for a bar that appears in response to something, not
+   * for one already part of a panel. */
   live?: boolean;
   /** Value of `data-testid` on the outer element.
    * @default "public_room_bar" */

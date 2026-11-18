@@ -19,38 +19,38 @@ const meta = {
     title: {
       control: "text",
       description:
-        "Content on the leading side of the header row, in bold. The header row is left out when both this and `extra` are unset",
+        "Left side of the header row. A string renders as the card's heading; any other node is rendered as given inside a `<div>`. Without this and `extra` there is no header row.",
       table: { type: { summary: "React.ReactNode" } },
     },
     extra: {
       control: "text",
       description:
-        "Content on the trailing side of the header row, kept on one line at its natural width, such as a status or a badge",
+        "Right side of the header row, pushed against the trailing edge — a status, a badge, a link.",
       table: { type: { summary: "React.ReactNode" } },
     },
     children: {
       control: "text",
-      description:
-        "Body of the card, in smaller secondary text. Nothing is rendered for it when it is empty",
+      description: "Body of the card. Nothing is rendered when it is empty.",
       table: { type: { summary: "React.ReactNode" } },
     },
     footer: {
       control: "text",
       description:
-        "Content of a footer below the body, with no styling of its own beyond the card's 12px spacing",
+        "Contents of a `<footer>` below the body. It gets no styling of its own beyond the card's 12px gap.",
       table: { type: { summary: "React.ReactNode" } },
     },
     className: {
       control: "text",
-      description: "Class added after the component's own on the outer element",
+      description:
+        "Added after the component's own class, on the outer element.",
     },
     style: {
       control: "object",
-      description: "Inline style of the outer element",
+      description: "Inline style of the outer element.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the outer element",
+      description: "Value of `data-testid` on the outer element.",
       table: { defaultValue: { summary: '"card"' } },
     },
   },
@@ -84,7 +84,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The common case: a heading over a short block of text (`title`, `children`). Change any other prop live in the Controls panel below.",
+          "The common case: a heading over a short block of text (`title`, `children`).",
       },
       source: {
         code: `<Card title="Card title">Card body content goes here.</Card>`,
@@ -94,6 +94,7 @@ export const Default: Story = {
 };
 
 export const WithExtra: Story = {
+  name: "With a status",
   args: {
     title: "Backup storage",
     extra: <span className={styles.connectedStatus}>Connected</span>,
@@ -112,7 +113,7 @@ export const WithExtra: Story = {
     docs: {
       description: {
         story:
-          'A short status belongs next to the heading: "Connected" sits on the trailing edge of the header row, on one line however long the title is (`extra`).',
+          'A short status next to the heading: "Connected" sits on the trailing edge of the header row (`extra`). It stays on one line however long the title is.',
       },
       source: {
         code: `<Card title="Backup storage" extra={<span>Connected</span>}>
@@ -124,6 +125,7 @@ export const WithExtra: Story = {
 };
 
 export const TitleOnly: Story = {
+  name: "Title only",
   args: {
     title: "Title without body",
   },
@@ -147,6 +149,7 @@ export const TitleOnly: Story = {
 };
 
 export const BodyOnly: Story = {
+  name: "Text only",
   args: {
     children: "Body content without a header row.",
   },
@@ -161,7 +164,7 @@ export const BodyOnly: Story = {
     docs: {
       description: {
         story:
-          "Text alone, for a note that needs no heading: with neither `title` nor `extra` set, the header row is left out and the text starts at the top of the card.",
+          "Text alone, for a note that needs no heading. With neither `title` nor `extra`, the header row is left out and the text starts at the top.",
       },
       source: {
         code: `<Card>Body content without a header row.</Card>`,
@@ -184,6 +187,7 @@ const WithIconInTitleTemplate = () => (
 );
 
 export const WithIconInTitle: Story = {
+  name: "Icon in the title",
   render: () => <WithIconInTitleTemplate />,
   play: async ({ canvas }) => {
     const header = canvas.getByTestId("card").querySelector("header");
@@ -194,7 +198,7 @@ export const WithIconInTitle: Story = {
     docs: {
       description: {
         story:
-          "An icon before the heading marks what the card is about; the card lays out nothing inside the title, so the icon and the text are wrapped in a flex span of the consumer's own (`title`).",
+          "An icon before the heading marks what the card is about (`title`). The card lays out nothing inside the title, so the icon and text sit in a flex span of your own.",
       },
       source: {
         code: `<Card
@@ -230,6 +234,7 @@ const FullExampleTemplate = () => (
 );
 
 export const FullExample: Story = {
+  name: "Every slot",
   render: () => <FullExampleTemplate />,
   play: async ({ canvas }) => {
     // Every slot, in order: header, body, footer.
@@ -246,7 +251,7 @@ export const FullExample: Story = {
     docs: {
       description: {
         story:
-          'Every slot at once, for a block that states something and offers the next step: an icon and a heading (`title`), "Connected" on the trailing edge (`extra`), a paragraph (`children`) and an "Open settings" button below it (`footer`).',
+          'Every slot at once. An icon and a heading (`title`), "Connected" on the trailing edge (`extra`), a paragraph (`children`) and an "Open settings" button below (`footer`).',
       },
       source: {
         code: `<Card
@@ -284,6 +289,7 @@ const CssCustomizationTemplate = () => (
 );
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => <CssCustomizationTemplate />,
   play: async ({ canvas }) => {
     const card = canvas.getByTestId("card");
