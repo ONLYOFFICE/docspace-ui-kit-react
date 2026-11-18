@@ -35,7 +35,7 @@ type InputProps = Omit<TextInputProps, keyof CommonProps>;
 type IconProps = {
   /** URL of the icon at the end of the field. */
   iconName?: string;
-  /** Colour of that icon. */
+  /** Any CSS colour the icon is drawn in, while `isIconFill` is on. */
   iconColor?: string;
   /** Colour of that icon on hover. */
   hoverColor?: string;
@@ -47,7 +47,7 @@ type IconProps = {
    * @default false
    */
   isIconFill?: boolean;
-  /** The icon as an element, instead of `iconName`. */
+  /** The icon as JSX, rendered inline with no request; wins over `iconName`. */
   iconNode?: React.ReactNode;
   /**
    * Called when the icon is clicked. Without it the icon is rendered in the
@@ -56,9 +56,8 @@ type IconProps = {
   onIconClick?: (e: React.MouseEvent) => void;
   /**
    * Name of the icon as a button. With `onIconClick` it also puts the icon in
-   * the Tab order, where Enter and Space press it; without a name it stays
-   * out, so the keyboard never meets a button it cannot announce. Without
-   * `onIconClick` the icon is no button, and the name is not set.
+   * the Tab order, where Enter and Space press it. Without `onIconClick` the
+   * icon is no button, and the name is not set.
    */
   iconAriaLabel?: string;
   /** Applied to the box around the icon. */

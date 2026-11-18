@@ -6,9 +6,8 @@ export type ColorInputProps = {
   /** Applied to the outermost element. */
   id?: string;
   /**
-   * Colour the field starts on, as a hex string. It is read once, on mount —
-   * the component owns the value from then on, so this is a starting point and
-   * not a controlled value. The kit's blue is used when it is left out.
+   * Colour the field starts on, as a hex string; the kit's blue when left out.
+   * It is read once, on mount: a starting point, not a controlled value.
    */
   defaultColor?: string;
   /**

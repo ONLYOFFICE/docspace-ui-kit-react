@@ -43,7 +43,8 @@ const meta = {
     },
     placeholder: {
       control: "text",
-      description: "Placeholder text",
+      description:
+        "Placeholder text. The default is a single space, not an empty string, so `:placeholder-shown` matches even when no placeholder was asked for.",
       table: {
         defaultValue: { summary: '" "' },
       },
@@ -95,29 +96,30 @@ const meta = {
     },
     iconName: {
       control: "text",
-      description: "URL of the icon at the end of the field",
+      description: "URL of the icon at the end of the field.",
     },
     iconNode: {
       control: false,
-      description: "The icon as an element, instead of `iconName`",
+      description:
+        "The icon as JSX, rendered inline with no request; wins over `iconName`.",
     },
     iconSize: {
       control: "number",
-      description:
-        "Size of the icon in pixels; left out, the icon follows the field's size",
+      description: "Size of that icon in pixels. It falls back to `size`.",
     },
     iconColor: {
       control: "color",
-      description: "Colour of the icon at the end of the field",
+      description:
+        "Any CSS colour the icon is drawn in, while `isIconFill` is on.",
     },
     hoverColor: {
       control: "color",
-      description: "Colour of that icon while the pointer is over it",
+      description: "Colour of that icon on hover.",
     },
     isIconFill: {
       control: "boolean",
       description:
-        "Recolours the icon's paths to the icon color; leave it off for a multi-coloured icon",
+        "Whether the icon's paths are recoloured to `iconColor`. Leave it off for a multi-coloured icon.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -125,7 +127,7 @@ const meta = {
     noIcon: {
       control: "boolean",
       description:
-        "Leaves the icon box out entirely; without it an empty box still takes space at the end of the field",
+        "Whether the icon box is left out entirely. Without it an empty box is still rendered and still takes its padding.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -133,17 +135,17 @@ const meta = {
     onIconClick: {
       control: false,
       description:
-        "Called when the icon is clicked; without it the icon is drawn greyed out and ignores clicks",
+        "Called when the icon is clicked. Without it the icon is rendered in the disabled style and does not respond — it is what makes the icon a button.",
     },
     children: {
       control: "text",
       description:
-        "Content rendered before the input, inside the same border, such as a currency sign or a country code",
+        "Rendered before the input, inside the same bordered group — a currency sign, a country code, a fixed prefix.",
     },
     tabIndex: {
       control: "number",
       description:
-        "Place of the inner `<input>` in the keyboard tab order; unset, the field keeps its natural place, and `-1` makes the Tab key skip it",
+        "Used as HTML `tabindex` property of the `<input>`. Unset, the field keeps its natural place in the tab order; pass `-1` only for a field the keyboard must skip.",
     },
     isAutoFocussed: {
       control: "boolean",
@@ -165,7 +167,7 @@ const meta = {
     },
     id: {
       control: "text",
-      description: "Applied to the inner `<input>`, not to the group around it",
+      description: "Applied to the `<input>`, not to the group around it.",
     },
     mask: {
       control: false,
@@ -202,33 +204,34 @@ const meta = {
     },
     iconButtonClassName: {
       control: "text",
-      description: "Class name applied to the box around the icon",
+      description: "Applied to the box around the icon.",
       table: {
         defaultValue: { summary: '""' },
       },
     },
     className: {
       control: "text",
-      description: "Class name applied to the group",
+      description: "Applied to the group.",
     },
     style: {
       control: "object",
-      description: "Inline style applied to the group",
+      description: "Applied to the group.",
     },
     dataTestId: {
       control: "text",
-      description: "`data-testid` of the group",
+      description: "`data-testid` of the group.",
       table: {
         defaultValue: { summary: '"input-block"' },
       },
     },
     testId: {
       control: "text",
-      description: "`data-testid` of the inner `<input>`",
+      description:
+        "`data-testid` of the inner `<input>`, passed through to `TextInput`.",
     },
     forwardedRef: {
       control: false,
-      description: "Ref to the inner `<input>` element",
+      description: "Ref to the `<input>` element itself.",
     },
   },
 } satisfies Meta<typeof InputBlock>;
@@ -306,8 +309,7 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "A text field with a search icon at its end, inside one border. Type in it, and change any other prop live in the Controls panel below.",
+        story: "A text field with a search icon at its end, inside one border.",
       },
       source: {
         code: `<InputBlock
@@ -358,7 +360,7 @@ export const Sizes: Story = {
     docs: {
       description: {
         story:
-          "Match the field to the controls around it: **Base size**, **Middle size** and **Large size** differ in text size, padding and the height of the icon box (`size`).",
+          "The three sizes (`size`), which differ in text size, padding and the height of the icon box.",
       },
       source: {
         code: `<InputBlock size={InputSize.base} placeholder="Base size" iconName={SearchIcon} />
@@ -417,7 +419,7 @@ export const States: Story = {
     docs: {
       description: {
         story:
-          "How the field reads in each state: **Error state** and **Warning state** recolour the border of the whole group (`hasError`, `hasWarning`); **Disabled** greys the field out and drops the icon (`isDisabled`); **Read-only content** keeps the look and the icon and only stops typing (`isReadOnly`).",
+          "The field in each state:\n\n- **Error state**, **Warning state** — the whole group's border recoloured (`hasError`, `hasWarning`)\n- **Disabled** — greyed out, without the icon (`isDisabled`)\n- **Read-only content** — the look and the icon kept, typing stopped (`isReadOnly`)",
       },
       source: {
         code: `<InputBlock placeholder="Normal" iconName={SearchIcon} />
@@ -443,6 +445,7 @@ const PasswordTemplate = () => {
 };
 
 export const PasswordType: Story = {
+  name: "Password type",
   render: () => <PasswordTemplate />,
   play: async ({ canvas, userEvent }) => {
     const input = canvas.getByPlaceholderText("Enter password");
@@ -480,6 +483,7 @@ const WithIconClickTemplate = () => {
 };
 
 export const WithIconClick: Story = {
+  name: "Clickable icon",
   render: () => <WithIconClickTemplate />,
   beforeEach: () => {
     onSearchIconClick.mockClear();
@@ -496,7 +500,7 @@ export const WithIconClick: Story = {
     docs: {
       description: {
         story:
-          "An icon that does something, such as clearing the field or opening a picker, needs a click handler (`onIconClick`); without it the icon is drawn greyed out and ignores clicks, as in the other stories. Click the search icon to see the action.",
+          "A search icon with a click handler (`onIconClick`), as for clearing the field or opening a picker. Without a handler the icon is greyed out and ignores clicks, as in the other stories.",
       },
       source: {
         code: `<InputBlock
@@ -523,6 +527,7 @@ const WithPrefixTemplate = () => {
 };
 
 export const WithPrefix: Story = {
+  name: "With prefix",
   render: () => <WithPrefixTemplate />,
   play: async ({ canvas }) => {
     const [amount, phone] = canvas.getAllByTestId("input-block");
@@ -569,6 +574,7 @@ const RightToLeftTemplate = () => {
 
 // Framed on Docs: the theme provider stamps data-dir on <html>, which would flip the whole page.
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: () => <RightToLeftTemplate />,
   play: async ({ canvas }) => {
     const [plain, prefixed] = canvas.getAllByTestId("input-block");
@@ -590,7 +596,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "106px" },
       description: {
         story:
-          'The same field under a right-to-left interface: the icon moves to the left end, the prefix to the right end, and the placeholder sits at the right edge. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+          "Two fields in a right-to-left interface: the icon at the left end, the prefix at the right, the placeholder from the right edge. The direction comes from the theme's `interfaceDirection` and the wrapper's `dir=\"rtl\"`.",
       },
       source: {
         code: `<div dir="rtl">
@@ -605,6 +611,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   render: () => (
     <div
       style={
@@ -658,9 +665,10 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
+        story: `Every overridable variable, set on one wrapper.
 
-**Amount** carries a prefix, for the prefix padding, and shows every other variable except the large icon padding; **Large size** is there for \`--input-block-icon-padding-lg\`, which only the large size reads. Hover and focus a field to see the hover and focus border colours.`,
+- **Amount** — a prefix, for the prefix padding, and every other variable but the large icon padding
+- **Large size** — for \`--input-block-icon-padding-lg\`, which only the large size reads`,
       },
       source: {
         code: `<div style={{ "--text-input-bg": "#f5f3ff", "--text-input-border-color": "#c4b5fd", "--input-block-icon-padding": "16px" }}>

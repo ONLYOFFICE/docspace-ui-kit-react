@@ -20,7 +20,7 @@ interface TabItemObject {
 }
 
 type QuantityPickerProps = {
-  /** Current value; the component is controlled */
+  /** The number shown. The component is controlled: pass back what `onChange` reports */
   value: number;
   /** Lower bound for the controls, typed input and slider */
   minValue: number;
@@ -59,7 +59,7 @@ type QuantityPickerProps = {
   isZeroAllowed?: boolean;
   /** Allows zero as a value below `minValue`; other values below it are flagged */
   enableZero?: boolean;
-  /** Tooltip id set as `data-tooltip-id` on the minus control */
+  /** Id of a `Tooltip` you render, anchored to the minus control through `data-tooltip-id` */
   minusTooltipId?: string;
   /** Disables only the minus control; it stays focusable (`aria-disabled`) so `minusTooltipId` can still explain why */
   minusDisabled?: boolean;

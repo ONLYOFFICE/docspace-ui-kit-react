@@ -33,7 +33,7 @@ export type FileInputProps = {
    * the button has no loading form.
    */
   isLoading?: boolean;
-  /** Ignored. Nothing reads this prop. */
+  /** No effect: it lands on the outer `<div>` as an attribute nothing reads. */
   name?: string;
   /**
    * Called with the files `accept` turned away. While it is set the component
@@ -59,13 +59,13 @@ export type FileInputProps = {
    * is set. Without it the click opens the file dialog and this never fires.
    */
   onClick?: (e: React.MouseEvent) => void;
-  /** Applied to the outermost element. */
+  /** Id of the outer element, the one a `<label for>` should point at. */
   idButton?: string;
   /** Text shown in the field instead of the chosen file names, with `fromStorage`. */
   path?: string;
   /**
-   * Turns the control into a button that picks from somewhere else: the hidden
-   * file input is not rendered, `path` is displayed, and clicks go to `onClick`.
+   * Turns the control into a button that picks from somewhere else. The hidden
+   * file input is left out, `path` is shown, and clicks go to `onClick`.
    */
   fromStorage?: boolean;
   /**
@@ -78,7 +78,7 @@ export type FileInputProps = {
   /** Accessible description of the control. */
   "aria-description"?: string;
   /**
-   * `data-testid` of the outermost element.
+   * Sets the outer element's `data-testid`, despite the hyphenated name.
    * @default "file-input"
    */
   "data-test-id"?: string;
