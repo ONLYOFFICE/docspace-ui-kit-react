@@ -2,10 +2,8 @@ import type { DateTime } from "luxon";
 
 type TimePickerBase = {
   /**
-   * Time the fields start on. It is read once, on mount; changing it afterwards
-   * does nothing. Its **date** part is carried into every value `onChange`
-   * reports, so pass a full date-time if that matters. Midnight today is used
-   * when it is left out.
+   * Time the fields start on, read once on mount; midnight today without it.
+   * Its **date** part is carried into every value `onChange` reports.
    */
   initialTime?: string | Date | DateTime;
   /**
@@ -30,8 +28,8 @@ type TimePickerBase = {
   /** Position of both fields in the tab order. Left out, both take their natural place in it. */
   tabIndex?: number;
   /**
-   * Called when typing completes the minutes field — two digits, a single digit
-   * above 5, a third digit or a value above 59 — not when the field loses focus.
+   * Called when typing completes the minutes field, not when it loses focus.
+   * Two digits, one digit above 5, a third digit or a value above 59 complete it.
    */
   onBlur?: () => void;
   /**
@@ -71,7 +69,7 @@ type TimePickerHourFormat =
       isTwelveHourFormat: true;
       /**
        * `"AM"` or `"PM"`, used when parsing the typed time in 12-hour mode. You
-       * own this value and the control that changes it.
+       * own this value and the control that changes it; a change reports nothing.
        */
       meridiem: string;
     }

@@ -194,8 +194,8 @@ export type TComboboxProps = {
    */
   ariaLabel?: string;
   /**
-   * Position of the button in the tab order. It is `0` by default, so the
-   * control is reachable; pass `-1` to take it off the tab order.
+   * Position of the button in the tab order; `-1` takes it out. A disabled
+   * button is out of the tab order whatever this says.
    * @default 0
    */
   tabIndex?: number;
@@ -243,10 +243,9 @@ export type TComboboxProps = {
    */
   onSelect?: (option: TOption) => void;
   /**
-   * Called when the button is clicked or a key opens or closes the list, with
-   * the state being asked for — so the event is a mouse or a keyboard one.
-   * Passing it without `onBackdropClick` also stops a click outside closing
-   * the list.
+   * Called with the open state asked for, by a click on the button or a key;
+   * the event is a mouse or a keyboard one. Without `onBackdropClick`, a click
+   * outside no longer closes the list.
    */
   onToggle?: (
     e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>,
