@@ -22,11 +22,11 @@ The Table README describes it in full.`,
     columns: {
       control: false,
       description:
-        "The table's columns; only those with an `onChange` and without `isDisabled` get a checkbox",
+        "The table's columns. Only those with an `onChange` and without `isDisabled` get a checkbox.",
     },
     disableSettings: {
       control: "boolean",
-      description: "Greys the cog out and stops the list of columns opening",
+      description: "Greys the cog out and stops the list of columns opening.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -47,6 +47,7 @@ const columnRow = (key: string) =>
 const listOpen = () => waitFor(() => expect(columnRow("type")).toBeVisible());
 
 export const Default: Story = {
+  name: "Column list",
   render: (args) => <TableSettings {...args} />,
   args: {
     columns: [
@@ -106,7 +107,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The cog that lets a user choose which columns to see; click it to open the list, where Modified is unticked because that column is hidden.",
+          "The cog that lets a user choose which columns to see. In its list, Modified is unticked because that column is hidden.",
       },
       source: {
         code: `<TableSettings
@@ -124,6 +125,7 @@ export const Default: Story = {
 };
 
 export const Disabled: Story = {
+  name: "Disabled",
   render: (args) => <TableSettings {...args} />,
   args: {
     ...Default.args,
@@ -151,6 +153,7 @@ export const Disabled: Story = {
 };
 
 export const WithLockedColumns: Story = {
+  name: "Locked columns",
   render: (args) => <TableSettings {...args} />,
   args: {
     columns: [
@@ -197,7 +200,7 @@ export const WithLockedColumns: Story = {
     docs: {
       description: {
         story:
-          "Click the cog: only Type and Modified are listed. Name is marked `isDisabled` and Size has no `onChange`, so neither can be hidden, which keeps the column that identifies a row always on screen.",
+          "A cog whose list offers only Type and Modified. Name is marked `isDisabled` and Size has no `onChange`, so neither can be hidden. The column that identifies a row stays on screen.",
       },
       source: {
         code: `<TableSettings

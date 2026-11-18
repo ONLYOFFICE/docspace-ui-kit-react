@@ -22,7 +22,7 @@ The Table README describes it in full.`,
     hasAccess: {
       control: "boolean",
       description:
-        "Shows the child marked `table-container_row-checkbox` in place of the child marked `table-container_element` while the pointer is over the cell",
+        "On hover, shows the child marked `table-container_row-checkbox` in place of the one marked `table-container_element`.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -30,42 +30,43 @@ The Table README describes it in full.`,
     checked: {
       control: "boolean",
       description:
-        "Shows the child marked `table-container_row-checkbox` in place of the child marked `table-container_element` all the time",
+        "Shows the child marked `table-container_row-checkbox` in place of the one marked `table-container_element`, hovered or not.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     className: {
       control: "text",
-      description: "Class applied to the cell after the component's own",
+      description: "Applied to the cell.",
     },
     style: {
       control: "object",
-      description: "Inline styles applied to the cell",
+      description: "Applied to the cell.",
     },
     children: {
       control: false,
-      description: "Content of the cell: text or elements",
+      description: "Content of the cell: text or elements.",
     },
     value: {
       control: "text",
       description:
-        "Written onto the cell as a `value` attribute, which drag and drop reads to identify the item",
+        "Written onto the cell as a `value` attribute, which drag and drop reads to identify the item.",
     },
     documentTitle: {
       control: "text",
-      description: "Written onto the cell as a `data-document-title` attribute",
+      description:
+        "Kept on the cell as `data-document-title` for your own scripts and tests; the kit never reads it.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of the cell's `data-testid` attribute",
+      description: "Value of `data-testid` on the cell.",
       table: {
         defaultValue: { summary: "table-cell" },
       },
     },
     forwardedRef: {
       control: false,
-      description: "Ref of the cell element",
+      description: "Ref of the cell element.",
     },
   },
 } satisfies Meta<typeof TableCell>;
@@ -82,6 +83,7 @@ const parts = (cell: HTMLElement) => ({
 });
 
 export const Default: Story = {
+  name: "Text",
   render: (args) => <TableCell {...args} />,
   args: {
     className: "custom-cell",
@@ -97,8 +99,7 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "A cell holding plain text, the most common case; change any other prop live in the Controls panel below.",
+        story: "A cell holding plain text, the most common case.",
       },
       source: {
         code: `<TableCell className="custom-cell">Cell Content</TableCell>`,
@@ -108,6 +109,7 @@ export const Default: Story = {
 };
 
 export const WithElement: Story = {
+  name: "Avatar swapped on hover",
   render: (args) => (
     <TableCell {...args}>
       <div className="table-container_element">
@@ -138,7 +140,7 @@ export const WithElement: Story = {
     docs: {
       description: {
         story:
-          "An avatar that turns into a checkbox when the pointer is over the cell, so a row can be picked without a separate checkbox column (`hasAccess`). Hover the cell to see the swap.",
+          "An avatar that a hover swaps for a checkbox (`hasAccess`). A row can then be picked without a separate checkbox column.",
       },
       source: {
         code: `<TableCell hasAccess>
@@ -153,6 +155,7 @@ export const WithElement: Story = {
 };
 
 export const WithElementChecked: Story = {
+  name: "Selected",
   render: (args) => (
     <TableCell {...args}>
       <div className="table-container_element">
@@ -199,6 +202,7 @@ export const WithElementChecked: Story = {
 };
 
 export const WithElementNoAccess: Story = {
+  name: "Not selectable",
   render: (args) => (
     <TableCell {...args}>
       <div className="table-container_element">
@@ -229,7 +233,7 @@ export const WithElementNoAccess: Story = {
     docs: {
       description: {
         story:
-          "Without `hasAccess` the cell keeps the avatar on hover and never shows the checkbox, for a row the user may not select.",
+          "Without `hasAccess` the cell keeps the avatar on hover, for a row the user may not select.",
       },
       source: {
         code: `<TableCell hasAccess={false}>

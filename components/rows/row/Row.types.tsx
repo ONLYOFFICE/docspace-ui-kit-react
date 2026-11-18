@@ -37,7 +37,8 @@ export type RowProps = {
   className?: string;
   /** Element placed before the context button, after the badges. */
   contentElement?: React.ReactNode;
-  /** Width reserved for the context button, as a CSS length.
+  /** Changes nothing on screen: it sets a CSS variable that no row style
+   * reads.
    * @default "26px" */
   contextButtonSpacerWidth?: string;
   /**
@@ -59,9 +60,15 @@ export type RowProps = {
   id?: string;
   /** Draws the checkbox as partly ticked, for a group that is half-selected. */
   indeterminate?: boolean;
-  /** Called with the new checked state and whatever `data` holds. */
+  /**
+   * Called with the new checked state and whatever `data` holds. In the modern
+   * mode on a touch device, a tap on the start element calls it with `true`.
+   */
   onSelect?: (checked: boolean, data?: unknown) => void;
-  /** Called by a click on the start element and on the content, but not on the checkbox or the context button. */
+  /**
+   * Called by a click on the content, and in the default mode on the start
+   * element. The checkbox and the context button do not call it.
+   */
   onRowClick?: (e: React.MouseEvent) => void;
   /** Called when the context menu is asked for, with `true` for a right-click. */
   onContextClick?: (value?: boolean) => void;
@@ -83,7 +90,7 @@ export type RowProps = {
   isIndexEditingMode?: boolean;
   /** Tells the context menu that this row is a room, which changes its header. */
   isRoom?: boolean;
-  /** Hover tooltip of the context button. */
+  /** Hover tooltip and accessible name of the context button. */
   contextTitle?: string;
   /** Element placed before `contentElement`, for badges of your own. */
   badgesComponent?: React.ReactNode;

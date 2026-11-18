@@ -67,14 +67,16 @@ const meta = {
     },
     backgroundOpacity: {
       control: "number",
-      description: "Opacity of `backgroundColor`, from 0 to 1",
+      description:
+        "How strongly the shapes' resting colour shows, from 0 (invisible) to 1",
       table: {
         defaultValue: { summary: "0.1" },
       },
     },
     foregroundOpacity: {
       control: "number",
-      description: "Opacity of `foregroundColor`, from 0 to 1",
+      description:
+        "How strongly the sweeping band's colour shows, from 0 (invisible) to 1",
       table: {
         defaultValue: { summary: "0.15" },
       },
@@ -126,6 +128,7 @@ const isAnimated = (root: Element) =>
   root.querySelector("animateTransform") !== null;
 
 export const Default: Story = {
+  name: "Five rows",
   render: (args) => <RowsSkeleton {...args} />,
   args: {
     count: 5,
@@ -142,7 +145,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Five placeholder rows (`count`) with the band sweeping across them, as a list shows them while its first page loads. Change any other prop live in the Controls panel below.",
+          "Five placeholder rows (`count`) with a light band sweeping across them, as a list shows them while its first page loads.",
       },
       source: {
         code: `<RowsSkeleton count={5} />`,
@@ -152,6 +155,7 @@ export const Default: Story = {
 };
 
 export const StaticPlaceholder: Story = {
+  name: "Still",
   render: (args) => <RowsSkeleton {...args} />,
   args: {
     count: 3,
@@ -165,7 +169,7 @@ export const StaticPlaceholder: Story = {
     docs: {
       description: {
         story:
-          "A placeholder that does not move, for a reader who asked for less motion: the band no longer sweeps across the shapes (`animate`). The component does not check the system's reduced-motion setting itself.",
+          "Three still placeholder rows, for a reader who asked for less motion: no band sweeps across the shapes (`animate`). The component does not check the system's reduced-motion setting itself.",
       },
       source: {
         code: `<RowsSkeleton count={3} animate={false} />`,
@@ -183,6 +187,7 @@ const RoundStartElementTemplate = () => (
 );
 
 export const RoundStartElement: Story = {
+  name: "Round avatars",
   render: () => <RoundStartElementTemplate />,
   play: async ({ canvas }) => {
     const rows = canvas.getAllByTestId("row-skeleton");
@@ -195,7 +200,7 @@ export const RoundStartElement: Story = {
     docs: {
       description: {
         story:
-          "Rows for a list of people, whose start element is a round avatar: each `RowSkeleton` draws a circle in place of the square (`isRectangle={false}`). `RowsSkeleton` has no such prop, so a list of round rows is built from `RowSkeleton` directly.",
+          "Three rows for a list of people: each `RowSkeleton` draws a round avatar in place of the square (`isRectangle={false}`). `RowsSkeleton` has no such prop, so these rows are built from `RowSkeleton` directly.",
       },
       source: {
         code: `<RowSkeleton isRectangle={false} />

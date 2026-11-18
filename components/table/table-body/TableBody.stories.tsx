@@ -31,7 +31,7 @@ The Table README describes it in full.`,
     useReactWindow: {
       control: "boolean",
       description:
-        "Mounts only the rows near the visible part of the page and loads more on scroll; when off, every row is rendered at once",
+        "Mounts only the rows near the view and loads more on scroll. Off, every row is rendered at once.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -39,29 +39,29 @@ The Table README describes it in full.`,
     itemHeight: {
       control: "number",
       description:
-        "Height of every row in pixels when the rows are virtualised",
+        "Height of every row in pixels while the rows are virtualised.",
       table: {
         defaultValue: { summary: "41" },
       },
     },
     itemCount: {
       control: "number",
-      description: "How many rows there are in total, loaded or not",
+      description: "How many rows there are in total, loaded or not.",
     },
     filesLength: {
       control: "number",
       description:
-        "How many rows are loaded; rows past this index are drawn as placeholders while `hasMoreFiles` is set",
+        "How many rows are loaded. Past this index the virtualised body draws placeholders while `hasMoreFiles` is set.",
     },
     hasMoreFiles: {
       control: "boolean",
       description:
-        "Adds two placeholder rows after the loaded ones and asks `fetchMoreFiles` for more when they come into view",
+        "Adds two placeholder rows after the loaded ones and asks `fetchMoreFiles` for more as they come into view.",
     },
     infoPanelVisible: {
       control: "boolean",
       description:
-        "Lays the virtualised rows out with the column widths saved under `columnInfoPanelStorageName` instead of `columnStorageName`",
+        "Lays the virtualised rows out with the widths saved under `columnInfoPanelStorageName` instead.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -69,32 +69,32 @@ The Table README describes it in full.`,
     columnStorageName: {
       control: "text",
       description:
-        "`localStorage` key the header saved the column widths under; without it the body renders nothing",
+        "`localStorage` key the header saved the column widths under. Without it, or without `columnInfoPanelStorageName`, the body renders an empty element.",
     },
     columnInfoPanelStorageName: {
       control: "text",
       description:
-        "`localStorage` key of the column widths used while an info panel is open; without it the body renders nothing",
+        "`localStorage` key of the widths used while an info panel is open. Without it the body renders an empty element.",
     },
     isIndexEditingMode: {
       control: "boolean",
-      description: "Accepted for the rows being reordered, but has no effect",
+      description: "Not read: the body is the same while rows are reordered.",
     },
     fetchMoreFiles: {
       control: false,
       action: "fetchMoreFiles",
       description:
-        "Called with the start and stop index of the rows to load when placeholder rows scroll into view",
+        "Called with the start and stop index of the rows to load when placeholder rows scroll into view.",
     },
     onScroll: {
       control: false,
       action: "onScroll",
       description:
-        "Called as the page scrolls, only while the rows are virtualised",
+        "Called as the page scrolls, only while the rows are virtualised.",
     },
     children: {
       control: false,
-      description: "The rows, as an array with one element per row",
+      description: "The rows, as an array with one element per row.",
     },
   },
   decorators: [
@@ -175,6 +175,7 @@ const createMockRows = (count: number) =>
   });
 
 export const Default: Story = {
+  name: "Virtualised",
   render: (args) => <TableBody {...args} />,
   args: {
     columnStorageName: COLUMN_STORAGE_NAME,
@@ -200,7 +201,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Twenty rows through the virtualised body, the mode for a list that can grow long: scroll the frame and only the rows near the view stay mounted, as the counter below it shows.",
+          "Twenty rows through the virtualised body, the mode for a list that can grow long. Only the rows near the view stay mounted, as the counter below the frame shows.",
       },
       source: {
         code: `<TableBody
@@ -221,6 +222,7 @@ export const Default: Story = {
 };
 
 export const WithoutReactWindow: Story = {
+  name: "All rows at once",
   render: (args) => <TableBody {...args} />,
   args: {
     ...Default.args,
@@ -259,6 +261,7 @@ export const WithoutReactWindow: Story = {
 };
 
 export const WithMoreFiles: Story = {
+  name: "More pages to load",
   render: (args) => <TableBody {...args} />,
   args: {
     ...Default.args,
@@ -287,7 +290,7 @@ export const WithMoreFiles: Story = {
     docs: {
       description: {
         story:
-          "Five loaded rows followed by two placeholder rows, what the user sees while the next page is on its way (`hasMoreFiles`); `fetchMoreFiles` is called as the placeholders come into view.",
+          "Five loaded rows and two placeholder rows after them, as the user sees them while the next page loads (`hasMoreFiles`). `fetchMoreFiles` is called as the placeholders come into view.",
       },
       source: {
         code: `<TableBody

@@ -76,6 +76,7 @@ const createMenuItem = (
 };
 
 export const Default: Story = {
+  name: "Single action",
   render: (args) => <GroupMenuItem {...args} />,
   args: {
     item: createMenuItem(),
@@ -91,7 +92,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A single action applied to every selected row with one click, the most common entry of a group menu; change any other prop live in the Controls panel below.",
+          "A single action applied to every selected row with one click, the most common entry of a group menu.",
       },
       source: {
         code: `<GroupMenuItem
@@ -111,6 +112,7 @@ export const Default: Story = {
 };
 
 export const WithDropdown: Story = {
+  name: "With menu",
   render: (args) => <GroupMenuItem {...args} />,
   args: {
     item: createMenuItem({
@@ -170,6 +172,7 @@ export const WithDropdown: Story = {
 };
 
 export const Blocked: Story = {
+  name: "Blocked",
   render: (args) => <GroupMenuItem {...args} />,
   args: {
     item: createMenuItem(),

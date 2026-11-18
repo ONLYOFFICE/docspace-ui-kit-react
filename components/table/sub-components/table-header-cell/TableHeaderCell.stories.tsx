@@ -20,53 +20,53 @@ The Table README describes it in full.`,
   argTypes: {
     column: {
       control: false,
-      description:
-        "The column to render: its title, its sort field and callbacks, and the flags that shape the cell",
+      description: "The column this cell renders.",
     },
     index: {
       control: "number",
       description:
-        "Position of the column, which becomes the cell's id `column_<index>`",
+        "Position of the column, which becomes the cell's `column_<index>` id.",
     },
     sortBy: {
       control: "select",
       options: [SortByFieldName.Name, SortByFieldName.Author],
       description:
-        "Field the table is sorted by; the column with the same `sortBy` keeps its arrow visible",
+        "Field the table is sorted by. The column with the same `sortBy` keeps its arrow shown.",
     },
     sorted: {
       control: "boolean",
-      description: "Direction of the sort; turning it off turns the arrow over",
+      description:
+        "Direction of the sort; turning it off turns the arrow over.",
     },
     sortingVisible: {
       control: "boolean",
       description:
-        "Shows the sort arrow and lets clicks on the title and the arrow sort the table",
+        "Shows the sort arrow and lets the title and the arrow sort the table.",
     },
     resizable: {
       control: "boolean",
-      description: "Draws the resize handle at the end of the cell",
+      description: "Draws the resize handle at the end of the cell.",
     },
     defaultSize: {
       control: "number",
       description:
-        "Width in pixels the column returns to when the widths are reset",
+        "Fixed width of the column, written to the cell for the header to read.",
     },
     testId: {
       control: "text",
-      description: "Value of the cell's `data-testid` attribute",
+      description: "Value of `data-testid` on the cell.",
       table: {
         defaultValue: { summary: "table-header-cell" },
       },
     },
     onMouseDown: {
       control: false,
-      description: "Called when the resize handle is pressed",
+      description: "Called when the resize handle is pressed.",
     },
     tagRef: {
       control: false,
       description:
-        "Ref attached to the cell when the column asks for it with `withTagRef`",
+        "Ref attached to this cell when the column asks for it with `withTagRef`.",
     },
   },
 
@@ -93,6 +93,7 @@ const cellOf = (canvas: { getByTestId: (id: string) => HTMLElement }) =>
   canvas.getByTestId("table-header-cell");
 
 export const Default: Story = {
+  name: "Not sorted",
   render: (args) => <TableHeaderCell {...args} />,
   args: {
     column: {
@@ -133,7 +134,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The title of a column the table is not sorted by; hover it to see the arrow that sorts by this column, and change any other prop live in the Controls panel below.",
+          "The title of a column the table is not sorted by. Its arrow shows on hover or keyboard focus, and a click on the title sorts by the column.",
       },
       source: {
         code: `<TableHeaderCell
@@ -157,6 +158,7 @@ export const Default: Story = {
 };
 
 export const Resizable: Story = {
+  name: "With resize handle",
   render: (args) => <TableHeaderCell {...args} />,
   args: {
     ...Default.args,
@@ -181,7 +183,7 @@ export const Resizable: Story = {
     docs: {
       description: {
         story:
-          "The short bar at the end of the cell is the handle a user drags to widen the column (`resizable`); here it only reports the press, since TableHeader does the resizing.",
+          "The short bar at the end of the cell is the handle a user drags to widen the column (`resizable`). Here it only reports the press; TableHeader does the resizing.",
       },
       source: {
         code: `<TableHeaderCell
@@ -207,6 +209,7 @@ export const Resizable: Story = {
 };
 
 export const SortedByThisColumn: Story = {
+  name: "Sorted by this column",
   render: (args) => <TableHeaderCell {...args} />,
   args: { ...Default.args, sortBy: SortByFieldName.Name },
   play: async ({ canvas }) => {
@@ -216,7 +219,7 @@ export const SortedByThisColumn: Story = {
     docs: {
       description: {
         story:
-          "The column the table is sorted by keeps its arrow on screen without a hover, so the user sees what the list is ordered by (`sortBy` matches the column's `sortBy`).",
+          "The column the table is sorted by keeps its arrow on screen without a hover (`sortBy` matches the column's). The user sees what the list is ordered by.",
       },
       source: {
         code: `<TableHeaderCell
@@ -240,6 +243,7 @@ export const SortedByThisColumn: Story = {
 };
 
 export const WithoutSorting: Story = {
+  name: "Without sorting",
   render: (args) => (
     <div>
       <i style={{ marginBottom: 12 }}>No sorting icon on hover</i>
@@ -279,6 +283,7 @@ export const WithoutSorting: Story = {
 };
 
 export const WithUncheckedCheckbox: Story = {
+  name: "Unticked checkbox hidden",
   render: (args) => (
     <div>
       <i style={{ marginBottom: 12 }}>Checkbox hidden if it is unchecked</i>
@@ -332,6 +337,7 @@ export const WithUncheckedCheckbox: Story = {
 };
 
 export const WithCheckedCheckbox: Story = {
+  name: "Ticked checkbox",
   render: (args) => <TableHeaderCell {...args} />,
   args: {
     ...Default.args,
@@ -384,6 +390,7 @@ export const WithCheckedCheckbox: Story = {
 };
 
 export const WithIndeterminateCheckbox: Story = {
+  name: "Partly ticked checkbox",
   render: (args) => <TableHeaderCell {...args} />,
   args: {
     ...Default.args,
@@ -432,6 +439,7 @@ export const WithIndeterminateCheckbox: Story = {
 };
 
 export const ShortColumn: Story = {
+  name: "Short column",
   render: (args) => (
     <div>
       <i style={{ marginBottom: 12 }}>
