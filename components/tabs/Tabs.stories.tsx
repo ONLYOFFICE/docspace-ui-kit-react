@@ -25,18 +25,18 @@ const meta = {
       // The icons are data URIs too long to edit, and they stretch the table.
       control: false,
       description:
-        "The tabs, in the order they are drawn. Each carries its id, its label, the content shown while it is selected, and optionally a disabled flag, a click handler, a badge or an icon",
+        "The tabs, in the order they are drawn. Each carries its own content.",
     },
     selectedItemId: {
       control: "text",
       description:
-        "`id` of the selected tab. The component is controlled: set it from `onSelect`. An empty value selects the first tab",
+        "`id` of the selected tab, set from `onSelect`; the component keeps no selection of its own. An empty value selects the first tab.",
     },
     type: {
       control: "select",
       options: Object.values(TabsTypes),
       description:
-        "Which of the two tab bars is drawn: an underlined row, or a segmented control",
+        "Which of the two tab bars is drawn: an underlined row, or a segmented control.",
       table: {
         defaultValue: { summary: "primary" },
       },
@@ -44,12 +44,12 @@ const meta = {
     onSelect: {
       action: "onSelect",
       description:
-        "Called with the whole tab object when a different tab is clicked, when a segmented arrow is clicked, or when a highlighted segmented tab is chosen with Enter or Space",
+        "Called with the whole tab object when a different tab is chosen by a click, Enter or Space, or a segmented arrow.",
     },
     scaled: {
       control: "boolean",
       description:
-        "Makes the segmented tabs share the container's width equally instead of taking the width of the widest label. Secondary tabs only",
+        "Whether the tabs share the container's width equally instead of being measured from the longest label. Secondary tabs only.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -57,7 +57,7 @@ const meta = {
     isLoading: {
       control: "boolean",
       description:
-        "Keeps the segmented bar hidden and unmeasured while the labels are still changing, then sizes every tab to the widest label once it is turned off. Draws no loader of its own. Secondary tabs only",
+        "Holds off sizing the tabs until the labels are final, and hides a bar that is not `scaled` meanwhile. It draws no loader. Secondary tabs only.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -65,7 +65,7 @@ const meta = {
     withAnimation: {
       control: "boolean",
       description:
-        "Grows the underline of a newly selected tab and dims the content until that tab's `onClick` promise settles. Primary tabs only",
+        "Whether selecting a tab grows its underline and keeps the old content, dimmed, until the item's `onClick` settles. Primary tabs only.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -73,17 +73,17 @@ const meta = {
     stickyTop: {
       control: "text",
       description:
-        "Distance from the top of the scrolling container at which the tab bar sticks, as a CSS length. Without it the bar sticks at the very top",
+        "`top` of the sticky tab bar, as a CSS length. Without it the bar sticks to the top of the scrolling ancestor.",
     },
     stickyHeader: {
       control: false,
       description:
-        "Content drawn in its own sticky strip above the tab bar; the bar then sticks directly below it. Primary tabs only",
+        "Rendered in its own sticky strip above the tab bar, which the bar then sticks below. Primary tabs only.",
     },
     withoutStickyIntend: {
       control: "boolean",
       description:
-        "Leaves out the 20px gap between the tab bar and the selected tab's content",
+        "Whether the gap between the tab bar and the selected tab's content is left out.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -91,25 +91,25 @@ const meta = {
     hotkeysId: {
       control: "text",
       description:
-        "Suffix of the class `secondary-tabs-scroll-<hotkeysId>` put on the tab scroller, for a caller that queries it. Keyboard navigation does not need it. Secondary tabs only",
+        "Suffix of the class `secondary-tabs-scroll-<hotkeysId>` put on the tab scroller, for a caller that queries it. Keyboard navigation does not need it. Secondary tabs only.",
     },
     layoutId: {
       control: "text",
       description:
-        "Shared name that lets the selected background slide between two segmented bars; also becomes the `id` of the tab list. Secondary tabs only",
+        "Shared `layoutId` of the sliding background, and the `id` of the tab list. Secondary tabs only.",
     },
     id: {
       control: "text",
       description:
-        "`id` of the tab list on primary tabs, and of the outermost element on secondary ones",
+        "Applied to the tab list on primary tabs, and to the outermost element on secondary ones.",
     },
     className: {
       control: "text",
-      description: "Class added to the outermost element",
+      description: "Applied to the outermost element.",
     },
     style: {
       control: "object",
-      description: "Inline style of the outermost element",
+      description: "Applied to the outermost element as inline style.",
     },
   },
 } satisfies Meta<typeof Tabs>;
@@ -155,6 +155,7 @@ const Template = (args: TabsProps) => {
 };
 
 export const Default: Story = {
+  name: "Underlined row",
   render: (args) => <Template {...args} />,
   args: {
     items: data,
@@ -185,7 +186,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The underlined row, for splitting one page into sections the reader switches between: click a tab to show its content below the bar. **Contacts** is greyed out and ignores clicks (`isDisabled`). Change any other prop live in the Controls panel below.",
+          "The underlined row, for splitting one page into sections. A click on a tab shows its content below the bar. **Contacts** is greyed out and ignores clicks (`isDisabled`).",
       },
       source: {
         code: `<Tabs
@@ -199,6 +200,7 @@ export const Default: Story = {
 };
 
 export const Secondary: Story = {
+  name: "Segmented control",
   render: (args) => <Template {...args} />,
   args: {
     items: data,
@@ -212,7 +214,7 @@ export const Secondary: Story = {
     const documents = canvas.getByRole("tab", { name: "Documents" });
     await expect(overview).toHaveAttribute("aria-selected", "true");
 
-    // The keys the description promises: Tab lands on the selected tab, an
+    // The keys the README promises: Tab lands on the selected tab, an
     // arrow moves the focus to Documents, Enter picks it.
     await userEvent.tab();
     await expect(overview).toHaveFocus();
@@ -246,7 +248,7 @@ export const Secondary: Story = {
     docs: {
       description: {
         story:
-          "The segmented control (`type={TabsTypes.Secondary}`), for switching between views of the same content; every tab takes the width of the widest label and the selected background slides to the clicked tab. From the keyboard, Tab lands on the selected tab, the arrow keys, Home and End move the focus, Enter or Space picks the focused tab, and Tab moves on to the rest of the page.",
+          "The segmented control (`type={TabsTypes.Secondary}`), for switching between views of the same content. Every tab takes the width of the widest label, and the selected background slides to the chosen tab.",
       },
       source: {
         code: `<Tabs
@@ -261,6 +263,7 @@ export const Secondary: Story = {
 };
 
 export const Scaled: Story = {
+  name: "Segmented, full width",
   render: (args) => <Template {...args} />,
   play: async ({ args, canvas, userEvent }) => {
     // Every tab an equal share of the row.
@@ -284,7 +287,7 @@ export const Scaled: Story = {
     docs: {
       description: {
         story:
-          "The segmented control spread across the whole width of its container, every tab an equal share (`scaled`) — for a bar that should line up with the edges of the panel it sits in. The underlined row ignores `scaled`.",
+          "The segmented control across the whole width of its container, every tab an equal share (`scaled`). It lines up with the edges of the panel it sits in. The underlined row ignores `scaled`.",
       },
       source: {
         code: `<Tabs
@@ -320,6 +323,7 @@ const LoadingDemo = (args: TabsProps) => {
 };
 
 export const Loading: Story = {
+  name: "Labels loading",
   render: (args) => <LoadingDemo {...args} />,
   play: async ({ canvas }) => {
     // The bar waits for its labels; the selected content shows meanwhile.
@@ -337,7 +341,7 @@ export const Loading: Story = {
     docs: {
       description: {
         story:
-          "While the labels are still arriving, the segmented bar is kept hidden so that it is not sized to placeholder text (`isLoading`); only the selected tab's content shows. Turn `isLoading` off in the Controls panel below and the bar appears, every tab as wide as the widest label. The component draws no loader of its own, so the page puts a skeleton where the bar will be, as this story does. Click **Labels arrived** to see the bar replace the skeleton, and **Load again** to go back; the underlined row ignores `isLoading`.",
+          "A skeleton in place of the segmented bar, which stays hidden while its labels load (`isLoading`). The selected tab's content still shows. The component draws no loader, so the page draws the skeleton. The **Labels arrived** button brings the bar back.",
       },
       source: {
         code: `<Tabs
@@ -357,6 +361,7 @@ const badgeItems: TTabItem[] = data.map((item, index) =>
 );
 
 export const WithBadges: Story = {
+  name: "With badges",
   render: (args) => <Template {...args} />,
   play: async ({ canvas }) => {
     await expect(canvas.getByTestId("Overview_tab")).toHaveTextContent(
@@ -376,7 +381,7 @@ export const WithBadges: Story = {
     docs: {
       description: {
         story:
-          "A count after the label of **Overview** and **Documents** (the item's `badge`) — for telling the reader how many new entries wait behind a tab. The segmented control does not draw badges.",
+          "A count after the labels of **Overview** and **Documents** (the item's `badge`), for the entries that wait behind a tab. The segmented control does not draw badges.",
       },
       source: {
         code: `const tabItems = [
@@ -401,6 +406,7 @@ const iconItems: TTabItem[] = data.map((item) => ({
 }));
 
 export const WithIcons: Story = {
+  name: "With icons",
   render: (args) => <Template {...args} />,
   play: async ({ args, canvas, userEvent }) => {
     // The icons are fetched and inlined after mounting.
@@ -424,7 +430,7 @@ export const WithIcons: Story = {
     docs: {
       description: {
         story:
-          "An icon before every label of the segmented control (the item's `iconName`, an SVG URL), recoloured with the label as a tab is selected or hovered — for tabs that are recognised faster by a picture. The underlined row does not draw icons.",
+          "An icon before every label of the segmented control (the item's `iconName`, an SVG URL). It takes the label's colour when the tab is selected or hovered. The underlined row draws no icons.",
       },
       source: {
         code: `const tabItems = [
@@ -451,6 +457,7 @@ const animatedItems: TTabItem[] = data.map((item) => ({
 }));
 
 export const AnimatedSelection: Story = {
+  name: "Content fetched on selection",
   render: (args) => <Template {...args} />,
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByTestId("Documents_tab"));
@@ -475,7 +482,7 @@ export const AnimatedSelection: Story = {
       story: { inline: false, height: "240px" },
       description: {
         story:
-          "Click **Documents**: its underline grows and the old content stays dimmed for the second and a half the tab's `onClick` promise takes, then the new content replaces it (`withAnimation`) — for tabs whose content is fetched when they are selected. The segmented control ignores `withAnimation`.",
+          "The underlined row for tabs whose content is fetched on selection (`withAnimation`). The chosen tab's underline grows, and the old content stays dimmed while the tab's `onClick` runs. The segmented control ignores `withAnimation`.",
       },
       source: {
         code: `const tabItems = [
@@ -508,6 +515,7 @@ const longItems: TTabItem[] = data.map((item) => ({
 }));
 
 export const WithStickyHeader: Story = {
+  name: "With sticky header",
   render: (args) => {
     const [selectedId, setSelectedId] = useState(args.selectedItemId);
     return (
@@ -559,7 +567,7 @@ export const WithStickyHeader: Story = {
     docs: {
       description: {
         story:
-          "Scroll the box: the heading and the tab bar stay at its top while the content moves under them (`stickyHeader`) — for a section title that should stay in view together with the bar. The heading sticks only with `stickyTop` set, here to `0px`; a larger value moves both further down. The segmented control does not draw a sticky header.",
+          "A heading above the bar (`stickyHeader`) in a scrolling box: both stay at its top while the content scrolls under them. The heading sticks only with `stickyTop` set, here to `0px`. The segmented control draws no sticky header.",
       },
       source: {
         code: `<div style={{ height: "260px", overflowY: "auto" }}>
@@ -617,6 +625,7 @@ const OverflowTemplate = (args: TabsProps) => {
 };
 
 export const OverflowingTabs: Story = {
+  name: "More tabs than fit",
   render: (args) => <OverflowTemplate {...args} />,
   play: async ({ args, canvasElement }) => {
     // The underlined row scrolls sideways.
@@ -657,7 +666,7 @@ export const OverflowingTabs: Story = {
         story: `More tabs than a 360px column holds, for a bar whose tabs cannot be cut down:
 
 - **Underlined row** — scrolls sideways; the edge that hides more tabs fades out
-- **Segmented control** — adds an arrow at each end that selects the previous or next tab, not only scrolls to it (the arrows are left out on phones)`,
+- **Segmented control** — adds an arrow at each end that selects the previous or next tab; phones get no arrows`,
       },
       source: {
         code: `<div style={{ width: "360px" }}>
@@ -675,6 +684,7 @@ export const OverflowingTabs: Story = {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <OverflowTemplate {...args} />
@@ -704,7 +714,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "112px" },
       description: {
         story:
-          'The overflowing bars in a right-to-left layout: the first tab sits at the right-hand end, the fade moves to the left edge, and the segmented arrows swap sides so the right one selects the previous tab. The wrapper carries `dir="rtl"` for the layout; the fade direction and the scroll correction come from the theme\'s `interfaceDirection` (the Direction toolbar).',
+          "The overflowing bars in a right-to-left layout. The first tab sits at the right-hand end and the fade moves to the left edge. The segmented arrows swap sides, so the right one selects the previous tab. The fade and the scroll correction follow the theme's direction.",
       },
       source: {
         code: `<div dir="rtl">
@@ -773,6 +783,7 @@ const CssCustomizationTemplate = () => {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => <CssCustomizationTemplate />,
   play: async ({ canvas }) => {
     const bar = canvas
@@ -792,7 +803,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every variable either bar can show without overflowing, set on one wrapper -- the variables are listed under CSS variables on this page. The first instance is the underlined row, for the \`--tabs-primary-*\`, underline and weight variables; the second is the segmented control (\`type={TabsTypes.Secondary}\`), for the \`--tabs-secondary-*\` ones. Hover the tabs to see the hover colours.`,
+        story: `Every variable either bar shows without overflowing, set on one wrapper. The underlined row shows the \`--tabs-primary-*\`, underline and weight variables. The segmented control (\`type={TabsTypes.Secondary}\`) shows the \`--tabs-secondary-*\` ones; the hover colours appear on hover.`,
       },
       source: {
         code: `<div style={{

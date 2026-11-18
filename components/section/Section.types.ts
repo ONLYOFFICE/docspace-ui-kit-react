@@ -28,7 +28,7 @@ export type InfoPanelProps = {
   anotherDialogOpen?: boolean;
   /** Which listing the body holds. It changes the body's padding, and in `row` view it lets a click beside the info panel close it. */
   viewAs?: TViewAs;
-  /** Which layout to render. It decides where the header and the filter go, whether the body scrolls itself, and whether the info panel is inline or a portal over the page. Nothing here measures the viewport. */
+  /** Which layout to render. It places the header and the filter, decides whether the body scrolls, and puts the info panel inline or over the page. Nothing here measures the viewport. */
   currentDeviceType?: DeviceType;
   /** Not read. The info panel reads `topInfoPanel`, which the section never passes on. */
   asideInfoPanel?: boolean;
@@ -147,40 +147,23 @@ export type SectionContainerProps = {
   isInfoPanelVisible?: boolean;
   viewAs?: TViewAs;
   children: React.ReactNode;
-  /** Whether the section scrolls its own body. With `false` the page scrolls instead and the section takes a 20px inline-start padding. */
+  /** Whether the section scrolls its own body. With `false` the page scrolls instead and the section takes a 20px inline-start padding. On a phone the page always scrolls. */
   withBodyScroll: boolean;
   currentDeviceType?: DeviceType;
   /** Not read by the section: the banner comes from the `SectionBanner` slot instead. */
   bannerContent?: React.ReactNode;
-  /**
-   * When true, the banner is rendered inside the scrollable body (as its first
-   * element) instead of being pinned above the scroll container. Lets the
-   * banner scroll away under the sticky section header. Defaults to false to
-   * preserve the legacy pinned-banner behaviour.
-   */
+  /** Puts the banner at the top of the scrolling body, so it scrolls away under the header. Off, the banner stays pinned above the scroller. */
   scrollableBanner?: boolean;
-  /**
-   * When true, the desktop SectionFilter slot is rendered INSIDE the scroll
-   * body as a sticky element (below the optional scrollable banner) instead of
-   * the always-pinned `.section-sticky-container`, and the table header is
-   * switched from `position: fixed` to `position: sticky` so it pins below the
-   * in-body filter natively (no host JS to measure the header `top`). The host
-   * supplies the pin offset via the `--section-filter-bottom` CSS variable.
-   * Defaults to false (legacy fixed-header + sticky-container-filter).
-   */
+  /** Moves the desktop filter into the scrolling body, where it sticks under the header. A table header then sticks under the filter instead of being fixed. */
   stickyTableHeader?: boolean;
-  /**
-   * Marks the section root (`#section`) and its whole subtree as inert —
-   * non-focusable and non-interactive. Used when the section is visually
-   * collapsed but kept mounted (e.g. behind the fullscreen AI chat panel).
-   */
+  /** Makes the whole section unfocusable and unclickable, and hides it from assistive technology. It suits a section kept mounted behind a fullscreen panel. */
   inert?: boolean;
 };
 
 export type SectionFilterProps = {
   children: React.ReactNode;
   className?: string;
-  /** Tells the filter row that tabs sit above it, which removes its top margin. Honoured below the desktop breakpoint, where the filter lives inside the body. */
+  /** Marks the filter below the desktop breakpoint as sitting under tabs. No style reads the mark, so it changes nothing on screen. */
   withTabs?: boolean;
 };
 
@@ -225,7 +208,7 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
     SectionBodyProps,
     "children" | "isSectionHeaderAvailable" | "autoFocus" | "withScroll"
   > & {
-    /** The slots. Each child must be one of the ten `Section.*` markers; the section reads their contents and renders them in its own places, and drops everything else. With no header, filter or body slot it renders nothing at all. */
+    /** The slots: each child is one of the ten `Section.*` markers, whose contents the section renders in its own places. Anything else is dropped. With no header, filter or body slot it renders nothing at all. */
     children: React.ReactNode;
     /** Not read. Nothing in the component destructures it. */
     progressBarDropDownContent?: React.ReactNode;
@@ -241,24 +224,19 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
     infoPanelWithoutScroll?: boolean;
     /** Opt-in edge resizer for the info panel (desktop only), from `INFO_PANEL_WIDTH` to `INFO_PANEL_MAX_WIDTH`. Pass the width the host stores plus a setter; leave unset for a fixed-width panel. */
     isInfoPanelResizable?: boolean;
-    /** Current width of the info panel in pixels. */
+    /** Width of the info panel in px while `isInfoPanelResizable` is on. Without the resizer it is ignored and the panel keeps its stylesheet width. */
     infoPanelWidth?: number;
-    /** Called with the committed info panel width: once per resize drag, when the pointer is released, and on the double click that restores the default. A width narrowed to fit the window is never committed, so the panel grows back once the window does. */
+    /** Called with the committed width: once per drag, on release, and on the double click that restores the default. A width narrowed to fit the window is never committed. */
     setInfoPanelWidth?: (value: number) => void;
-    /** Called with the width in px the open info panel, or the AI chat open in its place, takes on screen, and with `0` when neither does: how far the floating buttons in the corner have to move clear of it. On a desktop it is the panel's actual width, a window-narrowed one included, and it follows a resize drag once per frame; below a desktop the info panel counts as `INFO_PANEL_WIDTH` and the chat as `0`. */
+    /** Called with the width in px an open info or chat panel takes, or `0`, so corner buttons can move clear of it. Below a desktop the info panel counts as `INFO_PANEL_WIDTH` and the chat as `0`. */
     onShownInfoPanelWidthChange?: (value: number) => void;
     /** Whether the AI chat region exists at all. It defaults to `false`. */
     isChatPanelAvailable?: boolean;
-    /** Whether the AI chat panel is open. */
+    /** Opens the AI chat panel, docked on a desktop and covering the page below it. It needs `isChatPanelAvailable`. */
     isChatPanelVisible?: boolean;
-    /** Called by the chat panel's own close control. */
+    /** Called with `false` when the browser goes back while the chat panel is open below the desktop breakpoint. */
     setIsChatPanelVisible?: (value: boolean) => void;
-    /**
-     * Overlay label shown while a drag started in the section body hovers the
-     * chat panel; leave unset the rest of the time. The host owns both the
-     * hit-testing (its list drag is mouse-based, not HTML5 DnD) and the
-     * wording — the panel only renders the affordance.
-     */
+    /** Text of a dashed "drop here" frame over the chat panel. Set it while the host drags its own items over the panel, and clear it afterwards. */
     chatPanelDropTargetLabel?: string;
     /**
      * Opt-in edge resizer for the docked chat panel (desktop only). Pass the
@@ -354,15 +332,15 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
     vectorizedFiles?: TFile[];
     /** Not read. Nothing in the component destructures it. */
     user?: TUser;
-    /** Tells the filter row that tabs sit above it. It only reaches the filter below the desktop breakpoint. */
+    /** Marks the filter below the desktop breakpoint as sitting under tabs. No style reads the mark, so it changes nothing on screen. */
     withTabs?: boolean;
-    /** Drops the footer slot and the spacer under the body. */
+    /** Drops both the footer slot and the spacer under the body. */
     withoutFooter?: boolean;
     /** Whether a drag of the host's own items is in progress, which the progress button uses for its drop-preview state. */
     dragging?: boolean;
     /** Name of the folder a dragged item would land in, shown by the progress button. */
     dropTargetPreview?: string;
-    /** Clears that drop preview. */
+    /** Called by the progress button when its drop preview ends, so the host can forget the target folder. */
     clearDropPreviewLocation?: () => void;
     /** Its mere presence makes the progress button appear, even with no operations, so that a drag can show its drop preview. */
     startDropPreview?: () => void;
@@ -371,7 +349,7 @@ export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
     // Plugin operations props
     /** Operations contributed by plugins, merged into the background operations of the progress button. */
     pluginOperations?: Operation[];
-    /** Whether those plugin operations have finished. */
+    /** Whether the plugin operations have finished, for the progress button's completed state. */
     pluginOperationsCompleted?: boolean;
     /** Puts the progress button in its alert state for a failed plugin operation. */
     pluginOperationsAlert?: boolean;

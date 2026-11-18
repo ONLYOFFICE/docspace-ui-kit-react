@@ -224,43 +224,43 @@ const meta = {
       // The icons are data URIs too long to edit, and they stretch the table.
       control: false,
       description:
-        "The sections of the menu, in order. Each group has an id, an optional caption and its items; an item may carry an icon, a badge, a link target and a list of sub-items",
+        "The sections of the menu, in order. A group with a `label` renders it as a caption above its items.",
     },
     activeItemId: {
       control: "text",
       description:
-        "Id of the item or sub-item that is currently open. It is highlighted, and the section it belongs to opens",
+        "Id of the item or sub-item that is currently open. It highlights that entry and, through an effect, expands the section it belongs to.",
     },
     defaultExpandedId: {
       control: "text",
       description:
-        "Id of the section that is open on the first render. After that the menu opens and shuts sections itself",
+        "Section expanded on the first render. After that the expansion is the component's own state.",
     },
     withAnimation: {
       control: "boolean",
-      description:
-        "Fills the highlight across an entry from its start to its end when the entry is clicked",
+      description: "Plays the sliding highlight when an entry is clicked.",
       table: { defaultValue: { summary: "false" } },
     },
     className: {
       control: "text",
-      description: "Extra class added to the `nav` element",
+      description:
+        "Added after the component's own classes on the `nav` element.",
     },
     LinkRouter: {
       control: false,
       description:
-        "The host's link component. With it, leaf entries that carry `linkData` render as links; without it every entry is a button and `linkData` is ignored",
+        "Your router's link component. Without it `linkData` is ignored and every entry is a `button`.",
     },
     iconOnly: {
       control: "boolean",
       description:
-        "Collapses the menu to a narrow rail of icons: labels, captions and sub-menus are hidden, each label becomes a tooltip, and the active section's sub-items are listed as entries of their own",
+        "Collapsed rail: labels become tooltips, sub-menus are not rendered, and the active section's children are flattened into the list instead.",
       table: { defaultValue: { summary: "false" } },
     },
     withExpandControl: {
       control: "boolean",
       description:
-        "Adds a chevron at the end of every section that opens and shuts it; clicking the item itself then selects it and never shuts it, and several sections can be open at once",
+        "Gives each section its own chevron and leaves the item body to navigation. Several sections may then be open at once.",
       table: { defaultValue: { summary: "false" } },
     },
   },
@@ -305,6 +305,7 @@ const isExpanded = (root: HTMLElement, id: string) => {
 const nav = (root: HTMLElement) => root.querySelector("nav") as HTMLElement;
 
 export const Default: Story = {
+  name: "Two groups",
   play: async ({ canvasElement, userEvent }) => {
     await expect(within(canvasElement).getByText("Enabled Apps")).toBeVisible();
     await expect(
@@ -324,7 +325,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The starting point: two captioned groups, the first section open and active. Change the active entry, collapse the menu to a rail or try any other prop live in the Controls panel below.",
+          "Two captioned groups, the first section open and active: the starting point for an application's sidebar.",
       },
       source: {
         code: `<NavMenu
@@ -338,6 +339,7 @@ export const Default: Story = {
 };
 
 export const NoSubItems: Story = {
+  name: "Without sub-menus",
   args: {
     groups: noChildrenData,
     activeItemId: "files",
@@ -356,7 +358,7 @@ export const NoSubItems: Story = {
     docs: {
       description: {
         story:
-          "For a short menu of plain destinations: one group whose items have no sub-menus, so each entry is a single row with its icon and label.",
+          "One group of plain destinations with no sub-menus, so each entry is a single row with its icon and label.",
       },
       source: {
         code: `<NavMenu
@@ -379,6 +381,7 @@ export const NoSubItems: Story = {
 };
 
 export const ControlledActive: Story = {
+  name: "Selection wired by the host",
   render: (args) => {
     const [activeId, setActiveId] = useState("ai-files");
 
@@ -413,7 +416,7 @@ export const ControlledActive: Story = {
     docs: {
       description: {
         story:
-          "How a host wires selection: every entry's `onClick` stores its id, and the stored id goes back as `activeItemId`. Click the entries — the highlight follows, and clicking a section without a sub-menu shuts the open one.",
+          "How a host wires selection: every entry's `onClick` stores its id, and the stored id goes back as `activeItemId`. The highlight follows a click, and a section without a sub-menu shuts the open one.",
       },
       source: {
         code: `const [activeId, setActiveId] = useState("ai-files");
@@ -441,6 +444,7 @@ const groupsWithHandlers = groups.map((group) => ({
 };
 
 export const DarkTheme: Story = {
+  name: "Dark theme",
   decorators: [
     (Story) => (
       <div
@@ -479,6 +483,7 @@ export const DarkTheme: Story = {
 };
 
 export const WithBadge: Story = {
+  name: "With badges",
   render: () => {
     const [activeId, setActiveId] = useState("rooms");
     const [iconOnly, setIconOnly] = useState(false);
@@ -544,12 +549,12 @@ export const WithBadge: Story = {
   parameters: {
     docs: {
       description: {
-        story: `To draw attention to an entry with new content:
+        story: `Badges that draw attention to an entry with new content:
 
-- **Rooms** — the kit's counter badge with the number 5 (\`showBadge\`, \`labelBadge\`)
-- **Agents** — a badge of the host's own in place of the counter (\`badgeComponent\`)
+- **Rooms** — the kit's counter badge (\`showBadge\`, \`labelBadge\`)
+- **Agents** — a badge of the host's own (\`badgeComponent\`)
 
-Press the button below the menu to collapse it to a rail: the badges give way to a dot on each icon.`,
+The button below the menu collapses it to a rail, where each badge becomes a dot on its icon.`,
       },
       source: {
         code: `<NavMenu
@@ -579,6 +584,7 @@ Press the button below the menu to collapse it to a rail: the badges give way to
 };
 
 export const WithAnimation: Story = {
+  name: "Click animation",
   render: () => {
     const [activeId, setActiveId] = useState("documents-shared");
 
@@ -609,7 +615,7 @@ export const WithAnimation: Story = {
     docs: {
       description: {
         story:
-          "To give a click visible feedback while the next page loads: click any entry and its highlight fills from the start of the row to the end (`withAnimation`). Opening another section also shuts the one that was open.",
+          "A clicked entry's highlight fills from the start of the row to the end, as feedback while the next page loads (`withAnimation`). Opening another section shuts the open one.",
       },
       source: {
         code: `<NavMenu
@@ -648,6 +654,7 @@ const MockLinkRouter = ({
 );
 
 export const WithLinkData: Story = {
+  name: "Router links",
   render: () => {
     const [activeId, setActiveId] = useState("rooms");
     const [navigatedTo, setNavigatedTo] = useState<NavMenuLinkData | null>(
@@ -750,7 +757,7 @@ export const WithLinkData: Story = {
     docs: {
       description: {
         story:
-          "For an application with a client-side router: Files, Agents and the two Rooms sub-items render as the router's links to their paths (`LinkRouter`, `linkData`), while Rooms itself stays a button because it opens a sub-menu. Click a link — the path it leads to appears below the menu.",
+          "Files, Agents and the two Rooms sub-items as a client-side router's links (`LinkRouter`, `linkData`). Rooms stays a button because it opens a sub-menu. A clicked link's path appears below the menu.",
       },
       source: {
         code: `const RouterLink = ({ to, state, className, onClick, children }) => (
@@ -895,6 +902,7 @@ const SidebarDemo = () => {
 };
 
 export const FullSidebar: Story = {
+  name: "Whole sidebar",
   decorators: [
     (Story) => (
       <div style={{ height: "100vh", display: "flex" }}>
@@ -917,7 +925,7 @@ export const FullSidebar: Story = {
     docs: {
       description: {
         story:
-          "Two menus assembled into a whole sidebar: the sections at the top scroll, a second menu of settings entries sits at the bottom, followed by a collapse button and the signed-in user. Press the collapse button — both menus switch to the rail together (`iconOnly`), and hovering an icon shows its label.",
+          "Two menus assembled into a whole sidebar: scrolling sections at the top, settings entries at the bottom, then a collapse button and the signed-in user. The collapse button switches both menus to the rail (`iconOnly`).",
       },
       source: {
         code: `<aside style={{ display: "flex", flexDirection: "column", width: iconOnly ? 60 : 252 }}>
@@ -970,6 +978,7 @@ const railGroups: NavMenuGroup[] = [
 ];
 
 export const CollapsedRail: Story = {
+  name: "Collapsed rail",
   render: () => {
     const [activeId, setActiveId] = useState("recent");
 
@@ -1014,11 +1023,11 @@ export const CollapsedRail: Story = {
   parameters: {
     docs: {
       description: {
-        story: `For a sidebar the user has collapsed to save room (\`iconOnly\`):
+        story: `A sidebar collapsed to save room (\`iconOnly\`):
 
-- **Recent** and **Favorites** — the sub-items of Documents, the active section, listed as entries of their own under it, with a gap after the last one
-- **Rooms** — a shut section with a badge, shown as a dot on its icon
-- Hover any icon to read its label; the tooltip is the kit's shared one, so the app mounts \`RootTooltip\` once, as this story does`,
+- **Recent** and **Favorites** — the active section's sub-items, listed as entries of their own, with a gap after them
+- **Rooms** — a shut section whose badge is a dot on its icon
+- Each icon's label is a hover tooltip, which needs \`RootTooltip\` mounted once`,
       },
       source: {
         code: `<RootTooltip />
@@ -1068,6 +1077,7 @@ const expandControlGroups: NavMenuGroup[] = [
 ];
 
 export const WithExpandControl: Story = {
+  name: "Expand chevrons",
   render: () => {
     const [activeId, setActiveId] = useState("documents");
 
@@ -1102,7 +1112,7 @@ export const WithExpandControl: Story = {
     docs: {
       description: {
         story:
-          "For a touch layout where a section is itself a page: each section gets a chevron at its end (`withExpandControl`). Press the chevron of Rooms — Rooms opens and Documents stays open next to it; press it again to shut Rooms. Clicking a label selects the entry and never shuts a section.",
+          "A chevron at the end of each section, for a touch layout where a section is itself a page (`withExpandControl`). Several sections can be open at once. A click on a label selects the entry and never shuts a section.",
       },
       source: {
         code: `<NavMenu
@@ -1116,6 +1126,7 @@ export const WithExpandControl: Story = {
 };
 
 export const SectionBadges: Story = {
+  name: "Section and sub-item counts",
   render: () => {
     const [activeId, setActiveId] = useState("overview");
     const [clickedBadge, setClickedBadge] = useState<string | null>(null);
@@ -1187,10 +1198,10 @@ export const SectionBadges: Story = {
   parameters: {
     docs: {
       description: {
-        story: `For counts that live on sub-items:
+        story: `Counts that live on sub-items:
 
-- **Documents** — while the section is shut it shows the total, 12, in a badge of its own (\`collapsedBadgeComponent\`); click it to open the section and the total gives way to the counts inside
-- **Recent** and **Shared** — a counter on each sub-item (\`showBadge\`, \`labelBadge\`); click a counter and the sub-item it belongs to is reported below the menu, without selecting it (\`onClickBadge\`)`,
+- **Documents** — the total, 12, while the section is shut (\`collapsedBadgeComponent\`); open, it gives way to the counts inside
+- **Recent** and **Shared** — a counter on each sub-item (\`showBadge\`, \`labelBadge\`). A click on one reports its sub-item below the menu without selecting it (\`onClickBadge\`)`,
       },
       source: {
         code: `<NavMenu
@@ -1246,6 +1257,7 @@ const separatorGroups: NavMenuGroup[] = [
 ];
 
 export const WithSeparator: Story = {
+  name: "Separated sub-item",
   args: {
     groups: separatorGroups,
     activeItemId: "recent",
@@ -1266,7 +1278,7 @@ export const WithSeparator: Story = {
     docs: {
       description: {
         story:
-          "To set one sub-item apart from the rest without a second section: Trash sits below a gap (`withTopSeparator`). A line is drawn in that gap only once `--nav-menu-separator-color` gives it a colour — the theme sets none, as the CSS Customization story shows.",
+          "Trash set apart from the other sub-items by a gap, without a second section (`withTopSeparator`). A line is drawn in the gap only once `--nav-menu-separator-color` is set; the theme sets none.",
       },
       source: {
         code: `<NavMenu
@@ -1295,6 +1307,7 @@ export const WithSeparator: Story = {
 };
 
 export const ClickWithoutExpanding: Story = {
+  name: "Click without expanding",
   render: () => {
     const [activeId, setActiveId] = useState("overview");
     const [message, setMessage] = useState<string | null>(null);
@@ -1354,7 +1367,7 @@ export const ClickWithoutExpanding: Story = {
     docs: {
       description: {
         story:
-          "For a section whose click opens a dialog rather than a page: click Invite people — its sub-menu stays shut, because its `onClick` returns `false`, and the message below the menu stands in for the dialog.",
+          "A section whose click opens a dialog rather than a page. The sub-menu of Invite people stays shut because its `onClick` returns `false`. The message below the menu stands in for the dialog.",
       },
       source: {
         code: `{
@@ -1405,6 +1418,7 @@ const rtlGroups: NavMenuGroup[] = [
 ];
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   globals: { direction: "rtl" },
   play: async ({ canvasElement }) => {
     const [menu] = Array.from(canvasElement.querySelectorAll("nav"));
@@ -1443,7 +1457,7 @@ export const RightToLeft: Story = {
     docs: {
       description: {
         story:
-          "The menu in a right-to-left interface: icons and captions start at the right edge, sub-items are indented from the right, and the counter sits at the left end of its row. Below it, the collapsed rail keeps its highlight tile centred on the active icon.",
+          "The menu in a right-to-left interface. Icons and captions start at the right edge, sub-items are indented from the right, and counters sit at the left end. Below, the rail keeps its highlight centred on the active icon.",
       },
       source: {
         code: `<div dir="rtl">
@@ -1458,6 +1472,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <NavMenu
@@ -1504,9 +1519,9 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set through \`className\` -- the variables, and why a wrapper cannot set them, are listed under CSS variables on this page.
+        story: `Every overridable variable set through \`className\`, since a wrapper cannot set them.
 
-- **The open menu** — every variable but the dot: the caption, the labels, the icons, the active highlight and the line above Trash; hover an entry for the hover colour, and press Tab for the focus outline
+- **The open menu** — the caption, labels, icons, active highlight and the line above Trash, plus the hover colour and focus outline
 - **The rail** — the dot on the Rooms icon (\`--nav-menu-signal-dot-color\`), which only the collapsed form shows`,
       },
       source: {
