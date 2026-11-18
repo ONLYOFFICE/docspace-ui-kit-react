@@ -154,7 +154,7 @@ const useRootHelper = ({
               title = t("Rooms");
               break;
             case AI_HUB_ROOT_FOLDER_TYPE as FolderType:
-              title = t("AiWorkspace");
+              title = t("Common:AIChat");
               break;
             default:
               break;
