@@ -19,24 +19,24 @@ const meta = {
     previousLabel: {
       control: "text",
       description:
-        "Label of the previous-page button; nothing is translated, so pass the string already localised",
+        "Label of the previous-page button. Nothing here is translated, so pass the string already localised.",
     },
     nextLabel: {
       control: "text",
       description:
-        "Label of the next-page button; nothing is translated, so pass the string already localised",
+        "Label of the next-page button. Nothing here is translated, so pass the string already localised.",
     },
     disablePrevious: {
       control: "boolean",
       description:
-        "Disables the previous button; the page selector is disabled too only when `disableNext` is set as well",
+        "Disables the previous button. The page selector is disabled only when `disableNext` is set as well.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     disableNext: {
       control: "boolean",
-      description: "Disables the next button",
+      description: "Disables the next button.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -45,14 +45,14 @@ const meta = {
       control: "select",
       options: ["bottom", "top", "both"],
       description:
-        "Side of the buttons both drop-downs open on: `bottom`, `top`, or `both` to open below and move above when a list does not fit there",
+        "Which way both drop-downs open; `both` lets each one choose by the room under it.",
       table: {
         defaultValue: { summary: "bottom" },
       },
     },
     showCountItem: {
       control: "boolean",
-      description: "Whether the page-size selector is rendered at all",
+      description: "Whether the per-page selector is rendered at all.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -60,55 +60,56 @@ const meta = {
     pageItems: {
       control: false,
       description:
-        "One `{ key, label }` per page, listed in the page selector; passing nothing leaves the page selector out",
+        "One `{ key, label }` per page. Typed as required, but passing nothing simply leaves the page selector out.",
     },
     countItems: {
       control: false,
       description:
-        "One `{ key, label }` per page size, listed in the page-size selector; passing nothing leaves that selector out",
+        "One `{ key, label }` per page size. Typed as required, but passing nothing simply leaves the per-page selector out.",
     },
     selectedPageItem: {
       control: false,
       description:
-        "The option the page selector shows; hold it in your own state and update it from `onSelectPage`",
+        "The option the page selector displays. It is read on every render, so hold it in your own state and update it from `onSelectPage`.",
     },
     selectedCountItem: {
       control: false,
       description:
-        "The option the page-size selector shows; hold it in your own state and update it from `onSelectCount`",
+        "The option the per-page selector displays. It is read on every render, so hold it in your own state and update it from `onSelectCount`.",
     },
     previousAction: {
       description:
-        "Called when the previous button is clicked; a returned promise is not awaited",
+        "Called when the previous button is clicked. A promise it returns is not awaited: the component has no loading state of its own.",
     },
     nextAction: {
       description:
-        "Called when the next button is clicked; a returned promise is not awaited",
+        "Called when the next button is clicked. A promise it returns is not awaited: the component has no loading state of its own.",
     },
     onSelectPage: {
       description:
-        "Called with the option picked in the page selector; nothing moves until you update `selectedPageItem`",
+        "Called with the option that was picked in the page selector. Nothing moves until you update `selectedPageItem` yourself.",
     },
     onSelectCount: {
       description:
-        "Called with the option picked in the page-size selector; nothing changes until you update `selectedCountItem`",
+        "Called with the option that was picked in the per-page selector. Nothing changes until you update `selectedCountItem` yourself.",
     },
     id: {
       control: "text",
-      description: "Value of `id` on the outer element",
+      description: "Value of `id` on the outer element.",
     },
     className: {
       control: "text",
-      description: "Added after the component's own class on the outer element",
+      description:
+        "Added after the component's own class on the outer element.",
     },
     style: {
       control: false,
       description:
-        "Inline style of the outer element, and where the `--paging-*` custom properties go",
+        "Inline style of the outer element, and where the `--paging-*` custom properties go.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the outer element",
+      description: "Value of `data-testid` on the outer element.",
       table: {
         defaultValue: { summary: "paging" },
       },
@@ -207,6 +208,7 @@ const countSelector = (canvas: Canvas) =>
   within(canvas.getByTestId("paging_count_items_combobox")).getByRole("button");
 
 export const Default: Story = {
+  name: "Full strip",
   play: async ({ args, canvas, userEvent }) => {
     await expect(pageSelector(canvas)).toHaveTextContent("1 of 200");
 
@@ -244,7 +246,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The full strip under a list of 200 pages: step with Previous and Next, jump from the page selector, or change the page size, and watch the calls in the Actions panel. The story holds the current page and size itself, as your code must; change any other prop live in the Controls panel below.",
+          "The full strip under a list of 200 pages: Previous and Next, the page selector and the page-size selector. The story holds the current page and size itself, as your code must.",
       },
       source: {
         code: `<Paging
@@ -280,6 +282,7 @@ const DisabledPreviousTemplate = () => {
 };
 
 export const DisabledPrevious: Story = {
+  name: "First page",
   render: () => <DisabledPreviousTemplate />,
   play: async ({ canvas }) => {
     await expect(previous(canvas)).toBeDisabled();
@@ -294,7 +297,7 @@ export const DisabledPrevious: Story = {
     docs: {
       description: {
         story:
-          "On the first page there is nowhere to go back to, so the Previous button is greyed out and ignores clicks (`disablePrevious`); the component does not work this out, you set it.",
+          "The first page: the Previous button is greyed out and ignores clicks (`disablePrevious`). The component does not work this out; you set it.",
       },
       source: {
         code: `<Paging previousLabel="Previous" nextLabel="Next" disablePrevious />`,
@@ -321,6 +324,7 @@ const DisabledNextTemplate = () => {
 };
 
 export const DisabledNext: Story = {
+  name: "Last page",
   render: () => <DisabledNextTemplate />,
   play: async ({ canvas }) => {
     await expect(next(canvas)).toBeDisabled();
@@ -357,6 +361,7 @@ const WithoutCountTemplate = () => {
 };
 
 export const WithoutCountSelector: Story = {
+  name: "Without page size",
   render: () => <WithoutCountTemplate />,
   play: async ({ canvas }) => {
     await expect(
@@ -370,7 +375,7 @@ export const WithoutCountSelector: Story = {
     docs: {
       description: {
         story:
-          "For a list whose page size is fixed, the page-size selector at the end is left out (`showCountItem={false}`), leaving the two buttons and the page selector.",
+          "The two buttons and the page selector, without the page-size selector (`showCountItem={false}`). It suits a list whose page size is fixed.",
       },
       source: {
         code: `<Paging previousLabel="Previous" nextLabel="Next" showCountItem={false} />`,
@@ -399,6 +404,7 @@ const SinglePageTemplate = () => {
 };
 
 export const SinglePage: Story = {
+  name: "Single page",
   render: () => <SinglePageTemplate />,
   play: async ({ canvas }) => {
     await expect(previous(canvas)).toBeDisabled();
@@ -414,7 +420,7 @@ export const SinglePage: Story = {
     docs: {
       description: {
         story:
-          "When the whole list fits on one page, both buttons are greyed out and the page selector is disabled with them (`disablePrevious` and `disableNext` together), while the page size can still be changed.",
+          "A list that fits on one page: both buttons and the page selector are disabled (`disablePrevious` and `disableNext` together). The page size can still be changed.",
       },
       source: {
         code: `<Paging
@@ -450,6 +456,7 @@ const ButtonsOnlyTemplate = () => (
 );
 
 export const ButtonsOnly: Story = {
+  name: "Buttons only",
   render: () => <ButtonsOnlyTemplate />,
   play: async ({ canvas }) => {
     await expect(previous(canvas)).toBeInTheDocument();
@@ -463,7 +470,7 @@ export const ButtonsOnly: Story = {
     docs: {
       description: {
         story:
-          "For a list whose length is not known, only the Previous and Next buttons remain once neither list of options is passed (`pageItems` and `countItems` left out).",
+          "Only the Previous and Next buttons, with `pageItems` and `countItems` left out. It suits a list whose length is not known.",
       },
       source: {
         code: `<Paging
@@ -480,6 +487,7 @@ export const ButtonsOnly: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   play: async ({ canvas }) => {
     await expect(previous(canvas)).toHaveStyle({
       maxWidth: "140px",
@@ -528,7 +536,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The example raises the width cap of both buttons so their larger labels are not cut off, widens the page-size selector, and shows taller controls in a window narrower than 1024px.`,
+        story: `Every overridable variable set on one wrapper, as listed under CSS variables. Both buttons get a higher width cap and the page-size selector is wider. Below 1024px the buttons are taller.`,
       },
       source: {
         code: `<div

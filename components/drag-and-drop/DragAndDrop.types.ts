@@ -11,9 +11,15 @@ export interface DragAndDropProps {
   isDragDisabled?: boolean;
   /** Called when the pointer is pressed. It is passed straight to the element, not through the drop library. */
   onMouseDown?: () => void;
-  /** Called with the dropped files. It is skipped entirely when the drop carried none, and nothing is ever rejected: there is no accepted-type or size filter here. */
+  /**
+   * Called with the dropped files, and skipped when the drop carried none.
+   * Nothing is rejected: there is no type or size filter here.
+   */
   onDrop?: (acceptedFiles: File[]) => void;
-  /** Called on every drag-over with the drag-active flag as it stood when the current render began — on the first event of a drag that is still `false`. */
+  /**
+   * Called on every drag-over with the drag-active flag from the last render.
+   * On the first event of a drag that flag is still `false`.
+   */
   onDragOver?: (isDragActive: boolean, e: React.DragEvent<HTMLElement>) => void;
   /** Called when the dragged selection leaves the target. */
   onDragLeave?: (e: React.DragEvent<HTMLElement>) => void;

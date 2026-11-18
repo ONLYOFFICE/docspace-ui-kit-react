@@ -35,43 +35,40 @@ const meta = {
     items: {
       control: false,
       description:
-        "The tiles, in the order they are drawn. Each has an `id`, an `icon` and a `label`, and may add `onClick`, `href` with `target`, `disabled`, `tooltipContent` and `dataTestId`. An empty array renders nothing.",
+        "The tiles, in the order they are drawn. An empty array renders nothing at all.",
     },
     prevLabel: {
       control: "text",
       description:
-        "Accessible name of the arrow that scrolls back. Required, with no built-in default, unless `isLoading` is always `true`.",
+        "Accessible name of the arrow that scrolls back. Required, and localized by you, unless `isLoading` is pinned to `true`.",
     },
     nextLabel: {
       control: "text",
       description:
-        "Accessible name of the arrow that scrolls on. Required, with no built-in default, unless `isLoading` is always `true`.",
+        "Accessible name of the arrow that scrolls on. Required, and localized by you, unless `isLoading` is pinned to `true`.",
     },
     onClose: {
       control: false,
       description:
-        "Called when the close control is clicked. Without it no close control is drawn.",
+        "Called when the close control is clicked; the banner stays until you remove it. Without it no close control is drawn.",
     },
     closeLabel: {
       control: "text",
-      description:
-        "Tooltip and accessible name of the close control. Required together with `onClose`.",
+      description: "Tooltip and accessible name for the close control.",
     },
     isLoading: {
       control: "boolean",
-      description:
-        "Draws skeleton tiles of the same size instead of the real ones, one per item, or four when `items` is empty, and no controls.",
+      description: "Whether skeleton tiles are drawn instead of the real ones.",
       table: { defaultValue: { summary: "false" } },
     },
     className: {
       control: "text",
-      description:
-        "Class added to the banner's root element, after the component's own.",
+      description: "Applied to the banner, after the component's own class.",
     },
     dataTestId: {
       control: "text",
       description:
-        "`data-testid` of the banner's root element. The track and the controls carry fixed test ids of their own.",
+        "`data-testid` of the banner. The track and the controls carry ids of their own.",
     },
   },
 } satisfies Meta<typeof QuickActions>;
@@ -207,6 +204,7 @@ const aiChatItems: QuickActionItem[] = [
 ];
 
 export const Default: Story = {
+  name: "Document tiles",
   render: (args: QuickActionsProps) => (
     <Wrapper>
       <QuickActions {...args} />
@@ -233,7 +231,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Four tiles in a banner 752px wide, the width a content column usually gives it. Click a tile to see its `onClick` in the Actions panel, and change any other prop live in the Controls panel below.",
+          "Four tiles in a banner 752px wide, the width a content column usually gives it. A tile calls its own `onClick`.",
       },
       source: {
         code: `<QuickActions
@@ -252,6 +250,7 @@ export const Default: Story = {
 };
 
 export const InAIForms: Story = {
+  name: "Illustrations of different shapes",
   render: (args: QuickActionsProps) => (
     <Wrapper>
       <QuickActions {...args} />
@@ -278,7 +277,7 @@ export const InAIForms: Story = {
     docs: {
       description: {
         story:
-          "Four ways to start the same kind of file, each drawn with a different illustration from the set this folder exports: the icons differ in proportions, and each is fitted into the same box without being stretched.",
+          "Four ways to start the same kind of file, each with an illustration this folder exports. The icons differ in proportions; each fits the same box unstretched.",
       },
       source: {
         code: `<QuickActions
@@ -297,6 +296,7 @@ export const InAIForms: Story = {
 };
 
 export const InAIChat: Story = {
+  name: "Fewer tiles than fit",
   render: (args: QuickActionsProps) => (
     <Wrapper>
       <QuickActions {...args} />
@@ -316,7 +316,7 @@ export const InAIChat: Story = {
     docs: {
       description: {
         story:
-          "Three tiles, fewer than the banner has room for: the row stays centred in the banner and no arrow appears, because there is nothing to scroll.",
+          "Three tiles, fewer than the banner has room for. The row stays centred, and no arrow appears because there is nothing to scroll.",
       },
       source: {
         code: `<QuickActions
@@ -334,6 +334,7 @@ export const InAIChat: Story = {
 };
 
 export const Carousel: Story = {
+  name: "More tiles than fit",
   render: (args: QuickActionsProps) => (
     <Wrapper>
       <QuickActions {...args} />
@@ -375,9 +376,10 @@ export const Carousel: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Five tiles, more than the banner holds. The tiles keep their width and the strip scrolls sideways; wheel, trackpad, touch swipe and the arrows all move the same strip.
+        story: `Five tiles, more than the banner holds: the strip scrolls, starting with only the forward arrow.
 
-At the start only the forward arrow is shown; scroll and the back arrow appears, and at the far end the forward one goes. From the keyboard, the arrow keys, Home and End move between the tiles and bring each into view. The arrows float over the strip, so nothing moves when they appear. With a mouse they fade in while the banner is hovered or focused; on a touch screen they stay visible.`,
+- The back arrow appears once the strip has moved; the forward one goes at the far end.
+- The arrow keys, Home and End move focus between the tiles and scroll each into view.`,
       },
       source: {
         code: `<QuickActions
@@ -397,6 +399,7 @@ At the start only the forward arrow is shown; scroll and the back arrow appears,
 };
 
 export const Dismissible: Story = {
+  name: "With a close cross",
   render: (args: QuickActionsProps) => (
     <Wrapper>
       <QuickActions {...args} />
@@ -420,9 +423,9 @@ export const Dismissible: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The close control in the top corner (\`onClose\`); hover the banner, then hover the control to read its tooltip, which is also its accessible name (\`closeLabel\`). A click shows up in the Actions panel.
+        story: `A close cross in the top corner (\`onClose\`), drawn only when the handler is passed. Its tooltip and accessible name are \`closeLabel\`.
 
-The control is only rendered when \`onClose\` is given: a consumer with nowhere to persist the choice would otherwise offer a button that undoes itself on the next load. Hiding the banner is the host's decision to store and to reverse — the component only reports the click.`,
+A click only calls \`onClose\`; the banner stays. Hiding it, and remembering that, is the host's job.`,
       },
       source: {
         code: `<QuickActions
@@ -454,6 +457,7 @@ const linkItems: QuickActionItem[] = [
 ];
 
 export const LinkTiles: Story = {
+  name: "Link tiles",
   render: (args: QuickActionsProps) => (
     <Wrapper>
       <QuickActions {...args} />
@@ -479,7 +483,7 @@ export const LinkTiles: Story = {
     docs: {
       description: {
         story:
-          'Tiles that go somewhere instead of doing something: each is a real link (`href`), so it can be opened in a new tab from the context menu and shows its address in the status bar. **Open the guide** opens a new tab (`target="_blank"`) and gets `rel="noopener noreferrer"` without asking.',
+          'Tiles that go somewhere instead of doing something. Each is a real link (`href`), so the browser offers to open it in a new tab. **Open the guide** opens a new tab (`target="_blank"`) and gets `rel="noopener noreferrer"` by itself.',
       },
       source: {
         code: `<QuickActions
@@ -506,6 +510,7 @@ const disabledItems: QuickActionItem[] = [
 ];
 
 export const DisabledState: Story = {
+  name: "Disabled tile with a tooltip",
   render: (args: QuickActionsProps) => (
     <Wrapper>
       <QuickActions {...args} />
@@ -531,7 +536,7 @@ export const DisabledState: Story = {
     docs: {
       description: {
         story:
-          "**Presentation** is faded and ignores clicks (`disabled`); hover it to read why (`tooltipContent`). Use it to keep an action in its usual place while it cannot be taken, rather than making the row shift by dropping it. A tooltip works the same on an enabled tile.",
+          "**Presentation** is faded and ignores clicks (`disabled`), and its tooltip says why (`tooltipContent`). The action keeps its place, so the row does not shift.",
       },
       source: {
         code: `<QuickActions
@@ -555,6 +560,7 @@ export const DisabledState: Story = {
 };
 
 export const LoadingState: Story = {
+  name: "Loading",
   render: () => (
     <Wrapper>
       <QuickActions items={documentItems} isLoading />
@@ -569,7 +575,7 @@ export const LoadingState: Story = {
     docs: {
       description: {
         story:
-          "Skeleton tiles of the real tiles' size, one per item, while the set of actions is still being worked out (`isLoading`). The banner keeps its height, so the content below does not jump when the tiles arrive. With an empty `items` four skeletons are drawn.",
+          "Skeleton tiles of the real tiles' size, one per item, while the actions load (`isLoading`). The banner keeps its height, so the content below does not jump. An empty `items` draws four.",
       },
       source: {
         code: `<QuickActions items={items} isLoading />`,
@@ -579,6 +585,7 @@ export const LoadingState: Story = {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: () => (
     <div dir="rtl" style={{ maxWidth: 752 }}>
       <QuickActions items={roomItems} prevLabel="Previous" nextLabel="Next" />
@@ -598,7 +605,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "173px" },
       description: {
         story:
-          'The strip in a right-to-left layout: the first tile sits at the right edge, the strip scrolls toward the left, and the fade and the forward arrow move to the left edge with the arrow pointing left. The wrapper carries `dir="rtl"`; the direction also comes from the theme\'s `interfaceDirection` (the Direction toolbar).',
+          'The strip in a right-to-left layout: the first tile at the right edge, and the fade and forward arrow on the left. The strip reads the direction from its computed style, here the wrapper\'s `dir="rtl"`.',
       },
       source: {
         code: `<div dir="rtl">
@@ -614,6 +621,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={
@@ -644,9 +652,9 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable but the row cap set on one wrapper -- the variables are listed under CSS variables on this page. The example narrows the tiles to 176px and holds the first one 24px off the banner's edge, which still leaves the fourth tile scrolling; hover a tile for the hover background and Tab into the strip for the focus outline.
+        story: `Every variable but the row cap, set on one wrapper: dark tiles 176px wide, the first one 24px off the banner's edge. The fourth tile still scrolls.
 
-Set the variables on any ancestor element — they cascade down to all tiles:
+Set the variables on any ancestor of the banner:
 
 \`\`\`tsx
 <div

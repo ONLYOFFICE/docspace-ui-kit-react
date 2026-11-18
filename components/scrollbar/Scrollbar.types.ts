@@ -37,38 +37,43 @@ export type ScrollbarProps = {
   translateContentSizeYToHolder?: ScrollbarLibraryProps["translateContentSizeYToHolder"];
   /** The same on the horizontal axis. */
   translateContentSizeXToHolder?: ScrollbarLibraryProps["translateContentSizeXToHolder"];
-  /** Both at once. */
+  /** Gives the outer element both the content's height and its width. */
   translateContentSizesToHolder?: ScrollbarLibraryProps["translateContentSizesToHolder"];
   /** Which side the vertical track is on. It follows the interface direction unless set. */
   rtl?: ScrollbarLibraryProps["rtl"];
-  /** Ref to access the DOM element or React component instance */
+  /** Receives the scrollbar instance, with its scroll methods and elements. */
   ref?: React.Ref<ScrollbarType | null>;
-  /** Ref to access the DOM element of Scroll content element */
+  /** Receives the element that holds the content, once it is mounted. */
   contentRef?: React.RefObject<HTMLDivElement | null>;
-  /** This class will be placed on scroller element */
+  /** Extra class on the inner element that scrolls, the `.scroller`. */
   scrollClass?: string;
-  /** This class will be placed on scroller body element */
+  /** Extra class on the element that holds the content, the `.scroll-body`. */
   scrollBodyClassName?: string;
   /**
-   * Whether the tracks fade out again three seconds after the last scroll or
-   * pointer move.
+   * Hides the tracks until a scroll or a pointer move over the content, and
+   * fades them out three seconds later. `false` keeps them on screen.
    * @default true
    */
   autoHide?: boolean;
-  /** Fix scrollbar size. */
+  /**
+   * Keeps the thumb 8px thick on desktop. Without it the thumb is 4px and
+   * thickens only under the pointer.
+   */
   fixedSize?: boolean;
-  /** Set focus on scroll content element after first render */
+  /** Focuses the content element after mount, so the arrow keys scroll it straight away. */
   autoFocus?: boolean;
   /**
-   * Position of the scrolling element in the tab order. The default of -1 keeps
-   * it off the tab order, so the region cannot be scrolled with the arrow keys;
-   * `null` removes the attribute entirely.
+   * Tab order of the content element. The default keeps it out of the tab
+   * order, so the keyboard cannot reach the region; `null` drops the attribute.
    * @default -1
    */
   tabIndex?: number | null;
-  /** Add padding bottom to scroll-body */
+  /** Space below the last item, as a CSS length. */
   paddingAfterLastItem?: string;
-  /** Add custom padding-inline-end to scroll-body. */
+  /**
+   * Space between the content and the side the vertical track is on, as a CSS
+   * length. It replaces the default at every screen width.
+   */
   paddingInlineEnd?: string;
   /** Called as the content scrolls, with the native event. */
   onScroll?: React.UIEventHandler<HTMLDivElement>;

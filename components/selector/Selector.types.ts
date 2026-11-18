@@ -181,7 +181,7 @@ export type TSelectorTabs = WithFlag<
   {
     /** Whether a tab strip is shown above the list. It only accepts `true`. */
     withTabs: true;
-    /** The tabs, in order. */
+    /** One entry per tab in the strip above the list, left to right. */
     tabsData: TTabItem[];
     /**
      * Id of the open tab. Selector keeps one selection per tab id and adds them
@@ -228,15 +228,15 @@ export type TSelectorSearch = WithFlag<
   {
     /**
      * Whether the list can be searched. It only accepts `true`. The box hides
-     * itself while the list is empty and no search is running, so an empty
-     * folder shows the empty screen rather than a search over nothing.
+     * while the list is empty and no search runs, so an empty folder shows the
+     * empty screen.
      */
     withSearch: true;
     /** Shown in place of the box while `isSearchLoading` is set. */
     searchLoader: React.ReactNode;
     /** Whether to replace the box with `searchLoader`. */
     isSearchLoading: boolean;
-    /** Placeholder of the box. */
+    /** Grey text in the empty search box. */
     searchPlaceholder?: string;
     /** Text in the box. Searching is yours to do; this is what is displayed. */
     searchValue?: string;
@@ -394,14 +394,14 @@ export type TSelectorCancelButton = WithFlag<
      * `true`.
      */
     withCancelButton: true;
-    /** Text of that button. */
+    /** Text on the footer's second button, the one that calls `onCancel`. */
     cancelButtonLabel: string;
     /**
      * Called by that button — and by Escape, which Selector listens for on the
      * window whether or not the button is there.
      */
     onCancel: () => void;
-    /** `id` attribute of that button. */
+    /** Placed as the `id` attribute on the footer's second button. */
     cancelButtonId?: string;
   }
 >;
@@ -435,7 +435,10 @@ type TWithAccessRightsProps = {
   selectedAccessRight: TAccessRight | null;
   /** Called when the choice changes. */
   onAccessRightsChange: (access: TAccessRight) => void;
-  /** Whether each entry shows its `description`. */
+  /**
+   * How the access list opens: `compact` fits its entries, `detailed` spans the
+   * footer, or the screen as a panel on a phone.
+   */
   accessRightsMode?: SelectorAccessRightsMode;
 };
 
@@ -515,7 +518,7 @@ export type TSelectorCheckbox = WithFlag<
      * makes the footer 110px, or 181px alongside `withFooterInput`.
      */
     withFooterCheckbox: true;
-    /** Label beside that checkbox. */
+    /** Text shown beside the footer checkbox. */
     footerCheckboxLabel: string;
     /**
      * Initial state of the checkbox. Selector owns it from then on and hands the
@@ -537,7 +540,7 @@ export type TSelectorInfo = WithFlag<
      * accepts `true`, and the note is hidden during the initial load.
      */
     withInfo: true;
-    /** Text of that note. */
+    /** Text of the tinted note between the search box and the list. */
     infoText: string;
     /** Whether an icon is drawn beside the text. */
     withInfoBadge?: boolean;
@@ -602,8 +605,8 @@ export type SelectorProps = TSelectorHeader &
     maxSelectedItems?: number;
     /**
      * Called when a row is ticked past `maxSelectedItems`. With it set, the
-     * unticked rows stay as they are and the tick is refused here instead, so
-     * the host can say why (a toast) only when the limit is hit.
+     * unticked rows stay active and the extra tick is refused here. The host
+     * can then say why, with a toast for example.
      */
     onSelectLimitReached?: () => void;
 
@@ -648,8 +651,8 @@ export type SelectorProps = TSelectorHeader &
     hideBackButton?: boolean;
     /**
      * Matched against the footer input on every keystroke. A match marks the
-     * field as in error and shows the kit's "contains special characters" line —
-     * so it describes what is *forbidden*, not what is allowed.
+     * field as in error under a "contains special characters" line, so the
+     * pattern describes what is *forbidden*.
      */
     folderFormValidation?: RegExp;
 
@@ -825,7 +828,7 @@ export type TSelectorItemFile = MergeTypes<
     rootFolderType: string | number;
     /** What the current user may do with it. */
     security: FileEntryDtoIntegerAllOfSecurity;
-    /** The icon: a URL, or an SVG component the row renders itself. */
+    /** A URL, or an SVG component the row renders. */
     icon: TSvgComponent | string;
   }
 >;
@@ -845,7 +848,7 @@ export type TSelectorItemFolder = MergeTypes<
     foldersCount: number;
     /** What the current user may do with it. */
     security: FileEntryDtoIntegerAllOfSecurity;
-    /** The icon: a URL, or an SVG component the row renders itself. */
+    /** A URL, or an SVG component the row renders. */
     icon?: TSvgComponent | string;
     /** Picture drawn instead of the folder icon. */
     avatar?: string | React.ReactElement;
@@ -871,7 +874,7 @@ export type TSelectorItemRoom = MergeTypes<
     foldersCount: number;
     /** What the current user may do with it. */
     security: FileEntryDtoIntegerAllOfSecurity;
-    /** URL of the room's own logo. */
+    /** URL of the room's logo. */
     icon?: string;
     /** Colour of the generated logo, when there is no picture. */
     color?: string;
@@ -898,7 +901,7 @@ export type TSelectorItemGroup = MergeTypes<
      * to the top and a divider is inserted under the first of them.
      */
     isSystem?: boolean;
-    /** Name of the group. */
+    /** Required by the group type but not read; the row shows `label`. */
     name: string;
   }
 >;
@@ -908,10 +911,7 @@ export type TSelectorItemMCP = MergeTypes<
   {
     /** Marks the row as an MCP server, which draws the server tile. */
     isMCP: boolean;
-    /**
-     * A URL for remotely hosted icons, or a rendered element for the ones
-     * bundled as SVG components (see utils/ai/getServerIcon).
-     */
+    /** A URL, or an element rendered as it is. */
     icon?: string | React.ReactElement;
   }
 >;
@@ -951,7 +951,7 @@ export type TSelectorItemInput = MergeTypes<
     isInputItem: boolean;
     /** Text the field starts with. */
     defaultInputValue: string;
-    /** Icon beside the field: a URL, or an element rendered as it is. */
+    /** Beside the field: a URL, or an element rendered as it is. */
     icon?: string | React.ReactElement;
     /** Colour of the generated logo beside the field. */
     color?: string;
@@ -959,7 +959,7 @@ export type TSelectorItemInput = MergeTypes<
     roomType?: RoomType;
     /** Cover art drawn beside the field. */
     cover?: ICover;
-    /** Placeholder of the field. */
+    /** Grey text in the empty name field. */
     placeholder?: string;
 
     /** Called with the typed name when the tick is clicked or Enter pressed. */
@@ -1007,9 +1007,9 @@ export type TSelectorItem = TSelectorItemType & {
   viewUrl?: string;
   /** Whether the room is a template, which changes its logo. */
   isTemplate?: boolean;
-  /** The current user's access to that template. */
+  /** Not read: a template row looks the same whatever the access. */
   templateAccess?: FileShare;
-  /** Whether the current user owns that template. */
+  /** Not read: a template row looks the same whoever owns it. */
   templateIsOwner?: boolean;
   /** Whether this row stays single-select while the rest are not. */
   disableMultiSelect?: boolean;
