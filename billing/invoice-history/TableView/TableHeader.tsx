@@ -33,6 +33,13 @@ const InvoiceHistoryTableHeader = (props: TableHeaderProps) => {
       minWidth: 120,
     },
     {
+      key: "Type",
+      title: t("Type"),
+      enable: true,
+      resizable: true,
+      minWidth: 120,
+    },
+    {
       key: "Actions",
       title: t("Actions"),
       enable: true,

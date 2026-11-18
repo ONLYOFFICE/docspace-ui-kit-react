@@ -9,6 +9,7 @@ import styles from "../InvoiceHistory.module.scss";
 type InvoiceRowProps = {
   date: string;
   amount: string;
+  type: string;
   hasInvoice: boolean;
   onOpenInvoice: () => void;
 };
@@ -16,6 +17,7 @@ type InvoiceRowProps = {
 const InvoiceRow: React.FC<InvoiceRowProps> = ({
   date,
   amount,
+  type,
   hasInvoice,
   onOpenInvoice,
 }) => (
@@ -33,6 +35,16 @@ const InvoiceRow: React.FC<InvoiceRowProps> = ({
     <TableCell>
       <Text fontSize="12px" fontWeight={600} className={styles.cellText}>
         {amount}
+      </Text>
+    </TableCell>
+    <TableCell>
+      <Text
+        fontSize="12px"
+        fontWeight={600}
+        className={styles.cellText}
+        dataTestId="invoice_type"
+      >
+        {type}
       </Text>
     </TableCell>
     <TableCell>
