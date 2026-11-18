@@ -529,7 +529,7 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
     <>
       <div
         className={classNames(styles.transactionHistoryHeader, {
-          [styles.withoutTitle]: withoutHeader,
+          [styles.withoutTitle]: withoutHeader && isMobile,
         })}
       >
         {withoutHeader ? null : (

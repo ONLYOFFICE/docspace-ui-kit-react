@@ -122,6 +122,10 @@
     margin-inline-start: auto;
   }
 
+  &:empty {
+    margin-bottom: 0;
+  }
+
   &.withoutTitle {
     margin-top: 16px;
 
