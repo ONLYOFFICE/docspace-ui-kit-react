@@ -7,9 +7,8 @@ import type { AsideHeaderProps } from "./aside-header";
  */
 export type AsideProps = AsideHeaderProps &
   AriaAttributes & {
-    /** Whether the panel is slid in. It only switches a CSS transform — the
-     * panel and its children stay mounted and in the tab order either way, so
-     * render the component conditionally to close it properly. */
+    /** Whether the panel is slid in. The panel stays mounted and in the tab
+     * order either way, so render the component conditionally to close it. */
     visible: boolean;
     /** Makes the panel take the full width of the viewport instead of its
      * 480px.
@@ -17,8 +16,8 @@ export type AsideProps = AsideHeaderProps &
     scale?: boolean;
     /** Applied to the `<aside>` element. */
     className?: string;
-    /** Stacking order of the panel. It sits above the page but below nothing
-     * in particular — a `Backdrop` of your own needs a lower value.
+    /** Stacking order of the panel. A `Backdrop` of your own behind it needs a
+     * lower value.
      * @default 400 */
     zIndex?: number;
     /** Content of the panel, below the header. */

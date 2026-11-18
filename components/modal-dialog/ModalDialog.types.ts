@@ -14,15 +14,15 @@ export type ModalSubComponentsProps = AsideHeaderProps & {
   ref?: RefObject<HTMLDivElement | null>;
   /** Reference to the inner sheet/content element (`<div id="modal-dialog">`) */
   sheetRef?: RefObject<HTMLDivElement | null>;
-  /** Unique identifier for the modal */
+  /** Applied to the dialog's outer element. */
   id?: string;
-  /** Custom styles for the modal */
+  /** Applied to the click-to-close layer around the dialog surface. */
   style?: React.CSSProperties;
-  /** Additional CSS classes */
+  /** Added to the click-to-close layer around the dialog surface. */
   className?: string;
   /** Current display type of the modal (modal or aside) */
   currentDisplayType: ModalDialogType;
-  /** **`ASIDE-ONLY`** Enables body scroll */
+  /** **`ASIDE-ONLY`** Wraps the side panel's body in the kit's scrollbar. */
   withBodyScroll?: boolean;
   /** **`ASIDE-ONLY`** Locks the scroll in body section */
   isScrollLocked?: boolean;
@@ -30,15 +30,18 @@ export type ModalSubComponentsProps = AsideHeaderProps & {
   isLarge: boolean;
   /** **`MODAL-ONLY`** Sets predefined huge size */
   isHuge: boolean;
-  /** CSS z-index for modal layering */
+  /** Stacking order of the backdrop, which holds the dialog. */
   zIndex?: number;
-  /** **`MODAL-ONLY`** Sets max-height: auto */
+  /** **`MODAL-ONLY`** Lifts the height cap, so the modal grows with its
+   * content. */
   autoMaxHeight?: boolean;
-  /** **`MODAL-ONLY`** Sets max-width: auto */
+  /** **`MODAL-ONLY`** Lets the width follow the content instead of the fixed
+   * 400px. */
   autoMaxWidth?: boolean;
-  /** Callback function when modal is closed */
+  /** Called by the cross, Escape, a backdrop click or a swipe down. */
   onClose: (e?: React.MouseEvent) => void;
-  /** Shows loader in body */
+  /** Replaces the header, body and footer with a skeleton of the current
+   * display type. */
   isLoading?: boolean;
   /** Content for the modal header */
   header?: React.ReactNode;
@@ -48,26 +51,29 @@ export type ModalSubComponentsProps = AsideHeaderProps & {
   footer?: React.ReactNode;
   /** Container content for aside mode */
   container?: React.ReactNode;
-  /** Controls modal visibility */
+  /** Shows the dialog. It stays mounted either way, so render it
+   * conditionally to remove it. */
   visible?: boolean;
   /** **`MODAL-ONLY`** Displays border between body and footer */
   withFooterBorder: boolean;
-  /** Offset for modal swipe animation */
+  /** How far the sheet has been dragged down, in pixels. The dialog tracks it
+   * itself; a value passed here overrides it. */
   modalSwipeOffset?: number;
   /** **`ASIDE-ONLY`** Allows embedding modal as aside dialog inside parent container */
   containerVisible?: boolean;
-  /** Displays double line in footer */
+  /** Stacks the footer in a column, so each `<div>` in it becomes a row of
+   * buttons. */
   isDoubleFooterLine?: boolean;
-  /** Whether the user may close the dialog at all. Every route to `onClose` —
-   * the header's cross, Escape, a backdrop click — runs through one guard, so
-   * `false` stops all three and leaves closing entirely to the caller.
+  /** Whether the user may close the dialog at all. The cross, Escape and a
+   * backdrop click share one guard, so `false` stops all three.
    * @default true */
   isCloseable?: boolean;
   /** Whether a click on the backdrop closes the dialog. Unlike `isCloseable`,
    * this stops only that one route; the cross and Escape keep working.
    * @default true */
   closeOnBackdropClick?: boolean;
-  /** Enables embedded mode */
+  /** Turns closing off: no cross, and neither Escape nor the backdrop calls
+   * `onClose`. */
   embedded?: boolean;
   /** Wraps content in form element */
   withForm?: boolean;
@@ -77,11 +83,12 @@ export type ModalSubComponentsProps = AsideHeaderProps & {
   withoutPadding?: boolean;
   /** Removes default margin from header */
   withoutHeaderMargin?: boolean;
-  /** Hides modal content */
+  /** Renders the backdrop without the dialog surface, so none of the content
+   * mounts. */
   hideContent?: boolean;
-  /** Sets backdrop blur value */
+  /** Ignored. Nothing reads this prop. */
   blur?: number;
-  /** Shows invite panel loader */
+  /** Draws the invite panel's skeleton while the side panel is loading. */
   isInvitePanelLoader?: boolean;
   /** Forces body scroll regardless of display type */
   withBodyScrollForcibly?: boolean;
@@ -118,7 +125,8 @@ export type ModalDialogProps = Partial<
 > & {
   /** Displays the child elements */
   children: (React.ReactElement | null)[] | React.ReactElement;
-  /** Displays type */
+  /** Shows the dialog as a centred modal or a side panel at every width.
+   * `displayTypeDetailed` wins over it. */
   displayType?: ModalDialogType;
   /** Detailed display type for each dimension */
   displayTypeDetailed?: ModalDialogTypeDetailed;

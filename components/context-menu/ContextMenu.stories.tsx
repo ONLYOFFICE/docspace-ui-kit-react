@@ -36,20 +36,21 @@ const meta = {
       // The icons are data URIs too long to edit, and they stretch the table.
       control: false,
       description:
-        "The items — actions, separators and submenus — read each time the menu opens; `getContextModel` replaces them when it is given",
+        "The items. The desktop list reads them on every render; `getContextModel`, when given, replaces them.",
     },
     getContextModel: {
       control: false,
-      description: "Builds the items on every open instead of the static model",
+      description:
+        "Builds the items each time the menu opens, replacing `model`. This is the one to use for a menu whose entries depend on the current selection.",
     },
     className: {
       control: "text",
-      description: "Additional CSS class on the menu element",
+      description: "Applied to the menu element.",
     },
     withBackdrop: {
       control: "boolean",
       description:
-        "Dims the page behind the open menu while it is a bottom sheet (viewports up to 600px), or on any viewport together with ignoreChangeView",
+        "Whether a backdrop is rendered behind the menu. It is only visible when the menu is in its mobile sheet form, so on a desktop it shows nothing.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -57,83 +58,82 @@ const meta = {
     header: {
       control: false,
       description:
-        "Mobile-only header above the items: a title with an optional visual — the title's initials on a color, an icon, an avatar, a logo or a cover image",
+        "Title, icon and badge of the bar above the items, on the mobile sheet.",
     },
     headerOnlyMobile: {
       control: "boolean",
-      description:
-        "Mobile header only: shows the header for an opened submenu (its label and a back button) even when no header is passed",
+      description: "Renders the header only in the mobile sheet form.",
     },
     withoutBackHeaderButton: {
       control: "boolean",
       description:
-        "Mobile header only: removes the back button of an opened submenu and the icon block of the root header",
+        "Removes the back arrow from a submenu's header on the mobile sheet.",
     },
     isRoom: {
       control: "boolean",
       description:
-        "Mobile header only: a 32px icon block instead of the default size",
+        "Renders the header in its room form, with a logo and a cover.",
     },
     isArchive: {
       control: "boolean",
-      description:
-        "Mobile header only: draws the header icon in its archived state",
+      description: "Renders that header in its archived form.",
     },
     badgeUrl: {
       control: false,
-      description: "Mobile header only: badge icon on the header's icon block",
+      description: "URL of the badge image in the header.",
     },
     badgeIconColor: {
       control: false,
-      description: "Mobile header only: color of that badge icon",
+      description:
+        "Colour of the header badge's icon, as a CSS colour. A header with a logo or a cover ignores it.",
     },
     ignoreChangeView: {
       control: "boolean",
       description:
-        "Opens the menu as a bottom sheet on a narrow viewport whatever its height, and shows the backdrop on any viewport",
+        "Forces that mobile sheet form, and with it the backdrop, at any width.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     showDisabledItems: {
       control: "boolean",
-      description: "Keeps disabled items in the list instead of dropping them",
+      description: "Keeps disabled items in the menu instead of dropping them.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withHotkeys: {
       control: "boolean",
-      description: "Keyboard navigation with the arrows, Enter and Escape",
+      description:
+        "Whether the arrow keys, Enter and Escape work while the menu is open. This is the one menu in the kit that can be used from the keyboard.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     fillIcon: {
       control: "boolean",
-      description: "Fills item icons with the theme text color",
+      description: "Recolours the items' icons to the text colour.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     maxHeight: {
       control: "number",
-      description: "Maximum height of the root list in px; the rest scrolls",
+      description:
+        "Height cap of the item list, in pixels; past it the list scrolls.",
     },
     maxHeightLowerSubmenu: {
       control: "number",
-      description:
-        "Maximum height of a submenu in px; the rest of its items scroll",
+      description: "Height cap of a second-level submenu, in pixels.",
     },
     containerRef: {
       control: false,
       description:
-        "Element the menu opens under, at its left edge and 4px below it, instead of at the pointer",
+        "Element to position the menu against instead of the pointer. The menu opens 4px under it, at its left edge, at least 210px wide.",
     },
     scaled: {
       control: "boolean",
-      description:
-        "Meant to make the menu as wide as the element in `containerRef`; today the menu keeps the width of its longest item",
+      description: "Matches the menu's width to that container's.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -141,22 +141,21 @@ const meta = {
     leftOffset: {
       control: "number",
       description:
-        "Moves a menu opened under `containerRef` this many pixels to the left",
+        "Shifts the menu left by this many pixels, when positioned against a container.",
     },
     rightOffset: {
       control: "number",
-      description:
-        "Moves that menu further to the left by this many pixels; both offsets add up",
+      description: "Shifts it further left again; both offsets are subtracted.",
     },
     appendTo: {
       control: false,
       description:
-        "Element the menu is rendered into, instead of the end of the page body",
+        "Element the menu is rendered into, instead of `document.body`.",
     },
     autoZIndex: {
       control: "boolean",
       description:
-        "Puts each opened menu above everything opened before it, so it is never hidden behind another overlay",
+        "Sets the menu's stacking order on each open: `baseZIndex` plus a counter the kit shares, from 1001.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -164,18 +163,18 @@ const meta = {
     baseZIndex: {
       control: "number",
       description:
-        "Stacking level the menu and its backdrop start from, for a page whose own overlays sit higher",
+        "Stacking order of the backdrop, and the base of the menu's under `autoZIndex`.",
       table: {
         defaultValue: { summary: "0" },
       },
     },
     style: {
       control: "object",
-      description: "Inline styles of the menu element",
+      description: "Applied to the menu element.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the menu wrapper",
+      description: "Value of `data-testid` on the menu.",
       table: {
         defaultValue: { summary: "context-menu" },
       },
@@ -183,27 +182,29 @@ const meta = {
     ref: {
       control: false,
       description:
-        "Handle the menu is opened through: `show(event)`, `hide(event)` and `toggle(event)`; there is no visibility prop",
+        "Handle the menu is opened through: `show(event)`, `hide(event)` and `toggle(event)`. There is no visibility prop — this is the only way.",
     },
     global: {
       control: "boolean",
       description:
-        "Opens on right-click anywhere in the document instead of through the ref",
+        "Opens the menu on a right-click anywhere in the document, with no `show` call of yours.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     id: {
       control: "text",
-      description: "ID attribute for the component",
+      description: "Applied to the menu element.",
     },
     onHide: {
       action: "onHide",
-      description: "Callback when menu is hidden",
+      description:
+        "Called when the menu closes, with the event that closed it.",
     },
     onShow: {
       action: "onShow",
-      description: "Callback when the menu opens",
+      description:
+        "Called when a closed menu opens, with the event passed to `show`.",
     },
   },
 } satisfies Meta<typeof ContextMenu>;
@@ -337,7 +338,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Full-featured context menu with icons, separators, nested submenus and a disabled item. Disabled items are dropped from the list by default; `showDisabledItems` keeps them greyed out. Right-click the colored area to open.",
+          "Full-featured context menu with icons, separators, nested submenus and a disabled item. Disabled items are dropped by default; `showDisabledItems` keeps them greyed out. The coloured area opens it on a right-click.",
       },
       source: {
         code: `const cm = useRef<ContextMenuRefType>(null);
@@ -409,6 +410,7 @@ const SimpleMenuTemplate = () => {
 };
 
 export const SimpleMenu: Story = {
+  name: "Simple menu",
   render: () => <SimpleMenuTemplate />,
   beforeEach: () => {
     onSimpleItemClick.mockClear();
@@ -426,7 +428,7 @@ export const SimpleMenu: Story = {
     docs: {
       description: {
         story:
-          "A flat list of actions with one separator and no submenus — the shape most row and card menus need, with nothing but `ref` and `model` set. Right-click the colored area to open.",
+          "A flat list of actions with one separator and no submenus, with only `ref` and `model` set. Most row and card menus need this shape.",
       },
       source: {
         code: `<ContextMenu
@@ -480,6 +482,7 @@ const WithBackdropTemplate = () => {
 };
 
 export const WithBackdrop: Story = {
+  name: "With a backdrop",
   render: () => <WithBackdropTemplate />,
   play: async ({ canvas, userEvent }) => {
     rightClick(canvas.getByRole("button", { name: "Right click on me" }));
@@ -495,7 +498,7 @@ export const WithBackdrop: Story = {
     docs: {
       description: {
         story:
-          "Context menu with a backdrop overlay. `withBackdrop` shows the backdrop only while the menu is a bottom sheet (viewports up to 600px), so on a desktop viewport it also needs `ignoreChangeView`, which this story passes. The mobile stories below set both props too, so the sheet and its backdrop appear however short the menu is.",
+          "A context menu with a backdrop. `withBackdrop` shows it only while the menu is a bottom sheet, up to 600px, so a desktop also needs `ignoreChangeView`. This story and the mobile ones below pass both.",
       },
       source: {
         code: `<ContextMenu ref={cm} model={items} withBackdrop ignoreChangeView />`,
@@ -527,6 +530,7 @@ const accessItems: ContextMenuModel[] = [
 ];
 
 export const WithItemDescriptions: Story = {
+  name: "Items with descriptions",
   render: (args) => <MenuTemplate {...args} />,
   args: {
     model: accessItems,
@@ -643,6 +647,7 @@ const ItemVariantsTemplate = () => {
 };
 
 export const ItemVariants: Story = {
+  name: "Item kinds",
   render: () => <ItemVariantsTemplate />,
   play: async ({ canvas, userEvent }) => {
     rightClick(canvas.getByTestId("trigger"));
@@ -674,16 +679,16 @@ export const ItemVariants: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every kind of item the model supports, in one menu. From top to bottom:
+        story: `Every item kind:
 
-- **Notifications** — a switch inside the item (\`withToggle\`, \`checked\`). Clicking it flips the switch and keeps the menu open.
-- **Auto-save** — the same switch, disabled. The label keeps its color and only the switch is greyed (\`disabledStylesType: "toggle"\`); hover the switch to read why it is off (\`getTooltipContent\` anchored with \`tooltipTarget: "toggle"\`).
-- **Share with people** — the icon is a React element (\`iconNode\`) instead of an image URL.
-- **Ask the MCP server** — the MCP server icon (\`withMCPIcon\`): the server logo when \`icon\` is given, the first letter of the label otherwise.
-- **Export to PDF** — a text badge after the label (\`badgeLabel\`).
-- **Version history** — the same badge in the paid-feature color (\`badgeLabel\` + \`isPaidBadge\`).
-- **Help Center** — an external link that opens in a new tab (\`url\`, \`target\`); \`isOutsideLink\` adds the arrow.
-- **Delete** — a disabled item. It stays in the list only because of \`showDisabledItems\`; hover it to read the reason (\`getTooltipContent\`).`,
+- **Notifications** — a switch (\`withToggle\`, \`checked\`).
+- **Auto-save** — that switch, disabled (\`disabledStylesType\`).
+- **Share with people** — a JSX icon (\`iconNode\`).
+- **Ask the MCP server** — \`withMCPIcon\`.
+- **Export to PDF** — a text badge (\`badgeLabel\`).
+- **Version history** — a paid badge (\`isPaidBadge\`).
+- **Help Center** — an outside link (\`url\`, \`isOutsideLink\`).
+- **Delete** — disabled (\`showDisabledItems\`).`,
       },
       source: {
         code: `<ContextMenu
@@ -735,6 +740,7 @@ const DynamicModelTemplate = () => {
 };
 
 export const DynamicModel: Story = {
+  name: "Items built on open",
   render: () => <DynamicModelTemplate />,
   play: async ({ canvas, userEvent }) => {
     // The model is built on every open.
@@ -749,7 +755,7 @@ export const DynamicModel: Story = {
     docs: {
       description: {
         story:
-          "`getContextModel` replaces a static `model`: the getter runs each time the menu opens, so the first item shows the time of that open and the favorite item reads the state changed by its own click. Leading and trailing separators in the result are trimmed.",
+          "`getContextModel` replaces a static `model` and runs on each open. The first item shows the time of that open, and the favourite item reads the state its own click changed. Leading and trailing separators are trimmed.",
       },
       source: {
         code: `<ContextMenu
@@ -812,6 +818,7 @@ const GlobalTemplate = (props: ContextMenuProps) => (
 );
 
 export const AttachedToDocument: Story = {
+  name: "Whole-page menu",
   render: (args) => <GlobalTemplate {...args} />,
   args: {
     model: globalItems,
@@ -828,7 +835,7 @@ export const AttachedToDocument: Story = {
       story: { inline: false, iframeHeight: 340 },
       description: {
         story:
-          "The blue square has no handler of its own and nothing calls `show`: with `global` the menu attaches itself to the whole document, so a right-click on the square and one on the empty space around it open the same menu. Use it for a page-level menu that is not tied to one element.",
+          "The blue square has no handler, and nothing calls `show`. With `global` the menu listens to the whole document, so a right-click anywhere opens it. It suits a page-level menu.",
       },
       source: {
         code: `<ContextMenu model={items} global />`,
@@ -860,6 +867,7 @@ const manyItems: ContextMenuModel[] = [
 ];
 
 export const MaxHeight: Story = {
+  name: "Capped height",
   render: (args) => <MenuTemplate {...args} />,
   args: {
     model: manyItems,
@@ -889,7 +897,7 @@ export const MaxHeight: Story = {
     docs: {
       description: {
         story:
-          "The model has sixteen items, but the menu is only 240px tall — about six and a half rows — and the rest scrolls inside it (`maxHeight`). Hover **Move to**: its submenu has twelve folders and is limited the same way, to 160px (`maxHeightLowerSubmenu`).",
+          "Sixteen items in a menu 240px tall, about six and a half rows; the rest scroll (`maxHeight`). The **Move to** submenu holds twelve folders, capped the same way at 160px (`maxHeightLowerSubmenu`).",
       },
       source: {
         code: `<ContextMenu
@@ -985,6 +993,7 @@ const roomItems: ContextMenuModel[] = [
 ];
 
 export const MobileWithHeader: Story = {
+  name: "Phone sheet with a header",
   globals: mobileViewport,
   decorators: [withPhoneFrame],
   render: (args) => <MobileMenuTemplate {...args} />,
@@ -1011,7 +1020,7 @@ export const MobileWithHeader: Story = {
     docs: {
       description: {
         story:
-          "Shown at 320px, where the menu is a bottom sheet with the `header` on top: the title and, in the 32px block that `isRoom` gives it, the title's initials on the header `color` (the block renders only when `icon` is set; `color` then replaces the icon). Tap **Move or copy**: the submenu replaces the list in place and the header turns into a back button. `ignoreChangeView` forces the sheet layout regardless of the menu height.",
+          "At 320px the menu is a bottom sheet with the `header` on top (`ignoreChangeView`). With `isRoom` the title gets a 32px block of its initials on the header `color`; it needs `icon`. **Move or copy** opens its submenu in place, and the header becomes a back button.",
       },
       source: {
         code: `<ContextMenu
@@ -1044,6 +1053,7 @@ const userItems: ContextMenuModel[] = [
 ];
 
 export const MobileWithAvatarHeader: Story = {
+  name: "Phone sheet with an avatar",
   globals: mobileViewport,
   decorators: [withPhoneFrame],
   render: (args) => <MobileMenuTemplate {...args} />,
@@ -1111,6 +1121,7 @@ const AnchoredToElementTemplate = (props: ContextMenuProps) => {
 };
 
 export const AnchoredToElement: Story = {
+  name: "Anchored to a button",
   render: (args) => <AnchoredToElementTemplate {...args} />,
   args: {
     model: [
@@ -1135,7 +1146,7 @@ export const AnchoredToElement: Story = {
     docs: {
       description: {
         story:
-          "Click **Actions**: the menu opens under the button, at its left edge, wherever the pointer was (`containerRef`). Use it for a menu that belongs to a toolbar button or a row's action button rather than to a right-click. `leftOffset` and `rightOffset` move it left from that edge; change them live in the Controls panel below.",
+          "The menu under **Actions**, at the button's left edge wherever the pointer was (`containerRef`). It suits a toolbar or row action button rather than a right-click. `leftOffset` and `rightOffset` move it left from that edge.",
       },
       source: {
         code: `const anchorRef = useRef<HTMLDivElement>(null);
@@ -1180,6 +1191,7 @@ const RightToLeftTemplate = (props: ContextMenuProps) => {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => <RightToLeftTemplate {...args} />,
   globals: { direction: "rtl" },
   play: async ({ canvas }) => {
@@ -1223,7 +1235,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "326px" },
       description: {
         story:
-          "The menu in a right-to-left interface: it opens to the left of the pointer, the icons sit on the right of the labels, and the third item's submenu opens to the left with its arrow pointing left. The menu renders into the right-to-left container (`appendTo`), because on its own it goes to the end of the page body, outside any `dir` wrapper.",
+          "The menu in a right-to-left interface opens left of the pointer, with icons right of the labels. The third item's submenu opens to the left. It renders into the right-to-left container (`appendTo`), since the page body is outside any `dir` wrapper.",
       },
       source: {
         code: `<div dir="rtl" ref={setContainer}>
@@ -1308,6 +1320,7 @@ const CssCustomizationTemplate = () => {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => <CssCustomizationTemplate />,
   play: async ({ canvas }) => {
     rightClick(canvas.getByTestId("trigger"));
@@ -1324,7 +1337,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every variable a desktop menu can show, passed through the menu's own \`style\` prop, since the menu is portalled out of any wrapper -- the variables are listed under CSS variables on this page. Hover **Delete** for the hover background, hover **Rename** for the disabled one, and press Arrow Down for the keyboard highlight. The mobile header rows only apply to the bottom sheet.`,
+        story: `Every variable a desktop menu can show, passed through the menu's own \`style\`, since the menu is portalled out of any wrapper. **Rename** is disabled; the hover and keyboard-highlight colours show on interaction. The mobile header rows apply only to the bottom sheet.`,
       },
       source: {
         code: `<ContextMenu

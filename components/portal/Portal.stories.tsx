@@ -17,20 +17,21 @@ const meta = {
   },
   argTypes: {
     element: {
-      description: "React node to render inside the portal",
+      description:
+        "What to render in the container. It is a node, not children: the component renders nothing of its own around it.",
       control: false,
     },
     visible: {
       control: "boolean",
       description:
-        "Whether the content is rendered; turning it off unmounts the content, so anything it held is lost",
+        "Whether the content is rendered. Turning it off unmounts the content, so anything it held is lost.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     appendTo: {
       description:
-        "Element to append the content to; when it is null on a render the content goes to the end of document.body",
+        "Element to append the content to. While it is null the content goes to `document.body`, so hold the container in state, not in a ref.",
       control: false,
       table: {
         defaultValue: { summary: "null" },
@@ -73,7 +74,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The content passed in `element` shows inside the dashed container that owns it, not beside the text it was declared next to (`appendTo`). Switch `visible` in the Controls panel below to unmount and mount it again.",
+          "The content passed in `element` shows inside the dashed container named by `appendTo`. Turning `visible` off unmounts it.",
       },
       source: {
         code: `<Portal element={<div>Portal content</div>} visible appendTo={containerElement} />`,
@@ -83,6 +84,7 @@ export const Default: Story = {
 };
 
 export const Hidden: Story = {
+  name: "Hidden",
   render: (args) => {
     const [container, setContainer] = useState<HTMLElement | null>(null);
 
@@ -138,6 +140,7 @@ const CustomContainerTemplate = () => {
 };
 
 export const CustomContainer: Story = {
+  name: "Into a container",
   render: () => <CustomContainerTemplate />,
   play: async ({ canvas }) => {
     const content = await canvas.findByText(
@@ -152,7 +155,7 @@ export const CustomContainer: Story = {
     docs: {
       description: {
         story:
-          "Portal rendering into a specific custom container element instead of document.body.",
+          "The content lands inside the dashed container passed as `appendTo`, not in the page body. The text above the container stays outside it.",
       },
       source: {
         code: `<Portal
@@ -207,6 +210,7 @@ const MultiplePortalsTemplate = () => {
 };
 
 export const MultiplePortals: Story = {
+  name: "Several portals",
   render: () => <MultiplePortalsTemplate />,
   play: async ({ canvas }) => {
     // Each portal is appended after the last.
@@ -268,6 +272,7 @@ const ToggleVisibilityTemplate = () => {
 };
 
 export const ToggleVisibility: Story = {
+  name: "Open and close",
   render: () => <ToggleVisibilityTemplate />,
   play: async ({ canvas, userEvent }) => {
     await expect(canvas.queryByText("Portal content")).toBeNull();
@@ -288,7 +293,7 @@ export const ToggleVisibility: Story = {
     docs: {
       description: {
         story:
-          "Click Show Portal and Close to open and close the content from outside and from inside it. Each close unmounts the content (`visible`), so state held inside it starts over on the next open.",
+          "A Show Portal button outside the content opens it, and a Close button inside closes it. Each close unmounts the content (`visible`), so its state starts over on the next open.",
       },
       source: {
         code: `<Portal
@@ -315,6 +320,7 @@ const IntoDocumentBodyTemplate = () => (
 );
 
 export const IntoDocumentBody: Story = {
+  name: "Into the page body",
   render: () => <IntoDocumentBodyTemplate />,
   play: async ({ canvasElement }) => {
     // Without appendTo the content leaves the story for document.body.
@@ -330,7 +336,7 @@ export const IntoDocumentBody: Story = {
       story: { inline: false, height: "300px" },
       description: {
         story:
-          "With no `appendTo`, the content leaves the dashed box it is declared in and lands at the end of the page body, centred on the window by its own fixed position.",
+          "With no `appendTo`, the content leaves the dashed box it is declared in for the end of the page body. Its own fixed position centres it on the window.",
       },
       source: {
         code: `<Portal element={<div style={{ position: "fixed" }}>Content</div>} />`,
@@ -371,6 +377,7 @@ const CssCustomizationTemplate = () => {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => <CssCustomizationTemplate />,
   play: async ({ canvas }) => {
     // The content picks up the variables set on the container it lands in.
@@ -383,7 +390,7 @@ export const CssCustomization: Story = {
     docs: {
       description: {
         story:
-          "Portal has no styles of its own, so the README lists no CSS variables for it: the `--portal-popup-*` variables set here belong to this page's demo popup, and are set on the container the portal appends to so the content picks them up there.",
+          "A light blue popup with rounded corners. Portal has no styles of its own; the `--portal-popup-*` variables belong to this demo's popup. They sit on the target container, so the content picks them up there.",
       },
       source: {
         code: `<div

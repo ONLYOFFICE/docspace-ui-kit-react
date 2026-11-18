@@ -18,15 +18,13 @@ export type AsideHeaderProps = {
   /** Applied to the header element. */
   style?: React.CSSProperties;
   /**
-   * Title of the panel. A string is rendered as bold 21px text; any other node
-   * is rendered inside a `Heading` that truncates with an ellipsis. Nothing is
-   * rendered when it is absent, including no placeholder.
+   * Title of the panel. A string is shown as bold 21px text, any other node in
+   * a `Heading` that ends in an ellipsis.
    */
   header?: string | React.ReactNode;
   /**
    * Extra icon buttons between the title and the close cross. Each needs a
-   * `key`, an `onClick` and either `iconNode` (JSX, preferred) or `url` — a URL
-   * fetched at runtime, not an asset name.
+   * `key`, an `onClick`, and an `iconNode` or a `url` fetched at runtime.
    */
   headerIcons?: HeaderIcon[];
   /**
@@ -45,9 +43,8 @@ export type AsideHeaderProps = {
    */
   withoutBorder?: boolean;
   /**
-   * Height of the header as a CSS length, applied through the
-   * `--aside-header-custom-height` custom property. Without it the header is
-   * 53px.
+   * Height of the header as a CSS length, such as `70px`. Without it the header
+   * is 53px tall.
    */
   headerHeight?: string;
   /**

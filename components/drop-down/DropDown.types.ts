@@ -20,9 +20,11 @@ export interface DropDownProps {
   disableOnClickOutside?: boolean;
   /** Called once each time the dropdown opens. */
   enableOnClickOutside?: () => void;
-  /** Sets the opening direction relative to the parent */
+  /** Side the menu extends to: `right` lines it up with the anchor's start
+   * edge, `left` with its end edge. */
   directionX?: TDirectionX;
-  /** Sets the opening direction relative to the parent */
+  /** Whether the menu opens below the anchor, above it, or below unless there
+   * is no room (`both`). */
   directionY?: TDirectionY;
   /** `id` of the menu element, for `aria-controls` on the control that opens it. */
   id?: string;
@@ -32,16 +34,17 @@ export interface DropDownProps {
    * @default "listbox"
    */
   role?: "listbox" | "menu";
-  /** Required for specifying the exact width of the component; for example; 100% */
+  /** Width of the menu as a CSS length, such as `200px` or `100%`. */
   manualWidth?: string;
-  /** (Non portal only) Required for specifying the exact distance from the parent component */
+  /** Horizontal distance from the anchor's edge, as a CSS length. Read only
+   * with `isDefaultMode` off. */
   manualX?: string;
-  /** (Non portal only) Required for specifying the exact distance from the parent component */
+  /** Vertical distance from the anchor, as a CSS length; the default of 100%
+   * opens the menu flush with it. Read only with `isDefaultMode` off. */
   manualY?: string;
   /**
-   * Height of the list in pixels. It is also the switch that turns on
-   * virtualisation, the scrollbar and the arrow keys: without it every child is
-   * rendered as given and none of the three happens.
+   * Height of the list in pixels. It also turns on virtualisation, the
+   * scrollbar and the arrow keys; without it every child renders as given.
    */
   maxHeight?: number;
   /**
@@ -65,9 +68,8 @@ export interface DropDownProps {
    */
   showDisabledItems?: boolean;
   /**
-   * Ref of the element the menu belongs to. In the default portal mode it is
-   * what the menu is measured and positioned against; without it the menu falls
-   * back to the corner of the viewport.
+   * Ref of the element the menu belongs to. The default portal mode positions
+   * the menu against it; without it the menu is not placed next to anything.
    */
   forwardedRef?: React.RefObject<HTMLElement | null>;
   /**
@@ -85,7 +87,8 @@ export interface DropDownProps {
   fixedDirection?: boolean;
   /** Ignored. Nothing reads this prop. */
   withBlur?: boolean;
-  /** (Portal only) Specifies the horizontal offset */
+  /** Horizontal shift from the anchor's edge, in pixels. Read only in the
+   * default portal mode. */
   offsetX?: number;
   /** Value of `data-testid` on the dropdown.
    * @default "dropdown" */
@@ -98,14 +101,15 @@ export interface DropDownProps {
    * for items whose height is not the 32px the list assumes.
    */
   isNoFixedHeightOptions?: boolean;
-  /** Disables scrollbar inline padding to allow hover styles to extend to edge */
+  /** Removes the scrollbar's side padding, so an item's hover background
+   * reaches the edge. Read only with `isNoFixedHeightOptions`. */
   disableScrollbarPadding?: boolean;
-  /** Use flexible maxHeight instead of fixed height for scrollbar (allows shrinking when fewer items) */
+  /** Sizes the menu to its content's width. With `isNoFixedHeightOptions` the
+   * list is also capped at `maxHeight` instead of fixed there. */
   useFlexibleHeight?: boolean;
   /**
-   * Whether the arrow keys move through the items and Enter clicks one. It is
-   * read only when `maxHeight` is set, and while it is on every key press in
-   * the document has its default action prevented.
+   * Whether the arrow keys move through the items and Enter clicks one. Read
+   * only with `maxHeight`; while on, it blocks the default of every key press.
    * @default true
    */
   enableKeyboardEvents?: boolean;
@@ -120,11 +124,12 @@ export interface DropDownProps {
    * is listened for when it is absent; the backdrop is the usual mechanism.
    */
   eventTypes?: string[] | string;
-  /** Stops the outside-click listeners being registered at all. */
+  /** Drops the mobile default outside-click listeners. An `eventTypes` you
+   * pass is still listened for. */
   forceCloseClickOutside?: boolean;
   /** Passed to the backdrop: makes it transparent. */
   withoutBackground?: boolean;
-  /** Stacking order of the menu, written as `--z-index`. The default is 400. */
+  /** Stacking order of the menu. The default is 400. */
   zIndex?: number;
   /** (`withDynamicScrollbar` only) Space to leave above the menu, in pixels. */
   topSpace?: number;
