@@ -44,7 +44,7 @@ const meta = {
     isRooms: {
       control: false,
       description:
-        "Meant to widen the columns for room tiles; it currently changes nothing",
+        "Meant to widen the columns for room tiles; its rule never matches, so it changes nothing",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -82,14 +82,16 @@ const meta = {
     },
     backgroundOpacity: {
       control: "number",
-      description: "Opacity of `backgroundColor`, from 0 to 1",
+      description:
+        "How strongly the shapes' resting colour shows, from 0 (invisible) to 1",
       table: {
         defaultValue: { summary: "0.1" },
       },
     },
     foregroundOpacity: {
       control: "number",
-      description: "Opacity of `foregroundColor`, from 0 to 1",
+      description:
+        "How strongly the sweeping band's colour shows, from 0 (invisible) to 1",
       table: {
         defaultValue: { summary: "0.15" },
       },
@@ -148,6 +150,7 @@ const headingBar = (root: HTMLElement, kind: "folders" | "files") =>
   root.querySelector(`.${kind}`);
 
 export const Default: Story = {
+  name: "Folders and files",
   render: (args) => <TilesSkeleton {...args} />,
   args: {
     foldersCount: 2,
@@ -163,7 +166,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Two folder and four file placeholders under their heading bars (`foldersCount`, `filesCount`), as a tile listing shows them while its first page loads. Change any other prop live in the Controls panel below.",
+          "Two folder and four file placeholders under their heading bars (`foldersCount`, `filesCount`), as a tile listing shows them while its first page loads.",
       },
       source: {
         code: `<TilesSkeleton foldersCount={2} filesCount={4} />`,
@@ -173,6 +176,7 @@ export const Default: Story = {
 };
 
 export const FilesWithoutHeading: Story = {
+  name: "Files without a heading",
   render: (args) => <TilesSkeleton {...args} />,
   args: {
     foldersCount: 0,
@@ -190,7 +194,7 @@ export const FilesWithoutHeading: Story = {
     docs: {
       description: {
         story:
-          "A folder that holds files only and shows no heading above them: no folder placeholders, so their bar goes as well, and no bar above the files (`foldersCount={0}`, `withTitle={false}`).",
+          "Files only, with no heading: no folder placeholders, so their bar goes too, and no bar above the files (`foldersCount={0}`, `withTitle={false}`).",
       },
       source: {
         code: `<TilesSkeleton foldersCount={0} filesCount={3} withTitle={false} />`,
@@ -215,6 +219,7 @@ const TileShapesTemplate = () => (
 );
 
 export const TileShapes: Story = {
+  name: "Single tile shapes",
   render: () => <TileShapesTemplate />,
   play: async ({ canvas }) => {
     const folder = canvas.getByTestId("tile-skeleton-folder");
@@ -231,7 +236,7 @@ export const TileShapes: Story = {
     docs: {
       description: {
         story:
-          "The three shapes one `TileSkeleton` can take, for a listing that builds its own placeholder grid: a folder bar (`isFolder`), a room card with a logo, a title bar, a small square for the menu and two tag bars (`isRoom`), and a file card. `TilesSkeleton` never draws the room card, so a grid of rooms is built from `TileSkeleton` directly.",
+          "The three shapes of one `TileSkeleton`: a folder bar (`isFolder`), a room card (`isRoom`) and a file card. `TilesSkeleton` never draws the room card, so build a grid of rooms from `TileSkeleton`.",
       },
       source: {
         code: `<TileSkeleton isFolder />

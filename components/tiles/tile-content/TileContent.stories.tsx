@@ -29,23 +29,24 @@ const meta = {
     children: {
       control: false,
       description:
-        "The one element shown as the tile's name; a `containerWidth` prop on it becomes the width of the slot",
+        "The one element shown as the tile's name, not a string or a list. A `containerWidth` prop on it becomes the width of the slot.",
     },
     onClick: {
       description:
-        "Called when anything inside the slot is clicked; the type declares no parameter, but it receives the React mouse event",
+        "Called on any click inside the slot. The type declares no parameter, but the handler receives the React mouse event.",
     },
     className: {
       control: "text",
-      description: "Class added after the component's own on the outer element",
+      description:
+        "Added after the component's own class on the outer element.",
     },
     id: {
       control: "text",
-      description: "Value of `id` on the outer element",
+      description: "Value of `id` on the outer element.",
     },
     style: {
       control: "object",
-      description: "Inline style of the outer element",
+      description: "Inline style of the outer element.",
     },
   },
   args: {
@@ -78,6 +79,7 @@ type Story = StoryObj<ComponentProps<typeof TileContent>>;
 export default meta;
 
 export const Default: Story = {
+  name: "Name as a link",
   args: {
     children: <Link>Document.docx</Link>,
   },
@@ -94,7 +96,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A file name as a link, the way a tile usually shows it. Click it to see `onClick` in the Actions panel, and change any other prop live in the Controls panel below.",
+          "A file name as a link, the way a tile usually shows it. A click on it calls `onClick` with the mouse event.",
       },
       source: {
         code: `<TileContent>
@@ -106,6 +108,7 @@ export const Default: Story = {
 };
 
 export const WithText: Story = {
+  name: "Name as plain text",
   args: {
     children: (
       <Text fontSize="14px" fontWeight={600}>
@@ -133,6 +136,7 @@ export const WithText: Story = {
 };
 
 export const WithMultipleElements: Story = {
+  name: "Name with a badge",
   args: {
     children: (
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -165,6 +169,7 @@ export const WithMultipleElements: Story = {
 };
 
 export const FixedTitleWidth: Story = {
+  name: "Fixed name width",
   args: {
     children: (
       <Text containerWidth="120px" truncate>
@@ -187,7 +192,7 @@ export const FixedTitleWidth: Story = {
     docs: {
       description: {
         story:
-          "A name held to a set width whatever room the tile has, so the names in a grid end at the same point: the slot takes its width from the child's own `containerWidth` prop, and `truncate` on the `Text` cuts the rest off.",
+          "A name held to a set width, so the names in a grid end at the same point. The slot takes the child's `containerWidth`, and `truncate` cuts the rest off.",
       },
       source: {
         code: `<TileContent>
@@ -201,6 +206,7 @@ export const FixedTitleWidth: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   args: {
     children: <Link>Document.docx</Link>,
   },
@@ -219,7 +225,7 @@ export const CssCustomization: Story = {
     } as CSSProperties,
     docs: {
       description: {
-        story: `TileContent reads no variables of its own -- the tile's variables it sits in are listed under CSS variables on the BaseTile, FileTile, FolderTile and RoomTile pages. This example sets four of the BaseTile ones on a wrapper; hover the tile to see the hover background.`,
+        story: `TileContent reads no variables of its own. The tile around it does, and they are listed on the BaseTile, FileTile, FolderTile and RoomTile pages. This example sets four of BaseTile's on a wrapper; \`--tile-hover-bg\` shows on hover.`,
       },
     },
   },
