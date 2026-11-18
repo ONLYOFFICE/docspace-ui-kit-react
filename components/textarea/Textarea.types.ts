@@ -46,6 +46,20 @@ export type TextareaProps = {
   /** `id` of the element describing the field, such as a hint or an error line
    * below it. Announced after the name. */
   "aria-describedby"?: string;
+  /** HTML `spellcheck` of the field. Pass `false` for text that is no prose,
+   * such as a secret phrase: some browsers send checked text to a cloud
+   * service. Left out, the browser decides. */
+  spellCheck?: boolean;
+  /** Safari's `autocorrect` attribute; `"off"` stops a phone keyboard
+   * replacing words. Left out, the browser decides. */
+  autoCorrect?: "on" | "off";
+  /** HTML `autocapitalize` of the field; `"off"` stops a phone keyboard
+   * capitalising the first letter. Left out, the browser decides. */
+  autoCapitalize?: "off" | "none" | "on" | "sentences" | "words" | "characters";
+  /** HTML `autocomplete` of the field; `"off"` asks the browser neither to
+   * save what is typed nor to suggest earlier entries. Left out, the browser
+   * decides. */
+  autoComplete?: string;
   /** The text. The field is controlled, so pair it with `onChange`.
    * @default "" */
   value?: string;

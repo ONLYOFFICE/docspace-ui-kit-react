@@ -25,6 +25,7 @@ The product name in prose, wherever it means the product rather than a codebase:
 | Was                         | Now                                            |
 | --------------------------- | ---------------------------------------------- |
 | ONLYOFFICE DocSpace         | ONLYOFFICE Apps                                |
+| the DocSpace client         | the ONLYOFFICE Apps client                     |
 | a DocSpace portal           | an ONLYOFFICE Apps portal                      |
 | a DocSpace plugin           | an ONLYOFFICE Apps plugin                      |
 | the DocSpace API / REST API | the ONLYOFFICE Apps API / REST API             |
@@ -47,7 +48,9 @@ change them; the URL behind them is not.
 Names of things are not copy, and renaming them breaks a link, a key or an import:
 
 - the `DocSpace-client` and `DocSpace` repositories, their paths and checkouts
-  ("a DocSpace-client checkout", `packages/shared/...`, `@docspace/shared`);
+  ("a DocSpace-client checkout", `packages/shared/...`, `@docspace/shared`). Only the
+  hyphenated name is the repository: "the DocSpace client" in prose is the product and
+  changes like any other mention;
 - `@onlyoffice/docspace-api-sdk` and any other package name;
 - URLs — `github.com/ONLYOFFICE/DocSpace`, Figma file names (`UI-Kit-DocSpace-1.0.0`),
   `your-docspace.com` in samples, API routes;
@@ -61,7 +64,7 @@ Engineering notes (`CLAUDE.md`, `.claude/`) keep "DocSpace" where it names that 
 
 ```bash
 git grep -n 'DocSpace' -- '*.md' '*.mdx' '*.tsx' '*.ts' ':!locales' ':!.claude' ':!CLAUDE.md' ':!CHANGELOG.md' \
-  | grep -v 'DocSpace-client\|DocSpace client\|DocSpace/client\|docspace-api-sdk\|UI-Kit-DocSpace\|useDocSpace\|@docspace/'
+  | grep -v 'DocSpace-client\|DocSpace/client\|docspace-api-sdk\|UI-Kit-DocSpace\|useDocSpace\|@docspace/'
 ```
 
 Every remaining hit is either one of the names above or something to rename. Changing a

@@ -9,6 +9,7 @@ import {
 import {
   AI_HUB_ROOT_FOLDER_TYPE,
   FORMS_SECTION_ID,
+  PRIVATE_SECTION_ID,
 } from "../../utils/constants";
 import { LoadersContextProvider } from "../../utils/contexts/Loaders";
 import type { UseRootHelperProps } from "../FilesSelector.types";
@@ -82,6 +83,33 @@ describe("useRootHelper", () => {
         withRoomsTreeFolder: false,
         withFormsTreeFolder: false,
       }),
+    ).toEqual([1]);
+  });
+});
+
+describe("useRootHelper Private section", () => {
+  it("lists Private after Forms when the host turns it on", async () => {
+    expect(await getRootIds({ withPrivateTreeFolder: true })).toEqual([
+      1,
+      2,
+      FORMS_SECTION_ID,
+      PRIVATE_SECTION_ID,
+    ]);
+  });
+
+  it("keeps Private when Rooms and Forms are hidden", async () => {
+    expect(
+      await getRootIds({
+        withRoomsTreeFolder: false,
+        withFormsTreeFolder: false,
+        withPrivateTreeFolder: true,
+      }),
+    ).toEqual([1, PRIVATE_SECTION_ID]);
+  });
+
+  it("leaves Private out of a My documents only picker", async () => {
+    expect(
+      await getRootIds({ withPrivateTreeFolder: true, isUserOnly: true }),
     ).toEqual([1]);
   });
 });

@@ -10,7 +10,7 @@
 }
 
 .transactionHistoryTitle {
-  margin-bottom: 10px;
+  margin: 0;
 }
 
 .transactionHistoryCombobox {
@@ -115,9 +115,27 @@
 
 .transactionHistoryHeader {
   display: flex;
+  align-items: center;
   margin-top: 24px;
+  margin-bottom: 10px;
   #filterButton {
     margin-inline-start: auto;
+  }
+
+  &:empty {
+    margin-bottom: 0;
+  }
+
+  &.withoutTitle {
+    margin-top: 16px;
+
+    .filterIconWrapper {
+      margin-inline-start: 0;
+
+      > [role="button"] {
+        margin-inline-start: 0;
+      }
+    }
   }
 }
 

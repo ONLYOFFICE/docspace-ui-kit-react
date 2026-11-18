@@ -23,6 +23,7 @@ import {
   PAGE_COUNT,
   FORMS_SEARCH_AREA,
   AI_HUB_SEARCH_AREA,
+  PRIVATE_ROOMS_SEARCH_AREA,
   ROOMS_SECTION_FOLDER_TYPES,
 } from "../constants";
 import type { UseRoomsHelperProps } from "../types";
@@ -47,6 +48,7 @@ const useRoomsHelper = ({
   searchArea,
   roomType,
   formsSection,
+  privateSection,
   roomsSectionTypes,
   aiRoomsSectionTypes,
   isRoomsOnly,
@@ -187,7 +189,9 @@ const useRoomsHelper = ({
           typeFilter = aiRoomsSectionTypes as RoomTypeEnum[];
         }
 
-        if (!typeFilter && formsSection !== undefined) {
+        // The "Private" section is told apart by the search area alone: a
+        // private room has an ordinary room type.
+        if (!typeFilter && !privateSection && formsSection !== undefined) {
           // The Rooms section lists the ordinary rooms unless the host names
           // the types itself (it adds Instructions or Knowledge rooms when its
           // selection can land there). Form filling rooms live in the Forms
@@ -228,11 +232,13 @@ const useRoomsHelper = ({
 
         const effectiveSearchArea = searchArea
           ? (searchArea as SearchArea)
-          : formsSection || isFormRoomOnlyFilter
-            ? (FORMS_SEARCH_AREA as unknown as SearchArea)
-            : isAiHubOnlyFilter
-              ? (AI_HUB_SEARCH_AREA as unknown as SearchArea)
-              : undefined;
+          : privateSection
+            ? (PRIVATE_ROOMS_SEARCH_AREA as unknown as SearchArea)
+            : formsSection || isFormRoomOnlyFilter
+              ? (FORMS_SEARCH_AREA as unknown as SearchArea)
+              : isAiHubOnlyFilter
+                ? (AI_HUB_SEARCH_AREA as unknown as SearchArea)
+                : undefined;
 
         const res = await roomsApi.getRoomsFolder({
           type: typeFilter,
@@ -286,7 +292,14 @@ const useRoomsHelper = ({
         if (firstLoadRef.current || startIndex === 0) {
           const { security } = current!;
 
-          if (withCreate && security?.Create && !aiRoomsSectionTypes) {
+          // No room creation in the AI rooms and Private sections.
+          const withCreateItem =
+            withCreate &&
+            security?.Create &&
+            !aiRoomsSectionTypes &&
+            !privateSection;
+
+          if (withCreateItem) {
             setTotal(total + 1);
             const createRoomType =
               createDefineRoomType ??
@@ -331,6 +344,7 @@ const useRoomsHelper = ({
             startIndex === 0 &&
             !searchValue &&
             !aiRoomsSectionTypes &&
+            !privateSection &&
             (withRecentTreeFolder || withFavoritesTreeFolder)
           ) {
             const specialItems = buildSpecialFolderItems({
@@ -353,10 +367,7 @@ const useRoomsHelper = ({
             if (specialItems.length) {
               itemList.unshift(...specialItems);
               specialItemsCountRef.current = specialItems.length;
-              const base =
-                withCreate && security?.Create && !aiRoomsSectionTypes
-                  ? total + 1
-                  : total;
+              const base = withCreateItem ? total + 1 : total;
               setTotal(base + specialItems.length);
             }
           }
@@ -394,6 +405,7 @@ const useRoomsHelper = ({
       setIsNextPageLoading,
       roomType,
       formsSection,
+      privateSection,
       roomsSectionTypes,
       aiRoomsSectionTypes,
       isRoomsOnly,

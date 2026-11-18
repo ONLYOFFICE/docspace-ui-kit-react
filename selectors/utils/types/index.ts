@@ -29,6 +29,11 @@ export type UseRoomsHelperProps = TUseInputItemHelper & {
   roomType?: RoomType | RoomType[];
   formsSection?: boolean;
   /**
+   * The "Private" section is open: the listing asks for the PrivateRooms
+   * search area and offers no room creation and no Recent / Favorites rows.
+   */
+  privateSection?: boolean;
+  /**
    * The room types the Rooms section lists when no `roomType` is given.
    * Defaults to the ordinary rooms; a host adds Instructions or Knowledge
    * rooms when what it carries can land there.

@@ -1,6 +1,35 @@
 import { Duration } from "luxon";
 
+import { isLanguageRtl } from "../../providers/theme/rtl-utils";
 import { dateDiff, now } from "../../utils/date";
+import { LATIN_NUMBERING_SYSTEM } from "../../utils/latin-digits";
+
+const FIRST_STRONG_ISOLATE = "\u2068";
+const POP_DIRECTIONAL_ISOLATE = "\u2069";
+
+export const isolateCurrencySymbol = (language: string, symbol: string) =>
+  symbol && isLanguageRtl(language)
+    ? `${FIRST_STRONG_ISOLATE}${symbol}${POP_DIRECTIONAL_ISOLATE}`
+    : symbol;
+
+export const isolateCurrencyParts = (
+  language: string,
+  parts: Intl.NumberFormatPart[],
+): Intl.NumberFormatPart[] =>
+  parts.map((part) =>
+    part.type === "currency"
+      ? { ...part, value: isolateCurrencySymbol(language, part.value) }
+      : part,
+  );
+
+export const formatCurrencyIsolated = (
+  language: string,
+  formatter: Intl.NumberFormat,
+  amount: number,
+) =>
+  isolateCurrencyParts(language, formatter.formatToParts(amount))
+    .map(({ value }) => value)
+    .join("");
 
 /**
  * Whole days from now until `date` (negative if the date is in the past).
@@ -18,7 +47,11 @@ export const formatRemainingDays = (
   t: (key: string) => string,
 ) =>
   days > 1
-    ? Duration.fromObject({ days }, { locale: language }).toHuman()
+    ? Duration.fromObject(
+        { days },
+        // Its own setting, not the host's luxon default: Storybook sets none.
+        { locale: language, numberingSystem: LATIN_NUMBERING_SYSTEM },
+      ).toHuman()
     : t("LessThanOneDay");
 
 // Done in a similar way to server code
@@ -91,24 +124,31 @@ export const formatCurrencyValue = (
   const truncated = Number(truncatedStr);
 
   const formatter = new Intl.NumberFormat(language, {
+    numberingSystem: LATIN_NUMBERING_SYSTEM,
     style: "currency",
     currency,
     minimumFractionDigits: fractionDigits,
     maximumFractionDigits: fractionDigits,
   });
 
-  return formatter.format(truncated);
+  return formatCurrencyIsolated(language, formatter, truncated);
 };
 
 /** Formats a fee percent with the locale's decimal separator, e.g. 5.5 → "5,5". */
 export const formatPercentValue = (language: string, value: number) =>
-  new Intl.NumberFormat(language, { maximumFractionDigits: 2 }).format(value);
+  new Intl.NumberFormat(language, {
+    numberingSystem: LATIN_NUMBERING_SYSTEM,
+    maximumFractionDigits: 2,
+  }).format(value);
 
 export const formatNumber = (language: string, value: number) =>
-  new Intl.NumberFormat(language).format(value);
+  new Intl.NumberFormat(language, {
+    numberingSystem: LATIN_NUMBERING_SYSTEM,
+  }).format(value);
 
 export const formatCompactNumber = (value: number, language = "en"): string =>
   new Intl.NumberFormat(language, {
+    numberingSystem: LATIN_NUMBERING_SYSTEM,
     notation: value >= 1_000_000 ? "compact" : "standard",
     maximumFractionDigits: 2,
   }).format(value);
@@ -119,10 +159,15 @@ export const getCurrencySymbol = (
 ): string => {
   if (!currency) return "";
   try {
-    return (
-      new Intl.NumberFormat(language, { style: "currency", currency })
+    return isolateCurrencySymbol(
+      language,
+      new Intl.NumberFormat(language, {
+        numberingSystem: LATIN_NUMBERING_SYSTEM,
+        style: "currency",
+        currency,
+      })
         .formatToParts(0)
-        .find((part) => part.type === "currency")?.value ?? currency
+        .find((part) => part.type === "currency")?.value ?? currency,
     );
   } catch {
     return currency;

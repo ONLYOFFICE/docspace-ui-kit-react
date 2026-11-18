@@ -228,6 +228,7 @@ export function formatDateLocalized(
   }
 
   if (preset === "DATE_MONTH_DAY") {
+    // biome-ignore lint/plugin/no-intl-without-latin-digits: a luxon DateTime, whose digits Settings.defaultNumberingSystem sets
     return dt.toLocaleString({ month: "long", day: "numeric" });
   }
 

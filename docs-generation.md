@@ -26,14 +26,16 @@ pnpm docs:screenshots # the pictures alone, from an existing storybook-static
 instead of rebuilding it. `docs:screenshots` takes `--only <slug>...` for a few pages,
 `--missing` for the pictures not on disk yet, `--changed` for the pages whose sources changed
 since the last run, and `--storybook <dir|url>` for a Storybook other than `storybook-static`.
-The full set is about 1 100 pictures. A picture that fails does not stop the pages: they are
-written without it, and `docs:build` exits non-zero at the end so the failure is seen.
+The full set is about 1 100 pictures. A picture that fails is tried once more in a fresh browser
+context, since a renderer that dies on a loaded runner takes every later picture in its context
+with it (`[retry]` in the log). One that fails twice does not stop the pages: they are written
+without it, and `docs:build` exits non-zero at the end so the failure is seen.
 
 CI runs `pnpm docs:check` in the lint job.
 
 | Variable        | Effect                                                                                                                                           |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `DOCS_REVISION` | Branch or commit the "Edit this page" and source links point at. Default: `master`, the one branch the GitHub mirror carries                     |
+| `DOCS_REVISION` | Branch or commit the source links point at. Default: `master`, the one branch the GitHub mirror carries. "Edit this page" always opens `master`  |
 | `STORYBOOK_URL` | A published Storybook. Set, every component page gets an "Open in Storybook" link, and `docs:screenshots` reads it instead of `storybook-static` |
 | `API_SITE_ROOT` | The api.onlyoffice.com checkout for `docs:sync`. Default: `../api.onlyoffice.com`                                                                |
 
@@ -149,10 +151,19 @@ wrapper and the TranslationProvider photograph as nothing a reader learns from.
 Stories are opened with `globals=canvas:transparent`, a global `.storybook/preview.tsx` declares
 to drop the white or black page the decorator otherwise paints; the picture is the union of
 everything that paints anywhere in the body, so what a portal renders is in it too, with an 8px
-margin, clamped to the viewport, taken at 2x and shown at 1x. The demo-data banner and the
-dashed story frames (`STORY_CHROME`, matched by CSS-module class prefix) are hidden first: they
+margin, clamped to the viewport, taken at 2x and shown at 1x. An element counts for the
+part of it that can be seen -- its box cut to the viewport and to every ancestor that clips it
+with `overflow` -- not for the whole box: a closed panel parked past the edge, as the folder
+selector in the Uploader's stories is, and the rows of a list scrolled out of its frame
+otherwise stretched the picture to the viewport's height with nothing in it. The demo-data
+banner, the dashed story frames (`STORY_CHROME`, matched by CSS-module class prefix) and
+whatever a story marks `data-story-scaffold` (`STORY_SCAFFOLD_ATTRIBUTE`) -- a control that
+feeds the component, as the folder picker above the Uploader does -- are hidden first: they
 are scenery, not the component. A block is photographed as the element Storybook rendered,
 matched to the MDX by position among the page's non-Markdown blocks.
+The cursor is parked outside the viewport before every picture: a page keeps its mouse position
+across navigations, so after a recipe's gesture the component photographed next in the same page
+was otherwise in its hover state, and which one that was changed from run to run.
 
 `pnpm run docs` copies the pictures beside the pages and puts a Docusaurus `<ThemedImage>` where
 each belongs, so the reader sees the theme they are in. A picture not taken leaves no trace on
@@ -179,9 +190,11 @@ every story and docs entry, so nothing is guessed; the export-to-id rule (`WithI
    link at `DOCS_REVISION`; a link to a file that does not exist is a `[warn]`. Prose is escaped
    for MDX: `{`/`}`, a `<` that would open a JSX element, autolinks, void tags; code blocks and
    inline code are never touched. Each Props table is reshaped into the SDK's three columns,
-   `Property | Type | Description`: `Required` becomes the optional marker after the code span
-   (`` `label`? ``, outside the span so the row id has no `?`) and `Default` closes the
-   description as ``Default: `x`.``. Five columns do not fit the site's `<APITable>`, which the
+   `Property | Type | Description`: `Required` opens the description as `**Required.**`, the
+   sentence the SDK's JSDoc writes by hand, and `Default` closes it as ``Default: `x`.``. There
+   is no optional `?` marker, the SDK dropped its own, so a row id is the plain name. The args
+   table of an `autodocs` page or a `<Controls />` block is written the same way. Five columns
+   do not fit the site's `<APITable>`, which the
    tables are then wrapped in; as in the SDK, they get a `name` only when their row ids collide.
    The primary picture goes under the intro. A Stories section, listing each story's name,
    description (`docs.description.story`) and picture, is placed before the Minimal example
@@ -191,7 +204,9 @@ every story and docs entry, so nothing is guessed; the export-to-id rule (`WithI
    it -- the version and licence line under Welcome -- is the page's Storybook footer and goes
    too. A page whose H1 was inside a React element gets one from its title.
 3. **Front matter**: `description` from the metadata `summary` (or the component description),
-   and `custom_edit_url` pointing at the source file.
+   and `custom_edit_url` pointing at the source file on `master` (`EDIT_BRANCH` in
+   `scripts/docs/config.mjs`), whatever `DOCS_REVISION` the pages were built from: an edit is a
+   pull request against `master`, and a feature branch is deleted once it is merged.
 4. **Portal-only pages.** A README whose `status` is `portal-internal`, or a page whose source
    is under a directory in `PORTAL_DIRS` (`scripts/docs/config.mjs`), opens with a warning
    admonition that says so and links to the tiers section of the Installation page.

@@ -1,8 +1,13 @@
 # `skips` names a job that did not run -- above all the pre-push build, which
 # runs only when a push changes the build's own code; without it a skipped
 # build and a passed one look the same in the summary.
+#
+# `execution` is what prints a job's own output, and with it the job's name as
+# it starts. Leave it out and `follow` has nothing to stream: the gate shows
+# its banner and then nothing until the summary, which looks like a hang.
 output:
   - meta
+  - execution
   - summary
   - skips
 

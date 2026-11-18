@@ -24,7 +24,7 @@ a folder trail, two context menu getters and a device type you tell it about.
 
 ## Use this when / not when
 
-- **This is portal-internal.** It is shipped so the DocSpace client can use it; outside that layout
+- **This is portal-internal.** It is shipped so the ONLYOFFICE Apps client can use it; outside that layout
   most of its props have no natural source, and the parts it renders assume the portal's header.
 - Use it when you are rebuilding a file browser with the same trail-and-actions header and can
   supply a `Section` around it.

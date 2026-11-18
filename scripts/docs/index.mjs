@@ -8,8 +8,9 @@
 // --strict   a [warn] line fails the run
 // --check    also compiles every page as MDX, the way Docusaurus will
 //
-// DOCS_REVISION sets the branch or commit the edit and source links point at
-// (default: master). STORYBOOK_URL adds "Open in Storybook" links.
+// DOCS_REVISION sets the branch or commit the source links point at (default:
+// master); "Edit this page" always opens master, where a pull request goes.
+// STORYBOOK_URL adds "Open in Storybook" links.
 
 import fs from "node:fs";
 import path from "node:path";

@@ -23,6 +23,8 @@ import {
   PAGE_COUNT,
   FORMS_ROOT_FOLDER_TYPE,
   FORMS_SECTION_ID,
+  PRIVATE_ROOMS_ROOT_FOLDER_TYPE,
+  PRIVATE_SECTION_ID,
 } from "../../utils/constants";
 import type { UseFilesHelpersProps } from "../FilesSelector.types";
 import {
@@ -85,6 +87,7 @@ const useFilesHelper = ({
   withFavoritesTreeFolder,
   activeSpecialScope,
   formsSection,
+  withPrivateTreeFolder,
   onFilesLoaded,
 }: UseFilesHelpersProps) => {
   const t = useCommonTranslation();
@@ -113,6 +116,7 @@ const useFilesHelper = ({
   const specialItemsCountRef = React.useRef(0);
   const disabledItemsRef = React.useRef(disabledItems);
   const formsSectionRef = React.useRef(formsSection);
+  const withPrivateTreeFolderRef = React.useRef(withPrivateTreeFolder);
   const privateRoomCacheRef = React.useRef<Map<number | string, boolean>>(
     new Map(),
   );
@@ -131,6 +135,10 @@ const useFilesHelper = ({
   React.useEffect(() => {
     formsSectionRef.current = formsSection;
   }, [formsSection]);
+
+  React.useEffect(() => {
+    withPrivateTreeFolderRef.current = withPrivateTreeFolder;
+  }, [withPrivateTreeFolder]);
 
   React.useEffect(() => {
     firstLoadRef.current = isFullLoadActive;
@@ -383,6 +391,29 @@ const useFilesHelper = ({
               isRoom: true,
               rootFolderType: FORMS_ROOT_FOLDER_TYPE as FolderType,
             });
+          }
+
+          // A private room sits under the rooms root on the server, but the
+          // Rooms listing never returns it. Where the host lists the Private
+          // section, the room's path starts there, so going one level up
+          // lands on the list the room is in.
+          if (
+            withPrivateTreeFolderRef.current &&
+            isInsidePrivateRoom &&
+            roomPart &&
+            !isThirdParty
+          ) {
+            const roomIndex = breadCrumbs.findIndex(
+              (bc) => bc.id === roomPart.id,
+            );
+            if (roomIndex > 0 && breadCrumbs[roomIndex - 1].isRoom) {
+              breadCrumbs[roomIndex - 1] = {
+                label: t("Private"),
+                id: PRIVATE_SECTION_ID,
+                isRoom: true,
+                rootFolderType: PRIVATE_ROOMS_ROOT_FOLDER_TYPE as FolderType,
+              };
+            }
           }
 
           onSetBaseFolderPath?.(isErrorPath ? [] : breadCrumbs);

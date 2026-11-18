@@ -247,6 +247,16 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Added
 
+- **`ComboBox` and `AccessRightSelect` take `ariaLabel`**, the accessible name of the button.
+  Without it the button is still named by the option it shows.
+- **`FolderType.PrivateRooms` (42)**: the root of the Private section. It holds no rooms
+  itself; private rooms stay under the Rooms root and are listed through the `PrivateRooms`
+  search area
+- **`FilesSelector` can list the Private section.** `withPrivateTreeFolder` (off by default) adds a
+  Private entry at the root, after Forms and off the Rooms root. It lists private rooms through
+  the `PrivateRooms` search area, which the Rooms listing never returns, and offers no room
+  creation and no Recent / Favorites rows. With it on, the path of a folder inside a private room
+  starts at that entry in place of Rooms. The host's `Common` namespace needs the `Private` key
 - **`hasTabStop(root)`** (`hooks/useFocusTrap`): whether `root` holds a Tab stop, by the rule of
   `getTabStops`, reading the layout no further than the first one
 - **`markAsDropDownItem(component)`** (`utils/drop-down-item-mark`): marks a component that renders
@@ -280,6 +290,17 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`PasswordInput` generates passwords from the cryptographic generator.** The generate link
+  and the handle's `onGeneratePassword` drew every character and the final shuffle from
+  `Math.random`, which is predictable, while consumers use the result as an account password
+  and as the passphrase of an encryption key. They draw from `crypto.getRandomValues` now, with
+  no fallback, without the bias of a modulo, and shuffle with Fisher-Yates. The free characters
+  come evenly from every allowed character; before, a character set was picked first, so each
+  of the eight symbols came up about three times as often as each letter. Length and rules are
+  unchanged
+- **`OperationsProgressButton` names its button after what is running.** The button and its
+  progress bar were named after the icon ("dots button", "upload button"); they carry the
+  operation's label now, or the count of processes when several run.
 - **`PeopleSelector` and `GroupsSelector` load past their first page.** Both took the list's
   size from the answer's `count`, which is the items in that answer - one page of 100 at most -
   so the list never had a next page and scrolling to its end loaded nothing. They read the
@@ -751,6 +772,7 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   windows open the portal's `/doceditor`, so the calls are now addressed to
   `window.location.origin` and the browser drops one whose window holds any other page.
 - Table: a column reset no longer squeezes the name column below its own minimum. With many columns on and a narrow list, for instance beside the AI chat, the reset took every other column's minimum out of the name column's share, down to a negative width that broke the grid: the header lost its title and the rows came out empty. The name column now keeps its minimum, and when the other columns cannot fit next to it the table shows the name column alone, as a resize already does
+- Table: a column reset no longer empties a table that has no name column, such as the billing transaction history. In a narrow list the reset fell back to showing the name column alone, so with no name column every column got zero width: the header lost its titles and the cells piled on top of each other. That fallback now applies only when the table has a name column
 
 ## 4.1.0
 

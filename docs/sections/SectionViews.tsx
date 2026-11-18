@@ -22,6 +22,7 @@ import {
 } from "../../components/tiles";
 import { SortByFieldName } from "../../enums";
 import type { SectionItem, SectionKind, SortKey } from "./source";
+import { LATIN_NUMBERING_SYSTEM } from "../../utils/latin-digits";
 import styles from "./SectionList.module.scss";
 
 /**
@@ -44,6 +45,7 @@ export const changedAt = (iso: string) =>
   iso
     ? new Date(iso)
         .toLocaleString("en-US", {
+          numberingSystem: LATIN_NUMBERING_SYSTEM,
           day: "numeric",
           month: "numeric",
           year: "numeric",

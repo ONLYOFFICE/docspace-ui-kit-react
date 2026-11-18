@@ -55,7 +55,7 @@ const DropDown = ({
   dataTestId,
   id,
   role = "listbox",
-  "aria-label": ariaLabel,
+  ariaLabel,
 }: DropDownProps) => {
   const { isRTL } = useInterfaceDirection();
 

@@ -177,6 +177,11 @@ export enum FolderType {
   AiProjectRoom = 40,
   /** The root the Instructions rooms, Knowledge rooms and AI projects are kept under ("AI rooms"). */
   AiHub = 41,
+  /**
+   * The root of the "Private" section. It holds no rooms itself: private rooms
+   * stay under the Rooms root and are listed through the PrivateRooms search area.
+   */
+  PrivateRooms = 42,
 }
 
 export enum GuidanceRefKey {

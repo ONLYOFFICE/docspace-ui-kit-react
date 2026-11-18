@@ -441,6 +441,16 @@ describe("Date Utilities", () => {
       expect(result).toBe("1 jour");
     });
 
+    it("writes the relative suffix with Western digits in Arabic", () => {
+      const result = humanizeDuration(-3, "days", {
+        locale: "ar-SA",
+        addSuffix: true,
+      });
+
+      expect(result).toContain("3");
+      expect(result).not.toMatch(/[٠-٩]/);
+    });
+
     it("fromNow works correctly", () => {
       const past = DateTime.now().minus({ days: 10, hours: 1 });
       const future = DateTime.now().plus({ days: 10, hours: 1 });

@@ -59,8 +59,19 @@ vi.mock("./components/chat-no-access-screen", () => ({
   ),
 }));
 
+const panelState = { isAnalyzeMode: false };
+
 vi.mock("../providers/ai-chat-store/AiChatStoreProvider", () => ({
-  useAiChatStore: () => ({ effectiveFullscreen: false }),
+  useAiChatStore: () => ({
+    effectiveFullscreen: false,
+    isAnalyzeMode: panelState.isAnalyzeMode,
+  }),
+}));
+
+// The bar reads the panel store and the translations itself; its own test
+// covers what it says.
+vi.mock("./components/analyze-banner", () => ({
+  AnalyzeBanner: () => <div data-testid="analyze-banner" />,
 }));
 
 // The room sync needs the API provider and the clouds store; its own tests
@@ -81,6 +92,7 @@ describe("<NewChat />", () => {
     widgetState.threadId = "";
     widgetState.profiles = [];
     widgetState.initialized = true;
+    panelState.isAnalyzeMode = false;
     vi.stubGlobal("DocSpace", { navigate });
   });
 
@@ -245,5 +257,35 @@ describe("<NewChat />", () => {
     render(<NewChat />);
 
     expect(screen.getByTestId("chat-list")).toBeInTheDocument();
+  });
+
+  describe("Analyze responses", () => {
+    beforeEach(() => {
+      widgetState.profiles = [{ id: "profile-1" }];
+    });
+
+    it("Analyzing a form: the bar names it and the composer's chip row is hidden", () => {
+      panelState.isAnalyzeMode = true;
+
+      const { container } = render(<NewChat aiReady />);
+
+      expect(screen.getByTestId("analyze-banner")).toBeInTheDocument();
+      expect(container.querySelector("section")).toHaveClass("analyzeMode");
+    });
+
+    it("An ordinary chat: the chip row stays", () => {
+      const { container } = render(<NewChat aiReady />);
+
+      expect(container.querySelector("section")).not.toHaveClass("analyzeMode");
+    });
+
+    it("No access to AI: no bar over the screen that says so", () => {
+      panelState.isAnalyzeMode = true;
+
+      render(<NewChat aiReady={false} noAccessProps={noAccessProps} />);
+
+      expect(screen.getByTestId("no-access-screen")).toBeInTheDocument();
+      expect(screen.queryByTestId("analyze-banner")).not.toBeInTheDocument();
+    });
   });
 });

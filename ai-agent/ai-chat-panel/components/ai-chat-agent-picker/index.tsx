@@ -256,7 +256,7 @@ const AiChatAgentPicker = observer(({ title }: AiChatAgentPickerProps) => {
           if (anchorRef.current?.contains(e.target as Node)) return;
           close();
         }}
-        aria-label={t("Common:AIAgents")}
+        ariaLabel={t("Common:AIAgents")}
         dataTestId="ai-chat-agent-picker-menu"
       >
         {/* Keys pressed on an option bubble up here. */}

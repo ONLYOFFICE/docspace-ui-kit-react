@@ -21,7 +21,8 @@ import { SelectedItemPure } from "../../../components/selected-item";
 import { TSelectorItem } from "../../../components/selector";
 import PeopleSelector from "../../../selectors/People";
 import type { PeopleFilter } from "../../../selectors/People/PeopleSelector.types";
-import { EmployeeType } from "../../../enums";
+import { DeviceType, EmployeeType } from "../../../enums";
+import useDeviceType from "../../hooks/useDeviceType";
 import FilterPanel from "./sub-components/FilterPanel";
 import TransactionBody from "./sub-components/TransactionBody";
 import styles from "./styles/TransactionHistory.module.scss";
@@ -59,8 +60,6 @@ const filter = (withoutRoleFilter?: boolean): PeopleFilter => ({
 
 const TransactionHistory = (props: TransactionHistoryProps) => {
   const {
-    isMobile,
-    isTablet,
     withoutHeader,
     serviceName,
     headerTitle,
@@ -96,6 +95,14 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
   } = store;
 
   const { isNotPaidPeriod } = store.tariff;
+
+  const currentDeviceType = useDeviceType({
+    mobile: store.mobileBreakpoint,
+    desktop: store.desktopBreakpoint,
+  });
+
+  const isMobile = props.isMobile ?? currentDeviceType === DeviceType.mobile;
+  const isTablet = props.isTablet ?? currentDeviceType === DeviceType.tablet;
 
   const t = useCommonTranslation();
 
@@ -520,7 +527,11 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
 
   return (
     <>
-      <div className={styles.transactionHistoryHeader}>
+      <div
+        className={classNames(styles.transactionHistoryHeader, {
+          [styles.withoutTitle]: withoutHeader && isMobile,
+        })}
+      >
         {withoutHeader ? null : (
           <Text
             isBold

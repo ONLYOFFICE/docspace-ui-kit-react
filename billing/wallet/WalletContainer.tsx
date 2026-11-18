@@ -22,8 +22,11 @@ import styles from "./styles/Wallet.module.scss";
 import BalanceAmount from "../shared/balance-amount";
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useServicesStore } from "../store/ServicesStoreProvider";
+import useDeviceType from "../hooks/useDeviceType";
+import { DeviceType } from "../../enums";
 import { getBrandName } from "../../constants/brands";
 import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
+import { LATIN_NUMBERING_SYSTEM } from "../../utils/latin-digits";
 
 const WALLET_TAB_IDS = ["transaction-history", "upcoming-payments"];
 
@@ -50,9 +53,16 @@ type WalletProps = {
 };
 
 const Wallet = (props: WalletProps) => {
-  const { isMobile, onViewUsage, onAddonsClick } = props;
+  const { onViewUsage, onAddonsClick } = props;
 
   const store = usePaymentStore();
+
+  const currentDeviceType = useDeviceType({
+    mobile: store.mobileBreakpoint,
+    desktop: store.desktopBreakpoint,
+  });
+
+  const isMobile = props.isMobile ?? currentDeviceType === DeviceType.mobile;
   const { walletMonthToDateSpend } = useServicesStore();
 
   const {
@@ -99,6 +109,7 @@ const Wallet = (props: WalletProps) => {
   const monthLabel = useMemo(
     () =>
       new Intl.DateTimeFormat(store.language || "en", {
+        numberingSystem: LATIN_NUMBERING_SYSTEM,
         month: "long",
         year: "numeric",
       }).format(new Date()),

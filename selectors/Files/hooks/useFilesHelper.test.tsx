@@ -6,6 +6,7 @@ import {
   LoadersContext,
   LoadersContextProvider,
 } from "../../utils/contexts/Loaders";
+import { PRIVATE_SECTION_ID } from "../../utils/constants";
 import type { UseFilesHelpersProps } from "../FilesSelector.types";
 import useFilesHelper from "./useFilesHelper";
 
@@ -152,5 +153,50 @@ describe("useFilesHelper", () => {
       { folderId: ROOM_ID, roomId: ROOM_ID, isInsidePrivateRoom: true },
     );
     expect(mocks.getFolderInfo).not.toHaveBeenCalled();
+  });
+
+  const crumbIds = (setBreadCrumbs: ReturnType<typeof vi.fn>) =>
+    (setBreadCrumbs.mock.calls.at(-1)?.[0] as { id: number | string }[]).map(
+      (crumb) => crumb.id,
+    );
+
+  it("starts the path of a private room at the Private entry where the host lists it", async () => {
+    mocks.getFolderByFolderId.mockResolvedValue({
+      data: { response: roomListing },
+    });
+    // On its first load the helper reads the folder's own info before the list.
+    mocks.getFolderInfo.mockResolvedValue({
+      data: { response: { id: ROOM_ID, rootFolderType: 14, private: true } },
+    });
+    const setBreadCrumbs = vi.fn();
+    const { result } = setup({
+      isInit: true,
+      withPrivateTreeFolder: true,
+      setBreadCrumbs,
+    });
+
+    await act(async () => {
+      await result.current.files.getFileList(0);
+    });
+
+    expect(crumbIds(setBreadCrumbs)).toEqual([0, PRIVATE_SECTION_ID, ROOM_ID]);
+  });
+
+  it("keeps the Rooms root in the path of a private room by default", async () => {
+    mocks.getFolderByFolderId.mockResolvedValue({
+      data: { response: roomListing },
+    });
+    // On its first load the helper reads the folder's own info before the list.
+    mocks.getFolderInfo.mockResolvedValue({
+      data: { response: { id: ROOM_ID, rootFolderType: 14, private: true } },
+    });
+    const setBreadCrumbs = vi.fn();
+    const { result } = setup({ isInit: true, setBreadCrumbs });
+
+    await act(async () => {
+      await result.current.files.getFileList(0);
+    });
+
+    expect(crumbIds(setBreadCrumbs)).toEqual([0, 2002, ROOM_ID]);
   });
 });

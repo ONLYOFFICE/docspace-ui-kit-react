@@ -36,6 +36,18 @@ export const AI_HUB_SEARCH_AREA = "AiHub";
 /** Root folder type of the "AI rooms" section (FolderType.AiHub); the SDK enum lacks it. */
 export const AI_HUB_ROOT_FOLDER_TYPE = 41;
 
+/** Root folder type of the "Private" section (FolderType.PrivateRooms); the SDK enum lacks it. */
+export const PRIVATE_ROOMS_ROOT_FOLDER_TYPE = 42;
+
+/** Synthetic id of the client-side "Private" root item in the selector tree. */
+export const PRIVATE_SECTION_ID = "private-section";
+
+/**
+ * Search area that lists private rooms (SearchArea.PrivateRooms): the server
+ * keeps them under the Rooms root but leaves them out of the Rooms listing.
+ */
+export const PRIVATE_ROOMS_SEARCH_AREA = "PrivateRooms";
+
 /**
  * The room types the "AI rooms" section of a selector lists: the Instructions
  * and Knowledge rooms. AI projects are left out - they hold no files.
