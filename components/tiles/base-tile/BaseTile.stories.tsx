@@ -317,7 +317,8 @@ export const Default: Story = {
     await userEvent.click(within(tile).getByText("Marketing"));
     await expect(args.onRoomClick).toHaveBeenCalled();
 
-    await userEvent.click(within(tile).getByText("Campaigns"));
+    // The label lets the pointer through to the tag, so click the tag.
+    await userEvent.click(within(tile).getByTestId("tag_item_Campaigns"));
     await expect(onSelectTag).toHaveBeenCalledWith(
       expect.objectContaining({ label: "Campaigns" }),
     );
