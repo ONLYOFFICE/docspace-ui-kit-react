@@ -290,6 +290,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **A loading `Button` no longer repeats its `id` on the spinner.** The button passed its own
+  `id` to the `track` loader, so while it loaded the page held two elements with that id. A
+  loader without an `id` now gets a unique one, so its gradients stay apart from every other
+  track's; before, tracks without an `id` shared one set and a secondary button's spinner drew
+  in the primary's white
 - **`PasswordInput` generates passwords from the cryptographic generator.** The generate link
   and the handle's `onGeneratePassword` drew every character and the final shuffle from
   `Math.random`, which is predictable, while consumers use the result as an account password

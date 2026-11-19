@@ -161,9 +161,9 @@ export function PanelBody({
 - **`rombs` needs a positioned container.** The diamonds are absolutely positioned `<div>`s that
   move between `top: 0` and `top: 120px`. They need about `size` plus 120px of height below the
   nearest positioned ancestor.
-- **Give every `track` its own `id`.** The track builds its gradient ids from `id`
-  (`spinner-color-<id>-1` and on). Two tracks with the same or no `id` share one set of
-  gradients, and the second draws in the first one's colour.
+- **The track builds its gradient ids from `id`** (`spinner-color-<id>-1` and on). Without an
+  `id` each loader gets a unique one. Two tracks given the same `id` share one set of gradients,
+  and the second draws in the first one's colour.
 - `ref` reaches the `track` type's `<svg>` alone; the other types ignore it.
 - `primary` and `isDisabled` are read by the `track` type alone; the other three ignore them.
 
