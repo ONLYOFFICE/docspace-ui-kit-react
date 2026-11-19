@@ -4,6 +4,7 @@ import { screen, act, render, fireEvent } from "@testing-library/react";
 import { InterfaceDirectionProvider } from "../../context/InterfaceDirectionContext";
 import { Toast } from ".";
 import { toastr } from "./sub-components/Toastr";
+import styles from "./Toast.module.scss";
 
 vi.useFakeTimers();
 
@@ -297,6 +298,45 @@ describe("<Toast />", () => {
     ).not.toThrow();
 
     expect(screen.getByText("Failed")).toBeInTheDocument();
+  });
+
+  it("expands only its own deck on a click, until the deck empties", () => {
+    const foreign = document.createElement("div");
+    foreign.className = "Toastify__toast";
+    document.body.appendChild(foreign);
+
+    render(<Toast />);
+
+    act(() => {
+      toastr.info("Expand me", "Title", 0);
+    });
+
+    fireEvent.click(screen.getByText("Expand me"));
+
+    const deck = (text: string) =>
+      screen.getByText(text).closest(`.${styles.toast}`);
+
+    expect(deck("Expand me")).toHaveClass(styles.expanded);
+    expect(foreign.style.position).toBe("");
+
+    const expanded = screen.getByText("Expand me").closest(".Toastify__toast");
+
+    act(() => {
+      toastr.clear();
+      vi.runAllTimers();
+    });
+    // jsdom runs no animations: end the exit by hand so the toast is removed.
+    fireEvent.animationEnd(expanded as Element);
+    act(() => {
+      vi.runAllTimers();
+    });
+    act(() => {
+      toastr.info("Next one", "Title", 0);
+    });
+
+    expect(deck("Next one")).not.toHaveClass(styles.expanded);
+
+    foreign.remove();
   });
 
   it("falls back to the English default title without translations", () => {

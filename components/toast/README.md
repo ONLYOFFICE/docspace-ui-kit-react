@@ -204,17 +204,14 @@ export async function uploadWithProgressToast(file: File) {
   [`Portal`](../portal/README.md) into `document.getElementById("root")`, or the body without one.
 - An app whose root node has another id gets the toasts on the body, outside the theme class,
   and loses their colours.
-- **`--toast-top-offset` is written on `<html>`**, from a `visualViewport` listener that runs only
-  on a phone. It does not move the toasts, since the container declares its own 16px.
-- **Clicking any toast makes every toast `position: static`.** The container's click handler
-  rewrites every `.Toastify__toast` in the document to unstack the mobile deck, and never undoes
-  it.
 - **The container follows the interface direction** from `ThemeProvider`; without a provider it
   is left-to-right. The position stays `top-right`, mirrored by `inset-inline-end`.
 - **The container is `position: fixed` at `z-index: 9999`**, 320px wide, 24px from the trailing
   edge. The newest toast is on top.
 - At tablet width and below the toasts overlap as a deck, each 8px below the one in front. On a
   phone the container spans the viewport minus 32px.
+- A click on the deck lays its toasts out one under another. The deck closes again once its last
+  toast is gone; toasts outside the container are not touched.
 - `isSSR` makes the container render `null` on the first pass and appear after the first
   effect, so a server-rendered tree does not reach for `#root`.
 

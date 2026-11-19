@@ -294,6 +294,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **A click on a `Toast` spreads out its own deck only, and the deck closes again.** The click
+  set `position: static` on every `.Toastify__toast` in the document and never undid it, so a
+  later toast stacked over the spread ones. The container now carries a class until its last
+  toast is gone. The `visualViewport` listener that wrote `--toast-top-offset` on `<html>`, where
+  nothing read it, is removed
 - **A swipe down no longer closes a `ModalDialog` that cannot close.** The swipe called
   `onClose` directly, past the guard the cross and Escape go through, so `isCloseable={false}`
   and `embedded` did not stop it on a phone. It goes through that guard now, and such a dialog
