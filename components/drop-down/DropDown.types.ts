@@ -29,11 +29,14 @@ export interface DropDownProps {
   /** `id` of the menu element, for `aria-controls` on the control that opens it. */
   id?: string;
   /**
-   * ARIA role of the menu element: `listbox` for a list of choices, `menu` for
-   * a list of actions (give the items `role="menuitem"` to match).
+   * ARIA role of the menu element. `listbox` lists choices, `menu` actions
+   * (give the items `role="menuitem"`), `dialog` a popover of your own
+   * controls, named with `ariaLabel`.
    * @default "listbox"
    */
-  role?: "listbox" | "menu";
+  role?: "listbox" | "menu" | "dialog";
+  /** `aria-label` of the menu element: its accessible name. */
+  ariaLabel?: string;
   /** Width of the menu as a CSS length, such as `200px` or `100%`. */
   manualWidth?: string;
   /** Horizontal distance from the anchor's edge, as a CSS length. Read only

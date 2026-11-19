@@ -1,6 +1,12 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { screen, render, fireEvent } from "@testing-library/react";
+import {
+  act,
+  screen,
+  render,
+  fireEvent,
+  waitFor,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { InputSize, InputType } from "../text-input";
@@ -283,6 +289,99 @@ describe("<PasswordInput />", () => {
     ).not.toBeInTheDocument();
   });
 
+  describe("tooltipPasswordPlace", () => {
+    const openRulesTooltip = async (
+      props: Partial<React.ComponentProps<typeof PasswordInput>> = {},
+    ) => {
+      const user = userEvent.setup();
+      render(<PasswordInput {...baseProps} id="placed-password" {...props} />);
+
+      const input = screen.getByTestId("password-input").querySelector("input");
+      await user.type(input!, "abc");
+
+      const title = await screen.findByText("Password must contain:");
+      return title.closest(".react-tooltip") as HTMLElement;
+    };
+
+    it("opens the rules tooltip above the field by default", async () => {
+      const tooltip = await openRulesTooltip();
+
+      await waitFor(() =>
+        expect(tooltip).toHaveClass("react-tooltip__place-top"),
+      );
+    });
+
+    it("opens the rules tooltip on the side it is given", async () => {
+      const tooltip = await openRulesTooltip({ tooltipPasswordPlace: "right" });
+
+      await waitFor(() =>
+        expect(tooltip).toHaveClass("react-tooltip__place-right"),
+      );
+    });
+
+    it("anchors the rules tooltip to the whole field, reveal button included", async () => {
+      // jsdom lays nothing out: in a 1024 x 768 page the field is 300px wide,
+      // its text input the first 260px of it, the reveal button the rest.
+      const rect = (width: number, height: number) =>
+        ({
+          x: 0,
+          y: 0,
+          top: 0,
+          left: 0,
+          right: width,
+          bottom: height,
+          width,
+          height,
+          toJSON: () => ({}),
+        }) as DOMRect;
+      // floating-ui watches a laid-out anchor with an IntersectionObserver,
+      // which jsdom does not provide.
+      vi.stubGlobal(
+        "IntersectionObserver",
+        class {
+          observe() {}
+
+          unobserve() {}
+
+          disconnect() {}
+
+          takeRecords() {
+            return [];
+          }
+        },
+      );
+      const root = document.documentElement;
+      const page = { clientWidth: 1024, clientHeight: 768 };
+      for (const [key, value] of Object.entries(page))
+        Object.defineProperty(root, key, { configurable: true, value });
+      const original = Element.prototype.getBoundingClientRect;
+      Element.prototype.getBoundingClientRect = function getRect(
+        this: Element,
+      ) {
+        if (this === root || this === document.body) return rect(1024, 768);
+        if (this.getAttribute("data-testid") === "tooltipContent")
+          return rect(300, 32);
+        if (this.tagName === "INPUT") return rect(260, 32);
+        return rect(100, 50);
+      };
+
+      try {
+        const tooltip = await openRulesTooltip({
+          tooltipPasswordPlace: "right",
+        });
+
+        await waitFor(() =>
+          expect(parseFloat(tooltip.style.left)).toBeGreaterThanOrEqual(300),
+        );
+      } finally {
+        Element.prototype.getBoundingClientRect = original;
+        for (const key of Object.keys(page))
+          delete (root as unknown as Record<string, unknown>)[key];
+        vi.unstubAllGlobals();
+      }
+    });
+  });
+
   it("handles custom autocomplete attribute", () => {
     render(<PasswordInput {...baseProps} autoComplete="current-password" />);
 
@@ -411,5 +510,58 @@ describe("<PasswordInput />", () => {
       const wrapper = screen.getByTestId("password-input");
       expect(wrapper).toHaveAttribute("data-scale", "true");
     });
+  });
+});
+
+describe("<PasswordInput /> generator settings", () => {
+  type Handle = { onGeneratePassword: (e: React.MouseEvent) => void };
+
+  const generate = (props: object) => {
+    const ref = React.createRef<Handle>();
+    render(
+      <PasswordInput
+        {...baseProps}
+        {...props}
+        ref={ref as unknown as React.RefObject<never>}
+      />,
+    );
+    act(() => {
+      ref.current?.onGeneratePassword({
+        preventDefault: () => {},
+      } as unknown as React.MouseEvent);
+    });
+    return (
+      screen
+        .getByTestId("password-input")
+        .querySelector("input") as HTMLInputElement
+    ).value;
+  };
+
+  const strict = {
+    ...basePasswordSettings,
+    minLength: 12,
+    upperCase: true,
+    digits: true,
+    specSymbols: true,
+  };
+
+  it("draws by generatorSettings when they are given", () => {
+    const value = generate({
+      passwordSettings: { ...basePasswordSettings, minLength: 12 },
+      generatorSettings: strict,
+    });
+
+    expect(value).toHaveLength(12);
+    expect(value).toMatch(/[A-Z]/);
+    expect(value).toMatch(/\d/);
+    expect(value).toMatch(/[!@#$%^&*]/);
+  });
+
+  it("draws by passwordSettings otherwise", () => {
+    const value = generate({
+      passwordSettings: { ...basePasswordSettings, minLength: 10 },
+    });
+
+    expect(value).toMatch(/^[a-z]{10}$/);
   });
 });

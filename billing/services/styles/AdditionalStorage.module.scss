@@ -1,12 +1,8 @@
 .servicesWrapper {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 320px);
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
   gap: 16px;
   max-width: 656px;
-
-  &.servicesWrapperMobile {
-    grid-template-columns: 1fr;
-  }
 }
 
 .aiCard {

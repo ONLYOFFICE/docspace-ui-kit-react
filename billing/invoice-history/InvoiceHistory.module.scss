@@ -18,6 +18,39 @@
   }
 }
 
+.filterIconRow {
+  display: flex;
+  margin-bottom: 10px;
+
+  > [role="button"] {
+    margin-inline-start: 0;
+  }
+}
+
+.filterRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  gap: 12px;
+  margin-bottom: 8px;
+
+  .initiatorCombobox {
+    padding: 0;
+  }
+}
+
+.filterDates {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.clearFilter {
+  margin: auto 0;
+}
+
 .introLoader {
   margin-bottom: 16px;
   max-width: 300px;

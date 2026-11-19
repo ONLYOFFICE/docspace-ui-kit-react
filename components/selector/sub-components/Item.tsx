@@ -13,6 +13,7 @@ import { Text } from "../../text";
 import { Checkbox } from "../../checkbox";
 import { RoomIcon } from "../../room-icon";
 import { Tooltip } from "../../tooltip";
+import { Badge } from "../../badge";
 import { MCPIcon, MCPIconSize } from "../../mcp-icon";
 
 import type { Data, ItemProps, TSelectorItem } from "../Selector.types";
@@ -38,6 +39,7 @@ const compareFunction = (prevProps: ItemProps, nextProps: ItemProps) => {
   return (
     prevItem?.id === nextItem?.id &&
     prevItem?.label === nextItem?.label &&
+    prevItem?.mark === nextItem?.mark &&
     prevItem?.isSelected === nextItem?.isSelected &&
     nextData?.inputItemVisible === prevData?.inputItemVisible &&
     nextData?.listHeight === prevData?.listHeight &&
@@ -72,6 +74,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
   const isActive = activeIndex === index;
 
   const { isBase } = useTheme();
+  const [isMarkHovered, setIsMarkHovered] = React.useState(false);
 
   const isLoaded = isItemLoaded(index);
 
@@ -120,6 +123,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
       isMCP,
       isFolder,
       id,
+      mark,
     } = item;
 
     if (isSeparator) {
@@ -229,6 +233,41 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
       </Text>
     );
 
+    const markId = `${optionId ?? `selector-item-${index}`}-mark`;
+
+    const markNode = mark ? (
+      <>
+        <span
+          className={styles.itemMark}
+          data-tooltip-id={markId}
+          data-testid={`selector-item-${index}-mark`}
+        >
+          <Badge
+            label={mark.label}
+            backgroundColor={globalColors.mainOrange}
+            color={globalColors.black}
+            maxWidth="none"
+            noHover
+          />
+        </span>
+        <span id={`${markId}-description`} hidden>
+          {mark.description}
+        </span>
+        <Tooltip
+          id={markId}
+          place="bottom"
+          maxWidth="300px"
+          // The active row of the keyboard shows it as a hover does.
+          isOpen={isActive || isMarkHovered}
+          setIsOpen={setIsMarkHovered}
+        >
+          <Text fontSize="12px" fontWeight={400} noSelect>
+            {mark.description}
+          </Text>
+        </Tooltip>
+      </>
+    ) : null;
+
     const itemAvatar =
       avatar ?? (isGroup && isSystem ? <EveryoneIconUrl /> : "");
 
@@ -245,6 +284,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
         role={optionId ? "option" : undefined}
         aria-selected={optionId ? !!isSelected : undefined}
         aria-disabled={optionId && isItemDisabled ? true : undefined}
+        aria-describedby={mark ? `${markId}-description` : undefined}
         className={classNames(styles.selectorItem, {
           [styles.keyboardActive]: isActive,
           [styles.disabled]: isItemDisabled,
@@ -312,7 +352,15 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
           )
         ) : null}
         {renderCustomItem ? (
-          renderCustomItem(label, typeLabel, email, isGroup, status, id)
+          renderCustomItem(
+            label,
+            typeLabel,
+            email,
+            isGroup,
+            status,
+            id,
+            markNode,
+          )
         ) : (
           <div
             className={
@@ -351,6 +399,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
                 />
               </>
             ) : null}
+            {markNode}
           </div>
         )}
 

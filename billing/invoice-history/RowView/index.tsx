@@ -1,10 +1,12 @@
 import { observer } from "mobx-react";
 
 import { RowContainer } from "../../../components/rows";
+import { useCommonTranslation } from "../../../utils/i18n";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import type { TInvoice } from "../../types";
 
 import { getCorrectDate } from "../../../utils/date/getCorrectDate";
+import { getInitiatorLabel } from "../getInitiatorLabel";
 import InvoiceRow from "./RowBody";
 import styles from "../InvoiceHistory.module.scss";
 
@@ -19,6 +21,7 @@ const RowView = ({
   invoices,
   onOpenInvoice,
 }: InvoiceHistoryRowViewProps) => {
+  const t = useCommonTranslation();
   const {
     formatWalletCurrency,
     language,
@@ -43,6 +46,7 @@ const RowView = ({
           sectionWidth={sectionWidth}
           date={getCorrectDate(language, invoice.date)}
           amount={formatWalletCurrency(invoice.amount, 2, invoice.currency)}
+          type={getInitiatorLabel(t, invoice.initiator)}
           hasInvoice={invoice.hasInvoice}
           onOpenInvoice={() => onOpenInvoice(invoice.id)}
         />
