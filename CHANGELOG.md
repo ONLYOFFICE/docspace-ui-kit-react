@@ -295,6 +295,10 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   loader without an `id` now gets a unique one, so its gradients stay apart from every other
   track's; before, tracks without an `id` shared one set and a secondary button's spinner drew
   in the primary's white
+- **`TextInput`'s `keepCharPositions` works.** The prop reached only a `data-` attribute and
+  never the mask, so typing or deleting in the middle shifted the rest. With a `mask` every
+  character now keeps its slot: typing into a filled slot is refused, and a deletion leaves the
+  slot empty. The attribute is still set
 - **`PasswordInput` generates passwords from the cryptographic generator.** The generate link
   and the handle's `onGeneratePassword` drew every character and the final shuffle from
   `Math.random`, which is predictable, while consumers use the result as an account password

@@ -47,6 +47,7 @@ export const TextInputPure = (props: TextInputProps) => {
       style={combinedStyle}
       isAutoFocussed={isAutoFocussed}
       guide={guide}
+      keepCharPositions={keepCharPositions}
       size={size}
       data-testid={testId ?? "text-input"}
       data-size={size}

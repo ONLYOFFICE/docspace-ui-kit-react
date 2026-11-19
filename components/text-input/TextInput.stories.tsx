@@ -173,7 +173,7 @@ const meta = {
     keepCharPositions: {
       control: "boolean",
       description:
-        "Meant to keep the other characters in place while one is typed or deleted. The component does not pass it to the mask, so it has no effect.",
+        "Keeps every character in its slot: typing into a filled slot is refused, and a deletion leaves the slot empty instead of shifting the rest. Read only with `mask`.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -556,6 +556,19 @@ export const WithMask: Story = {
     const date = canvas.getByPlaceholderText("DD/MM/YYYY");
     await userEvent.type(date, "25122024");
     await expect(date).toHaveValue("25/12/2024");
+
+    // keepCharPositions: a digit typed into a filled slot is refused rather
+    // than shifting the rest, and a deleted one leaves its slot empty.
+    await userEvent.type(date, "1", {
+      initialSelectionStart: 0,
+      initialSelectionEnd: 0,
+    });
+    await expect(date).toHaveValue("25/12/2024");
+    await userEvent.type(date, "{Backspace}", {
+      initialSelectionStart: 1,
+      initialSelectionEnd: 1,
+    });
+    await expect(date).toHaveValue("_5/12/2024");
 
     const phone = canvas.getByPlaceholderText("+1 (___) ___-____");
     await userEvent.type(phone, "15551234567");
