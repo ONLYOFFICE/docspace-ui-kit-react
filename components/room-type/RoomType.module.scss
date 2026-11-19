@@ -150,7 +150,10 @@
   }
 
   &:active {
-    border-color: var(--accent-main);
+    border-color: var(
+      --accent-main,
+      var(--color-scheme-main-accent, #{$light-blue-main})
+    );
   }
 
   :global {
@@ -203,7 +206,10 @@
 
   &.isOpen,
   &:active {
-    border-color: var(--accent-main);
+    border-color: var(
+      --accent-main,
+      var(--color-scheme-main-accent, #{$light-blue-main})
+    );
   }
 
   :global {

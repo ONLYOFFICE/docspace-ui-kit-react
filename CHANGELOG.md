@@ -305,6 +305,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`RoomType` works the same for the pointer and the keys, and needs no portal for its accent.**
+  A `dropdownButton` ignored the disabled props for a click but not for Enter and Space; now it
+  ignores them for both. The pressed and open borders fall back to the theme's accent, not the
+  text colour. Leaving out `roomType` leaves the row blank, as an unknown value does, instead of
+  borrowing the form room's texts
 - **`InfiniteLoader`'s row skeletons line up with the right edge in a right-to-left layout.** The
   rule that moves them named `.row-loade`, a class nothing carries
 - **`SelectionArea` reports at most once per animation frame, and a release cancels the report
