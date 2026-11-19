@@ -68,9 +68,9 @@ function resolveTheme(
 }
 
 export type UseThemeProps = {
-  /** Theme to use; a new value is applied in place, without a remount. Left out, the system's own preference is followed. */
+  /** Theme to use; a new value is applied in place, without a remount. Left out, `systemTheme` or the system's own preference is followed. */
   initialTheme?: ThemeKeys;
-  /** Theme to treat as the system's, instead of reading `prefers-color-scheme`. */
+  /** Theme to treat as the system's, read only when `initialTheme` is left out. With `ThemeKeys.SystemStr` the real preference wins. */
   systemTheme?: ThemeKeys;
   /** The portal's accent palette. Outside the portal there is none — leave it out. */
   colorTheme?: CustomColorThemesSettingsDto;

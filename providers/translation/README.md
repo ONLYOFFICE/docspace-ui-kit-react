@@ -4,7 +4,7 @@
   "folder": "providers/translation",
   "kind": "provider",
   "status": "public",
-  "summary": "Installs the i18next instance the eleven components with labels of their own read from.",
+  "summary": "Installs the i18next instance that components with labels of their own, such as `Toast`, `Filter` and `Selector`, read from.",
   "import": { "subpath": "providers/translation", "barrel": true, "default": false },
   "exports": ["TranslationProvider", "TTranslationProvider", "TTranslations"],
   "providers": [],
@@ -15,14 +15,13 @@
 
 # TranslationProvider
 
-Installs the i18next instance the eleven components with labels of their own read from. Most of
-the kit takes its text as props and needs nothing here; these eleven do not, and without this
-provider their labels are **empty strings** — not missing-key placeholders, not the key itself.
-A button renders at full size with nothing written on it.
+Installs the i18next instance that components with labels of their own, such as `Toast`, `Filter`
+and `Selector`, read from. Most of the kit takes its text as props and needs nothing here. Without
+this provider most of the others show **empty labels**; a few, such as `Toast`, fall back to
+English.
 
-The eleven are `article`, `color-picker`, `drop-down-item`, `file-input`, `filter`,
-`operations-progress-button`, `room-type`, `selector`, `table`, `tiles` and `toast`. `Dropzone`
-is **not** among them, despite the prompt it draws: that prompt is a prop like any other.
+`Dropzone` is **not** among them, despite the prompt it draws: that prompt is a prop like any
+other.
 
 ## Use this when / not when
 
@@ -99,7 +98,7 @@ import common from "@onlyoffice/apps-ui-kit/locales/en/Common.json";
 const app = { Greeting: "Good morning" };
 
 // Annotate the inner map: left to infer, its value type is taken from the first
-// entry -- the 685 keys of `Common` -- and a namespace of your own is then
+// entry -- the keys of `Common` -- and a namespace of your own is then
 // rejected for not having them.
 const translations: TTranslations = new Map([
   [
@@ -149,33 +148,30 @@ export function German({ children }: { children: React.ReactNode }) {
 
 ## Behaviour the types don't state
 
-- **No `translations` means no context at all.** The provider returns its children bare when the
-  instance is null, so nothing throws, nothing warns, and `useTranslation` below it falls through
-  to whatever else is on the page. The symptom is empty labels, which is easy to read as a design
-  decision rather than a missing provider — a toast with no title, for instance, renders no title
-  element whatsoever.
-- **The package ships `en` and nothing else**, in three namespaces: `Common` (685 keys),
-  `Settings` and `Payments`. Only `Common` is read by components; the other two belong to portal
-  screens.
-- **The instance is private, and also global.** It is built with `i18next.createInstance()`
-  rather than by configuring the singleton, so it does not collide with an application's own
-  i18next — but it is published on `window` as well, because `getCommonTranslation` reads it from
-  there outside React: `window.i18n.t` is its bound `t`, `window.i18n.instance` the instance, and
-  `window.i18n.loaded` the resources keyed as `<lang>/<namespace>.json`. Each mount overwrites
-  all three.
+- **No `translations` means no instance at all.** The provider returns its children bare, and
+  nothing throws or warns. Empty labels are then easy to read as a design decision.
+- **The package ships `en` and nothing else**, in three namespaces: `Common`, `Settings` and
+  `Payments`. Only `Common` is read by components; the other two belong to portal screens.
+- **The instance is private, and also global.** `i18next.createInstance()` keeps it apart from an
+  application's own i18next. It is also published on `window.i18n`, and components read it from
+  there.
+- **A component outside the provider's tree is translated too**, once a provider has mounted
+  anywhere on the page, because it reads `window.i18n`.
+- **Every provider on the page shares one instance.** A second provider with another `locale`
+  switches the language for both.
 - **The language is resolved from three sources, in order:** `locale`, then the user's
   `cultureName`, then the portal settings' `culture`, then `en`. The last two are portal-internal
   and an application of its own passes neither.
 - **`settings.timezone` is written onto `window`** as a side effect, for the date components.
-- **Re-rendering with the same `translations` identity is free**, and changing that identity
-  re-registers the resources. Build the map once, outside the component, as every example here
-  does — a map rebuilt on each render was what made `t()` snap back to raw keys.
+- **Re-rendering with the same `translations` identity is free**; a new identity re-registers the
+  resources. Build the map once, outside the component, as every example here does.
 
 ## Accessibility
 
+- The provider renders no element of its own. Its props accept no `aria-*`, and there is no
+  element to put one on.
 - An empty label is announced as nothing at all. A screen reader meets a button with no
-  accessible name, which is worse than an untranslated one, so mounting this provider is an
-  accessibility matter and not only a cosmetic one.
+  accessible name, which is worse than an untranslated one.
 - `locale` here is about text, not direction: the writing direction comes from
   [`ThemeProvider`](../theme/README.md)'s own `locale`. Set both to the same language, or the
   interface reads in one direction and speaks in another.
@@ -184,7 +180,7 @@ export function German({ children }: { children: React.ReactNode }) {
 
 - [`ThemeProvider`](../theme/README.md) — the other provider an application mounts.
 - [`ErrorBoundary`](../error-boundary/README.md) — catches what the tree below throws.
-- [`Toast`](../../components/toast/README.md) — one of the eleven, and the one whose missing
-  title is easiest to mistake for a choice.
-- [`Selector`](../../components/selector/README.md) — another, with more of its interface
-  translated than any other.
+- [`Toast`](../../components/toast/README.md) — reads its default titles from here, and falls back
+  to English without it.
+- [`Selector`](../../components/selector/README.md) — reads its empty-screen and input labels from
+  here.
