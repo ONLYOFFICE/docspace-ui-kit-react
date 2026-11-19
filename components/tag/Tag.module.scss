@@ -161,9 +161,9 @@
 
 .tagText {
   color: var(--tag-text-color, var(--tag-color));
-  line-height: var(--tag-lh, var(--tag-text-line-height));
+  line-height: var(--tag-lh, var(--tag-text-line-height, 20px));
   pointer-events: none;
-  font-size: var(--tag-size, var(--tag-font-size));
+  font-size: var(--tag-size, var(--tag-font-size, 13px));
 
   &.isDefault {
     color: var(--tag-default-color);

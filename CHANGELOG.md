@@ -307,6 +307,10 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   half. Every value is `initialTime` with the typed hour and minute set on it, so it keeps that
   date's seconds and time zone; it used to be parsed again in the local zone with the seconds
   at zero. `DateTimePicker` reports a value equal to its current one only once
+- **`Tag` styles its label.** The label never got the stylesheet's label class, so a deleted tag
+  was not struck through, a disabled one not greyed, and `--tag-text-color`, `--tag-size` and
+  `--tag-lh` changed nothing. All of them reach the label now. Its size comes from `--tag-size`,
+  13px by default, instead of an inline style
 - **`Heading` no longer carries a class named `undefined`.** It asked for a `not-selectable`
   class its stylesheet never defined. Headings stay selectable, as they were
 - **`RadioButton`s sharing a `name` clear each other.** Without `onChange` each button held its
