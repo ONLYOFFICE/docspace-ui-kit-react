@@ -156,8 +156,7 @@ const meta = {
     },
     id: {
       control: "text",
-      description:
-        "Id of the `<input>`, for a `<label>` or a `FieldContainer`'s `labelFor` to point at.",
+      description: "Id set on both the outer element and the `<input>`.",
     },
     name: {
       control: "text",
