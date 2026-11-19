@@ -1264,11 +1264,12 @@ export const WithSeparator: Story = {
     defaultExpandedId: "documents",
   },
   play: async ({ canvasElement }) => {
-    // A gap above Trash; the theme draws no line in it.
+    // A gap above Trash, with the theme's line in it.
     const trash = entry(canvasElement, "trash").closest("li") as HTMLElement;
     await expect(getComputedStyle(trash).marginTop).toBe("8px");
     await expect(getComputedStyle(trash).paddingTop).toBe("8px");
-    await expect(getComputedStyle(trash).borderTopWidth).toBe("0px");
+    await expect(getComputedStyle(trash).borderTopWidth).toBe("1px");
+    await expect(getComputedStyle(trash).borderTopStyle).toBe("solid");
     const favorites = entry(canvasElement, "favorites").closest(
       "li",
     ) as HTMLElement;
@@ -1278,7 +1279,7 @@ export const WithSeparator: Story = {
     docs: {
       description: {
         story:
-          "Trash set apart from the other sub-items by a gap, without a second section (`withTopSeparator`). A line is drawn in the gap only once `--nav-menu-separator-color` is set; the theme sets none.",
+          "Trash set apart from the other sub-items by a gap, without a second section (`withTopSeparator`). A thin line in the theme's divider colour runs through the gap.",
       },
       source: {
         code: `<NavMenu

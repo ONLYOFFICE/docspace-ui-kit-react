@@ -301,6 +301,10 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`Article` survives a `showArticle` value in local storage that is not JSON.** The parse ran
   unguarded in an effect, so such a value threw on mount and on every device change. It now
   counts as its raw text, and storage that cannot be read counts as an absent key
+- **`NavMenu` draws the line of `withTopSeparator` without any setup.** The border fell back to
+  `--quick-buttons-color`, which the kit does not define, so with neither that nor
+  `--nav-menu-separator-color` set there was no line. The theme now supplies a divider grey last;
+  both variables still win over it
 - **A click on a `Toast` spreads out its own deck only, and the deck closes again.** The click
   set `position: static` on every `.Toastify__toast` in the document and never undid it, so a
   later toast stacked over the spread ones. The container now carries a class until its last
