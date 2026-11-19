@@ -298,6 +298,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `onClose` directly, past the guard the cross and Escape go through, so `isCloseable={false}`
   and `embedded` did not stop it on a phone. It goes through that guard now, and such a dialog
   is not dragged at all
+- **`ContextMenu`'s mobile sheet shows a `badgeLabel` without `isPaidBadge`.** The sheet drew a
+  badge only for a paid item, while the desktop list drew a plain one in blue; both draw it now
 - **`DropDownItem` draws an `icon` passed as an element or a memoised component.** An element
   such as `<Icon />`, or a component wrapped in `memo` or `forwardRef`, fell through to
   `react-svg` with an empty address and drew nothing, though the type allows both

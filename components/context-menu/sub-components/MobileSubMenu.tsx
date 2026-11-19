@@ -121,7 +121,7 @@ const MenuItem = ({
         <span className="p-menuitem-text not-selectable">{item.label}</span>
       ) : null}
       {item.items ? <ArrowIcon className="p-submenu-icon" /> : null}
-      {item.isPaidBadge ? (
+      {item.badgeLabel || item.isPaidBadge ? (
         <Badge
           label={item.badgeLabel}
           className={`${subMenuIconClassName} p-submenu-badge`}
