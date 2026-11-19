@@ -40,6 +40,16 @@ describe("<MCPIcon />", () => {
     expect(screen.getByText("H")).toBeInTheDocument();
   });
 
+  it("draws the first letter after leading spaces", () => {
+    renderComponent({ title: "  hugging face" });
+    expect(screen.getByText("H")).toBeInTheDocument();
+  });
+
+  it("draws a leading emoji whole", () => {
+    renderComponent({ title: "\u{1F916} Robot" });
+    expect(screen.getByText("\u{1F916}")).toBeInTheDocument();
+  });
+
   it("renders image when imgSrc is provided", () => {
     renderComponent({
       title: "Test",

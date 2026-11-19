@@ -23,7 +23,10 @@ export type MCPIconProps = {
   dataTestId?: string;
 };
 
-const getFirstChar = (title: string) => title?.at(0)?.toUpperCase() ?? "";
+// Leading spaces are skipped, and an emoji is taken whole, not as half of
+// its surrogate pair.
+const getFirstChar = (title: string) =>
+  Array.from(title?.trim() ?? "")[0]?.toUpperCase() ?? "";
 
 // What a failed load is remembered by. A node is usually built afresh on
 // every render -- a context menu model is -- so an element with a string

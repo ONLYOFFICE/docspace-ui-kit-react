@@ -333,6 +333,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`PortalLogo`'s phone bar takes the portal's `--header-background-color`.** The logo declared
   that token on itself, hiding the portal's value, and left the bar with no colour outside a
   `.light` or `.dark` ancestor
+- **`MCPIcon` draws the first letter after leading spaces, and a leading emoji whole.** It drew the
+  space, a blank tile, or half of the emoji's surrogate pair
 - **`InfiniteLoader`'s row skeletons line up with the right edge in a right-to-left layout.** The
   rule that moves them named `.row-loade`, a class nothing carries
 - **`SelectionArea` reports at most once per animation frame, and a release cancels the report
