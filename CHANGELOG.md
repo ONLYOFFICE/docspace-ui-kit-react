@@ -312,6 +312,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   frame gave several reports, and the release cancelled a new, empty one
 - **`Dropzone`'s format line opens nothing while `isDisabled`.** It had left the tab order, but a
   click still opened the full list. The line now carries `aria-disabled` as well
+- **Clearing `Scrollbar`'s `paddingInlineEnd` brings the default space back.** The value was
+  written only while the prop was set, so the last one stayed
 - **A click on a tile's three-dot button calls `tileContextClick` once.** `BaseTile`, `FileTile`
   and `FolderTile` called it as the button read its options, with no argument, and again with
   `false` as it reported the click. Only the second call is left

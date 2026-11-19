@@ -136,23 +136,15 @@ const Scrollbar = (props: ScrollbarProps) => {
   useLayoutEffect(() => {
     if (!scrollRef.current?.holderElement) return;
 
-    if (paddingAfterLastItem) {
-      scrollRef.current.holderElement.style.setProperty(
-        "--scrollbar-padding-after-last-item",
-        paddingAfterLastItem,
-      );
-    }
+    const { style } = scrollRef.current.holderElement;
 
-    if (paddingInlineEnd) {
-      scrollRef.current.holderElement.style.setProperty(
-        "--scrollbar-padding-inline-end",
-        paddingInlineEnd,
-      );
-      scrollRef.current.holderElement.style.setProperty(
-        "--scrollbar-padding-inline-end-mobile",
-        paddingInlineEnd,
-      );
-    }
+    // A cleared prop removes its value, so the stylesheet default returns.
+    const write = (name: string, value?: string) =>
+      value ? style.setProperty(name, value) : style.removeProperty(name);
+
+    write("--scrollbar-padding-after-last-item", paddingAfterLastItem);
+    write("--scrollbar-padding-inline-end", paddingInlineEnd);
+    write("--scrollbar-padding-inline-end-mobile", paddingInlineEnd);
   }, [paddingAfterLastItem, paddingInlineEnd]);
 
   return (
