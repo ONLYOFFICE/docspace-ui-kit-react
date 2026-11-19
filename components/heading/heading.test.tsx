@@ -21,6 +21,12 @@ describe("<Heading />", () => {
     expect(screen.getByTestId("heading")).toBeInTheDocument();
   });
 
+  it("carries no class named undefined", () => {
+    render(<Heading>Title</Heading>);
+
+    expect(screen.getByTestId("heading")).not.toHaveClass("undefined");
+  });
+
   it("renders with inherited text props", () => {
     render(
       <Heading

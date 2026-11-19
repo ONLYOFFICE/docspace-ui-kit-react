@@ -216,10 +216,6 @@ export function TruncatedTitle({ name }: { name: string }) {
   plain attribute.
 - **`dataTestId` does nothing here.** The `data-testid` is the literal `heading`, and the only way
   to change it is the `data-testid` attribute itself, which lands through the spread.
-- **Every heading carries a class named `undefined`.** The component asks for a `not-selectable`
-  class the stylesheet does not define, and `classNames` renders the missing lookup literally.
-- Nothing styles that class, so headings stay selectable. Do not write a CSS rule or a test that
-  keys on the element's full `class` string.
 - **`as` replaces the element but not the styling**, and removes the heading semantics.
   `as="div"` renders a div that looks like a heading, and the screen reader's outline loses it.
 - **`Heading` is memoised** (`React.memo`). A new inline `style` object or `children` fragment on
