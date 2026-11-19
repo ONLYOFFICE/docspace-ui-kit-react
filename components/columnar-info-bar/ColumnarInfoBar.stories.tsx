@@ -126,8 +126,14 @@ export const ProfileDetails: Story = {
   },
   play: async ({ args, canvas, userEvent }) => {
     // The close button is named by closeLabel and only calls the handler.
-    await userEvent.click(canvas.getByRole("button", { name: "Close" }));
+    const close = canvas.getByRole("button", { name: "Close" });
+    await userEvent.click(close);
     await expect(args.onAction).toHaveBeenCalledTimes(1);
+    // The cross takes the bar's text colour.
+    const cross = close.querySelector("path") as SVGPathElement;
+    await expect(getComputedStyle(cross).fill).toBe(
+      getComputedStyle(close).color,
+    );
     await expect(canvas.getByText("New account details")).toBeVisible();
   },
   parameters: {

@@ -299,6 +299,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   later toast stacked over the spread ones. The container now carries a class until its last
   toast is gone. The `visualViewport` listener that wrote `--toast-top-offset` on `<html>`, where
   nothing read it, is removed
+- **`ColumnarInfoBar`'s close cross follows `--cib-color`.** Its `fill: var(--gray)` named a
+  variable the kit does not define, so the cross kept the asset's fixed grey in both themes
 - **A swipe down no longer closes a `ModalDialog` that cannot close.** The swipe called
   `onClose` directly, past the guard the cross and Escape go through, so `isCloseable={false}`
   and `embedded` did not stop it on a phone. It goes through that guard now, and such a dialog

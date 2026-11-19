@@ -191,9 +191,6 @@ export function ErrorFacts() {
   below 600px.
 - **There is no `className` prop.** `style` is the only way to reach the element, which is why
   the custom properties are documented as inline values.
-- **The cross is painted with `fill: var(--gray)`, and nothing in the kit defines `--gray`.**
-  The declaration is invalid, so the icon keeps whatever the asset itself carries. Set the
-  colour on the bar through `--cib-color` and the icon inherits nothing from it either.
 - **The close button's hit area differs by variant.** It is 44×44 in the default and `neutral`
   forms, and 12×12 in `page`, where the 16px icon overflows its own button box.
 - **The header is an `<h3>`**, whatever the bar's place on the page, so it can leave a gap in
@@ -204,12 +201,12 @@ export function ErrorFacts() {
 
 Set them through `style` on the component.
 
-| Variable             | Default                            | Effect                                                                                            |
-| -------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `--cib-bg`           | a pale warning cream; grey in dark | Background of the bar                                                                             |
-| `--cib-color`        | black; white in dark               | Text colour, and the label at 60% opacity; in `page` the label keeps its own grey at full opacity |
-| `--cib-accent`       | the warning orange                 | The 4px leading edge; `transparent` in the other two variants                                     |
-| `--cib-header-color` | `--cib-accent`                     | Colour of `headerText`; `neutral` and `page` set their own                                        |
+| Variable             | Default                            | Effect                                                                                               |
+| -------------------- | ---------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `--cib-bg`           | a pale warning cream; grey in dark | Background of the bar                                                                                |
+| `--cib-color`        | black; white in dark               | Text and close-cross colour, the label at 60% opacity; `page` keeps its own grey for label and cross |
+| `--cib-accent`       | the warning orange                 | The 4px leading edge; `transparent` in the other two variants                                        |
+| `--cib-header-color` | `--cib-accent`                     | Colour of `headerText`; `neutral` and `page` set their own                                           |
 
 The stylesheet declares `--cib-bg`, `--cib-color` and `--cib-accent` on the bar itself, in both
 themes, so a value set on an ancestor never reaches it. `neutral` and `page` declare
