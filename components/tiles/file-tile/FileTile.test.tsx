@@ -255,6 +255,18 @@ describe("FileTile", () => {
     expect(screen.getByTestId("test-badge")).toBeTruthy();
   });
 
+  it("keeps its dead props off the DOM", () => {
+    render(
+      <FileTile {...defaultProps} contextButtonSpacerWidth={8} sideColor="red">
+        <FileContent />
+      </FileTile>,
+    );
+
+    const tile = screen.getByTestId("tile");
+    expect(tile).not.toHaveAttribute("contextbuttonspacerwidth");
+    expect(tile).not.toHaveAttribute("sidecolor");
+  });
+
   it("shows hotkey border when showHotkeyBorder is true", () => {
     const { container } = render(
       <FileTile {...defaultProps} showHotkeyBorder>
@@ -275,7 +287,9 @@ describe("FileTile", () => {
     const button = screen.getByTestId("context-menu-button");
     fireEvent.click(button);
 
-    expect(tileContextClick).toHaveBeenCalled();
+    // Once, as a click rather than a right-click.
+    expect(tileContextClick).toHaveBeenCalledTimes(1);
+    expect(tileContextClick).toHaveBeenCalledWith(false);
   });
 
   it("calls withCtrlSelect when Ctrl+Click", () => {

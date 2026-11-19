@@ -150,7 +150,7 @@ const meta = {
     isBlockingOperation: {
       control: "boolean",
       description:
-        "Meant to turn the pointer off while an operation runs over the tile. Its rule never matches the tile, so it changes nothing.",
+        "Stops hover, clicks and right-clicks reaching the tile while an operation runs over it. The tile looks the same.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -254,13 +254,11 @@ const meta = {
     },
     contextButtonSpacerWidth: {
       control: false,
-      description:
-        "Ignored. Nothing reads it, and it is spread onto the outer element as an unknown attribute.",
+      description: "Ignored. Nothing reads it.",
     },
     sideColor: {
       control: false,
-      description:
-        "Ignored. Nothing reads it, and it is spread onto the outer element as an unknown attribute.",
+      description: "Ignored. Nothing reads it.",
     },
   },
   args: {
@@ -444,6 +442,7 @@ export const InProgress: Story = {
   args: {
     ...Default.args,
     inProgress: true,
+    isBlockingOperation: true,
   },
   play: async ({ canvas }) => {
     const tile = canvas.getByTestId("tile");
@@ -451,12 +450,14 @@ export const InProgress: Story = {
       within(tile).queryByRole("checkbox", { hidden: true }),
     ).toBeNull();
     await expect(tile.querySelector('[class*="loader"]')).not.toBeNull();
+    // The pointer does not reach a blocked tile.
+    await expect(getComputedStyle(tile).pointerEvents).toBe("none");
   },
   parameters: {
     docs: {
       description: {
         story:
-          "A file that is busy, being uploaded or converted: a small loader stands where the icon and the checkbox were (`inProgress`).",
+          "A file that is busy, being uploaded or converted: a small loader stands where the icon and the checkbox were (`inProgress`). The pointer does not reach it (`isBlockingOperation`).",
       },
       source: {
         code: `<FileTile
@@ -464,6 +465,7 @@ export const InProgress: Story = {
   element={<WordSvgUrl />}
   contextOptions={contextOptions}
   inProgress={true}
+  isBlockingOperation={true}
 >
   <TileContent>
     <Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>

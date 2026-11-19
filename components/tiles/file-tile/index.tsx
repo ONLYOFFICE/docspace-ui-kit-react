@@ -49,6 +49,9 @@ const FileTile = ({
   isEdit,
   forwardRef,
   dataTestId,
+  // Declared but not read; taken out so they do not reach the DOM.
+  contextButtonSpacerWidth: _contextButtonSpacerWidth,
+  sideColor: _sideColor,
   ...rest
 }: FileTileProps) => {
   const t = useCommonTranslation();
@@ -95,12 +98,8 @@ const FileTile = ({
         }
       : undefined;
 
-  const getOptions = () => {
-    if (tileContextClick) {
-      tileContextClick();
-    }
-    return contextOptions;
-  };
+  // The button's onClick reports the click through onContextMenu.
+  const getOptions = () => contextOptions;
 
   const onContextMenu = (e: React.MouseEvent) => {
     e.stopPropagation();

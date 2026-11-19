@@ -301,6 +301,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`FileTile`'s `isBlockingOperation` turns the pointer off.** Its rule matched only a descendant
+  of the tile, so hover, clicks and right-clicks still reached a blocked file. The dead
+  `contextButtonSpacerWidth` and `sideColor` no longer reach the DOM as unknown attributes
 - **A `RowContainer` with any `id` gets rows of its own width.** The virtual list measured
   `document.getElementById("rowContainer")`, so another id laid the rows out zero wide and a
   second container took the first one's width. A `row` list of `InfiniteLoaderComponent` now
