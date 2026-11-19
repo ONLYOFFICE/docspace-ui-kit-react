@@ -112,7 +112,7 @@ export interface DropDownProps {
   useFlexibleHeight?: boolean;
   /**
    * Whether the arrow keys move through the items and Enter clicks one. Read
-   * only with `maxHeight`; while on, it blocks the default of every key press.
+   * only with `maxHeight`; while on, those three keys lose their default.
    * @default true
    */
   enableKeyboardEvents?: boolean;

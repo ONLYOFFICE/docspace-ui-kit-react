@@ -59,13 +59,16 @@ const VirtualList = ({
     (event: KeyboardEvent) => {
       if (!listRef.current || !isOpen) return;
 
-      event.preventDefault();
-
       let index = currentIndexRef.current;
 
       if (!children || !Array.isArray(children)) {
         return;
       }
+
+      // Only the keys the list acts on lose their default; Tab, Escape and
+      // typing still reach the page.
+      if (["ArrowDown", "ArrowUp", "Enter"].includes(event.code))
+        event.preventDefault();
 
       switch (event.code) {
         case "ArrowDown": {

@@ -15,6 +15,7 @@ vi.mock("react-device-detect", async (importOriginal) => {
   };
 });
 import styles from "./DropDown.module.scss";
+import { DropDownItem } from "../drop-down-item";
 import { DropDown } from ".";
 
 const baseProps = {
@@ -152,6 +153,48 @@ describe("<DropDown />", () => {
       "--manual-x": "10px",
       "--manual-y": "20px",
     });
+  });
+
+  it("takes only the arrows and Enter from the page", () => {
+    render(
+      <DropDown {...baseProps} open maxHeight={200}>
+        {[
+          <DropDownItem key="a" label="First" />,
+          <DropDownItem key="b" label="Second" />,
+        ]}
+      </DropDown>,
+    );
+
+    const press = (code: string) => {
+      const event = new KeyboardEvent("keydown", {
+        key: code,
+        code,
+        bubbles: true,
+        cancelable: true,
+      });
+      window.dispatchEvent(event);
+      return event.defaultPrevented;
+    };
+
+    expect(press("Tab")).toBe(false);
+    expect(press("KeyA")).toBe(false);
+    expect(press("ArrowDown")).toBe(true);
+  });
+
+  it("keeps the markup of a child that is not a DropDownItem", () => {
+    render(
+      <DropDown {...baseProps} open maxHeight={200}>
+        {[
+          <DropDownItem key="a" label="First" />,
+          <button key="b" type="button" data-testid="own-row">
+            Own row
+          </button>,
+        ]}
+      </DropDown>,
+    );
+
+    expect(screen.getByTestId("own-row").tagName).toBe("BUTTON");
+    expect(screen.getByText("First")).toBeInTheDocument();
   });
 
   it("doesn't handle keyboard events when enableKeyboardEvents is false", () => {

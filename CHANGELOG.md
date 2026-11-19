@@ -298,6 +298,14 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `onClose` directly, past the guard the cross and Escape go through, so `isCloseable={false}`
   and `embedded` did not stop it on a phone. It goes through that guard now, and such a dialog
   is not dragged at all
+- **`DropDown`'s virtual list keeps the markup of a child of its own.** With `maxHeight` every
+  child was rendered again as a `DropDownItem` built from its props, so a component of your own
+  lost its markup. A `DropDownItem` is still drawn that way; any other child is placed in its
+  row as it is
+- **An open `DropDown` takes only the arrows and Enter from the page.** Its virtual list, with
+  `maxHeight` and keyboard navigation on, prevented the default of every key press on the page
+  before looking at the key, so a text field elsewhere took no characters and Tab did not move.
+  Only the three keys it acts on are prevented now
 - **`Calendar` leaves the day of `minDate` selectable, and keeps the seconds.** A day was
   compared at midnight with `minDate` and its time, so a `minDate` of now disabled today; it is
   compared with the day `minDate` falls on now. A picked day kept the old hours and minutes but
