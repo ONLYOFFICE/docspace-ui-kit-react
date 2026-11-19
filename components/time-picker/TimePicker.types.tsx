@@ -3,12 +3,13 @@ import type { DateTime } from "luxon";
 type TimePickerBase = {
   /**
    * Time the fields start on, read once on mount; midnight today without it.
-   * Its **date** part is carried into every value `onChange` reports.
+   * Its day, seconds and time zone are carried into every value `onChange`
+   * reports.
    */
   initialTime?: string | Date | DateTime;
   /**
-   * Called on every accepted keystroke with a full `DateTime` — the date from
-   * `initialTime` combined with the typed time.
+   * Called on every accepted keystroke, and on a change of `meridiem`, with
+   * `initialTime` carrying the typed time.
    */
   onChange?: (date: DateTime) => void;
   /** Applied to the outermost element. */
@@ -68,8 +69,8 @@ type TimePickerHourFormat =
        */
       isTwelveHourFormat: true;
       /**
-       * `"AM"` or `"PM"`, used when parsing the typed time in 12-hour mode. You
-       * own this value and the control that changes it; a change reports nothing.
+       * `"AM"` or `"PM"`: the half of the day the typed time is in. You own
+       * this value and the control that changes it; a change reports the time.
        */
       meridiem: string;
     }

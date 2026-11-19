@@ -302,6 +302,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`DatePicker` writes the chip's date in `locale`.** The month name followed the date's own
   Luxon locale, so a German picker showed "15 Mar 2024"; it shows "15 März 2024". `DateTimePicker`
   gains the same
+- **`TimePicker` reports a change of `meridiem`, and keeps the zone of `initialTime`.** A new
+  AM or PM reported nothing until the next keystroke; it now reports the typed time in the new
+  half. Every value is `initialTime` with the typed hour and minute set on it, so it keeps that
+  date's seconds and time zone; it used to be parsed again in the local zone with the seconds
+  at zero. `DateTimePicker` reports a value equal to its current one only once
 - **A loading `Button` no longer repeats its `id` on the spinner.** The button passed its own
   `id` to the `track` loader, so while it loaded the page held two elements with that id. A
   loader without an `id` now gets a unique one, so its gradients stay apart from every other

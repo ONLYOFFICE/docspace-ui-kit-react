@@ -4,13 +4,7 @@ import type { DateTime } from "luxon";
 
 import { InputSize, InputType, TextInput } from "../text-input";
 
-import {
-  parseToDateTime,
-  formatDate,
-  startOf,
-  now,
-  parseWithFormat,
-} from "../../utils/date";
+import { parseToDateTime, formatDate, startOf, now } from "../../utils/date";
 
 import type { TimePickerProps } from "./TimePicker.types";
 import styles from "./TimePicker.module.scss";
@@ -75,18 +69,18 @@ const TimePicker = ({
     if (autoAdvance) blurMinutesInput();
   };
 
+  // The typed time is set on the held date, which keeps its day, seconds and
+  // zone. A 12-hour time needs the meridiem to know its half of the day.
   const report = (h: string, m: string) => {
-    const day = formatDate(date, "yyyy-MM-dd");
-    const newDate = parseWithFormat(`${day} ${h}:${m}`, "yyyy-MM-dd HH:mm");
-    if (newDate) setDate(newDate);
+    const half = meridiem?.toUpperCase();
+    if (isTwelveHourFormat && half !== "AM" && half !== "PM") return;
 
-    const parsedDate = isTwelveHourFormat
-      ? parseWithFormat(
-          `${day} ${h}:${m} ${meridiem ?? ""}`,
-          "yyyy-MM-dd hh:mm a",
-        )
-      : newDate;
-    if (parsedDate) onChange(parsedDate);
+    const hour = isTwelveHourFormat ? (+h % 12) + (half === "PM" ? 12 : 0) : +h;
+    const newDate = date.set({ hour, minute: +m });
+    if (!newDate.isValid) return;
+
+    setDate(newDate);
+    onChange(newDate);
   };
 
   const changeHours = (time: string) => {
@@ -109,6 +103,15 @@ const TimePicker = ({
     if (focusOnRender && hoursInputRef.current) hoursInputRef.current.select();
     mountRef.current = true;
   }, [focusOnRender]);
+
+  // A new meridiem moves the typed time to the other half of the day, so it
+  // is reported as a keystroke would be.
+  const reportedMeridiem = useRef(meridiem);
+  useEffect(() => {
+    if (reportedMeridiem.current === meridiem) return;
+    reportedMeridiem.current = meridiem;
+    if (isTwelveHourFormat) report(hours, minutes);
+  }, [meridiem]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const changeMinutes = (time: string) => {
     setMinutes(time);
