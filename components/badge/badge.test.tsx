@@ -17,6 +17,17 @@ describe("<Badge />", () => {
       expect(badgeElement).toBeInTheDocument();
     });
 
+    it("merges a passed style over its own", () => {
+      renderComponent({
+        label: "5",
+        height: "20px",
+        style: { marginInlineStart: "4px" },
+      });
+
+      const badge = screen.getByTestId("badge");
+      expect(badge).toHaveStyle({ height: "20px", marginInlineStart: "4px" });
+    });
+
     it("renders Badge with correct text", () => {
       renderComponent({ label: "Test Badge" });
       const badgeElement = screen.getByText("Test Badge");

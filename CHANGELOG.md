@@ -307,6 +307,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   half. Every value is `initialTime` with the typed hour and minute set on it, so it keeps that
   date's seconds and time zone; it used to be parsed again in the local zone with the seconds
   at zero. `DateTimePicker` reports a value equal to its current one only once
+- **`Badge` merges a passed `style` over its own.** The style was spread after the badge's own,
+  so it replaced `height`, `border`, `borderRadius` and the background colour as a whole; now
+  only the keys it names change
 - **`LinkWithDropdown` renders on a server and finds entries with a numeric `key`.** It read
   `window.orientation` while it was created, which threw where there is no `window`. An entry's
   `onClick` was looked up by comparing its `key` with a DOM attribute, so a numeric key never

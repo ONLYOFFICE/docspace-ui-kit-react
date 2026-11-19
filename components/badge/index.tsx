@@ -32,6 +32,7 @@ const Badge = (props: BadgeProps) => {
     isPaidBadge,
     isMutedBadge,
     dataTestId,
+    style,
     ...rest
   } = props;
 
@@ -52,6 +53,7 @@ const Badge = (props: BadgeProps) => {
     border,
     borderRadius,
     "--badge-background-color": backgroundColor,
+    ...style,
   } as React.CSSProperties;
 
   const innerStyle = isPaidBadge
