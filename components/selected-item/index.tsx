@@ -19,6 +19,7 @@ export const SelectedItemPure = (props: SelectedItemProps) => {
     isInline = true,
     className,
     id,
+    style,
     propKey,
     group,
     forwardedRef,
@@ -82,6 +83,7 @@ export const SelectedItemPure = (props: SelectedItemProps) => {
       onClick={handleOnClick}
       className={selectedItemClassNames}
       id={id}
+      style={style}
       ref={forwardedRef}
       data-testid={dataTestId ?? "selected-item"}
       title={title}
@@ -97,7 +99,9 @@ export const SelectedItemPure = (props: SelectedItemProps) => {
       <div className={labelClassNames}>{label}</div>
       {!hideCross ? (
         <IconButton
-          className={`selected-tag-removed ${classNameCloseButton}`}
+          className={["selected-tag-removed", classNameCloseButton]
+            .filter(Boolean)
+            .join(" ")}
           iconNode={<CrossReactSvgUrl />}
           size={12}
           onClick={onCloseClick}

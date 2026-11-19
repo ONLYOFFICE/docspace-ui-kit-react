@@ -107,8 +107,7 @@ const meta = {
     },
     style: {
       control: false,
-      description:
-        "Ignored. Nothing reads this prop; style the chip through `className` or the custom properties.",
+      description: "Inline style of the outermost element.",
     },
     clickable: {
       control: false,

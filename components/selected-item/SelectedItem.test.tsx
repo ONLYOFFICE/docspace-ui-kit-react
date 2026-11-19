@@ -55,6 +55,20 @@ describe("<SelectedItem />", () => {
     expect(onClick).not.toHaveBeenCalled();
   });
 
+  it("puts only the given classes on the cross", () => {
+    const { cross } = renderWithHandlers();
+
+    expect(cross.className).not.toMatch(/undefined/);
+  });
+
+  it("applies style to the chip", () => {
+    render(<SelectedItem {...baseProps} style={{ maxWidth: "120px" }} />);
+
+    expect(screen.getByTestId("selected-item")).toHaveStyle({
+      maxWidth: "120px",
+    });
+  });
+
   it("calls onClick when the label is clicked", () => {
     const { onClose, onClick } = renderWithHandlers();
 
