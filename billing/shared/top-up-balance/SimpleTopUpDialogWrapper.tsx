@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { isIOS } from "react-device-detect";
 
 import { useApi } from "../../../providers/api";
+import { toAbsoluteUrl } from "../../utils/url";
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
+import { getPromoCodeReturnUrls } from "../promo-code/promoCodeReturn";
 import SimpleTopUpDialog, {
   type SimpleTopUpDialogProps,
   type TSimpleTopUpDeps,
@@ -23,6 +26,7 @@ const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
     refreshTransactionHistory,
     language,
     walletBalance,
+    isCardLinkedToPortal,
   } = store;
   const {
     walletCustomerStatusNotActive,
@@ -43,6 +47,30 @@ const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
     return store.fetchCardLinked(backUrl, successUrl, false);
   };
 
+  const onClose = () => {
+    store.setTopUpDialogTab("purchase");
+    props.onClose();
+  };
+
+  useEffect(() => {
+    return () => {
+      store.setVisibleWalletSetting(false);
+    };
+  }, [store]);
+
+  const onLinkCard = async () => {
+    const { backUrl, successUrl } = getPromoCodeReturnUrls();
+
+    const linkUrl = await store.fetchCardLinked(backUrl, successUrl, false);
+
+    if (!linkUrl) throw new Error("Missing Stripe checkout URL");
+
+    const checkoutUrl = toAbsoluteUrl(linkUrl);
+
+    if (isIOS) window.location.href = checkoutUrl;
+    else window.open(checkoutUrl, "_blank");
+  };
+
   return (
     <SimpleTopUpDialog
       {...props}
@@ -58,6 +86,11 @@ const SimpleTopUpDialogWrapper: React.FC<SimpleTopUpDialogWrapperProps> = (
       fetchCardLinked={fetchCardLinked}
       walletBalance={walletBalance ?? 0}
       fetchCustomerInfo={fetchCustomerInfo}
+      applyPromoCode={store.applyPromoCode}
+      isCardLinked={isCardLinkedToPortal}
+      onLinkCard={onLinkCard}
+      initialTab={props.initialTab ?? store.topUpDialogTab}
+      onClose={onClose}
     />
   );
 };

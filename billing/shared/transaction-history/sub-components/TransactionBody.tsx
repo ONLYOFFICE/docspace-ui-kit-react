@@ -22,6 +22,7 @@ import styles from "../styles/TransactionHistory.module.scss";
 import TableView from "./TableView";
 import RowView from "./RowView";
 import { TokenUsageTooltip } from "./TokenUsage";
+import { BonusSplitTooltip } from "./BonusSplit/sub-components/BonusSplitTooltip";
 import { ByokMarkTooltip } from "./ByokMark/sub-components/ByokMarkTooltip";
 
 type TransactionHistoryProps = {
@@ -125,6 +126,7 @@ const TransactionBody = ({
     <div className={styles.transactionBodyWrapper} style={wrapperStyle}>
       {isTransactionHistoryExist ? renderContent : emptyView}
       <TokenUsageTooltip />
+      <BonusSplitTooltip />
       <ByokMarkTooltip />
     </div>
   );

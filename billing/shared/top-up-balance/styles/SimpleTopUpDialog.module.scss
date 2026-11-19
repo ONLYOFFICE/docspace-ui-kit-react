@@ -46,6 +46,15 @@
   margin-top: 6px;
 }
 
+.tabs {
+  --tabs-primary-bg: var(--modal-dialog-bg, var(--modal-dialog-bg-color));
+}
+
+.panel {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .footerButtons {
   display: flex;
   gap: 8px;

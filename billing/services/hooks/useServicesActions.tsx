@@ -13,7 +13,7 @@ export const useServicesActions = () => {
   const t = useCommonTranslation();
 
   const paymentStore = usePaymentStore();
-  const { walletBalance } = paymentStore;
+  const { availableCredits } = paymentStore;
   const {
     currentStoragePlanSize,
     hasScheduledStorageChange,
@@ -24,7 +24,7 @@ export const useServicesActions = () => {
   const maxStorageLimit = 9999;
 
   const isWalletBalanceInsufficient = (totalPrice: number): boolean => {
-    return walletBalance < totalPrice;
+    return availableCredits < totalPrice;
   };
 
   const isExceedingPlanLimit = (quantity: number, type = "storage") => {
