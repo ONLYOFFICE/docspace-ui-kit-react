@@ -717,7 +717,9 @@ the stylesheet reads neither, so setting them changes nothing.
   field, disabled rows and rows the selection limit disables are skipped - and scroll to them,
   and Enter or Space click the row, so a key does what the pointer does there: open a folder,
   pick an item, start "New folder". Enter on the row already picked in single select submits the
-  choice instead of unpicking it. Picking a row keeps the keyboard on it; only a new list (a
+  choice instead of unpicking it. On a row its checkbox alone ticks (`selectByCheckboxOnly`, a
+  folder that the row opens) Space is the box and Enter the row, so the folder can be both
+  ticked and opened without the pointer; a box the limit disables takes no Space. Picking a row keeps the keyboard on it; only a new list (a
   folder opened, a search run) starts again from its first row. The row is ringed only while the
   focus came from the keyboard. The Enter that opened a row does not also submit the selector.
   The row's own controls - the multi-select checkbox, the "New" row's button - are no Tab stops

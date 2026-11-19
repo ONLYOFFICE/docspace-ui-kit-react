@@ -81,6 +81,65 @@ describe("Selector list from the keyboard", () => {
     expect(getList()).not.toHaveAttribute("aria-multiselectable");
   });
 
+  describe("rows ticked by the checkbox only", () => {
+    const folders = [1, 2].map((n) => ({
+      id: `Folder-${n}`,
+      label: `Folder ${n}`,
+      isFolder: true,
+      selectByCheckboxOnly: true,
+    })) as TSelectorItem[];
+    const box = (index: number) =>
+      screen
+        .getAllByRole("option")
+        [index].querySelector("input[type='checkbox']") as HTMLInputElement;
+
+    // The box is no Tab stop inside the listbox: without Space such a row
+    // could be opened from the keyboard but never ticked.
+    it("ticks the row with Space and passes Enter on as a row click", async () => {
+      const { props } = await renderList({
+        items: folders,
+        totalItems: 2,
+        isMultiSelect: true,
+      });
+      const onSelect = vi.mocked(props.onSelect!);
+      const list = getList();
+      act(() => list.focus());
+      await waitFor(() => expect(activeOptionText()).toContain("Folder 1"));
+
+      fireEvent.keyDown(list, { key: " " });
+      await waitFor(() => expect(box(0).checked).toBe(true));
+      expect(onSelect.mock.calls[0][3]).toBe(true);
+
+      fireEvent.keyDown(list, { key: "Enter" });
+      await waitFor(() => expect(onSelect).toHaveBeenCalledTimes(2));
+      expect(onSelect.mock.calls[1][3]).toBeUndefined();
+      expect(box(0).checked).toBe(true);
+
+      fireEvent.keyDown(list, { key: " " });
+      await waitFor(() => expect(box(0).checked).toBe(false));
+    });
+
+    it("leaves Space on a folder at the limit without a tick", async () => {
+      const { props } = await renderList({
+        items: folders,
+        totalItems: 2,
+        isMultiSelect: true,
+        maxSelectedItems: 1,
+      });
+      fireEvent.click(box(0));
+      const list = getList();
+      act(() => list.focus());
+
+      fireEvent.keyDown(list, { key: "ArrowDown" });
+      await waitFor(() => expect(activeOptionText()).toContain("Folder 2"));
+      fireEvent.keyDown(list, { key: " " });
+      await act(async () => {});
+
+      expect(box(1).checked).toBe(false);
+      expect(props.onSelect).toHaveBeenCalledTimes(1);
+    });
+  });
+
   // An id naming no element is announced as nothing: the list points at the
   // keyboard's row only while react-window draws it, and again once it does.
   it("points at the keyboard's row only while it is drawn", async () => {

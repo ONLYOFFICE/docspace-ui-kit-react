@@ -431,11 +431,14 @@ const Body = ({
   // Clicks the row the keyboard is on. The keys scrolled it on screen, but the
   // wheel may have taken it away since, and react-window drew it out: it is
   // scrolled back and clicked once drawn, a few frames later at most.
-  const clickRow = (index: number) => {
+  // `box` clicks the row's checkbox in place of the row, for a row the box
+  // alone ticks: a box that is disabled takes no click, as under the pointer.
+  const clickRow = (index: number, box = false) => {
     const optionId = `${listboxId}-option-${index}`;
     const click = () => {
       const row = document.getElementById(optionId);
-      row?.click();
+      if (box) row?.querySelector<HTMLInputElement>(".checkbox input")?.click();
+      else row?.click();
       return !!row;
     };
     if (click()) return;
@@ -582,7 +585,14 @@ const Body = ({
             listItems[activeIndex]?.isSelected
           )
             return;
-          clickRow(activeIndex);
+          // A row its checkbox alone ticks (a folder that the row opens):
+          // Space is the box, Enter the row.
+          clickRow(
+            activeIndex,
+            e.key === " " &&
+              isMultiSelect &&
+              !!listItems[activeIndex]?.selectByCheckboxOnly,
+          );
           break;
         }
         default:
