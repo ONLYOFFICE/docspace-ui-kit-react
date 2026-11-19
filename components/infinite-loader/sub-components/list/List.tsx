@@ -53,6 +53,9 @@ const ListComponent = ({
 
     measure();
 
+    // jsdom has no ResizeObserver: a consumer's tests get one measurement.
+    if (typeof ResizeObserver === "undefined") return;
+
     const observer = new ResizeObserver(measure);
     observer.observe(container);
     return () => observer.disconnect();

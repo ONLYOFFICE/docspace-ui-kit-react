@@ -189,6 +189,20 @@ describe("ListComponent", () => {
     lists.forEach((holder) => holder.remove());
   });
 
+  it("measures a row list once where there is no ResizeObserver", () => {
+    vi.stubGlobal("ResizeObserver", undefined);
+    try {
+      render(<ListComponent {...defaultProps} />, { container: rowContainer });
+
+      expect(
+        rowContainer.querySelector<HTMLElement>(".ReactVirtualized__List")
+          ?.style.width,
+      ).toBe("1000px");
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it("calculates height from scroll element when WindowScroller height is undefined", () => {
     const customScroll = document.createElement("div");
     const spy = vi

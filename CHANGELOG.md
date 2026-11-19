@@ -375,8 +375,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **A `RowContainer` with any `id` gets rows of its own width.** The virtual list measured
   `document.getElementById("rowContainer")`, so another id laid the rows out zero wide and a
   second container took the first one's width. A `row` list of `InfiniteLoaderComponent` now
-  measures the element it sits in and follows it as it resizes; `table` and `tile` still look up
-  their ids
+  measures the element it sits in and follows it as it resizes, or measures it once where there is
+  no `ResizeObserver`, as in jsdom; `table` and `tile` still look up their ids
 - **`TableHeader` gives the free width to the wide column on a window resize.** When the columns
   stopped fitting, a resize handed it only to a `default` column that also set `minWidth`, and to
   any column with `minWidth` and `default: false`. The wide column could end at `0px` with the
