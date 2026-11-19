@@ -75,8 +75,13 @@ const SortButton = ({
     setIsOpen((val) => !val);
   }, []);
 
+  // Reports each change of the list's state, not the first render.
+  const reportedOpen = React.useRef(isOpen);
+
   React.useEffect(() => {
-    onSortButtonClick?.(!isOpen);
+    if (reportedOpen.current === isOpen) return;
+    reportedOpen.current = isOpen;
+    onSortButtonClick?.(isOpen);
   }, [isOpen, onSortButtonClick]);
 
   const onOptionClick = React.useCallback(

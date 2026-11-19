@@ -8,6 +8,10 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **`Filter`'s `onSortButtonClick` gets `true` when the sort menu opens and `false` when it
+  closes.** It got the opposite, and `true` once on mount. The first render now reports nothing.
+  A handler that relied on the old values, such as one that hides a button while the menu is open
+  with `setVisible(value)`, needs `setVisible(!value)`
 - **`Navigation`'s `hideInfoPanel` is a `boolean`.** It was typed as a callback but never called:
   any truthy value hid the info panel toggle, so passing the handler the type asked for hid the
   button. Pass `true` to hide it; a function no longer type-checks, and passing one still hides it

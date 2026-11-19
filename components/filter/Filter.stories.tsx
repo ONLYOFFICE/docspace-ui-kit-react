@@ -540,7 +540,7 @@ const meta = {
     onSortButtonClick: {
       action: "onSortButtonClick",
       description:
-        "Called with `false` when the sort menu opens and `true` when it closes, and with `true` on mount.",
+        "Called with `true` when the sort menu opens and `false` when it closes.",
     },
     sortByTitle: {
       control: "text",
