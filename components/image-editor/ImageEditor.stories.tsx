@@ -52,7 +52,7 @@ const meta = {
     isDisabled: {
       control: "boolean",
       description:
-        "Blocks dragging and zooming, and drops a file chosen through the replace control. Pass `false` when nothing is in flight.",
+        "Blocks dragging, zooming and the replace control's file dialog. Pass `false` when nothing is in flight.",
     },
     editorBorderRadius: {
       control: "number",
@@ -192,7 +192,7 @@ export const Default: Story = {
 
     // Choosing another image loads it as a File, which brings the zoom row.
     const input = canvasElement.querySelector(
-      "#customFileInput",
+      'input[type="file"]',
     ) as HTMLInputElement;
     const blob = await (await fetch(DefaultUserPhotoUrl)).blob();
     await userEvent.upload(
@@ -348,7 +348,7 @@ export const DisabledState: Story = {
     docs: {
       description: {
         story:
-          "The editor while a save is in flight: the zoom row is greyed out and the picture no longer drags. A file chosen through Choose another is dropped.",
+          "The editor while a save is in flight: the zoom row is greyed out and the picture no longer drags. Choose another opens no file dialog.",
       },
       source: {
         code: fileSource("  isDisabled"),

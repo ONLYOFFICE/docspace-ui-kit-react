@@ -8,6 +8,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **`ImageEditor`'s test ids are `data-testid`, and its file input has an id of its own.** The
+  outer element and the cropper wrapper carried `image-editor` and `image-cropper-wrapper` under
+  the misspelt `data-test-id`; select them with `getByTestId` now. The hidden input's fixed id
+  `customFileInput`, which a page's own upload input often carries too, is now generated per
+  editor: reach the input as the `input[type="file"]` inside the replace control
 - **`Filter`'s `onSortButtonClick` gets `true` when the sort menu opens and `false` when it
   closes.** It got the opposite, and `true` once on mount. The first render now reports nothing.
   A handler that relied on the old values, such as one that hides a button while the menu is open
@@ -316,6 +321,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`Avatar`'s badge colours can be set on an ancestor.** The avatar declared
   `--avatar-owner-fill`, `--avatar-administrator-fill` and their strokes on itself, so a value from
   above never reached the badge
+- **`ImageEditor` keeps the file dialog shut while `isDisabled`.** The replace control still opened
+  it, and the file chosen there was dropped
 - **`InfiniteLoader`'s row skeletons line up with the right edge in a right-to-left layout.** The
   rule that moves them named `.row-loade`, a class nothing carries
 - **`SelectionArea` reports at most once per animation frame, and a release cancels the report

@@ -24,7 +24,7 @@ export type ImageEditorProps = {
   Preview: React.ReactNode;
   /** Called, at most every 300ms, with the cropped picture as a `data:` URL. A canvas tainted by a cross-origin image makes it stop silently. */
   setPreview: TSetPreview;
-  /** Blocks dragging and zooming, and drops a file chosen through the replace control. Pass `false` when nothing is in flight. */
+  /** Blocks dragging, zooming and the replace control's file dialog. Pass `false` when nothing is in flight. */
   isDisabled: boolean;
   /** Added to the element that wraps the cropper and `Preview`. It is the hook for laying those two out side by side. */
   classNameWrapperImageCropper?: string;
@@ -54,7 +54,7 @@ export type ImageCropperProps = {
   setUploadedFile: (uploadedFile?: File) => void;
   /** Called with the cropped picture as a `data:` URL, throttled to every 300ms. */
   setPreviewImage: TSetPreview;
-  /** Blocks dragging and zooming, and drops a file chosen through the replace control. */
+  /** Blocks dragging, zooming and the replace control's file dialog. */
   isDisabled: boolean;
   /** Hides the zoom row and freezes the crop position. */
   disableImageRescaling?: boolean;

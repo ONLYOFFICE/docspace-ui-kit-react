@@ -29,12 +29,12 @@ const ImageEditor = ({
       className={className}
       role="region"
       aria-label="Image editor"
-      data-test-id="image-editor"
+      data-testid="image-editor"
     >
       {image.uploadedFile && !isDefaultAvatar ? (
         <div
           className={classNameWrapperImageCropper}
-          data-test-id="image-cropper-wrapper"
+          data-testid="image-cropper-wrapper"
         >
           <ImageCropper
             t={t}

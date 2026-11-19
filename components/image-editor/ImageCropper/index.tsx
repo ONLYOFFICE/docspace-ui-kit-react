@@ -29,6 +29,7 @@ const ImageCropper = ({
 }: ImageCropperProps) => {
   const editorRef = React.useRef<null | AvatarEditor>(null);
   const inputFilesElement = React.useRef<HTMLInputElement>(null);
+  const fileInputId = `${React.useId()}-image-editor-file`;
   const setEditorRef = (editor: AvatarEditor | null) => {
     editorRef.current = editor;
   };
@@ -130,7 +131,10 @@ const ImageCropper = ({
       </div>
       <div
         className={styles.iconCropperChangeButton}
-        onClick={() => inputFilesElement.current?.click()}
+        // A disabled editor would drop the file, so the dialog stays shut.
+        onClick={() => {
+          if (!isDisabled) inputFilesElement.current?.click();
+        }}
         title={t("Common:ChooseAnother")}
         data-testid="change_image_button"
       >
@@ -139,7 +143,7 @@ const ImageCropper = ({
           {t("Common:ChooseAnother")}
         </div>
         <input
-          id="customFileInput"
+          id={fileInputId}
           className="custom-file-input"
           type="file"
           onChange={handleChangeImage}
