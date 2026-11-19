@@ -51,6 +51,7 @@ import type {
   TGoodwill,
   TGoodwillLot,
   TInvoice,
+  TInvoiceInitiatorFilter,
   TPromoCodeResult,
   TInvoicesPage,
   TServiceUsage,
@@ -131,6 +132,7 @@ import PaymentQuotasStore from "./PaymentQuotasStore";
 export const TOTAL_SIZE = "total_size";
 
 const INVOICES_PAGE_SIZE = 25;
+const INVOICES_LOADER_DELAY = 500;
 
 export type TTransactionFilterContact = {
   id: string;
@@ -154,6 +156,12 @@ class PaymentStore {
   #rawApiClient: TApiClient;
 
   #openingInvoiceIds = new Set<number>();
+
+  #invoicesRequestId = 0;
+
+  #invoicesLoaderTimerId: ReturnType<typeof setTimeout> | null = null;
+
+  #isFetchingInvoices = false;
 
   private abortControllers: AbortController[] = [];
 
@@ -286,6 +294,16 @@ class PaymentStore {
 
   isLoadingMoreInvoices = false;
 
+  isInvoicesLoading = false;
+
+  invoiceFilterInitiator: TInvoiceInitiatorFilter = "all";
+
+  invoiceFilterStartDate: DateTime = (
+    subtractFromDate(now(), 4, "weeks") ?? now()
+  ).setLocale(getCookie(LANGUAGE) ?? "en");
+
+  invoiceFilterEndDate: DateTime = now().setLocale(getCookie(LANGUAGE) ?? "en");
+
   activeServices: TActiveService[] = [];
 
   autoPayments: TenantWalletSettings | null = null;
@@ -411,6 +429,8 @@ class PaymentStore {
       clearTimeout(this._transactionTimerId);
       this._transactionTimerId = null;
     }
+
+    this.#clearInvoicesLoaderTimer();
   };
 
   get isAlreadyPaid() {
@@ -810,7 +830,17 @@ class PaymentStore {
     const { data } = await this.#rawApiClient.instance.get(
       "api/2.0/portal/payment/customer/deposits",
       {
-        params: { status: "Completed", offset, limit: INVOICES_PAGE_SIZE },
+        params: {
+          status: "Completed",
+          startDate: this.formatDate(this.invoiceFilterStartDate, "start"),
+          endDate: this.formatDate(this.invoiceFilterEndDate, "end"),
+          initiator:
+            this.invoiceFilterInitiator === "all"
+              ? undefined
+              : this.invoiceFilterInitiator,
+          offset,
+          limit: INVOICES_PAGE_SIZE,
+        },
         signal: abortController.signal,
       },
     );
@@ -824,21 +854,47 @@ class PaymentStore {
     };
   };
 
+  #clearInvoicesLoaderTimer = () => {
+    if (this.#invoicesLoaderTimerId === null) return;
+
+    clearTimeout(this.#invoicesLoaderTimerId);
+    this.#invoicesLoaderTimerId = null;
+  };
+
   fetchInvoices = async () => {
+    const requestId = ++this.#invoicesRequestId;
+
+    this.#isFetchingInvoices = true;
+    this.#clearInvoicesLoaderTimer();
+    this.#invoicesLoaderTimerId = setTimeout(() => {
+      runInAction(() => {
+        if (requestId !== this.#invoicesRequestId) return;
+        this.#invoicesLoaderTimerId = null;
+        this.isInvoicesLoading = true;
+      });
+    }, INVOICES_LOADER_DELAY);
+
     try {
       const { collection, total } = await this.#requestInvoices(0);
+
+      if (requestId !== this.#invoicesRequestId) return;
 
       runInAction(() => {
         this.invoices = collection;
         this.invoicesTotal = total;
       });
     } catch (error: unknown) {
+      if (requestId !== this.#invoicesRequestId) return;
       if (error instanceof Error && error.name === "CanceledError") return;
       toastr.error(error as Error);
     }
 
+    this.#clearInvoicesLoaderTimer();
+    this.#isFetchingInvoices = false;
+
     runInAction(() => {
       this.isInitInvoices = true;
+      this.isInvoicesLoading = false;
     });
   };
 
@@ -846,8 +902,41 @@ class PaymentStore {
     await this.fetchInvoices();
   };
 
+  get isInvoiceFilterModified(): boolean {
+    return (
+      this.invoiceFilterInitiator !== "all" ||
+      !isSameDay(this.invoiceFilterStartDate, this.defaultFilterStartDate) ||
+      !isSameDay(this.invoiceFilterEndDate, this.defaultFilterEndDate)
+    );
+  }
+
+  setInvoiceFilterInitiator = (initiator: TInvoiceInitiatorFilter) => {
+    this.invoiceFilterInitiator = initiator;
+  };
+
+  setInvoiceFilterStartDate = (date: DateTime) => {
+    this.invoiceFilterStartDate = date;
+  };
+
+  setInvoiceFilterEndDate = (date: DateTime) => {
+    this.invoiceFilterEndDate = date;
+  };
+
+  resetInvoiceFilter = () => {
+    this.invoiceFilterInitiator = "all";
+    this.invoiceFilterStartDate = this.defaultFilterStartDate;
+    this.invoiceFilterEndDate = this.defaultFilterEndDate;
+  };
+
   fetchMoreInvoices = async () => {
-    if (this.isLoadingMoreInvoices || !this.hasMoreInvoices) return;
+    if (
+      this.isLoadingMoreInvoices ||
+      this.#isFetchingInvoices ||
+      !this.hasMoreInvoices
+    )
+      return;
+
+    const requestId = this.#invoicesRequestId;
 
     this.isLoadingMoreInvoices = true;
 
@@ -855,6 +944,8 @@ class PaymentStore {
       const { collection, total } = await this.#requestInvoices(
         this.invoices.length,
       );
+
+      if (requestId !== this.#invoicesRequestId) return;
 
       runInAction(() => {
         this.invoices = [...this.invoices, ...collection];

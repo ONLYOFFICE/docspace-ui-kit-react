@@ -31,6 +31,9 @@ type FilterPanelProps = {
   clearFilter: () => void;
   shouldShowClearButton: boolean;
   hideTypeFilter?: boolean;
+  periodLabel?: string;
+  typeComboboxTestId?: string;
+  typeDropdownTestId?: string;
 };
 
 const FilterPanel = ({
@@ -48,6 +51,9 @@ const FilterPanel = ({
   clearFilter,
   shouldShowClearButton,
   hideTypeFilter,
+  periodLabel,
+  typeComboboxTestId = "transaction_type_combobox",
+  typeDropdownTestId = "transaction_type_dropdown",
 }: FilterPanelProps) => {
   const t = useCommonTranslation();
   return (
@@ -89,8 +95,8 @@ const FilterPanel = ({
                   showDisabledItems
                   size={ComboBoxSize.content}
                   scaled
-                  dataTestId="transaction_type_combobox"
-                  dropDownTestId="transaction_type_dropdown"
+                  dataTestId={typeComboboxTestId}
+                  dropDownTestId={typeDropdownTestId}
                 />
               </div>
               <div className={styles.filterDialogDivider} />
@@ -98,17 +104,21 @@ const FilterPanel = ({
           ) : null}
           <div className={styles.filterDialogSection}>
             <Text fontWeight={600} fontSize="15px">
-              {t("TransactionPeriod")}
+              {periodLabel ?? t("TransactionPeriod")}
             </Text>
             <div>{datesComponent}</div>
           </div>
-          <div className={styles.filterDialogDivider} />
-          <div className={styles.filterDialogSection}>
-            <Text fontWeight={600} fontSize="15px">
-              {t("Contact")}
-            </Text>
-            <div>{contactSelector}</div>
-          </div>
+          {contactSelector ? (
+            <>
+              <div className={styles.filterDialogDivider} />
+              <div className={styles.filterDialogSection}>
+                <Text fontWeight={600} fontSize="15px">
+                  {t("Contact")}
+                </Text>
+                <div>{contactSelector}</div>
+              </div>
+            </>
+          ) : null}
         </div>
       </ModalDialog.Body>
       <ModalDialog.Footer>

@@ -41,6 +41,18 @@ describe("<DropDown />", () => {
     expect(screen.getByTestId("child")).toHaveTextContent("Test Content");
   });
 
+  it("renders as a named dialog when asked to", () => {
+    render(
+      <DropDown {...baseProps} open role="dialog" ariaLabel="Key">
+        <button type="button">Lock now</button>
+      </DropDown>,
+    );
+
+    expect(screen.getByRole("dialog", { name: "Key" })).toContainElement(
+      screen.getByRole("button", { name: "Lock now" }),
+    );
+  });
+
   it("applies correct directional classes", () => {
     render(
       <DropDown {...baseProps} open directionY="top" directionX="right">

@@ -31,6 +31,8 @@ import styles from "./styles/Wallet.module.scss";
 import BalanceAmount from "../shared/balance-amount";
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useServicesStore } from "../store/ServicesStoreProvider";
+import useDeviceType from "../hooks/useDeviceType";
+import { DeviceType } from "../../enums";
 import { getBrandName } from "../../constants/brands";
 import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
 import type { TopUpTab } from "../shared/top-up-balance/SimpleTopUpDialog";
@@ -61,9 +63,16 @@ type WalletProps = {
 };
 
 const Wallet = (props: WalletProps) => {
-  const { isMobile, onViewUsage, onAddonsClick } = props;
+  const { onViewUsage, onAddonsClick } = props;
 
   const store = usePaymentStore();
+
+  const currentDeviceType = useDeviceType({
+    mobile: store.mobileBreakpoint,
+    desktop: store.desktopBreakpoint,
+  });
+
+  const isMobile = props.isMobile ?? currentDeviceType === DeviceType.mobile;
   const { walletMonthToDateSpend, walletMonthToDatePromoSpend } =
     useServicesStore();
   const promoSpend = walletMonthToDatePromoSpend ?? 0;

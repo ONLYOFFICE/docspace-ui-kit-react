@@ -203,8 +203,13 @@ export type TInvoice = {
   amount: number;
   currency: string;
   status: TInvoiceStatus;
+  initiator: TInvoiceInitiator | null;
   hasInvoice: boolean;
 };
+
+export type TInvoiceInitiator = "Manual" | "Automatic";
+
+export type TInvoiceInitiatorFilter = TInvoiceInitiator | "all";
 
 export type TInvoicesPage = {
   collection: TInvoice[];
