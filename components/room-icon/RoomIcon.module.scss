@@ -195,7 +195,10 @@
   justify-content: center;
   bottom: -6px;
   border-radius: 50%;
-  background-color: var(--accent-main);
+  background-color: var(
+    --accent-main,
+    var(--color-scheme-main-accent, #{colors.$light-blue-main})
+  );
 
   :global(.light) & {
     --room-icon-fill: #{colors.$white};

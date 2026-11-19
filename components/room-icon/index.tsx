@@ -349,7 +349,8 @@ const RoomIcon = ({
           </div>
         ) : null}
 
-        {withEditing && !isArchive ? (
+        {/* The empty state's plus already opens the menu, in this corner. */}
+        {withEditing && !isArchive && !(isEmptyIcon && !isTemplate) ? (
           <div
             className={classNames(styles.editWrapper, styles.size20, {
               [styles.rtl]: isRTL,

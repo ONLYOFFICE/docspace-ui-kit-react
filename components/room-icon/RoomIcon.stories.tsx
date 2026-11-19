@@ -85,7 +85,7 @@ const meta = {
     withEditing: {
       control: "boolean",
       description:
-        "Adds the pencil button and the menu it opens. It also makes the tile 64px wide at the least.",
+        "Adds the pencil button and the menu it opens; the empty state keeps its plus instead. It also makes the tile 64px wide at the least.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -385,17 +385,20 @@ export const EmptyState: Story = {
   play: async ({ canvas, userEvent }: PlayContext) => {
     const icon = canvas.getByTestId("room-icon");
     await expect(canvas.getByTestId("empty-icon")).toBeInTheDocument();
+    const plus = icon.querySelector(".open-plus-logo-icon") as HTMLElement;
+    // The plus circle is the accent colour without the portal too.
+    await expect(
+      getComputedStyle(plus.parentElement as HTMLElement).backgroundColor,
+    ).not.toBe("rgba(0, 0, 0, 0)");
     // The plus button opens the same logo menu.
-    await userEvent.click(
-      icon.querySelector(".open-plus-logo-icon") as HTMLElement,
-    );
+    await userEvent.click(plus);
     await waitFor(() => expect(isMenuOpen()).toBe(true));
   },
   parameters: {
     docs: {
       description: {
         story:
-          "A dashed frame with a camera glyph, for a room with no logo yet (`isEmptyIcon`). Its corner plus button opens the logo menu (`model`). The button's circle takes the portal's accent colour, so here it has none.",
+          "A dashed frame with a camera glyph, for a room with no logo yet (`isEmptyIcon`). Its corner plus button opens the logo menu (`model`) and sits on a circle in the accent colour.",
       },
       source: {
         code: `<RoomIcon title="" size="96px" isEmptyIcon model={menuModel} />`,

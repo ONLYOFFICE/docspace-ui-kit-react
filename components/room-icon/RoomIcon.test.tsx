@@ -63,6 +63,16 @@ describe("<RoomIcon />", () => {
     expect(screen.getByTestId("icon-button")).toBeInTheDocument();
   });
 
+  it("draws the plus alone, and one menu, when empty and editable", () => {
+    render(
+      <RoomIcon {...baseProps} isEmptyIcon withEditing model={mockModel} />,
+    );
+    expect(screen.getAllByTestId("icon-button")).toHaveLength(1);
+
+    fireEvent.click(screen.getByTestId("icon-button"));
+    expect(screen.getAllByText(mockModel[0].label)).toHaveLength(1);
+  });
+
   it("renders edit mode correctly", () => {
     render(<RoomIcon {...baseProps} withEditing model={mockModel} />);
     const editButton = screen.getByTestId("icon-button");
