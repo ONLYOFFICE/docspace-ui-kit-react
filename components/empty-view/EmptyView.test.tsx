@@ -103,6 +103,15 @@ describe("EmptyView", () => {
     expect(description).toHaveClass(styles.subheading);
   });
 
+  it("adds no banner landmark to the page", () => {
+    renderComponent(mockProps);
+
+    expect(screen.queryByRole("banner")).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Test Title" }),
+    ).toBeInTheDocument();
+  });
+
   it("renders icon when provided", () => {
     const { container } = renderComponent(mockProps);
 

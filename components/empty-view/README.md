@@ -208,9 +208,8 @@ items have no override either.
 
 ## Accessibility
 
-- The title renders as an `<h3>` and the description as a `<p>`, inside a `<header>` element.
-  Outside a `main`, `section` or `article` that `<header>` is a `banner` landmark, so place the
-  view inside your own region.
+- The title renders as an `<h3>` and the description as a `<p>`, inside a plain `<div>`. The view
+  adds no landmark of its own.
 - An item is a `<div role="button" tabIndex={0}>` with its `title` as the `aria-label`, so it is
   in the Tab order and announced by its title.
 - Enter and Space activate an item as a click does. `onClick` receives a click event, and an item

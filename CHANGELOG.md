@@ -8,6 +8,10 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **`EmptyView`'s title and description sit in a `<div>`, not a `<header>`.** Outside a `main`,
+  `section` or `article` the `<header>` was a `banner` landmark, a second one beside the page's
+  own. The view now adds no landmark; a selector for `header` inside it finds nothing, while the
+  class stays
 - **`SearchInput`'s `id` is on the `<input>` alone.** It was set on the outer `<div>` too, so the
   page held the id twice and a `<label htmlFor>` or a `FieldContainer`'s `labelFor` found the
   `<div>` first and named nothing. The label now names the field. A selector or a test that
