@@ -307,6 +307,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   half. Every value is `initialTime` with the typed hour and minute set on it, so it keeps that
   date's seconds and time zone; it used to be parsed again in the local zone with the seconds
   at zero. `DateTimePicker` reports a value equal to its current one only once
+- **`RadioButtonGroup` takes several captions.** Every `type: "text"` entry had the key
+  `radio-text`, so a second caption collided with the first; each is keyed by its position now
 - **A loading `Button` no longer repeats its `id` on the spinner.** The button passed its own
   `id` to the `track` loader, so while it loaded the page held two elements with that id. A
   loader without an `id` now gets a unique one, so its gradients stay apart from every other

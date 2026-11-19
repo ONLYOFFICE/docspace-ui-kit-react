@@ -15,7 +15,7 @@ export type TRadioButtonOption = {
   disabled?: boolean;
   /**
    * `"text"` renders a caption inside the group instead of a button, as a
-   * heading above the options or between two runs of them. One per group.
+   * heading above the options or between two runs of them.
    */
   type?: "text" | "radio";
   /** Whether this option's input takes focus on mount. */

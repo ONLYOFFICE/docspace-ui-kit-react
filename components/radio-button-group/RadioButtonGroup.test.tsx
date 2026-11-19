@@ -43,6 +43,27 @@ describe("<RadioButtonGroup />", () => {
     });
   });
 
+  it("renders several captions without a key collision", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    render(
+      <RadioButtonGroup
+        {...baseProps}
+        options={[
+          { value: "fruit", type: "text", label: "Fruit" },
+          { value: "apple", label: "Sweet apple" },
+          { value: "vegetable", type: "text", label: "Vegetables" },
+          { value: "carrot", label: "Carrot" },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Fruit")).toBeInTheDocument();
+    expect(screen.getByText("Vegetables")).toBeInTheDocument();
+    expect(error.mock.calls.flat().join(" ")).not.toMatch(/same key/);
+    error.mockRestore();
+  });
+
   it("accepts and applies custom id", () => {
     render(<RadioButtonGroup {...baseProps} id="test-id" />);
     expect(screen.getByTestId("radio-button-group")).toHaveAttribute(
