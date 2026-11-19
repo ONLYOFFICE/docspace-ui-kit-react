@@ -5,13 +5,22 @@ import { useEffect, useRef } from "react";
 import { useStores } from "@onlyoffice/ai-chat";
 
 import { useApi } from "../../../providers/api";
-import { useContextRooms, useSyncedContextRoom } from "./index";
+import {
+  useContextRooms,
+  useSyncedContextRoom,
+  type SyncedContextRoom,
+} from "./index";
 
 // DocSpace is a single cloud to the chat library. The AI service lists the
 // Instructions rooms under the same label (`CONTEXT_CLOUD` in ASC.AI.Chat),
 // so the room connected here and a room picked from the list compare
 // equal; the label itself is never shown, the menu skips the cloud level.
 export const CONTEXT_ROOM_CLOUD = "docspace";
+
+// The rooms a sync connected, by the provider's sync key holder: they
+// outlive the chat pane as the key does. A sync whose rooms held no skills
+// connected none.
+const connectedBySync = new WeakMap<SyncedContextRoom, string[]>();
 
 /**
  * Connects the rooms the host offers (the room the user is in, or an AI
@@ -24,7 +33,9 @@ export const CONTEXT_ROOM_CLOUD = "docspace";
  * it if it holds a `.ai` folder: one `GET /files/rooms/{id}/ai` decides. The
  * skills themselves are then read by the library's clouds store through the
  * AI service. Leaving the rooms it connected for a place without such a
- * room drops the connection. Nothing else is taken away: on its first sync,
+ * room disconnects those rooms, and those alone: a skill set the user
+ * picked beside them stays, and so does every skill set when the sync had
+ * connected none. Nothing else is taken away: on its first sync,
  * or coming from a place with no such room, the skill sets the chat has
  * (the ones it brought back for the open conversation, or the user's own
  * picks) stay as they are.
@@ -78,15 +89,19 @@ const ContextRoomSync = () => {
       return undefined;
     }
 
-    // Only rooms this sync connected are its to take away: the previous
-    // key is a set of rooms it was handed. `undefined` (no sync yet, or one
-    // whose check never landed) and `null` (a place with no such room) left
-    // nothing of its own connected.
+    // Only rooms this sync connected are its to take away. A first sync,
+    // one whose check never landed, a place with no such room and rooms
+    // that held no skills all left nothing of its own connected.
     const previous = synced.current;
-    const leavesOwnRooms = typeof previous === "string";
+    const dropOwnRooms = (store: typeof clouds) => {
+      for (const id of connectedBySync.get(synced) ?? []) {
+        store.deselectContextFolder(CONTEXT_ROOM_CLOUD, id);
+      }
+      connectedBySync.delete(synced);
+    };
     synced.current = here;
     if (rooms.length === 0) {
-      if (leavesOwnRooms) clouds.clearContextFolder();
+      dropOwnRooms(clouds);
       return undefined;
     }
 
@@ -100,7 +115,7 @@ const ContextRoomSync = () => {
       const current = useCloudsStore.getState();
       const withSkills = rooms.filter((_, index) => flags[index]);
       if (withSkills.length === 0) {
-        if (leavesOwnRooms) current.clearContextFolder();
+        dropOwnRooms(current);
         return;
       }
       // The store reads the skills of a changed list itself (it compares
@@ -116,6 +131,10 @@ const ContextRoomSync = () => {
             item.room.name === withSkills[index].name,
         );
       current.selectContextFolders(CONTEXT_ROOM_CLOUD, withSkills);
+      connectedBySync.set(
+        synced,
+        withSkills.map((room) => room.id),
+      );
       if (unchanged) {
         void current.fetchRoomSkills();
       }
