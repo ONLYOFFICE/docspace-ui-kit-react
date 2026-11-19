@@ -83,12 +83,8 @@ export const BaseTile = ({
       }
     : undefined;
 
-  const getOptions = () => {
-    if (tileContextClick) {
-      tileContextClick();
-    }
-    return contextOptions;
-  };
+  // The button's onClick reports the click through onContextMenu.
+  const getOptions = () => contextOptions;
 
   const changeCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
     onSelect?.(e.target.checked, item);

@@ -219,8 +219,7 @@ export function TileWithMenu() {
   whether the button is drawn. Without it the button opens nothing.
 - **A right-click always stops propagation and calls `tileContextClick(true)`.** Without
   `getContextModel` it swallows the browser's menu and shows none.
-- **A click on the three-dot button calls `tileContextClick` twice**: once with no argument as it
-  reads the options, then with `false`.
+- A click on the three-dot button calls `tileContextClick(false)` once.
 - **A right-click also clicks `forwardRef`.** Before the menu is mounted, the component
   calls `.click()` on whatever that ref points at. It attaches the ref to nothing itself, so this
   fires a click on an element you own.

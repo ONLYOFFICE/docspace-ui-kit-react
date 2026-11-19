@@ -347,9 +347,9 @@ describe("FolderTile", () => {
     const button = screen.getByTestId("context-menu-button");
     fireEvent.click(button);
 
-    // tileContextClick is called once in getOptions (getData)
-    // and once in onContextMenu (onClick)
-    expect(tileContextClick).toHaveBeenCalled();
+    // Once, as a click rather than a right-click.
+    expect(tileContextClick).toHaveBeenCalledTimes(1);
+    expect(tileContextClick).toHaveBeenCalledWith(false);
   });
 
   it("calls forwardRef.current.click when context menu is opened and menuRef is null", () => {

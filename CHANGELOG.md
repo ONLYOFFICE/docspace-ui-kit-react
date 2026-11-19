@@ -301,6 +301,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **A click on a tile's three-dot button calls `tileContextClick` once.** `BaseTile`, `FileTile`
+  and `FolderTile` called it as the button read its options, with no argument, and again with
+  `false` as it reported the click. Only the second call is left
 - **`FileTile`'s `isBlockingOperation` turns the pointer off.** Its rule matched only a descendant
   of the tile, so hover, clicks and right-clicks still reached a blocked file. The dead
   `contextButtonSpacerWidth` and `sideColor` no longer reach the DOM as unknown attributes
