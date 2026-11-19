@@ -313,6 +313,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`TableRow` and `TableBody` add no class named `undefined`.** `hideColumns` and the body's
   `infoPanelVisible` each looked up a class their stylesheet does not define. The props change
   nothing else
+- **`RowContent` adds no class named `undefined`.** `sectionWidth` looked up a class its
+  stylesheet does not define; the prop changes nothing else
 - **`Article` survives a `showArticle` value in local storage that is not JSON.** The parse ran
   unguarded in an effect, so such a value threw on mount and on every device change. It now
   counts as its raw text, and storage that cannot be read counts as an absent key

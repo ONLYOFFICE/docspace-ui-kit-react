@@ -20,10 +20,7 @@ export type RowContentProps = {
   sideColor?: string;
   /** Applied to the content element, and again to the title's wrapper. */
   style?: React.CSSProperties;
-  /**
-   * Changes nothing on screen: a non-zero value adds a class that no style
-   * reads.
-   */
+  /** Changes nothing on screen; nothing reads it. */
   sectionWidth?: number;
   /**
    * Whether the last side element is joined into the line as text like the
