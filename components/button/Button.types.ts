@@ -62,15 +62,18 @@ type BaseButtonProps = PropsWithChildren<{
 }>;
 
 /** Props for the Button component */
-export type ButtonProps = BaseButtonProps & {
-  /** Overwritten by `label` on every render, so a value passed here never
-   * reaches the button. */
-  "aria-label"?: string;
-  /** Overwritten on every render: `true` while `isDisabled`, absent otherwise. */
-  "aria-disabled"?: "true" | "false";
-  /** Overwritten on every render: `true` while `isLoading`, absent otherwise. */
-  "aria-busy"?: "true" | "false";
-  /** Text of a tooltip shown below the button on hover. The button renders it
-   * itself, apart from the `title` tooltip. */
-  tooltipText?: string;
-};
+export type ButtonProps = BaseButtonProps &
+  Omit<React.AriaAttributes, "aria-label" | "aria-disabled" | "aria-busy"> & {
+    /** Accessible name of the button, in place of `label`. Names an icon-only
+     * button. */
+    "aria-label"?: string;
+    /** Marks the button disabled to assistive technology while it stays
+     * focusable and clickable. `isDisabled` sets it to `true` over this value. */
+    "aria-disabled"?: React.AriaAttributes["aria-disabled"];
+    /** Marks the button busy to assistive technology. `isLoading` sets it to
+     * `true` over this value. */
+    "aria-busy"?: React.AriaAttributes["aria-busy"];
+    /** Text of a tooltip shown below the button on hover. The button renders it
+     * itself, apart from the `title` tooltip. */
+    tooltipText?: string;
+  };

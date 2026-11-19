@@ -161,6 +161,23 @@ describe("FloatingButton", () => {
       ).toBeInTheDocument();
     });
 
+    it("keeps a passed aria-* on the circle, its aria-label over label", () => {
+      renderComponent(
+        <FloatingButton
+          {...defaultProps}
+          onClick={vi.fn()}
+          label="Uploads"
+          aria-label="Uploading 3 files"
+          aria-describedby="upload-hint"
+        />,
+      );
+      const button = screen.getByRole("button", { name: "Uploading 3 files" });
+      expect(button).toHaveAttribute("aria-describedby", "upload-hint");
+      expect(
+        screen.getByRole("progressbar", { name: "Uploading 3 files" }),
+      ).not.toHaveAttribute("aria-describedby");
+    });
+
     it("reports the percent through a progress bar", () => {
       const { rerender } = renderComponent(
         <FloatingButton {...defaultProps} percent={45} />,

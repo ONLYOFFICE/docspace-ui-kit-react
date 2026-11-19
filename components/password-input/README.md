@@ -358,8 +358,10 @@ is a fixed `320px` and the variable is not read.
 - Colour is the only signal that a rule now passes.
 - The field has no label of its own. Use [`FieldContainer`](../field-container/README.md) or
   [`Label`](../label/README.md) with `htmlFor` pointing at `id`.
-- **An `aria-*` you pass is dropped.** The type accepts the input's attributes, but the component
-  hands the field only the props it names. A `<label>` pointing at `id` is the way to name it.
+- **A passed `aria-*` lands on the `<input>` and is kept.** The component sets none of its own
+  there, so `aria-label` names the field and `aria-describedby` can point at your own rules text.
+- Any other input attribute the type accepts, such as `required`, is dropped: the component hands
+  the field only the props it names.
 - **`isSimulateType` puts the password into a `type="text"` field.** Password managers, the
   browser's own reveal control and assistive technology all treat it as ordinary text; avoid it
   where a real password field will do.

@@ -17,6 +17,24 @@ describe("<SearchInput />", () => {
     expect(screen.getByTestId("search-input")).toBeInTheDocument();
   });
 
+  it("forwards a passed aria-* to the <input>, not the wrapper", () => {
+    render(
+      <SearchInput
+        {...baseProps}
+        id="filter_search-input"
+        aria-label="Search files"
+        aria-controls="file-list"
+      />,
+    );
+
+    const input = screen.getByRole("textbox", { name: "Search files" });
+    expect(input).toHaveAttribute("aria-controls", "file-list");
+    expect(input).toHaveAttribute("id", "filter_search-input");
+    const wrapper = screen.getByTestId("search-input");
+    expect(wrapper).not.toHaveAttribute("aria-label");
+    expect(wrapper).not.toHaveAttribute("aria-controls");
+  });
+
   it("renders with different sizes", () => {
     const { rerender } = render(
       <SearchInput {...baseProps} size={InputSize.base} />,

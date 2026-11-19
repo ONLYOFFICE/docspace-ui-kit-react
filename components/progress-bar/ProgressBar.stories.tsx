@@ -21,7 +21,11 @@ const meta = {
     label: {
       control: "text",
       description:
-        "Line of text above the bar, and the bar's `aria-label`; without it the bar has no accessible name. A truncated label shows in full in the kit's tooltip.",
+        "Line of text above the bar, and the bar's accessible name unless `aria-label` is passed. A truncated label shows in full in the kit's tooltip.",
+    },
+    "aria-label": {
+      control: false,
+      description: "Accessible name of the bar, in place of `label`.",
     },
     isInfiniteProgress: {
       control: "boolean",

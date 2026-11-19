@@ -1,4 +1,13 @@
-export type SliderProps = {
+export type SliderProps = Omit<
+  React.AriaAttributes,
+  | "aria-label"
+  | "aria-labelledby"
+  | "aria-describedby"
+  | "aria-valuetext"
+  | "aria-valuenow"
+  | "aria-valuemin"
+  | "aria-valuemax"
+> & {
   /** Applied to the input. */
   id?: string;
 

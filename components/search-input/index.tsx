@@ -17,6 +17,8 @@ import { MainButton } from "../main-button";
 import { InputBlock } from "../input-block";
 import { InputType } from "../text-input";
 
+import { pickAriaProps } from "../../utils/aria-props";
+
 import styles from "./SearchInput.module.scss";
 import { SearchInputProps } from "./SearchInput.types";
 
@@ -46,6 +48,7 @@ const SearchInput = ({
   mainButtonIcon = <PlusIconSvg />,
   mainButtonDataTestId,
   hideField = false,
+  ...rest
 }: SearchInputProps) => {
   const [inputValue, setInputValue] = useState(value);
 
@@ -165,6 +168,7 @@ const SearchInput = ({
       {hideField ? null : (
         <div className={styles.searchInputField}>
           <InputBlock
+            {...pickAriaProps(rest)}
             className="search-input-block"
             forwardedRef={forwardedRef}
             onClick={onClick}

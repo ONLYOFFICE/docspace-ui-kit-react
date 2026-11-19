@@ -1,6 +1,6 @@
 import type React from "react";
 
-export type LabelProps = {
+export type LabelProps = React.AriaAttributes & {
   /**
    * Appends a red asterisk, hidden from assistive technology, to the text. It
    * does not mark the field itself — put `required` on your input too.

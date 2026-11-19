@@ -71,7 +71,7 @@ export type ActionOption = {
   description?: React.ReactNode;
 };
 
-export type MainButtonMobileProps = {
+export type MainButtonMobileProps = React.AriaAttributes & {
   /** Handle exposing `contains` and `getButtonElement`, for deciding whether a click landed on the button. */
   ref?: React.RefObject<MainButtonMobileRef>;
   /** Merged into the wrapper's inline style, after the z-index the component sets itself. */

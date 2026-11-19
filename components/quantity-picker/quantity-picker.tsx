@@ -9,6 +9,7 @@ import { Slider } from "../slider";
 import { TextInput } from "../text-input";
 import { InputType } from "../text-input";
 import { TabItem } from "../tab-item";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import styles from "./quantity-picker.module.scss";
 
@@ -19,7 +20,7 @@ interface TabItemObject {
   value: number;
 }
 
-type QuantityPickerProps = {
+type QuantityPickerProps = React.AriaAttributes & {
   /** The number shown. The component is controlled: pass back what `onChange` reports */
   value: number;
   /** Lower bound for the controls, typed input and slider */
@@ -103,7 +104,9 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
   minusDisabled,
   decreaseLabel,
   increaseLabel,
+  ...rest
 }) => {
+  const aria = pickAriaProps(rest);
   const enableZero = enableZeroProp ?? isZeroAllowed ?? false;
 
   const displayValue = showPlusSign
@@ -314,9 +317,12 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
         )}
 
         {isDisabled ? (
-          <Text className={inputClass}>{disableValue ?? displayValue}</Text>
+          <Text {...aria} className={inputClass}>
+            {disableValue ?? displayValue}
+          </Text>
         ) : (
           <TextInput
+            {...aria}
             type={InputType.text}
             isReadOnly={isDisabled}
             withBorder={false}

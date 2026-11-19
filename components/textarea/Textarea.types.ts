@@ -1,6 +1,9 @@
 import { ChangeEvent, KeyboardEvent } from "react";
 
-export type TextareaProps = {
+export type TextareaProps = Omit<
+  React.AriaAttributes,
+  "aria-label" | "aria-labelledby" | "aria-describedby"
+> & {
   /** Applied to the scrollbar around the textarea, not to the textarea itself. */
   className?: string;
   /** Applied to the outer wrapper that carries the height and the copy icon. */
@@ -38,9 +41,8 @@ export type TextareaProps = {
   /** Place of the field in the tab order. Left out, the field takes its natural
    * place; pass `-1` only for a field the keyboard should skip. */
   tabIndex?: number;
-  /** Accessible name of the field, for when no `<label>` points at it. Declared
-   * as a prop because this type is closed and accepts no arbitrary DOM
-   * attributes; `id` with a `<label for>` names the field just as well. */
+  /** Accessible name of the field, for when no `<label>` points at it. `id`
+   * with a `<label for>` names the field just as well. */
   "aria-label"?: string;
   /** `id` of the element that names this field, the usual choice when the
    * caption is already on screen. */

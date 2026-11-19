@@ -1,6 +1,7 @@
 import { Text } from "../text";
 
 import type { LabelProps } from "./Label.types";
+import { pickAriaProps } from "../../utils/aria-props";
 import { globalColors } from "../../providers/theme";
 
 const Label = (props: LabelProps) => {
@@ -23,6 +24,7 @@ const Label = (props: LabelProps) => {
 
   return (
     <Text
+      {...pickAriaProps(props)}
       as="label"
       id={id}
       style={style}

@@ -57,6 +57,23 @@ describe("<LoadingButton />", () => {
     expect(bar).not.toHaveAttribute("aria-valuenow");
   });
 
+  it("keeps a passed aria-* on the progress bar, its aria-label over progressLabel", () => {
+    render(
+      <LoadingButton
+        percent={40}
+        progressLabel="Progress"
+        aria-label="Uploading report.docx"
+        aria-describedby="upload-hint"
+        aria-valuenow={10}
+      />,
+    );
+    const bar = screen.getByRole("progressbar", {
+      name: "Uploading report.docx",
+    });
+    expect(bar).toHaveAttribute("aria-describedby", "upload-hint");
+    expect(bar).toHaveAttribute("aria-valuenow", "40");
+  });
+
   it("applies id, className and style to the square", () => {
     render(
       <LoadingButton id="upload-1" className="mine" style={{ margin: 4 }} />,

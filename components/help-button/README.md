@@ -126,6 +126,8 @@ Declared by [`components/icon-button`](../../components/icon-button/README.md) a
 | `tabIndex`      | `number`                                           | no       | –       | Tab order of the button. Passing it switches off the built-in keyboard support that an enabled button with `onClick` gets.                             |
 | `title`         | `string`                                           | no       | –       | Text of the shared tooltip shown on hover. It becomes a native `title` attribute only under `NODE_ENV=test`.                                           |
 
+Plus 53 more props inherited from `React.AriaAttributes`, forwarded to the element.
+
 <!-- props:end -->
 
 ## Recipes
@@ -232,7 +234,10 @@ element itself, so use the `color` prop.
 - The anchor is an `IconButton`, which renders a `<div>` with no role, no tab stop and no key
   handler. The explanation is unreachable from the keyboard and unannounced by a screen reader.
 - When the content matters, put the same text in the page, where it needs no opening.
-- The component passes no `aria-*` to the icon; `role` and `ariaLabel` are left out of its props.
+- **A passed `aria-*` is kept on the anchor**: the info icon, or the element around `children`.
+  The component sets none of its own. `role` and `ariaLabel` are left out of its props.
+- **The anchor has no role, so a screen reader may ignore an `aria-label` on it.** Pass a
+  `<button>` as `children` to give the explanation a named, focusable trigger.
 - Once open, the tooltip closes on Escape.
 - The tooltip is not linked to anything by `aria-describedby`; nothing here reaches the
   accessibility tree.

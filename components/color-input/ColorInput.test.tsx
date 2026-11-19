@@ -196,6 +196,30 @@ describe("ColorInput component", () => {
     expect(screen.getByRole("button", { name: "Pick accent" })).toBeDisabled();
   });
 
+  it("forwards a passed aria-* to the hex field, aria-label over inputLabel", () => {
+    render(
+      <ColorInput
+        inputLabel="Accent"
+        aria-label="Brand colour"
+        aria-describedby="brand-hint"
+      />,
+    );
+    const input = screen.getByRole("textbox", { name: "Brand colour" });
+    expect(input).toHaveAttribute("aria-describedby", "brand-hint");
+    expect(screen.getByTestId("color-input")).not.toHaveAttribute(
+      "aria-describedby",
+    );
+  });
+
+  it("keeps a passed aria-invalid unless hasError sets it", () => {
+    const { rerender } = render(<ColorInput aria-invalid="true" />);
+    const input = screen.getByRole("textbox", { name: "Color" });
+    expect(input).toHaveAttribute("aria-invalid", "true");
+
+    rerender(<ColorInput hasError aria-invalid="false" />);
+    expect(input).toHaveAttribute("aria-invalid", "true");
+  });
+
   it("opens the picker on the colour the field holds now", () => {
     render(<ColorInput defaultColor="#4781D1" />);
 

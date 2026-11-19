@@ -1,6 +1,7 @@
+import type React from "react";
 import { InputSize } from "../text-input";
 
-export type ColorInputProps = {
+export type ColorInputProps = React.AriaAttributes & {
   /** Applied to the outermost element. */
   className?: string;
   /** Applied to the outermost element. */
@@ -33,7 +34,7 @@ export type ColorInputProps = {
   dataTestId?: string;
   /**
    * Accessible name of the hex field. Left out, the kit's own translation of
-   * "Color" (`Common:Color`) is used.
+   * "Color" (`Common:Color`) is used. A passed `aria-label` wins over it.
    */
   inputLabel?: string;
   /** Accessible name of the swatch button that opens the picker. It is not translated for you. */

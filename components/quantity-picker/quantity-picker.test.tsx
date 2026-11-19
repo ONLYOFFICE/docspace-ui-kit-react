@@ -43,6 +43,16 @@ const getPlus = () => screen.getByTestId("quantity_picker_plus_icon");
 const getMinus = () => screen.getByTestId("quantity_picker_minus_icon");
 
 describe("<QuantityPicker />", () => {
+  it("puts a passed aria-* on the value field", () => {
+    render(
+      <Harness aria-label="Number of admins" aria-describedby="admins-hint" />,
+    );
+
+    const field = screen.getByRole("textbox", { name: "Number of admins" });
+    expect(field).toBe(getInput());
+    expect(field).toHaveAttribute("aria-describedby", "admins-hint");
+  });
+
   it("renders the current value", () => {
     render(<Harness initialValue={10} />);
 
