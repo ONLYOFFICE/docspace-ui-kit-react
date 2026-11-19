@@ -27,7 +27,7 @@ const meta = {
     currentColorScheme: {
       control: "object",
       description:
-        "The accent colours and the text drawn on them. They reach the page only when `main` is present; leaving the scheme out later keeps the colours already there.",
+        "The accent colours and the text drawn on them. They reach the page only when `main` is present; leaving the scheme out later takes them off.",
       table: { defaultValue: { summary: "undefined" } },
     },
     children: {

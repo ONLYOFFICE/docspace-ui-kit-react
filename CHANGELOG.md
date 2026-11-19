@@ -8,6 +8,12 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **`ThemeProviderComponent` hands the page back when it unmounts.** It left `data-theme`,
+  `data-dir`, the body classes and every custom property behind. Now the provider mounted last
+  writes the page, and when it goes the one around it writes again, or the page returns to what it
+  was before any provider. A colour scheme without `main`, or none, takes the previous accent off
+  instead of keeping it. A theme without `isBase` is light in the React context too, as it already
+  was in the body class
 - **`ImageEditor`'s test ids are `data-testid`, and its file input has an id of its own.** The
   outer element and the cropper wrapper carried `image-editor` and `image-cropper-wrapper` under
   the misspelt `data-test-id`; select them with `getByTestId` now. The hidden input's fixed id
