@@ -119,8 +119,12 @@ const ModalDialog = ({
 
     onResize();
 
+    // The swipe closes through the same guard as the cross and Escape, and a
+    // dialog that cannot close is not dragged either.
     const onSwipe = (e: TouchEvent) =>
-      setModalSwipeOffset(handleTouchMove(e, onClose));
+      setModalSwipeOffset(
+        embedded || !isCloseable ? 0 : handleTouchMove(e, onCloseEvent),
+      );
 
     const onSwipeEnd = () => setModalSwipeOffset(0);
 
@@ -159,7 +163,7 @@ const ModalDialog = ({
   }, [
     displayType,
     displayTypeDetailed,
-    onClose,
+    isCloseable,
     onCloseEvent,
     visible,
     onBackClick,

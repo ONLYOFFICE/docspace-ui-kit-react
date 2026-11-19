@@ -294,6 +294,10 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **A swipe down no longer closes a `ModalDialog` that cannot close.** The swipe called
+  `onClose` directly, past the guard the cross and Escape go through, so `isCloseable={false}`
+  and `embedded` did not stop it on a phone. It goes through that guard now, and such a dialog
+  is not dragged at all
 - **`Calendar` leaves the day of `minDate` selectable, and keeps the seconds.** A day was
   compared at midnight with `minDate` and its time, so a `minDate` of now disabled today; it is
   compared with the day `minDate` falls on now. A picked day kept the old hours and minutes but
