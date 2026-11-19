@@ -4,8 +4,38 @@ import { PrimaryTabs } from "./PrimaryTabs";
 import { type TTabItem, type TabsProps } from "./Tabs.types";
 
 const Tabs = (props: TabsProps) => {
-  if (props?.type === TabsTypes.Secondary) return <SecondaryTabs {...props} />;
-  return <PrimaryTabs {...props} />;
+  // Each bar gets only its own props; the rest would reach the DOM.
+  const {
+    type,
+    layoutId,
+    isLoading,
+    scaled,
+    withoutArrows,
+    hotkeysId,
+    withAnimation,
+    stickyHeader,
+    ...common
+  } = props;
+
+  if (type === TabsTypes.Secondary)
+    return (
+      <SecondaryTabs
+        {...common}
+        layoutId={layoutId}
+        isLoading={isLoading}
+        scaled={scaled}
+        withoutArrows={withoutArrows}
+        hotkeysId={hotkeysId}
+      />
+    );
+
+  return (
+    <PrimaryTabs
+      {...common}
+      withAnimation={withAnimation}
+      stickyHeader={stickyHeader}
+    />
+  );
 };
 
 export { Tabs };

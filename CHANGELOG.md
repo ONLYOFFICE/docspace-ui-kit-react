@@ -313,6 +313,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   its own id, where every header shared `iconTooltip`. `withLogo={true}` no longer draws an
   `<img>` with an empty `src`. The extra button's place in the row follows `currentDeviceType`, as
   the rest of the layout does, instead of the window's width at render
+- **`Tabs` passes each bar only its own props.** A prop of the other type, such as `scaled` on
+  the primary bar, reached the wrapper `<div>` and React warned about an unknown attribute
 - **A click on a `Toast` spreads out its own deck only, and the deck closes again.** The click
   set `position: static` on every `.Toastify__toast` in the document and never undid it, so a
   later toast stacked over the spread ones. The container now carries a class until its last

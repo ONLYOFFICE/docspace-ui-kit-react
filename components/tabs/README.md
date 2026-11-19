@@ -209,8 +209,7 @@ export function LazyTabs() {
 - **The two types are separate components behind one name.** `badge`, `stickyHeader` and
   `withAnimation` only exist on the primary bar; `iconName`, `layoutId`, `scaled`, `isLoading`
   and `hotkeysId` only on the secondary one.
-- **Props belonging to the other type are spread onto the wrapper `<div>`.** React reports them
-  in the console as unknown DOM attributes.
+- A prop of the other type is dropped; it does not reach the wrapper `<div>`.
 - **`id` lands in a different place per type**: on the tab list for primary tabs, on the
   outermost element for secondary ones.
 - **`isLoading` renders no loader.** It holds off the measurement of the tab widths until the
