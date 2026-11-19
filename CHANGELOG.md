@@ -305,6 +305,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`InfiniteLoader`'s row skeletons line up with the right edge in a right-to-left layout.** The
+  rule that moves them named `.row-loade`, a class nothing carries
 - **A click on a tile's three-dot button calls `tileContextClick` once.** `BaseTile`, `FileTile`
   and `FolderTile` called it as the button read its options, with no argument, and again with
   `false` as it reported the click. Only the second call is left

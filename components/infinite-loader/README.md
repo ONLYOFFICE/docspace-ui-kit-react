@@ -184,8 +184,8 @@ export function LoadableList({
 - `isLoading` returns `null`, so the region collapses rather than holding its height.
 - `children` has to be an array, which the loader indexes. With `hasMoreFiles` it counts two
   rows more than there are, to leave room for the loading rows.
-- **In a right-to-left layout the row skeletons stay at the left edge.** The rule that moves
-  them names `.row-loade`, a class nothing carries; loaded rows and table rows do move.
+- In a right-to-left layout the rows, their skeletons and the table rows line up with the right
+  edge.
 
 ## CSS variables
 
