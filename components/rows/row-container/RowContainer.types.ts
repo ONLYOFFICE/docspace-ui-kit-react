@@ -24,8 +24,7 @@ export type RowContainerProps = {
   /** Applied to the container. */
   className?: string;
   /**
-   * Id of the container. The virtual list measures its width through the
-   * literal id `rowContainer`, so another id leaves the rows zero wide.
+   * Id of the container element.
    * @default "rowContainer"
    */
   id?: string;

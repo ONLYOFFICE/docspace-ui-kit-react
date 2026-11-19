@@ -83,8 +83,7 @@ const meta = {
     },
     id: {
       control: "text",
-      description:
-        "Id of the container. The virtual list measures its width through the literal id `rowContainer`, so another id leaves the rows zero wide.",
+      description: "Id of the container element.",
       table: {
         defaultValue: { summary: '"rowContainer"' },
       },
@@ -326,7 +325,6 @@ export const Virtualised: Story = {
   </Scrollbar>
 </div>`,
       },
-      // Framed: the virtual list measures the first #rowContainer on the page
       story: { inline: false, height: "326px" },
     },
   },

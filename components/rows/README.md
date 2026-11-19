@@ -129,8 +129,6 @@ export function SelectableList({ names }: { names: string[] }) {
 - **The parts are coupled by position and by name, not by types.**
   [`RowContent`](./row-content/README.md) addresses its children by index, and
   [`Row`](./row/README.md) reads `item` off its child's props.
-- [`RowContainer`](./row-container/README.md) is measured by the virtual list through the
-  literal id `rowContainer`. A second list on the page takes the first one's width.
 - Virtualisation follows the portal's scroll element. Pass `useReactWindow={false}` outside the
   portal.
 - The folder also exports `RowSkeleton` and `RowsSkeleton` for the loading state, and

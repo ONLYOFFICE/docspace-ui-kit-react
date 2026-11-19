@@ -148,7 +148,7 @@ describe("InfiniteLoader Component", () => {
   it("shows skeleton when scroll shift is large", async () => {
     vi.mocked(isMobile).mockReturnValue(false);
 
-    // Create a container that ListComponent expects for width calculation
+    // The element the list sits in gives it its width.
     const rowContainer = document.createElement("div");
     rowContainer.id = "rowContainer";
     document.body.appendChild(rowContainer);
@@ -172,7 +172,9 @@ describe("InfiniteLoader Component", () => {
       width: 1000,
     } as DOMRect);
 
-    render(<InfiniteLoaderComponent {...defaultProps} />);
+    render(<InfiniteLoaderComponent {...defaultProps} />, {
+      container: rowContainer,
+    });
 
     // Simulate initial scroll
     fireEvent.scroll(scroller, { target: { scrollTop: 0 } });

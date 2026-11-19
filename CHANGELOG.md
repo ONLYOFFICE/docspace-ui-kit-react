@@ -301,6 +301,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **A `RowContainer` with any `id` gets rows of its own width.** The virtual list measured
+  `document.getElementById("rowContainer")`, so another id laid the rows out zero wide and a
+  second container took the first one's width. A `row` list of `InfiniteLoaderComponent` now
+  measures the element it sits in and follows it as it resizes; `table` and `tile` still look up
+  their ids
 - **`Article` survives a `showArticle` value in local storage that is not JSON.** The parse ran
   unguarded in an effect, so such a value threw on mount and on every device change. It now
   counts as its raw text, and storage that cannot be read counts as an absent key
