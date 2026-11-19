@@ -8,6 +8,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **`Navigation`'s `hideInfoPanel` is a `boolean`.** It was typed as a callback but never called:
+  any truthy value hid the info panel toggle, so passing the handler the type asked for hid the
+  button. Pass `true` to hide it; a function no longer type-checks, and passing one still hides it
 - **`EmptyView`'s title and description sit in a `<div>`, not a `<header>`.** Outside a `main`,
   `section` or `article` the `<header>` was a `banner` landmark, a second one beside the page's
   own. The view now adds no landmark; a selector for `header` inside it finds nothing, while the
@@ -305,6 +308,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `--quick-buttons-color`, which the kit does not define, so with neither that nor
   `--nav-menu-separator-color` set there was no line. The theme now supplies a divider grey last;
   both variables still win over it
+- **`Navigation`'s header holds up in four corner cases.** The room title with `rootRoomTitle` and
+  a single crumb threw on click; it now only closes the drop box. Each title icon's tooltip has
+  its own id, where every header shared `iconTooltip`. `withLogo={true}` no longer draws an
+  `<img>` with an empty `src`. The extra button's place in the row follows `currentDeviceType`, as
+  the rest of the layout does, instead of the window's width at render
 - **A click on a `Toast` spreads out its own deck only, and the deck closes again.** The click
   set `position: static` on every `.Toastify__toast` in the document and never undid it, so a
   later toast stacked over the spread ones. The container now carries a class until its last

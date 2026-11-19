@@ -465,7 +465,7 @@ export const SectionList = ({ kind, withFolderPicker }: SectionListProps) => {
       getContextOptionsFolder={() => []}
       getContextOptionsPlus={() => []}
       toggleInfoPanel={noop}
-      hideInfoPanel={noop}
+      hideInfoPanel
       showFolderInfo={noop}
       onPlusClick={noop}
       withLogo={false}

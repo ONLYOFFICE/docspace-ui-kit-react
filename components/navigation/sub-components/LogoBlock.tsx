@@ -9,7 +9,7 @@ const NavigationLogo = ({
 }: TNavigationLogoProps) => {
   return (
     <div {...rest}>
-      <img className="logo-icon_svg" alt="logo" src={logo} />
+      {logo ? <img className="logo-icon_svg" alt="logo" src={logo} /> : null}
       <div className="header-burger">
         <img src={burgerLogo} alt="burger logo" />
       </div>

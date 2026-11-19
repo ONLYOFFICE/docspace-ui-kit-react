@@ -164,8 +164,7 @@ export type TNavigationItem = {
 
 export type TRowParam = {
   /** Shows the logo block at the start of the header. A string is the
-   * desktop image's URL; `true` leaves that image empty and shows only
-   * `burgerLogo`. */
+   * desktop image's URL; `true` shows only `burgerLogo`. */
   withLogo: boolean | string;
   /** Which layout to render. It decides which buttons appear in place of a
    * media query, so a wrong value shows the wrong buttons. */
@@ -307,10 +306,8 @@ export type TNavigationProps = Omit<
 
     /** Not read. Nothing destructures it. */
     isRoom: boolean;
-    /** **A flag, despite its type.** It is never called, and any truthy value
-     * hides the info panel toggle. A function is always truthy, so the callback
-     * the type asks for hides the button. */
-    hideInfoPanel?: () => void;
+    /** Hides the info panel toggle on a desktop. */
+    hideInfoPanel?: boolean;
     /** URL of the logo shown below the desktop breakpoint while `withLogo` is
      * set. It is an `<img src>`, not an icon name. */
     burgerLogo: string;

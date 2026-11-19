@@ -751,7 +751,7 @@ export const FilesApp = () => {
                 ]}
                 getContextOptionsPlus={() => createOptions}
                 toggleInfoPanel={noop}
-                hideInfoPanel={noop}
+                hideInfoPanel
                 showFolderInfo={noop}
                 onPlusClick={noop}
                 withLogo={false}

@@ -83,9 +83,8 @@ const meta = {
         "Whether the info panel is open, which draws its toggle pressed.",
     },
     hideInfoPanel: {
-      control: false,
-      description:
-        "**A flag, despite its type.** It is never called, and any truthy value hides the info panel toggle. A function is always truthy, so the callback the type asks for hides the button.",
+      control: "boolean",
+      description: "Hides the info panel toggle on a desktop.",
       table: { defaultValue: { summary: "undefined" } },
     },
     navigationButtonLabel: {
@@ -148,7 +147,7 @@ const meta = {
     withLogo: {
       control: false,
       description:
-        "Shows the logo block at the start of the header. A string is the desktop image's URL; `true` leaves that image empty and shows only `burgerLogo`.",
+        "Shows the logo block at the start of the header. A string is the desktop image's URL; `true` shows only `burgerLogo`.",
     },
     burgerLogo: {
       control: false,
@@ -344,8 +343,8 @@ const defaultArgs = {
   isDesktop: true,
   isRoom: false,
   isFrame: false,
-  // Truthy, so the info panel toggle stays hidden; WithInfoPanel clears it
-  hideInfoPanel: noop,
+  // The info panel toggle stays hidden; WithInfoPanel clears it
+  hideInfoPanel: true,
   withLogo: false,
   burgerLogo: "",
   showRootFolderTitle: true,
