@@ -63,7 +63,7 @@ const meta = {
     isLoading: {
       control: "boolean",
       description:
-        "Puts the save button in its loading state and blocks the editor and the cancel button. The header cross, Escape and the backdrop still close the dialog.",
+        "Puts the save button in its loading state and blocks the editor and every way to close the dialog.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -262,9 +262,13 @@ export const Loading: Story = {
     ...Default.args,
     isLoading: true,
   },
-  play: async () => {
+  play: async ({ args, userEvent }) => {
     await waitFor(() => expect(dialog()).toBeVisible());
     const modal = within(dialog());
+    // Nothing closes the dialog, and so resets the image, mid-upload.
+    await userEvent.keyboard("{Escape}");
+    await expect(args.onClose).not.toHaveBeenCalled();
+    await expect(dialog()).toBeVisible();
     // The editor and Cancel are locked while the upload runs.
     await expect(modal.getByRole("button", { name: "Cancel" })).toBeDisabled();
     await expect(await waitFor(() => modal.getByRole("slider"))).toBeDisabled();
@@ -277,7 +281,7 @@ export const Loading: Story = {
     docs: {
       description: {
         story:
-          "The dialog while the picture uploads: a spinner on Save, with Cancel and the zoom row disabled. The header cross, Escape and the backdrop still close it, so guard `onClose` yourself.",
+          "The dialog while the picture uploads: a spinner on Save, with Cancel and the zoom row disabled and no header cross. Neither Escape nor the backdrop closes it.",
       },
       source: {
         code: `<AvatarEditorDialog

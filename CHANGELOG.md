@@ -323,6 +323,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   above never reached the badge
 - **`ImageEditor` keeps the file dialog shut while `isDisabled`.** The replace control still opened
   it, and the file chosen there was dropped
+- **`AvatarEditorDialog` cannot be closed while `isLoading`.** The header cross, Escape and the
+  backdrop still closed it, and the close reset the image the save was sending
 - **`InfiniteLoader`'s row skeletons line up with the right edge in a right-to-left layout.** The
   rule that moves them named `.row-loade`, a class nothing carries
 - **`SelectionArea` reports at most once per animation frame, and a release cancels the report
