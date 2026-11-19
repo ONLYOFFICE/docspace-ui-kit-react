@@ -33,7 +33,7 @@ in the list, a dropdown's collapsed button, and an entry inside that dropdown.
 
 **Portal-internal.** All nine titles and all nine descriptions come from the portal's `Common`
 namespace (`CollaborationRoomTitle`, `VirtualDataRoomDescription`, `FormFilingRoomInfo` and so
-on). Without those translations loaded the row renders a glyph and two empty lines.
+on). Without those translations loaded the row shows the keys themselves.
 
 ## Import
 
@@ -45,8 +45,9 @@ It is a **default** export, so the name is yours to choose. The root barrel also
 as `RoomType`. Prefer the subpath: the barrel does not build without four optional peers, see
 [Which import form](../../docs/getting-started.md#which-import-form).
 
-Needs `TranslationProvider` above it, with the portal's `Common` namespace, or every label is
-empty and i18next logs a missing-key error. Needs `ThemeProvider` for its borders and hover
+Needs `TranslationProvider` above it, with the portal's `Common` namespace. With no provider
+anywhere the labels read `Common:CollaborationRoomTitle` and so on, and react-i18next warns
+that it has no instance. With one but no `Common` resources they read `CollaborationRoomTitle`. Needs `ThemeProvider` for its borders and hover
 backgrounds.
 
 ## Minimal example
