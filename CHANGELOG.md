@@ -337,6 +337,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   space, a blank tile, or half of the emoji's surrogate pair
 - **`SelectedItem` applies `style`, and its cross carries no `undefined` class.** `style` was
   declared and never read; without `classNameCloseButton` the cross got the literal class
+- **`isManagement()` is true only under the management app's `/management`.** It matched the word
+  anywhere in the path, so `CategoryItem` hid its paid badge on a page such as
+  `/portal-settings/management/...`
 - **`InfiniteLoader`'s row skeletons line up with the right edge in a right-to-left layout.** The
   rule that moves them named `.row-loade`, a class nothing carries
 - **`SelectionArea` reports at most once per animation frame, and a release cancels the report
