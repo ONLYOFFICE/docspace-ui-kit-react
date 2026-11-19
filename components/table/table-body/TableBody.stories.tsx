@@ -227,11 +227,14 @@ export const WithoutReactWindow: Story = {
   args: {
     ...Default.args,
     useReactWindow: false,
+    // Without the virtual list it changes nothing.
+    infoPanelVisible: true,
   },
   play: async ({ canvas }) => {
     // Every row at once.
     const body = await waitFor(() => canvas.getByTestId("table-body"));
     await expect(mountedRows(body)).toHaveLength(20);
+    await expect(body).not.toHaveClass("undefined");
     await expect(
       canvas.getByText("Architecture Diagram (2)"),
     ).toBeInTheDocument();

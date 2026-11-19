@@ -306,6 +306,13 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   second container took the first one's width. A `row` list of `InfiniteLoaderComponent` now
   measures the element it sits in and follows it as it resizes; `table` and `tile` still look up
   their ids
+- **`TableHeader` gives the free width to the wide column on a window resize.** When the columns
+  stopped fitting, a resize handed it only to a `default` column that also set `minWidth`, and to
+  any column with `minWidth` and `default: false`. The wide column could end at `0px` with the
+  rest. A layout reset was not affected
+- **`TableRow` and `TableBody` add no class named `undefined`.** `hideColumns` and the body's
+  `infoPanelVisible` each looked up a class their stylesheet does not define. The props change
+  nothing else
 - **`Article` survives a `showArticle` value in local storage that is not JSON.** The parse ran
   unguarded in an effect, so such a value threw on mount and on every device change. It now
   counts as its raw text, and storage that cannot be read counts as an absent key

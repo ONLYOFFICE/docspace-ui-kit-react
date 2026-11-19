@@ -210,7 +210,7 @@ export interface TableRowProps {
   onDoubleClick?: (e: React.MouseEvent) => void;
   /** Ref of the row element. */
   forwardedRef?: React.ForwardedRef<HTMLDivElement>;
-  /** Has no effect on screen: the row's stylesheet has no rule for it. */
+  /** Changes nothing on screen; nothing in the row reads it. */
   hideColumns?: boolean;
   /** Marks the row whose context menu is open: children marked `create-share-link` stay shown and the drop fill is off. */
   isActive?: boolean;

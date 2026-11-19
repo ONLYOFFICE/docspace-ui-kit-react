@@ -319,6 +319,32 @@ describe("<TableHeader />", () => {
       expect(sizes).toEqual(["376px", "0px", "0px", "0px", "0px", "24px"]);
     });
 
+    it("gives the free width to the wide column on a window resize", () => {
+      // The wide column without minWidth, a narrow one with default: false.
+      const columns = [
+        { ...name, minWidth: undefined },
+        { ...type, default: false, minWidth: 120 },
+        tags,
+        mockColumns[3],
+      ];
+      render(
+        <TableHeaderWithContainerRef {...defaultProps} columns={columns} />,
+      );
+
+      narrow(400);
+      act(() => {
+        window.dispatchEvent(new Event("resize"));
+      });
+
+      expect(localStorage.getItem(COLUMN_STORAGE_NAME)?.split(" ")).toEqual([
+        "376px",
+        "0px",
+        "0px",
+        "0px",
+        "24px",
+      ]);
+    });
+
     it("keeps every column of a table without a wide column", () => {
       narrow(400);
 
