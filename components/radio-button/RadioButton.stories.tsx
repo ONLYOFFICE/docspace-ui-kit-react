@@ -246,6 +246,38 @@ export const CheckedStates: Story = {
   },
 };
 
+const SharedNameTemplate = () => (
+  <Wrapper>
+    <RadioButton name="fruit" value="apple" label="Apple" isChecked />
+    <RadioButton name="fruit" value="pear" label="Pear" />
+  </Wrapper>
+);
+
+export const SharedName: Story = {
+  name: "Shared name",
+  render: () => <SharedNameTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const apple = canvas.getByRole("radio", { name: "Apple" });
+    const pear = canvas.getByRole("radio", { name: "Pear" });
+
+    await userEvent.click(pear);
+    await expect(pear).toBeChecked();
+    await expect(apple).not.toBeChecked();
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Two buttons sharing a `name`, without `onChange`. Checking one clears the dot of the other.",
+      },
+      source: {
+        code: `<RadioButton name="fruit" value="apple" label="Apple" isChecked />
+<RadioButton name="fruit" value="pear" label="Pear" />`,
+      },
+    },
+  },
+};
+
 const DisabledTemplate = () => {
   return (
     <Wrapper>

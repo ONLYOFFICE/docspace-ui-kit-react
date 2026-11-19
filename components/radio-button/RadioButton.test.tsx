@@ -35,6 +35,22 @@ describe("<RadioButton />", () => {
     expect(onClick).toHaveBeenCalled();
   });
 
+  it("clears its dot when another button of its name is checked", () => {
+    render(
+      <>
+        <RadioButton name="fruit" value="apple" label="Apple" isChecked />
+        <RadioButton name="fruit" value="pear" label="Pear" />
+      </>,
+    );
+    const apple = screen.getByRole("radio", { name: "Apple" });
+    const pear = screen.getByRole("radio", { name: "Pear" });
+
+    fireEvent.click(pear);
+
+    expect(pear).toBeChecked();
+    expect(apple).not.toBeChecked();
+  });
+
   it("applies disabled state correctly", () => {
     renderComponent({ isDisabled: true });
 
