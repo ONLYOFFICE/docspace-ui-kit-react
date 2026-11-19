@@ -250,22 +250,23 @@ export function ProfileAvatar({
 
 ## CSS variables
 
-| Variable                   | Default      | Effect                                                                                       |
-| -------------------------- | ------------ | -------------------------------------------------------------------------------------------- |
-| `--avatar-radius`          | `50%`        | Corner radius of the avatar and of its picture — square it here                              |
-| `--avatar-bg`              | theme grey   | Background of an avatar with neither `source` nor `userName`: the camera or the illustration |
-| `--avatar-initials-bg`     | theme accent | Background behind a person's initials; a group's initials keep their own background          |
-| `--avatar-initials-weight` | `600`        | Weight of a person's initials; a group's stay at `700`                                       |
+| Variable                      | Default      | Effect                                                                                       |
+| ----------------------------- | ------------ | -------------------------------------------------------------------------------------------- |
+| `--avatar-radius`             | `50%`        | Corner radius of the avatar and of its picture — square it here                              |
+| `--avatar-bg`                 | theme grey   | Background of an avatar with neither `source` nor `userName`: the camera or the illustration |
+| `--avatar-initials-bg`        | theme accent | Background behind a person's initials; a group's initials keep their own background          |
+| `--avatar-initials-weight`    | `600`        | Weight of a person's initials; a group's stay at `700`                                       |
+| `--avatar-owner-fill`         | yellow       | Fill of the owner badge                                                                      |
+| `--avatar-administrator-fill` | orange       | Fill of the admin badge                                                                      |
 
-All four are read inside the avatar and none is declared on it, so set them on an ancestor. The
-`style` prop is ignored and cannot carry them.
+All of them are read inside the avatar and none is declared on it, so set them on an ancestor.
+The `style` prop is ignored and cannot carry them.
 
 Behind a `source` the background is a theme colour that none of these overrides. The kit's
 illustration stays round whatever `--avatar-radius` says, and so does the edit button.
 
-The badge colours (`--avatar-owner-fill`, `--avatar-administrator-fill` and their strokes) are
-declared on the avatar element itself. An ancestor's value loses to them; override them in a rule
-on your `className`.
+Each badge also reads `--avatar-owner-stroke` and `--avatar-owner-color`, or their
+`administrator` pair, for its outline and its glyph.
 
 ## Accessibility
 

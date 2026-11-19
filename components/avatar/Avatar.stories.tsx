@@ -829,6 +829,7 @@ export const CssCustomization: Story = {
           "--avatar-initials-weight": "400",
           "--avatar-initials-bg": "#7c3aed",
           "--avatar-bg": "#c4b5fd",
+          "--avatar-administrator-fill": "#16a34a",
         } as CSSProperties
       }
     >
@@ -849,11 +850,14 @@ export const CssCustomization: Story = {
     await expect(getComputedStyle(painted as HTMLElement).borderRadius).toBe(
       "8px",
     );
+    // The badge colours are read from an ancestor like the rest.
+    const badge = initials.querySelector(".admin_icon rect") as Element;
+    await expect(getComputedStyle(badge).fill).toBe("rgb(22, 163, 74)");
   },
   parameters: {
     docs: {
       description: {
-        story: `Four variables set on one wrapper. The avatar with initials shows the radius, the initials background and the weight; the empty one shows \`--avatar-bg\`.`,
+        story: `Five variables set on one wrapper. The avatar with initials shows the radius, the initials background, the weight and a green admin badge; the empty one shows \`--avatar-bg\`.`,
       },
       source: {
         code: `<div
@@ -862,6 +866,7 @@ export const CssCustomization: Story = {
     "--avatar-initials-weight": "400",
     "--avatar-initials-bg": "#7c3aed",
     "--avatar-bg": "#c4b5fd",
+    "--avatar-administrator-fill": "#16a34a",
   }}
 >
   <Avatar size={AvatarSize.big} role={AvatarRole.admin} userName="John Doe" />

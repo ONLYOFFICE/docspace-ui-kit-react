@@ -313,6 +313,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`RoomIcon`'s empty state draws one button.** With `withEditing` the pencil sat over the plus
   in the same corner, each with a menu of its own; the plus is left. Its circle takes the theme's
   accent without the portal too, where it had no background and the white plus was invisible
+- **`Avatar`'s badge colours can be set on an ancestor.** The avatar declared
+  `--avatar-owner-fill`, `--avatar-administrator-fill` and their strokes on itself, so a value from
+  above never reached the badge
 - **`InfiniteLoader`'s row skeletons line up with the right edge in a right-to-left layout.** The
   rule that moves them named `.row-loade`, a class nothing carries
 - **`SelectionArea` reports at most once per animation frame, and a release cancels the report

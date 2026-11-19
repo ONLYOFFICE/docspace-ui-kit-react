@@ -271,26 +271,26 @@
 }
 
 .avatar {
-  --avatar-administrator-fill: #{$light-status-warning};
-  --avatar-administrator-stroke: #{$dark-black};
-  --avatar-administrator-color: #{$white};
-  --avatar-guest-fill: #{$light-icons};
-  --avatar-guest-stroke: #{$dark-black};
-  --avatar-guest-color: #{$white};
-  --avatar-owner-fill: #{$favorites-status};
-  --avatar-owner-stroke: #{$dark-black};
-  --avatar-owner-color: #{$white};
+  --avatar-administrator-fill-default: #{$light-status-warning};
+  --avatar-administrator-stroke-default: #{$dark-black};
+  --avatar-administrator-color-default: #{$white};
+  --avatar-guest-fill-default: #{$light-icons};
+  --avatar-guest-stroke-default: #{$dark-black};
+  --avatar-guest-color-default: #{$white};
+  --avatar-owner-fill-default: #{$favorites-status};
+  --avatar-owner-stroke-default: #{$dark-black};
+  --avatar-owner-color-default: #{$white};
 
   :global(.dark) & {
-    --avatar-administrator-fill: #{$dark-status-warning};
-    --avatar-administrator-stroke: #{$dark-black};
-    --avatar-administrator-color: #{$white};
-    --avatar-guest-fill: #{$dark-icon};
-    --avatar-guest-stroke: #{$dark-black};
-    --avatar-guest-color: #{$white};
-    --avatar-owner-fill: #{$favorites-status};
-    --avatar-owner-stroke: #{$dark-black};
-    --avatar-owner-color: #{$white};
+    --avatar-administrator-fill-default: #{$dark-status-warning};
+    --avatar-administrator-stroke-default: #{$dark-black};
+    --avatar-administrator-color-default: #{$white};
+    --avatar-guest-fill-default: #{$dark-icon};
+    --avatar-guest-stroke-default: #{$dark-black};
+    --avatar-guest-color-default: #{$white};
+    --avatar-owner-fill-default: #{$favorites-status};
+    --avatar-owner-stroke-default: #{$dark-black};
+    --avatar-owner-color-default: #{$white};
   }
 
   position: relative;
@@ -347,37 +347,46 @@
   :global {
     .admin_icon {
       rect:nth-child(1) {
-        fill: var(--avatar-administrator-fill);
+        fill: var(
+          --avatar-administrator-fill,
+          var(--avatar-administrator-fill-default)
+        );
       }
       rect:nth-child(2) {
-        stroke: var(--avatar-administrator-stroke);
+        stroke: var(
+          --avatar-administrator-stroke,
+          var(--avatar-administrator-stroke-default)
+        );
       }
       path {
-        fill: var(--avatar-administrator-color);
+        fill: var(
+          --avatar-administrator-color,
+          var(--avatar-administrator-color-default)
+        );
       }
     }
 
     .guest_icon {
       rect:nth-child(1) {
-        fill: var(--avatar-guest-fill);
+        fill: var(--avatar-guest-fill, var(--avatar-guest-fill-default));
       }
       rect:nth-child(2) {
-        stroke: var(--avatar-guest-stroke);
+        stroke: var(--avatar-guest-stroke, var(--avatar-guest-stroke-default));
       }
       path {
-        fill: var(--avatar-guest-color);
+        fill: var(--avatar-guest-color, var(--avatar-guest-color-default));
       }
     }
 
     .owner_icon {
       rect:nth-child(1) {
-        fill: var(--avatar-owner-fill);
+        fill: var(--avatar-owner-fill, var(--avatar-owner-fill-default));
       }
       rect:nth-child(2) {
-        stroke: var(--avatar-owner-stroke);
+        stroke: var(--avatar-owner-stroke, var(--avatar-owner-stroke-default));
       }
       path {
-        fill: var(--avatar-owner-color);
+        fill: var(--avatar-owner-color, var(--avatar-owner-color-default));
       }
     }
   }
