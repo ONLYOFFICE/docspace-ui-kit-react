@@ -298,6 +298,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `onClose` directly, past the guard the cross and Escape go through, so `isCloseable={false}`
   and `embedded` did not stop it on a phone. It goes through that guard now, and such a dialog
   is not dragged at all
+- **`DropDownItem` draws an `icon` passed as an element or a memoised component.** An element
+  such as `<Icon />`, or a component wrapped in `memo` or `forwardRef`, fell through to
+  `react-svg` with an empty address and drew nothing, though the type allows both
 - **`DropDown`'s virtual list keeps the markup of a child of its own.** With `maxHeight` every
   child was rendered again as a `DropDownItem` built from its props, so a component of your own
   lost its markup. A `DropDownItem` is still drawn that way; any other child is placed in its

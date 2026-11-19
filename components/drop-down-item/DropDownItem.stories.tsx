@@ -24,7 +24,7 @@ const meta = {
     icon: {
       control: "text",
       description:
-        "Icon at the start of the item: a component or a URL. A same-origin `.svg` or an SVG data URL is inlined; any other URL becomes an `<img>`.",
+        "Icon at the start of the item: a component, an element or a URL. A same-origin `.svg` or an SVG data URL is inlined; any other URL becomes an `<img>`.",
     },
     disabled: {
       control: "boolean",
