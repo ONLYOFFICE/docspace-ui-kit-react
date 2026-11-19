@@ -318,6 +318,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **Arabic gets the system font in any region.** `getFontFamilyDependingOnLanguage`, and with it
+  `ThemeProvider`, matched only `ar-SA`; `ar` and `ar-EG` got Open Sans, which has no Arabic
+  glyphs
 - **`RoomType` works the same for the pointer and the keys, and needs no portal for its accent.**
   A `dropdownButton` ignored the disabled props for a click but not for Enter and Space; now it
   ignores them for both. The pressed and open borders fall back to the theme's accent, not the
