@@ -226,10 +226,9 @@ export function ControlledSelection({ ids }: { ids: string[] }) {
   `itemHeight` in `arrayTypes` is not read.
 - **`added` and `removed` are not deltas.** On each report every selectable element is classified
   afresh: `added` is everything the rectangle covers now, `removed` everything it does not.
-- **A report follows every pointer move and every scroll**, in the next animation frame. Several
-  moves within one frame give several reports.
-- The release does not cancel a report already scheduled, so one may arrive just after the button
-  goes up.
+- **Reports come at most once per animation frame**, after a pointer move or a scroll. Several
+  moves within one frame give one report.
+- The release cancels a report still scheduled, so none arrives after the button goes up.
 - **The drag starts after 10px.** Below that the rectangle stays hidden and no `onMove` fires, so a
   plain click never reports anything.
 - Past 10px `onMove` is called once with `clear: true` and both lists empty, the cue to drop an
