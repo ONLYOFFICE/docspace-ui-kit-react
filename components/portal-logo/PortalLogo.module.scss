@@ -2,17 +2,17 @@
 @use "../../styles/mixins";
 
 .wrapper {
-  :global(.light) & {
-    --header-background-color: #{colors.$gray-light};
-  }
+  // The portal's own --header-background-color wins over this default: a
+  // declaration of that token here would hide the inherited one.
+  --portal-logo-header-bg-default: #{colors.$gray-light};
 
   :global(.dark) & {
-    --header-background-color: #{colors.$dark-gray-light};
+    --portal-logo-header-bg-default: #{colors.$dark-gray-light};
   }
 
   --portal-logo-mobile-bg-value: var(
     --portal-logo-mobile-bg,
-    var(--header-background-color)
+    var(--header-background-color, var(--portal-logo-header-bg-default))
   );
   --portal-logo-mobile-height-value: var(--portal-logo-mobile-height, 48px);
   --portal-logo-mobile-img-height-value: var(

@@ -267,6 +267,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Added
 
+- **`PortalLogo` takes `dataTestId`**, `portal-logo` by default, on the wrapper or on the
+  fallback logo that replaces it. It carried no test id at all
 - **`ComboBox` and `AccessRightSelect` take `ariaLabel`**, the accessible name of the button.
   Without it the button is still named by the option it shows.
 - **`FolderType.PrivateRooms` (42)**: the root of the Private section. It holds no rooms
@@ -328,6 +330,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`RoomLogoCoverDialog`'s "without icon" stays chosen while no glyph is.** The first click turned
   it off, and nothing turned it back on. Its label asks for `Common:WithoutIcon`, so a `t` whose
   default namespace is not `Common` finds it
+- **`PortalLogo`'s phone bar takes the portal's `--header-background-color`.** The logo declared
+  that token on itself, hiding the portal's value, and left the bar with no colour outside a
+  `.light` or `.dark` ancestor
 - **`InfiniteLoader`'s row skeletons line up with the right edge in a right-to-left layout.** The
   rule that moves them named `.row-loade`, a class nothing carries
 - **`SelectionArea` reports at most once per animation frame, and a release cancels the report

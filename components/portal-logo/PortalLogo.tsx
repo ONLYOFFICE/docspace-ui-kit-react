@@ -18,6 +18,7 @@ const PortalLogo = ({
   className,
   isResizable = false,
   alt = "portal logo",
+  dataTestId = "portal-logo",
 }: PortalLogoProps) => {
   const [isError, setIsError] = useState(false);
   // A server-rendered logo can fail before the page hydrates; its error event
@@ -79,12 +80,13 @@ const PortalLogo = ({
         role={alt ? "img" : undefined}
         aria-label={alt || undefined}
         aria-hidden={alt ? undefined : true}
+        data-testid={dataTestId}
       />
     );
   }
 
   return (
-    <div className={wrapperClassName}>
+    <div className={wrapperClassName} data-testid={dataTestId}>
       {logo ? (
         <img
           ref={catchEarlyError}

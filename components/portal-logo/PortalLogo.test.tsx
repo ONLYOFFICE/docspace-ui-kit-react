@@ -43,6 +43,15 @@ describe("PortalLogo", () => {
     expect(img).toHaveClass("custom-class");
   });
 
+  it("carries a test id on the wrapper and on the fallback", () => {
+    render(<PortalLogo dataTestId="login-logo" />);
+    const wrapper = screen.getByTestId("login-logo");
+    expect(wrapper).toBe(screen.getByRole("img").parentElement);
+
+    fireEvent.error(screen.getByRole("img"));
+    expect(screen.getByTestId("login-logo")).toBe(screen.getByRole("img"));
+  });
+
   it("adds wrapper class by default", () => {
     render(<PortalLogo />);
     const wrapper = screen.getByRole("img").parentElement;
@@ -211,7 +220,7 @@ describe("PortalLogo", () => {
     render(<PortalLogo alt="" />);
     fireEvent.error(screen.getByRole("presentation", { hidden: true }));
 
-    expect(screen.getByTestId("svg-mock")).toHaveAttribute(
+    expect(screen.getByTestId("portal-logo")).toHaveAttribute(
       "aria-hidden",
       "true",
     );
