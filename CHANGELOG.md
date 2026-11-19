@@ -340,6 +340,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`isManagement()` is true only under the management app's `/management`.** It matched the word
   anywhere in the path, so `CategoryItem` hid its paid badge on a page such as
   `/portal-settings/management/...`
+- **`FormWrapper`'s width variables hold on a tablet, and a class can restyle it on a phone.** A
+  tablet fixed the width at 416px whatever the variables said; on a phone the shadow and background
+  were removed with `!important`
 - **`InfiniteLoader`'s row skeletons line up with the right edge in a right-to-left layout.** The
   rule that moves them named `.row-loade`, a class nothing carries
 - **`SelectionArea` reports at most once per animation frame, and a release cancels the report
