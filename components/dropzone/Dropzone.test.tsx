@@ -179,6 +179,21 @@ describe("Dropzone", () => {
     expect(line).toHaveAttribute("aria-expanded", "false");
   });
 
+  it("keeps the full format list shut while disabled", () => {
+    render(
+      <Dropzone
+        {...defaultProps}
+        isDisabled
+        fullExstsText="PDF, DOC, DOCX, ODT, RTF"
+      />,
+    );
+
+    const line = screen.getByTestId("dropzone-file-types");
+    expect(line).toHaveAttribute("aria-disabled", "true");
+    fireEvent.click(line);
+    expect(line).toHaveAttribute("aria-expanded", "false");
+  });
+
   it("keeps the format button out of the drop area's button", () => {
     render(
       <Dropzone {...defaultProps} fullExstsText="PDF, DOC, DOCX, ODT, RTF" />,

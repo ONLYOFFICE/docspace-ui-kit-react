@@ -310,6 +310,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`SelectionArea` reports at most once per animation frame, and a release cancels the report
   still scheduled.** Each move and scroll built a scheduler of its own, so several moves within one
   frame gave several reports, and the release cancelled a new, empty one
+- **`Dropzone`'s format line opens nothing while `isDisabled`.** It had left the tab order, but a
+  click still opened the full list. The line now carries `aria-disabled` as well
 - **A click on a tile's three-dot button calls `tileContextClick` once.** `BaseTile`, `FileTile`
   and `FolderTile` called it as the button read its options, with no argument, and again with
   `false` as it reported the click. Only the second call is left
