@@ -325,6 +325,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   it, and the file chosen there was dropped
 - **`AvatarEditorDialog` cannot be closed while `isLoading`.** The header cross, Escape and the
   backdrop still closed it, and the close reset the image the save was sending
+- **`RoomLogoCoverDialog`'s "without icon" stays chosen while no glyph is.** The first click turned
+  it off, and nothing turned it back on. Its label asks for `Common:WithoutIcon`, so a `t` whose
+  default namespace is not `Common` finds it
 - **`InfiniteLoader`'s row skeletons line up with the right edge in a right-to-left layout.** The
   rule that moves them named `.row-loade`, a class nothing carries
 - **`SelectionArea` reports at most once per animation frame, and a release cancels the report

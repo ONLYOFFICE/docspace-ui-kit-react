@@ -1,9 +1,9 @@
-import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
 
 import type { TTranslation } from "../../utils";
 
-import { RoomLogoCoverDialog } from ".";
+import { RoomLogoCover, RoomLogoCoverDialog } from ".";
 
 const t = ((key: string) => key) as TTranslation;
 
@@ -29,5 +29,37 @@ describe("RoomLogoCoverDialog", () => {
     // jsdom's 768px window leaves room for 768 - 84.
     await screen.findByTestId("room_logo_cover_dialog");
     expect(dialogHeight()).toBe(`${window.innerHeight - 84}px`);
+  });
+});
+
+describe("RoomLogoCover", () => {
+  const renderPicker = (onChange = vi.fn()) =>
+    render(
+      <RoomLogoCover
+        t={t}
+        covers={[{ id: "1", data: "<svg></svg>" }]}
+        openColorPicker={false}
+        setOpenColorPicker={() => {}}
+        onChange={onChange}
+      />,
+    );
+
+  it("asks for the without-icon label in Common", () => {
+    renderPicker();
+    expect(
+      screen.getByTestId("room_logo_cover_without_icon"),
+    ).toHaveTextContent("Common:WithoutIcon");
+  });
+
+  // The first click used to turn it off, and nothing could turn it back on.
+  it("keeps without icon chosen while no glyph is", () => {
+    const onChange = vi.fn();
+    renderPicker(onChange);
+    const withoutIcon = screen.getByTestId("room_logo_cover_without_icon");
+
+    fireEvent.click(withoutIcon);
+
+    expect(withoutIcon.className).toMatch(/isSelected/);
+    expect(onChange).not.toHaveBeenCalled();
   });
 });

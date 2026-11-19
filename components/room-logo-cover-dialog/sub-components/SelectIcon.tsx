@@ -24,7 +24,7 @@ export const SelectIcon = ({
           onClick={toggleWithoutIcon}
           data-testid="room_logo_cover_without_icon"
         >
-          {t("WithoutIcon")}
+          {t("Common:WithoutIcon")}
         </div>
       </div>
 
