@@ -9,15 +9,15 @@ export interface RoomLogoProps {
   isArchive?: boolean;
   /** Draws the generic template glyph, ignoring `type`. Checked after `isArchive`. */
   isTemplate?: boolean;
-  /** Draws the template variant of `type`'s glyph. There is no AI template variant — that one falls back to the plain AI glyph. */
+  /** Draws the template variant of `type`'s glyph. The four AI types have no variant and keep their plain glyph. */
   isTemplateRoom?: boolean;
   /** Renders a checkbox next to the glyph. The stylesheet hides it, so it only becomes visible under a rule of yours. */
   withCheckbox?: boolean;
-  /** Whether that checkbox is checked. */
+  /** Ticks that checkbox; `false` leaves it empty. A click flips the box itself until this prop next changes. */
   isChecked?: boolean;
   /** Whether that checkbox shows the mixed state instead of a tick. */
   isIndeterminate?: boolean;
-  /** Called by the checkbox, and by a tap on the glyph itself — but the glyph only calls it on a device `react-device-detect` reports as mobile. */
+  /** Called by the checkbox, and by a tap on the glyph. The glyph calls it only where `react-device-detect` reports a mobile device. */
   onChange?: () => void;
   /** `id` of the outer element. */
   id?: string;

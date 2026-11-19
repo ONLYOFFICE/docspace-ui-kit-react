@@ -7,7 +7,7 @@ import type { ICover } from "../../types";
 export type { ICover };
 
 export type RoomLogoCoverDialogProps = {
-  /** Translation function. The dialog asks it for `Common:RoomCover`, `Common:ApplyButton` and `Common:CancelButton`, and its icon picker for keys outside `Common`, so a portal translation context is required. */
+  /** Translation function for the heading, the buttons and the picker labels. Outside the portal it must also supply the icon picker's keys from outside `Common`. */
   t: TTranslation;
   /** Whether the dialog is on screen. Opening it remounts the picker, which discards whatever was chosen last time. */
   visible: boolean;

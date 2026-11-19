@@ -14,7 +14,7 @@ type RoomIconDefault = {
   radius?: string;
   /** Draws the initials instead of the logo, whatever `logo` holds. */
   showDefault?: boolean;
-  /** Added to the `<img>` the logo renders into. The type refuses it alongside a required `color`: a coloured default or an image, not both. */
+  /** Added to the `<img>` the logo renders into, and to the template's 24px image. */
   imgClassName?: string;
   /** Added to the outer element, before the component's own classes. */
   className?: string;
@@ -43,7 +43,7 @@ type RoomIconExpansion = {
   /** Called with the change event of the hidden file input. Passing it is what renders that input at all; its id is generated per instance. */
   onChangeFile?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   /** Draws a dashed empty frame with a camera glyph and a plus button, for a room that has no logo yet.
-   * It replaces every other content, including the initials. */
+   * It replaces the logo and the initials, and `isTemplate` wins over it. */
   isEmptyIcon?: boolean;
   /** Horizontal offset of the logo menu.
    * @default "-10px" */
@@ -64,16 +64,16 @@ type RoomIconExpansion = {
 };
 
 type RoomIconColor = {
-  /** Background of the tile and the source of the initials' colour, as six hex digits **without** a leading `#`. Required unless you pass `imgClassName` instead. */
+  /** Background of the tile and the source of the initials' colour, as six hex digits **without** a leading `#`. Unset, the initials sit on no background. */
   color: string;
-  /** Added to the `<img>` the logo renders into. The type refuses it alongside a required `color`: a coloured default or an image, not both. */
+  /** Added to the `<img>` the logo renders into, and to the template's 24px image. */
   imgClassName?: undefined;
 };
 
 type RoomIconImage = {
-  /** Background of the tile and the source of the initials' colour, as six hex digits **without** a leading `#`. Required unless you pass `imgClassName` instead. */
+  /** Background of the tile and the source of the initials' colour, as six hex digits **without** a leading `#`. Unset, the initials sit on no background. */
   color?: string | undefined;
-  /** Added to the `<img>` the logo renders into. The type refuses it alongside a required `color`: a coloured default or an image, not both. */
+  /** Added to the `<img>` the logo renders into, and to the template's 24px image. */
   imgClassName?: string;
 };
 
@@ -82,7 +82,7 @@ type RoomIconBadge = {
   badgeUrl?: string;
   /** Badge glyph as a node, used instead of `badgeUrl`. */
   badgeIconNode?: React.ReactNode;
-  /** Keeps the glyph's own colours instead of filling it with the tile's background colour. */
+  /** Any value keeps the badge glyph's own colours; the value itself is not read. Unset, the glyph is filled white, or black in the dark theme. */
   badgeIconColor?: string;
   /** Called when the badge is clicked. The click also reaches the tile, which toggles the logo menu when the tile has one. */
   onBadgeClick?: () => void;
@@ -93,7 +93,7 @@ type RoomIconNonBadge = {
   badgeUrl?: undefined;
   /** Badge glyph as a node, used instead of `badgeUrl`. */
   badgeIconNode?: undefined;
-  /** Keeps the glyph's own colours instead of filling it with the tile's background colour. */
+  /** Any value keeps the badge glyph's own colours; the value itself is not read. Unset, the glyph is filled white, or black in the dark theme. */
   badgeIconColor?: undefined;
   /** Called when the badge is clicked. The click also reaches the tile, which toggles the logo menu when the tile has one. */
   onBadgeClick?: undefined;

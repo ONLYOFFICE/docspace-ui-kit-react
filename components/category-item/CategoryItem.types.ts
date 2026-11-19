@@ -1,7 +1,7 @@
 import { MouseEvent } from "react";
 
 export type ICategoryItemProps = {
-  /** Heading of the card, rendered as the text of a link at 16px. */
+  /** Heading of the row, rendered as the text of a link at 16px. */
   title: string;
   /** Where the link points. It is dropped while `isDisabled` is set, which leaves an `<a>` with no `href`. */
   url: string;
@@ -9,7 +9,7 @@ export type ICategoryItemProps = {
   subtitle: string;
   /** Called with the click event on the title link. Nothing prevents the browser from following `url` — call `preventDefault` yourself when you route in JavaScript. */
   onClickLink: (e: MouseEvent<Element>) => void;
-  /** Greys the subtitle and removes both `href` and `onClickLink` from the link. The title keeps its colour and the arrow still points right, so say elsewhere that the card is unavailable. */
+  /** Dims the title, subtitle and arrow, and removes `href` and `onClickLink` from the link. The arrow still renders, so say in the subtitle why the row is unavailable. */
   isDisabled?: boolean;
   /** Shows the paid badge beside the title — unless the page's path contains `management`, where it is suppressed. Required, so pass `false` when there is no badge. */
   withPaidBadge: boolean;

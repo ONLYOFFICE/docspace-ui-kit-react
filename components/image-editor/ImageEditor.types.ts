@@ -14,17 +14,17 @@ export type TChangeImage = (image: TImage) => void;
 export type TSetPreview = (preview: string) => void;
 
 export type ImageEditorProps = {
-  /** Translation function. The editor asks it for `Common:ChooseAnother`, so a portal translation context is required. */
+  /** Translation function, asked for the replace control's label, `Common:ChooseAnother`. */
   t: TTranslation;
   /** The picture and its crop, held in your state. The whole editor renders nothing while `uploadedFile` is empty. */
   image: TImage;
   /** Called with a new `image` whenever the crop is dragged or the zoom changes. Apply it to your state or nothing moves. */
   onChangeImage: TChangeImage;
-  /** Rendered beside the cropper, inside the wrapper that `classNameWrapperImageCropper` names — the place for a preview of the cropped result. */
+  /** Rendered beside the cropper, inside the wrapper that `classNameWrapperImageCropper` names: the place for a preview of the cropped result. */
   Preview: React.ReactNode;
   /** Called, at most every 300ms, with the cropped picture as a `data:` URL. A canvas tainted by a cross-origin image makes it stop silently. */
   setPreview: TSetPreview;
-  /** Blocks dragging, zooming and choosing another file. It is required, so pass `false` when nothing is in flight. */
+  /** Blocks dragging and zooming, and drops a file chosen through the replace control. Pass `false` when nothing is in flight. */
   isDisabled: boolean;
   /** Added to the element that wraps the cropper and `Preview`. It is the hook for laying those two out side by side. */
   classNameWrapperImageCropper?: string;
@@ -35,7 +35,7 @@ export type ImageEditorProps = {
   /** Ignored. Nothing in this folder reads it; check the file's size in `onChangeFile` instead.
    * @deprecated */
   maxImageSize?: number;
-  /** Corner radius of the crop window in pixels, measured on the 648px canvas — half of it, 324, is a circle. */
+  /** Corner radius of the crop window in pixels, measured on the 648px canvas. Half of it, 324, is a circle. */
   editorBorderRadius: number;
   /** Called with the change event of the hidden file input when another picture is chosen. Read the file and put it in `image.uploadedFile` yourself. */
   onChangeFile: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -54,7 +54,7 @@ export type ImageCropperProps = {
   setUploadedFile: (uploadedFile?: File) => void;
   /** Called with the cropped picture as a `data:` URL, throttled to every 300ms. */
   setPreviewImage: TSetPreview;
-  /** Blocks dragging, zooming and choosing another file. */
+  /** Blocks dragging and zooming, and drops a file chosen through the replace control. */
   isDisabled: boolean;
   /** Hides the zoom row and freezes the crop position. */
   disableImageRescaling?: boolean;
