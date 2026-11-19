@@ -37,7 +37,9 @@ const Calendar = ({
   const handleDateChange = (date: DateTime) => {
     // Combine the new date with the existing time from selectedDate
     const dateStr = formatDate(date, "yyyy-MM-dd");
-    const timeStr = selectedDate ? formatDate(selectedDate, "HH:mm") : "00:00";
+    const timeStr = selectedDate
+      ? formatDate(selectedDate, "HH:mm:ss")
+      : "00:00:00";
     let formattedDate = parseToDateTime(`${dateStr}T${timeStr}`)!;
 
     if (useMaxTime) {

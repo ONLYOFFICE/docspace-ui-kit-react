@@ -294,6 +294,14 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`Calendar` leaves the day of `minDate` selectable, and keeps the seconds.** A day was
+  compared at midnight with `minDate` and its time, so a `minDate` of now disabled today; it is
+  compared with the day `minDate` falls on now. A picked day kept the old hours and minutes but
+  dropped the seconds; it keeps them too. `DatePicker` and `DateTimePicker` show the calendar
+  and gain both
+- **`DatePicker` writes the chip's date in `locale`.** The month name followed the date's own
+  Luxon locale, so a German picker showed "15 Mar 2024"; it shows "15 März 2024". `DateTimePicker`
+  gains the same
 - **A loading `Button` no longer repeats its `id` on the spinner.** The button passed its own
   `id` to the `track` loader, so while it loaded the page held two elements with that id. A
   loader without an `id` now gets a unique one, so its gradients stay apart from every other

@@ -137,6 +137,32 @@ describe("getDayElements", () => {
       expect(day.closest("button")).toBeDisabled();
     });
   });
+  it("leaves the day of minDate selectable whatever its time", () => {
+    const afternoon = DateTime.fromObject({
+      year: 2023,
+      month: 10,
+      day: 10,
+      hour: 15,
+      minute: 30,
+    });
+    const elements = getDayElements(
+      mockObservedDate,
+      mockSelectedDate,
+      handleDateChange,
+      afternoon,
+      mockMaxDate,
+      "en",
+    );
+    render(<>{elements}</>);
+
+    expect(
+      screen.getByRole("button", { name: "October 10, 2023" }),
+    ).toBeEnabled();
+    expect(
+      screen.getByRole("button", { name: "October 9, 2023" }),
+    ).toBeDisabled();
+  });
+
   it("names every day by its full date and marks the selected one", () => {
     const elements = getDayElements(
       mockObservedDate,

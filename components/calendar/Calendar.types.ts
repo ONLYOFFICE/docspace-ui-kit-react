@@ -23,8 +23,8 @@ export interface CalendarProps {
   /** Called with the newly picked day, before `onChange`. */
   setSelectedDate?: (formattedDate: DateTime) => void;
   /**
-   * Earliest selectable moment, compared with its time. Days before it are
-   * greyed and the header arrows stop at its month; pass the start of a day.
+   * Earliest selectable day; its own day stays selectable, whatever its time.
+   * Days before it are greyed, and the header arrows stop at its month.
    */
   minDate?: DateTime | Date;
   /** Latest selectable day, with the same effect at the other end. */

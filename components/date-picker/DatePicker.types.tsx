@@ -22,15 +22,14 @@ export type DatePickerProps = {
   /** Applied to the outermost element. */
   id?: string;
   /**
-   * Earliest selectable moment in the calendar, compared with its time; pass
-   * the start of a day.
+   * Earliest selectable day in the calendar; its own day stays selectable,
+   * whatever its time.
    */
   minDate?: DateTime | Date;
   /** Latest selectable day in the calendar. */
   maxDate?: DateTime | Date;
   /**
-   * BCP 47 tag the calendar is written in. The chip's date ignores it and
-   * follows the date's own Luxon locale.
+   * BCP 47 tag the calendar and the chip's date are written in.
    */
   locale: string;
   /**

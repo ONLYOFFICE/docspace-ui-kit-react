@@ -58,6 +58,23 @@ describe("DatePicker tests", () => {
     expect(selectedItem).toHaveTextContent("15 Jan 2024");
   });
 
+  it("writes the chip's month in the locale", () => {
+    const initialDate = createDateTime(2024, 3, 15);
+    render(
+      <DatePicker
+        {...defaultProps}
+        locale="de"
+        initialDate={initialDate}
+        outerDate={initialDate}
+        showCalendarIcon={false}
+      />,
+    );
+
+    expect(screen.getByTestId("selected-item")).toHaveTextContent(
+      "15 März 2024",
+    );
+  });
+
   it("shows calendar icon when enabled", () => {
     const initialDate = createDateTime(2024, 1, 15);
     render(

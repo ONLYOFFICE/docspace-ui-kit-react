@@ -74,6 +74,7 @@ describe("Calendar tests:", () => {
       day: 15,
       hour: 10,
       minute: 30,
+      second: 45,
     }),
     setSelectedDate: mockSetSelectedDate,
     minDate: DateTime.fromObject({ year: 2020, month: 1, day: 1 }),
@@ -91,8 +92,15 @@ describe("Calendar tests:", () => {
         if (str.includes("T")) {
           const [datePart, timePart] = str.split("T");
           const [year, month, day] = datePart.split("-").map(Number);
-          const [hour, minute] = timePart.split(":").map(Number);
-          return DateTime.fromObject({ year, month, day, hour, minute });
+          const [hour, minute, second = 0] = timePart.split(":").map(Number);
+          return DateTime.fromObject({
+            year,
+            month,
+            day,
+            hour,
+            minute,
+            second,
+          });
         }
         const [year, month, day] = str.split("-").map(Number);
         return DateTime.fromObject({ year, month, day });
@@ -107,10 +115,10 @@ describe("Calendar tests:", () => {
             d.day,
           ).padStart(2, "0")}`;
         }
-        if (format === "HH:mm") {
-          return `${String(d.hour).padStart(2, "0")}:${String(
-            d.minute,
-          ).padStart(2, "0")}`;
+        if (format === "HH:mm:ss") {
+          return [d.hour, d.minute, d.second]
+            .map((part) => String(part).padStart(2, "0"))
+            .join(":");
         }
         return "";
       },
@@ -186,10 +194,15 @@ describe("Calendar tests:", () => {
     const selectButton = screen.getByText("Select Date");
     fireEvent.click(selectButton);
 
-    // Verify formatDate was called to extract time from selectedDate
-    expect(dateUtils.formatDate).toHaveBeenCalledWith(
-      expect.objectContaining({ hour: 10, minute: 30 }),
-      "HH:mm",
+    // The picked day keeps the old time, seconds included.
+    expect(mockOnChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        day: 15,
+        month: 6,
+        hour: 10,
+        minute: 30,
+        second: 45,
+      }),
     );
   });
 
