@@ -102,6 +102,20 @@ describe("LinkWithDropdown", () => {
     expect(trigger).toHaveAttribute("aria-expanded", "false");
   });
 
+  it("calls the onClick of an entry with a numeric key", () => {
+    const onClick = vi.fn();
+    render(
+      <LinkWithDropdown isBold data={[{ key: 7, label: "Seven", onClick }]}>
+        Link with dropdown
+      </LinkWithDropdown>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Link with dropdown" }));
+    fireEvent.click(screen.getByText("Seven"));
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
   it("renders with custom styles", () => {
     render(
       <LinkWithDropdown

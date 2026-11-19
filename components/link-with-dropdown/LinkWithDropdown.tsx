@@ -46,10 +46,11 @@ const LinkWithDropdown = ({
 }: LinkWithDropDownProps) => {
   const ref = useRef<HTMLDivElement | null>(null);
 
-  const [state, setState] = useState({
+  // Read only in a browser, so the component also renders on a server.
+  const [state, setState] = useState(() => ({
     isOpen,
-    orientation: window.orientation,
-  });
+    orientation: typeof window === "undefined" ? undefined : window.orientation,
+  }));
 
   const setIsOpen = (value: boolean) =>
     setState((s) => ({ ...s, isOpen: value }));
@@ -225,7 +226,8 @@ const LinkWithDropdown = ({
   ) => {
     const currentTarget = e.currentTarget as HTMLElement;
     const { key } = currentTarget.dataset;
-    const item = data?.find((x) => x.key === key);
+    // The DOM attribute is text, so a numeric key is compared as text too.
+    const item = data?.find((x) => String(x.key) === key);
     setIsOpen(!state.isOpen);
     if (item && "onClick" in item) item.onClick?.(e);
   };
