@@ -298,6 +298,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`Article` survives a `showArticle` value in local storage that is not JSON.** The parse ran
+  unguarded in an effect, so such a value threw on mount and on every device change. It now
+  counts as its raw text, and storage that cannot be read counts as an absent key
 - **A click on a `Toast` spreads out its own deck only, and the deck closes again.** The click
   set `position: static` on every `.Toastify__toast` in the document and never undid it, so a
   later toast stacked over the spread ones. The container now carries a class until its last
