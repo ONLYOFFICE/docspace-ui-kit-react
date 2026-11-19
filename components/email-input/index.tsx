@@ -1,4 +1,5 @@
 import React from "react";
+import classNames from "classnames";
 import { isIOS, isMobile } from "react-device-detect";
 
 import { parseAddress } from "../../utils/email";
@@ -20,6 +21,7 @@ export const EmailInput = ({
   onChange,
   onBlur,
   dataTestId,
+  className,
   ...rest
 }: EmailInputProps) => {
   const [inputValue, setInputValue] = React.useState(value);
@@ -70,7 +72,7 @@ export const EmailInput = ({
   return (
     <TextInput
       {...rest}
-      className={styles.emailInput}
+      className={classNames(styles.emailInput, className)}
       type={InputType.text}
       value={inputValue}
       hasError={computedHasError}
