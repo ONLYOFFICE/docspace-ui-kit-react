@@ -8,6 +8,28 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **`ThemeProviderComponent` hands the page back when it unmounts.** It left `data-theme`,
+  `data-dir`, the body classes and every custom property behind. Now the provider mounted last
+  writes the page, and when it goes the one around it writes again, or the page returns to what it
+  was before any provider. A colour scheme without `main`, or none, takes the previous accent off
+  instead of keeping it. A theme without `isBase` is light in the React context too, as it already
+  was in the body class
+- **`ImageEditor`'s test ids are `data-testid`, and its file input has an id of its own.** The
+  outer element and the cropper wrapper carried `image-editor` and `image-cropper-wrapper` under
+  the misspelt `data-test-id`; select them with `getByTestId` now. The hidden input's fixed id
+  `customFileInput`, which a page's own upload input often carries too, is now generated per
+  editor: reach the input as the `input[type="file"]` inside the replace control
+- **`Filter`'s `onSortButtonClick` gets `true` when the sort menu opens and `false` when it
+  closes.** It got the opposite, and `true` once on mount. The first render now reports nothing.
+  A handler that relied on the old values, such as one that hides a button while the menu is open
+  with `setVisible(value)`, needs `setVisible(!value)`
+- **`Navigation`'s `hideInfoPanel` is a `boolean`.** It was typed as a callback but never called:
+  any truthy value hid the info panel toggle, so passing the handler the type asked for hid the
+  button. Pass `true` to hide it; a function no longer type-checks, and passing one still hides it
+- **`EmptyView`'s title and description sit in a `<div>`, not a `<header>`.** Outside a `main`,
+  `section` or `article` the `<header>` was a `banner` landmark, a second one beside the page's
+  own. The view now adds no landmark; a selector for `header` inside it finds nothing, while the
+  class stays
 - **`FileTile`'s `--tile-option-button-padding-end` is now `--tile-option-button-margin-end`,
   default `8px`.** The actions button pads its icon alike on every side, so its keyboard focus
   ring sits around the icon, and the room to the tile's edge is a margin after it. The space to
@@ -247,6 +269,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Added
 
+- **`PortalLogo` takes `dataTestId`**, `portal-logo` by default, on the wrapper or on the
+  fallback logo that replaces it. It carried no test id at all
 - **`ComboBox` and `AccessRightSelect` take `ariaLabel`**, the accessible name of the button.
   Without it the button is still named by the option it shows.
 - **`FolderType.PrivateRooms` (42)**: the root of the Private section. It holds no rooms
@@ -290,6 +314,150 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **Arabic gets the system font in any region.** `getFontFamilyDependingOnLanguage`, and with it
+  `ThemeProvider`, matched only `ar-SA`; `ar` and `ar-EG` got Open Sans, which has no Arabic
+  glyphs
+- **`RoomType` works the same for the pointer and the keys, and needs no portal for its accent.**
+  A `dropdownButton` ignored the disabled props for a click but not for Enter and Space; now it
+  ignores them for both. The pressed and open borders fall back to the theme's accent, not the
+  text colour. Leaving out `roomType` leaves the row blank, as an unknown value does, instead of
+  borrowing the form room's texts
+- **`RoomIcon`'s empty state draws one button.** With `withEditing` the pencil sat over the plus
+  in the same corner, each with a menu of its own; the plus is left. Its circle takes the theme's
+  accent without the portal too, where it had no background and the white plus was invisible
+- **`Avatar`'s badge colours can be set on an ancestor.** The avatar declared
+  `--avatar-owner-fill`, `--avatar-administrator-fill` and their strokes on itself, so a value from
+  above never reached the badge
+- **`ImageEditor` keeps the file dialog shut while `isDisabled`.** The replace control still opened
+  it, and the file chosen there was dropped
+- **`AvatarEditorDialog` cannot be closed while `isLoading`.** The header cross, Escape and the
+  backdrop still closed it, and the close reset the image the save was sending
+- **`RoomLogoCoverDialog`'s "without icon" stays chosen while no glyph is.** The first click turned
+  it off, and nothing turned it back on. Its label asks for `Common:WithoutIcon`, so a `t` whose
+  default namespace is not `Common` finds it
+- **`PortalLogo`'s phone bar takes the portal's `--header-background-color`.** The logo declared
+  that token on itself, hiding the portal's value, and left the bar with no colour outside a
+  `.light` or `.dark` ancestor
+- **`MCPIcon` draws the first letter after leading spaces, and a leading emoji whole.** It drew the
+  space, a blank tile, or half of the emoji's surrogate pair
+- **`SelectedItem` applies `style`, and its cross carries no `undefined` class.** `style` was
+  declared and never read; without `classNameCloseButton` the cross got the literal class
+- **`isManagement()` is true only under the management app's `/management`.** It matched the word
+  anywhere in the path, so `CategoryItem` hid its paid badge on a page such as
+  `/portal-settings/management/...`
+- **`FormWrapper`'s width variables hold on a tablet, and a class can restyle it on a phone.** A
+  tablet fixed the width at 416px whatever the variables said; on a phone the shadow and background
+  were removed with `!important`
+- **`InfiniteLoader`'s row skeletons line up with the right edge in a right-to-left layout.** The
+  rule that moves them named `.row-loade`, a class nothing carries
+- **`SelectionArea` reports at most once per animation frame, and a release cancels the report
+  still scheduled.** Each move and scroll built a scheduler of its own, so several moves within one
+  frame gave several reports, and the release cancelled a new, empty one
+- **`Dropzone`'s format line opens nothing while `isDisabled`.** It had left the tab order, but a
+  click still opened the full list. The line now carries `aria-disabled` as well
+- **Clearing `Scrollbar`'s `paddingInlineEnd` brings the default space back.** The value was
+  written only while the prop was set, so the last one stayed
+- **A click on a tile's three-dot button calls `tileContextClick` once.** `BaseTile`, `FileTile`
+  and `FolderTile` called it as the button read its options, with no argument, and again with
+  `false` as it reported the click. Only the second call is left
+- **`FileTile`'s `isBlockingOperation` turns the pointer off.** Its rule matched only a descendant
+  of the tile, so hover, clicks and right-clicks still reached a blocked file. The dead
+  `contextButtonSpacerWidth` and `sideColor` no longer reach the DOM as unknown attributes
+- **A `RowContainer` with any `id` gets rows of its own width.** The virtual list measured
+  `document.getElementById("rowContainer")`, so another id laid the rows out zero wide and a
+  second container took the first one's width. A `row` list of `InfiniteLoaderComponent` now
+  measures the element it sits in and follows it as it resizes; `table` and `tile` still look up
+  their ids
+- **`TableHeader` gives the free width to the wide column on a window resize.** When the columns
+  stopped fitting, a resize handed it only to a `default` column that also set `minWidth`, and to
+  any column with `minWidth` and `default: false`. The wide column could end at `0px` with the
+  rest. A layout reset was not affected
+- **`TableRow` and `TableBody` add no class named `undefined`.** `hideColumns` and the body's
+  `infoPanelVisible` each looked up a class their stylesheet does not define. The props change
+  nothing else
+- **`RowContent` adds no class named `undefined`.** `sectionWidth` looked up a class its
+  stylesheet does not define; the prop changes nothing else
+- **`Article` survives a `showArticle` value in local storage that is not JSON.** The parse ran
+  unguarded in an effect, so such a value threw on mount and on every device change. It now
+  counts as its raw text, and storage that cannot be read counts as an absent key
+- **`NavMenu` draws the line of `withTopSeparator` without any setup.** The border fell back to
+  `--quick-buttons-color`, which the kit does not define, so with neither that nor
+  `--nav-menu-separator-color` set there was no line. The theme now supplies a divider grey last;
+  both variables still win over it
+- **`Navigation`'s header holds up in four corner cases.** The room title with `rootRoomTitle` and
+  a single crumb threw on click; it now only closes the drop box. Each title icon's tooltip has
+  its own id, where every header shared `iconTooltip`. `withLogo={true}` no longer draws an
+  `<img>` with an empty `src`. The extra button's place in the row follows `currentDeviceType`, as
+  the rest of the layout does, instead of the window's width at render
+- **`Tabs` passes each bar only its own props.** A prop of the other type, such as `scaled` on
+  the primary bar, reached the wrapper `<div>` and React warned about an unknown attribute
+- **A click on a `Toast` spreads out its own deck only, and the deck closes again.** The click
+  set `position: static` on every `.Toastify__toast` in the document and never undid it, so a
+  later toast stacked over the spread ones. The container now carries a class until its last
+  toast is gone. The `visualViewport` listener that wrote `--toast-top-offset` on `<html>`, where
+  nothing read it, is removed
+- **`ColumnarInfoBar`'s close cross follows `--cib-color`.** Its `fill: var(--gray)` named a
+  variable the kit does not define, so the cross kept the asset's fixed grey in both themes
+- **A swipe down no longer closes a `ModalDialog` that cannot close.** The swipe called
+  `onClose` directly, past the guard the cross and Escape go through, so `isCloseable={false}`
+  and `embedded` did not stop it on a phone. It goes through that guard now, and such a dialog
+  is not dragged at all
+- **`ContextMenu`'s mobile sheet shows a `badgeLabel` without `isPaidBadge`.** The sheet drew a
+  badge only for a paid item, while the desktop list drew a plain one in blue; both draw it now
+- **`DropDownItem` draws an `icon` passed as an element or a memoised component.** An element
+  such as `<Icon />`, or a component wrapped in `memo` or `forwardRef`, fell through to
+  `react-svg` with an empty address and drew nothing, though the type allows both
+- **`DropDown`'s virtual list keeps the markup of a child of its own.** With `maxHeight` every
+  child was rendered again as a `DropDownItem` built from its props, so a component of your own
+  lost its markup. A `DropDownItem` is still drawn that way; any other child is placed in its
+  row as it is
+- **An open `DropDown` takes only the arrows and Enter from the page.** Its virtual list, with
+  `maxHeight` and keyboard navigation on, prevented the default of every key press on the page
+  before looking at the key, so a text field elsewhere took no characters and Tab did not move.
+  Only the three keys it acts on are prevented now
+- **`Calendar` leaves the day of `minDate` selectable, and keeps the seconds.** A day was
+  compared at midnight with `minDate` and its time, so a `minDate` of now disabled today; it is
+  compared with the day `minDate` falls on now. A picked day kept the old hours and minutes but
+  dropped the seconds; it keeps them too. `DatePicker` and `DateTimePicker` show the calendar
+  and gain both
+- **`DatePicker` writes the chip's date in `locale`.** The month name followed the date's own
+  Luxon locale, so a German picker showed "15 Mar 2024"; it shows "15 März 2024". `DateTimePicker`
+  gains the same
+- **`TimePicker` reports a change of `meridiem`, and keeps the zone of `initialTime`.** A new
+  AM or PM reported nothing until the next keystroke; it now reports the typed time in the new
+  half. Every value is `initialTime` with the typed hour and minute set on it, so it keeps that
+  date's seconds and time zone; it used to be parsed again in the local zone with the seconds
+  at zero. `DateTimePicker` reports a value equal to its current one only once
+- **`Badge` merges a passed `style` over its own.** The style was spread after the badge's own,
+  so it replaced `height`, `border`, `borderRadius` and the background colour as a whole; now
+  only the keys it names change
+- **`LinkWithDropdown` renders on a server and finds entries with a numeric `key`.** It read
+  `window.orientation` while it was created, which threw where there is no `window`. An entry's
+  `onClick` was looked up by comparing its `key` with a DOM attribute, so a numeric key never
+  matched and the click only closed the menu
+- **`Tag` styles its label.** The label never got the stylesheet's label class, so a deleted tag
+  was not struck through, a disabled one not greyed, and `--tag-text-color`, `--tag-size` and
+  `--tag-lh` changed nothing. All of them reach the label now. Its size comes from `--tag-size`,
+  13px by default, instead of an inline style
+- **`Heading` no longer carries a class named `undefined`.** It asked for a `not-selectable`
+  class its stylesheet never defined. Headings stay selectable, as they were
+- **`RadioButton`s sharing a `name` clear each other.** Without `onChange` each button held its
+  own dot, and React restored the group from those stale dots: a click on a second button left
+  its input unchecked and the first one's dot drawn. A button checked that way now clears the
+  others of its name in the same form
+- **`RadioButtonGroup` takes several captions.** Every `type: "text"` entry had the key
+  `radio-text`, so a second caption collided with the first; each is keyed by its position now
+- **A loading `Button` no longer repeats its `id` on the spinner.** The button passed its own
+  `id` to the `track` loader, so while it loaded the page held two elements with that id. A
+  loader without an `id` now gets a unique one, so its gradients stay apart from every other
+  track's; before, tracks without an `id` shared one set and a secondary button's spinner drew
+  in the primary's white
+- **`TextInput`'s `keepCharPositions` works.** The prop reached only a `data-` attribute and
+  never the mask, so typing or deleting in the middle shifted the rest. With a `mask` every
+  character now keeps its slot: typing into a filled slot is refused, and a deletion leaves the
+  slot empty. The attribute is still set
+- **`EmailInput` keeps a passed `className`.** Its own class was set after the rest of the props
+  and replaced it; the two are now joined
 - **`PasswordInput` generates passwords from the cryptographic generator.** The generate link
   and the handle's `onGeneratePassword` drew every character and the final shuffle from
   `Math.random`, which is predictable, while consumers use the result as an account password

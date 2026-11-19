@@ -89,7 +89,7 @@ const TagPure: FC<TagProps> = ({
         ))
         .otherwise(() => null)}
       {withLabel ? (
-        <Text title={label} fontSize="13px" noSelect truncate>
+        <Text className={styles.tagText} title={label} noSelect truncate>
           {label}
           {labelSuffix ? (
             <span style={{ color: labelSuffixColor }}>{labelSuffix}</span>

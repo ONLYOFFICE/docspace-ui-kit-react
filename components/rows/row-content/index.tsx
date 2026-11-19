@@ -14,7 +14,6 @@ const RowContent = (props: RowContentProps) => {
     style,
     sideColor,
     onClick,
-    sectionWidth,
     convertSideInfo = true,
   } = props;
 
@@ -37,11 +36,7 @@ const RowContent = (props: RowContentProps) => {
 
   return (
     <div
-      className={classNames(
-        styles.rowContent,
-        { [styles.sectionWidth]: sectionWidth },
-        className,
-      )}
+      className={classNames(styles.rowContent, className)}
       id={id}
       onClick={onClick}
       style={style}

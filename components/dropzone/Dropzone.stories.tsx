@@ -28,7 +28,7 @@ const meta = {
     isDisabled: {
       control: "boolean",
       description:
-        "Blocks clicking, the keyboard and dropping on the area, and sets `aria-disabled`. The format line still opens its full list on a click.",
+        "Blocks clicking, the keyboard and dropping on the area and its format line, and sets `aria-disabled`.",
       table: {
         defaultValue: { summary: "false" },
       },

@@ -6,4 +6,7 @@ export type PortalLogoProps = {
   isResizable?: boolean;
   /** Accessible name of the logo: the `alt` of the image, and the `aria-label` of the bundled mark shown when the image fails to load. Pass the portal or product name, translated. An empty string marks the logo as decorative. */
   alt?: string;
+  /** Value of `data-testid` on the wrapper, or on the fallback logo that replaces it.
+   * @default "portal-logo" */
+  dataTestId?: string;
 };

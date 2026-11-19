@@ -152,8 +152,8 @@ export function ShortList({ names }: { names: string[] }) {
 - The [`InfiniteLoader`](../infinite-loader/README.md) looks for
   `#sectionScroll .scroll-wrapper > .scroller`, so give the outer element an id rather than
   restructuring the inside.
-- **`paddingInlineEnd` is written as a custom property in an effect, and only when it is set.**
-  Clearing it leaves the last value in place.
+- **`paddingInlineEnd` is written as a custom property in an effect.** Clearing it removes the
+  value, and the default space returns.
 - **`paddingAfterLastItem` takes effect through a class that only the prop adds.** Clearing it
   removes the space; `--scrollbar-last-padding` alone does nothing.
 - `contentRef` is filled in by the ref setter rather than forwarded, so it is available after

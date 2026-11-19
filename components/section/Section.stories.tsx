@@ -504,7 +504,7 @@ const NavigationHeader = ({
       { key: "create", label: "Create folder" },
     ]}
     toggleInfoPanel={noop}
-    hideInfoPanel={noop}
+    hideInfoPanel
     showFolderInfo={noop}
     onPlusClick={noop}
     withLogo={false}

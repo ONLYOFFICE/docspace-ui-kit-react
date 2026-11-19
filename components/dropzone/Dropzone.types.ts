@@ -9,8 +9,8 @@ type BaseDropzoneProps = {
   /** Percentage for the progress bar shown in place of the plain loader while `isLoading`. Leave it out and the loader is an indeterminate spinner. */
   uploadPercent?: number;
   /**
-   * Blocks clicking, the keyboard and dropping on the area, and sets
-   * `aria-disabled`. The format line still opens its full list on a click.
+   * Blocks clicking, the keyboard and dropping on the area and its format
+   * line, and sets `aria-disabled`.
    */
   isDisabled?: boolean;
   /**

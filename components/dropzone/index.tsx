@@ -157,8 +157,11 @@ const Dropzone = ({
   const [isFormatsOpen, setIsFormatsOpen] = React.useState(false);
   const formatsRef = React.useRef<HTMLDivElement>(null);
 
+  // The full list opens from the format line, unless the area is disabled.
+  const canOpenFormats = !!fullExstsText && !isDisabled;
+
   const handleFormatsClick = (e: React.MouseEvent) => {
-    if (fullExstsText) {
+    if (canOpenFormats) {
       e.stopPropagation();
       e.preventDefault();
       setIsFormatsOpen((prev) => !prev);
@@ -166,7 +169,7 @@ const Dropzone = ({
   };
 
   const handleFormatsKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
-    if (!fullExstsText) return;
+    if (!canOpenFormats) return;
 
     if (e.key === "Enter" || e.key === " ") {
       // Keep the page from scrolling on Space, and the key from the page's
@@ -311,7 +314,7 @@ const Dropzone = ({
             <div
               ref={formatsRef}
               className={classNames(styles.dropzoneExsts, {
-                [styles.clickable]: !!fullExstsText,
+                [styles.clickable]: canOpenFormats,
               })}
               data-testid="dropzone-file-types"
               {...(fullExstsText
@@ -319,6 +322,7 @@ const Dropzone = ({
                     role: "button",
                     tabIndex: isDisabled ? -1 : 0,
                     "aria-expanded": isFormatsOpen,
+                    "aria-disabled": isDisabled || undefined,
                     onKeyDown: handleFormatsKeyDown,
                   }
                 : { "aria-label": "Supported file types" })}
@@ -327,7 +331,7 @@ const Dropzone = ({
               <div
                 className={classNames(styles.dropzoneExstsTextContainer, {
                   [styles.isOpen]: isFormatsOpen,
-                  [styles.clickable]: !!fullExstsText,
+                  [styles.clickable]: canOpenFormats,
                 })}
               >
                 <span className={styles.dropzoneExstsText}>{exstsText}</span>

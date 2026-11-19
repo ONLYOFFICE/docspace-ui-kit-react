@@ -13,8 +13,8 @@ import enCommon from "../../locales/en/Common.json";
 import { RoomLogoCoverDialog } from ".";
 
 // The dialog takes its translator as a prop rather than using the hook, so
-// the stories hand it the kit's own English bundle. `Common:` keys and the
-// bare `WithoutIcon` come from there; `CreateEditRoomDialog:Icon` lives in a
+// the stories hand it the kit's own English bundle. `Common:` keys come from
+// there; `CreateEditRoomDialog:Icon` lives in a
 // namespace the kit does not ship, which is what an application outside the
 // portal has to supply too.
 const EXTRA_LABELS: Record<string, string> = {
@@ -79,7 +79,7 @@ const meta = {
     t: {
       control: false,
       description:
-        "Translation function for the heading, the buttons and the picker labels. Outside the portal it must also supply the icon picker's keys from outside `Common`.",
+        "Translation function for the heading, the buttons and the picker labels. Outside the portal it must also supply the icon picker's key from outside `Common`.",
     },
     visible: {
       control: "boolean",

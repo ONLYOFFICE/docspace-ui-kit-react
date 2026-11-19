@@ -84,7 +84,6 @@ export const Button = (props: React.PropsWithChildren<ButtonProps>) => {
         {isLoading ? (
           <Loader
             isDecorative
-            id={id}
             className={classNames(styles.loader, "loader", {
               [styles.primary]: primary,
             })}

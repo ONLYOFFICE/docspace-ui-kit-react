@@ -127,9 +127,16 @@ const Article = ({
   }, [onMobileBack]);
 
   React.useEffect(() => {
-    const item = localStorage.getItem("showArticle") || "{}";
-
-    const showArticle = JSON.parse(item);
+    // A value that is not JSON counts as its raw text; blocked storage, as an
+    // absent key.
+    let showArticle: unknown = true;
+    try {
+      const item = localStorage.getItem("showArticle") || "{}";
+      showArticle = item;
+      showArticle = JSON.parse(item);
+    } catch {
+      // keep the fallback above
+    }
 
     if (currentDeviceType === DeviceType.mobile) {
       setShowText(true);

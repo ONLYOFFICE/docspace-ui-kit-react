@@ -324,6 +324,36 @@ export const CssCustomization: Story = {
     await expect(style.paddingLeft).toBe("40px");
     // So the card itself is the width plus the padding on both sides.
     await expect(Math.round(card.getBoundingClientRect().width)).toBe(480);
+
+    // The canvas is desktop-wide, so read the card's own rules inside its
+    // media queries: the width variables hold on a tablet too, and nothing
+    // on a phone is !important.
+    const mediaRules = [...document.styleSheets]
+      .flatMap((sheet) => {
+        try {
+          return [...sheet.cssRules];
+        } catch {
+          return [];
+        }
+      })
+      .filter((rule): rule is CSSMediaRule => rule instanceof CSSMediaRule)
+      .flatMap((media) => [...media.cssRules])
+      .filter(
+        (rule): rule is CSSStyleRule =>
+          rule instanceof CSSStyleRule &&
+          [...card.classList].some((name) => rule.selectorText === `.${name}`),
+      );
+    await expect(mediaRules.length).toBeGreaterThan(0);
+    for (const rule of mediaRules) {
+      for (const name of [...rule.style]) {
+        await expect(rule.style.getPropertyPriority(name)).toBe("");
+      }
+    }
+    await expect(
+      mediaRules.some((rule) =>
+        rule.style.maxWidth.includes("--form-wrapper-max-width"),
+      ),
+    ).toBe(true);
   },
   parameters: {
     docs: {

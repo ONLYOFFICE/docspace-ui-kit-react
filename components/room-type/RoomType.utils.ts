@@ -3,7 +3,7 @@ import { RoomsType } from "../../enums";
 
 export const getRoomTypeTitleTranslation = (
   t: TTranslation,
-  roomType: RoomsType = 1,
+  roomType?: RoomsType,
   isTemplate: boolean = false,
   isFormSection: boolean = false,
 ) => {
@@ -38,7 +38,7 @@ export const getRoomTypeTitleTranslation = (
 
 export const getRoomTypeDescriptionTranslation = (
   t: TTranslation,
-  roomType: RoomsType = 1,
+  roomType?: RoomsType,
   isTemplate: boolean = false,
   isFormSection: boolean = false,
 ) => {

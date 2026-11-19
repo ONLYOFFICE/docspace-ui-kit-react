@@ -9,7 +9,7 @@ Shared utility functions for user types, room types, folder icons, and translati
 - `getUserAvatarRoleByType(type)` — maps `EmployeeType` to `AvatarRole` for avatar badge display
 - `RoomsTypeValues` — array of numeric `RoomsType` values (excludes AIRoom)
 - `RoomsTypes` — lookup object mapping room type numbers to themselves
-- `isManagement()` — checks if the current URL is in the management section
+- `isManagement()` — checks if the current path is under the management app's `/management`
 - `getLifetimePeriodTranslation(period)` — translates lifetime period codes (0=Days, 1=Months, 2=Years)
 - `getIconPathByFolderType(folderType?)` — returns SVG icon filename for a given folder type
 

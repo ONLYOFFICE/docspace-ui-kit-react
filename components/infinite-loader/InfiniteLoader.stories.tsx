@@ -471,9 +471,23 @@ export const RightToLeft: Story = {
       <InfiniteLoaderDemo {...args} renderItem={renderRtlItem} />
     </div>
   ),
-  play: async ({ canvas }) => {
+  play: async ({ canvas, canvasElement }) => {
     const item = await canvas.findByText("ملف 1");
     await expect(getComputedStyle(item).direction).toBe("rtl");
+
+    // The skeletons of the next page line up with the right edge too.
+    const scroller = getScroller();
+    scroller.scrollTop = scroller.scrollHeight;
+    scroller.dispatchEvent(new Event("scroll"));
+    const skeleton = await waitFor(() => {
+      const found = canvasElement.querySelector<HTMLElement>(".row-loader");
+      if (!found) throw new Error("No row skeleton yet");
+      return found;
+    });
+    const list = skeleton.parentElement as HTMLElement;
+    await expect(Math.round(skeleton.getBoundingClientRect().right)).toBe(
+      Math.round(list.getBoundingClientRect().right),
+    );
   },
   parameters: {
     noPadding: true,

@@ -13,9 +13,9 @@ export type TagProps = {
   style?: React.CSSProperties;
   /** Whether the tag is drawn in its "new" colours. It is also what makes the delete cross appear. */
   isNewTag?: boolean;
-  /** Whether the tag is inert. Pointer events are dropped in CSS as well, so hover does nothing either. */
+  /** Whether the tag is inert, with a dashed border and a greyed label. Pointer events are dropped in CSS as well, so hover does nothing either. */
   isDisabled?: boolean;
-  /** Whether the tag counts as removed: `onClick` stops firing and the border greys out. */
+  /** Whether the tag counts as removed: `onClick` stops firing, the border greys out and the label is struck through. */
   isDeleted?: boolean;
   /** Called on a click anywhere in the tag, with `{ label, roomType, providerType }` — not with the DOM event. */
   onClick?: (tag: TagClickEvent) => void;

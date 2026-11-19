@@ -47,8 +47,9 @@ export type TextInputProps = HTMLInputProps & {
   /** Pattern the typed text is fitted to: an array of literal characters and
    * RegExps, or a function of the value that returns one. */
   mask?: Mask | ((value: string) => Mask);
-  /** Meant to keep the other characters in place while one is typed or
-   * deleted. The component does not pass it to the mask, so it has no effect. */
+  /** Keeps every character in its slot: typing into a filled slot is refused,
+   * and a deletion leaves the slot empty instead of shifting the rest. Read
+   * only with `mask`. */
   keepCharPositions?: boolean;
   /** Shows the mask's placeholder and literal characters before they are typed.
    * Without it they appear as the text reaches them. */

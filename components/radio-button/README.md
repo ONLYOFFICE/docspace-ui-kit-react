@@ -163,8 +163,8 @@ export function ControlledChoice() {
   `onClick` is never called.
 - **It keeps its own checked state.** `isChecked` seeds it and re-applies on every change of the
   prop, so a click moves the dot even if your state never changes.
-- **Buttons sharing a `name` do not clear each other.** A click fills the new circle, but the old
-  one keeps its dot until its `isChecked` changes. Update `isChecked` on every button, or use
+- **Buttons sharing a `name` clear each other**, within one form, while none has `onChange`.
+  With `onChange` each dot follows its own `isChecked`, so update it on every button, or use
   [`RadioButtonGroup`](../radio-button-group/README.md).
 - **Without `spacing` the buttons touch.** The gap rule is switched on only when the prop is set,
   and there is no default gap.

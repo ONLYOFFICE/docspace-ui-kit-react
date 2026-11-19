@@ -63,7 +63,7 @@ export function UnreadCount({ count }: { count: number }) {
 
 - Read: `backgroundColor`, `className`, `color`, `fontSize`, `fontWeight`.
 - `title` is consumed by the tooltip wrapper the badge is built on.
-- `style` replaces the badge's own inline style; see "Behaviour" below.
+- `style` is merged over the badge's own inline style, key by key.
 - The rest of `TextProps` is spread onto the element unread.
 
 <!-- props:start -->
@@ -209,10 +209,6 @@ export function PlanMarker() {
 - **The label is clipped at 50px by default, without an ellipsis.** `maxWidth` caps the pill and
   the outer element clips the overflow, while the text itself is `white-space: nowrap`, so a long
   label simply ends mid-character. `isPaidBadge` is the one preset that removes the cap.
-- **`style` replaces the badge's own inline style rather than extending it.** The component
-  writes `height`, `border`, `borderRadius` and the background into `style`. Yours arrives later
-  in the spread and overwrites the whole object.
-- Use `className`, or pass `backgroundColor`, `height` and `border` as props.
 - **The pointer cursor is on by default**, and so is a background shift. The pill turns 15%
   transparent under the pointer and takes 10% black while pressed, muted grey included.
 - A badge that is not clickable wants `noHover`.

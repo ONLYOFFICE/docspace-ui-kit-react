@@ -136,6 +136,32 @@ describe("Tabs", () => {
     expect(labels).toHaveLength(3);
   });
 
+  it.each([TabsTypes.Primary, TabsTypes.Secondary])(
+    "keeps the other type's props off the DOM (%s)",
+    (type) => {
+      const { container } = render(
+        <Tabs
+          items={arrayItems}
+          type={type}
+          selectedItemId="tab1"
+          layoutId="layout"
+          hotkeysId="keys"
+          scaled
+          withAnimation
+          stickyHeader={<span />}
+        />,
+      );
+
+      const outer = container.firstElementChild as HTMLElement;
+      for (const name of ["type", "scaled", "withanimation", "stickyheader"])
+        expect(outer).not.toHaveAttribute(name);
+      if (type === TabsTypes.Primary) {
+        expect(outer).not.toHaveAttribute("layoutid");
+        expect(outer).not.toHaveAttribute("hotkeysid");
+      }
+    },
+  );
+
   it("applies correct styles for primary tabs", () => {
     const { container } = render(
       <Tabs

@@ -41,7 +41,7 @@ const meta = {
     isDisabled: {
       control: "boolean",
       description:
-        "Whether the tag is inert. Pointer events are dropped in CSS as well, so hover does nothing either.",
+        "Whether the tag is inert, with a dashed border and a greyed label. Pointer events are dropped in CSS as well, so hover does nothing either.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -49,7 +49,7 @@ const meta = {
     isDeleted: {
       control: "boolean",
       description:
-        "Whether the tag counts as removed: `onClick` stops firing and the border greys out.",
+        "Whether the tag counts as removed: `onClick` stops firing, the border greys out and the label is struck through.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -262,16 +262,25 @@ export const States: Story = {
     await expect(
       within(canvas.getByLabelText("New Tag")).getByTestId("icon-button"),
     ).toBeInTheDocument();
+    // A deleted tag strikes its label through; a disabled one greys it.
+    const labelOf = (name: string) =>
+      within(canvas.getByLabelText(name)).getByText(name);
+    await expect(
+      getComputedStyle(labelOf("Deleted")).textDecorationLine,
+    ).toContain("line-through");
+    await expect(getComputedStyle(labelOf("Disabled")).color).not.toBe(
+      getComputedStyle(labelOf("Default")).color,
+    );
   },
   parameters: {
     docs: {
       description: {
         story: `The four looks a tag can take:
 
-- **Default** — a bordered tag on the plain background
+- **Default** — a bordered tag
 - **New Tag** — filled, with a delete cross (\`isNewTag\` with \`onDelete\`)
-- **Disabled** — a dashed border; the tag ignores hover and clicks (\`isDisabled\`)
-- **Deleted** — a greyed-out border; clicks no longer reach \`onClick\` (\`isDeleted\`)`,
+- **Disabled** — a dashed border and a grey label; hover and clicks do nothing (\`isDisabled\`)
+- **Deleted** — a grey border and a struck-through label; clicks skip \`onClick\` (\`isDeleted\`)`,
       },
       source: {
         code: `<Tag tag="default" label="Default" />
@@ -458,6 +467,11 @@ export const CssCustomization: Story = {
         rect(canvas.getByLabelText("Second Tag")).left - rect(custom).right,
       ),
     ).toBe(16);
+    // --tag-text-color and --tag-size reach the label.
+    await expect(within(custom).getByText("Custom Tag")).toHaveStyle({
+      color: "rgb(106, 27, 154)",
+      fontSize: "14px",
+    });
   },
   render: () => (
     <div
@@ -470,6 +484,8 @@ export const CssCustomization: Story = {
           "--tag-inner-padding": "4px 14px",
           "--tag-height": "30px",
           "--tag-spacing-end": "16px",
+          "--tag-text-color": "#6A1B9A",
+          "--tag-size": "14px",
         } as CSSProperties
       }
     >
@@ -480,7 +496,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Two tags under a wrapper that sets six variables. The second shows the space \`--tag-spacing-end\` leaves after **Custom Tag**.`,
+        story: `Two tags under a wrapper that sets eight variables. The second shows the space \`--tag-spacing-end\` leaves after **Custom Tag**.`,
       },
       source: {
         code: `<div
@@ -492,6 +508,8 @@ export const CssCustomization: Story = {
     "--tag-inner-padding": "4px 14px",
     "--tag-height": "30px",
     "--tag-spacing-end": "16px",
+    "--tag-text-color": "#6A1B9A",
+    "--tag-size": "14px",
   }}
 >
   <Tag tag="custom" label="Custom Tag" />

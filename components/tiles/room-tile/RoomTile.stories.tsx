@@ -276,7 +276,8 @@ export const Default: Story = {
     await expect(args.thumbnailClick).toHaveBeenCalledTimes(1);
 
     // The tag and the badge have their own handlers; neither opens the room.
-    await userEvent.click(within(tile).getByText("Collaboration"));
+    // The label lets the pointer through to the tag, so click the tag.
+    await userEvent.click(within(tile).getByTestId("tag_item_Collaboration"));
     await expect(args.selectTag).toHaveBeenCalledWith(
       expect.objectContaining({ label: "Collaboration" }),
     );

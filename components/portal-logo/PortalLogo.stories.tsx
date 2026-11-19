@@ -79,6 +79,14 @@ const meta = {
         defaultValue: { summary: '"portal logo"' },
       },
     },
+    dataTestId: {
+      control: "text",
+      description:
+        "Value of `data-testid` on the wrapper, or on the fallback logo that replaces it.",
+      table: {
+        defaultValue: { summary: '"portal-logo"' },
+      },
+    },
   },
   decorators: [withPlaceholderLogo],
 } satisfies Meta<typeof PortalLogo>;
@@ -109,6 +117,18 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const img = await findLogo(canvasElement);
     await expect(img).toHaveAttribute("alt", "portal logo");
+    // The phone bar's colour has a default of its own and yields to the
+    // portal's --header-background-color set above it.
+    const wrapper = img.parentElement as HTMLElement;
+    const holder = wrapper.parentElement as HTMLElement;
+    const barColor = () =>
+      getComputedStyle(wrapper)
+        .getPropertyValue("--portal-logo-mobile-bg-value")
+        .trim();
+    await expect(barColor()).not.toBe("");
+    holder.style.setProperty("--header-background-color", "rgb(1, 2, 3)");
+    await expect(barColor()).toBe("rgb(1, 2, 3)");
+    holder.style.removeProperty("--header-background-color");
     // Without isResizable the logo is hidden, not shrunk, on a phone.
     if (isPhoneWidth()) {
       await expect(img).not.toBeVisible();

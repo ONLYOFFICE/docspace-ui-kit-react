@@ -330,6 +330,17 @@ describe("Article", () => {
     expect(setShowText).toHaveBeenCalledWith(false);
   });
 
+  it("keeps the text on tablet when the local storage flag is not JSON", () => {
+    const setShowText = vi.fn();
+
+    localStorage.setItem("showArticle", "yes");
+
+    renderComponent({ currentDeviceType: DeviceType.tablet, setShowText });
+
+    expect(setShowText).not.toHaveBeenCalledWith(false);
+    localStorage.removeItem("showArticle");
+  });
+
   it("shows backdrop on mobile when article is open", () => {
     renderComponent({
       currentDeviceType: DeviceType.mobile,

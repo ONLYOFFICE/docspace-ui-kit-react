@@ -247,7 +247,7 @@ export type SortButtonProps = {
   /** Shows the view selector: beside the sort button on a desktop, inside the sort menu below it. */
   viewSelectorVisible: boolean;
 
-  /** Called with `false` when the sort menu opens and `true` when it closes, and with `true` on mount. */
+  /** Called with `true` when the sort menu opens and `false` when it closes. */
   onSortButtonClick: TOnSortButtonClick;
 };
 

@@ -163,8 +163,9 @@ export function LocalServerMark() {
   nothing, is not replaced.
 - **A failed image is remembered by its source**: the `imgSrc`, or the `src` of an `<img>` passed
   as `imgNode`. The letter stays until that source changes.
-- **`title` is the accessible name and the letter.** The letter is its first character,
-  uppercased, so a leading space or emoji is what you get. An empty string leaves the tile blank.
+- **`title` is the accessible name and the letter.** The letter is its first character after
+  any leading spaces, uppercased; an emoji is drawn whole. An empty or blank title leaves the
+  tile blank.
 - **The sizes are fixed and come with their own typography**: 16px at 11px text, 24px at 11px,
   32px at 14px, 48px at 24px. Only the radius is a variable; the box cannot be resized.
 - **The tile is a `::before` at `z-index: -1`**, inside the stacking context the icon opens with

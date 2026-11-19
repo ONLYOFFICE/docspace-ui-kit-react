@@ -230,5 +230,34 @@ describe("<RoomType />", () => {
       expect(onClick).toHaveBeenCalledTimes(1);
       expect(root).not.toHaveAttribute("aria-disabled");
     });
+
+    it("lets the keys open a dropdown button the pointer opens", () => {
+      const onClick = vi.fn();
+      render(
+        <RoomType
+          {...baseProps}
+          type="dropdownButton"
+          roomType={RoomsType.FormRoom}
+          disabledFormRoom
+          isDisabled
+          onClick={onClick}
+        />,
+      );
+
+      const root = screen.getByTestId("room-type-dropdown-button");
+      fireEvent.click(root);
+      fireEvent.keyDown(root, { key: "Enter" });
+      fireEvent.keyDown(root, { key: " " });
+
+      expect(onClick).toHaveBeenCalledTimes(3);
+    });
+  });
+
+  it("leaves the texts empty without roomType", () => {
+    render(<RoomType {...baseProps} onClick={vi.fn()} />);
+
+    const root = screen.getByTestId("room-type-list-item");
+    expect(root).toHaveTextContent(/^$/);
+    expect(root).not.toHaveAttribute("title");
   });
 });

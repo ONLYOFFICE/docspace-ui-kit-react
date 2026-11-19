@@ -71,7 +71,8 @@ const RoomType = ({
     if (e.target !== e.currentTarget) return;
     e.preventDefault();
     // A disabled type does nothing, so it must not take the next keyup either.
-    if (disabled) return;
+    // The dropdown button ignores the disabled props, for the pointer too.
+    if (disabled && type !== "dropdownButton") return;
     consumeKey(e);
     e.currentTarget.click();
   };

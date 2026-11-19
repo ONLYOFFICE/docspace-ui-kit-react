@@ -260,6 +260,35 @@ describe("Filter Component", () => {
 
       expect(onSort).toHaveBeenCalled();
     });
+
+    it("reports the sort list opening with true and closing with false", async () => {
+      const user = userEvent.setup();
+      const onSortButtonClick = vi.fn();
+      await act(async () => {
+        renderComponent({
+          onSortButtonClick,
+          getSortData: () => [
+            { id: "sort-title", key: "title", label: "Name", default: true },
+          ],
+          getSelectedSortData: () => ({
+            sortId: "title",
+            sortDirection: "asc",
+          }),
+        });
+      });
+      // Nothing on mount: the list has not moved.
+      expect(onSortButtonClick).not.toHaveBeenCalled();
+
+      const sortButton = within(
+        screen.getByTestId("filter_sort_combobox"),
+      ).getByRole("button");
+      await user.click(sortButton);
+      expect(onSortButtonClick).toHaveBeenLastCalledWith(true);
+
+      await user.click(sortButton);
+      expect(onSortButtonClick).toHaveBeenLastCalledWith(false);
+      expect(onSortButtonClick).toHaveBeenCalledTimes(2);
+    });
   });
 
   // The panel's tags were divs only the pointer could press: the keyboard

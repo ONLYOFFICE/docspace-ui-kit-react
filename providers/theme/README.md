@@ -144,8 +144,8 @@ export function Arabic({ children }: { children: React.ReactNode }) {
 ## Behaviour the types don't state
 
 - **It writes on the document as well as into React context.** `light` or `dark` and `ltr` or
-  `rtl` go on `<body>`, `data-theme` and `data-dir` on `<html>`. Two providers on one page fight
-  over the same attributes.
+  `rtl` go on `<body>`, `data-theme` and `data-dir` on `<html>`. The provider mounted last wins,
+  and an unmounted one hands the page back.
 - **`initialTheme` keeps being read.** An effect re-resolves the theme when it changes, so a new
   value applies in place with no state lost below the provider.
 - **The system theme keeps being followed.** A `prefers-color-scheme` listener stays attached while
@@ -159,7 +159,7 @@ export function Arabic({ children }: { children: React.ReactNode }) {
 - **A `colorTheme` that arrives later is picked up.** A portal that loads its palette after the
   first render can pass it in without remounting the provider.
 - **The font is not shipped.** The family is `Open Sans, sans-serif, Arial`; load Open Sans
-  yourself. `locale="ar-SA"`, and only that tag, gets the system's font stack instead.
+  yourself. Arabic, `ar` in any region, gets the system's font stack instead.
 
 ## Accessibility
 

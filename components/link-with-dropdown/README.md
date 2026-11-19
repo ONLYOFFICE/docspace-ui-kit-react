@@ -165,14 +165,9 @@ export function FixedRole({ role }: { role: string }) {
 
 ## Behaviour the types don't state
 
-- **An entry's `onClick` is found by matching its `key` against a DOM attribute**, so the key
-  has to be a **string**. A numeric `key` is read back as text, and the menu closes without
-  calling anything.
 - **The menu closes on any entry click**, before the entry's own handler runs.
 - **`isOpen` is a seed, not a source of truth.** It is applied through an effect on change, so
   re-passing the same `true` after the user closed the menu does not reopen it.
-- **`window.orientation` is read while the component is being created**, so it throws when
-  rendered on a server. Render it on the client only.
 - **`hasScroll` only does anything on a phone.** Elsewhere it is ignored; on a phone the menu is
   given a fixed height — 250px upright, 100px in landscape — and its own scrollbar.
 - **Unknown props are spread onto both the `<a>` and the menu.** Anything the component does not

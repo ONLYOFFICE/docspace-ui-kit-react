@@ -174,10 +174,13 @@ const Navigation = ({
     </div>
   );
 
+  // With rootRoomTitle and a single crumb there is no parent to open.
+  const parentItem = navigationItems?.[navigationItems.length - 2];
+
   const onTextClick = React.useCallback(() => {
-    onClickFolder(navigationItems[navigationItems.length - 2].id, false, false);
+    if (parentItem) onClickFolder(parentItem.id, false, false);
     setIsOpen(false);
-  }, [navigationItems, onClickFolder]);
+  }, [parentItem, onClickFolder]);
 
   const navigationTitleContainerNode = showRootFolderNavigation ? (
     <div className="title-container">
@@ -189,9 +192,7 @@ const Navigation = ({
         />
         <NavigationText
           className="room-title"
-          title={
-            rootRoomTitle || navigationItems[navigationItems.length - 2].title
-          }
+          title={rootRoomTitle || parentItem?.title || ""}
           isOpen={isOpen}
           isRootFolder={isRootFolder}
           isRootFolderTitle

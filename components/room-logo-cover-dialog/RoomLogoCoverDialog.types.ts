@@ -7,7 +7,7 @@ import type { ICover } from "../../types";
 export type { ICover };
 
 export type RoomLogoCoverDialogProps = {
-  /** Translation function for the heading, the buttons and the picker labels. Outside the portal it must also supply the icon picker's keys from outside `Common`. */
+  /** Translation function for the heading, the buttons and the picker labels. Outside the portal it must also supply the icon picker's key from outside `Common`. */
   t: TTranslation;
   /** Whether the dialog is on screen. Opening it remounts the picker, which discards whatever was chosen last time. */
   visible: boolean;

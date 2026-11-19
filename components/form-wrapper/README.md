@@ -150,15 +150,14 @@ export function WideForm({ children }: { children: React.ReactNode }) {
 ## Behaviour the types don't state
 
 - **The width is fixed, and it is not a prop.** `min-width` and `max-width` are both 320px on a
-  desktop and both 416px on a tablet, so the card ignores its container. Override
+  desktop and both 416px on a tablet, so the card ignores its container. A phone gives it 100%. Override
   `--form-wrapper-min-width` and `--form-wrapper-max-width` together — setting one leaves the
   other clamping.
 - **Those widths are the content width, not the card's.** The card is `content-box`, so its
   outer width adds `--form-wrapper-padding` on both sides: 384px by default on a desktop.
   Subtract twice the padding from the card width you want.
 - **On a phone the card stops being a card.** Under the mobile breakpoint the padding, radius,
-  shadow and background are removed. The shadow and background carry `!important`, so neither
-  `style` nor a class of yours can restore them.
+  shadow and background are removed. A class of yours can bring them back.
 - **Children are centred.** The card is a flex column with `align-items: center`, so a child
   without a width of its own shrinks to its content. Give inputs and buttons `scale` to span the
   card.
@@ -186,8 +185,8 @@ export function WideForm({ children }: { children: React.ReactNode }) {
 
 Set them on the card's `style` or on any ancestor. Under the mobile breakpoint the card sets its
 own padding, radius, shadow and background, so those four variables do nothing on a phone. The
-width variables work on a desktop only: a tablet fixes the width at 416px and a phone at 100%. Set
-the minimum and the maximum together; either one alone is clamped by the other.
+width variables work on a desktop and a tablet; a phone fixes the width at 100%. Set the minimum
+and the maximum together; either one alone is clamped by the other.
 
 ## Accessibility
 

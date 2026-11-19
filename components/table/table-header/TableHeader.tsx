@@ -654,7 +654,9 @@ export const TableHeader = (props: TableHeaderProps) => {
 
           if (shortColumnSize && index === 0) {
             gridTemplateColumns.push(`${shortColumnSize}px`);
-          } else if (column?.dataset?.minWidth && column?.dataset?.default) {
+          } else if (column?.dataset?.default === "true") {
+            // The wide column, with or without a minWidth; data-default is
+            // the string "false" on the others.
             gridTemplateColumns.push(
               `${containerWidth - defaultSize - shortColumnSize - SETTINGS_SIZE}px`,
             );

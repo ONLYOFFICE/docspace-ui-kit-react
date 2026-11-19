@@ -53,8 +53,7 @@ The Table README describes it in full.`,
     },
     hideColumns: {
       control: "boolean",
-      description:
-        "Has no effect on screen: the row's stylesheet has no rule for it.",
+      description: "Changes nothing on screen; nothing in the row reads it.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -191,6 +190,7 @@ export const Default: Story = {
     selectionProp: { className: "selection-class" },
     title: "Context menu",
     contextOptions,
+    hideColumns: true,
   },
   beforeEach: () => {
     onDeleteOption.mockClear();
@@ -198,6 +198,8 @@ export const Default: Story = {
   play: async ({ args, canvas, userEvent }) => {
     const row = canvas.getByTestId("table-row");
     await expect(row).toHaveClass("custom-row-class", "table-container_row");
+    // hideColumns adds no class, an "undefined" one included.
+    await expect(row).not.toHaveClass("undefined");
 
     await userEvent.click(canvas.getByText("Annual Report 2025"));
     await expect(args.onClick).toHaveBeenCalled();

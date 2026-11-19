@@ -11,6 +11,9 @@ import { Text } from "../text";
 import styles from "./RadioButton.module.scss";
 import { RadioButtonProps } from "./RadioButton.types";
 
+// Sent on the document by a button checked without `onChange`.
+const SIBLING_CHECKED = "radio-button-checked";
+
 const RadiobuttonIcon = ({ isChecked }: { isChecked?: boolean }) => {
   const newProps = {
     "data-size": IconSizeType.medium,
@@ -45,13 +48,43 @@ const RadioButton = ({
 }: RadioButtonProps) => {
   const [isCheckedState, setIsCheckedState] = React.useState(isChecked);
   const labelRef = React.useRef<HTMLLabelElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     setIsCheckedState(isChecked);
   }, [isChecked]);
 
+  // The browser fires no change on the radio a click unchecks, so the button
+  // that is checked tells the others of its group to clear their dot. It does
+  // so inside React's own handler: React then restores the group from the
+  // cleared state, not from a stale one that would uncheck the new choice.
+  // With `onChange` the dot follows `isChecked` alone.
+  React.useEffect(() => {
+    if (onChange || !name) return;
+
+    const clearOnSiblingCheck = (e: Event) => {
+      const own = inputRef.current;
+      const checked = (e as CustomEvent<HTMLInputElement>).detail;
+      if (
+        own &&
+        checked !== own &&
+        checked.name === name &&
+        checked.form === own.form
+      )
+        setIsCheckedState(false);
+    };
+
+    document.addEventListener(SIBLING_CHECKED, clearOnSiblingCheck);
+    return () =>
+      document.removeEventListener(SIBLING_CHECKED, clearOnSiblingCheck);
+  }, [name, onChange]);
+
   const onChangeAction = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsCheckedState((s) => !s);
+    if (name)
+      document.dispatchEvent(
+        new CustomEvent(SIBLING_CHECKED, { detail: e.target }),
+      );
     onClick?.(e);
   };
 
@@ -73,6 +106,7 @@ const RadioButton = ({
       data-testid={testId}
     >
       <input
+        ref={inputRef}
         className={classNames(styles.input, classNameInput)}
         type="radio"
         name={name}

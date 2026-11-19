@@ -101,12 +101,8 @@ export const FolderTile = ({
     }
   };
 
-  const getOptions = () => {
-    if (tileContextClick) {
-      tileContextClick();
-    }
-    return contextOptions;
-  };
+  // The button's onClick reports the click through onContextMenu.
+  const getOptions = () => contextOptions;
 
   const onFolderClick = (e: React.MouseEvent) => {
     if (e.ctrlKey || e.metaKey) {

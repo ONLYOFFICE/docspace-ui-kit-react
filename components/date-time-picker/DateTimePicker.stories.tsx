@@ -59,7 +59,7 @@ const meta = {
     minDate: {
       control: "date",
       description:
-        "Earliest selectable moment in the calendar, compared with its time; pass the start of a day.",
+        "Earliest selectable day in the calendar; its own day stays selectable, whatever its time.",
     },
     maxDate: {
       control: "date",

@@ -10,7 +10,7 @@ export type AvatarEditorDialogProps = {
   title: string;
   /** The picture and its crop, held in your state. The body is empty until `uploadedFile` is set. */
   image: TImage;
-  /** Puts the save button in its loading state and blocks the editor and the cancel button. The header cross, Escape and the backdrop still close the dialog. */
+  /** Puts the save button in its loading state and blocks the editor and every way to close the dialog. */
   isLoading?: boolean;
   /** Corner radius of the crop window in pixels, on the editor's 648px canvas.
    * @default 110 */

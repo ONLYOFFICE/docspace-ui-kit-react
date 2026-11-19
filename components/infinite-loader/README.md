@@ -163,10 +163,10 @@ export function LoadableList({
 - Otherwise the component looks for `#sectionScroll .scroll-wrapper > .scroller`, or
   `#customScrollBar`'s at 600px wide or narrower. Those are the inner elements of a
   [`Scrollbar`](../scrollbar/README.md); without either it falls back to the window.
-- **The width comes from an element found by a literal id**: `#table-container` for the `table`
-  layout, `#tileContainer` for `tile` and `#rowContainer` for every other.
-- Without the right id in the document the items are laid out at a width of zero. That is why
-  the examples above put the id on the wrapper.
+- **A `row` list is as wide as the element it sits in**, and follows it as it resizes.
+- **The other two layouts find their width by a literal id**: `#table-container` for `table` and
+  `#tileContainer` for `tile`. Without it in the document the items are laid out at a width of
+  zero.
 - **Every row and table row is `itemSize` tall**, and a taller one gets no more room.
 - **The `tile` layout ignores `itemSize`.** It sizes each grid row by the class name of the child
   in it: `isRoom`, `isFolder`, `isFile`, `isTemplate`, or a section header otherwise.
@@ -184,8 +184,8 @@ export function LoadableList({
 - `isLoading` returns `null`, so the region collapses rather than holding its height.
 - `children` has to be an array, which the loader indexes. With `hasMoreFiles` it counts two
   rows more than there are, to leave room for the loading rows.
-- **In a right-to-left layout the row skeletons stay at the left edge.** The rule that moves
-  them names `.row-loade`, a class nothing carries; loaded rows and table rows do move.
+- In a right-to-left layout the rows, their skeletons and the table rows line up with the right
+  edge.
 
 ## CSS variables
 

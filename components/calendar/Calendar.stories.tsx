@@ -62,7 +62,7 @@ const meta = {
     minDate: {
       control: "date",
       description:
-        "Earliest selectable moment, compared with its time. Days before it are greyed and the header arrows stop at its month; pass the start of a day.",
+        "Earliest selectable day; its own day stays selectable, whatever its time. Days before it are greyed, and the header arrows stop at its month.",
       table: {
         defaultValue: { summary: "1970-01-01" },
       },

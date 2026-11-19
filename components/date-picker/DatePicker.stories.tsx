@@ -27,7 +27,7 @@ const meta = {
     locale: {
       control: "text",
       description:
-        "BCP 47 tag the calendar is written in. The chip's date ignores it and follows the date's own Luxon locale.",
+        "BCP 47 tag the calendar and the chip's date are written in.",
     },
     selectDateText: {
       control: "text",
@@ -66,7 +66,7 @@ const meta = {
     minDate: {
       control: false,
       description:
-        "Earliest selectable moment in the calendar, compared with its time; pass the start of a day.",
+        "Earliest selectable day in the calendar; its own day stays selectable, whatever its time.",
     },
     maxDate: {
       control: false,

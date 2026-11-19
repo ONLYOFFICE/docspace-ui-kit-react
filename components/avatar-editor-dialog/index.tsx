@@ -63,6 +63,8 @@ const AvatarEditorDialog = ({
       withBodyScroll
       visible={visible}
       onClose={handleClose}
+      // A close during the save would reset the image the save is sending.
+      isCloseable={!isLoading}
       withFooterBorder
       withBodyScrollForcibly={!!scrollBodyHeight}
       dataTestId={dataTestId}

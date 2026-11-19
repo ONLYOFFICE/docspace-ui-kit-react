@@ -1,8 +1,16 @@
 import React from "react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { screen, render } from "@testing-library/react";
+import { screen, render, fireEvent } from "@testing-library/react";
 import Navigation from "./Navigation";
 import { DeviceType } from "../../enums";
+
+// The real tooltip renders nothing until it opens; this one shows its id.
+vi.mock("../tooltip", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../tooltip")>()),
+  Tooltip: ({ id }: { id?: string }) => (
+    <div data-testid="title-icon-tooltip" id={id} />
+  ),
+}));
 
 describe("Navigation Component", () => {
   const defaultProps = {
@@ -46,7 +54,7 @@ describe("Navigation Component", () => {
     isDesktop: true,
     isRoom: false,
     isFrame: false,
-    hideInfoPanel: vi.fn(),
+    hideInfoPanel: true,
     withLogo: false,
     burgerLogo: "test-logo.svg",
     showRootFolderTitle: true,
@@ -88,6 +96,75 @@ describe("Navigation Component", () => {
     render(<Navigation {...defaultProps} />);
     // Add assertions for tablet-specific UI elements
     expect(screen.getByText("My Documents")).toBeInTheDocument();
+  });
+
+  it("opens nothing from the room title with a single crumb", () => {
+    render(
+      <Navigation
+        {...defaultProps}
+        navigationItems={[{ id: "1", title: "Documents", isRootRoom: true }]}
+      />,
+    );
+
+    // React reports a handler's error on the window rather than throwing it.
+    const errors: unknown[] = [];
+    const onError = (event: ErrorEvent) => {
+      event.preventDefault();
+      errors.push(event.error);
+    };
+    window.addEventListener("error", onError);
+    fireEvent.click(screen.getByText("Root Room"));
+    window.removeEventListener("error", onError);
+
+    expect(errors).toEqual([]);
+    expect(defaultProps.onClickFolder).not.toHaveBeenCalled();
+  });
+
+  it("gives each header its own title icon tooltip", () => {
+    const { container } = render(
+      <>
+        <Navigation {...defaultProps} />
+        <Navigation {...defaultProps} />
+      </>,
+    );
+
+    const ids = Array.from(
+      container.querySelectorAll('[data-testid="title-icon-tooltip"]'),
+      (node) => node.id,
+    );
+    expect(ids).toHaveLength(2);
+    expect(ids[0]).not.toBe(ids[1]);
+  });
+
+  it("draws no empty image for withLogo={true}", () => {
+    const { container } = render(<Navigation {...defaultProps} withLogo />);
+
+    const images = Array.from(container.querySelectorAll("img"));
+    expect(images.some((image) => !image.getAttribute("src"))).toBe(false);
+  });
+
+  it.each([
+    [DeviceType.desktop, ["navigation_button", "analyze"]],
+    [DeviceType.tablet, ["analyze", "navigation_button"]],
+  ])("places the extra button by currentDeviceType (%s)", (type, order) => {
+    window.innerWidth = type === DeviceType.desktop ? 800 : 1200;
+
+    render(
+      <Navigation
+        {...defaultProps}
+        currentDeviceType={type}
+        analyzeResponsesButton={<span data-testid="analyze" />}
+      />,
+    );
+
+    const found = Array.from(
+      document.querySelectorAll(
+        '[data-testid="navigation_button"], [data-testid="analyze"]',
+      ),
+      (node) => node.getAttribute("data-testid"),
+    );
+    expect(found).toEqual(order);
+    window.innerWidth = 1024;
   });
 
   it("shows public room specific UI when isPublicRoom is true", () => {

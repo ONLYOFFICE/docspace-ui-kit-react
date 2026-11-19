@@ -31,7 +31,6 @@ const TableRow = React.memo((props: TableRowProps) => {
     checked,
     isActive,
     dragging,
-    hideColumns,
     onClick,
     onDoubleClick,
     contextMenuCellStyle,
@@ -75,7 +74,6 @@ const TableRow = React.memo((props: TableRowProps) => {
       [styles.isActive]: isActive,
       [styles.checked]: checked,
       [styles.dragging]: dragging,
-      [styles.hideColumns]: hideColumns,
     },
   );
 

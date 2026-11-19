@@ -1,3 +1,4 @@
+import React from "react";
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
@@ -235,6 +236,23 @@ describe("<DropDownItem /> icon source", () => {
       "data-src",
       dataUrl,
     );
+  });
+
+  it("draws an element as it is", () => {
+    render(
+      <DropDownItem {...baseProps} icon={<svg data-testid="own-icon" />} />,
+    );
+
+    expect(screen.getByTestId("own-icon")).toBeInTheDocument();
+    expect(screen.queryByTestId("mocked-react-svg")).not.toBeInTheDocument();
+  });
+
+  it("renders a memoised component", () => {
+    const Icon = React.memo(() => <svg data-testid="memo-icon" />);
+
+    render(<DropDownItem {...baseProps} icon={Icon} />);
+
+    expect(screen.getByTestId("memo-icon")).toBeInTheDocument();
   });
 
   it("draws a cross-origin .svg as an image, without fetching it", () => {

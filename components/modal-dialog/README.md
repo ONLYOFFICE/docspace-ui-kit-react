@@ -338,9 +338,8 @@ export function RenameDialog({
 - **Anything the component does not read itself is forwarded last** to the internal modal and
   overrides the value the component computed, `modalSwipeOffset` included.
 - **Swipe-to-close is mobile-touch only** and starts only on the element with the literal id
-  `modal-header-swipe`; dragging it down more than 120px calls `onClose`.
-- **The swipe calls `onClose` past the closing guard**, so `isCloseable={false}` and `embedded` do
-  not stop it on a phone.
+  `modal-header-swipe`; dragging it down more than 120px calls `onClose`. Under
+  `isCloseable={false}` or `embedded` the sheet does not move.
 - `blur` is declared and never read.
 
 ## Sub-components

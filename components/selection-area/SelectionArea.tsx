@@ -264,15 +264,19 @@ const SelectionArea = ({
     style.height = `${height}px`;
   };
 
-  const frame = React.useCallback(
-    () =>
-      frames(() => {
-        recalculateSelectionAreaRect();
-        updateElementSelection();
-        redrawSelectionArea();
-      }),
-    [recalculateSelectionAreaRect, updateElementSelection],
-  );
+  // One scheduler for the component, so the moves of one frame give one
+  // report and a release cancels the one still scheduled. It runs the latest
+  // work, whatever render scheduled it.
+  const frameWork = React.useRef(() => {});
+  frameWork.current = () => {
+    recalculateSelectionAreaRect();
+    updateElementSelection();
+    redrawSelectionArea();
+  };
+
+  const [scheduler] = React.useState(() => frames(() => frameWork.current()));
+
+  const frame = React.useCallback(() => scheduler, [scheduler]);
 
   const onTapMove = React.useCallback(
     (e: MouseEvent) => {

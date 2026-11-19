@@ -63,11 +63,11 @@ const RadioButtonGroup = ({
       style={{ width, ...style }}
       data-testid={dataTestId ?? "radio-button-group"}
     >
-      {options.map((option: TRadioButtonOption) => {
+      {options.map((option: TRadioButtonOption, index) => {
         if (option.type === "text")
           return (
             <Text
-              key="radio-text"
+              key={`radio-text-${index}`}
               className={styles.subtext}
               data-testid={option.dataTestId ?? "radio-button-group_text"}
             >

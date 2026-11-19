@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { InfiniteLoader, WindowScroller, List } from "react-virtualized";
 import classNames from "classnames";
 
@@ -28,10 +34,29 @@ const ListComponent = ({
   const listRef = useRef<List | null>(null);
 
   const listItemRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [rowListWidth, setRowListWidth] = useState(0);
 
   useEffect(() => {
     listRef?.current?.forceUpdate();
   });
+
+  // A row list is as wide as the element it sits in, whatever that one's id.
+  useLayoutEffect(() => {
+    if (viewAs === "table") return;
+
+    const container = wrapperRef.current?.parentElement;
+    if (!container) return;
+
+    const measure = () =>
+      setRowListWidth(container.getBoundingClientRect().width);
+
+    measure();
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [viewAs]);
 
   const getLoader = (style: React.CSSProperties, key: string) => {
     switch (viewAs) {
@@ -132,6 +157,7 @@ const ListComponent = ({
 
   return (
     <div
+      ref={wrapperRef}
       style={{ display: "contents" }}
       data-testid="infinite-loader-container-list"
     >
@@ -149,12 +175,12 @@ const ListComponent = ({
                 newHeight = scroll.getBoundingClientRect().height;
               }
 
-              const viewId =
-                viewAs === "table" ? "table-container" : "rowContainer";
-
               const width =
-                document.getElementById(viewId)?.getBoundingClientRect()
-                  .width ?? 0;
+                viewAs === "table"
+                  ? (document
+                      .getElementById("table-container")
+                      ?.getBoundingClientRect().width ?? 0)
+                  : rowListWidth;
 
               return (
                 <List

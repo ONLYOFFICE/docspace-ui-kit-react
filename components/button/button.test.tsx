@@ -62,6 +62,15 @@ describe("<Button />", () => {
     expect(screen.queryByRole("status")).toBeNull();
   });
 
+  it("keeps its id on the button alone while loading", () => {
+    const { container } = render(
+      <Button {...baseProps} id="save-button" isLoading />,
+    );
+
+    expect(container.querySelectorAll("#save-button")).toHaveLength(1);
+    expect(screen.getByRole("button")).toHaveAttribute("id", "save-button");
+  });
+
   it("renders with custom className", () => {
     render(<Button {...baseProps} className="custom-class" />);
     expect(screen.getByTestId("button").className).toContain("custom-class");

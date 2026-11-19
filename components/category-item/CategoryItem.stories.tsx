@@ -44,7 +44,7 @@ const meta = {
     withPaidBadge: {
       control: "boolean",
       description:
-        "Shows the paid badge beside the title — unless the page's path contains `management`, where it is suppressed. Required, so pass `false` when there is no badge.",
+        "Shows the paid badge beside the title — unless the page's path starts with `/management`, where it is suppressed. Required, so pass `false` when there is no badge.",
     },
     badgeLabel: {
       control: "text",

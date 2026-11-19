@@ -20,7 +20,7 @@ const meta = {
     initialTime: {
       control: false,
       description:
-        "Time the fields start on, read once on mount; midnight today without it. Its **date** part is carried into every value `onChange` reports.",
+        "Time the fields start on, read once on mount; midnight today without it. Its day, seconds and time zone are carried into every value `onChange` reports.",
       table: {
         defaultValue: { summary: "00:00 of the current day" },
       },
@@ -69,7 +69,7 @@ const meta = {
     onChange: {
       action: "onChange",
       description:
-        "Called on every accepted keystroke with a full `DateTime` — the date from `initialTime` combined with the typed time.",
+        "Called on every accepted keystroke, and on a change of `meridiem`, with `initialTime` carrying the typed time.",
     },
     onBlur: {
       action: "onBlur",

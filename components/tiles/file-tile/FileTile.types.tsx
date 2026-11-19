@@ -51,7 +51,7 @@ export type FileTileProps = {
   checked?: boolean;
   /** The tile's content. Only the first element is rendered, in the row beside the icon; the rest are dropped. */
   children?: ReactElement | ReactElement[];
-  /** Ignored. Nothing reads it, and it is spread onto the outer element as an unknown attribute. */
+  /** Ignored. Nothing reads it. */
   contextButtonSpacerWidth?: number;
   /** Draws the three-dot button when non-empty and `item` carries a `contextOptions` key. The menu lists `getContextModel`'s entries, not these. */
   contextOptions: ContextMenuModel[];
@@ -79,7 +79,7 @@ export type FileTileProps = {
   getContextModel?: () => ContextMenuModel[];
   /** Called when the menu closes. */
   hideContextMenu?: () => void;
-  /** Ignored. Nothing reads it, and it is spread onto the outer element as an unknown attribute. */
+  /** Ignored. Nothing reads it. */
   sideColor?: string;
   /** Called with an empty array before a plain click selects the tile, unless the click landed on an image, an input or an SVG shape. */
   setSelection?: (items: FileItem[]) => void;
@@ -89,7 +89,7 @@ export type FileTileProps = {
   badges?: ReactElement;
   /** Fades `--highlightColor` out of the name row once, on mount, to point at a matched file. The kit sets no such colour, so nothing shows until you set one. */
   isHighlight?: boolean;
-  /** Meant to turn the pointer off while an operation runs over the tile. Its rule never matches the tile, so it changes nothing. */
+  /** Stops hover, clicks and right-clicks reaching the tile while an operation runs over it. The tile looks the same. */
   isBlockingOperation?: boolean;
   /** Draws the accent outline that marks the tile the keyboard is on. */
   showHotkeyBorder?: boolean;

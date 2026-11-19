@@ -31,6 +31,22 @@ describe("<TimePicker />", () => {
     expect(minutesInput.value).toBe("30");
   });
 
+  it("reports the time again when the meridiem changes", () => {
+    const { rerender } = render(
+      <TimePicker {...baseProps} isTwelveHourFormat meridiem="PM" />,
+    );
+    expect(mockOnChange).not.toHaveBeenCalled();
+
+    rerender(<TimePicker {...baseProps} isTwelveHourFormat meridiem="AM" />);
+
+    expect(mockOnChange).toHaveBeenCalledTimes(1);
+    expect(mockOnChange.mock.calls[0][0]).toMatchObject({
+      day: 9,
+      hour: 2,
+      minute: 30,
+    });
+  });
+
   it("handles hours input correctly", () => {
     render(<TimePicker {...baseProps} />);
     const hoursInput = screen.getByLabelText("Hours") as HTMLInputElement;

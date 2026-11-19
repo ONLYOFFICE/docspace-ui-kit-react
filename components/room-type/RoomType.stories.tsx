@@ -31,7 +31,7 @@ const meta = {
       },
       options: Object.values(RoomsType).filter((v) => typeof v === "number"),
       description:
-        "Which room type the row describes: its glyph, title and description. An unknown value leaves both texts empty; none gives the form room's texts beside an empty glyph box.",
+        "Which room type the row describes: its glyph, title and description. An unknown value, or none, leaves both texts and the glyph box empty.",
     },
     isOpen: {
       control: "boolean",
@@ -59,7 +59,7 @@ const meta = {
     onClick: {
       action: "clicked",
       description:
-        "Called with the event on a click anywhere in the row, once per click. Enter and Space click the row too. A disabled row never calls it.",
+        "Called with the event on a click anywhere in the row, once per click. Enter and Space click the row too. A disabled row never calls it; `dropdownButton` has no disabled state.",
     },
     disabledFormRoom: {
       control: "boolean",
@@ -174,6 +174,10 @@ export const DropdownButton: Story = {
     const button = canvas.getByTestId("room-type-dropdown-button");
     await expect(button.className).toMatch(/isOpen/);
     await expect(button).toHaveAttribute("aria-expanded", "true");
+    // The accent border needs no portal: with no --accent-main it is the
+    // theme's accent, not the text colour.
+    const style = getComputedStyle(button);
+    await expect(style.borderTopColor).not.toBe(style.color);
     await userEvent.click(button);
     await expect(args.onClick).toHaveBeenCalledTimes(1);
     button.focus();

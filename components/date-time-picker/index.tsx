@@ -69,6 +69,11 @@ const DateTimePicker = (props: DateTimePickerProps) => {
       setSelectedFormat(d.hour >= 12 ? options[1] : options[0]);
     }
 
+    // The time editor reports again when AM/PM changes, after this component
+    // has already reported the new half; a value equal to the current one is
+    // not reported twice.
+    if (d && date && d.equals(date)) return;
+
     onChange?.(d);
     setDate(d);
   };

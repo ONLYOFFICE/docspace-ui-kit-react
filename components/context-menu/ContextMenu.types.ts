@@ -82,11 +82,9 @@ export type ContextMenuType = {
   withToggle?: boolean;
   /** Turns the item's toggle on. It needs `withToggle`. */
   checked?: boolean;
-  /** Text of a badge after the label. Without `isPaidBadge` the desktop list
-   * draws it blue. */
+  /** Text of a badge after the label. Without `isPaidBadge` it is blue. */
   badgeLabel?: string;
-  /** Draws the badge in the paid-plan colour. The mobile sheet shows a badge
-   * only with it. */
+  /** Draws the badge in the paid-plan colour. */
   isPaidBadge?: boolean;
   /** Stops a `url` opening in a new tab. */
   preventNewTab?: boolean;

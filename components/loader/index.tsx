@@ -1,3 +1,5 @@
+import { useId } from "react";
+
 import { Text } from "../text";
 import { useCommonTranslation } from "../../utils/i18n";
 import { useLiveRegionText } from "../../hooks/useLiveRegionText";
@@ -46,8 +48,12 @@ const Loader = (props: LoaderProps) => {
 
   const label = labelProp ?? (t("LoadingProcessing") || DEFAULT_LABEL);
 
+  // The track names its gradients after the id; without one of its own each
+  // loader gets a unique id, so two tracks never share a gradient.
+  const generatedId = useId().replace(/[^\w-]/g, "");
+
   const { isDecorative: _isDecorative, ...rest } = props;
-  const animationProps = { ...rest, type, label };
+  const animationProps = { ...rest, id: id ?? generatedId, type, label };
 
   const svgRenderer = (t: LoaderTypes) => {
     switch (t) {

@@ -181,10 +181,10 @@ const DatePicker = (props: DatePickerProps) => {
                   className={styles.calendarIcon}
                   data-testid="calendar-icon"
                 />
-                {formatDate(date, "dd MMM yyyy")}
+                {formatDate(date, "dd MMM yyyy", { locale })}
               </span>
             ) : (
-              formatDate(date, "dd MMM yyyy")
+              formatDate(date, "dd MMM yyyy", { locale })
             )
           }
           onClick={toggleCalendar}

@@ -23,7 +23,7 @@ export interface SelectedItemProps {
   className?: string;
   /** Applied to the outermost element. */
   id?: string;
-  /** Ignored. Nothing reads this prop; style the chip through `className` or the custom properties. */
+  /** Inline style of the outermost element. */
   style?: React.CSSProperties;
   /** Identifier handed back to `onClose` and `onClick`. It is not used for anything else. */
   propKey: string | number;

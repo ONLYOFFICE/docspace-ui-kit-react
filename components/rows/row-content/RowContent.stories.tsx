@@ -51,8 +51,7 @@ const meta = {
     },
     sectionWidth: {
       control: "number",
-      description:
-        "Changes nothing on screen: a non-zero value adds a class that no style reads.",
+      description: "Changes nothing on screen; nothing reads it.",
     },
     onClick: {
       control: false,
@@ -106,9 +105,15 @@ export const Default: Story = {
     disableSideInfo: false,
     convertSideInfo: true,
     sideColor: globalColors.gray,
+    sectionWidth: 600,
     onClick: fn(),
   },
   play: async ({ args, canvas }) => {
+    // sectionWidth adds no class, an "undefined" one included.
+    await expect(canvas.getByTestId("row-content")).not.toHaveClass(
+      "undefined",
+    );
+
     // The later children are joined into one line; they are not shown.
     await expect(canvas.getByTestId("tablet-side-info")).toHaveTextContent(
       "Modified today | 24 KB | Version 2",

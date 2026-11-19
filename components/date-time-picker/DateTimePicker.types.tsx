@@ -27,8 +27,8 @@ export type DateTimePickerProps = {
    */
   onChange: (d: null | DateTime) => void;
   /**
-   * Earliest selectable moment in the calendar, compared with its time; pass
-   * the start of a day.
+   * Earliest selectable day in the calendar; its own day stays selectable,
+   * whatever its time.
    */
   minDate?: DateTime | Date;
   /** Latest selectable day in the calendar. */

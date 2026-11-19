@@ -316,7 +316,9 @@ describe("BaseTile", () => {
     const button = screen.getByTestId("context-menu-button");
     fireEvent.click(button);
 
-    expect(tileContextClick).toHaveBeenCalled();
+    // Once, as a click rather than a right-click.
+    expect(tileContextClick).toHaveBeenCalledTimes(1);
+    expect(tileContextClick).toHaveBeenCalledWith(false);
     expect(mockCMShow).toHaveBeenCalled();
   });
 

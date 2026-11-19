@@ -38,7 +38,7 @@ export type TModel = { label: string; icon: string } & (
 type RoomIconExpansion = {
   /** Image faded in over the tile while the pointer is on it. Ignored while `isArchive` is set. */
   hoverSrc?: string;
-  /** Adds the pencil button and the menu it opens. It also makes the tile 64px wide at the least. */
+  /** Adds the pencil button and the menu it opens; the empty state keeps its plus instead. It also makes the tile 64px wide at the least. */
   withEditing?: boolean;
   /** Called with the change event of the hidden file input. Passing it is what renders that input at all; its id is generated per instance. */
   onChangeFile?: (e: React.ChangeEvent<HTMLInputElement>) => void;

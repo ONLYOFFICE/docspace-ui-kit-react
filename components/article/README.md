@@ -318,7 +318,7 @@ export function CollapsibleSidebar() {
 - **It reads `localStorage`.** The key `showArticle` is parsed on mount and on every device change.
   On a tablet `setShowText(false)` is called only when it holds a falsy JSON value; an absent key
   counts as `{}`.
-- A `showArticle` value that is not JSON throws inside that effect.
+- A `showArticle` value that is not JSON counts as its raw text, so it keeps the text shown.
 - **On a phone the whole panel is a portal into `#root`**, over a backdrop that calls
   `toggleArticleOpen`. Going back in the browser calls `setArticleOpen(false)`.
 - **The developer tools entry is hidden by the URL.** Besides `isAdmin` and

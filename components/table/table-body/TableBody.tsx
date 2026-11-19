@@ -25,7 +25,6 @@ const TableBodyPure = (props: TableBodyProps) => {
 
   const classes = classNames(styles.tableBody, "table-container_body", {
     [styles.useReactWindow]: useReactWindow,
-    [styles.infoPanelVisible]: infoPanelVisible,
   });
 
   return useReactWindow ? (

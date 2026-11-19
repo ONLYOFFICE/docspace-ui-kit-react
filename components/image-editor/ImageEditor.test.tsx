@@ -62,6 +62,19 @@ describe("ImageEditor", () => {
     expect(screen.getByRole("region")).toHaveClass(className);
   });
 
+  it("is found by its test ids", () => {
+    render(
+      <ImageEditor
+        {...defaultProps}
+        image={{ ...defaultProps.image, uploadedFile: "photo.png" }}
+      />,
+    );
+    expect(screen.getByTestId("image-editor")).toBe(screen.getByRole("region"));
+    expect(screen.getByTestId("image-cropper-wrapper")).toContainElement(
+      screen.getByTestId("image-cropper"),
+    );
+  });
+
   it("handles image rescaling when enabled", () => {
     const props = {
       ...defaultProps,

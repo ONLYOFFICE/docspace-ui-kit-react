@@ -11,7 +11,7 @@ export type ICategoryItemProps = {
   onClickLink: (e: MouseEvent<Element>) => void;
   /** Dims the title, subtitle and arrow, and removes `href` and `onClickLink` from the link. The arrow still renders, so say in the subtitle why the row is unavailable. */
   isDisabled?: boolean;
-  /** Shows the paid badge beside the title — unless the page's path contains `management`, where it is suppressed. Required, so pass `false` when there is no badge. */
+  /** Shows the paid badge beside the title — unless the page's path starts with `/management`, where it is suppressed. Required, so pass `false` when there is no badge. */
   withPaidBadge: boolean;
   /** Text inside the paid badge. Required even when `withPaidBadge` is `false`; pass an empty string then. */
   badgeLabel: string;
