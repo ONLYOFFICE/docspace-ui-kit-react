@@ -30,6 +30,15 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `section` or `article` the `<header>` was a `banner` landmark, a second one beside the page's
   own. The view now adds no landmark; a selector for `header` inside it finds nothing, while the
   class stays
+- **Every component's README, prop JSDoc and story texts follow the documentation rules, and what
+  they said wrong is corrected.** The text changed, not the components: the defects the rewrite
+  found are under _Fixed_. A corrected statement may be one your code relied on. `Button`'s
+  `accent` has no accent border, its `ref` is always the `<button>`, and a passed `aria-label` is
+  overwritten even without `label`. `ContextMenu` reads `global` and `autoZIndex`.
+  `SelectionArea`'s examples put an item's key in `data-value`, where it reads `value`.
+  `DragAndDrop` has `role="presentation"` and no keyboard, not `role="button"`. The controls of
+  `Filter`, `Row` and `Table` that were called mouse-only take the keyboard. `ThemeProvider` writes
+  the React context too
 - **`FileTile`'s `--tile-option-button-padding-end` is now `--tile-option-button-margin-end`,
   default `8px`.** The actions button pads its icon alike on every side, so its keyboard focus
   ring sits around the icon, and the room to the tile's edge is a margin after it. The space to
