@@ -51,6 +51,7 @@ const PasswordInput = ({
   clipActionResource,
   emailInputName,
   passwordSettings = DEFAULT_PASSWROD_SETTINGS,
+  generatorSettings,
   onBlur,
   onKeyDown,
   onValidateInput,
@@ -77,6 +78,7 @@ const PasswordInput = ({
   autoComplete = "new-password",
   forwardedRef,
   isDisableTooltip = false,
+  tooltipPasswordPlace = "top",
   inputWidth,
   className = "",
   style,
@@ -129,7 +131,7 @@ const PasswordInput = ({
 
   const { onGeneratePassword } = usePasswordGenerator(
     generatorSpecial,
-    passwordSettings,
+    generatorSettings ?? passwordSettings,
     isDisabled,
     state.type,
     onChangeAction,
@@ -419,10 +421,10 @@ const PasswordInput = ({
 
         {!isDisableTooltip && !isDisabled ? (
           <Tooltip
-            place="top"
+            place={tooltipPasswordPlace}
             clickable
             openOnClick
-            anchorSelect={`div[id='tooltipContent-${id || inputName}'] input`}
+            anchorSelect={`div[id='tooltipContent-${id || inputName}']`}
             ref={refTooltip}
             imperativeModeOnly
           >

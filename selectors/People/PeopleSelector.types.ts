@@ -9,6 +9,7 @@ import type {
   TSelectorCheckbox,
   TSelectorHeader,
   TSelectorInfo,
+  TSelectorItemMark,
   TSelectorSubmitButton,
   TSelectorWithAside,
 } from "../../components/selector";
@@ -72,6 +73,15 @@ export type PeopleSelectorProps = TSelectorHeader &
     setActiveTab?: (id: string) => void;
 
     checkIfUserInvited?: (user: EmployeeFullDto) => boolean;
+    /**
+     * Called with the people of each page the list loads, the first one and
+     * the pages of a search included. The marks it resolves with, by person
+     * id, are shown in those rows once they arrive; the rows stay
+     * selectable. Until then, and when it rejects, the rows carry no mark.
+     */
+    getItemMarks?: (
+      people: EmployeeFullDto[],
+    ) => Promise<Record<string, TSelectorItemMark>>;
     injectedElement?: React.ReactElement;
     alwaysShowFooter?: boolean;
     onlyRoomMembers?: boolean;

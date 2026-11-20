@@ -54,6 +54,10 @@ const Textarea = ({
   "aria-label": ariaLabel,
   "aria-labelledby": ariaLabelledBy,
   "aria-describedby": ariaDescribedBy,
+  spellCheck,
+  autoCorrect,
+  autoCapitalize,
+  autoComplete,
 }: TextareaProps) => {
   const { isRTL } = useInterfaceDirection();
 
@@ -202,6 +206,10 @@ const Textarea = ({
           aria-label={ariaLabel}
           aria-labelledby={ariaLabelledBy}
           aria-describedby={ariaDescribedBy}
+          spellCheck={spellCheck}
+          autoCorrect={autoCorrect}
+          autoCapitalize={autoCapitalize}
+          autoComplete={autoComplete}
           disabled={isDisabled}
           readOnly={isReadOnly}
           value={isJSONField ? modifiedValue : value}

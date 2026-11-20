@@ -412,3 +412,82 @@ describe("<PeopleSelector /> paging", () => {
     expect(mocks.lastProps.hasNextPage).toBe(false);
   });
 });
+
+describe("<PeopleSelector /> marks", () => {
+  const NO_KEY = { label: "No key", description: "Cannot be invited yet." };
+  const markOf = (label: string) =>
+    mocks.lastProps.items.find((item) => item.label === label)?.mark;
+
+  it("marks the rows of a page once the answer arrives", async () => {
+    mocks.searchUsersByExtendedFilter.mockResolvedValueOnce(
+      people(["Alex", "Bella"]),
+    );
+    let answer: (marks: Record<string, typeof NO_KEY>) => void = () => {};
+    const getItemMarks = vi.fn(
+      () =>
+        new Promise<Record<string, typeof NO_KEY>>((resolve) => {
+          answer = resolve;
+        }),
+    );
+    render(<PeopleSelector getItemMarks={getItemMarks} {...submit} />);
+
+    await waitFor(() => expect(labels()).toEqual(["Alex", "Bella"]));
+    expect(getItemMarks).toHaveBeenCalledWith([
+      expect.objectContaining({ id: "u-Alex" }),
+      expect.objectContaining({ id: "u-Bella" }),
+    ]);
+    expect(markOf("Bella")).toBeUndefined();
+
+    await act(async () => answer({ "u-Bella": NO_KEY }));
+
+    expect(markOf("Bella")).toEqual(NO_KEY);
+    expect(markOf("Alex")).toBeUndefined();
+  });
+
+  it("asks for the people of the next page", async () => {
+    mocks.searchUsersByExtendedFilter.mockResolvedValueOnce(
+      people(["Alex"], 2),
+    );
+    const getItemMarks = vi.fn(async () => ({ "u-Chris": NO_KEY }));
+    render(<PeopleSelector getItemMarks={getItemMarks} {...submit} />);
+    await waitFor(() => expect(labels()).toEqual(["Alex"]));
+
+    mocks.searchUsersByExtendedFilter.mockResolvedValueOnce(
+      people(["Chris"], 2),
+    );
+    loadAfter(1);
+
+    await waitFor(() => expect(markOf("Chris")).toEqual(NO_KEY));
+    expect(getItemMarks).toHaveBeenLastCalledWith([
+      expect.objectContaining({ id: "u-Chris" }),
+    ]);
+  });
+
+  it("marks nobody when the answer fails", async () => {
+    mocks.searchUsersByExtendedFilter.mockResolvedValueOnce(people(["Alex"]));
+    const getItemMarks = vi.fn(async () => {
+      throw new Error("offline");
+    });
+    render(<PeopleSelector getItemMarks={getItemMarks} {...submit} />);
+
+    await waitFor(() => expect(getItemMarks).toHaveBeenCalled());
+    await act(async () => {});
+
+    expect(markOf("Alex")).toBeUndefined();
+  });
+
+  it("asks for no marks for groups", async () => {
+    const getItemMarks = vi.fn(async () => ({}));
+    render(
+      <PeopleSelector
+        withGroups
+        isGroupsOnly
+        getItemMarks={getItemMarks}
+        {...submit}
+      />,
+    );
+
+    await waitFor(() => expect(labels()).toEqual(["Legal", "Sales"]));
+    expect(getItemMarks).not.toHaveBeenCalled();
+  });
+});

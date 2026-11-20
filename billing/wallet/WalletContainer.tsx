@@ -1,5 +1,12 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { observer } from "mobx-react";
+import classNames from "classnames";
 import { useCommonTranslation } from "../../utils/i18n";
 import { CommonTrans } from "../../utils/i18n/CommonTrans";
 
@@ -7,23 +14,28 @@ import { toAbsoluteUrl } from "../utils/url";
 
 import { Text } from "../../components/text";
 import { Button, ButtonSize } from "../../components/button";
-import { toastr } from "../../components/toast";
 import { Link } from "../../components/link";
 import { Tabs, type TTabItem } from "../../components/tabs";
 import { finishRefreshingWithMinCycle } from "../utils/refreshing";
+import { useBalanceRefresh } from "../shared/balance-amount/useBalanceRefresh";
 
 import TransactionHistory from "../shared/transaction-history";
 import UpcomingPayments from "./sub-components/UpcomingPayments";
 import WalletRefilledModal from "./WalletRefilledModal";
 import AutoPaymentInfo from "./sub-components/AutoPaymentInfo";
 import DelayedPaymentMethodBanner from "./sub-components/DelayedPaymentMethodBanner";
+import PromoCredits from "./sub-components/PromoCredits";
+import PromoExpiryBanner from "./sub-components/PromoExpiryBanner";
 import UnlinkedCardBanner from "../shared/unlinked-card-banner";
 import styles from "./styles/Wallet.module.scss";
 import BalanceAmount from "../shared/balance-amount";
 import { usePaymentStore } from "../store/PaymentStoreProvider";
 import { useServicesStore } from "../store/ServicesStoreProvider";
+import useDeviceType from "../hooks/useDeviceType";
+import { DeviceType } from "../../enums";
 import { getBrandName } from "../../constants/brands";
 import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
+import type { TopUpTab } from "../shared/top-up-balance/SimpleTopUpDialog";
 import { LATIN_NUMBERING_SYSTEM } from "../../utils/latin-digits";
 
 const WALLET_TAB_IDS = ["transaction-history", "upcoming-payments"];
@@ -51,18 +63,28 @@ type WalletProps = {
 };
 
 const Wallet = (props: WalletProps) => {
-  const { isMobile, onViewUsage, onAddonsClick } = props;
+  const { onViewUsage, onAddonsClick } = props;
 
   const store = usePaymentStore();
-  const { walletMonthToDateSpend } = useServicesStore();
+
+  const currentDeviceType = useDeviceType({
+    mobile: store.mobileBreakpoint,
+    desktop: store.desktopBreakpoint,
+  });
+
+  const isMobile = props.isMobile ?? currentDeviceType === DeviceType.mobile;
+  const { walletMonthToDateSpend, walletMonthToDatePromoSpend } =
+    useServicesStore();
+  const promoSpend = walletMonthToDatePromoSpend ?? 0;
+  const hasPromoSpend = promoSpend > 0;
 
   const {
-    walletBalance,
+    availableCredits,
+    hasPromoCredits,
     walletCodeCurrency,
     isCardLinkedToPortal,
     isVisibleWalletSettings,
     wasChangeBalance,
-    fetchBalance,
     refreshTransactionHistory,
     canUpdateTariff,
     recommendedAmount,
@@ -85,16 +107,42 @@ const Wallet = (props: WalletProps) => {
 
   const { isNotPaidPeriod, isDelayedPaymentMethod } = store.tariff;
 
+  const hasPayer = Boolean(store.tariff.walletCustomerEmail);
+  const canRedeemPromoCode =
+    (store.isPayer || !hasPayer) && canUpdateTariff && !isNotPaidPeriod;
+
   const t = useCommonTranslation();
 
+  const { isRefreshing, onRefresh } = useBalanceRefresh(
+    refreshTransactionHistory,
+  );
   const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(
     isVisibleWalletSettings,
   );
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [topUpTab, setTopUpTab] = useState<TopUpTab>(store.topUpDialogTab);
   const [isWalletRefilledOpen, setIsWalletRefilledOpen] = useState(false);
   const [selectedTabId, setSelectedTabId] = useState(getInitialTabId);
 
   const [isAutoSpinning, setIsAutoSpinning] = useState(isAutoTopUpInProgress);
+  const hasPromoSection = hasPromoCredits || hasPromoSpend;
+  const hadPromoOnMount = useRef(hasPromoSection);
+  const [isPromoShown, setIsPromoShown] = useState(hasPromoSection);
+  const [isPromoLeaving, setIsPromoLeaving] = useState(false);
+
+  useEffect(() => {
+    if (hasPromoSection) {
+      setIsPromoShown(true);
+      setIsPromoLeaving(false);
+    } else if (isPromoShown) {
+      setIsPromoLeaving(true);
+    }
+  }, [hasPromoSection]);
+
+  const onPromoLeft = useCallback(() => {
+    setIsPromoShown(false);
+    setIsPromoLeaving(false);
+  }, []);
+
   const autoStartTimeRef = useRef<number | null>(null);
 
   const monthLabel = useMemo(
@@ -138,27 +186,13 @@ const Wallet = (props: WalletProps) => {
   };
 
   const onOpen = () => {
+    setTopUpTab("purchase");
     setIsTopUpDialogVisible(true);
   };
 
-  const onClick = async () => {
-    if (isRefreshing) return;
-
-    setIsRefreshing(true);
-
-    const startTime = Date.now();
-
-    try {
-      refreshTransactionHistory();
-      await fetchBalance!(true);
-    } catch (e) {
-      toastr.error(e as Error);
-    } finally {
-      finishRefreshingWithMinCycle({
-        startTime,
-        setRefreshing: setIsRefreshing,
-      });
-    }
+  const onPromoCodeClick = () => {
+    setTopUpTab("promo");
+    setIsTopUpDialogVisible(true);
   };
 
   const onSelectTab = (item: TTabItem) => {
@@ -213,6 +247,8 @@ const Wallet = (props: WalletProps) => {
         </Link>
       ) : null}
 
+      <PromoExpiryBanner />
+
       <div className={styles.summaryGrid}>
         <div className={`${styles.summaryCard} ${styles.summaryCardBalance}`}>
           <BalanceAmount
@@ -224,11 +260,32 @@ const Wallet = (props: WalletProps) => {
             isRefreshing={isRefreshing || isAutoSpinning}
             progressText={t("TopUpInProgress")}
             isProgressTextVisible={isAutoSpinning}
-            onRefresh={onClick}
-            amount={walletBalance}
+            onRefresh={onRefresh}
+            amount={availableCredits}
             currency={walletCodeCurrency}
             language={store.language}
           />
+
+          {isPromoShown ? (
+            <PromoCredits
+              animate={!hadPromoOnMount.current}
+              keepEmpty={hasPromoSpend}
+              leaving={isPromoLeaving}
+              onLeft={onPromoLeft}
+            />
+          ) : canRedeemPromoCode ? (
+            <Link
+              onClick={onPromoCodeClick}
+              textDecoration="underline"
+              fontSize="13px"
+              fontWeight={600}
+              color="accent"
+              className={styles.promoCodeLink}
+              dataTestId="wallet_promo_code_link"
+            >
+              {t("HavePromoCode")}
+            </Link>
+          ) : null}
 
           <div className={styles.cardButtons}>
             <Button
@@ -251,6 +308,32 @@ const Wallet = (props: WalletProps) => {
               />
             ) : null}
           </div>
+
+          {isPromoShown ? (
+            <Text
+              fontSize="11px"
+              lineHeight="16px"
+              className={styles.promoFootnote}
+            >
+              {t("PromoCreditsFootnote")}
+              {canRedeemPromoCode ? (
+                <>
+                  {" "}
+                  <Link
+                    onClick={onPromoCodeClick}
+                    textDecoration="underline"
+                    fontSize="11px"
+                    lineHeight="16px"
+                    fontWeight={600}
+                    color="accent"
+                    dataTestId="wallet_promo_code_link"
+                  >
+                    {t("HavePromoCode")}
+                  </Link>
+                </>
+              ) : null}
+            </Text>
+          ) : null}
         </div>
 
         <div className={`${styles.summaryCard} ${styles.summaryCardSpend}`}>
@@ -267,20 +350,53 @@ const Wallet = (props: WalletProps) => {
             amount={walletMonthToDateSpend}
             currency={walletCodeCurrency}
             language={store.language}
-            mainFontSize="18px"
-            fractionFontSize="12px"
+            mainFontSize={hasPromoSpend ? "22px" : "18px"}
+            fractionFontSize={hasPromoSpend ? "14px" : "12px"}
             withoutMargin
-            className={styles.spendAmount}
+            className={classNames(styles.spendAmount, {
+              [styles.spendAmountAligned]: hasPromoSpend,
+            })}
           />
-          <Text fontSize="12px" lineHeight="16px">
-            {t("ForPeriod", { period: monthLabel })}
-          </Text>
+          {hasPromoSpend ? (
+            <div className={styles.spendDetails}>
+              <Text fontSize="13px" lineHeight="20px">
+                {t("ForPeriod", { period: monthLabel })}
+              </Text>
+              <div className={styles.spendSplit}>
+                <div className={styles.creditsRow}>
+                  <Text fontSize="13px" lineHeight="20px">
+                    {t("SpendFromPurchasedCredits")}
+                  </Text>
+                  <Text fontSize="13px" lineHeight="20px" fontWeight={600}>
+                    {store.formatWalletCurrency(
+                      walletMonthToDateSpend - promoSpend,
+                      2,
+                    )}
+                  </Text>
+                </div>
+                <div className={styles.creditsRow}>
+                  <Text fontSize="13px" lineHeight="20px">
+                    {t("SpendFromPromoCredits")}
+                  </Text>
+                  <Text fontSize="13px" lineHeight="20px" fontWeight={600}>
+                    {store.formatWalletCurrency(promoSpend, 2)}
+                  </Text>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <Text fontSize="12px" lineHeight="16px">
+              {t("ForPeriod", { period: monthLabel })}
+            </Text>
+          )}
           {onViewUsage ? (
             <Link
               onClick={onViewUsage}
               textDecoration="underline"
               color="accent"
-              className={styles.viewUsageLink}
+              className={classNames(styles.viewUsageLink, {
+                [styles.viewUsageLinkBottom]: hasPromoSpend,
+              })}
               dataTestId="wallet_view_usage_link"
               fontWeight={600}
             >
@@ -303,6 +419,7 @@ const Wallet = (props: WalletProps) => {
           visible={isTopUpDialogVisible}
           onClose={onClose}
           recommendedAmount={recommendedAmount}
+          initialTab={topUpTab}
         />
       ) : null}
 

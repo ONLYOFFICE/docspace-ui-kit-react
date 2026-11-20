@@ -78,6 +78,7 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
     storagePriceIncrement,
     formatWalletCurrency,
     walletBalance,
+    availableCredits,
     walletCodeCurrency,
     isPayer,
     isStripeCheckoutRequired,
@@ -158,8 +159,8 @@ const StoragePlanUpgrade: React.FC<StorageDialogProps> = ({
 
   const recommendedAmount = isPaymentBlockedByBalance
     ? hasStorageSubscription && isUpgradeStoragePlan
-      ? Math.ceil(partialUpgradeFee - walletBalance)
-      : Math.ceil(totalPrice - walletBalance)
+      ? Math.ceil(partialUpgradeFee - availableCredits)
+      : Math.ceil(totalPrice - availableCredits)
     : 0;
 
   const isBalanceInsufficient =

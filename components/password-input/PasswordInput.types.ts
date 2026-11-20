@@ -2,6 +2,7 @@ import React, { MouseEvent } from "react";
 
 import { InputType } from "../text-input";
 import { InputBlockProps } from "../input-block";
+import type { TTooltipPlace } from "../tooltip";
 
 export type TPasswordSettings = {
   /** Minimum length requirement for the password */
@@ -77,6 +78,11 @@ export type TPasswordTooltipProps = {
   tooltipAllowedCharacters?: string;
   /** Allows to hide Tooltip */
   isDisableTooltip?: boolean;
+  /**
+   * Side of the field the rules tooltip opens on. Where that side has no room, the
+   * tooltip flips to another one (see Tooltip).
+   */
+  tooltipPasswordPlace?: TTooltipPlace;
   /** Title of the password generation button */
   generatePasswordTitle?: string;
 };
@@ -93,10 +99,16 @@ type PasswordInputBaseProps = {
   /** Ignored. It only sets an internal flag for a copy button that is not rendered. */
   emailInputName?: string;
   /**
-   * The rules the generator and the checker use. Left out, only a minimum
-   * length of 8 is required — digits, capitals and symbols are all off.
+   * The rules the checker uses, and the generator too unless
+   * `generatorSettings` is given. Left out, only a minimum length of 8 is
+   * required — digits, capitals and symbols are all off.
    */
   passwordSettings?: TPasswordSettings;
+  /**
+   * The settings the generator draws by, when they differ from the rules the
+   * input checks. Left out, the generator uses `passwordSettings`.
+   */
+  generatorSettings?: TPasswordSettings;
   /**
    * Called after every change with whether every rule passes, and with each
    * rule's own result. It never fires in `simpleView`, which skips checking.

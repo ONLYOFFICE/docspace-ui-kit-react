@@ -63,7 +63,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
     isServiceActionDisabled,
     isShowPreviousStoragePlan,
     showUnlinkedCardBanner,
-    walletBalance = 0,
+    availableCredits = 0,
   } = paymentStore;
 
   const {
@@ -179,7 +179,10 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
     : currentStoragePlanSize;
 
   const monthlyPrice = calculateTotalPrice(planSize, storagePriceIncrement);
-  const renewalShortfall = Math.max(0, Math.ceil(monthlyPrice - walletBalance));
+  const renewalShortfall = Math.max(
+    0,
+    Math.ceil(monthlyPrice - availableCredits),
+  );
   const isDelayedPaymentTopUp = isDelayedPaymentMethod && renewalShortfall > 0;
 
   const getRenewLabel = () => {

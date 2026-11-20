@@ -20,6 +20,8 @@ vi.mock("@onlyoffice/docspace-api-sdk", async (importOriginal) => {
     getCustomerBalance = vi.fn().mockResolvedValue({ data: {} });
 
     getCustomerInfo = vi.fn().mockResolvedValue({ data: {} });
+
+    getQuotaPaymentInformation = vi.fn().mockResolvedValue({ data: {} });
   }
 
   class MockApi {}
@@ -45,6 +47,11 @@ const createStores = () => {
   vi.spyOn(apiClient.instance, "get").mockImplementation(
     (url: string, config?: AxiosRequestConfig) =>
       new Promise((resolve, reject) => {
+        if (!url.includes("customer/usage")) {
+          resolve({ data: { response: null } });
+          return;
+        }
+
         config?.signal?.addEventListener?.("abort", () => {
           const error = new Error("canceled");
           error.name = "CanceledError";

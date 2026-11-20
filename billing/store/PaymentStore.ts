@@ -35,6 +35,7 @@ export type WalletOperationDto = Omit<
   sourceTitle?: string | null;
   sourceType?: TransactionSourceType | null;
   tokenUsage?: OperationTokenUsage | null;
+  sources?: OperationSource[] | null;
   cost?: number | null;
   byok?: boolean;
   provider?: string | null;
@@ -43,15 +44,25 @@ export type WalletOperationDto = Omit<
 import { toastr } from "../../components/toast";
 import type { TData } from "../../components/toast";
 import type {
+  OperationSource,
   TAccountingPrice,
   TActiveService,
   TBalance,
+  TGoodwill,
+  TGoodwillLot,
   TInvoice,
+  TInvoiceInitiatorFilter,
+  TPromoCodeResult,
   TInvoicesPage,
   TServiceUsage,
   TUsagePeriodKey,
 } from "../types";
-import { formatCurrencyValue, formatPercentValue } from "../utils/common";
+import {
+  daysUntil,
+  formatCurrencyValue,
+  formatPercentValue,
+  sumAmounts,
+} from "../utils/common";
 import {
   getCardLinkedOnFreeTariff,
   getCardLinkedOnNonProfit,
@@ -110,6 +121,10 @@ import type {
   TWalletServiceQuota,
 } from "../types";
 import type { TApiClient } from "../../providers/api/ApiProvider";
+import {
+  clearPromoCodeReturn,
+  isPromoCodeReturn,
+} from "../shared/promo-code/promoCodeReturn";
 import CurrentTariffStatusStore from "./CurrentTariffStatusStore";
 import CurrentQuotasStore from "./CurrentQuotasStore";
 import PaymentQuotasStore from "./PaymentQuotasStore";
@@ -117,11 +132,14 @@ import PaymentQuotasStore from "./PaymentQuotasStore";
 export const TOTAL_SIZE = "total_size";
 
 const INVOICES_PAGE_SIZE = 25;
+const INVOICES_LOADER_DELAY = 500;
 
 export type TTransactionFilterContact = {
   id: string;
   displayName?: string;
 };
+
+const PROMO_EXPIRY_WARNING_DAYS = 7;
 
 const getTransactionType = (key: string) => ({
   isCredit: key !== "debit",
@@ -138,6 +156,12 @@ class PaymentStore {
   #rawApiClient: TApiClient;
 
   #openingInvoiceIds = new Set<number>();
+
+  #invoicesRequestId = 0;
+
+  #invoicesLoaderTimerId: ReturnType<typeof setTimeout> | null = null;
+
+  #isFetchingInvoices = false;
 
   private abortControllers: AbortController[] = [];
 
@@ -252,6 +276,8 @@ class PaymentStore {
 
   previousBalance: TBalance = 0;
 
+  goodwill: TGoodwill | null = null;
+
   cardLinked = "";
 
   transactionHistory: WalletOperationDto[] = [];
@@ -268,6 +294,16 @@ class PaymentStore {
 
   isLoadingMoreInvoices = false;
 
+  isInvoicesLoading = false;
+
+  invoiceFilterInitiator: TInvoiceInitiatorFilter = "all";
+
+  invoiceFilterStartDate: DateTime = (
+    subtractFromDate(now(), 4, "weeks") ?? now()
+  ).setLocale(getCookie(LANGUAGE) ?? "en");
+
+  invoiceFilterEndDate: DateTime = now().setLocale(getCookie(LANGUAGE) ?? "en");
+
   activeServices: TActiveService[] = [];
 
   autoPayments: TenantWalletSettings | null = null;
@@ -279,6 +315,8 @@ class PaymentStore {
   isAutomaticPaymentsEnabled: boolean = false;
 
   isVisibleWalletSettings = false;
+
+  topUpDialogTab: "purchase" | "promo" = "purchase";
 
   upToBalanceError = false;
 
@@ -391,6 +429,8 @@ class PaymentStore {
       clearTimeout(this._transactionTimerId);
       this._transactionTimerId = null;
     }
+
+    this.#clearInvoicesLoaderTimer();
   };
 
   get isAlreadyPaid() {
@@ -500,12 +540,57 @@ class PaymentStore {
     return getWalletBalanceAmount(this.balance);
   }
 
+  get promoLots(): TGoodwillLot[] {
+    return this.goodwill?.lots ?? [];
+  }
+
+  get hasPromoCredits() {
+    return this.promoLots.length > 0;
+  }
+
+  get promoBalance(): number {
+    return sumAmounts(this.promoLots.map((lot) => lot.remaining));
+  }
+
+  get promoGranted(): number {
+    return sumAmounts(this.promoLots.map((lot) => lot.amount));
+  }
+
+  get promoDaysLeft(): number {
+    const lot = this.nextExpiringPromoLot;
+    if (!lot?.expiresAt) return 0;
+
+    return Math.max(0, daysUntil(lot.expiresAt));
+  }
+
+  get nextExpiringPromoLot(): TGoodwillLot | null {
+    let next: TGoodwillLot | null = null;
+
+    for (const lot of this.promoLots) {
+      if (!lot.expiresAt) continue;
+      if (!next || Date.parse(lot.expiresAt) < Date.parse(next.expiresAt!))
+        next = lot;
+    }
+
+    return next;
+  }
+
+  get isPromoExpiringSoon() {
+    if (!this.nextExpiringPromoLot) return false;
+
+    return this.promoDaysLeft <= PROMO_EXPIRY_WARNING_DAYS;
+  }
+
+  get availableCredits(): number {
+    return sumAmounts([this.walletBalance, this.promoBalance]);
+  }
+
   get isLowWalletBalance() {
     if (!this.isCardLinkedToPortal) return false;
 
     if (!this.isAiToolsServiceOn) return false;
 
-    return this.walletBalance < 1;
+    return this.availableCredits < 1;
   }
 
   get wasFirstTopUp() {
@@ -608,8 +693,8 @@ class PaymentStore {
 
   get availableBackupsCount() {
     if (this.backupServicePrice === 0) return 0;
-    if (this.walletBalance === 0) return 0;
-    return Math.floor(this.walletBalance / this.backupServicePrice);
+    if (this.availableCredits === 0) return 0;
+    return Math.floor(this.availableCredits / this.backupServicePrice);
   }
 
   get allowedStorageSizeByQuota() {
@@ -665,6 +750,18 @@ class PaymentStore {
 
   setVisibleWalletSetting = (isVisibleWalletSettings: boolean) => {
     this.isVisibleWalletSettings = isVisibleWalletSettings;
+  };
+
+  setTopUpDialogTab = (tab: "purchase" | "promo") => {
+    this.topUpDialogTab = tab;
+  };
+
+  applyPromoCodeReturn = () => {
+    if (!isPromoCodeReturn()) return;
+
+    this.setTopUpDialogTab("promo");
+    this.setVisibleWalletSetting(true);
+    clearPromoCodeReturn();
   };
 
   setIsShowTariffDeactivatedModal = (value: boolean) => {
@@ -733,7 +830,17 @@ class PaymentStore {
     const { data } = await this.#rawApiClient.instance.get(
       "api/2.0/portal/payment/customer/deposits",
       {
-        params: { status: "Completed", offset, limit: INVOICES_PAGE_SIZE },
+        params: {
+          status: "Completed",
+          startDate: this.formatDate(this.invoiceFilterStartDate, "start"),
+          endDate: this.formatDate(this.invoiceFilterEndDate, "end"),
+          initiator:
+            this.invoiceFilterInitiator === "all"
+              ? undefined
+              : this.invoiceFilterInitiator,
+          offset,
+          limit: INVOICES_PAGE_SIZE,
+        },
         signal: abortController.signal,
       },
     );
@@ -747,21 +854,47 @@ class PaymentStore {
     };
   };
 
+  #clearInvoicesLoaderTimer = () => {
+    if (this.#invoicesLoaderTimerId === null) return;
+
+    clearTimeout(this.#invoicesLoaderTimerId);
+    this.#invoicesLoaderTimerId = null;
+  };
+
   fetchInvoices = async () => {
+    const requestId = ++this.#invoicesRequestId;
+
+    this.#isFetchingInvoices = true;
+    this.#clearInvoicesLoaderTimer();
+    this.#invoicesLoaderTimerId = setTimeout(() => {
+      runInAction(() => {
+        if (requestId !== this.#invoicesRequestId) return;
+        this.#invoicesLoaderTimerId = null;
+        this.isInvoicesLoading = true;
+      });
+    }, INVOICES_LOADER_DELAY);
+
     try {
       const { collection, total } = await this.#requestInvoices(0);
+
+      if (requestId !== this.#invoicesRequestId) return;
 
       runInAction(() => {
         this.invoices = collection;
         this.invoicesTotal = total;
       });
     } catch (error: unknown) {
+      if (requestId !== this.#invoicesRequestId) return;
       if (error instanceof Error && error.name === "CanceledError") return;
       toastr.error(error as Error);
     }
 
+    this.#clearInvoicesLoaderTimer();
+    this.#isFetchingInvoices = false;
+
     runInAction(() => {
       this.isInitInvoices = true;
+      this.isInvoicesLoading = false;
     });
   };
 
@@ -769,8 +902,41 @@ class PaymentStore {
     await this.fetchInvoices();
   };
 
+  get isInvoiceFilterModified(): boolean {
+    return (
+      this.invoiceFilterInitiator !== "all" ||
+      !isSameDay(this.invoiceFilterStartDate, this.defaultFilterStartDate) ||
+      !isSameDay(this.invoiceFilterEndDate, this.defaultFilterEndDate)
+    );
+  }
+
+  setInvoiceFilterInitiator = (initiator: TInvoiceInitiatorFilter) => {
+    this.invoiceFilterInitiator = initiator;
+  };
+
+  setInvoiceFilterStartDate = (date: DateTime) => {
+    this.invoiceFilterStartDate = date;
+  };
+
+  setInvoiceFilterEndDate = (date: DateTime) => {
+    this.invoiceFilterEndDate = date;
+  };
+
+  resetInvoiceFilter = () => {
+    this.invoiceFilterInitiator = "all";
+    this.invoiceFilterStartDate = this.defaultFilterStartDate;
+    this.invoiceFilterEndDate = this.defaultFilterEndDate;
+  };
+
   fetchMoreInvoices = async () => {
-    if (this.isLoadingMoreInvoices || !this.hasMoreInvoices) return;
+    if (
+      this.isLoadingMoreInvoices ||
+      this.#isFetchingInvoices ||
+      !this.hasMoreInvoices
+    )
+      return;
+
+    const requestId = this.#invoicesRequestId;
 
     this.isLoadingMoreInvoices = true;
 
@@ -778,6 +944,8 @@ class PaymentStore {
       const { collection, total } = await this.#requestInvoices(
         this.invoices.length,
       );
+
+      if (requestId !== this.#invoicesRequestId) return;
 
       runInAction(() => {
         this.invoices = [...this.invoices, ...collection];
@@ -905,7 +1073,7 @@ class PaymentStore {
     fractionDigits: number = 2,
     currency?: string,
   ) => {
-    const amount = item ?? this.walletBalance;
+    const amount = item ?? this.availableCredits;
 
     return formatCurrencyValue(
       this.language,
@@ -916,7 +1084,7 @@ class PaymentStore {
   };
 
   formatPaymentCurrency = (item?: number, fractionDigits: number = 0) => {
-    const amount = item ?? this.walletBalance;
+    const amount = item ?? this.availableCredits;
     const { isoCurrencySymbol } = this.paymentQuotas.planCost;
 
     return formatCurrencyValue(
@@ -931,7 +1099,7 @@ class PaymentStore {
     this.formatPaymentCurrency(amount, Number.isInteger(amount) ? 0 : 2);
 
   formatFuturePaymentCurrency = (item?: number, fractionDigits: number = 0) => {
-    const amount = item ?? this.walletBalance;
+    const amount = item ?? this.availableCredits;
     const { isoCurrencySymbol } = this.paymentQuotas.futurePlanCost;
 
     return formatCurrencyValue(
@@ -964,6 +1132,93 @@ class PaymentStore {
     } catch (e: unknown) {
       if (e instanceof Error && e.name === "CanceledError") return;
       throw e;
+    }
+  };
+
+  fetchGoodwill = async () => {
+    const abortController = new AbortController();
+    this.addAbortController(abortController);
+
+    try {
+      const { data } = await this.#rawApiClient.instance.get(
+        "api/2.0/portal/payment/customer/goodwill",
+        { signal: abortController.signal },
+      );
+
+      const goodwill = (data?.response as TGoodwill | null) ?? null;
+
+      runInAction(() => {
+        this.goodwill = goodwill;
+      });
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "CanceledError") return;
+      runInAction(() => {
+        this.goodwill = null;
+      });
+      console.error(error);
+    }
+  };
+
+  refreshBalance = async () => {
+    await Promise.all([
+      this.fetchBalance(true),
+      this.fetchGoodwill(),
+      this.tariff.fetchCustomerInfo(true),
+    ]);
+  };
+
+  applyPromoCode = async (promoCode: string): Promise<TPromoCodeResult> => {
+    try {
+      const { data } = await this.#rawApiClient.instance.post(
+        "api/2.0/portal/payment/promoCode",
+        { promoCode },
+      );
+
+      const response = data?.response as
+        | {
+            status?: string;
+            amount?: number;
+            currency?: string;
+            expiresAt?: string | null;
+          }
+        | undefined;
+
+      const isPending = response?.status === "Pending";
+
+      await Promise.all([
+        isPending ? Promise.resolve() : this.fetchGoodwill(),
+        this.refreshTransactionHistory(),
+      ]);
+
+      return {
+        status: isPending ? "pending" : "applied",
+        amount: response?.amount ?? 0,
+        currency: response?.currency ?? this.walletCodeCurrency,
+        expiresAt: response?.expiresAt ?? null,
+      };
+    } catch (error: unknown) {
+      const response = (
+        error as {
+          response?: {
+            status?: number;
+            data?: { error?: { message?: string } };
+          };
+        }
+      )?.response;
+
+      if (response?.status === 400)
+        return {
+          status: "refused",
+          reason: response.data?.error?.message?.trim().toLowerCase() ?? "",
+        };
+      if (response?.status === 402) {
+        await this.fetchGoodwill().catch(() => undefined);
+        return { status: "unconfirmed" };
+      }
+      if (response?.status === 429) return { status: "rateLimited" };
+
+      console.error(error);
+      return { status: "failed" };
     }
   };
 
@@ -1332,6 +1587,7 @@ class PaymentStore {
     const requests: Promise<unknown>[] = [
       this.tariff.fetchCustomerInfo(isRefresh),
       this.fetchBalance(isRefresh),
+      this.fetchGoodwill(),
     ];
 
     if (!this.quotas.isLoaded)
@@ -1451,7 +1707,11 @@ class PaymentStore {
       requests.push(this.getBasicPaymentLink(this.quotas.addedManagersCount));
     }
 
-    requests.push(this.tariff.fetchPortalTariff(), this.fetchBalance());
+    requests.push(
+      this.tariff.fetchPortalTariff(),
+      this.fetchBalance(),
+      this.fetchGoodwill(),
+    );
 
     try {
       await Promise.all(requests);
@@ -1492,6 +1752,7 @@ class PaymentStore {
       this.getSettingsPayment(),
       this.paymentQuotas.fetchPaymentQuotas(),
       this.fetchBalance(isRefresh),
+      this.fetchGoodwill(),
     );
 
     if (this.isAlreadyPaid && this.isStripePortalAvailable) {
@@ -1525,6 +1786,7 @@ class PaymentStore {
       return;
     }
 
+    this.applyPromoCodeReturn();
     this.setIsInitPaymentPage(true);
   };
 
@@ -1654,7 +1916,7 @@ class PaymentStore {
       const priceParam = params.get("price");
 
       if (priceParam) {
-        const recommendedAmount = this.walletBalance - Number(priceParam);
+        const recommendedAmount = this.availableCredits - Number(priceParam);
         if (recommendedAmount < 0)
           this.setRecommendedAmount(
             Math.ceil(Math.abs(recommendedAmount)).toString(),
@@ -1662,6 +1924,8 @@ class PaymentStore {
       } else {
         this.setRecommendedAmount("");
       }
+
+      this.applyPromoCodeReturn();
 
       if (
         window.location.href.includes("complete=true") ||
@@ -1767,7 +2031,7 @@ class PaymentStore {
 
     try {
       const dueTodayAmount = this.tariffDueTodayAmount ?? this.totalPrice;
-      const isBalanceInsufficient = this.walletBalance < dueTodayAmount;
+      const isBalanceInsufficient = this.availableCredits < dueTodayAmount;
 
       if (
         type === ProductQuantityType.Add &&
@@ -1775,7 +2039,7 @@ class PaymentStore {
         !this.tariff.isDelayedPaymentMethod
       ) {
         const recommendedAmount = Math.ceil(
-          dueTodayAmount - this.walletBalance,
+          dueTodayAmount - this.availableCredits,
         );
         if (recommendedAmount > 0) {
           await this.paymentApi.topUpDeposit({
@@ -1839,7 +2103,7 @@ class PaymentStore {
     const isTheSameCount =
       !isFreeTariff && this.managersCount === maxCountManagersByQuota;
     const dueTodayAmount = this.tariffDueTodayAmount ?? this.totalPrice;
-    const isBalanceInsufficient = this.walletBalance < dueTodayAmount;
+    const isBalanceInsufficient = this.availableCredits < dueTodayAmount;
 
     if (this.isTariffDueTodayCalculating) return t("UpgradeNow");
 

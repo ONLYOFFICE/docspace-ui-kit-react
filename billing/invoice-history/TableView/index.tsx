@@ -2,16 +2,18 @@ import React, { useRef } from "react";
 import { observer } from "mobx-react";
 
 import { TableBody, TableContainer } from "../../../components/table";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
 import type { TInvoice } from "../../types";
 
 import { getCorrectDate } from "../../../utils/date/getCorrectDate";
+import { getInitiatorLabel } from "../getInitiatorLabel";
 import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
 import styles from "../InvoiceHistory.module.scss";
 
-const TABLE_VERSION = "1";
+const TABLE_VERSION = "2";
 const COLUMNS_SIZE = `invoiceHistoryColumnsSize_ver-${TABLE_VERSION}`;
 const INFO_PANEL_COLUMNS_SIZE = `infoPanelInvoiceHistoryColumnsSize_ver-${TABLE_VERSION}`;
 
@@ -26,6 +28,7 @@ const TableView = ({
   invoices,
   onOpenInvoice,
 }: InvoiceHistoryTableViewProps) => {
+  const t = useCommonTranslation();
   const {
     formatWalletCurrency,
     userId,
@@ -67,6 +70,7 @@ const TableView = ({
             key={invoice.id}
             date={getCorrectDate(language, invoice.date)}
             amount={formatWalletCurrency(invoice.amount, 2, invoice.currency)}
+            type={getInitiatorLabel(t, invoice.initiator, false)}
             hasInvoice={invoice.hasInvoice}
             onOpenInvoice={() => onOpenInvoice(invoice.id)}
           />

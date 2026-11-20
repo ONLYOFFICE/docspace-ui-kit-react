@@ -4,6 +4,7 @@ import type {
   TransactionSourceType,
   WalletOperationDto,
 } from "../../store/PaymentStore";
+import { OperationType } from "@onlyoffice/docspace-api-sdk";
 import { AI_SEARCH, AI_TOOLS } from "../../constants";
 
 export const isAiServiceName = (serviceName?: string) =>
@@ -63,6 +64,47 @@ export const getTransactionSourceLabel = (
 
   return typeLabel || sourceTitle || null;
 };
+
+export const BONUS_SPLIT_TOOLTIP_ID = "bonusSplitTooltip";
+
+export type BonusSplit = {
+  bonus: number;
+  wallet: number;
+  currency: string;
+};
+
+const GOODWILL_OPERATION_TYPES = new Set<string | number>([
+  "GoodwillCredit",
+  "GoodwillExpiration",
+  OperationType.GoodwillCredit,
+]);
+
+export const getBonusSplit = (
+  transaction: Pick<
+    WalletOperationDto,
+    "sources" | "currency" | "debit" | "type"
+  >,
+): BonusSplit | null => {
+  const { type } = transaction;
+  const isGoodwillOperation =
+    type !== undefined && type !== null && GOODWILL_OPERATION_TYPES.has(type);
+
+  if ((transaction.debit ?? 0) <= 0 || isGoodwillOperation) return null;
+
+  const sources = transaction.sources ?? [];
+  const bonus = sources.find((source) => source.isBonus)?.amount ?? 0;
+
+  if (bonus <= 0) return null;
+
+  const wallet = sources.find((source) => !source.isBonus)?.amount ?? 0;
+
+  return { bonus, wallet, currency: transaction.currency ?? "" };
+};
+
+export const serializeBonusSplit = (split: BonusSplit) => JSON.stringify(split);
+
+export const parseBonusSplit = (content: string | null): BonusSplit | null =>
+  content ? (JSON.parse(content) as BonusSplit) : null;
 
 export const TOKEN_USAGE_TOOLTIP_ID = "tokenUsageTooltip";
 
