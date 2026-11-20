@@ -346,6 +346,19 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`AvatarEditorDialog`, `RoomLogoCoverDialog` and the filter panel are named by their
+  heading**: `title`, `t("Common:RoomCover")` and `filterHeader`. Each was announced as an
+  unnamed dialog. A passed `aria-label` or `aria-labelledby` still wins
+- **Images beside their own label have an empty `alt`**: the plugin icons of `ContextMenu` and
+  `DropDownItem`, `Dropzone`'s icon, `Selector`'s empty-screen picture, `FileTile`'s thumbnail,
+  `RoomIcon`'s hover image and the burger images of `Navigation` and `Article`. Each was
+  announced by English filler such as "plugin-logo" or "Thumbnail-img"
+- **Logos are named by what they show.** A `RoomIcon` logo is named by `title`, like the
+  initials it replaces, and the logos of `Navigation` and `Article` by the product name as the
+  portal brands it. They read "room icon", "logo" and "burger-logo"
+- **`PortalLogo`'s `alt` defaults to the product name** as the portal brands it, instead of the
+  English "portal logo"
+- **`Calendar`'s month arrows are named in the kit's translations**, "Previous" and "Next"
 - **The kit's own icon-only buttons are named**, in its translations. Each was a focusable button
   announced only as "button": the crosses of `Tag`, `SelectedItem` and the filter chips
   ("Remove"), `Textarea`'s copy button ("Copy to clipboard"), the table group menu's cross and

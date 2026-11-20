@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { Button, ButtonSize } from "../button";
 import { ModalDialog } from "../modal-dialog";
 import { Text } from "../text";
-import { getBrandName } from "../../constants/brands";
+import { getProductName } from "../../utils/product-name";
 import { pickAriaProps } from "../../utils/aria-props";
 
 import type { TwoStateToggleProps } from "./TwoStateToggle.types";
@@ -29,15 +29,6 @@ const writeStoredDesign = (value: "new" | "old") => {
   } catch {
     // Storage unavailable: nothing to persist to.
   }
-};
-
-// The product's name as the portal brands it. The library's own lookup is the
-// identity until an application registers one, so an unwired lookup -- which
-// answers with the key itself -- falls back to the product's current name.
-const PRODUCT_NAME_KEY = "ProductName";
-const getProductName = (): string => {
-  const name = getBrandName(PRODUCT_NAME_KEY).trim();
-  return name && name !== PRODUCT_NAME_KEY ? name : "ONLYOFFICE Apps";
 };
 
 const TwoStateToggle = ({

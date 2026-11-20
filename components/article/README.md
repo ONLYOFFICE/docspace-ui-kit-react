@@ -421,8 +421,8 @@ go on `:root` or another ancestor of `#root`.
   `<aside>`. It is not announced as a region and cannot be jumped to.
 - **The collapse handle is a `<div>` with an `onClick`**, with no role, tab stop or key handler.
   The panel cannot be collapsed from the keyboard.
-- The logo, which navigates home, is a clickable `<img>` out of the tab order, with the `alt`
-  `burger-logo`.
+- The logo, which navigates home, is a clickable `<img>` out of the tab order. Its `alt` is the
+  product name as the portal brands it; the tablet's burger image has an empty `alt`.
 - On a phone the panel is a portal over the page with a backdrop. Nothing moves focus into it,
   traps it there or restores it on close.
 - Its labels come from the kit's shared translations. Without a `TranslationProvider` they are

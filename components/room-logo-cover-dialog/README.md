@@ -329,8 +329,8 @@ types are, for typing a re-implementation.
   as unlabelled graphics.
 - **While the colour picker is open, Escape does not close the dialog.** With focus inside the
   picker, Escape or its "Close color picker" cross closes the picker.
-- The dialog has no accessible name of its own. The header is a plain string, not a heading
-  element. Pass `aria-label` or `aria-labelledby`.
+- The dialog is named by `t("Common:RoomCover")`, the text of its header, which is a plain string
+  rather than a heading. A passed `aria-label` or `aria-labelledby` replaces it.
 - **A passed `aria-*` lands on the `role="dialog"` element and is kept.**
 
 ## Test ids

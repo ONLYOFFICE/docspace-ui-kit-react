@@ -525,6 +525,7 @@ const FilterBlock = ({
       onClose={hideFilterBlock}
       withBodyScroll
       containerVisible={showSelector.show || !!customPanel}
+      aria-label={filterHeader}
       data-testid="filter_modal_dialog"
     >
       {showSelector.show && renderSelector ? (

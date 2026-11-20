@@ -104,7 +104,7 @@ export const Default: Story = {
     ).toBeVisible();
     await expect(canvas.getByText("Try again later")).toBeVisible();
     await expect(canvas.getByText("Customized body")).toBeVisible();
-    await expect(canvas.getByAltText("portal logo")).toBeInTheDocument();
+    await expect(canvas.getByAltText("ONLYOFFICE Apps")).toBeInTheDocument();
     // No buttonText, so no button even though onClickButton is set.
     await expect(canvas.queryByRole("button")).toBeNull();
     // The illustration is decorative: every SVG sits under aria-hidden.
@@ -321,7 +321,7 @@ export const WithoutLogo: Story = {
     hideLogo: true,
   },
   play: async ({ canvas }) => {
-    await expect(canvas.queryByAltText("portal logo")).toBeNull();
+    await expect(canvas.queryByAltText("ONLYOFFICE Apps")).toBeNull();
   },
   parameters: {
     docs: {

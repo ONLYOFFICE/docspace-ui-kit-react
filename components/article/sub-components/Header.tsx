@@ -7,6 +7,7 @@ import { useTheme } from "../../../context/ThemeContext";
 
 import { AsideHeader } from "../../aside";
 import BackButton from "./BackButton";
+import { getProductName } from "../../../utils/product-name";
 
 import styles from "../Article.module.scss";
 
@@ -100,7 +101,7 @@ const ArticleHeader = ({
           <img
             src={burgerLogo}
             className="burger-logo"
-            alt="burger-logo"
+            alt=""
             onClick={onLogoClick}
             onAuxClick={onLogoAuxClick}
           />
@@ -113,14 +114,14 @@ const ArticleHeader = ({
         {currentDeviceType === DeviceType.tablet ? (
           <img
             className="logo-icon_svg"
-            alt="burger-logo"
+            alt={getProductName()}
             src={logo}
             onClick={onLogoClick}
             onAuxClick={onLogoAuxClick}
           />
         ) : (
           <div onClick={onLogoClick} onAuxClick={onLogoAuxClick}>
-            <img className="logo-icon_svg" alt="burger-logo" src={logo} />
+            <img className="logo-icon_svg" alt={getProductName()} src={logo} />
           </div>
         )}
       </div>

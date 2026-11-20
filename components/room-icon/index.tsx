@@ -241,7 +241,7 @@ const RoomIcon = ({
               <img
                 className={classNames([imgClassName, "room-image"])}
                 src={imgSrc}
-                alt="room icon"
+                alt={title}
               />
             ) : (
               <ReactSVG
@@ -305,7 +305,7 @@ const RoomIcon = ({
               "not-selectable",
             ])}
             src={imgSrc as string}
-            alt="room icon"
+            alt={title}
             data-testid="room-icon-image"
           />
         )}
@@ -318,7 +318,7 @@ const RoomIcon = ({
             <img
               className={styles.roomIconHover}
               src={hoverSrc}
-              alt="room icon hover"
+              alt=""
               data-testid="hover-image"
             />
             {dropdownElement}

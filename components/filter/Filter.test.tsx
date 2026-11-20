@@ -246,6 +246,18 @@ describe("Filter Component", () => {
       ).toBeInTheDocument();
     });
 
+    it("names the panel by filterHeader", async () => {
+      await act(async () => {
+        renderComponent();
+      });
+
+      await userEvent.click(screen.getByTestId("filter_icon_button"));
+
+      expect(
+        await screen.findByRole("dialog", { name: "Filter" }),
+      ).toBeInTheDocument();
+    });
+
     it("names the panel's clear button", async () => {
       await act(async () => {
         renderComponent({

@@ -200,8 +200,8 @@ platform's:
 - Tab and Shift+Tab move through the arrows and the grid one item at a time; Enter and Space
   pick the focused item. The arrow keys do not move between days, and there is no `grid` role.
 - Out-of-range items and arrows are `disabled`, so Tab skips them and they cannot be picked.
-- The arrows are named `aria-label="Previous"` and `aria-label="Next"`; changing the month is
-  announced only by the grid re-rendering.
+- The arrows are named by the translated "Previous" and "Next". Changing the month is announced
+  only by the grid re-rendering.
 - The title that opens the month and year views is an `<h2>` with a click handler, so those
   views are reachable by mouse only.
 - Each day's accessible name is its full date in `locale` ("October 15, 2023"); the visible text

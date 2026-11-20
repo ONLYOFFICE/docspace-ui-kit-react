@@ -350,7 +350,8 @@ show only while it is open. The header's other colours come from the theme and a
 - The folder name and the room title are both `<h1>` elements, whatever the page around them.
 - The header is not a landmark: there is no `<nav>`, no `aria-label` and no breadcrumb semantics.
 - The drop box is an ordinary positioned `<div>`. Focus is not moved into it and not trapped.
-- The logo images carry `alt="logo"` and `alt="burger logo"` whether or not they are meaningful.
+- The logo's `alt` is the product name as the portal brands it; the burger image has an empty
+  `alt`.
 - **A passed `aria-*` lands on the header's container and is kept.** The container has no role,
   so a name there is not read.
 

@@ -264,8 +264,8 @@ A stylesheet cannot override them.
   keyboard cannot reach it; put the room's name in a real link or button next to it.
 - The initials are rendered as text, so a screen reader reads out "TR" rather than the room name.
   Treat the tile as decorative and label the row.
-- Both images use fixed English `alt` text, `"room icon"` and `"room icon hover"`. No prop
-  changes or translates it.
+- A logo image is named by `title`, like the initials it replaces. The hover image has an empty
+  `alt`.
 - The pencil and the plus are focusable buttons, and Enter or Space opens the menu. Both are
   named by the translated "Edit".
 - The badge is a focusable button only with `onBadgeClick`, named by `badgeLabel`. Without it the

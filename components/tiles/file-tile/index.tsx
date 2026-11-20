@@ -138,7 +138,7 @@ const FileTile = ({
             <img
               src={thumbnail}
               className={styles.thumbnailImage}
-              alt="Thumbnail-img"
+              alt=""
               onError={onError}
               data-testid="file-thumbnail"
             />

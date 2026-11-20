@@ -6,7 +6,7 @@ export type AvatarEditorDialogProps = React.AriaAttributes & {
   t: TTranslation;
   /** Puts the dialog on screen; while false it stays mounted but hidden. */
   visible: boolean;
-  /** Text of the dialog's header. It is not translated for you. */
+  /** Text of the dialog's header, and its accessible name. It is not translated for you. */
   title: string;
   /** The picture and its crop, held in your state. The body is empty until `uploadedFile` is set. */
   image: TImage;

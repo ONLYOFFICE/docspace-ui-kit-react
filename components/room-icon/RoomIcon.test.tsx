@@ -37,6 +37,21 @@ describe("<RoomIcon />", () => {
     vi.clearAllMocks();
   });
 
+  it("names a logo image by the title and hides the hover image", () => {
+    render(
+      <RoomIcon
+        title="Harper v. Northwind"
+        logo="logo.png"
+        hoverSrc="hover.png"
+      />,
+    );
+
+    expect(
+      screen.getByRole("img", { name: "Harper v. Northwind" }),
+    ).toHaveAttribute("src", "logo.png");
+    expect(screen.getByTestId("hover-image")).toHaveAttribute("alt", "");
+  });
+
   it("names a clickable badge by badgeLabel", () => {
     render(
       <RoomIcon

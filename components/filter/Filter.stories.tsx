@@ -456,7 +456,7 @@ const meta = {
     filterHeader: {
       control: "text",
       description:
-        "Heading of the filter panel. Nothing translates it for you.",
+        "Heading of the filter panel, and its accessible name. Nothing translates it for you.",
     },
     filterTitle: {
       control: "text",

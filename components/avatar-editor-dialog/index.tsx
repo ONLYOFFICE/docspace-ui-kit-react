@@ -61,6 +61,7 @@ const AvatarEditorDialog = ({
   return (
     <ModalDialog
       {...pickAriaProps(rest)}
+      aria-label={rest["aria-label"] ?? title}
       className={styles.modalDialog}
       displayType={ModalDialogType.modal}
       withBodyScroll

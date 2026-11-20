@@ -180,6 +180,16 @@ describe("FileTile", () => {
     vi.clearAllMocks();
   });
 
+  it("treats the thumbnail as decorative", () => {
+    render(
+      <FileTile {...defaultProps} thumbnail="test.png">
+        <FileContent />
+      </FileTile>,
+    );
+
+    expect(screen.getByTestId("file-thumbnail")).toHaveAttribute("alt", "");
+  });
+
   it("puts a passed aria-* on the tile", () => {
     render(<FileTile {...defaultProps} aria-describedby="file-hint" />);
     expect(screen.getByTestId("tile")).toHaveAttribute(

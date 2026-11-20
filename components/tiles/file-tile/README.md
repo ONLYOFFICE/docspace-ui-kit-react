@@ -292,8 +292,8 @@ or an ancestor, and the fade plays once, for two seconds, when the tile mounts.
   until the pointer is on the icon, so Tab reaches it only while `checked`.
 - The three-dot button is named by its tooltip, "Show File Actions". Without a translation
   provider the tooltip is empty and the button is named "More options".
-- **The thumbnail's `alt` is the fixed English string `Thumbnail-img`**, which is neither
-  descriptive nor translated and cannot be changed.
+- **The thumbnail is decorative**, with an empty `alt`: the file's name beside it already names the
+  tile.
 - Ctrl-click and Shift-click have no keyboard equivalent, so range and additive selection are
   pointer-only.
 - `inProgress` sets `aria-busy="true"` on the tile, and its loader is decorative, so the tile

@@ -133,6 +133,7 @@ const RoomLogoCoverDialog = ({
   return (
     <ModalDialog
       {...pickAriaProps(rest)}
+      aria-label={rest["aria-label"] ?? t("Common:RoomCover")}
       visible={visible}
       autoMaxHeight
       className={classNames(styles.roomLogoCoverModal, {

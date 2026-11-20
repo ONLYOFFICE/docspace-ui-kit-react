@@ -74,10 +74,7 @@ const meta = {
     alt: {
       control: "text",
       description:
-        "Accessible name of the logo: the `alt` of the image, and the `aria-label` of the bundled mark shown when the image fails to load. Pass the portal or product name, translated. An empty string marks the logo as decorative.",
-      table: {
-        defaultValue: { summary: '"portal logo"' },
-      },
+        "Accessible name of the logo, on the image and on the mark shown when it fails to load. Without it, the product name as the portal brands it; an empty string makes the logo decorative.",
     },
     dataTestId: {
       control: "text",
@@ -116,7 +113,7 @@ export const Default: Story = {
   },
   play: async ({ canvasElement }) => {
     const img = await findLogo(canvasElement);
-    await expect(img).toHaveAttribute("alt", "portal logo");
+    await expect(img).toHaveAttribute("alt", "ONLYOFFICE Apps");
     // The phone bar's colour has a default of its own and yields to the
     // portal's --header-background-color set above it.
     const wrapper = img.parentElement as HTMLElement;

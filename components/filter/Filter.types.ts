@@ -188,7 +188,7 @@ export type FilterBlockProps = {
 
   selectedFilterValue: Map<FilterGroups, Map<string | number, TItem>>;
 
-  /** Heading of the filter panel. Nothing translates it for you. */
+  /** Heading of the filter panel, and its accessible name. Nothing translates it for you. */
   filterHeader: string;
   /** Passed to `renderSelector` as the heading of its step. */
   selectorLabel: string;

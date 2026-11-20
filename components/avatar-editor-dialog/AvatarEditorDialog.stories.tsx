@@ -53,7 +53,8 @@ const meta = {
     },
     title: {
       control: "text",
-      description: "Text of the dialog's header. It is not translated for you.",
+      description:
+        "Text of the dialog's header, and its accessible name. It is not translated for you.",
     },
     image: {
       control: false,

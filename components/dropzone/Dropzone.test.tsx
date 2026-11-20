@@ -24,6 +24,12 @@ describe("Dropzone", () => {
     vi.clearAllMocks();
   });
 
+  it("treats an icon URL as decorative", () => {
+    render(<Dropzone {...defaultProps} icon="upload.svg" />);
+
+    expect(screen.getByTestId("dropzone-icon")).toHaveAttribute("alt", "");
+  });
+
   it("puts a passed aria-* on the drop area, its aria-label over the default", () => {
     render(
       <Dropzone

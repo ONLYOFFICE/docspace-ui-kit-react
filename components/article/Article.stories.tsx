@@ -797,7 +797,7 @@ export const CollapsedOnTablet: Story = {
     await expect(
       within(article(canvasElement)).getAllByTestId("icon-button")[0],
     ).toBeVisible();
-    await expect(canvas.queryByAltText("ONLYOFFICE")).toBeNull();
+    await expect(canvas.queryByAltText("ONLYOFFICE Apps")).toBeNull();
   },
   parameters: {
     docs: {

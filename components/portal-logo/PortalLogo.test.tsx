@@ -105,9 +105,9 @@ describe("PortalLogo", () => {
     );
   });
 
-  it("names the image with the alt prop, defaulting to the old string", () => {
+  it("names the image with the alt prop, defaulting to the product name", () => {
     const { unmount } = render(<PortalLogo />);
-    expect(screen.getByRole("img", { name: "portal logo" })).toBeVisible();
+    expect(screen.getByRole("img", { name: "ONLYOFFICE Apps" })).toBeVisible();
     unmount();
 
     render(<PortalLogo alt="Acme portal" />);
