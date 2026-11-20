@@ -11,7 +11,7 @@ import { CommonTrans } from "../../../utils/i18n/CommonTrans";
 import { getBrandName } from "../../../constants/brands";
 import useGetIcon from "../../hooks/useGetIcon";
 
-import { copyFileToFolder } from "./copy-file";
+import { CopyNotStartedError, copyFileToFolder } from "./copy-file";
 import useDeviceType from "./use-device-type";
 
 /** A file a reply produced, as "Save to room..." copies it. */
@@ -65,9 +65,16 @@ const CopyToRoomDialog = ({ file, onClose }: CopyToRoomDialogProps) => {
             />,
           );
         })
-        .catch((error: unknown) => toastr.error(error as TData));
+        .catch((error: unknown) =>
+          // A copy the portal never started has no message of its own.
+          toastr.error(
+            error instanceof CopyNotStartedError
+              ? t("Common:UnexpectedError")
+              : (error as TData),
+          ),
+        );
     },
-    [file, onClose, operationsApi],
+    [file, onClose, operationsApi, t],
   );
 
   // A room, or a folder, the user may add files to: the rooms list itself

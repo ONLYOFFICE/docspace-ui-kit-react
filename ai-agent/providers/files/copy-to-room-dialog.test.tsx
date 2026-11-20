@@ -22,7 +22,10 @@ const { copyFileToFolder, toastr } = vi.hoisted(() => ({
   copyFileToFolder: vi.fn(),
   toastr: { success: vi.fn(), error: vi.fn() },
 }));
-vi.mock("./copy-file", () => ({ copyFileToFolder }));
+vi.mock("./copy-file", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("./copy-file")>()),
+  copyFileToFolder,
+}));
 vi.mock("../../../components/toast", () => ({ toastr }));
 
 type Crumb = { id?: string | number; label: string };
@@ -51,6 +54,7 @@ vi.mock("../../../selectors/Files", () => ({
   },
 }));
 
+import { CopyNotStartedError } from "./copy-file";
 import CopyToRoomDialog from "./copy-to-room-dialog";
 
 const selector = () => {
@@ -132,6 +136,15 @@ describe("CopyToRoomDialog", () => {
     act(() => selector().onSubmit(9, "Design", false, []));
     await flush();
     expect(toastr.error).toHaveBeenCalledWith(error);
+  });
+
+  it("says the copy failed when the portal started none", async () => {
+    copyFileToFolder.mockRejectedValue(new CopyNotStartedError());
+    render(<CopyToRoomDialog file={FILE} onClose={vi.fn()} />);
+    act(() => selector().onSubmit(9, "Design", false, []));
+    await flush();
+    expect(toastr.success).not.toHaveBeenCalled();
+    expect(toastr.error).toHaveBeenCalledWith("Common:UnexpectedError");
   });
 
   it("copies nothing on the virtual root", () => {

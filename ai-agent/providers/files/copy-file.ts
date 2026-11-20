@@ -23,6 +23,17 @@ const wait = (ms: number) =>
  * Resolves `true` once the copy is done, `false` when it is still running
  * after the wait (it may yet land); rejects with the portal's error.
  */
+/**
+ * The portal answered the copy request without an operation to follow, so
+ * nothing says a copy is under way.
+ */
+export class CopyNotStartedError extends Error {
+  constructor() {
+    super("The portal started no copy operation");
+    this.name = "CopyNotStartedError";
+  }
+}
+
 export const copyFileToFolder = async (
   operationsApi: Pick<OperationsApi, "copyBatchItems" | "getOperationStatuses">,
   fileId: number | string,
@@ -39,7 +50,10 @@ export const copyFileToFolder = async (
     },
   });
   let operation: FileOperationDto | undefined = started.data.response?.[0];
-  for (let attempt = 0; operation && !operation.finished; attempt += 1) {
+  // No operation is no copy: reporting it done would name a file that is
+  // not in the folder.
+  if (!operation) throw new CopyNotStartedError();
+  for (let attempt = 0; !operation.finished; attempt += 1) {
     if (attempt >= attempts) return false;
     await wait(interval);
     const id: string | null = operation.id;
@@ -49,6 +63,6 @@ export const copyFileToFolder = async (
     operation =
       statuses.data.response?.find((item) => item.id === id) ?? operation;
   }
-  if (operation?.error) throw new Error(operation.error);
+  if (operation.error) throw new Error(operation.error);
   return true;
 };

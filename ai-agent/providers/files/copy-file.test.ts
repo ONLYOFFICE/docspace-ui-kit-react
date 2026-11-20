@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { copyFileToFolder } from "./copy-file";
+import { CopyNotStartedError, copyFileToFolder } from "./copy-file";
 
 type Operation = { id: string | null; finished: boolean; error: string | null };
 
@@ -76,6 +76,28 @@ describe("copyFileToFolder", () => {
       ),
     ).rejects.toThrow("Access denied");
   });
+
+  it.each([
+    ["an empty list", []],
+    ["no list", undefined],
+  ])(
+    "fails when the portal starts no operation: %s",
+    async (_name, started) => {
+      const operations = api(
+        started as unknown as Parameters<typeof api>[0],
+        [],
+      );
+      await expect(
+        copyFileToFolder(
+          operations as unknown as Parameters<typeof copyFileToFolder>[0],
+          42,
+          7,
+          NO_WAIT,
+        ),
+      ).rejects.toBeInstanceOf(CopyNotStartedError);
+      expect(operations.getOperationStatuses).not.toHaveBeenCalled();
+    },
+  );
 
   it("stops waiting after its last attempt, the copy still running", async () => {
     const running = { id: "op", finished: false, error: null };
