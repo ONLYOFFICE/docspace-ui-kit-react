@@ -4,7 +4,7 @@ import { InputSize } from "../text-input";
 import type { MainButtonProps } from "../main-button/MainButton.types";
 
 export type SearchInputProps = React.AriaAttributes & {
-  /** Id set on both the outer element and the `<input>`. */
+  /** Id of the `<input>`, for a `<label>` or a `FieldContainer`'s `labelFor` to point at. */
   id?: string;
   /** Ref to the `<input>`. */
   forwardedRef?: React.Ref<HTMLInputElement>;

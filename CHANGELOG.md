@@ -8,6 +8,10 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **`SearchInput`'s `id` is on the `<input>` alone.** It was set on the outer `<div>` too, so the
+  page held the id twice and a `<label htmlFor>` or a `FieldContainer`'s `labelFor` found the
+  `<div>` first and named nothing. The label now names the field. A selector or a test that
+  found the outer element by `#id` finds the field instead; use `dataTestId` for the block
 - **`Button` keeps a passed `aria-label`, `aria-disabled` and `aria-busy`.** All three were
   overwritten: the name always came from `label`, so an icon-only button could not be named. A
   passed `aria-label` now wins over `label`, which stays the fallback. `isDisabled` and
