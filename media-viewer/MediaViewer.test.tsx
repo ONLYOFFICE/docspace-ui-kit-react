@@ -723,9 +723,10 @@ describe("MediaViewer reading a file", () => {
     );
     vi.stubGlobal(
       "fetch",
-      vi
-        .fn()
-        .mockResolvedValue({ arrayBuffer: async () => new ArrayBuffer(1) }),
+      vi.fn().mockResolvedValue({
+        ok: true,
+        arrayBuffer: async () => new ArrayBuffer(1),
+      }),
     );
 
     const playlist = [
@@ -754,6 +755,98 @@ describe("MediaViewer reading a file", () => {
 
     expect(URL.createObjectURL).not.toHaveBeenCalled();
     expect(lastWrapperProps()?.fileUrl).toBe("b.jpg");
+  });
+
+  const plainItem = (title: string) =>
+    createMockProps({
+      playlist: [{ ...mockPlaylistItem, id: 0, src: title, title }],
+      files: [{ ...mockFile, title }],
+      playlistPos: 0,
+    });
+
+  it.each(["scan.tiff", "photo.heic"])(
+    "shows the media error for a %s the portal refuses",
+    async (title) => {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockResolvedValue({ ok: false, status: 403 }),
+      );
+
+      render(<MediaViewer {...plainItem(title)} />);
+
+      await waitFor(() =>
+        expect(lastWrapperProps()?.decryptionError).toBe("Common:MediaError"),
+      );
+      expect(decodeTiff).not.toHaveBeenCalled();
+      expect(heic2any).not.toHaveBeenCalled();
+    },
+  );
+
+  it("shows a TIFF the decoder returns nothing for from its address", async () => {
+    vi.mocked(decodeTiff).mockResolvedValue(null);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        arrayBuffer: async () => new ArrayBuffer(1),
+      }),
+    );
+
+    render(<MediaViewer {...plainItem("scan.tiff")} />);
+
+    await waitFor(() => expect(lastWrapperProps()?.fileUrl).toBe("scan.tiff"));
+    expect(lastWrapperProps()?.decryptionError).toBeUndefined();
+  });
+
+  it("does not read the current file again for new callbacks", async () => {
+    const decryptFile = vi.fn().mockResolvedValue({ data: new Blob(["x"]) });
+    const props = encryptedItem("photo.jpg");
+
+    const { rerender } = render(
+      <MediaViewer {...props} decryptFile={decryptFile} />,
+    );
+
+    await waitFor(() => expect(URL.createObjectURL).toHaveBeenCalledTimes(1));
+
+    const nextDecryptFile = vi
+      .fn()
+      .mockResolvedValue({ data: new Blob(["y"]) });
+
+    rerender(
+      <MediaViewer
+        {...props}
+        decryptFile={nextDecryptFile}
+        onClose={vi.fn()}
+        onDecryptionError={vi.fn()}
+        onEmptyPlaylistError={vi.fn()}
+        t={createMockProps().t}
+      />,
+    );
+
+    await act(async () => {});
+
+    expect(decryptFile).toHaveBeenCalledTimes(1);
+    expect(nextDecryptFile).not.toHaveBeenCalled();
+  });
+
+  it("shows the decryption error for an encrypted item that is missing from the files", async () => {
+    const onDecryptionError = vi.fn();
+
+    render(
+      <MediaViewer
+        {...encryptedItem("photo.jpg")}
+        files={[]}
+        decryptFile={vi.fn().mockRejectedValue(new Error("Bad key"))}
+        onDecryptionError={onDecryptionError}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(onDecryptionError).toHaveBeenCalledWith("Bad key"),
+    );
+    expect(lastWrapperProps()?.decryptionError).toBe(
+      "Common:EncryptionDecryptPartialFailed",
+    );
   });
 });
 

@@ -14,6 +14,7 @@ The media files of one portal folder or room in the viewer, with previous / next
 - It renders the loader until the first answer, so the viewer itself never renders on the server.
 - `folderId` takes the portal's alias `@my` for the user's own documents.
 - On the portal's own origin the files are shown straight from their `viewUrl`: the browser sends the session with the request. When the `ApiProvider` points at a portal on another origin, a media element cannot carry the key and the portal answers 403, so each file is read through the API client and shown from memory. The whole file is downloaded before it plays, TIFF and HEIC are converted as on the portal's own origin, and a failed read shows the viewer's media error. `readThroughApiClient` takes that path on the portal's own origin too, for a frame that signs in with a token instead of the session cookie (OAuth).
+- Without `onDownload` a file read through the API client is downloaded through it too, since its `viewUrl` would not carry the key.
 - The viewer lies over an opaque backdrop that covers the page, so the host page does not show through its translucent background.
 
 | Property                    | Type                                                            | Required | Default | Description                                                                |
@@ -31,6 +32,7 @@ The media files of one portal folder or room in the viewer, with previous / next
 | `onLoadError`               | `(error: unknown) => void`                                      | No       | -       | Called when the first request for the folder fails.                        |
 | `currentDeviceType`         | `DeviceType`                                                    | No       | -       | Type of the current device.                                                |
 | `autoPlay`                  | `boolean`                                                       | No       | -       | Starts video and audio as soon as they open.                               |
+| `currentRoomId`             | `number \| string \| null`                                      | No       | -       | The room of the folder, passed to `decryptFile`, as for `MediaViewer`.     |
 | `decryptFile`               | `(params: DecryptFileParams) => Promise<DecryptedFile \| null>` | No       | -       | Decrypts an encrypted item, as for `MediaViewer`.                          |
 | `getDecryptionErrorMessage` | `(error: Error) => string \| null`                              | No       | -       | Returns the message for a decryption error, as for `MediaViewer`.          |
 | `resolveTitle`              | `(item) => string`                                              | No       | -       | Returns the title to show for an item, as for `MediaViewer`.               |

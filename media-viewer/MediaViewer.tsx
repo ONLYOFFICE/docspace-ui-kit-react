@@ -96,6 +96,19 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
   // Read through a ref so a new identity does not reload the current file.
   const getDecryptionErrorMessageRef = useRef(getDecryptionErrorMessage);
   getDecryptionErrorMessageRef.current = getDecryptionErrorMessage;
+  const tRef = useRef(t);
+  tRef.current = t;
+  const decryptFileRef = useRef(decryptFile);
+  decryptFileRef.current = decryptFile;
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+  const onDecryptionErrorRef = useRef(onDecryptionError);
+  onDecryptionErrorRef.current = onDecryptionError;
+  const onEmptyPlaylistErrorRef = useRef(onEmptyPlaylistError);
+  onEmptyPlaylistErrorRef.current = onEmptyPlaylistError;
+
+  const playlistRef = useRef(playlist);
+  playlistRef.current = playlist;
 
   const isWillUnmountRef = useRef(false);
   const lastRemovedFileIdRefRef = useRef<number>(undefined);
@@ -356,22 +369,26 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
     TiffAbortSignalRef.current = controller;
 
     fetch(src, { signal: controller.signal })
-      .then((response) => response.arrayBuffer())
-      .then(async (response) => {
-        const blob = await decodeTiff(response);
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`The file is not available: ${response.status}`);
+        }
+
+        return response.arrayBuffer();
+      })
+      .then(async (buffer) => {
+        const blob = await decodeTiff(buffer);
 
         if (controller.signal.aborted) return;
 
-        if (blob) {
-          setFileUrl(URL.createObjectURL(blob));
-        }
+        setFileUrl(blob ? URL.createObjectURL(blob) : src);
       })
       .catch((error: Error) => {
-        if (error.name === "AbortError") {
+        if (error.name === "AbortError" || controller.signal.aborted) {
           return;
         }
 
-        console.log(error);
+        setDecryptionError(tRef.current("Common:MediaError"));
       });
   }, []);
 
@@ -381,21 +398,26 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
     HeicAbortSignalRef.current = controller;
 
     try {
-      const { default: heic2any } = await import("heic2any");
       const response = await fetch(src, { signal: controller.signal });
-      const blob = await response.blob();
-      const conversionResult = await heic2any({ blob });
+
+      if (!response.ok) {
+        throw new Error(`The file is not available: ${response.status}`);
+      }
+
+      const viewableBlob = await convertImage(await response.blob(), ".heic");
 
       if (controller.signal.aborted) return;
 
-      if (conversionResult && !Array.isArray(conversionResult)) {
-        setFileUrl(URL.createObjectURL(conversionResult));
-      }
+      setFileUrl(URL.createObjectURL(viewableBlob));
     } catch (error) {
-      if (error instanceof Error && error.name === "AbortError") {
+      if (
+        (error instanceof Error && error.name === "AbortError") ||
+        controller.signal.aborted
+      ) {
         return;
       }
-      console.error(error);
+
+      setDecryptionError(tRef.current("Common:MediaError"));
     }
   }, []);
 
@@ -440,6 +462,8 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
       const isStale = () => signal.aborted;
 
       try {
+        const decryptFile = decryptFileRef.current;
+
         if (!decryptFile) {
           throw new Error("File decryption is not available");
         }
@@ -455,7 +479,7 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
         if (!decrypted) {
           // The consumer gave up on the file (the user dismissed the unlock
           // dialog) — close the viewer instead of leaving it on a loader.
-          onClose?.();
+          onCloseRef.current?.();
           return;
         }
 
@@ -506,21 +530,25 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
             return;
           }
 
-          const isEncryptedFile =
-            filesRef.current.find((file) => file.id === fileId)?.encrypted ===
-            true;
+          const file = filesRef.current.find((item) => item.id === fileId);
+          const isEncryptedFile = file
+            ? file.encrypted === true
+            : playlistRef.current.find((item) => item.fileId === fileId)
+                ?.encrypted === true;
 
           if (!isEncryptedFile) {
             console.error("[MediaViewer] File read error:", error.message);
-            setDecryptionError(t("Common:MediaError"));
+            setDecryptionError(tRef.current("Common:MediaError"));
             return;
           }
 
           console.error("[MediaViewer] Decryption error:", error.message);
-          onDecryptionError?.(error.message);
+          onDecryptionErrorRef.current?.(error.message);
           setDecryptionError(
             getDecryptionErrorMessageRef.current?.(error) ??
-              t("Common:EncryptionDecryptPartialFailed", { fileNames: title }),
+              tRef.current("Common:EncryptionDecryptPartialFailed", {
+                fileNames: title,
+              }),
           );
         }
       } finally {
@@ -529,7 +557,7 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
         }
       }
     },
-    [t, decryptFile, onClose, onDecryptionError],
+    [],
   );
 
   useEffect(() => {
@@ -551,7 +579,7 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
     const extension = getFileExtension(currentTitle);
 
     if (!src) {
-      onEmptyPlaylistError?.();
+      onEmptyPlaylistErrorRef.current?.();
       return;
     }
 
@@ -587,6 +615,22 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
       setFileUrl(undefined);
       fetchAndSetTiffDataURL(src);
     }
+  }, [
+    src,
+    fileId,
+    currentTitle,
+    isEncrypted,
+    currentRoomId,
+    fetchAndSetTiffDataURL,
+    fetchAndSetHeicDataURL,
+    fetchAndDecryptFile,
+    pluginViewerContent,
+    pluginTitle,
+    pluginFileId,
+  ]);
+
+  useEffect(() => {
+    if (!src) return;
 
     setTitle(
       resolveTitle
@@ -598,21 +642,7 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
         : currentTitle,
     );
     setTitleFileId(fileId);
-  }, [
-    src,
-    fileId,
-    currentTitle,
-    isEncrypted,
-    currentRoomId,
-    onEmptyPlaylistError,
-    fetchAndSetTiffDataURL,
-    fetchAndSetHeicDataURL,
-    fetchAndDecryptFile,
-    resolveTitle,
-    pluginViewerContent,
-    pluginTitle,
-    pluginFileId,
-  ]);
+  }, [src, fileId, currentTitle, isEncrypted, resolveTitle]);
 
   useEffect(() => {
     const foundFile = files.find((file) => file.id === fileId);

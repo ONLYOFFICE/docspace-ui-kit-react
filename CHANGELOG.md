@@ -257,11 +257,15 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
     `getDecryptionErrorMessage`. The PDF menu of an encrypted file offers no member link and no
     Download as; a decrypted HEIC or TIFF the converter cannot read is shown as it is. A script
     URL that fails to load shows the load error. `onError` is called once per file that is both playable and
-    previewable as an image.
+    previewable as an image. A HEIC or TIFF the portal refuses shows the media error instead of
+    the loader, and new identities of the host's callbacks do not read the current file again.
   - `MediaGallery` reads one folder or room through the nearest `ApiProvider`, page by page and
     without subfolders, and keeps the playlist itself. `startFileId` keeps loading pages under
     the loader until the file turns up, ten at most, and opens the first media file otherwise.
-    Files of a portal on another origin are read through the API client.
+    Files of a portal on another origin are read through the API client, and with
+    `readThroughApiClient` on the portal's own origin too (a frame signed in with a token);
+    without `onDownload` such a file is downloaded through it as well. `currentRoomId` goes on
+    to decryption. The viewer lies over an opaque backdrop.
   - The theme variables ship with the module. The host's `Common` namespace needs the viewer's
     keys (`MediaError`, `Download`, `DownloadAs`, `Rename`, ...).
   - `@react-spring/web` (`9.7.5`), `@use-gesture/react` (`10.3.1`), `heic2any` (`0.0.4`) and

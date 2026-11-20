@@ -388,6 +388,55 @@ describe("MediaGallery", () => {
     open.mockRestore();
   });
 
+  it("downloads a file read through the API client through it", async () => {
+    baseUrl = "https://portal.test";
+    const open = vi.spyOn(window, "open").mockImplementation(() => null);
+    const click = vi
+      .spyOn(HTMLAnchorElement.prototype, "click")
+      .mockImplementation(() => {});
+    Object.defineProperty(URL, "createObjectURL", {
+      value: vi.fn(() => "blob:file"),
+      configurable: true,
+    });
+    Object.defineProperty(URL, "revokeObjectURL", {
+      value: vi.fn(),
+      configurable: true,
+    });
+    get.mockResolvedValueOnce(answer([file(1, "image")]));
+
+    try {
+      renderGallery();
+
+      await waitFor(() => expect(current()).toBe("1"));
+
+      const blob = new Blob(["picture"]);
+      get.mockResolvedValueOnce({ data: blob });
+
+      fireEvent.click(screen.getByText("download"));
+
+      await waitFor(() => expect(click).toHaveBeenCalledTimes(1));
+      expect(get).toHaveBeenLastCalledWith("https://portal.test/view/1", {
+        responseType: "blob",
+      });
+      expect(URL.createObjectURL).toHaveBeenCalledWith(blob);
+      expect(open).not.toHaveBeenCalled();
+    } finally {
+      open.mockRestore();
+      click.mockRestore();
+      Reflect.deleteProperty(URL, "createObjectURL");
+      Reflect.deleteProperty(URL, "revokeObjectURL");
+    }
+  });
+
+  it("passes the room of the folder on to the viewer", async () => {
+    get.mockResolvedValueOnce(answer([file(1, "image")]));
+
+    renderGallery({ currentRoomId: 5 });
+
+    await waitFor(() => expect(current()).toBe("1"));
+    expect(viewerProps?.currentRoomId).toBe(5);
+  });
+
   it("starts over when the folder changes", async () => {
     get
       .mockResolvedValueOnce(answer([file(1, "image")]))

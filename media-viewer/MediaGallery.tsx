@@ -220,9 +220,26 @@ const Gallery = ({
         return;
       }
 
-      window.open(file.viewUrl, "_self");
+      if (!needsApiClient(file.viewUrl)) {
+        window.open(file.viewUrl, "_self");
+        return;
+      }
+
+      apiClient.instance
+        .get<Blob>(file.viewUrl, { responseType: "blob" })
+        .then(({ data }) => {
+          const url = URL.createObjectURL(data);
+          const link = document.createElement("a");
+
+          link.href = url;
+          link.download = file.title;
+          link.click();
+
+          setTimeout(() => URL.revokeObjectURL(url));
+        })
+        .catch(() => undefined);
     },
-    [onDownload],
+    [apiClient, needsApiClient, onDownload],
   );
 
   const onDownloadById = useCallback(

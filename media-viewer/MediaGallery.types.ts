@@ -11,6 +11,7 @@ export type MediaGalleryProps = Pick<
   | "extsImagePreviewed"
   | "currentDeviceType"
   | "autoPlay"
+  | "currentRoomId"
   | "decryptFile"
   | "getDecryptionErrorMessage"
   | "resolveTitle"
@@ -44,7 +45,8 @@ export type MediaGalleryProps = Pick<
   emptyContent?: React.ReactNode;
   /**
    * Called with the file to download. By default the file's `viewUrl` opens
-   * in the same window.
+   * in the same window; a file read through the API client is downloaded
+   * through it as well.
    */
   onDownload?: (file: TFile) => void;
   /**
