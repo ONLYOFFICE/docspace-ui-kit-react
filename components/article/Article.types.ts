@@ -99,7 +99,8 @@ export type ArticleProfileProps = {
   currentDeviceType: DeviceType;
 };
 
-export type ArticleProps = ArticleProfileProps &
+export type ArticleProps = React.AriaAttributes &
+  ArticleProfileProps &
   ArticleZendeskProps &
   ArticleHideMenuButtonProps &
   Omit<ArticleDevToolsBarProps, "withCustomSlot"> &

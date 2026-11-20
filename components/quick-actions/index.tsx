@@ -5,6 +5,7 @@ import { RectangleSkeleton } from "../rectangle";
 import { Tooltip } from "../tooltip";
 import { useIsomorphicLayoutEffect } from "../../hooks/useIsomorphicLayoutEffect";
 import { consumeKey } from "../../utils/consume-key";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import ArrowLeftIcon from "../../assets/arrow-left.react.svg";
 import ArrowRightIcon from "../../assets/icons/16/right.arrow.react.svg";
@@ -231,6 +232,7 @@ export const QuickActions = ({
   prevLabel,
   nextLabel,
   isLoading = false,
+  ...rest
 }: QuickActionsProps) => {
   // State rather than a ref: the loading placeholder renders a track of its own
   // without one, so the real track arrives on a later render. A ref object is
@@ -339,6 +341,7 @@ export const QuickActions = ({
       data-testid={dataTestId}
     >
       <div
+        {...pickAriaProps(rest)}
         ref={setTrack}
         className={styles.grid}
         role="toolbar"

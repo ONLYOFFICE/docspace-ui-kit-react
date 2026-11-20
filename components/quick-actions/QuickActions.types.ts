@@ -66,7 +66,8 @@ type QuickActionsControlProps =
       nextLabel: string;
     };
 
-export type QuickActionsProps = QuickActionsCloseProps &
+export type QuickActionsProps = React.AriaAttributes &
+  QuickActionsCloseProps &
   QuickActionsControlProps & {
     /** The tiles, in the order they are drawn. An empty array renders nothing at all. */
     items: QuickActionItem[];

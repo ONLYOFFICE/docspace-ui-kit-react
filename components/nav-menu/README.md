@@ -121,6 +121,8 @@ The `index` module exports a wrapped component, so these are accepted on top of 
 | ----- | ------------------ | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ref` | `Ref<HTMLElement>` | no       | –       | Allows getting a ref to the component instance. Once the component unmounts, React will set `ref.current` to `null` (or call the ref with `null` if you passed a callback ref). |
 
+Plus 53 more props inherited from `React.AriaAttributes`, forwarded to the element.
+
 <!-- props:end -->
 
 ## Recipes
@@ -369,8 +371,8 @@ itself on each animated element.
 - A collapsed sub-menu is `inert`, so its entries leave the Tab order and the accessibility tree.
 - Keyboard focus is drawn as a 2px outline inside the entry, in
   `--nav-menu-item-icon-active-color`; the pointer never shows it.
-- **The `<nav>` has no `aria-label`, and a passed `aria-*` is dropped**: only the named props are
-  read. Set the label through `ref` when the page has more than one navigation landmark.
+- **The `<nav>` has no name of its own.** A passed `aria-*` lands on it and is kept, so pass
+  `aria-label` when the page has more than one navigation landmark.
 - **In the collapsed rail the accessible name is the tooltip title.** It is set on the button, so
   it is announced even without the tooltip being mounted — but sighted users see nothing.
 - Group labels are `<span>`s, not headings, and are not tied to their list with

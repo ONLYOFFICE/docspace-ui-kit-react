@@ -20,6 +20,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   square, a `<div>` with no role, so it could not name or describe the button. A passed
   `aria-disabled` and `aria-busy` are kept unless `isDisabled` or `isLoading` sets them. Read them
   from `selector-add-button-container`, not from the square
+- **`Tabs` puts a passed `aria-*` on the tab list.** It landed on the outer `<div>`, so the tab
+  list could not be named. Name it with `aria-label` or `aria-labelledby`; read the attributes
+  from the `tablist`, not from the wrapper
+- **`TabItem` keeps its own `aria-selected` over a passed one.** The rest of the props were spread
+  after it, so a passed `aria-selected` won over the pill's state
 - **`ThemeProviderComponent` hands the page back when it unmounts.** It left `data-theme`,
   `data-dir`, the body classes and every custom property behind. Now the provider mounted last
   writes the page, and when it goes the one around it writes again, or the page returns to what it
@@ -335,6 +340,19 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`ModalDialog` puts every passed `aria-*` on the dialog.** Beyond `aria-label`,
+  `aria-labelledby` and `aria-describedby` they went to the header, which dropped them. The
+  header gets none now; `aria-modal` stays the component's
+- **`DropDown` and `ContextMenu` forward a passed `aria-*` to the menu.** Both dropped every one;
+  `DropDown` lets a passed `aria-label` win over `ariaLabel`. `ContextMenu` puts it on the panel
+  that takes `id`. `LinkWithDropdown` keeps the attributes on its link and off its list
+- **`NavMenu` and `QuickActions` forward a passed `aria-*` to their landmark and toolbar.** Both
+  dropped every one, so neither the `<nav>` nor the `toolbar` could be named
+- **`Card` and `CollapsibleCard` forward a passed `aria-*`.** `Card` puts it on its `<section>`,
+  which a name makes a `region` landmark, and `CollapsibleCard` on its toggle button
+- **`Article`, `Section`, `Navigation`, `AsideHeader`, `ColumnarInfoBar`, `EmptyView` and
+  `EmptyScreenContainer` forward a passed `aria-*` to their outer element.** Each dropped every
+  one. None of those elements has a role, so a name there is not read
 - **`ComboBox` and `AccessRightSelect` forward a passed `aria-*` to the button.** Both dropped
   every one but `ariaLabel`. A passed `aria-label` wins over `ariaLabel`; the open state and
   `aria-disabled` while `isDisabled` stay the component's

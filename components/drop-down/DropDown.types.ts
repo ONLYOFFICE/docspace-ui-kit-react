@@ -1,7 +1,7 @@
 import type { JSX } from "react";
 import type { TDirectionX, TDirectionY } from "../../types";
 
-export interface DropDownProps {
+export interface DropDownProps extends React.AriaAttributes {
   /**
    * Items of the menu, normally `DropDownItem`s. With `maxHeight` set they are
    * virtualised, so each child's height is read from its `height` prop rather

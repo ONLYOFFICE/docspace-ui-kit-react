@@ -17,9 +17,11 @@ const SectionContainer = ({
   scrollableBanner = false,
   stickyTableHeader = false,
   inert,
+  aria,
 }: SectionContainerProps) => {
   return (
     <div
+      {...aria}
       ref={forwardRef}
       id="section"
       inert={inert}

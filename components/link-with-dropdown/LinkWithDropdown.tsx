@@ -9,6 +9,7 @@ import { DropDownItem } from "../drop-down-item";
 import { Scrollbar } from "../scrollbar";
 import { Text } from "../text";
 import { consumeKey } from "../../utils/consume-key";
+import { omitAriaProps } from "../../utils/aria-props";
 
 import styles from "./LinkWithDropdown.module.scss";
 import { LinkWithDropDownProps } from "./LinkWithDropdown.types";
@@ -361,7 +362,8 @@ const LinkWithDropdown = ({
         topSpace={topSpace}
         bottomSpace={bottomSpace}
         withDynamicScrollbar={withDynamicScrollbar}
-        {...rest}
+        // The aria-* passed describe the link; the list is named by its role.
+        {...omitAriaProps(rest)}
       >
         {showScroll ? (
           <Scrollbar

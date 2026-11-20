@@ -76,6 +76,16 @@ describe("Navigation Component", () => {
     vi.clearAllMocks();
   });
 
+  it("puts a passed aria-* on the header container", () => {
+    const { container } = render(
+      <Navigation {...defaultProps} aria-describedby="folder-hint" />,
+    );
+
+    expect(
+      container.querySelector('[data-is-drop-box-component="false"]'),
+    ).toHaveAttribute("aria-describedby", "folder-hint");
+  });
+
   it("renders navigation component with title", () => {
     render(<Navigation {...defaultProps} />);
     expect(screen.getByText("My Documents")).toBeInTheDocument();

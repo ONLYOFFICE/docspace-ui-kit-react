@@ -103,20 +103,18 @@ export type EmptyViewOptionProps = {
   LinkRouter?: ComponentType<LinkRouterProps>;
 };
 
-export type EmptyViewProps = Omit<
-  EmptyViewItemType,
-  "key" | "onClick" | "disabled" | "model"
-> & {
-  /** What the user can do next, in the order given, under the description.
-   * `null` leaves the options out. */
-  options: Nullable<EmptyViewOptionsType>;
-  /** Your router's `Link`, used for link options instead of a plain anchor,
-   * so a click does not reload the page. */
-  LinkRouter?: ComponentType<LinkRouterProps>;
-  /** Added to the wrapper. */
-  className?: string;
-  /** Added to the element that holds the options. */
-  bodyClassName?: string;
-  /** Rendered between the header and the options, outside their gap. */
-  extraContent?: React.ReactNode;
-};
+export type EmptyViewProps = React.AriaAttributes &
+  Omit<EmptyViewItemType, "key" | "onClick" | "disabled" | "model"> & {
+    /** What the user can do next, in the order given, under the description.
+     * `null` leaves the options out. */
+    options: Nullable<EmptyViewOptionsType>;
+    /** Your router's `Link`, used for link options instead of a plain anchor,
+     * so a click does not reload the page. */
+    LinkRouter?: ComponentType<LinkRouterProps>;
+    /** Added to the wrapper. */
+    className?: string;
+    /** Added to the element that holds the options. */
+    bodyClassName?: string;
+    /** Rendered between the header and the options, outside their gap. */
+    extraContent?: React.ReactNode;
+  };

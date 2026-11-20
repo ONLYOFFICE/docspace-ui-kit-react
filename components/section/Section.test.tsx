@@ -39,6 +39,21 @@ describe("<Section />", () => {
     clearPrimaryProgressData: () => {},
   };
 
+  it("puts a passed aria-* on the section container", () => {
+    render(
+      <Section {...defaultProps} aria-describedby="section-hint">
+        <SectionBody withScroll autoFocus={false} settingsStudio={false}>
+          Body Content
+        </SectionBody>
+      </Section>,
+    );
+
+    expect(document.getElementById("section")).toHaveAttribute(
+      "aria-describedby",
+      "section-hint",
+    );
+  });
+
   it("renders all section components correctly", () => {
     render(
       <Section {...defaultProps}>

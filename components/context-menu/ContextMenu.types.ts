@@ -154,7 +154,7 @@ export type TOnMobileItemClick = (
 
 export type TGetContextMenuModel = () => ContextMenuModel[];
 
-export interface ContextMenuProps {
+export interface ContextMenuProps extends React.AriaAttributes {
   /** Applied to the menu element. */
   id?: string;
   /**

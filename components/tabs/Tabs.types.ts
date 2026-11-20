@@ -19,7 +19,7 @@ export type TTabItem = {
   iconName?: string;
 };
 
-export type TabsProps = {
+export type TabsProps = React.AriaAttributes & {
   /** The tabs, in the order they are drawn. Each carries its own content. */
   items: TTabItem[];
   /** `id` of the selected tab, set from `onSelect`; the component keeps no selection of its own. An empty value selects the first tab. */

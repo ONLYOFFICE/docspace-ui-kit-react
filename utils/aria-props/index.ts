@@ -13,3 +13,17 @@ export const pickAriaProps = (props: object): React.AriaAttributes => {
   }
   return aria as React.AriaAttributes;
 };
+
+/**
+ * Everything in `props` but the `aria-*` attributes, for the parts of a
+ * component that must not repeat the name or state its role element carries.
+ */
+export const omitAriaProps = <T extends object>(
+  props: T,
+): Omit<T, keyof React.AriaAttributes> => {
+  const others: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(props)) {
+    if (!key.startsWith("aria-")) others[key] = value;
+  }
+  return others as Omit<T, keyof React.AriaAttributes>;
+};

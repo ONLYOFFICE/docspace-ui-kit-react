@@ -16,6 +16,7 @@ import { Scrollbar } from "../scrollbar";
 import { VirtualList } from "./sub-components/VirtualList";
 import { Row } from "./sub-components/Row";
 
+import { pickAriaProps } from "../../utils/aria-props";
 import type { DropDownProps } from "./DropDown.types";
 import { DEFAULT_PARENT_HEIGHT } from "./DropDown.constants";
 import { getItemHeight, hideDisabledItems } from "./DropDown.utils";
@@ -56,6 +57,7 @@ const DropDown = ({
   id,
   role = "listbox",
   ariaLabel,
+  ...rest
 }: DropDownProps) => {
   const { isRTL } = useInterfaceDirection();
 
@@ -362,8 +364,9 @@ const DropDown = ({
           className={dropDownClasses}
           data-testid={dataTestId ?? "dropdown"}
           id={id}
+          {...pickAriaProps(rest)}
           role={role}
-          aria-label={ariaLabel}
+          aria-label={rest["aria-label"] ?? ariaLabel}
         >
           {/* withDynamicScrollbar: use project Scrollbar instead of VirtualList */}
           {useDynamicScrollbar ? (

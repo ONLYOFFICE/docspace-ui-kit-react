@@ -7,7 +7,7 @@ export type ColumnarInfoBarColumn = {
   value: React.ReactNode;
 };
 
-export type ColumnarInfoBarProps = {
+export type ColumnarInfoBarProps = React.AriaAttributes & {
   /** Bold caption above the columns, rendered as an `<h3>` and omitted entirely when empty. */
   headerText?: string;
   /** The label and value pairs, in order. An empty array renders the bar with nothing inside it. */

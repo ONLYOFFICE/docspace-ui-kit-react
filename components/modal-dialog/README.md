@@ -162,6 +162,8 @@ Declared by [`components/aside/aside-header`](../../components/aside/aside-heade
 | `onCloseClick`    | `() => void`   | no       | –                                     | Called by the close cross.                                                                                                                   |
 | `withoutBorder`   | `boolean`      | no       | –                                     | Hides the bottom border, which otherwise spans the full width of the panel regardless of the header's own side margins.                      |
 
+Plus 50 more props inherited from `React.AriaAttributes`, forwarded to the element.
+
 <!-- props:end -->
 
 ### Enums
@@ -404,7 +406,8 @@ Page-level:
 - Prefer `aria-labelledby` pointing at the heading in `ModalDialog.Header`, given an `id`. Fall
   back to `aria-label` when there is no visible title; without either the dialog is unnamed.
 - `aria-describedby` reaches the same element, for the sentence that explains what the dialog
-  is asking. Any other `aria-*` reaches the header, which drops it.
+  is asking. Any other `aria-*` lands there too and is kept; `aria-modal` stays the
+  component's.
 - **Focus moves in, stays in, and goes back.** Opened, the dialog takes the focus itself, unless
   its content already focused a field of its own. Closed, it returns the focus.
 - While it is open, Tab and Shift+Tab cycle through its controls and never reach the page

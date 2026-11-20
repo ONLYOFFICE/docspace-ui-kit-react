@@ -1,6 +1,6 @@
 import React from "react";
 
-export type TTabItemProps = {
+export type TTabItemProps = React.AriaAttributes & {
   /** Text of the pill, cut off with an ellipsis when it does not fit. */
   label: string | React.ReactNode;
   /** Called with the click event whenever the pill is clicked and not blocked by `isDisabled` or `lockLastSelection`. */

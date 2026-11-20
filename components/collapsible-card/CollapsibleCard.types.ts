@@ -1,6 +1,6 @@
 import type React from "react";
 
-export interface CollapsibleCardProps {
+export interface CollapsibleCardProps extends React.AriaAttributes {
   /** First line of the header, next to the chevron. The whole header is the button, so this is part of its accessible name. */
   title: React.ReactNode;
   /** Second line of the header, under the title. Also inside the button, and so also part of its accessible name. */

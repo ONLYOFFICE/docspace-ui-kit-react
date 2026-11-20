@@ -18,6 +18,7 @@ import ArticleDevToolsBar from "./sub-components/DevToolsBar";
 import HideArticleMenuButton from "./sub-components/HideMenuButton";
 import BackButton from "./sub-components/BackButton";
 
+import { pickAriaProps } from "../../utils/aria-props";
 import styles from "./Article.module.scss";
 import { HEADER_NAME, MAIN_BUTTON_NAME, BODY_NAME } from "./Article.constants";
 import { ArticleProps } from "./Article.types";
@@ -100,6 +101,7 @@ const Article = ({
   navigate,
   onBack,
   customSlot,
+  ...rest
 }: ArticleProps) => {
   const [articleHeaderContent, setArticleHeaderContent] =
     React.useState<null | React.JSX.Element>(null);
@@ -229,6 +231,7 @@ const Article = ({
   const articleComponent = (
     <>
       <div
+        {...pickAriaProps(rest)}
         id="article-container"
         data-show-text={showText ? "true" : "false"}
         data-open={articleOpen ? "true" : "false"}

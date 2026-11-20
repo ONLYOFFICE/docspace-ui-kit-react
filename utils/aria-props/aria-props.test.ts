@@ -1,6 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { pickAriaProps } from ".";
+import { omitAriaProps, pickAriaProps } from ".";
+
+describe("omitAriaProps", () => {
+  it("keeps everything but the aria-* attributes", () => {
+    const onClick = () => {};
+    expect(
+      omitAriaProps({ "aria-label": "Close", ariaLabel: "Close", onClick }),
+    ).toEqual({ ariaLabel: "Close", onClick });
+  });
+});
 
 describe("pickAriaProps", () => {
   it("keeps the aria-* attributes and nothing else", () => {
