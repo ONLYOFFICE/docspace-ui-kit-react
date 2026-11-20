@@ -23,7 +23,9 @@ type ContextFolderDialogProps = {
    * What the pick does to the chat's context folders: `"replace"` (default)
    * makes the folder the only one, as an AI project's Folder card does;
    * `"add"` connects it next to the others, as the chat's Data sources do
-   * (the chat library holds the limit) - and lets several be ticked at once.
+   * (the chat library holds the limit) - and lets several be ticked at once;
+   * with none ticked it connects the folder or the section the user stands
+   * in.
    */
   mode?: "replace" | "add";
 };
@@ -46,8 +48,10 @@ const kindOf = (
 // submits the folder the user is standing in, so the list shows folders
 // only and the button is live as soon as the first level has loaded. In
 // `"add"` mode the folders also carry checkboxes and the ticked ones, from
-// any number of places, are the pick: the button waits for the first tick,
-// and the open folder is never connected on its own. The AI section is left
+// any number of places, are the pick. With none ticked the pick is the place
+// the user stands in - a folder, a room or a whole section such as Files,
+// Rooms or Forms, which has no row to tick: the root lists the sections as
+// places to open. The AI section is left
 // out: its Instructions and Knowledge rooms are the chat's Skill sets and
 // Knowledge bases, picked in lists of their own, not data sources.
 const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
@@ -105,13 +109,13 @@ const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
   >(
     (selectedItemId, folderTitle, _isPublic, breadCrumbs) => {
       const clouds = useCloudsStore.getState();
-      if (isAdd) {
-        if (pickedRef.current.size === 0) return;
+      if (isAdd && pickedRef.current.size > 0) {
         for (const folder of pickedRef.current.values())
           clouds.addFolderContext(CONTEXT_ROOM_CLOUD, folder);
         onClose();
         return;
       }
+      if (isAdd && freeSlots === 0) return;
       // The selector opens on the virtual root, whose id is empty: that is
       // no folder to scope a round to.
       if (
@@ -140,10 +144,12 @@ const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
             : undefined,
         ),
       };
-      clouds.selectFolderContext(CONTEXT_ROOM_CLOUD, folder);
+      // With nothing ticked the Data sources take the open place itself.
+      if (isAdd) clouds.addFolderContext(CONTEXT_ROOM_CLOUD, folder);
+      else clouds.selectFolderContext(CONTEXT_ROOM_CLOUD, folder);
       onClose();
     },
-    [onClose, useCloudsStore, isAdd],
+    [onClose, useCloudsStore, isAdd, freeSlots],
   );
 
   const getIsDisabled = React.useCallback<
@@ -155,10 +161,13 @@ const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
       _selectedItemId,
       _itemType,
       isRoot,
-      // Only ticked folders are a pick in "add" mode, wherever the user
-      // stands; otherwise the open folder is, anywhere but the root.
-    ) => isFirstLoad || (isAdd ? pickedCount === 0 : isRoot),
-    [isAdd, pickedCount],
+      // Ticked folders are a pick wherever the user stands; with none
+      // ticked the open place is, anywhere but the root - unless the chat
+      // has no room for one more.
+    ) =>
+      isFirstLoad ||
+      (isAdd && pickedCount > 0 ? false : isRoot || (isAdd && freeSlots === 0)),
+    [isAdd, pickedCount, freeSlots],
   );
 
   return (

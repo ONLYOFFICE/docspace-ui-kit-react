@@ -144,13 +144,41 @@ describe("ContextFolderDialog", () => {
     });
   });
 
-  it("keeps Select off in add mode until a folder is ticked, wherever the user stands", () => {
+  it("connects the place the user stands in when nothing is ticked in add mode", () => {
+    const onClose = vi.fn();
+    render(<ContextFolderDialog mode="add" onClose={onClose} />);
+    // The root lists the sections; it is no place to connect.
+    expect(selector().getIsDisabled(false, false, "", undefined, true)).toBe(
+      true,
+    );
+    // A whole section has no row to tick: it is picked by standing in it.
+    expect(selector().getIsDisabled(false, false, "2", undefined, false)).toBe(
+      false,
+    );
+    act(() =>
+      selector().onSubmit(2, "Rooms", false, [
+        { id: "", label: "" },
+        { id: 2, label: "Rooms" },
+      ]),
+    );
+    // Added next to the others, not in their place.
+    expect(clouds.addFolderContext.mock.calls).toEqual([
+      [
+        CONTEXT_ROOM_CLOUD,
+        { id: "2", name: "Rooms", path: "Rooms", kind: "folder" },
+      ],
+    ]);
+    expect(clouds.selectFolderContext).not.toHaveBeenCalled();
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("connects no open place in add mode once the chat is full", () => {
+    clouds.selectedFolderContexts = [{}, {}, {}];
     const onClose = vi.fn();
     render(<ContextFolderDialog mode="add" onClose={onClose} />);
     expect(selector().getIsDisabled(false, false, "5", undefined, false)).toBe(
       true,
     );
-    // The open folder is not connected on its own.
     act(() =>
       selector().onSubmit(5, "Q3 reports", false, [
         { id: 1, label: "My documents" },
@@ -158,13 +186,7 @@ describe("ContextFolderDialog", () => {
       ]),
     );
     expect(clouds.addFolderContext).not.toHaveBeenCalled();
-    expect(clouds.selectFolderContext).not.toHaveBeenCalled();
     expect(onClose).not.toHaveBeenCalled();
-
-    act(() => selector().onFolderToggle({ id: 5, label: "Q3" }, []));
-    expect(selector().getIsDisabled(false, false, "5", undefined, false)).toBe(
-      false,
-    );
   });
 
   it("ticks folders only in add mode, up to what the chat still takes", () => {
