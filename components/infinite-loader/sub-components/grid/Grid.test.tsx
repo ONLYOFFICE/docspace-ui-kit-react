@@ -238,6 +238,30 @@ describe("GridComponent", () => {
     ]);
   });
 
+  // A skill set's and a knowledge base's cards are lower than a room's row
+  // kinds allow for: the row names its own height.
+  it("sizes a row as high as the row itself tells", () => {
+    const { container } = render(
+      <GridComponent {...defaultProps} itemCount={2} filesLength={2}>
+        {[
+          <div key="a" className="isRoom" data-row-height={170}>
+            A
+          </div>,
+          <div key="b" className="isRoom">
+            B
+          </div>,
+        ]}
+      </GridComponent>,
+    );
+    const rows = Array.from(
+      container.querySelectorAll<HTMLElement>("[style]"),
+    ).filter((el) => el.style.top !== "" && el.style.height !== "");
+    expect(rows.map((row) => [row.style.top, row.style.height])).toEqual([
+      ["0px", "170px"],
+      ["170px", "120px"],
+    ]);
+  });
+
   it("handles non-element children in getItemSize", () => {
     render(
       <GridComponent {...defaultProps} itemCount={1}>

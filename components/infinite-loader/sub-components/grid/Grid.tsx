@@ -120,7 +120,16 @@ const GridComponent = ({
       typeof elem !== "boolean" &&
       typeof elem !== "number"
     ) {
-      const props = elem?.props as { className?: string };
+      const props = elem?.props as {
+        className?: string;
+        "data-row-height"?: number | string;
+      };
+
+      // A row that knows the height of its own cards tells it: the client
+      // draws tiles this component has no size for.
+      const ownHeight = Number(props?.["data-row-height"]);
+      if (ownHeight > 0) return ownHeight;
+
       const itemClassNames = props?.className;
       const isFile = itemClassNames?.includes("isFile");
       const isFolder = itemClassNames?.includes("isFolder");
