@@ -214,6 +214,30 @@ describe("GridComponent", () => {
     expect(screen.getByTestId("tile-skeleton-room")).toBeInTheDocument();
   });
 
+  // The client draws an agent's card 290px high and leaves the row's own
+  // height to this grid: a lower row made the next row cover the card.
+  it("sizes a row of agents as high as the client's agent card", () => {
+    const { container } = render(
+      <GridComponent {...defaultProps} itemCount={2} filesLength={2}>
+        {[
+          <div key="a" className="isAgent">
+            A
+          </div>,
+          <div key="b" className="isAgent">
+            B
+          </div>,
+        ]}
+      </GridComponent>,
+    );
+    const rows = Array.from(
+      container.querySelectorAll<HTMLElement>("[style]"),
+    ).filter((el) => el.style.top !== "" && el.style.height !== "");
+    expect(rows.map((row) => [row.style.top, row.style.height])).toEqual([
+      ["0px", "306px"],
+      ["306px", "306px"],
+    ]);
+  });
+
   it("handles non-element children in getItemSize", () => {
     render(
       <GridComponent {...defaultProps} itemCount={1}>

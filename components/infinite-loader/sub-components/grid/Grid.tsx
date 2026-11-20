@@ -138,8 +138,11 @@ const GridComponent = ({
       const roomHeight = 104 + verticalRoomGap;
       const fileHeight = 220 + horizontalGap;
       const templateHeight = 126 + verticalRoomGap;
-      // An agent's tile is a template's with two more lines below the name.
-      const agentHeight = 182 + verticalRoomGap;
+      // The height of the client's agent card (its name row and five lines:
+      // category, model, skill sets, knowledge bases, owner). The client
+      // draws a skill set's and a knowledge base's card as high, and sizes
+      // the card itself, so a smaller number here makes the rows overlap.
+      const agentHeight = 290 + verticalRoomGap;
       const titleHeight = 20 + headerMargin + (isFolderHeader ? 0 : 11);
 
       if (isAgent) return agentHeight;
