@@ -285,7 +285,7 @@ variable on `<body>` or `:root`.
   `aria-label`; a passed `aria-label` or `aria-labelledby` replaces it.
 - **A passed `aria-*` lands on the `role="dialog"` element and is kept.**
 - The editor inside is a `role="region"` labelled "Image editor", in English whatever `t` says.
-- **The replace control is a `<div>` with a click handler**, so the keyboard cannot reach it.
+- The replace control is a keyboard button, named by its "Choose another" text.
 - The zoom buttons are focusable buttons with no accessible name, and the zoom slider is
   reachable. The crop position is pointer-only.
 - The save and cancel buttons are real buttons labelled by `t`. When `t` returns an empty string

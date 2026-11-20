@@ -202,8 +202,8 @@ platform's:
 - Out-of-range items and arrows are `disabled`, so Tab skips them and they cannot be picked.
 - The arrows are named by the translated "Previous" and "Next". Changing the month is announced
   only by the grid re-rendering.
-- The title that opens the month and year views is an `<h2>` with a click handler, so those
-  views are reachable by mouse only.
+- The title that opens the month and year views is an `<h2>` with `role="button"`, reached with
+  Tab and pressed with Enter or Space. When the view changes, the focus moves to the new title.
 - Each day's accessible name is its full date in `locale` ("October 15, 2023"); the visible text
   stays the number. The neighbouring months' days are told apart from this month's that way.
 - The selected day has `aria-pressed="true"` and every other day `aria-pressed="false"`; today

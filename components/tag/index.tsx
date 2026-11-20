@@ -10,6 +10,7 @@ import { IconButton } from "../icon-button";
 import { TooltipContainer } from "../tooltip";
 import { pickAriaProps } from "../../utils/aria-props";
 import { useCommonTranslation } from "../../utils/i18n";
+import { activateOnButtonKey } from "../../utils/keyboard-activation";
 
 import type { TagProps, TagType, TagClickEvent } from "./Tag.types";
 import styles from "./Tag.module.scss";
@@ -48,6 +49,9 @@ const TagPure: FC<TagProps> = ({
     }
   }, [onClick, isDisabled, isDeleted, roomType, providerType, label, tag]);
 
+  // A tag that does something on a click is a button to the keyboard too.
+  const isInteractive = !!onClick && !isDisabled && !isDeleted;
+
   const onDeleteAction = React.useCallback(() => {
     onDelete?.(tag);
   }, [onDelete, tag]);
@@ -60,6 +64,16 @@ const TagPure: FC<TagProps> = ({
       ref={ref}
       title={label}
       onClick={onClickAction}
+      role={isInteractive ? "button" : undefined}
+      tabIndex={isInteractive ? 0 : undefined}
+      onKeyDown={
+        isInteractive
+          ? (e: React.KeyboardEvent<HTMLDivElement>) =>
+              activateOnButtonKey(e, ({ currentTarget }) =>
+                currentTarget.click(),
+              )
+          : undefined
+      }
       className={classNames(styles.tag, "tag", className, {
         [styles.isNewTag]: isNewTag,
         [styles.isDisabled]: isDisabled,

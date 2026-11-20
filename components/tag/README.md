@@ -234,8 +234,9 @@ are declared by the theme on the tag itself. A wrapper cannot override them.
 
 ## Accessibility
 
-- The tag is a `<div>` with a click handler and `aria-label` set from `label`. It has **no
-  role and no `tabIndex`**, so a clickable tag cannot be reached or activated from the keyboard.
+- The tag is a `<div>` with `aria-label` set from `label`. **With `onClick` it is a keyboard
+  button**: `role="button"`, in the tab order, and pressed with Enter or Space. A disabled or
+  deleted tag is neither.
 - `aria-disabled` is set from `isDisabled`, and the CSS additionally makes the tag inert.
 - The delete cross is an [`IconButton`](../icon-button/README.md): a keyboard button, focusable
   and pressed by Enter and Space. It is named by the translated "Remove", which does not say

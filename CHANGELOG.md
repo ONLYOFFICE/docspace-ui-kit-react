@@ -350,6 +350,12 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **A clickable `Tag`, `ImageEditor`'s replace control and `ButtonDelete` take the keyboard.**
+  Each was a `<div>` with a click handler and no tab stop. Each is now `role="button"` in the tab
+  order, pressed with Enter or Space; a disabled or deleted tag stays out of it
+- **`Calendar`'s title opens the month and year views from the keyboard.** It was an `<h2>` that
+  answered the mouse only. When the view changes, the focus moves to the new view's title instead
+  of falling back to the page
 - **`AvatarEditorDialog`, `RoomLogoCoverDialog` and the filter panel are named by their
   heading**: `title`, `t("Common:RoomCover")` and `filterHeader`. Each was announced as an
   unnamed dialog. A passed `aria-label` or `aria-labelledby` still wins

@@ -142,6 +142,20 @@ describe("ImageCropper", () => {
     expect(screen.getByTestId("slider")).toBeInTheDocument();
   });
 
+  it("opens the file dialog from the keyboard", () => {
+    const props = createProps();
+    render(<ImageCropper {...props} />);
+
+    const button = screen.getByRole("button", {
+      name: "Common:ChooseAnother",
+    });
+    const input = button.querySelector("input") as HTMLInputElement;
+    const openDialog = vi.spyOn(input, "click");
+    fireEvent.keyDown(button, { key: "Enter" });
+
+    expect(openDialog).toHaveBeenCalled();
+  });
+
   it("updates zoom through slider changes", () => {
     const props = createProps();
     render(<ImageCropper {...props} />);

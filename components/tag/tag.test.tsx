@@ -24,6 +24,9 @@ vi.mock("../tooltip", () => ({
     "data-testid": testId,
     onMouseEnter,
     onMouseLeave,
+    role,
+    tabIndex,
+    onKeyDown,
     ...rest
   }: {
     children: React.ReactNode;
@@ -33,6 +36,9 @@ vi.mock("../tooltip", () => ({
     "data-testid"?: string;
     onMouseEnter?: React.MouseEventHandler;
     onMouseLeave?: React.MouseEventHandler;
+    role?: string;
+    tabIndex?: number;
+    onKeyDown?: React.KeyboardEventHandler;
   } & React.AriaAttributes) => (
     <div
       {...Object.fromEntries(
@@ -44,6 +50,9 @@ vi.mock("../tooltip", () => ({
       id={id}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      role={role}
+      tabIndex={tabIndex}
+      onKeyDown={onKeyDown}
     >
       {children}
     </div>
@@ -83,6 +92,20 @@ const baseProps: TagProps = {
 };
 
 describe("<Tag />", () => {
+  it("is a keyboard button when clickable", () => {
+    const onClick = vi.fn();
+    const { rerender } = render(<Tag {...baseProps} onClick={onClick} />);
+
+    const tag = screen.getByRole("button", { name: "Script" });
+    expect(tag).toHaveAttribute("tabindex", "0");
+    fireEvent.keyDown(tag, { key: "Enter" });
+    fireEvent.keyDown(tag, { key: " " });
+    expect(onClick).toHaveBeenCalledTimes(2);
+
+    rerender(<Tag {...baseProps} onClick={onClick} isDisabled />);
+    expect(screen.getByTestId("tag_item")).not.toHaveAttribute("role");
+  });
+
   it("names the delete cross", () => {
     render(<Tag {...baseProps} isNewTag />);
 
@@ -125,7 +148,7 @@ describe("<Tag />", () => {
   it("calls onDelete when cross icon is clicked", () => {
     const onDelete = vi.fn();
     render(<Tag {...baseProps} isNewTag onDelete={onDelete} />);
-    const deleteButton = screen.getByRole("button");
+    const deleteButton = screen.getByRole("button", { name: "Remove" });
     fireEvent.click(deleteButton);
     expect(onDelete).toHaveBeenCalledWith("script");
   });
@@ -142,7 +165,7 @@ describe("<Tag />", () => {
     const onDelete = vi.fn();
     render(<Tag {...baseProps} isNewTag onDelete={onDelete} />);
     const tag = screen.getByTestId("tag_item");
-    const deleteButton = screen.getByRole("button");
+    const deleteButton = screen.getByRole("button", { name: "Remove" });
 
     // Case 1: Target is NOT the container -> should call onDelete
     fireEvent.click(deleteButton);

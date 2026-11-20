@@ -230,8 +230,6 @@ export function RemovableCropper({ t, file }: { t: TTranslation; file: File }) {
   `toDataURL` then throws, the error is swallowed, and `setPreview` is never called again.
 - **The crop canvas is 648px and displayed at 368px**, so `editorBorderRadius` is measured on the
   648px figure. 324 is a circle; 110, the avatar dialog's default, is a rounded square.
-- **The replace control is a `<div>` with a click handler**, with no role, no `tabindex` and no
-  key handler. The keyboard cannot reach it, and the same is true of `ButtonDelete`.
 - **The folder contains a `PreviewTile` component that nothing imports** — not the editor, not
   the index. It is not part of the exported surface; build your own preview and hand it in
   through `Preview`.
@@ -241,7 +239,8 @@ export function RemovableCropper({ t, file }: { t: TTranslation; file: File }) {
 **`ButtonDelete`** — a trash glyph with a `Common:Delete` label, exported from the same subpath
 and rendered by you, not by the editor. It takes `onClick`, the same `t`, and an optional
 `className`, and it carries the class `icon_cropper-delete_button` for portal stylesheets. Like
-the replace control it is a `<div>`, so it is not keyboard-operable.
+the replace control it is a `<div>` with `role="button"`, reached with Tab and pressed with Enter or
+Space.
 
 `ImageCropper` and `PreviewTile` also live in the folder but neither is exported.
 
@@ -250,9 +249,9 @@ the replace control it is a `<div>`, so it is not keyboard-operable.
 - The outer element is a `region` labelled `"Image editor"`, in English. Pass a translated
   `aria-label` to replace it.
 - **A passed `aria-*` lands on the region and is kept.**
-- **Neither the replace control nor `ButtonDelete` is a button.** Both are `<div>`s with click
-  handlers: no role, no tab stop, no Enter or Space. Add your own controls beside the editor when
-  a keyboard user must replace or delete the picture.
+- **The replace control and `ButtonDelete` are keyboard buttons.** Each is a `<div>` with
+  `role="button"`, reached with Tab and pressed with Enter or Space, and named by its text. The
+  replace control carries `aria-disabled` while `isDisabled` is set.
 - The crop area is a canvas dragged with the pointer, with no keyboard equivalent for positioning.
 - The zoom slider is the kit's `Slider`, a native `<input type="range">`, reached with Tab and
   moved with the arrow keys.

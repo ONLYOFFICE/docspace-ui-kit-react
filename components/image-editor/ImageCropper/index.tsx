@@ -12,6 +12,7 @@ import { IconButton } from "../../icon-button";
 
 import { useTheme } from "../../../context/ThemeContext";
 
+import { activateOnButtonKey } from "../../../utils/keyboard-activation";
 import { ImageCropperProps } from "../ImageEditor.types";
 
 import styles from "./ImageCropper.module.scss";
@@ -135,6 +136,12 @@ const ImageCropper = ({
         onClick={() => {
           if (!isDisabled) inputFilesElement.current?.click();
         }}
+        role="button"
+        tabIndex={0}
+        aria-disabled={isDisabled}
+        onKeyDown={(e) =>
+          activateOnButtonKey(e, ({ currentTarget }) => currentTarget.click())
+        }
         title={t("Common:ChooseAnother")}
         data-testid="change_image_button"
       >
