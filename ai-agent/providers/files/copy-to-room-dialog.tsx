@@ -29,7 +29,7 @@ type CopyToRoomDialogProps = {
 };
 
 // The folder selector behind "Save to room..." on a file a reply produced
-// (a generated image, a created document): the user picks a room or folder
+// (a created document): the user picks a room or folder
 // they may add files to, and a copy of the file is put there; the file
 // itself stays where it is, and so does its card. Rendered inside
 // <AiAgentProviders> so useApi()/useGetIcon() resolve their context.

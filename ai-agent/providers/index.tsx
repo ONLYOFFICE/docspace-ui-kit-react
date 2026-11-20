@@ -40,7 +40,6 @@ import {
 } from "@onlyoffice/ai-chat";
 import type {
   ChatCallbacks,
-  GeneratedImageAction,
   HostTool,
   Profile,
   ProfilePickerAction,
@@ -127,7 +126,6 @@ import {
 import { CHAT_ATTACHMENT_LIMIT } from "./files/limits";
 import { uploadFilesToChat } from "./files/upload-files";
 import { openAttachedFile } from "./files/open-file";
-import { saveToRoomImageAction } from "./files/save-to-room";
 import { CreatedDocumentsRenderer } from "./files/created-document-card";
 import {
   CreatedDocumentsContext,
@@ -1193,17 +1191,6 @@ const AiAgentProviders = ({
     ],
   );
 
-  // The footer of a generated image's card, after its Download.
-  const generatedImageActions = useMemo<GeneratedImageAction[]>(
-    () => [
-      saveToRoomImageAction(
-        t("Common:SaveToRoom", { defaultValue: "Save to room..." }),
-        onSaveToRoom,
-      ),
-    ],
-    [t, onSaveToRoom],
-  );
-
   // What the cards of created documents take from the chat: the agent's
   // name for "created by" and "Save to room...".
   const agentName = chatAgent?.name ?? null;
@@ -1319,11 +1306,6 @@ const AiAgentProviders = ({
       // Every reply of a chat on an agent starts with the agent's logo; the
       // default agent's replies carry none.
       assistantLogo: chatAgent?.logo,
-      // A sent message shows its attachments inside its bubble, under the
-      // text: an image as a preview with its name, any other file as a chip
-      // with its type icon and name.
-      userAttachmentsPlacement: "inside",
-      generatedImageActions,
       // A document a reply created is a card under its tool call: its type
       // icon and name, "created by <agent>" in a chat on an agent, a click
       // that opens it and "Save to room...".
@@ -1359,7 +1341,6 @@ const AiAgentProviders = ({
       onOpenContextRoom,
       sourcesManager,
       chatAgent,
-      generatedImageActions,
       composerKnowledge,
       composerDataSources,
       t,
