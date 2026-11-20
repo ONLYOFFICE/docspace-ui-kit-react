@@ -25,6 +25,12 @@ export type MediaGalleryProps = Pick<
    */
   requestToken?: string;
   /**
+   * Reads every file through the API client, also on the portal's own origin:
+   * for a frame that signs in with a token instead of the session cookie,
+   * which a media element cannot send.
+   */
+  readThroughApiClient?: boolean;
+  /**
    * The file to open first. Pages are loaded until it turns up, ten at most;
    * otherwise the first media file opens.
    */

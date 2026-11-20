@@ -7,6 +7,7 @@ import MediaViewer from "./MediaViewer";
 import { ViewerLoader } from "./sub-components/ViewerLoader";
 import { getPlaylist } from "./utils/getPlaylist";
 import type { MediaGalleryProps } from "./MediaGallery.types";
+import styles from "./MediaGallery.module.scss";
 import type {
   DecryptFileParams,
   NumberOrString,
@@ -30,6 +31,7 @@ type FolderContent = {
 const Gallery = ({
   folderId,
   requestToken,
+  readThroughApiClient = false,
   startFileId,
   pageSize = DEFAULT_PAGE_SIZE,
   emptyContent = null,
@@ -62,6 +64,8 @@ const Gallery = ({
   // files with 403: those are read through the API client instead and shown
   // from memory. The whole file is downloaded before it plays.
   const needsApiClient = useMemo(() => {
+    if (readThroughApiClient) return () => true;
+
     if (typeof window === "undefined" || !baseUrl) return () => false;
 
     const portalOrigin = new URL(baseUrl, window.location.href).origin;
@@ -70,7 +74,7 @@ const Gallery = ({
 
     return (src: string) =>
       URL.canParse(src) && new URL(src).origin === portalOrigin;
-  }, [baseUrl]);
+  }, [baseUrl, readThroughApiClient]);
 
   // The viewer already has one way to take a file's bytes from its consumer:
   // the hook for encrypted files. A file read through the API client goes the
@@ -239,21 +243,24 @@ const Gallery = ({
   }
 
   return (
-    <MediaViewer
-      {...viewerProps}
-      decryptFile={readFile}
-      resolveTitle={resolveItemTitle}
-      visible
-      isPublicFile
-      files={files}
-      playlist={playlist}
-      playlistPos={playlistPos}
-      currentFileId={currentItem.fileId}
-      nextMedia={nextMedia}
-      prevMedia={prevMedia}
-      onDownload={onDownloadById}
-      onClickDownload={onClickDownload}
-    />
+    <>
+      <div className={styles.backdrop} data-testid="media-gallery-backdrop" />
+      <MediaViewer
+        {...viewerProps}
+        decryptFile={readFile}
+        resolveTitle={resolveItemTitle}
+        visible
+        isPublicFile
+        files={files}
+        playlist={playlist}
+        playlistPos={playlistPos}
+        currentFileId={currentItem.fileId}
+        nextMedia={nextMedia}
+        prevMedia={prevMedia}
+        onDownload={onDownloadById}
+        onClickDownload={onClickDownload}
+      />
+    </>
   );
 };
 

@@ -13,7 +13,8 @@ The media files of one portal folder or room in the viewer, with previous / next
 - A change of `folderId` or `requestToken` starts over.
 - It renders the loader until the first answer, so the viewer itself never renders on the server.
 - `folderId` takes the portal's alias `@my` for the user's own documents.
-- On the portal's own origin the files are shown straight from their `viewUrl`: the browser sends the session with the request. When the `ApiProvider` points at a portal on another origin, a media element cannot carry the key and the portal answers 403, so each file is read through the API client and shown from memory. The whole file is downloaded before it plays, TIFF and HEIC are converted as on the portal's own origin, and a failed read shows the viewer's media error.
+- On the portal's own origin the files are shown straight from their `viewUrl`: the browser sends the session with the request. When the `ApiProvider` points at a portal on another origin, a media element cannot carry the key and the portal answers 403, so each file is read through the API client and shown from memory. The whole file is downloaded before it plays, TIFF and HEIC are converted as on the portal's own origin, and a failed read shows the viewer's media error. `readThroughApiClient` takes that path on the portal's own origin too, for a frame that signs in with a token instead of the session cookie (OAuth).
+- The viewer lies over an opaque backdrop that covers the page, so the host page does not show through its translucent background.
 
 | Property                    | Type                                                            | Required | Default | Description                                                                |
 | --------------------------- | --------------------------------------------------------------- | -------- | ------- | -------------------------------------------------------------------------- |
@@ -22,6 +23,7 @@ The media files of one portal folder or room in the viewer, with previous / next
 | `getIcon`                   | `(size: number, ext: string, ...arg: unknown[]) => string`      | Yes      | -       | Function to get the icon for a file based on its size and extension.       |
 | `extsImagePreviewed`        | `string[]`                                                      | Yes      | -       | List of file extensions that can be previewed as images.                   |
 | `requestToken`              | `string`                                                        | No       | -       | The key of a public room link, sent with every request as `Request-Token`. |
+| `readThroughApiClient`      | `boolean`                                                       | No       | `false` | Reads every file through the API client, also on the portal's own origin.  |
 | `startFileId`               | `NumberOrString`                                                | No       | -       | The file to open first.                                                    |
 | `pageSize`                  | `number`                                                        | No       | `100`   | How many files one request asks for.                                       |
 | `emptyContent`              | `React.ReactNode`                                               | No       | -       | Shown when the folder has no media files.                                  |

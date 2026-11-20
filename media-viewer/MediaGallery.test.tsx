@@ -133,6 +133,25 @@ describe("MediaGallery", () => {
     });
   });
 
+  it("reads the files through the API client on its own origin when asked to", async () => {
+    baseUrl = window.location.origin;
+    get.mockResolvedValueOnce(answer([file(1, "image")]));
+
+    renderGallery({ readThroughApiClient: true });
+
+    await waitFor(() => expect(current()).toBe("1"));
+    expect(viewerProps?.playlist[0].encrypted).toBe(true);
+  });
+
+  it("puts an opaque backdrop under the viewer", async () => {
+    get.mockResolvedValueOnce(answer([file(1, "image")]));
+
+    renderGallery();
+
+    await waitFor(() => expect(current()).toBe("1"));
+    expect(screen.getByTestId("media-gallery-backdrop")).toBeInTheDocument();
+  });
+
   it("leaves a really encrypted file to the consumer's decryptFile", async () => {
     baseUrl = "https://portal.test";
     const decryptFile = vi.fn().mockResolvedValue({ data: "plain" });
