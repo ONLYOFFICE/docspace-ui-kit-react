@@ -12,6 +12,7 @@ export type MediaGalleryProps = Pick<
   | "currentDeviceType"
   | "autoPlay"
   | "decryptFile"
+  | "getDecryptionErrorMessage"
   | "resolveTitle"
   | "getPdfViewerScriptUrl"
   | "onClose"

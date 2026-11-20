@@ -143,6 +143,12 @@ export type MediaViewerProps = {
    * the loading error.
    */
   getPdfViewerScriptUrl?: () => Promise<string>;
+  /**
+   * Returns the message to show for a decryption error that has one of its
+   * own (a file not shared with the user yet, a missing key), or `null` to
+   * show the general decryption error with the file name.
+   */
+  getDecryptionErrorMessage?: (error: Error) => string | null;
   /** Callback when decryption fails. */
   onDecryptionError?: (error: string) => void;
   /** List of playlists. */

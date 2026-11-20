@@ -15,24 +15,25 @@ The media files of one portal folder or room in the viewer, with previous / next
 - `folderId` takes the portal's alias `@my` for the user's own documents.
 - On the portal's own origin the files are shown straight from their `viewUrl`: the browser sends the session with the request. When the `ApiProvider` points at a portal on another origin, a media element cannot carry the key and the portal answers 403, so each file is read through the API client and shown from memory. The whole file is downloaded before it plays, TIFF and HEIC are converted as on the portal's own origin, and a failed read shows the viewer's media error.
 
-| Property                | Type                                                            | Required | Default | Description                                                                |
-| ----------------------- | --------------------------------------------------------------- | -------- | ------- | -------------------------------------------------------------------------- |
-| `folderId`              | `NumberOrString`                                                | Yes      | -       | The folder or room whose media files are shown.                            |
-| `t`                     | `TranslationType`                                               | Yes      | -       | Function for translating text.                                             |
-| `getIcon`               | `(size: number, ext: string, ...arg: unknown[]) => string`      | Yes      | -       | Function to get the icon for a file based on its size and extension.       |
-| `extsImagePreviewed`    | `string[]`                                                      | Yes      | -       | List of file extensions that can be previewed as images.                   |
-| `requestToken`          | `string`                                                        | No       | -       | The key of a public room link, sent with every request as `Request-Token`. |
-| `startFileId`           | `NumberOrString`                                                | No       | -       | The file to open first.                                                    |
-| `pageSize`              | `number`                                                        | No       | `100`   | How many files one request asks for.                                       |
-| `emptyContent`          | `React.ReactNode`                                               | No       | -       | Shown when the folder has no media files.                                  |
-| `onDownload`            | `(file: TFile) => void`                                         | No       | -       | Called with the file to download. By default its `viewUrl` opens in place. |
-| `onLoadError`           | `(error: unknown) => void`                                      | No       | -       | Called when the first request for the folder fails.                        |
-| `currentDeviceType`     | `DeviceType`                                                    | No       | -       | Type of the current device.                                                |
-| `autoPlay`              | `boolean`                                                       | No       | -       | Starts video and audio as soon as they open.                               |
-| `decryptFile`           | `(params: DecryptFileParams) => Promise<DecryptedFile \| null>` | No       | -       | Decrypts an encrypted item, as for `MediaViewer`.                          |
-| `resolveTitle`          | `(item) => string`                                              | No       | -       | Returns the title to show for an item, as for `MediaViewer`.               |
-| `getPdfViewerScriptUrl` | `() => Promise<string>`                                         | No       | -       | Resolves the URL of the PDF viewer script, as for `MediaViewer`.           |
-| `onClose`               | `VoidFunction`                                                  | No       | -       | Shows the close button and is called by it.                                |
+| Property                    | Type                                                            | Required | Default | Description                                                                |
+| --------------------------- | --------------------------------------------------------------- | -------- | ------- | -------------------------------------------------------------------------- |
+| `folderId`                  | `NumberOrString`                                                | Yes      | -       | The folder or room whose media files are shown.                            |
+| `t`                         | `TranslationType`                                               | Yes      | -       | Function for translating text.                                             |
+| `getIcon`                   | `(size: number, ext: string, ...arg: unknown[]) => string`      | Yes      | -       | Function to get the icon for a file based on its size and extension.       |
+| `extsImagePreviewed`        | `string[]`                                                      | Yes      | -       | List of file extensions that can be previewed as images.                   |
+| `requestToken`              | `string`                                                        | No       | -       | The key of a public room link, sent with every request as `Request-Token`. |
+| `startFileId`               | `NumberOrString`                                                | No       | -       | The file to open first.                                                    |
+| `pageSize`                  | `number`                                                        | No       | `100`   | How many files one request asks for.                                       |
+| `emptyContent`              | `React.ReactNode`                                               | No       | -       | Shown when the folder has no media files.                                  |
+| `onDownload`                | `(file: TFile) => void`                                         | No       | -       | Called with the file to download. By default its `viewUrl` opens in place. |
+| `onLoadError`               | `(error: unknown) => void`                                      | No       | -       | Called when the first request for the folder fails.                        |
+| `currentDeviceType`         | `DeviceType`                                                    | No       | -       | Type of the current device.                                                |
+| `autoPlay`                  | `boolean`                                                       | No       | -       | Starts video and audio as soon as they open.                               |
+| `decryptFile`               | `(params: DecryptFileParams) => Promise<DecryptedFile \| null>` | No       | -       | Decrypts an encrypted item, as for `MediaViewer`.                          |
+| `getDecryptionErrorMessage` | `(error: Error) => string \| null`                              | No       | -       | Returns the message for a decryption error, as for `MediaViewer`.          |
+| `resolveTitle`              | `(item) => string`                                              | No       | -       | Returns the title to show for an item, as for `MediaViewer`.               |
+| `getPdfViewerScriptUrl`     | `() => Promise<string>`                                         | No       | -       | Resolves the URL of the PDF viewer script, as for `MediaViewer`.           |
+| `onClose`                   | `VoidFunction`                                                  | No       | -       | Shows the close button and is called by it.                                |
 
 ```tsx
 import { MediaGallery } from "@onlyoffice/apps-ui-kit/media-viewer";
@@ -54,7 +55,7 @@ A full-screen viewer for the images, video, audio and PDF files of a playlist, w
 
 ## What the consumer supplies
 
-- **Encrypted files.** The viewer holds no cryptography. For a playlist item marked `encrypted` it calls `decryptFile({ src, fileId, title, roomId, signal })` and shows the bytes that come back, TIFF and HEIC converted as usual. Resolve with `null` to close the viewer, reject to show the decryption error. Without `decryptFile` an encrypted item shows that error. An item marked `encrypted` whose file in `files` is not `encrypted` is only read through the hook, so its failure shows the media error and does not call `onDecryptionError`.
+- **Encrypted files.** The viewer holds no cryptography. For a playlist item marked `encrypted` it calls `decryptFile({ src, fileId, title, roomId, signal })` and shows the bytes that come back, TIFF and HEIC converted as usual; bytes the converter cannot read are shown as they are. Resolve with `null` to close the viewer, reject to show the decryption error. `getDecryptionErrorMessage(error)` gives the message for an error that has one of its own (a file not shared with the user yet, a missing key); without it, or when it returns `null`, the general decryption error with the file name is shown. Without `decryptFile` an encrypted item shows that error. An item marked `encrypted` whose file in `files` is not `encrypted` is only read through the hook, so its failure shows the media error and does not call `onDecryptionError`.
 - **Titles.** `resolveTitle` returns the title to show for an item when the consumer knows a better one than the playlist carries. Pass a stable reference: it is a dependency of the effect that loads the item.
 - **PDF.** `getPdfViewerScriptUrl` resolves the URL of the PDF viewer script. Without it a PDF item shows the loading error.
 - **Optional peers.** `@react-spring/web`, `@use-gesture/react`, `heic2any` and `utif` are optional peer dependencies of the package; an application that renders the viewer declares them.

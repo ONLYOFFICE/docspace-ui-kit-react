@@ -29,14 +29,17 @@ import {
 
 import "./MediaViewer.theme.scss";
 
+// Bytes a converter cannot read stay as they are: the file was read, and a
+// browser that reads HEIC itself (Safari) still shows it.
 const convertImage = async (blob: Blob, extension: string) => {
-  if (isTiff(extension)) return decodeTiff(await blob.arrayBuffer());
+  if (isTiff(extension))
+    return (await decodeTiff(await blob.arrayBuffer())) ?? blob;
 
   if (isHeic(extension)) {
     const { default: heic2any } = await import("heic2any");
-    const result = await heic2any({ blob });
+    const result = await heic2any({ blob }).catch(() => blob);
 
-    return Array.isArray(result) ? null : result;
+    return Array.isArray(result) ? blob : result;
   }
 
   return blob;
@@ -64,6 +67,7 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
     decryptFile,
     resolveTitle,
     getPdfViewerScriptUrl,
+    getDecryptionErrorMessage,
     onDecryptionError,
 
     t,
@@ -88,6 +92,10 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
 
   const filesRef = useRef(files);
   filesRef.current = files;
+
+  // Read through a ref so a new identity does not reload the current file.
+  const getDecryptionErrorMessageRef = useRef(getDecryptionErrorMessage);
+  getDecryptionErrorMessageRef.current = getDecryptionErrorMessage;
 
   const isWillUnmountRef = useRef(false);
   const lastRemovedFileIdRefRef = useRef<number>(undefined);
@@ -489,9 +497,6 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
         const typedBlob = new Blob([decryptedBlob], { type: mimeType });
         const viewableBlob = await convertImage(typedBlob, ext);
         if (isStale()) return;
-        if (!viewableBlob) {
-          throw new Error("The image could not be converted");
-        }
 
         setFileUrl(URL.createObjectURL(viewableBlob));
       } catch (error) {
@@ -514,7 +519,8 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
           console.error("[MediaViewer] Decryption error:", error.message);
           onDecryptionError?.(error.message);
           setDecryptionError(
-            t("Common:EncryptionDecryptPartialFailed", { fileNames: title }),
+            getDecryptionErrorMessageRef.current?.(error) ??
+              t("Common:EncryptionDecryptPartialFailed", { fileNames: title }),
           );
         }
       } finally {

@@ -252,8 +252,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   - `MediaViewer` shows the images and plays the video and audio of a playlist the host passes
     in, with previous / next navigation, a toolbar and a context menu. Decrypting private-room
     files, the shown file name and the PDF viewer script come from the host through
-    `decryptFile`, `resolveTitle` and `getPdfViewerScriptUrl`. A script URL that fails to load
-    shows the load error. `onError` is called once per file that is both playable and
+    `decryptFile`, `resolveTitle` and `getPdfViewerScriptUrl`, and the message of a decryption
+    error that has one of its own (a file not shared with the user yet) through
+    `getDecryptionErrorMessage`. The PDF menu of an encrypted file offers no member link and no
+    Download as; a decrypted HEIC or TIFF the converter cannot read is shown as it is. A script
+    URL that fails to load shows the load error. `onError` is called once per file that is both playable and
     previewable as an image.
   - `MediaGallery` reads one folder or room through the nearest `ApiProvider`, page by page and
     without subfolders, and keeps the playlist itself. `startFileId` keeps loading pages under

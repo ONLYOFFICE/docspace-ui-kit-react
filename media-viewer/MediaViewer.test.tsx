@@ -12,6 +12,7 @@ import {
 import MediaViewer from "./MediaViewer";
 import { getFileExtension } from "./utils/common";
 import { decodeTiff } from "./utils/decodeTiff";
+import heic2any from "heic2any";
 import { ViewerWrapper } from "./sub-components/ViewerWrapper";
 import {
   getDesktopMediaContextModel,
@@ -35,6 +36,7 @@ vi.mock("./utils/common", async () => {
 });
 
 vi.mock("./utils/decodeTiff", () => ({ decodeTiff: vi.fn() }));
+vi.mock("heic2any", () => ({ default: vi.fn() }));
 
 vi.mock("./sub-components/ViewerWrapper", () => ({
   ViewerWrapper: vi.fn(
@@ -625,6 +627,93 @@ describe("MediaViewer reading a file", () => {
     );
   });
 
+  it("shows the message the consumer gives for a decryption error", async () => {
+    const error = new Error("No decryption access for user bob");
+    const getDecryptionErrorMessage = vi.fn(
+      () => "Common:EncryptedFileNoAccessYet",
+    );
+    const props = encryptedItem("photo.jpg");
+
+    render(
+      <MediaViewer
+        {...props}
+        files={[{ ...props.files[0], encrypted: true }]}
+        decryptFile={vi.fn().mockRejectedValue(error)}
+        getDecryptionErrorMessage={getDecryptionErrorMessage}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(lastWrapperProps()?.decryptionError).toBe(
+        "Common:EncryptedFileNoAccessYet",
+      ),
+    );
+    expect(getDecryptionErrorMessage).toHaveBeenCalledWith(error);
+  });
+
+  it("shows the general decryption error when the consumer has no message for it", async () => {
+    const props = encryptedItem("photo.jpg");
+
+    render(
+      <MediaViewer
+        {...props}
+        files={[{ ...props.files[0], encrypted: true }]}
+        decryptFile={vi.fn().mockRejectedValue(new Error("tag mismatch"))}
+        getDecryptionErrorMessage={() => null}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(lastWrapperProps()?.decryptionError).toBe(
+        "Common:EncryptionDecryptPartialFailed",
+      ),
+    );
+  });
+
+  it("shows a decrypted HEIC the converter cannot read as it is", async () => {
+    vi.mocked(heic2any).mockRejectedValueOnce(new Error("unsupported"));
+    const props = encryptedItem("photo.heic");
+
+    render(
+      <MediaViewer
+        {...props}
+        files={[{ ...props.files[0], encrypted: true }]}
+        decryptFile={vi.fn().mockResolvedValue({ data: new Blob(["heic"]) })}
+      />,
+    );
+
+    await waitFor(() => expect(URL.createObjectURL).toHaveBeenCalledTimes(1));
+    const [shown] = vi.mocked(URL.createObjectURL).mock.calls[0] as [Blob];
+    expect(shown.type).toBe("image/heic");
+    expect(lastWrapperProps()?.decryptionError).toBeUndefined();
+  });
+
+  it("shows a decrypted TIFF the decoder returns nothing for as it is", async () => {
+    vi.mocked(decodeTiff).mockResolvedValue(null);
+    Object.defineProperty(Blob.prototype, "arrayBuffer", {
+      value: async () => new ArrayBuffer(1),
+      configurable: true,
+    });
+    const props = encryptedItem("scan.tiff");
+
+    try {
+      render(
+        <MediaViewer
+          {...props}
+          files={[{ ...props.files[0], encrypted: true }]}
+          decryptFile={vi.fn().mockResolvedValue({ data: new Blob(["tiff"]) })}
+        />,
+      );
+
+      await waitFor(() => expect(URL.createObjectURL).toHaveBeenCalledTimes(1));
+      const [shown] = vi.mocked(URL.createObjectURL).mock.calls[0] as [Blob];
+      expect(shown.type).toBe("image/tiff");
+      expect(lastWrapperProps()?.decryptionError).toBeUndefined();
+    } finally {
+      Reflect.deleteProperty(Blob.prototype, "arrayBuffer");
+    }
+  });
+
   it("drops a TIFF decoded after the viewer moved to the next file", async () => {
     let finishDecoding: (blob: Blob) => void = () => {};
     vi.mocked(decodeTiff).mockReturnValue(
@@ -693,6 +782,29 @@ describe("Media viewer menu models", () => {
       expect(visibleKeys(model)).not.toContain("rename");
     },
   );
+
+  it("Media viewer menu of an encrypted PDF", () => {
+    const pdf = {
+      ...renamable,
+      security: { ...renamable.security, Download: true },
+    } as TFile;
+
+    const keys = visibleKeys(models.pdf({ ...pdf, encrypted: true }));
+    expect(keys).not.toContain("download-as");
+    expect(keys).not.toContain("link-for-room-members");
+    expect(keys).toContain("download");
+  });
+
+  it("Media viewer menu of a PDF that is not encrypted", () => {
+    const pdf = {
+      ...renamable,
+      security: { ...renamable.security, Download: true },
+    } as TFile;
+
+    const keys = visibleKeys(models.pdf(pdf));
+    expect(keys).toContain("download-as");
+    expect(keys).toContain("link-for-room-members");
+  });
 
   it.each(Object.keys(models) as (keyof typeof models)[])(
     "Media viewer menu of a file that is not encrypted (%s)",
