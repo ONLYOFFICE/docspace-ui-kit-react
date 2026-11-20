@@ -199,8 +199,8 @@ export function LabelWithHelp() {
 - With `openOnClick` off it opens on hover and closes when the pointer leaves.
 - `place` is a preference: when that side has no room the tooltip flips to another one.
 - **The icon is the kit's 12px info glyph in the theme's grey**, unless you pass `iconNode`. It
-  is an [`IconButton`](../icon-button/README.md), a `<div>`: not focusable, not activated by
-  Enter.
+  is an [`IconButton`](../icon-button/README.md); see the accessibility section for when it takes
+  the keyboard.
 - **Of the props inherited from `IconButton`, only `className`, `color`, `size`, `isClickable`
   and `dataTip` reach the icon.** `onClick`, `title`, `tabIndex`, `onKeyDown`, `isDisabled`,
   `isFill`, `isStroke`, the hover and press props and the mouse handlers are dropped.
@@ -231,13 +231,16 @@ element itself, so use the `color` prop.
 
 ## Accessibility
 
-- The anchor is an `IconButton`, which renders a `<div>` with no role, no tab stop and no key
-  handler. The explanation is unreachable from the keyboard and unannounced by a screen reader.
-- When the content matters, put the same text in the page, where it needs no opening.
-- **A passed `aria-*` is kept on the anchor**: the info icon, or the element around `children`.
-  The component sets none of its own. `role` and `ariaLabel` are left out of its props.
-- **The anchor has no role, so a screen reader may ignore an `aria-label` on it.** Pass a
-  `<button>` as `children` to give the explanation a named, focusable trigger.
+- **The info icon is a keyboard button while its tooltip opens on click.** It has `role="button"`,
+  takes Tab focus, and Enter or Space opens the tooltip. It is named "Info", translated.
+- **With `openOnClick={false}` the icon is not a button.** A hover tooltip has no keyboard route, so
+  the icon stays a `<div>` with no role and no tab stop.
+- The tooltip's text is not announced: nothing links it to the icon. When the content matters, put
+  the same text in the page, where it needs no opening.
+- **A passed `aria-*` is kept on the anchor**: the info icon, or the element around `children`. A
+  passed `aria-label` replaces "Info". `role` and `ariaLabel` are left out of its props.
+- **The element around `children` has no role.** Pass a `<button>` as `children` to give the
+  explanation a named, focusable trigger.
 - Once open, the tooltip closes on Escape.
 - The tooltip is not linked to anything by `aria-describedby`; nothing here reaches the
   accessibility tree.

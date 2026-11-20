@@ -360,6 +360,13 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   rows were `<div>`s that answered the mouse only. Each is now `role="button"` in the tab order,
   pressed with Enter or Space, inside its heading where it has one. The folder name carries
   `aria-expanded`, the focus moves into the drop box and back, and Escape closes the box
+- **`RoomLogoCoverDialog`'s swatches, glyphs and "without icon" control take the keyboard.** Each
+  was a `<div>` that answered the mouse only, and nothing said which was chosen. Each is now a
+  `role="button"` with `aria-pressed`. A swatch is named by its hex value, a glyph by "Icon" and
+  its place in the row
+- **`HelpButton`'s tooltip opens from the keyboard.** The info icon was a `<div>` that answered the
+  mouse only. While the tooltip opens on click, the icon is a `role="button"` named "Info", and Enter
+  or Space opens it. A passed `aria-label` replaces the name
 - **`Article`'s collapse handle and logo take the keyboard.** Both answered the mouse only. The
   handle is now a `role="button"`, named "Show menu" while collapsed. The logo, which navigates
   home, is a `role="link"` named by the product name, followed with Enter

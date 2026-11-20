@@ -8,6 +8,7 @@ import { DropDown } from "../../drop-down";
 import { DropDownItem } from "../../drop-down-item";
 import { ColorPicker } from "../../color-picker";
 import { globalColors } from "../../../providers/theme/themes";
+import { activateOnButtonKey } from "../../../utils/keyboard-activation";
 
 import PlusIcon from "../../../assets/icons/16/button.plus.react.svg";
 import PencilIcon from "../../../assets/pencil.react.svg";
@@ -57,27 +58,45 @@ export const SelectColor = ({
   return (
     <div className="select-color-container">
       <div className="color-name">{t("Common:Color")}</div>
-      <div className="colors-container">
-        {logoColors.map((color, index) =>
-          color === selectedColor ? (
+      <div
+        className="colors-container"
+        role="group"
+        aria-label={t("Common:Color")}
+      >
+        {logoColors.map((color, index) => {
+          // A swatch is a toggle button named by its hex value; the chosen one
+          // stays in the tab order so its pressed state can be heard.
+          const swatch = {
+            role: "button",
+            tabIndex: 0,
+            "aria-label": color,
+            "aria-pressed": color === selectedColor,
+            style: { "--item-color": color } as React.CSSProperties,
+            onClick: () => onChangeColor(color),
+            onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) =>
+              activateOnButtonKey(e, ({ currentTarget }) =>
+                currentTarget.click(),
+              ),
+          };
+
+          return color === selectedColor ? (
             <div
+              {...swatch}
               key={color}
               className={styles.selectedColorItem}
-              style={{ "--item-color": color } as React.CSSProperties}
               data-testid={`color_item_selected_${index}`}
             >
               <div className="circle" />
             </div>
           ) : (
             <div
+              {...swatch}
               key={color}
               className={styles.colorItem}
-              style={{ "--item-color": color } as React.CSSProperties}
-              onClick={() => onChangeColor(color)}
               data-testid={`color_item_${index}`}
             />
-          ),
-        )}
+          );
+        })}
         {customColor ? (
           <div
             className={`${styles.customSelectedColor}${isSelectedColorPicker ? ` ${styles.isSelected}` : ""}${pickerColor === globalColors.white ? ` ${styles.whiteBorder}` : ""}`}

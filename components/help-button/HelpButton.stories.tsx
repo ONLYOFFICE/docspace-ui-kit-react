@@ -282,6 +282,15 @@ export const Default: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(icon(canvas));
     await tooltipShows("This is a help tooltip");
+
+    // Escape closes it, and the keyboard opens it again.
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(screen.queryByText("This is a help tooltip")).toBeNull(),
+    );
+    canvas.getByRole("button", { name: "Info" }).focus();
+    await userEvent.keyboard("{Enter}");
+    await tooltipShows("This is a help tooltip");
   },
   render: (args) => (
     <div style={{ padding: "40px 20px" }}>
@@ -528,6 +537,17 @@ export const WithTextContent: Story = {
     );
     // RootTooltip's info tooltip opens on a click, not on hover.
     await userEvent.click(anchor);
+    await tooltipShows("Plain text opens in the shared tooltip");
+
+    // Escape closes it, and the keyboard opens it again.
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(
+        screen.queryByText("Plain text opens in the shared tooltip"),
+      ).toBeNull(),
+    );
+    anchor.focus();
+    await userEvent.keyboard("{Enter}");
     await tooltipShows("Plain text opens in the shared tooltip");
   },
   parameters: {

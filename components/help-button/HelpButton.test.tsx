@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { HelpButton } from ".";
 
 describe("<HelpButton />", () => {
@@ -112,5 +112,47 @@ describe("<HelpButton />", () => {
   it("renders with openOnClick set to false", () => {
     render(<HelpButton tooltipContent={tooltipContent} openOnClick={false} />);
     expect(screen.getByTestId("help-button")).toBeInTheDocument();
+  });
+
+  it("opens the shared tooltip from the keyboard", () => {
+    render(<HelpButton tooltipContent={tooltipContent} />);
+    const icon = screen.getByRole("button", { name: "Info" });
+    const onClick = vi.fn();
+    icon.addEventListener("click", onClick);
+
+    expect(icon).toHaveAttribute("tabindex", "0");
+    fireEvent.keyDown(icon, { key: "Enter" });
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("clicks the SVG its own tooltip is anchored to", () => {
+    render(<HelpButton tooltipContent={<b>Rich content</b>} />);
+    const icon = screen.getByRole("button", { name: "Info" });
+    const svg = icon.querySelector("svg") as SVGElement;
+    const onClick = vi.fn();
+    svg.addEventListener("click", onClick);
+
+    fireEvent.keyDown(icon, { key: " " });
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("stays out of the tab order when the tooltip opens on hover", () => {
+    render(
+      <HelpButton tooltipContent={<b>Rich content</b>} openOnClick={false} />,
+    );
+
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+  });
+
+  it("lets a passed aria-label name the button", () => {
+    render(
+      <HelpButton tooltipContent={tooltipContent} aria-label="About storage" />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "About storage" }),
+    ).toBeInTheDocument();
   });
 });
