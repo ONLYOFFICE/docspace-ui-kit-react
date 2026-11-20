@@ -419,10 +419,13 @@ go on `:root` or another ancestor of `#root`.
 
 - **The panel is not a landmark.** It is a `<div>` with an id and no label, not a `<nav>` or
   `<aside>`. It is not announced as a region and cannot be jumped to.
-- **The collapse handle is a `<div>` with an `onClick`**, with no role, tab stop or key handler.
-  The panel cannot be collapsed from the keyboard.
-- The logo, which navigates home, is a clickable `<img>` out of the tab order. Its `alt` is the
-  product name as the portal brands it; the tablet's burger image has an empty `alt`.
+- **The collapse handle is a keyboard button.** It has `role="button"`, takes Tab focus and answers
+  Enter and Space. Collapsed to its icon, it is named "Show menu"; expanded, its "Hide menu" text
+  names it.
+- **The logo is a link to the keyboard.** It navigates home, so it has `role="link"`, takes Tab focus
+  and answers Enter only. It is named by the product name as the portal brands it.
+- On a tablet both the burger image and the logo are such links. The burger image keeps an empty
+  `alt` and takes the name from `aria-label`.
 - On a phone the panel is a portal over the page with a backdrop. Nothing moves focus into it,
   traps it there or restores it on close.
 - Its labels come from the kit's shared translations. Without a `TranslationProvider` they are

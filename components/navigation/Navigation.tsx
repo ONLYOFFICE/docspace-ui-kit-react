@@ -149,6 +149,51 @@ const Navigation = ({
     }
   }, [navigationItems]);
 
+  // Focus follows the box: into its copy of the title when it opens from the
+  // header, and back to the header's title when it closes with the focus in
+  // it -- unless something else has taken the focus by then.
+  const focusInDropBoxRef = React.useRef(false);
+
+  React.useEffect(() => {
+    if (!isOpen) {
+      if (!focusInDropBoxRef.current) return;
+      focusInDropBoxRef.current = false;
+      const active = document.activeElement;
+      if (active && active !== document.body) return;
+      containerRef.current
+        ?.querySelector<HTMLElement>("[aria-expanded]")
+        ?.focus();
+      return;
+    }
+
+    if (containerRef.current?.contains(document.activeElement))
+      dropBoxRef.current
+        ?.querySelector<HTMLElement>("[aria-expanded]")
+        ?.focus();
+
+    const onFocusIn = (e: FocusEvent) => {
+      focusInDropBoxRef.current = !!dropBoxRef.current?.contains(
+        e.target as Node,
+      );
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !e.defaultPrevented) setIsOpen(false);
+    };
+
+    focusInDropBoxRef.current = !!dropBoxRef.current?.contains(
+      document.activeElement,
+    );
+    document.addEventListener("focusin", onFocusIn);
+    document.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.removeEventListener("focusin", onFocusIn);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isOpen]);
+
+  const canOpenDropBox = !isRootFolder && !!navigationItems?.length;
+
   const onBackToParentFolderAction = React.useCallback(() => {
     setIsOpen((val) => !val);
     onBackToParentFolder?.();
@@ -168,6 +213,8 @@ const Navigation = ({
         isOpen={false}
         isRootFolder={isRootFolder}
         onClick={toggleDropBox}
+        isButton={canOpenDropBox}
+        isExpanded={canOpenDropBox ? isOpen : undefined}
         isRootFolderTitle={false}
         badgeLabel={!showRootFolderNavigation ? badgeLabel : ""}
         titleTooltip={!showRootFolderNavigation ? titleTooltip : undefined}
@@ -197,6 +244,7 @@ const Navigation = ({
           isOpen={isOpen}
           isRootFolder={isRootFolder}
           isRootFolderTitle
+          isButton
           onClick={onTextClick}
           badgeLabel={badgeLabel}
         />

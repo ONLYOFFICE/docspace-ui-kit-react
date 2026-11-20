@@ -569,6 +569,7 @@
   "SetTemplateDescription": "Create a space from a template. Settings, users, folders, and forms will be copied from the selected template.",
   "Settings": "Settings",
   "Show": "Show",
+  "ShowArticleMenu": "Show menu",
   "SingleUploadWarning": "Only one file or folder can be uploaded at a time. Please select a single item.",
   "Source": "Source",
   "SpaceGroups": "Space groups",

@@ -356,6 +356,13 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`Calendar`'s title opens the month and year views from the keyboard.** It was an `<h2>` that
   answered the mouse only. When the view changes, the focus moves to the new view's title instead
   of falling back to the page
+- **`Navigation`'s trail takes the keyboard.** The folder name, the room title and the drop box
+  rows were `<div>`s that answered the mouse only. Each is now `role="button"` in the tab order,
+  pressed with Enter or Space, inside its heading where it has one. The folder name carries
+  `aria-expanded`, the focus moves into the drop box and back, and Escape closes the box
+- **`Article`'s collapse handle and logo take the keyboard.** Both answered the mouse only. The
+  handle is now a `role="button"`, named "Show menu" while collapsed. The logo, which navigates
+  home, is a `role="link"` named by the product name, followed with Enter
 - **`AvatarEditorDialog`, `RoomLogoCoverDialog` and the filter panel are named by their
   heading**: `title`, `t("Common:RoomCover")` and `filterHeader`. Each was announced as an
   unnamed dialog. A passed `aria-label` or `aria-labelledby` still wins

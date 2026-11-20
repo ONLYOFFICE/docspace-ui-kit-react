@@ -32,8 +32,6 @@ two context menu getters and the device type.
   [`Tabs`](../tabs/README.md) for switching views.
 - **It is not responsive by itself.** The `currentDeviceType` you pass decides which buttons
   appear, so a wrong value shows the wrong header.
-- **The trail is pointer-only.** The folder name, the room title and the drop box rows are `<div>`s
-  with an `onClick`; see the accessibility section.
 
 ## Import
 
@@ -225,8 +223,8 @@ export function HeaderWithActions({ canCreate }: { canCreate: boolean }) {
 
 The trail is not rendered inline. Clicking the folder name opens a list of every entry in
 `navigationItems`, and choosing one calls `onClickFolder`. There is no prop for the box: it is
-internal state. It does not open in the root folder or with an empty trail, and a click outside
-closes it.
+internal state. It does not open in the root folder or with an empty trail. A click outside or
+Escape closes it.
 
 ```tsx
 import { useState } from "react";
@@ -338,18 +336,25 @@ show only while it is open. The header's other colours come from the theme and a
 
 ## Accessibility
 
-- **The trail is pointer-only.** The folder name, the room title, the drop box rows and the logo are
-  `<div>`s with an `onClick`, and no role, `tabindex` or key handler. The drop box cannot be opened
-  from the keyboard.
+- **The trail is reachable by keyboard.** The folder name, the room title and the drop box rows have
+  `role="button"`, take Tab focus and answer Enter and Space.
+- **The folder name carries `aria-expanded`** while it can open the drop box. In the root folder or
+  with an empty trail it is a plain heading.
+- **Focus follows the drop box.** Opened from the folder name, it moves to the box's copy of that
+  name. Closed with the focus inside, it returns to the header's folder name.
+- **The logo is pointer-only.** It is a `<div>` with an `onClick`, and no role, `tabindex` or key
+  handler.
 - **The icon buttons are keyboard buttons.** The back arrow, the plus, the folder and the info
   panel buttons have `role="button"`, take Tab focus and answer Enter and Space.
 - **Each is named.** The info panel toggle by `titles.infoPanel`, the plus by `titles.actions`, and
   the folder button by `titles.contextMenu`. Without them the plus is "Actions" and the folder
   button "More options"; the back arrow is always "Back", all translated.
 - The AI chat button and the extra button are real `<button>`s, named by their visible label.
-- The folder name and the room title are both `<h1>` elements, whatever the page around them.
+- The folder name and the room title are both `<h1>` elements, whatever the page around them. Each
+  button sits inside its heading, so the heading keeps its role.
 - The header is not a landmark: there is no `<nav>`, no `aria-label` and no breadcrumb semantics.
-- The drop box is an ordinary positioned `<div>`. Focus is not moved into it and not trapped.
+- The drop box is an ordinary positioned `<div>`, not a dialog. Escape closes it, and Tab can leave
+  it.
 - The logo's `alt` is the product name as the portal brands it; the burger image has an empty
   `alt`.
 - **A passed `aria-*` lands on the header's container and is kept.** The container has no role,

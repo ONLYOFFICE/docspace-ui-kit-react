@@ -124,6 +124,10 @@ export type TTextProps = {
   isRootFolder: boolean;
   isRootFolderTitle: boolean;
   onClick: () => void;
+  /** Makes the title a keyboard button. */
+  isButton?: boolean;
+  /** Whether the drop box the title opens is open; unset on a title that opens none. */
+  isExpanded?: boolean;
   className?: string;
   /** Text of the small badge after the title. It follows the room title when
    * one is shown, and the folder name otherwise. */
@@ -290,7 +294,13 @@ export type TNavigationProps = React.AriaAttributes &
   Omit<TControlButtonProps, "isMobile"> &
   Omit<
     TTextProps,
-    "isOpen" | "title" | "className" | "isRootFolderTitle" | "onClick"
+    | "isOpen"
+    | "title"
+    | "className"
+    | "isRootFolderTitle"
+    | "onClick"
+    | "isButton"
+    | "isExpanded"
   > & {
     /** Not read. Nothing destructures it. */
     showText: boolean;
