@@ -1,10 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
 
 import { ModalDialog, ModalDialogType } from "../../../components/modal-dialog";
 import { Button, ButtonSize } from "../../../components/button";
 import { Text } from "../../../components/text";
 import { toastr } from "../../../components/toast";
+import { Tabs, type TTabItem } from "../../../components/tabs";
 
 import { useCommonTranslation } from "../../../utils/i18n";
 import {
@@ -16,6 +17,9 @@ import { AnalyticsEvents } from "../../../enums";
 
 import WarningIcon from "../../../assets/danger.toast.react.svg";
 import Amount from "./sub-components/Amount";
+import PromoCodeField from "../promo-code/PromoCodeField";
+import PromoCodeNoCard from "../promo-code/PromoCodeNoCard";
+import { usePromoCode } from "../promo-code/usePromoCode";
 import { AmountProvider, useAmountValue } from "../../wallet/context";
 
 import type PaymentStore from "../../store/PaymentStore";
@@ -40,9 +44,17 @@ export type TSimpleTopUpDeps = {
   ) => Promise<string | null | undefined>;
   walletBalance: number;
   fetchCustomerInfo: TTopUpCompletionDeps["fetchCustomerInfo"];
+  /** when given, the dialog gets a Promo code tab next to the purchase */
+  applyPromoCode?: PaymentStore["applyPromoCode"];
+  /** without a linked card the Promo code tab offers to link one instead of the field */
+  isCardLinked?: boolean;
+  /** opens the card linking flow; the dialog closes right after */
+  onLinkCard?: () => Promise<void>;
 };
 
 const MIN_AMOUNT = "10";
+
+export type TopUpTab = "purchase" | "promo";
 
 type SimpleTopUpDialogBaseProps = {
   visible: boolean;
@@ -63,6 +75,7 @@ type SimpleTopUpDialogBaseProps = {
   descriptionText?: React.ReactNode;
   /** overrides the default helper text under the amount input */
   helperText?: React.ReactNode;
+  initialTab?: TopUpTab;
 };
 
 export type SimpleTopUpDialogProps = SimpleTopUpDialogBaseProps &
@@ -92,12 +105,37 @@ const SimpleTopUpDialogContent = observer(
     isPurchaseCompleted,
     descriptionText,
     helperText,
+    initialTab = "purchase",
+    applyPromoCode,
+    isCardLinked = true,
+    onLinkCard,
   }: SimpleTopUpDialogProps) => {
     const t = useCommonTranslation();
 
     const { amount, hasError } = useAmountValue();
 
     const [isLoading, setIsLoading] = useState(false);
+    const [isLinkingCard, setIsLinkingCard] = useState(false);
+    const [tabId, setTabId] = useState<TopUpTab>(initialTab);
+    const [panelMinHeight, setPanelMinHeight] = useState(0);
+
+    const purchasePanelRef = useCallback((node: HTMLDivElement) => {
+      const observer = new ResizeObserver(([entry]) => {
+        setPanelMinHeight(entry.borderBoxSize[0].blockSize);
+      });
+      observer.observe(node);
+      return () => observer.disconnect();
+    }, []);
+
+    const promoCode = usePromoCode({
+      applyPromoCode,
+      formatWalletCurrency,
+      language,
+      onApplied: onClose,
+    });
+
+    const hasPromoTab = Boolean(applyPromoCode);
+    const isPromoTab = hasPromoTab && tabId === "promo";
 
     const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -195,12 +233,101 @@ const SimpleTopUpDialogContent = observer(
       }
     };
 
+    const onSelectTab = (item: TTabItem) => {
+      setTabId(item.id as TopUpTab);
+    };
+
+    const onLinkCardClick = async () => {
+      if (!onLinkCard) return;
+
+      setIsLinkingCard(true);
+
+      try {
+        await onLinkCard();
+        onClose();
+      } catch (error) {
+        console.error(error);
+        toastr.error(t("UnexpectedError"));
+      } finally {
+        setIsLinkingCard(false);
+      }
+    };
+
     const onContinue = async () => {
       if (isDisabled) return;
 
       if (isStripeFlow) await onStripeContinue();
       else await onInstantTopUp();
     };
+
+    const purchasePanel = (
+      <div className={styles.body}>
+        {isDelayedPaymentMethod ? (
+          <div
+            className={styles.warning}
+            data-testid="top_up_delayed_payment_method_warning"
+          >
+            <WarningIcon className={styles.warningIcon} />
+            <Text
+              as="span"
+              fontSize="12px"
+              fontWeight={600}
+              lineHeight="16px"
+              className={styles.warningText}
+            >
+              {t("TopUpDelayedPaymentMethodWarning")}
+            </Text>
+          </div>
+        ) : null}
+
+        <Text className={styles.description}>
+          {descriptionText ??
+            (isStripeFlow
+              ? t("TopUpCreditsDescription")
+              : t("TopUpCreditsAmountDescription"))}
+        </Text>
+
+        <Amount
+          formatWalletCurrency={formatWalletCurrency}
+          isDisabled={isLoading}
+          walletCustomerStatusNotActive={walletCustomerStatusNotActive}
+          minValue={minValue ?? MIN_AMOUNT}
+          withoutCustomerCheck
+        />
+
+        <Text fontSize="12px" className={styles.helperText}>
+          {helperText ??
+            (isStripeFlow
+              ? t("TopUpCreditsChargeHint")
+              : t("TopUpTakeSomeTimeToComplete"))}
+        </Text>
+      </div>
+    );
+
+    const tabs: TTabItem[] = [
+      {
+        id: "purchase",
+        name: t("Purchase"),
+        content: (
+          <div ref={purchasePanelRef} className={styles.panel}>
+            {purchasePanel}
+          </div>
+        ),
+      },
+      {
+        id: "promo",
+        name: t("PromoCode"),
+        content: (
+          <div className={styles.panel} style={{ minHeight: panelMinHeight }}>
+            {isCardLinked ? (
+              <PromoCodeField promoCode={promoCode} />
+            ) : (
+              <PromoCodeNoCard />
+            )}
+          </div>
+        ),
+      },
+    ];
 
     return (
       <ModalDialog
@@ -209,73 +336,69 @@ const SimpleTopUpDialogContent = observer(
         displayType={ModalDialogType.modal}
         autoMaxHeight
         withBodyScroll
+        withoutBorder={hasPromoTab}
+        withoutHeaderMargin={hasPromoTab}
       >
         <ModalDialog.Header>{t("TopUpCredits")}</ModalDialog.Header>
 
         <ModalDialog.Body>
-          <div className={styles.body}>
-            {isDelayedPaymentMethod ? (
-              <div
-                className={styles.warning}
-                data-testid="top_up_delayed_payment_method_warning"
-              >
-                <WarningIcon className={styles.warningIcon} />
-                <Text
-                  as="span"
-                  fontSize="12px"
-                  fontWeight={600}
-                  lineHeight="16px"
-                  className={styles.warningText}
-                >
-                  {t("TopUpDelayedPaymentMethodWarning")}
-                </Text>
-              </div>
-            ) : null}
-
-            <Text className={styles.description}>
-              {descriptionText ??
-                (isStripeFlow
-                  ? t("TopUpCreditsDescription")
-                  : t("TopUpCreditsAmountDescription"))}
-            </Text>
-
-            <Amount
-              formatWalletCurrency={formatWalletCurrency}
-              isDisabled={isLoading}
-              walletCustomerStatusNotActive={walletCustomerStatusNotActive}
-              minValue={minValue ?? MIN_AMOUNT}
-              withoutCustomerCheck
+          {hasPromoTab ? (
+            <Tabs
+              className={styles.tabs}
+              items={tabs}
+              selectedItemId={tabId}
+              onSelect={onSelectTab}
             />
-
-            <Text fontSize="12px" className={styles.helperText}>
-              {helperText ??
-                (isStripeFlow
-                  ? t("TopUpCreditsChargeHint")
-                  : t("TopUpTakeSomeTimeToComplete"))}
-            </Text>
-          </div>
+          ) : (
+            purchasePanel
+          )}
         </ModalDialog.Body>
 
         <ModalDialog.Footer>
           <div className={styles.footerButtons}>
-            <Button
-              key="ContinueToStripeButton"
-              label={isStripeFlow ? t("ContinueToStripe") : t("TopUp")}
-              size={ButtonSize.normal}
-              primary
-              scale
-              onClick={onContinue}
-              isLoading={isLoading}
-              isDisabled={isDisabled}
-              testId="first_topup_continue_to_stripe"
-            />
+            {isPromoTab && !isCardLinked ? (
+              <Button
+                key="LinkCardButton"
+                label={t("LinkPaymentMethod")}
+                size={ButtonSize.normal}
+                primary
+                scale
+                onClick={onLinkCardClick}
+                isLoading={isLinkingCard}
+                testId="wallet_promo_code_link_card"
+              />
+            ) : isPromoTab ? (
+              <Button
+                key="RedeemButton"
+                label={t("RedeemButton")}
+                size={ButtonSize.normal}
+                primary
+                scale
+                onClick={promoCode.onSubmit}
+                isLoading={promoCode.isSubmitting}
+                isDisabled={!promoCode.canSubmit}
+                testId="wallet_promo_code_redeem"
+              />
+            ) : (
+              <Button
+                key="ContinueToStripeButton"
+                label={isStripeFlow ? t("ContinueToStripe") : t("TopUp")}
+                size={ButtonSize.normal}
+                primary
+                scale
+                onClick={onContinue}
+                isLoading={isLoading}
+                isDisabled={isDisabled}
+                testId="first_topup_continue_to_stripe"
+              />
+            )}
             <Button
               key="CancelButton"
               label={t("CancelButton")}
               size={ButtonSize.normal}
               scale
               onClick={onClose}
-              isDisabled={isLoading}
+              isDisabled={isLoading || isLinkingCard || promoCode.isSubmitting}
               testId="first_topup_cancel"
             />
           </div>

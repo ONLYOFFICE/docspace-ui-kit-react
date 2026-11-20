@@ -1,7 +1,12 @@
 import { Duration } from "luxon";
 
 import { isLanguageRtl } from "../../providers/theme/rtl-utils";
-import { dateDiff, now } from "../../utils/date";
+import {
+  dateDiff,
+  formatDateLocalized,
+  getAppTimezone,
+  now,
+} from "../../utils/date";
 import { LATIN_NUMBERING_SYSTEM } from "../../utils/latin-digits";
 
 const FIRST_STRONG_ISOLATE = "\u2068";
@@ -31,6 +36,21 @@ export const formatCurrencyIsolated = (
     .map(({ value }) => value)
     .join("");
 
+type DatePreset = Parameters<typeof formatDateLocalized>[1];
+
+export const formatBillingDate = (
+  date: Parameters<typeof formatDateLocalized>[0],
+  language: string,
+  preset: DatePreset = "DATE_MED",
+) =>
+  formatDateLocalized(date, preset, {
+    locale: language,
+    timezone: getAppTimezone(),
+  });
+
+export const sumAmounts = (amounts: number[]) =>
+  Number(amounts.reduce((sum, amount) => sum + amount, 0).toFixed(10));
+
 /**
  * Whole days from now until `date` (negative if the date is in the past).
  */
@@ -39,14 +59,14 @@ export const daysUntil = (date: Date | string | null | undefined) =>
 
 /**
  * Human-readable remaining period, e.g. "15 days" (localized).
- * Falls back to the "< 1 day" label when there is one day or less left.
+ * Falls back to the "< 1 day" label when less than a full day is left.
  */
 export const formatRemainingDays = (
   days: number,
   language: string,
   t: (key: string) => string,
 ) =>
-  days > 1
+  days >= 1
     ? Duration.fromObject(
         { days },
         // Its own setting, not the host's luxon default: Storybook sets none.

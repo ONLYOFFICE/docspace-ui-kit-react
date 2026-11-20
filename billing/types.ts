@@ -11,8 +11,35 @@ export type TNumericPaymentFeature = TenantQuotaFeatureDto & { value: number };
 /** Feature with a boolean value (e.g. SSO enabled). */
 export type TBooleanPaymentFeature = TenantQuotaFeatureDto & { value: boolean };
 
+export type OperationSource = {
+  subAccount: number;
+  isBonus: boolean;
+  amount: number;
+};
+
 /** Balance from the wallet API — can be a Balance object, 0, or null. */
 export type TBalance = Balance | 0 | null;
+
+export type TGoodwillLot = {
+  operationId: number;
+  amount: number;
+  remaining: number;
+  currency: string;
+  date: string;
+  expiresAt: string | null;
+};
+
+export type TGoodwill = Balance & { lots?: TGoodwillLot[] | null };
+
+export type TPromoCodeResult =
+  | {
+      status: "applied" | "pending";
+      amount: number;
+      currency: string;
+      expiresAt: string | null;
+    }
+  | { status: "refused"; reason: string }
+  | { status: "unconfirmed" | "rateLimited" | "failed" };
 
 /** QuotaDto extended with serviceName (returned by wallet service endpoints). */
 export type TWalletServiceQuota = QuotaDto & { serviceName?: string };
@@ -199,6 +226,7 @@ export type TServiceUsage = {
   currency: string;
   totalQuantity: number;
   totalAmount: number;
+  sources?: OperationSource[] | null;
   operationCount: number;
   title: string;
   /** Per-unit price for the service. */

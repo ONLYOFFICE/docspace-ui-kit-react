@@ -25,7 +25,7 @@ const CurrentPlan = ({ onEditPlan, isMobile }: CurrentPlanProps) => {
   const {
     formatPaymentCurrency,
     isCardMissingOrInactive,
-    walletBalance,
+    availableCredits,
     isLoading,
     setBasicTariffContainer,
     executeWalletUpdate,
@@ -50,11 +50,11 @@ const CurrentPlan = ({ onEditPlan, isMobile }: CurrentPlanProps) => {
   const planPrice = formatPaymentCurrency(overduePlanCost, 2);
 
   const isBalanceInsufficient =
-    isGracePeriod && walletBalance < overduePlanCost;
+    isGracePeriod && availableCredits < overduePlanCost;
   const isDelayedPaymentTopUp = isBalanceInsufficient && isDelayedPaymentMethod;
   const topUpShortfall = Math.max(
     0,
-    Math.ceil(overduePlanCost - walletBalance),
+    Math.ceil(overduePlanCost - availableCredits),
   );
 
   const onRenewPlan = () => {

@@ -20,6 +20,7 @@ import BenefitsContainer from "./BenefitsContainer";
 import ContactContainer from "./ContactContainer";
 import WalletInfo from "../shared/top-up-balance/sub-components/WalletInfo";
 import SimpleTopUpDialog from "../shared/top-up-balance/SimpleTopUpDialogWrapper";
+import { useTopUpDialogVisible } from "../shared/top-up-balance/useTopUpDialogVisible";
 import StorageWarning from "../services/panels/additional-storage/StorageWarning";
 import UnlinkedCardBanner from "../shared/unlinked-card-banner";
 import styles from "./MainTariff.module.scss";
@@ -37,7 +38,7 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     formatWalletCurrency,
   } = store;
 
-  const [isTopUpVisible, setIsTopUpVisible] = useState(false);
+  const [isTopUpVisible, setIsTopUpVisible] = useTopUpDialogVisible();
   const [isCancelDowngradeLoading, setIsCancelDowngradeLoading] =
     useState(false);
 
