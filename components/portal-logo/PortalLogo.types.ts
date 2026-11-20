@@ -1,4 +1,4 @@
-export type PortalLogoProps = {
+export type PortalLogoProps = React.AriaAttributes & {
   /** Added to the `<img>`, or to the fallback logo, next to the component's own `logo-wrapper` class. It never reaches the wrapper around it. */
   className?: string;
   /** Watches the window width and swaps to the small logo in a fixed bar at 600px and narrower. Without it the logo is hidden at those widths.

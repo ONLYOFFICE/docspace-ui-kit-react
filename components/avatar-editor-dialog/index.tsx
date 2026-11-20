@@ -4,6 +4,7 @@ import { ModalDialog, ModalDialogType } from "../modal-dialog";
 import { Button, ButtonSize } from "../button";
 import { Text } from "../text";
 import { ImageEditor } from "../image-editor";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import type { AvatarEditorDialogProps } from "./AvatarEditorDialog.types";
 
@@ -26,6 +27,7 @@ const AvatarEditorDialog = ({
   onSave,
   onChangeImage,
   onChangeFile,
+  ...rest
 }: AvatarEditorDialogProps) => {
   const [preview, setPreview] = useState("");
   const [scrollBodyHeight, setScrollBodyHeight] = useState<number | null>(null);
@@ -58,6 +60,7 @@ const AvatarEditorDialog = ({
 
   return (
     <ModalDialog
+      {...pickAriaProps(rest)}
       className={styles.modalDialog}
       displayType={ModalDialogType.modal}
       withBodyScroll

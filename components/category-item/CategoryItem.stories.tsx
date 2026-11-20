@@ -56,6 +56,15 @@ const meta = {
       description:
         "Value of `data-testid` on the wrapper, and the stem of the title link's own `<dataTestId>_category_link`. Without it the link keeps the shared `link` id.",
     },
+    className: {
+      control: "text",
+      description:
+        "Added after the component's own class, on the outer element.",
+    },
+    style: {
+      control: "object",
+      description: "Inline style of the outer element.",
+    },
   },
 } satisfies Meta<typeof CategoryItem>;
 

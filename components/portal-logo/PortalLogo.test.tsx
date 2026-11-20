@@ -27,6 +27,20 @@ describe("PortalLogo", () => {
     window.innerWidth = 1024;
   });
 
+  it("puts a passed aria-* on the image and on the fallback", () => {
+    render(<PortalLogo alt="Acme" aria-describedby="logo-hint" />);
+    expect(screen.getByRole("img")).toHaveAttribute(
+      "aria-describedby",
+      "logo-hint",
+    );
+
+    fireEvent.error(screen.getByRole("img"));
+    expect(screen.getByRole("img", { name: "Acme" })).toHaveAttribute(
+      "aria-describedby",
+      "logo-hint",
+    );
+  });
+
   it("renders without crashing", () => {
     render(<PortalLogo />);
     const img = screen.getByRole("img");

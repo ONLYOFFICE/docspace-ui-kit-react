@@ -37,6 +37,15 @@ describe("<RoomIcon />", () => {
     vi.clearAllMocks();
   });
 
+  it("puts a passed aria-* on the outer element", () => {
+    render(<RoomIcon {...baseProps} aria-hidden />);
+
+    expect(screen.getByTestId("room-icon")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+  });
+
   it("renders without error", () => {
     render(<RoomIcon {...baseProps} />);
     expect(screen.getByTestId("room-icon")).toBeInTheDocument();

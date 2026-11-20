@@ -4,6 +4,7 @@ import CrossReactSvgUrl from "../../assets/icons/12/cross.react.svg";
 import { IconButton } from "../icon-button";
 import { TooltipContainer } from "../tooltip";
 import { activateOnButtonKey } from "../../utils/keyboard-activation";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import type { SelectedItemProps } from "./SelectedItem.types";
 import styles from "./SelectedItem.module.scss";
@@ -79,6 +80,7 @@ export const SelectedItemPure = (props: SelectedItemProps) => {
 
   return (
     <TooltipContainer
+      {...pickAriaProps(props)}
       as="div"
       onClick={handleOnClick}
       className={selectedItemClassNames}

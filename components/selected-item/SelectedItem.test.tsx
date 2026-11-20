@@ -30,6 +30,22 @@ const renderWithHandlers = () => {
 };
 
 describe("<SelectedItem />", () => {
+  it("puts a passed aria-* on the chip and keeps its own aria-pressed", () => {
+    render(
+      <SelectedItem
+        {...baseProps}
+        clickable
+        isActive
+        hideCross
+        aria-label="Filter: documents"
+        aria-pressed={false}
+      />,
+    );
+
+    const chip = screen.getByRole("button", { name: "Filter: documents" });
+    expect(chip).toHaveAttribute("aria-pressed", "true");
+  });
+
   it("renders without error", () => {
     render(<SelectedItem {...baseProps} />);
 

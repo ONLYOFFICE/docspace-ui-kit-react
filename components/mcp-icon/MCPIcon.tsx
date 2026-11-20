@@ -2,11 +2,12 @@ import { isValidElement, useState } from "react";
 import classNames from "classnames";
 
 import { Text } from "../text";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import { MCPIconSize } from "./MCPIcon.enum";
 import styles from "./MCPIcon.module.scss";
 
-export type MCPIconProps = {
+export type MCPIconProps = React.AriaAttributes & {
   /** Name of the server. It is the icon's accessible name, with or without an image; its first character is drawn while there is no image. */
   title: string;
   /** One of the four square sizes: 16, 24, 32 or 48px, each with its own font size and corner radius.
@@ -62,16 +63,19 @@ export const MCPIcon = (props: MCPIconProps) => {
 
   const onImageError = () => setFailedSource(source);
 
-  const name = title?.trim();
+  const aria = pickAriaProps(props);
+  const label = aria["aria-label"] ?? (title?.trim() || undefined);
+  const isNamed = !!label || !!aria["aria-labelledby"];
 
   // The tile is one image named after the server; what is inside it - the
   // picture or the letter - is hidden from assistive technology.
   return (
     <div
+      {...aria}
       data-testid={dataTestId}
-      role={name ? "img" : undefined}
-      aria-label={name || undefined}
-      aria-hidden={name ? undefined : true}
+      role={isNamed ? "img" : undefined}
+      aria-label={label}
+      aria-hidden={isNamed ? aria["aria-hidden"] : true}
       className={classNames(className, styles.mcpIcon, styles[size], {
         [styles.withText]: !showImg,
       })}

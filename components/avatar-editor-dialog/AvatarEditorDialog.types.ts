@@ -1,7 +1,7 @@
 import type { TTranslation } from "../../utils";
 import type { TImage, TChangeImage } from "../image-editor/ImageEditor.types";
 
-export type AvatarEditorDialogProps = {
+export type AvatarEditorDialogProps = React.AriaAttributes & {
   /** Translation function, asked for `Common:SaveButton`, `Common:CancelButton` and `Common:ChooseAnother`. */
   t: TTranslation;
   /** Puts the dialog on screen; while false it stays mounted but hidden. */

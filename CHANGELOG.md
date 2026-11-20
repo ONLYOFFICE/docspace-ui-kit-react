@@ -295,6 +295,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Added
 
+- **`CategoryItem` takes `className` and `style`**, both on its outer element. It took neither,
+  so its variables could only be set on an ancestor
 - **`PortalLogo` takes `dataTestId`**, `portal-logo` by default, on the wrapper or on the
   fallback logo that replaces it. It carried no test id at all
 - **`ComboBox` and `AccessRightSelect` take `ariaLabel`**, the accessible name of the button.
@@ -340,6 +342,20 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`Avatar`, `RoomType`, `SelectedItem` and `CategoryItem` forward a passed `aria-*` to the
+  element with the role**: the avatar's button, the row, the chip and the title link. Each
+  dropped every one. A passed `aria-label` wins over `userName`, the row's text, the chip's label
+  and the title; `aria-expanded`, `aria-pressed` and a disabled row's `aria-disabled` stay the
+  component's
+- **`AvatarEditorDialog` and `RoomLogoCoverDialog` forward a passed `aria-*` to the dialog**, so
+  `aria-label` or `aria-labelledby` can name it. Neither dialog had a name, nor a way to give one
+- **`ImageEditor` forwards a passed `aria-*` to its region.** A passed `aria-label` replaces the
+  English "Image editor"
+- **`PortalLogo` and `MCPIcon` forward a passed `aria-*` to their image.** A passed `aria-label`
+  wins over `alt` and `title`, and a passed `aria-hidden` lets `MCPIcon` stay silent beside the
+  server's name in text
+- **`RoomIcon` and `RoomLogo` forward a passed `aria-*` to their outer element.** Each dropped
+  every one. Neither element has a role, so a name there is not read; `aria-hidden` works
 - **`Row`, `RowContainer`, `RowContent` and every part of the table forward a passed `aria-*` to
   their outer element.** Each dropped every one. None of those elements has a role, so a name
   there is not read

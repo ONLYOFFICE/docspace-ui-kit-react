@@ -8,6 +8,7 @@ import PlusSvgUrl from "../../assets/icons/16/button.plus.react.svg";
 import TemplateRoomIcon from "../../assets/template-room-icon.react.svg";
 
 import { useClickOutside, getTextColor } from "../../utils";
+import { pickAriaProps } from "../../utils/aria-props";
 import { ROOM_ACTION_KEYS } from "../../constants";
 
 import { useInterfaceDirection, useTheme } from "../../context";
@@ -48,6 +49,7 @@ const RoomIcon = ({
   tooltipId,
   isTemplate = false,
   dataTestId,
+  ...rest
 }: RoomIconProps) => {
   const [correctImage, setCorrectImage] = React.useState(true);
   const [openEditLogo, setOpenLogoEdit] = React.useState(false);
@@ -196,6 +198,7 @@ const RoomIcon = ({
   return (
     <>
       <div
+        {...pickAriaProps(rest)}
         ref={iconRef}
         className={classNames(
           {

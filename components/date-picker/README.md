@@ -197,8 +197,8 @@ with a fixed grey that no variable reaches.
   nothing announces that the calendar can be reopened.
 - **A passed `aria-*` lands on the select-date control and is kept.** A passed `aria-label` wins
   over `selectDateText`; `aria-expanded` stays the component's.
-- **Once a date is chosen, the chip carries none of them.** It is a `SelectedItem`, which takes
-  no `aria-*`.
+- **Once a date is chosen, the chip carries none of them.** It is a `SelectedItem` with no role,
+  so the picker does not hand them on.
 
 ## Test ids
 

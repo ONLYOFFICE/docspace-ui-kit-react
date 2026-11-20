@@ -99,7 +99,8 @@ type RoomIconNonBadge = {
   onBadgeClick?: undefined;
 };
 
-export type RoomIconProps = RoomIconDefault &
+export type RoomIconProps = React.AriaAttributes &
+  RoomIconDefault &
   RoomIconExpansion &
   (RoomIconColor | RoomIconImage) &
   (RoomIconBadge | RoomIconNonBadge);

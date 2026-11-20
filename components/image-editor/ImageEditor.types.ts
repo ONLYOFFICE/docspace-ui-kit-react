@@ -13,7 +13,7 @@ export type TImage = {
 export type TChangeImage = (image: TImage) => void;
 export type TSetPreview = (preview: string) => void;
 
-export type ImageEditorProps = {
+export type ImageEditorProps = React.AriaAttributes & {
   /** Translation function, asked for the replace control's label, `Common:ChooseAnother`. */
   t: TTranslation;
   /** The picture and its crop, held in your state. The whole editor renders nothing while `uploadedFile` is empty. */

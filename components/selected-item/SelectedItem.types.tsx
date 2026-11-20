@@ -1,4 +1,4 @@
-export interface SelectedItemProps {
+export interface SelectedItemProps extends React.AriaAttributes {
   /** Text of the chip. A falsy label renders nothing at all. */
   label: React.ReactNode;
   /** Whether the chip shrinks to its content. Without it the chip fills the width of its container. */

@@ -23,6 +23,7 @@ import VirtualDataTemplateSvg from "../../assets/icons/32/template/virtual-data.
 import { RoomsType } from "../../enums";
 
 import { Checkbox } from "../checkbox";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import type { RoomLogoProps } from "./RoomLogo.types";
 import styles from "./RoomLogo.module.scss";
@@ -40,6 +41,7 @@ const RoomLogoPure = ({
   isIndeterminate = false,
   isTemplateRoom = false,
   onChange,
+  ...rest
 }: RoomLogoProps) => {
   const getIcon = (): React.FC<React.SVGProps<SVGSVGElement>> | null => {
     if (isArchive) {
@@ -109,6 +111,7 @@ const RoomLogoPure = ({
 
   return (
     <div
+      {...pickAriaProps(rest)}
       id={id}
       className={classNames(className, styles.container)}
       style={style}

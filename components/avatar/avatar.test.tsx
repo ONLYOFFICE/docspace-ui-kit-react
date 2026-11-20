@@ -28,6 +28,20 @@ describe("<Avatar />", () => {
     vi.clearAllMocks();
   });
 
+  it("puts a passed aria-* on the avatar, whose passed name wins", () => {
+    render(
+      <Avatar
+        {...baseProps}
+        onClick={vi.fn()}
+        aria-label="Open profile"
+        aria-describedby="profile-hint"
+      />,
+    );
+
+    const avatar = screen.getByRole("button", { name: "Open profile" });
+    expect(avatar).toHaveAttribute("aria-describedby", "profile-hint");
+  });
+
   it("renders avatar with default props", () => {
     render(<Avatar {...baseProps} />);
     expect(screen.getByTestId("avatar")).toBeInTheDocument();
