@@ -29,6 +29,22 @@ describe("DatePicker tests", () => {
     vi.clearAllMocks();
   });
 
+  it("puts a passed aria-* on the select-date button", () => {
+    render(
+      <DatePicker
+        {...defaultProps}
+        aria-label="Due date"
+        aria-describedby="due-hint"
+        aria-expanded
+      />,
+    );
+
+    const button = screen.getByRole("button", { name: "Due date" });
+    expect(button).toHaveAttribute("aria-describedby", "due-hint");
+    // Whether the calendar is open is the component's to say.
+    expect(button).toHaveAttribute("aria-expanded", "false");
+  });
+
   it("renders without selected date", () => {
     render(<DatePicker {...defaultProps} />);
 

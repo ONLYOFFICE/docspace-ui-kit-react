@@ -1,7 +1,7 @@
 import type { DateTime } from "luxon";
 import type { Nullable } from "../../types";
 
-export type DatePickerProps = {
+export type DatePickerProps = React.AriaAttributes & {
   /**
    * Text of the button shown while no date is chosen.
    * @default "Select date"

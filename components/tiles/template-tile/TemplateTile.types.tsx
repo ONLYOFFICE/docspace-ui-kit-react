@@ -25,7 +25,7 @@ export type SpaceQuotaProps = {
   className?: string;
 };
 
-export type TemplateTileProps = {
+export type TemplateTileProps = React.AriaAttributes & {
   /** Ticks the checkbox and keeps it in place of the icon, and tints the
    * tile. */
   checked?: boolean;

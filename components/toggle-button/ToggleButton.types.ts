@@ -35,6 +35,7 @@ export type ToggleIconProps = Pick<
 /** Props for the main ToggleButton component */
 export type ToggleButtonProps = PickedTextProps &
   ElementProps &
+  Omit<React.AriaAttributes, "aria-checked"> &
   InputProps & {
     /** Text rendered beside the switch, in a `Text` span. Omit it and the
      * component is the 28×16 switch alone. */

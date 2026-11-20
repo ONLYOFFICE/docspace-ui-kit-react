@@ -81,4 +81,6 @@ type TimePickerHourFormat =
       meridiem?: string;
     };
 
-export type TimePickerProps = TimePickerBase & TimePickerHourFormat;
+export type TimePickerProps = React.AriaAttributes &
+  TimePickerBase &
+  TimePickerHourFormat;

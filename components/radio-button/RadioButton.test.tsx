@@ -19,6 +19,18 @@ describe("<RadioButton />", () => {
     expect(screen.getByText("Sweet apple")).toBeInTheDocument();
   });
 
+  it("puts a passed aria-* on the radio input", () => {
+    renderComponent({
+      "aria-describedby": "fruit-hint",
+      "aria-label": "Apple",
+    });
+
+    expect(screen.getByRole("radio", { name: "Apple" })).toHaveAttribute(
+      "aria-describedby",
+      "fruit-hint",
+    );
+  });
+
   it("handles checked state correctly", () => {
     renderComponent({ isChecked: true });
 

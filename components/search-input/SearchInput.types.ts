@@ -3,7 +3,7 @@ import React from "react";
 import { InputSize } from "../text-input";
 import type { MainButtonProps } from "../main-button/MainButton.types";
 
-export type SearchInputProps = {
+export type SearchInputProps = React.AriaAttributes & {
   /** Id set on both the outer element and the `<input>`. */
   id?: string;
   /** Ref to the `<input>`. */

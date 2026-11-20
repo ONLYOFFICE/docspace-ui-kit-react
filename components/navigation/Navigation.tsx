@@ -14,6 +14,7 @@ import NavigationText from "./sub-components/Text";
 
 import { DeviceType } from "../../enums";
 import styles from "./Navigation.module.scss";
+import { omitAriaProps, pickAriaProps } from "../../utils/aria-props";
 import { TNavigationProps } from "./Navigation.types";
 import Badges from "./sub-components/Badges";
 
@@ -230,7 +231,7 @@ const Navigation = ({
               />
 
               <DropBox
-                {...rest}
+                {...omitAriaProps(rest)}
                 isDesktop={isDesktop}
                 ref={dropBoxRef}
                 dropBoxWidth={dropBoxWidth}
@@ -259,6 +260,7 @@ const Navigation = ({
             </>
           ) : null}
           <div
+            {...pickAriaProps(rest)}
             ref={containerRef}
             className={styles.container}
             data-is-root-folder={isRootFolder ? "true" : "false"}

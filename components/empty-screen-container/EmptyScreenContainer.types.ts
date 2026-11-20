@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 
-export type EmptyScreenContainerProps = {
+export type EmptyScreenContainerProps = React.AriaAttributes & {
   /** Source of the illustration. The stylesheet pins the image to 200×140, and to 150×105 below 600px, so supply artwork of that shape. */
   imageSrc: string;
   /** Alternative text for the illustration. Pass an empty string when the artwork repeats what the text below already says. */

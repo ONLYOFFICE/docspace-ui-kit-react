@@ -10,7 +10,7 @@ type HeaderIcon = {
   onClick: () => void;
 };
 
-export type AsideHeaderProps = {
+export type AsideHeaderProps = React.AriaAttributes & {
   /** Applied to the header element. */
   className?: string;
   /** Applied to the header element. */

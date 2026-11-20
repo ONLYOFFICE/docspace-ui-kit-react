@@ -140,6 +140,8 @@ export type SectionBodyProps = {
 };
 
 export type SectionContainerProps = {
+  /** The `aria-*` attributes passed to the section, set on the container. */
+  aria?: React.AriaAttributes;
   /** Not read by the section: it keeps its own ref on the container. */
   ref?: React.RefObject<HTMLDivElement | null>;
   isSectionHeaderAvailable: boolean;
@@ -184,7 +186,8 @@ export type SectionSubmenuProps = {
   children: React.ReactNode;
 };
 
-export type SectionProps = Omit<SubInfoPanelHeaderProps, "children"> &
+export type SectionProps = React.AriaAttributes &
+  Omit<SubInfoPanelHeaderProps, "children"> &
   Omit<SectionSubmenuProps, "children"> &
   Omit<SubInfoPanelBodyProps, "children"> &
   Omit<SectionWarningProps, "children"> &

@@ -97,6 +97,35 @@ describe("<ProgressBar />", () => {
     expect(screen.queryByText("Uploading")).toBeNull();
   });
 
+  it("keeps a passed aria-label over label, and a passed aria-describedby", () => {
+    render(
+      <ProgressBar
+        {...defaultProps}
+        label="Uploading"
+        aria-label="Uploading report.docx"
+        aria-describedby="upload-hint"
+      />,
+    );
+    const bar = screen.getByRole("progressbar", {
+      name: "Uploading report.docx",
+    });
+    expect(bar).toHaveAttribute("aria-describedby", "upload-hint");
+  });
+
+  it("keeps a passed aria-busy unless infinite, and its own values over passed ones", () => {
+    const { rerender } = render(
+      <ProgressBar {...defaultProps} aria-busy aria-valuenow={10} />,
+    );
+    const bar = screen.getByRole("progressbar");
+    expect(bar).toHaveAttribute("aria-busy", "true");
+    expect(bar).toHaveAttribute("aria-valuenow", "50");
+
+    rerender(
+      <ProgressBar {...defaultProps} isInfiniteProgress aria-busy={false} />,
+    );
+    expect(bar).toHaveAttribute("aria-busy", "true");
+  });
+
   it("applies custom className when provided", () => {
     const customClass = "custom-progress";
     render(<ProgressBar {...defaultProps} className={customClass} />);

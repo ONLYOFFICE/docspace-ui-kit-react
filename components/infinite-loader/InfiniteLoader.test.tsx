@@ -26,6 +26,16 @@ const defaultProps = {
 };
 
 describe("InfiniteLoader Component", () => {
+  it("names the virtual grid with a passed aria-label", () => {
+    const { container } = render(
+      <InfiniteLoaderComponent {...defaultProps} aria-label="Files" />,
+    );
+    expect(container.querySelector(".ReactVirtualized__List")).toHaveAttribute(
+      "aria-label",
+      "Files",
+    );
+  });
+
   it("renders without crashing", () => {
     const { container } = render(<InfiniteLoaderComponent {...defaultProps} />);
     expect(container).toBeInTheDocument();

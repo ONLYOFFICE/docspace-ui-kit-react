@@ -97,6 +97,8 @@ Declared by [`components/text`](../../components/text/README.md) and accepted he
 | `fontSize`   | `string`           | no       | –       | Font size, as an inline style. Unset, `Text` is 13px through `--text-size`.                                   |
 | `fontWeight` | `number \| string` | no       | –       | Font weight, as an inline style. Ignored while `isBold` is set. Unset, `Text` is 400 through `--text-weight`. |
 
+Plus 52 more props inherited from `React.AriaAttributes`, forwarded to the element.
+
 <!-- props:end -->
 
 ## Recipes
@@ -205,9 +207,10 @@ the control itself, so an ancestor's off colours are ignored there.
 - The control is a real `<input type="checkbox">`, visually hidden but focusable, inside a
   `<label>`. A click anywhere on the label toggles it, and a screen reader announces a checkbox
   with its state.
-- **There is no way to give it an accessible name other than `label`.** The component accepts
-  no `aria-*` props, and the one it sets itself, `aria-checked`, is on a plain `<div>` with no
-  role, where it means nothing. A switch without `label` is announced as an unnamed checkbox.
+- **A passed `aria-*` is kept on the checkbox**, and a passed `aria-label` wins over `label`. A
+  switch with neither is announced as an unnamed checkbox.
+- `aria-checked` is not accepted: the native `checked` carries the state. The outer `<div>`
+  carries an `aria-checked` of its own, with no role, where it means nothing.
 - The hidden input is the element that receives focus; its keyboard focus is drawn as a ring
   around the switch. Tab reaches the input and Space toggles it.
 - `isDisabled` disables the input and sets `pointer-events: none` on the control, so it is

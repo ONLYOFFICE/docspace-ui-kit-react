@@ -60,7 +60,7 @@ export type TileItemProps = CommonTileProps & {
   item: TileItem;
 };
 
-export type TileContainerProps = {
+export type TileContainerProps = React.AriaAttributes & {
   /** The tiles. A child without an `item` prop is dropped without a word,
    * plain markup included. */
   children: React.ReactNode;

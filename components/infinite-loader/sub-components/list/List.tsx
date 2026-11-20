@@ -29,6 +29,7 @@ const ListComponent = ({
   scroll,
   infoPanelVisible,
   showSkeleton,
+  "aria-label": ariaLabel,
 }: ListComponentProps) => {
   const loaderRef = useRef<InfiniteLoader | null>(null);
   const listRef = useRef<List | null>(null);
@@ -206,6 +207,7 @@ const ListComponent = ({
                   onScroll={onScroll}
                   viewAs={viewAs}
                   width={width}
+                  aria-label={ariaLabel}
                   // React virtualized sets "LTR" by default.
                   style={
                     {

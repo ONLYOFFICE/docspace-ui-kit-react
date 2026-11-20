@@ -146,6 +146,11 @@ const meta = {
       control: "text",
       description: "Accessible description of the control.",
     },
+    "aria-disabled": {
+      control: false,
+      description:
+        "Marks the control disabled to assistive technology while it still takes clicks and drops. `isDisabled` and `isLoading` set it to `true` over this value.",
+    },
     "data-test-id": {
       control: "text",
       description:

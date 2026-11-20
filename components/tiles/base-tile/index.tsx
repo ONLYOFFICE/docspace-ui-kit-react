@@ -18,6 +18,7 @@ import {
   BaseTileItemProps,
 } from "./BaseTile.types";
 
+import { pickAriaProps } from "../../../utils/aria-props";
 import styles from "./BaseTile.module.scss";
 
 export const BaseTile = ({
@@ -45,6 +46,7 @@ export const BaseTile = ({
   forwardRef,
   dataTestId,
   badgeUrl,
+  ...rest
 }: BaseTileProps) => {
   const t = useCommonTranslation();
   const childrenArray = React.Children.toArray(topContent);
@@ -139,11 +141,12 @@ export const BaseTile = ({
 
   return (
     <div
+      {...pickAriaProps(rest)}
       className={tileClassName}
       onClick={onRoomClick}
       onContextMenu={onContextMenu}
       data-testid={dataTestId ?? "tile"}
-      aria-busy={inProgress || undefined}
+      aria-busy={inProgress || rest["aria-busy"]}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
     >

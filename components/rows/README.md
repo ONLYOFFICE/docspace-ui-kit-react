@@ -169,7 +169,8 @@ load.
 - A click on the content and the index-editing arrows work by pointer only.
 - A list a keyboard user must be able to work through needs [`Table`](../table/README.md) or
   markup of your own.
-- A passed `aria-*` is dropped by all three parts: none of them forwards extra props.
+- **A passed `aria-*` lands on the outer element of each part and is kept.** None of them has a
+  role, so a name there is not read.
 - Each skeleton shape is an SVG with `role="img"`: three per row on desktop, four below it.
   `title` names each through an SVG `<title>`; without it they have no name.
 - The skeletons set no `aria-busy`. Mark the loading region with it yourself.

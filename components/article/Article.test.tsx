@@ -105,6 +105,14 @@ describe("Article", () => {
     setDeviceFlags({ isMobile: false, isMobileOnly: false, isIOS: false });
   });
 
+  it("puts a passed aria-* on the panel", () => {
+    renderComponent({ "aria-describedby": "panel-hint" });
+    expect(screen.getByTestId("article")).toHaveAttribute(
+      "aria-describedby",
+      "panel-hint",
+    );
+  });
+
   it("renders without crashing", () => {
     renderComponent();
     expect(screen.getByTestId("article")).toBeInTheDocument();

@@ -1,4 +1,9 @@
-export interface LoadingButtonProps {
+export interface LoadingButtonProps extends Omit<
+  React.AriaAttributes,
+  "aria-label"
+> {
+  /** Accessible name of the ring's progress bar, in place of `progressLabel`. */
+  "aria-label"?: string;
   /** DOM `id` of the outer 16px square. */
   id?: string;
   /** Added to the outer 16px square, after the component's own class. */

@@ -2,6 +2,7 @@ import React from "react";
 import classNames from "classnames";
 import { TileContainerProps, TileItemProps } from "./TileContainer.types";
 
+import { pickAriaProps } from "../../../utils/aria-props";
 import styles from "./TileContainer.module.scss";
 import { Heading, HeadingSize } from "../../heading";
 
@@ -16,6 +17,7 @@ export const TileContainer = ({
   isDesc,
   style,
   noSelect,
+  ...rest
 }: TileContainerProps) => {
   const Rooms: React.ReactElement[] = [];
   const Folders: React.ReactElement[] = [];
@@ -169,6 +171,7 @@ export const TileContainer = ({
 
   return (
     <div
+      {...pickAriaProps(rest)}
       className={classNames(className, styles.tileContainer, {
         [styles.noSelect]: noSelect,
       })}

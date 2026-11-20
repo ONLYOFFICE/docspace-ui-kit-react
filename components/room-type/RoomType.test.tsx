@@ -14,6 +14,42 @@ const getArrow = (root: HTMLElement) =>
   root.querySelector(".choose_room-forward_btn") as HTMLElement;
 
 describe("<RoomType />", () => {
+  it("puts a passed aria-* on the row and keeps its own aria-disabled", () => {
+    render(
+      <RoomType
+        {...baseProps}
+        roomType={RoomsType.EditingRoom}
+        onClick={vi.fn()}
+        isDisabled
+        aria-label="Create a collaboration room"
+        aria-disabled={false}
+      />,
+    );
+
+    const row = screen.getByRole("button", {
+      name: "Create a collaboration room",
+    });
+    expect(row).toHaveAttribute("aria-disabled", "true");
+  });
+
+  it("keeps its own aria-expanded on the dropdown button", () => {
+    render(
+      <RoomType
+        {...baseProps}
+        type="dropdownButton"
+        roomType={RoomsType.EditingRoom}
+        onClick={vi.fn()}
+        isOpen
+        aria-expanded={false}
+        aria-describedby="type-hint"
+      />,
+    );
+
+    const button = screen.getByTestId("room-type-dropdown-button");
+    expect(button).toHaveAttribute("aria-expanded", "true");
+    expect(button).toHaveAttribute("aria-describedby", "type-hint");
+  });
+
   it("renders the list item by default with the room's title", () => {
     render(
       <RoomType

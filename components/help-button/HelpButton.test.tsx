@@ -83,6 +83,32 @@ describe("<HelpButton />", () => {
     expect(screen.getByTestId("help-button")).toBeInTheDocument();
   });
 
+  it("puts a passed aria-* on the info icon", () => {
+    render(
+      <HelpButton
+        tooltipContent={tooltipContent}
+        aria-label="About storage"
+        aria-describedby="storage-hint"
+      />,
+    );
+    const icon = screen.getByTestId("icon-button");
+    expect(icon).toHaveAttribute("aria-label", "About storage");
+    expect(icon).toHaveAttribute("aria-describedby", "storage-hint");
+    expect(screen.getByTestId("help-button")).not.toHaveAttribute("aria-label");
+  });
+
+  it("puts a passed aria-* on the anchor around children", () => {
+    render(
+      <HelpButton tooltipContent={tooltipContent} aria-label="About storage">
+        <span>Storage</span>
+      </HelpButton>,
+    );
+    expect(screen.getByText("Storage").parentElement).toHaveAttribute(
+      "aria-label",
+      "About storage",
+    );
+  });
+
   it("renders with openOnClick set to false", () => {
     render(<HelpButton tooltipContent={tooltipContent} openOnClick={false} />);
     expect(screen.getByTestId("help-button")).toBeInTheDocument();

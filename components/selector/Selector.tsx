@@ -7,6 +7,7 @@ import classNames from "classnames";
 
 import { ButtonKeys } from "../../enums";
 import { consumeKey } from "../../utils/consume-key";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import { Aside } from "../aside";
 import { Backdrop } from "../backdrop";
@@ -162,6 +163,7 @@ const Selector = ({
   hideBackButton,
 
   displayFileExtension,
+  ...rest
 }: SelectorProps) => {
   const selectorRef = React.useRef<HTMLDivElement>(null);
   const [footerVisible, setFooterVisible] = React.useState<boolean>(false);
@@ -711,6 +713,7 @@ const Selector = ({
 
   const selectorComponent = (
     <div
+      {...pickAriaProps(rest)}
       ref={selectorRef}
       id={id}
       className={classNames(styles.selector, className)}

@@ -12,6 +12,7 @@ import { useCommonTranslation } from "../../utils";
 import { consumeKey } from "../../utils/consume-key";
 
 import styles from "./ColorPicker.module.scss";
+import { pickAriaProps } from "../../utils/aria-props";
 import { ColorPickerProps } from "./ColorPicker.types";
 
 const ColorPicker = ({
@@ -27,6 +28,7 @@ const ColorPicker = ({
   hexCodeLabel = "Hex code",
   ariaLabel = "Color picker",
   closeButtonLabel = "Close color picker",
+  ...rest
 }: ColorPickerProps) => {
   const t = useCommonTranslation();
   const [color, setColor] = useState(() => appliedColor);
@@ -59,8 +61,9 @@ const ColorPicker = ({
       className={classNames(styles.wrapper, className)}
       id={id}
       data-testid="color-picker"
+      {...pickAriaProps(rest)}
       role="group"
-      aria-label={ariaLabel}
+      aria-label={rest["aria-label"] ?? ariaLabel}
       onKeyDown={onKeyDown}
     >
       {isPickerOnly ? (

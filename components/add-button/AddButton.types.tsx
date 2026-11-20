@@ -1,4 +1,4 @@
-export type AddButtonProps = {
+export type AddButtonProps = React.AriaAttributes & {
   /** Tooltip shown on hover, through the kit's own tooltip rather than the browser's. */
   title?: string;
   /** Called with the event when the square or the label is clicked, and on Enter or Space when the wrapper has focus. */

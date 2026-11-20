@@ -39,6 +39,19 @@ describe("ImageEditor", () => {
     vi.clearAllMocks();
   });
 
+  it("puts a passed aria-* on the region, whose passed name wins", () => {
+    render(
+      <ImageEditor
+        {...defaultProps}
+        aria-label="Logo editor"
+        aria-describedby="logo-hint"
+      />,
+    );
+
+    const region = screen.getByRole("region", { name: "Logo editor" });
+    expect(region).toHaveAttribute("aria-describedby", "logo-hint");
+  });
+
   it("renders without crashing", () => {
     render(<ImageEditor {...defaultProps} />);
   });

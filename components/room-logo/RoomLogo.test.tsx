@@ -16,6 +16,15 @@ const baseProps = {
 };
 
 describe("<RoomLogo />", () => {
+  it("puts a passed aria-* on the outer element", () => {
+    render(<RoomLogo {...baseProps} aria-label="Collaboration room" />);
+
+    expect(screen.getByTestId("room-logo")).toHaveAttribute(
+      "aria-label",
+      "Collaboration room",
+    );
+  });
+
   it("renders without error", () => {
     render(<RoomLogo {...baseProps} />);
     expect(screen.getByTestId("room-logo")).toBeInTheDocument();

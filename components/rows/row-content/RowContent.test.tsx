@@ -48,6 +48,19 @@ const sideLink = (
 );
 
 describe("<RowContent />", () => {
+  it("puts a passed aria-* on the content", () => {
+    render(
+      <RowContent aria-describedby="content-hint">
+        <span>Main</span>
+        <span>Side</span>
+      </RowContent>,
+    );
+    expect(screen.getByTestId("row-content")).toHaveAttribute(
+      "aria-describedby",
+      "content-hint",
+    );
+  });
+
   it("renders without error", () => {
     render(
       <RowContent>

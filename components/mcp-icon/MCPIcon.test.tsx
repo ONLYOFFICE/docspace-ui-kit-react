@@ -10,6 +10,25 @@ describe("<MCPIcon />", () => {
     return render(<MCPIcon title="Test" {...props} />);
   };
 
+  it("takes a passed name over title and keeps the other aria-*", () => {
+    renderComponent({
+      "aria-label": "Hugging Face server",
+      "aria-describedby": "server-hint",
+    });
+
+    const icon = screen.getByRole("img", { name: "Hugging Face server" });
+    expect(icon).toHaveAttribute("aria-describedby", "server-hint");
+  });
+
+  it("is hidden by a passed aria-hidden though it has a title", () => {
+    renderComponent({ "aria-hidden": true });
+
+    expect(screen.getByTestId("mcp-icon")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+  });
+
   it("renders MCPIcon component without errors", () => {
     renderComponent();
     const iconElement = screen.getByTestId("mcp-icon");

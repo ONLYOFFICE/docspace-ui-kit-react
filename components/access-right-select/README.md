@@ -136,6 +136,8 @@ Declared by [`components/combobox`](../../components/combobox/README.md) and acc
 | `withBlur`              | `boolean`                                                                             | no       | –                   | Ignored. It reaches the list, which does not read it either.                                                                                            |
 | `withoutBackground`     | `boolean`                                                                             | no       | –                   | Makes that backdrop transparent.                                                                                                                        |
 
+Plus 53 more props inherited from `React.AriaAttributes`, forwarded to the element.
+
 <!-- props:end -->
 
 ## Recipes
@@ -271,8 +273,9 @@ which renders the list in place. With the portal, set them on `body` or `:root`.
 - **The refusal message is a toast**, which is easy to miss and is not tied to the control.
 - The second line of each row is plain text, not a description associated with the option. It
   is read as part of the row rather than as help.
-- The button is named by the chosen level. Pass `ariaLabel` to say what is being chosen; any
-  other `aria-*` is dropped.
+- The button is named by the chosen level. Pass `ariaLabel` to say what is being chosen.
+- A passed `aria-*` lands on the button and is kept, as on a combo box. The open state is the
+  component's.
 
 ## Test ids
 

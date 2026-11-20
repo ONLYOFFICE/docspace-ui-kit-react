@@ -27,6 +27,29 @@ describe("CategoryItem", () => {
     vi.clearAllMocks();
   });
 
+  it("puts a passed aria-* on the title link", () => {
+    render(<CategoryItem {...defaultProps} aria-describedby="sso-hint" />);
+
+    expect(
+      screen.getByRole("link", { name: defaultProps.title }),
+    ).toHaveAttribute("aria-describedby", "sso-hint");
+  });
+
+  it("puts className and style on the outer element", () => {
+    render(
+      <CategoryItem
+        {...defaultProps}
+        dataTestId="sso"
+        className="sso-row"
+        style={{ marginTop: "8px" }}
+      />,
+    );
+
+    const row = screen.getByTestId("sso");
+    expect(row).toHaveClass("sso-row");
+    expect(row).toHaveStyle({ marginTop: "8px" });
+  });
+
   it("renders with default props", () => {
     render(<CategoryItem {...defaultProps} />);
 

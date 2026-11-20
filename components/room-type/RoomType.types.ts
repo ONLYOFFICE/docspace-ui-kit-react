@@ -1,7 +1,7 @@
 import type React from "react";
 import type { RoomsType } from "../../enums";
 
-export type RoomTypeProps = {
+export type RoomTypeProps = React.AriaAttributes & {
   /** Which room type the row describes: its glyph, title and description. An unknown value, or none, leaves both texts and the glyph box empty. */
   roomType?: RoomsType;
   /** Whether the row is drawn as opened: an accent border on `dropdownButton`, and its arrow turned the other way. */

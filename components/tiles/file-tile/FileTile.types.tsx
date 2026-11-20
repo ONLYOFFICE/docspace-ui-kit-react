@@ -46,7 +46,7 @@ export type FileItemType = {
   contextOptions?: string[];
 };
 
-export type FileTileProps = {
+export type FileTileProps = React.AriaAttributes & {
   /** Ticks the checkbox, shows it in place of the icon and tints the whole tile. The tile holds no state; pass back what `onSelect` reports. */
   checked?: boolean;
   /** The tile's content. Only the first element is rendered, in the row beside the icon; the rest are dropped. */

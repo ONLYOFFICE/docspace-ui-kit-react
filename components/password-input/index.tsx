@@ -21,6 +21,7 @@ import { InputSize, InputType } from "../text-input";
 import { PasswordInputProps, TPasswordSettings } from "./PasswordInput.types";
 import { globalColors } from "../../providers/theme";
 import { useCommonTranslation } from "../../utils";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import {
   usePasswordGenerator,
@@ -92,7 +93,9 @@ const PasswordInput = ({
   // clipPasswordResource = "Password ",
   simulateSymbol = "•",
   sanitizeValue,
+  ...rest
 }: PasswordInputProps) => {
+  const ariaProps = pickAriaProps(rest);
   const refTooltip = useRef(null);
 
   const usePrevious = (value: string) => {
@@ -390,6 +393,7 @@ const PasswordInput = ({
     return (
       <>
         <InputBlock
+          {...ariaProps}
           id={id}
           className="input-relative"
           name={inputName}

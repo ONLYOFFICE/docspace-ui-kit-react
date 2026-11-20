@@ -17,6 +17,7 @@ import { Text } from "../text";
 import { Avatar, AvatarRole, AvatarSize } from "../avatar";
 import { IconButton } from "../icon-button";
 import { Portal } from "../portal";
+import { pickAriaProps } from "../../utils/aria-props";
 import { RoomIcon } from "../room-icon";
 
 import { SubMenu } from "./sub-components/SubMenu";
@@ -660,6 +661,7 @@ const ContextMenu = (props: ContextMenuProps) => {
           onExited={onExited}
         >
           <div
+            {...pickAriaProps(props)}
             ref={menuRef}
             id={id}
             className={currentClassName}

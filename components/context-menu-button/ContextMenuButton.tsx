@@ -11,6 +11,7 @@ import { consumeKey } from "../../utils/consume-key";
 import { keyboardClickAt } from "../../utils/keyboard-activation";
 import { useInterfaceDirection } from "../../context/InterfaceDirectionContext";
 import { useCommonTranslation } from "../../utils/i18n";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import { DropDownItem } from "../drop-down-item";
 import { DropDown } from "../drop-down";
@@ -63,7 +64,9 @@ const ContextMenuButtonPure = ({
   iconName,
   fixedDirection = false,
   testId,
+  ...rest
 }: ContextMenuButtonProps) => {
+  const aria = pickAriaProps(rest);
   const { isRTL } = useInterfaceDirection();
   const t = useCommonTranslation();
   const ref = React.useRef<HTMLDivElement | null>(null);
@@ -409,6 +412,7 @@ const ContextMenuButtonPure = ({
         onMouseLeave={onMouseLeave}
         title={title}
         tabIndex={isDisabled ? -1 : 0}
+        {...aria}
         {...{
           ref: buttonRef,
           role: "button",
@@ -417,10 +421,20 @@ const ContextMenuButtonPure = ({
         }}
         // A focusable button needs a name even when the caller passes no
         // `title`, or a screen reader announces only "button, menu".
-        aria-label={title || t("MoreOptions") || "More options"}
-        aria-haspopup={isDropdown ? "menu" : undefined}
-        aria-expanded={isDropdown ? state.isOpen : undefined}
-        aria-controls={isDropdown && state.isOpen ? menuId : undefined}
+        aria-label={
+          aria["aria-label"] ?? (title || t("MoreOptions") || "More options")
+        }
+        aria-disabled={isDisabled || (aria["aria-disabled"] ?? false)}
+        // Toggle mode renders no menu, so the caller's menu state is kept.
+        aria-haspopup={isDropdown ? "menu" : aria["aria-haspopup"]}
+        aria-expanded={isDropdown ? state.isOpen : aria["aria-expanded"]}
+        aria-controls={
+          isDropdown
+            ? state.isOpen
+              ? menuId
+              : undefined
+            : aria["aria-controls"]
+        }
       />{" "}
       {state.displayType === ContextMenuButtonDisplayType.dropdown ? (
         <DropDown

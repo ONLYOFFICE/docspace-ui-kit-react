@@ -1,6 +1,6 @@
 import type { RoomsType } from "../../enums";
 
-export interface RoomLogoProps {
+export interface RoomLogoProps extends React.AriaAttributes {
   /** Which room type's glyph to draw. An unknown value, or none, renders an empty box of the logo's size. */
   type?: RoomsType;
   /** Ignored. Nothing reads this prop; there is no privacy glyph in the folder. */

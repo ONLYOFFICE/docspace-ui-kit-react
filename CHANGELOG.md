@@ -8,6 +8,23 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **`Button` keeps a passed `aria-label`, `aria-disabled` and `aria-busy`.** All three were
+  overwritten: the name always came from `label`, so an icon-only button could not be named. A
+  passed `aria-label` now wins over `label`, which stays the fallback. `isDisabled` and
+  `isLoading` still set the other two to `true`. Drop an `aria-label` that only repeats `label`
+  in another language, or the button is named in that language
+- **`ProgressBar` keeps a passed `aria-label` and `aria-busy`.** Both were overwritten: the name
+  always came from `label`, and `aria-busy` was dropped unless `isInfiniteProgress` was set. A
+  passed `aria-label` now wins over `label`, which stays the fallback
+- **`AddButton` puts a passed `aria-*` on the wrapper that has the role.** It landed on the inner
+  square, a `<div>` with no role, so it could not name or describe the button. A passed
+  `aria-disabled` and `aria-busy` are kept unless `isDisabled` or `isLoading` sets them. Read them
+  from `selector-add-button-container`, not from the square
+- **`Tabs` puts a passed `aria-*` on the tab list.** It landed on the outer `<div>`, so the tab
+  list could not be named. Name it with `aria-label` or `aria-labelledby`; read the attributes
+  from the `tablist`, not from the wrapper
+- **`TabItem` keeps its own `aria-selected` over a passed one.** The rest of the props were spread
+  after it, so a passed `aria-selected` won over the pill's state
 - **`ThemeProviderComponent` hands the page back when it unmounts.** It left `data-theme`,
   `data-dir`, the body classes and every custom property behind. Now the provider mounted last
   writes the page, and when it goes the one around it writes again, or the page returns to what it
@@ -278,6 +295,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Added
 
+- **`CategoryItem` takes `className` and `style`**, both on its outer element. It took neither,
+  so its variables could only be set on an ancestor
 - **`PortalLogo` takes `dataTestId`**, `portal-logo` by default, on the wrapper or on the
   fallback logo that replaces it. It carried no test id at all
 - **`ComboBox` and `AccessRightSelect` take `ariaLabel`**, the accessible name of the button.
@@ -323,6 +342,90 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`Avatar`, `RoomType`, `SelectedItem` and `CategoryItem` forward a passed `aria-*` to the
+  element with the role**: the avatar's button, the row, the chip and the title link. Each
+  dropped every one. A passed `aria-label` wins over `userName`, the row's text, the chip's label
+  and the title; `aria-expanded`, `aria-pressed` and a disabled row's `aria-disabled` stay the
+  component's
+- **`AvatarEditorDialog` and `RoomLogoCoverDialog` forward a passed `aria-*` to the dialog**, so
+  `aria-label` or `aria-labelledby` can name it. Neither dialog had a name, nor a way to give one
+- **`ImageEditor` forwards a passed `aria-*` to its region.** A passed `aria-label` replaces the
+  English "Image editor"
+- **`PortalLogo` and `MCPIcon` forward a passed `aria-*` to their image.** A passed `aria-label`
+  wins over `alt` and `title`, and a passed `aria-hidden` lets `MCPIcon` stay silent beside the
+  server's name in text
+- **`RoomIcon` and `RoomLogo` forward a passed `aria-*` to their outer element.** Each dropped
+  every one. Neither element has a role, so a name there is not read; `aria-hidden` works
+- **`Row`, `RowContainer`, `RowContent` and every part of the table forward a passed `aria-*` to
+  their outer element.** Each dropped every one. None of those elements has a role, so a name
+  there is not read
+- **Every tile forwards a passed `aria-*` to its outer element.** `BaseTile`, `FolderTile`,
+  `RoomTile`, `TemplateTile`, `TileContainer` and `TileContent` dropped them; `FileTile` already
+  passed them on and now declares them. `inProgress` still sets `aria-busy` over a passed value
+- **`Filter`, `Paging` and `Selector` forward a passed `aria-*` to their outer element.** Each
+  dropped every one
+- **`Dropzone` forwards a passed `aria-*` to its drop area**, the library's `role="button"`. A
+  passed `aria-label` wins over the English "File upload area" or "Folder upload area"
+- **`InfiniteLoader` names its virtual grid with a passed `aria-label`.** react-virtualized named
+  it `grid` and forwards no other `aria-*`
+- **`ModalDialog` puts every passed `aria-*` on the dialog.** Beyond `aria-label`,
+  `aria-labelledby` and `aria-describedby` they went to the header, which dropped them. The
+  header gets none now; `aria-modal` stays the component's
+- **`DropDown` and `ContextMenu` forward a passed `aria-*` to the menu.** Both dropped every one;
+  `DropDown` lets a passed `aria-label` win over `ariaLabel`. `ContextMenu` puts it on the panel
+  that takes `id`. `LinkWithDropdown` keeps the attributes on its link and off its list
+- **`NavMenu` and `QuickActions` forward a passed `aria-*` to their landmark and toolbar.** Both
+  dropped every one, so neither the `<nav>` nor the `toolbar` could be named
+- **`Card` and `CollapsibleCard` forward a passed `aria-*`.** `Card` puts it on its `<section>`,
+  which a name makes a `region` landmark, and `CollapsibleCard` on its toggle button
+- **`Article`, `Section`, `Navigation`, `AsideHeader`, `ColumnarInfoBar`, `EmptyView` and
+  `EmptyScreenContainer` forward a passed `aria-*` to their outer element.** Each dropped every
+  one. None of those elements has a role, so a name there is not read
+- **`ComboBox` and `AccessRightSelect` forward a passed `aria-*` to the button.** Both dropped
+  every one but `ariaLabel`. A passed `aria-label` wins over `ariaLabel`; the open state and
+  `aria-disabled` while `isDisabled` stay the component's
+- **`ColorPicker`, `TimePicker` and `Tags` forward a passed `aria-*` to their group.** Each took
+  only `ariaLabel`, which a passed `aria-label` now wins over
+- **`RadioButton` and `RadioButtonGroup` forward a passed `aria-*`.** The button puts it on its
+  input, and the group on its `radiogroup`, which can be named at last
+- **`DateTimePicker` is a named group, and forwards a passed `aria-*` to it.** Its
+  `selectDateText` name sat on a `<div>` with no role, where screen readers ignore it
+- **`DatePicker` forwards a passed `aria-*` to the select-date control, and `Calendar` to its
+  outer element.** Both dropped every one. A passed `aria-label` wins over `selectDateText`
+- **`Loader`, `AppLoader`, `LoaderWrapper`, `StatusMessage` and `Tag` forward a passed
+  `aria-*`.** Each dropped every one. The loaders put it on their status region, and `Tag` lets
+  a passed `aria-label` win over `label`
+- **`FloatingButton`, `OperationsProgressButton` and `MainButtonMobile` forward a passed `aria-*`
+  to the circle.** All three dropped it, so the badge could only be named after its icon in
+  English. A passed `aria-label` wins over `label`, and names the progress bar too. Pass a
+  translated `aria-label` to `MainButtonMobile`
+- **`ContextMenuButton` forwards a passed `aria-*` to its button.** It was dropped. A passed
+  `aria-label` wins over `title`. In `toggle` mode a passed `aria-haspopup`, `aria-expanded` and
+  `aria-controls` are kept, to describe the menu `onClick` opens
+- **`LoadingButton` forwards a passed `aria-*` to its progress bar.** It was dropped. A passed
+  `aria-label` wins over `progressLabel`, and the component keeps its own value attributes
+- **`ToggleButton` and `TwoStateToggle` forward a passed `aria-*` to the control.** Both dropped
+  it. `ToggleButton` puts it on its checkbox and `TwoStateToggle` on its switch, where a passed
+  `aria-label` wins over `label` and `ariaLabel`. The checked state stays the component's
+- **`HelpButton` forwards a passed `aria-*` to its anchor.** It was dropped. It lands on the info
+  icon, or on the element around `children`
+- **`QuantityPicker` forwards a passed `aria-*` to the number field.** It was dropped, so the
+  field could not be named. Pass `aria-label` or `aria-labelledby` to name it
+- **`PasswordInput` and `SearchInput` forward a passed `aria-*` to the `<input>`.** Both dropped
+  it. `PasswordInput`'s type took every input attribute but handed the field none, and
+  `SearchInput`'s type took no `aria-*` at all. Name either field with `aria-label` or
+  `aria-labelledby`
+- **`Textarea` and `Slider` forward every passed `aria-*`.** `Textarea` kept only `aria-label`,
+  `aria-labelledby` and `aria-describedby`, and `Slider` those and `aria-valuetext`; the rest were
+  dropped. `Slider` leaves out `aria-valuenow`, `aria-valuemin` and `aria-valuemax`, which the
+  native range reports from `value`, `min` and `max`
+- **`ColorInput` forwards a passed `aria-*` to its hex field.** It dropped every one, so the field
+  could be named only through `inputLabel`. A passed `aria-label` wins over `inputLabel`, and
+  `hasError` still sets `aria-invalid` to `true` over a passed value
+- **`Label` forwards a passed `aria-*` to the `<label>`.** It dropped every one
+- **`FileInput` takes every `aria-*` in its type and keeps `aria-disabled` while inert.** The type
+  took only `aria-label` and `aria-description`, though the wrapper received any `aria-*`. A
+  passed `aria-disabled` also overwrote the `true` that `isDisabled` and `isLoading` set
 - **Arabic gets the system font in any region.** `getFontFamilyDependingOnLanguage`, and with it
   `ThemeProvider`, matched only `ar-SA`; `ar` and `ar-EG` got Open Sans, which has no Arabic
   glyphs

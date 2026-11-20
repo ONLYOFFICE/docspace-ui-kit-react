@@ -38,7 +38,7 @@ type PicketRadioButtonProps = Pick<
   "isDisabled" | "fontWeight" | "fontSize" | "name" | "spacing" | "orientation"
 >;
 
-export type RadioButtonGroupProps = {
+export type RadioButtonGroupProps = React.AriaAttributes & {
   /**
    * Called when the choice changes, with the input's change event despite the
    * name. The new value is `event.target.value`, always a string.

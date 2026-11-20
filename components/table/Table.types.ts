@@ -3,7 +3,7 @@ import { IndexRange } from "react-virtualized";
 
 import { ContextMenuModel } from "../context-menu";
 
-export interface TableContainerProps {
+export interface TableContainerProps extends React.AriaAttributes {
   /** Ref of the container element; pass the same ref to the header as `containerRef`. */
   forwardedRef: React.Ref<HTMLDivElement>;
   /** Stops the user selecting text anywhere inside the table. */
@@ -58,7 +58,7 @@ export type TTableColumn = {
   };
 };
 
-export interface TableHeaderProps {
+export interface TableHeaderProps extends React.AriaAttributes {
   /** Ref of the `TableContainer`, whose grid columns the header writes. */
   containerRef: { current: HTMLDivElement | null };
   /**
@@ -143,7 +143,7 @@ export interface TableSettingsProps {
   disableSettings?: boolean;
 }
 
-export interface TableBodyProps {
+export interface TableBodyProps extends React.AriaAttributes {
   /**
    * `localStorage` key the header saved the column widths under. Without it,
    * or without `columnInfoPanelStorageName`, the body renders an empty element.
@@ -176,7 +176,7 @@ export interface TableBodyProps {
   isIndexEditingMode?: boolean;
 }
 
-export interface TableRowProps {
+export interface TableRowProps extends React.AriaAttributes {
   /** Called when the context menu is asked for, with `true` for a right-click. */
   fileContextClick?: (value?: boolean) => void;
   /** The row's cells, normally one `TableCell` per column. */
@@ -230,7 +230,7 @@ export interface TableRowProps {
   onMouseLeave?: (e: React.MouseEvent) => void;
 }
 
-export interface TableCellProps {
+export interface TableCellProps extends React.AriaAttributes {
   /** Applied to the cell. */
   className?: string;
   /** On hover, shows the child marked `table-container_row-checkbox` in place of the one marked `table-container_element`. */
@@ -275,7 +275,7 @@ export type TGroupMenuItem = {
   fixedDropdownStyles?: boolean;
 };
 
-interface TableGroupMenuBased {
+interface TableGroupMenuBased extends React.AriaAttributes {
   /** Ticks the select-all checkbox. */
   isChecked: boolean;
   /** Draws the select-all checkbox partly ticked, for a selection that covers some rows but not all. */

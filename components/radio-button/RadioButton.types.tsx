@@ -12,7 +12,7 @@ type PickedLabelProps = Pick<
   "id" | "className" | "style"
 >;
 
-export type RadioButtonProps = {
+export type RadioButtonProps = React.AriaAttributes & {
   /** `name` of the input. Buttons sharing one behave as a single choice. */
   name?: React.ComponentProps<"input">["name"];
 

@@ -118,6 +118,22 @@ describe("BaseTile", () => {
 
   const TileTopContent = () => <div data-testid="top-content">Top Content</div>;
 
+  it("puts a passed aria-* on the tile, keeping aria-busy while in progress", () => {
+    const { rerender } = render(
+      <BaseTile
+        {...defaultProps}
+        aria-describedby="tile-hint"
+        aria-busy={false}
+      />,
+    );
+    const tile = screen.getByTestId("tile");
+    expect(tile).toHaveAttribute("aria-describedby", "tile-hint");
+    expect(tile).toHaveAttribute("aria-busy", "false");
+
+    rerender(<BaseTile {...defaultProps} inProgress aria-busy={false} />);
+    expect(tile).toHaveAttribute("aria-busy", "true");
+  });
+
   it("renders tile correctly", () => {
     render(<BaseTile {...defaultProps} topContent={<TileTopContent />} />);
     expect(screen.getByTestId("tile")).toBeTruthy();

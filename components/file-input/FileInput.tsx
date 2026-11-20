@@ -145,9 +145,9 @@ const FileInputPure = ({
           className={wrapperClasses}
           id={idButton}
           data-testid={dataTestId ?? "file-input"}
-          aria-disabled={isInert ? "true" : "false"}
           role="button"
           {...rest}
+          aria-disabled={isInert ? "true" : (rest["aria-disabled"] ?? "false")}
           {...getRootProps()}
         >
           <TextInput

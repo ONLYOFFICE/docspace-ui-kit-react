@@ -9,6 +9,7 @@ import { IconButton } from "../../icon-button";
 import { Text } from "../../text";
 import { Heading, HeadingSize } from "../../heading";
 import { useCommonTranslation } from "../../../utils/i18n";
+import { pickAriaProps } from "../../../utils/aria-props";
 
 import type { AsideHeaderProps } from "./AsideHeader.types";
 import styles from "./AsideHeader.module.scss";
@@ -125,6 +126,7 @@ const AsideHeader = (props: AsideHeaderProps) => {
 
   return (
     <div
+      {...pickAriaProps(props)}
       ref={containerRef}
       id={id}
       className={classNames(styles.container, className, {

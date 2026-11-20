@@ -9,6 +9,7 @@ import { IconSizeType } from "../../utils";
 import { Text } from "../text";
 
 import styles from "./RadioButton.module.scss";
+import { pickAriaProps } from "../../utils/aria-props";
 import { RadioButtonProps } from "./RadioButton.types";
 
 // Sent on the document by a button checked without `onChange`.
@@ -45,6 +46,7 @@ const RadioButton = ({
   label,
   autoFocus,
   testId = "radio-button",
+  ...rest
 }: RadioButtonProps) => {
   const [isCheckedState, setIsCheckedState] = React.useState(isChecked);
   const labelRef = React.useRef<HTMLLabelElement>(null);
@@ -106,6 +108,7 @@ const RadioButton = ({
       data-testid={testId}
     >
       <input
+        {...pickAriaProps(rest)}
         ref={inputRef}
         className={classNames(styles.input, classNameInput)}
         type="radio"

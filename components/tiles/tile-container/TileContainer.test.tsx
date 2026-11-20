@@ -42,6 +42,15 @@ describe("TileContainer", () => {
     <div data-testid={`tile-${item.id}`}>{item.title}</div>
   );
 
+  it("puts a passed aria-* on the container", () => {
+    const { container } = render(
+      <TileContainer aria-label="Files">
+        <MockTile item={{ id: "1", title: "File 1" }} />
+      </TileContainer>,
+    );
+    expect(container.firstElementChild).toHaveAttribute("aria-label", "Files");
+  });
+
   it("renders container correctly", () => {
     render(
       <TileContainer>

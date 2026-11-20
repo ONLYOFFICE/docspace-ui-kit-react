@@ -13,6 +13,14 @@ const baseProps = {
 };
 
 describe("<Row />", () => {
+  it("puts a passed aria-* on the row", () => {
+    render(<Row {...baseProps} aria-describedby="row-hint" />);
+    expect(screen.getByTestId("row")).toHaveAttribute(
+      "aria-describedby",
+      "row-hint",
+    );
+  });
+
   it("renders without error", () => {
     render(
       <Row {...baseProps} isIndexEditingMode={false} onRowClick={() => {}} />,

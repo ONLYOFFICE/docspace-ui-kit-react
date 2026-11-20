@@ -13,6 +13,23 @@ const dialogHeight = () =>
     ?.style.getPropertyValue("--dialog-height");
 
 describe("RoomLogoCoverDialog", () => {
+  it("puts a passed aria-* on the dialog", async () => {
+    render(
+      <RoomLogoCoverDialog
+        t={t}
+        visible
+        covers={[]}
+        onClose={() => {}}
+        onApply={() => {}}
+        aria-label="Room cover picker"
+      />,
+    );
+
+    expect(
+      await screen.findByRole("dialog", { name: "Room cover picker" }),
+    ).toBeInTheDocument();
+  });
+
   it("measures its height on the first opening", async () => {
     render(
       <RoomLogoCoverDialog

@@ -65,6 +65,23 @@ describe("<ToggleButton />", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
+  it("puts a passed aria-* on the checkbox", () => {
+    render(
+      <ToggleButton
+        isChecked
+        onChange={vi.fn()}
+        aria-label="Notifications"
+        aria-describedby="notifications-hint"
+      />,
+    );
+    const checkbox = screen.getByRole("checkbox", { name: "Notifications" });
+    expect(checkbox).toHaveAttribute("aria-describedby", "notifications-hint");
+    expect(checkbox).toBeChecked();
+    expect(screen.getByTestId("toggle-button")).not.toHaveAttribute(
+      "aria-label",
+    );
+  });
+
   it("applies custom className", () => {
     render(<ToggleButton {...defaultProps} className="custom-class" />);
     const container = screen.getByTestId("toggle-button-container");

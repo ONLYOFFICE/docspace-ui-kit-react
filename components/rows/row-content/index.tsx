@@ -2,6 +2,7 @@ import React from "react";
 import classNames from "classnames";
 import { useInterfaceDirection } from "../../../context/InterfaceDirectionContext";
 import styles from "./RowContent.module.scss";
+import { pickAriaProps } from "../../../utils/aria-props";
 import { RowContentProps } from "./RowContent.types";
 import { getSideInfo } from "./RowContent.utils";
 
@@ -36,6 +37,7 @@ const RowContent = (props: RowContentProps) => {
 
   return (
     <div
+      {...pickAriaProps(props)}
       className={classNames(styles.rowContent, className)}
       id={id}
       onClick={onClick}

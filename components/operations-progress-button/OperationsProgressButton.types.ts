@@ -36,7 +36,7 @@ export interface Operation {
   iconUrl?: string;
 }
 
-export interface OperationsProgressProps {
+export interface OperationsProgressProps extends React.AriaAttributes {
   /** Operations that own a panel — the upload. Their progress is the one the ring shows. */
   panelOperations?: Operation[];
   /** Secondary operations: copy, move, delete and the rest. Listed without a ring. */

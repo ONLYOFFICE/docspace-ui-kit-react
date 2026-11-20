@@ -1,6 +1,6 @@
 import type React from "react";
 
-export interface CardProps {
+export interface CardProps extends React.AriaAttributes {
   /** Left side of the header row. A string renders as the card's heading;
    * any other node is rendered as given inside a `<div>`. Without this and
    * `extra` there is no header row. */

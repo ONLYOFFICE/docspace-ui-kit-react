@@ -117,6 +117,38 @@ const arrayItems: TTabItem[] = [
 ];
 
 describe("Tabs", () => {
+  it("puts a passed aria-* on the tab list, not on the wrapper", () => {
+    render(
+      <Tabs
+        items={arrayItems}
+        selectedItemId="tab1"
+        aria-label="Room views"
+        aria-describedby="views-hint"
+      />,
+    );
+
+    const tablist = screen.getByRole("tablist", { name: "Room views" });
+    expect(tablist).toHaveAttribute("aria-describedby", "views-hint");
+    expect(tablist.parentElement?.closest("[aria-label]")).toBeNull();
+  });
+
+  it("puts a passed aria-* on the secondary tab list too", () => {
+    render(
+      <Tabs
+        type={TabsTypes.Secondary}
+        items={arrayItems}
+        selectedItemId="tab1"
+        aria-label="Filters"
+      />,
+    );
+
+    expect(
+      screen
+        .getByRole("tablist", { name: "Filters" })
+        .parentElement?.closest("[aria-label]"),
+    ).toBeNull();
+  });
+
   it("renders without errors", () => {
     const { container } = render(
       <Tabs items={arrayItems} selectedItemId="tab1" />,

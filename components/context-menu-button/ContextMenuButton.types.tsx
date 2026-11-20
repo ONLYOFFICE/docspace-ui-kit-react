@@ -2,7 +2,7 @@ import type { TDirectionX, TDirectionY } from "../../types";
 import type { ContextMenuModel } from "../context-menu";
 import type { ContextMenuButtonDisplayType } from "./ContextMenuButton.enums";
 
-export interface ContextMenuButtonProps {
+export interface ContextMenuButtonProps extends React.AriaAttributes {
   /** Opens the menu from outside. Changing it opens or closes the menu. */
   opened?: boolean;
   /** Items of the menu, used when there is no `getData`. */

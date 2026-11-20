@@ -11,6 +11,7 @@ import { IconButton } from "../icon-button";
 import { Text } from "../text";
 import { TooltipContainer } from "../tooltip";
 import { consumeKey } from "../../utils/consume-key";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import {
   getRoomTypeDescriptionTranslation,
@@ -32,8 +33,10 @@ const RoomType = ({
   isTemplate,
   isTemplateRoom,
   isFormSection,
+  ...rest
 }: RoomTypeProps) => {
   const { t } = useTranslation(["Common"]);
+  const aria = pickAriaProps(rest);
 
   const room = {
     type: roomType,
@@ -121,6 +124,7 @@ const RoomType = ({
 
   return type === "listItem" ? (
     <TooltipContainer
+      {...aria}
       as="div"
       className={classNames(styles.roomType, styles.listItem, {
         [styles.isOpen]: isOpen,
@@ -130,7 +134,7 @@ const RoomType = ({
       title={disabled ? "" : room.title}
       onClick={handleClick}
       {...buttonProps}
-      aria-disabled={disabled || undefined}
+      aria-disabled={disabled || aria["aria-disabled"]}
       data-tooltip-id={disabled ? "create-room-tooltip" : undefined}
       data-testid="room-type-list-item"
       data-selected-id={selectedId}
@@ -139,6 +143,7 @@ const RoomType = ({
     </TooltipContainer>
   ) : type === "dropdownButton" ? (
     <TooltipContainer
+      {...aria}
       as="div"
       id={id}
       title={room.title}
@@ -155,12 +160,13 @@ const RoomType = ({
     </TooltipContainer>
   ) : type === "dropdownItem" ? (
     <TooltipContainer
+      {...aria}
       as="div"
       id={id}
       title={disabled ? "" : room.title}
       onClick={handleClick}
       {...buttonProps}
-      aria-disabled={disabled || undefined}
+      aria-disabled={disabled || aria["aria-disabled"]}
       data-selected-id={selectedId}
       data-tooltip-id={disabled ? "create-room-tooltip" : undefined}
       className={classNames(styles.roomType, styles.dropDownItem, {
@@ -173,6 +179,7 @@ const RoomType = ({
     </TooltipContainer>
   ) : (
     <TooltipContainer
+      {...aria}
       as="div"
       id={id}
       title={room.title}

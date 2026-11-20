@@ -21,6 +21,7 @@ import SubSectionFooter from "./sub-components/SectionFooter";
 import SubSectionWarning from "./sub-components/SectionWarning";
 import SubSectionSubmenu from "./sub-components/SectionSubmenu";
 
+import { pickAriaProps } from "../../utils/aria-props";
 import { SectionProps } from "./Section.types";
 import {
   SECTION_BODY_NAME,
@@ -373,6 +374,7 @@ const Section = (props: SectionProps) => {
         scrollableBanner={scrollableBanner}
         stickyTableHeader={stickyTableHeader}
         inert={inert}
+        aria={pickAriaProps(props)}
       >
         {currentDeviceType !== DeviceType.mobile ? (
           <div className="section-sticky-container">

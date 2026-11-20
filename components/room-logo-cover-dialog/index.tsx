@@ -7,6 +7,8 @@ import { globalColors } from "../../providers/theme/themes";
 import { ModalDialog, ModalDialogType } from "../modal-dialog";
 import { Button, ButtonSize } from "../button";
 
+import { pickAriaProps } from "../../utils/aria-props";
+
 import { RoomLogoCover } from "./RoomLogoCover";
 
 import type {
@@ -35,6 +37,7 @@ const RoomLogoCoverDialog = ({
   currentColorScheme,
   onClose,
   onApply,
+  ...rest
 }: RoomLogoCoverDialogProps) => {
   const defaultColor = initialColor ?? globalColors.logoColors[0];
 
@@ -129,6 +132,7 @@ const RoomLogoCoverDialog = ({
 
   return (
     <ModalDialog
+      {...pickAriaProps(rest)}
       visible={visible}
       autoMaxHeight
       className={classNames(styles.roomLogoCoverModal, {

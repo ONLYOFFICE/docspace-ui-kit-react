@@ -13,7 +13,7 @@ export type TAvatarModel = { label: string; icon: string } & (
     }
 );
 
-export type AvatarProps = {
+export type AvatarProps = React.AriaAttributes & {
   /**
    * Diameter of the avatar, from `extraSmall` (24px) to `max` (124px). The
    * initials and the role badge are sized to match; `extraSmall` has rules for

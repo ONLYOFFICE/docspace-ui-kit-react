@@ -4,6 +4,7 @@ import classNames from "classnames";
 import { ButtonSize, Button } from "../button";
 import { ComboBox, TOption } from "../combobox";
 
+import { pickAriaProps } from "../../utils/aria-props";
 import { PagingProps } from "./Paging.types";
 import styles from "./Paging.module.scss";
 
@@ -42,6 +43,7 @@ const Paging = (props: PagingProps) => {
 
   return (
     <div
+      {...pickAriaProps(props)}
       data-testid={dataTestId ?? "paging"}
       id={id}
       className={classNames(styles.paging, className)}

@@ -18,6 +18,22 @@ describe("<Tags />", () => {
     expect(screen.getByTestId("tags")).toHaveAttribute("aria-label", "Tags");
   });
 
+  it("puts a passed aria-* on the group, its aria-label over ariaLabel", () => {
+    render(
+      <Tags
+        {...baseProps}
+        ariaLabel="Tags"
+        aria-label="Room tags"
+        aria-describedby="tags-hint"
+      />,
+    );
+
+    expect(screen.getByRole("group", { name: "Room tags" })).toHaveAttribute(
+      "aria-describedby",
+      "tags-hint",
+    );
+  });
+
   it("renders with no tags", () => {
     render(<Tags {...baseProps} tags={[]} />);
     expect(screen.getByTestId("tags")).toBeEmptyDOMElement();

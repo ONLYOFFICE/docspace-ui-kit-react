@@ -119,6 +119,14 @@ describe("<TableHeader />", () => {
     );
   });
 
+  it("puts a passed aria-* on the header", () => {
+    render(<TableHeader {...defaultProps} aria-describedby="header-hint" />);
+    expect(screen.getByTestId("table-header")).toHaveAttribute(
+      "aria-describedby",
+      "header-hint",
+    );
+  });
+
   it("renders without errors", () => {
     render(<TableHeader {...defaultProps} />);
     expect(screen.getByTestId("table-header")).toBeInTheDocument();

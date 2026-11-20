@@ -9,6 +9,7 @@ import PencilReactSvgUrl from "../../assets/pencil.react.svg";
 import PlusSvgUrl from "../../assets/icons/16/button.plus.react.svg";
 
 import { IconSizeType, useClickOutside } from "../../utils";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import { useInterfaceDirection, useTheme } from "../../context";
 
@@ -54,6 +55,7 @@ const AvatarPure = ({
   isNotIcon = false,
   imgClassName = "",
   dataTestId,
+  ...rest
 }: AvatarProps) => {
   const { isRTL } = useInterfaceDirection();
   const { isBase } = useTheme();
@@ -216,6 +218,7 @@ const AvatarPure = ({
   return (
     <>
       <div
+        {...pickAriaProps(rest)}
         className={classNames(styles.avatar, className)}
         data-size={size}
         data-no-click={noClick ? "true" : "false"}
@@ -226,7 +229,10 @@ const AvatarPure = ({
         data-testid={dataTestId ?? "avatar"}
         role={isInteractive ? "button" : undefined}
         tabIndex={isInteractive ? 0 : undefined}
-        aria-label={isInteractive && userName ? userName : undefined}
+        aria-label={
+          rest["aria-label"] ??
+          (isInteractive && userName ? userName : undefined)
+        }
       >
         <div
           className={classNames(styles.avatarWrapper, className)}

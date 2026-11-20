@@ -2,7 +2,10 @@ import React from "react";
 
 import { InputSize } from "../text-input";
 
-export type FileInputProps = {
+export type FileInputProps = Omit<
+  React.AriaAttributes,
+  "aria-label" | "aria-description" | "aria-disabled"
+> & {
   /** Applied to the outermost element. */
   style?: React.CSSProperties;
   /** Placeholder of the read-only field, shown until a file is chosen. */
@@ -77,6 +80,10 @@ export type FileInputProps = {
   "aria-label"?: string;
   /** Accessible description of the control. */
   "aria-description"?: string;
+  /** Marks the control disabled to assistive technology while it still takes
+   * clicks and drops. `isDisabled` and `isLoading` set it to `true` over this
+   * value. */
+  "aria-disabled"?: React.AriaAttributes["aria-disabled"];
   /**
    * Sets the outer element's `data-testid`, despite the hyphenated name.
    * @default "file-input"

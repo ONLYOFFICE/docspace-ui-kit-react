@@ -177,17 +177,17 @@ const meta = {
     "aria-label": {
       control: false,
       description:
-        "Overwritten by `label` on every render, so a value passed here never reaches the button.",
+        "Accessible name of the button, in place of `label`. Names an icon-only button.",
     },
     "aria-disabled": {
       control: false,
       description:
-        "Overwritten on every render: `true` while `isDisabled`, absent otherwise.",
+        "Marks the button disabled to assistive technology while it stays focusable and clickable. `isDisabled` sets it to `true` over this value.",
     },
     "aria-busy": {
       control: false,
       description:
-        "Overwritten on every render: `true` while `isLoading`, absent otherwise.",
+        "Marks the button busy to assistive technology. `isLoading` sets it to `true` over this value.",
     },
   },
 } satisfies Meta<typeof Button>;

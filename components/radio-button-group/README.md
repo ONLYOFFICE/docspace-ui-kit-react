@@ -98,6 +98,8 @@ Declared by [`components/radio-button`](../../components/radio-button/README.md)
 | `name`       | `string`           | no       | –       | `name` of the input. Buttons sharing one behave as a single choice.                                                                                                              |
 | `spacing`    | `string`           | no       | –       | Gap to the neighbouring button, as a CSS length: `margin-inline-start` when horizontal, `margin-block-end` when vertical. There is no gap at all without it — the buttons touch. |
 
+Plus 53 more props inherited from `React.AriaAttributes`, forwarded to the element.
+
 <!-- props:end -->
 
 ### `TRadioButtonOption`
@@ -215,9 +217,8 @@ the `width` prop. The buttons' own variables are listed on
 - The buttons share a `name`, so the browser treats them as one radio group: Tab reaches the
   set and the arrow keys move within it.
 - The keyboard focus is drawn as an accent ring around the focused circle.
-- The wrapper is `role="radiogroup"`, but it has no accessible name.
-- **The group takes no `aria-*`.** An `aria-label` or `aria-labelledby` passed is dropped. Wrap
-  the group in a `<fieldset>` with a `<legend>` to name the set.
+- **The wrapper is `role="radiogroup"`, with no name of its own.** A passed `aria-*` lands on it
+  and is kept, so name the set with `aria-label` or `aria-labelledby`.
 - A `type: "text"` caption is a plain paragraph, not a legend, so it does not name the options
   that follow it for a screen reader.
 

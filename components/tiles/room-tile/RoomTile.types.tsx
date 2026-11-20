@@ -24,7 +24,7 @@ export interface SelectOption {
   value: string;
 }
 
-export type RoomTileProps = {
+export type RoomTileProps = React.AriaAttributes & {
   /** Ticks the checkbox and keeps it in place of the logo, and tints the tile
    * and its tags. */
   checked?: boolean;

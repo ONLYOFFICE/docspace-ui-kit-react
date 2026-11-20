@@ -1,6 +1,6 @@
 import { MouseEvent } from "react";
 
-export type ICategoryItemProps = {
+export type ICategoryItemProps = React.AriaAttributes & {
   /** Heading of the row, rendered as the text of a link at 16px. */
   title: string;
   /** Where the link points. It is dropped while `isDisabled` is set, which leaves an `<a>` with no `href`. */
@@ -17,4 +17,8 @@ export type ICategoryItemProps = {
   badgeLabel: string;
   /** Value of `data-testid` on the wrapper, and the stem of the title link's own `<dataTestId>_category_link`. Without it the link keeps the shared `link` id. */
   dataTestId?: string;
+  /** Added after the component's own class, on the outer element. */
+  className?: string;
+  /** Inline style of the outer element. */
+  style?: React.CSSProperties;
 };

@@ -117,6 +117,14 @@ describe("Filter Component", () => {
   };
 
   describe("Search Input", () => {
+    it("puts a passed aria-* on the bar", () => {
+      renderComponent({ "aria-describedby": "filter-hint" });
+      expect(screen.getByTestId("filter_container")).toHaveAttribute(
+        "aria-describedby",
+        "filter-hint",
+      );
+    });
+
     it("clears search when clearSearch prop is true", async () => {
       const onClearFilter = vi.fn();
       const setClearSearch = vi.fn();

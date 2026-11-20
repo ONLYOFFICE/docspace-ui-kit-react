@@ -1,4 +1,4 @@
-export type ColorPickerProps = {
+export type ColorPickerProps = React.AriaAttributes & {
   /** Applied to the outermost element. */
   className?: string;
 

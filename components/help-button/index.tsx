@@ -6,6 +6,7 @@ import classNames from "classnames";
 import InfoReactSvg from "../../assets/info.react.svg";
 import { IconButton } from "../icon-button";
 import { Tooltip } from "../tooltip";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import type { HelpButtonProps } from "./HelpButton.types";
 
@@ -37,6 +38,7 @@ const HelpButton = (props: HelpButtonProps) => {
     iconNode,
   } = props;
 
+  const aria = pickAriaProps(props);
   const currentId = id || uniqueId();
   const ref = React.useRef(null);
   const componentClass = classNames(className, "help-icon");
@@ -80,11 +82,17 @@ const HelpButton = (props: HelpButtonProps) => {
   return (
     <div ref={ref} style={style} data-testid={dataTestId ?? "help-button"}>
       {children ? (
-        <div id={currentId} className={componentClass} {...globalTooltipProps}>
+        <div
+          {...aria}
+          id={currentId}
+          className={componentClass}
+          {...globalTooltipProps}
+        >
           {children}
         </div>
       ) : (
         <IconButton
+          {...aria}
           id={currentId}
           className={componentClass}
           isClickable={isClickable}

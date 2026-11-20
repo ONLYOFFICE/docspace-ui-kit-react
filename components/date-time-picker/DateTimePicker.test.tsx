@@ -32,6 +32,24 @@ describe("DateTimePicker", () => {
     expect(picker).toHaveAttribute("aria-invalid", "false");
   });
 
+  it("is a group named by selectDateText, or by a passed aria-label", () => {
+    const { rerender } = render(<DateTimePicker {...defaultProps} />);
+    expect(
+      screen.getByRole("group", { name: "Select Date" }),
+    ).toBeInTheDocument();
+
+    rerender(
+      <DateTimePicker
+        {...defaultProps}
+        aria-label="Meeting start"
+        aria-describedby="start-hint"
+      />,
+    );
+    expect(
+      screen.getByRole("group", { name: "Meeting start" }),
+    ).toHaveAttribute("aria-describedby", "start-hint");
+  });
+
   it("should render with error state", () => {
     render(<DateTimePicker {...defaultProps} hasError />);
 

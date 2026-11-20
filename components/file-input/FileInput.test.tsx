@@ -146,6 +146,35 @@ describe("<FileInput />", () => {
     expect(mockOnInput).not.toHaveBeenCalled();
   });
 
+  it("forwards a passed aria-* to the button wrapper", () => {
+    render(
+      <FileInput
+        {...defaultProps}
+        aria-label="Attachment"
+        aria-describedby="attachment-hint"
+        aria-required="true"
+      />,
+    );
+
+    const control = screen.getByRole("button", { name: "Attachment" });
+    expect(control).toHaveAttribute("aria-describedby", "attachment-hint");
+    expect(control).toHaveAttribute("aria-required", "true");
+  });
+
+  it("keeps a passed aria-disabled unless isDisabled or isLoading is set", () => {
+    const { rerender } = render(
+      <FileInput {...defaultProps} aria-disabled="true" />,
+    );
+    const root = screen.getByTestId("file-input");
+    expect(root).toHaveAttribute("aria-disabled", "true");
+
+    rerender(<FileInput {...defaultProps} isDisabled aria-disabled="false" />);
+    expect(root).toHaveAttribute("aria-disabled", "true");
+
+    rerender(<FileInput {...defaultProps} isLoading aria-disabled="false" />);
+    expect(root).toHaveAttribute("aria-disabled", "true");
+  });
+
   it("keeps the wrapper as the only focus stop", () => {
     render(<FileInput {...defaultProps} buttonLabel="Browse" />);
 

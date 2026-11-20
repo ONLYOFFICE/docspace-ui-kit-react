@@ -1,6 +1,6 @@
 import { CSSProperties, ReactElement } from "react";
 
-export type TileContentProps = {
+export type TileContentProps = React.AriaAttributes & {
   /** The one element shown as the tile's name, not a string or a list. A
    * `containerWidth` prop on it becomes the width of the slot. */
   children: ReactElement<{ containerWidth?: string }>;

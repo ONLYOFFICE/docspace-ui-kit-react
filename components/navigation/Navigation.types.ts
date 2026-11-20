@@ -273,16 +273,17 @@ export type TDropBoxProps = TArrowButtonProps &
     showTitleInDropBox?: boolean;
   };
 
-export type TNavigationProps = Omit<
-  TDropBoxProps,
-  | "dropBoxWidth"
-  | "sectionHeight"
-  | "onCloseDropBox"
-  | "onClickAvailable"
-  | "isDesktopClient"
-  | "isTabletView"
-  | "navigationTitleContainerNode"
-> &
+export type TNavigationProps = React.AriaAttributes &
+  Omit<
+    TDropBoxProps,
+    | "dropBoxWidth"
+    | "sectionHeight"
+    | "onCloseDropBox"
+    | "onClickAvailable"
+    | "isDesktopClient"
+    | "isTabletView"
+    | "navigationTitleContainerNode"
+  > &
   Omit<TControlButtonProps, "isMobile"> &
   Omit<
     TTextProps,

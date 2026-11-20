@@ -1,7 +1,9 @@
 import type { TColorScheme } from "../../context/ThemeContext";
 import { FloatingButtonIcons } from "./FloatingButton.enums";
 
-export type FloatingButtonProps = {
+export type FloatingButtonProps = Omit<React.AriaAttributes, "aria-label"> & {
+  /** Accessible name of the circle and of its progress bar, in place of `label`. */
+  "aria-label"?: string;
   /** Applied to the circle, not to the wrapper that positions it. */
   id?: string;
   /** Applied to the circle, after the component's own classes. */

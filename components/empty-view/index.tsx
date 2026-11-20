@@ -2,6 +2,7 @@ import { Text } from "../text";
 
 import EmptyViewOption from "./sub-components/EmptyViewOption";
 
+import { pickAriaProps } from "../../utils/aria-props";
 import styles from "./EmptyView.module.scss";
 import type { EmptyViewProps } from "./EmptyView.types";
 
@@ -14,9 +15,11 @@ const EmptyView = ({
   className,
   bodyClassName,
   extraContent,
+  ...rest
 }: EmptyViewProps) => {
   return (
     <div
+      {...pickAriaProps(rest)}
       className={`${styles.wrapper}${className ? ` ${className}` : ""}`}
       data-testid="empty-view"
     >

@@ -1,7 +1,9 @@
-export type ProgressBarProps = {
+export type ProgressBarProps = Omit<React.AriaAttributes, "aria-label"> & {
+  /** Accessible name of the bar, in place of `label`. */
+  "aria-label"?: string;
   /** How far along the operation is, 0 to 100. The value is clamped to that range, and a non-number (`NaN`, `Infinity`) counts as 0. */
   percent: number;
-  /** Line of text above the bar, and the bar's `aria-label`; without it the bar has no accessible name. A truncated label shows in full in the kit's tooltip. */
+  /** Line of text above the bar, and the bar's accessible name unless `aria-label` is passed. A truncated label shows in full in the kit's tooltip. */
   label?: string;
   /** Replaces the fill with a strip that slides across the track for ever. The bar is then indeterminate: no `aria-valuenow`, and `aria-busy` set. */
   isInfiniteProgress?: boolean;
@@ -15,7 +17,10 @@ export type ProgressBarProps = {
   style?: React.CSSProperties;
 };
 
-export type PreparationPortalProgressProps = {
+export type PreparationPortalProgressProps = Omit<
+  React.AriaAttributes,
+  "aria-valuemin" | "aria-valuemax" | "aria-valuenow" | "aria-label"
+> & {
   /** Centred line of text under the bar. */
   text?: string;
   /** How far along the operation is, 0 to 100. The value is clamped to that range for the fill, the printed number and `aria-valuenow`; a non-number counts as 0. */

@@ -49,24 +49,25 @@ type BaseDropzoneProps = {
 
 type FileDropHandler<T extends File = File> = (acceptedFiles: T[]) => void;
 
-export type DropzoneProps = BaseDropzoneProps & {
-  /**
-   * Accepted types, in react-dropzone 11's form: MIME types or extensions such
-   * as `.docx`, comma-separated or in an array. Ignored in folder mode.
-   */
-  accept: string | string[];
-  /**
-   * Replaces the reader that walks a dropped directory and attaches each file's
-   * path. The directory and single-upload checks still run before it.
-   */
-  getFilesFromEvent?: (
-    event: DropEvent,
-  ) => Promise<(File | DataTransferItem)[]> | (File | DataTransferItem)[];
-  /** Called with the accepted files. An empty result never reaches it, and neither does a drop refused by the single-upload rule. */
-  onDrop?: FileDropHandler;
-  /** Called with the files the drop library refused — wrong type, or more than `maxFiles`. */
-  onDropRejected?: (fileRejections: FileRejection[]) => void;
-  /** Value of `data-testid` on the outer element.
-   * @default "dropzone" */
-  dataTestId?: string;
-};
+export type DropzoneProps = React.AriaAttributes &
+  BaseDropzoneProps & {
+    /**
+     * Accepted types, in react-dropzone 11's form: MIME types or extensions such
+     * as `.docx`, comma-separated or in an array. Ignored in folder mode.
+     */
+    accept: string | string[];
+    /**
+     * Replaces the reader that walks a dropped directory and attaches each file's
+     * path. The directory and single-upload checks still run before it.
+     */
+    getFilesFromEvent?: (
+      event: DropEvent,
+    ) => Promise<(File | DataTransferItem)[]> | (File | DataTransferItem)[];
+    /** Called with the accepted files. An empty result never reaches it, and neither does a drop refused by the single-upload rule. */
+    onDrop?: FileDropHandler;
+    /** Called with the files the drop library refused — wrong type, or more than `maxFiles`. */
+    onDropRejected?: (fileRejections: FileRejection[]) => void;
+    /** Value of `data-testid` on the outer element.
+     * @default "dropzone" */
+    dataTestId?: string;
+  };

@@ -13,6 +13,7 @@ import { TooltipContainer } from "../tooltip";
 
 import { ComboButton } from "./sub-components/ComboButton";
 import { ComboBoxSize, ComboBoxDisplayType } from "./ComboBox.enums";
+import { pickAriaProps } from "../../utils/aria-props";
 import type { TComboboxProps, TOption } from "./ComboBox.types";
 import styles from "./ComboBox.module.scss";
 
@@ -680,6 +681,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
         fillIcon={selectedOption?.fillIcon ?? fillIcon}
         tabIndex={tabIndex}
         ariaLabel={ariaLabel}
+        aria={pickAriaProps(props)}
         isLoading={isLoading}
         type={type}
         plusBadgeValue={plusBadgeValue}
