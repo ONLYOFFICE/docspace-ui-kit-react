@@ -21,7 +21,7 @@ export type TData = {
 
 export type TMode = "modern" | "default";
 
-export type RowProps = {
+export type RowProps = React.AriaAttributes & {
   /**
    * Whether the row's checkbox is ticked. Its **presence** is what renders the
    * checkbox at all — passing `checked={false}` gives an unticked box, omitting

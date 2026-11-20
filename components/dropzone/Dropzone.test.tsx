@@ -24,6 +24,19 @@ describe("Dropzone", () => {
     vi.clearAllMocks();
   });
 
+  it("puts a passed aria-* on the drop area, its aria-label over the default", () => {
+    render(
+      <Dropzone
+        {...defaultProps}
+        aria-label="Upload a logo"
+        aria-describedby="logo-hint"
+      />,
+    );
+    const area = screen.getByTestId("dropzone-input-area");
+    expect(area).toHaveAttribute("aria-label", "Upload a logo");
+    expect(area).toHaveAttribute("aria-describedby", "logo-hint");
+  });
+
   it("renders without error", () => {
     render(<Dropzone {...defaultProps} />);
 

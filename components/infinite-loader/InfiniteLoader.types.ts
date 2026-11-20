@@ -1,7 +1,10 @@
 import { IndexRange } from "react-virtualized";
 import { TViewAs } from "../../types";
 
-export type InfiniteLoaderProps = {
+/** The one `aria-*` attribute react-virtualized forwards to its grid. */
+export type InfiniteLoaderAriaProps = Pick<React.AriaAttributes, "aria-label">;
+
+export type InfiniteLoaderProps = InfiniteLoaderAriaProps & {
   /**
    * Which layout to render: `tile` is a grid of tile rows, every other value a
    * list. It also picks the skeleton: `row` and `table` have one, the rest none.

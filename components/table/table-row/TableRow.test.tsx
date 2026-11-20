@@ -34,6 +34,14 @@ describe("<TableRow />", () => {
     vi.clearAllMocks();
   });
 
+  it("puts a passed aria-* on the row", () => {
+    render(<TableRow aria-describedby="row-hint">Table row</TableRow>);
+    expect(screen.getByTestId("table-row")).toHaveAttribute(
+      "aria-describedby",
+      "row-hint",
+    );
+  });
+
   it("renders without errors", () => {
     render(<TableRow>Table row</TableRow>);
 

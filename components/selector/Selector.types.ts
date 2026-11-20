@@ -561,7 +561,8 @@ export type TRenderCustomItem = (
   mark?: React.ReactNode,
 ) => React.ReactNode | null;
 
-export type SelectorProps = TSelectorHeader &
+export type SelectorProps = React.AriaAttributes &
+  TSelectorHeader &
   TInfoBar &
   TSelectorInfo &
   TSelectorTabs &

@@ -44,6 +44,14 @@ const renderSelector = (override: object = {}) =>
   render(<Selector {...makeProps(override)} />);
 
 describe("<Selector /> loading modes", () => {
+  it("puts a passed aria-* on the outer element", () => {
+    renderSelector({ "aria-describedby": "selector-hint" });
+    expect(screen.getByTestId("selector")).toHaveAttribute(
+      "aria-describedby",
+      "selector-hint",
+    );
+  });
+
   it("renders the skeleton loader during the initial load", () => {
     renderSelector({ isLoading: true });
 

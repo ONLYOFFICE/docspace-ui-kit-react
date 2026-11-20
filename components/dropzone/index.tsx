@@ -10,6 +10,7 @@ import { Badge } from "../badge";
 import { DropDown } from "../drop-down";
 import { IconSizeType } from "../../utils";
 import { consumeKey } from "../../utils/consume-key";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import { DropzoneProps } from "./Dropzone.types";
 import styles from "./Dropzone.module.scss";
@@ -42,7 +43,9 @@ const Dropzone = ({
   iconClassName,
   className,
   loaderClassName,
+  ...rest
 }: DropzoneProps) => {
+  const aria = pickAriaProps(rest);
   const handleDrop = (acceptedFiles: File[]) => {
     if (!onDrop || acceptedFiles.length === 0) return;
 
@@ -234,10 +237,11 @@ const Dropzone = ({
         <div className={styles.dropzoneBody}>
           <div
             {...getRootProps({
+              ...aria,
               className: styles.dropzone,
-              "aria-label": isFolderUpload
-                ? "Folder upload area"
-                : "File upload area",
+              "aria-label":
+                aria["aria-label"] ??
+                (isFolderUpload ? "Folder upload area" : "File upload area"),
               "data-testid": "dropzone-input-area",
             })}
             {...(isFolderUpload

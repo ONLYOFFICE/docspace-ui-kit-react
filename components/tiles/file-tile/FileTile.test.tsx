@@ -180,6 +180,14 @@ describe("FileTile", () => {
     vi.clearAllMocks();
   });
 
+  it("puts a passed aria-* on the tile", () => {
+    render(<FileTile {...defaultProps} aria-describedby="file-hint" />);
+    expect(screen.getByTestId("tile")).toHaveAttribute(
+      "aria-describedby",
+      "file-hint",
+    );
+  });
+
   it("renders file title correctly", () => {
     render(
       <FileTile {...defaultProps}>

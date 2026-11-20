@@ -173,6 +173,14 @@ describe("FolderTile", () => {
     return render(<FolderTile {...defaultProps} />);
   };
 
+  it("puts a passed aria-* on the tile", () => {
+    renderFolderTile({ "aria-describedby": "folder-hint" });
+    expect(screen.getByTestId("tile")).toHaveAttribute(
+      "aria-describedby",
+      "folder-hint",
+    );
+  });
+
   it("renders folder title correctly", () => {
     renderFolderTile();
     expect(screen.getByTestId("folder-content")).toBeTruthy();

@@ -11,7 +11,7 @@ export interface FolderItem extends TileItem {
   };
 }
 
-export type FolderTileProps = {
+export type FolderTileProps = React.AriaAttributes & {
   /** The folder this tile stands for. Its `contextOptions` key — present or absent — is what decides whether the three-dot button appears. */
   item: FolderItem;
   /** Ticks the checkbox, shows it in place of the icon and tints the whole tile. The tile holds no state; pass back what `onSelect` reports. */

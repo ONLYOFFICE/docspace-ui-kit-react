@@ -11,6 +11,7 @@ import { hasOwnProperty } from "../../../utils";
 import { EMPTY_ARRAY } from "../../../constants";
 
 import { TableCell } from "../sub-components/table-cell";
+import { pickAriaProps } from "../../../utils/aria-props";
 import { TableRowProps } from "../Table.types";
 import styles from "./TableRow.module.scss";
 
@@ -79,6 +80,7 @@ const TableRow = React.memo((props: TableRowProps) => {
 
   return (
     <div
+      {...pickAriaProps(props)}
       onContextMenu={onContextMenu}
       className={tableRowClasses}
       ref={forwardedRef}

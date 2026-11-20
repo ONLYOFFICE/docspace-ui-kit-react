@@ -20,6 +20,7 @@ const GridComponent = ({
   scroll,
   showSkeleton,
   currentFolderId,
+  "aria-label": ariaLabel,
 }: ListComponentProps) => {
   const loaderRef = useRef<InfiniteLoader | null>(null);
   const listRef = useRef<List | null>(null);
@@ -186,6 +187,7 @@ const GridComponent = ({
                   rowHeight={getItemSize}
                   rowRenderer={renderTile}
                   width={width}
+                  aria-label={ariaLabel}
                   isScrolling={isScrolling}
                   onChildScroll={onChildScroll}
                   scrollTop={scrollTop}

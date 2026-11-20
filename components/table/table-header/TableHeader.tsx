@@ -2,6 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import classNames from "classnames";
 import throttle from "lodash/throttle";
 
+import { pickAriaProps } from "../../../utils/aria-props";
 import { TableHeaderProps, TTableColumn } from "../Table.types";
 import styles from "./TableHeader.module.scss";
 import { TableHeaderCell } from "../sub-components/table-header-cell";
@@ -1300,6 +1301,7 @@ export const TableHeader = (props: TableHeaderProps) => {
   return (
     <>
       <div
+        {...pickAriaProps(props)}
         id="table-container_caption-header"
         className={classNames(styles.tableHeader, "table-container_header", {
           "lengthen-header": isLengthenHeader,

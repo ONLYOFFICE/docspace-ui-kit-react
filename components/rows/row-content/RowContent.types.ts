@@ -1,4 +1,4 @@
-export type RowContentProps = {
+export type RowContentProps = React.AriaAttributes & {
   /**
    * The row's parts by position: the title, then the icons beside it. Later
    * children are side elements, hidden, with their text joined into the line

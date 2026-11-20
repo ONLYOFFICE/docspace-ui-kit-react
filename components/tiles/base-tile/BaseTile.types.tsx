@@ -1,7 +1,7 @@
 import type { TileItem } from "../tile-container/TileContainer.types";
 import { ContextMenuModel } from "../../context-menu/ContextMenu.types";
 
-export type BaseTileProps = {
+export type BaseTileProps = React.AriaAttributes & {
   /** Ticks the checkbox, shows it in place of the icon and tints the tile. The tile holds no state; pass back what `onSelect` reports. */
   checked?: boolean;
   /** Keeps the hover tint on the tile being acted on, after the pointer leaves it. */

@@ -340,6 +340,18 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`Row`, `RowContainer`, `RowContent` and every part of the table forward a passed `aria-*` to
+  their outer element.** Each dropped every one. None of those elements has a role, so a name
+  there is not read
+- **Every tile forwards a passed `aria-*` to its outer element.** `BaseTile`, `FolderTile`,
+  `RoomTile`, `TemplateTile`, `TileContainer` and `TileContent` dropped them; `FileTile` already
+  passed them on and now declares them. `inProgress` still sets `aria-busy` over a passed value
+- **`Filter`, `Paging` and `Selector` forward a passed `aria-*` to their outer element.** Each
+  dropped every one
+- **`Dropzone` forwards a passed `aria-*` to its drop area**, the library's `role="button"`. A
+  passed `aria-label` wins over the English "File upload area" or "Folder upload area"
+- **`InfiniteLoader` names its virtual grid with a passed `aria-label`.** react-virtualized named
+  it `grid` and forwards no other `aria-*`
 - **`ModalDialog` puts every passed `aria-*` on the dialog.** Beyond `aria-label`,
   `aria-labelledby` and `aria-describedby` they went to the header, which dropped them. The
   header gets none now; `aria-modal` stays the component's

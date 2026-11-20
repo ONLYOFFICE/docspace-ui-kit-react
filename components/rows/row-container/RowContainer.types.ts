@@ -1,6 +1,6 @@
 import { IndexRange } from "react-virtualized";
 
-export type RowContainerProps = {
+export type RowContainerProps = React.AriaAttributes & {
   /**
    * Height of one row in pixels, which the virtualised list uses for every row
    * alike. A taller row gets no more room.

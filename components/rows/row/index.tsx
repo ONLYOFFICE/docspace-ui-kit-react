@@ -17,6 +17,7 @@ import { ContextMenu, ContextMenuRefType } from "../../context-menu";
 import { Loader, LoaderTypes } from "../../loader";
 import { IndexIconButtons } from "./sub-components/index-icon-buttons";
 
+import { pickAriaProps } from "../../../utils/aria-props";
 import { RowProps } from "./Row.types";
 import { hasOwnProperty } from "../../../utils";
 import styles from "./Row.module.scss";
@@ -136,6 +137,7 @@ const Row = React.memo((props: RowProps) => {
 
   return (
     <div
+      {...pickAriaProps(props)}
       ref={row}
       onContextMenu={onContextMenu}
       className={classNames(

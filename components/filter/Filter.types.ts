@@ -301,7 +301,8 @@ export type TRoomGroup = {
   totalRooms: number;
 };
 
-export type FilterProps = SearchInputProps &
+export type FilterProps = React.AriaAttributes &
+  SearchInputProps &
   Omit<SortButtonProps, "id" | "title" | "viewSettings"> &
   Omit<FilterButtonProps, "id" | "title" | "selectedFilterValue"> & {
     /** Returns the filters in force, drawn as chips under the bar. Re-read whenever the function changes, so keep it stable. */

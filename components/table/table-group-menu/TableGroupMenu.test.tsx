@@ -56,6 +56,14 @@ describe("<TableGroupMenu />", () => {
     vi.clearAllMocks();
   });
 
+  it("puts a passed aria-* on the menu", () => {
+    render(<TableGroupMenu {...defaultProps} aria-describedby="menu-hint" />);
+    expect(screen.getByTestId("table-group-menu")).toHaveAttribute(
+      "aria-describedby",
+      "menu-hint",
+    );
+  });
+
   it("renders without errors", () => {
     render(<TableGroupMenu {...defaultProps} />);
     expect(screen.getByTestId("table-group-menu")).toBeInTheDocument();
