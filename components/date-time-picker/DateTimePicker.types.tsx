@@ -9,7 +9,7 @@ export type DateTimePickerTranslations = {
   PM: string;
 };
 
-export type DateTimePickerProps = {
+export type DateTimePickerProps = React.AriaAttributes & {
   /**
    * Moment shown from the first render, as the day chip and the time beside it.
    * Its hour also picks AM or PM.

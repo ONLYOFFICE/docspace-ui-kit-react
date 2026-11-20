@@ -11,6 +11,7 @@ import { parseToDateTime, formatDate } from "../../utils/date";
 import { TimePicker } from "../time-picker";
 import { DatePicker } from "../date-picker";
 import { ComboBox, TOption } from "../combobox";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import type {
   DateTimePickerProps,
@@ -170,8 +171,10 @@ const DateTimePicker = (props: DateTimePickerProps) => {
         [styles.hasError]: hasError,
       })}
       id={id}
+      {...pickAriaProps(props)}
       data-testid={dataTestId ?? "date-time-picker"}
-      aria-label={selectDateText}
+      role="group"
+      aria-label={props["aria-label"] ?? selectDateText}
       aria-invalid={hasError}
     >
       <DatePicker

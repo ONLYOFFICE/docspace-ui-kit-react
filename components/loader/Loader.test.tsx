@@ -19,6 +19,20 @@ describe("<Loader />", () => {
     expect(screen.getByTestId("loader")).toBeInTheDocument();
   });
 
+  it("puts a passed aria-* on the status region", () => {
+    render(
+      <Loader
+        {...baseProps}
+        aria-label="Loading files"
+        aria-describedby="files-hint"
+      />,
+    );
+
+    expect(
+      screen.getByRole("status", { name: "Loading files" }),
+    ).toHaveAttribute("aria-describedby", "files-hint");
+  });
+
   it("renders base type with text", () => {
     render(<Loader {...baseProps} />);
     expect(screen.getByText("Loading")).toBeInTheDocument();

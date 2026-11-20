@@ -8,6 +8,7 @@ import CrossIconReactSvgUrl from "../../assets/icons/12/cross.react.svg";
 import { Text } from "../text";
 import { IconButton } from "../icon-button";
 import { TooltipContainer } from "../tooltip";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import type { TagProps, TagType, TagClickEvent } from "./Tag.types";
 import styles from "./Tag.module.scss";
@@ -36,6 +37,7 @@ const TagPure: FC<TagProps> = ({
   withLabel = true,
   labelSuffix,
   labelSuffixColor,
+  ...rest
 }) => {
   const onClickAction = React.useCallback(() => {
     if (onClick && !isDisabled && !isDeleted) {
@@ -49,6 +51,7 @@ const TagPure: FC<TagProps> = ({
 
   return (
     <TooltipContainer
+      {...pickAriaProps(rest)}
       as="div"
       id={id}
       ref={ref}
@@ -63,8 +66,8 @@ const TagPure: FC<TagProps> = ({
         [styles.thirdPartyTag]: icon,
       })}
       style={{ ...style, maxWidth: tagMaxWidth }}
-      aria-label={label}
-      aria-disabled={isDisabled}
+      aria-label={rest["aria-label"] ?? label}
+      aria-disabled={isDisabled || rest["aria-disabled"]}
       data-testid={dataTestId ?? "tag_item"}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}

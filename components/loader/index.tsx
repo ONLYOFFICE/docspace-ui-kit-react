@@ -3,6 +3,7 @@ import { useId } from "react";
 import { Text } from "../text";
 import { useCommonTranslation } from "../../utils/i18n";
 import { useLiveRegionText } from "../../hooks/useLiveRegionText";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import { Oval } from "./sub-components/Oval";
 import { DualRing } from "./sub-components/DualRing";
@@ -98,6 +99,7 @@ const Loader = (props: LoaderProps) => {
 
   return (
     <div
+      {...pickAriaProps(props)}
       role="status"
       className={className}
       style={style}

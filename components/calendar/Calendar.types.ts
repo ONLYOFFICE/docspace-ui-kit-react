@@ -1,6 +1,6 @@
 import type { DateTime } from "luxon";
 
-export interface CalendarProps {
+export interface CalendarProps extends React.AriaAttributes {
   /** Applied to the outermost element. */
   className?: string;
   /** Applied to the outermost element. */

@@ -156,6 +156,20 @@ describe("Calendar tests:", () => {
     expect(screen.getByTestId("calendar")).toBeDefined();
   });
 
+  it("puts a passed aria-* on the outer element", () => {
+    render(
+      <Calendar
+        {...defaultProps}
+        aria-describedby="range-hint"
+        aria-hidden="false"
+      />,
+    );
+
+    const calendar = screen.getByTestId("calendar");
+    expect(calendar).toHaveAttribute("aria-describedby", "range-hint");
+    expect(calendar).toHaveAttribute("aria-hidden", "false");
+  });
+
   it("should render Days component by default (selectedScene = 0)", () => {
     render(<Calendar {...defaultProps} />);
     expect(screen.getByTestId("days-component")).toBeDefined();

@@ -5,6 +5,7 @@ import React, { FC, useCallback } from "react";
 import { useUnmount } from "../../hooks/useUnmount";
 import { consumeKey } from "../../utils/consume-key";
 import { useCommonTranslation } from "../../utils/i18n";
+import { pickAriaProps } from "../../utils/aria-props";
 import { Tag, type TagClickEvent, type TagType } from "../tag";
 
 import styles from "./Tags.module.scss";
@@ -48,6 +49,7 @@ const Tags: FC<TagsProps> = ({
   optionTagRef,
   ariaLabel: ariaLabelProp,
   createTagLabel,
+  ...rest
 }) => {
   const t = useCommonTranslation();
   const ariaLabel = ariaLabelProp ?? (t("Tags") || "Tags");
@@ -145,12 +147,13 @@ const Tags: FC<TagsProps> = ({
 
   return (
     <div
+      {...pickAriaProps(rest)}
       id={id}
       style={style}
       ref={tagsRef}
       role="group"
       data-testid="tags"
-      aria-label={ariaLabel}
+      aria-label={rest["aria-label"] ?? ariaLabel}
       className={classNames(styles.tags, className)}
       onKeyDown={handleKeyDown}
     >

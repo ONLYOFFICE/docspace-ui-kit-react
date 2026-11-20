@@ -20,6 +20,21 @@ describe("<RadioButtonGroup />", () => {
     vi.clearAllMocks();
   });
 
+  it("puts a passed aria-* on the radio group", () => {
+    render(
+      <RadioButtonGroup
+        {...baseProps}
+        aria-label="Fruit"
+        aria-describedby="fruit-hint"
+      />,
+    );
+
+    expect(screen.getByRole("radiogroup", { name: "Fruit" })).toHaveAttribute(
+      "aria-describedby",
+      "fruit-hint",
+    );
+  });
+
   it("renders without error", () => {
     render(<RadioButtonGroup {...baseProps} />);
     expect(screen.getByTestId("radio-button-group")).toBeInTheDocument();

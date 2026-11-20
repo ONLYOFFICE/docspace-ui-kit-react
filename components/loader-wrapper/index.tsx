@@ -1,12 +1,15 @@
+import { pickAriaProps } from "../../utils/aria-props";
 import type { LoaderWrapperProps } from "./LoaderWrapper.types";
 
 export const LoaderWrapper = ({
   children,
   isLoading,
   testId,
+  ...rest
 }: LoaderWrapperProps) => {
   return (
     <div
+      {...pickAriaProps(rest)}
       style={{
         opacity: isLoading
           ? "var(--loader-wrapper-loading-opacity, 0.5)"

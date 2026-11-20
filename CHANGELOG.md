@@ -335,6 +335,20 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`ComboBox` and `AccessRightSelect` forward a passed `aria-*` to the button.** Both dropped
+  every one but `ariaLabel`. A passed `aria-label` wins over `ariaLabel`; the open state and
+  `aria-disabled` while `isDisabled` stay the component's
+- **`ColorPicker`, `TimePicker` and `Tags` forward a passed `aria-*` to their group.** Each took
+  only `ariaLabel`, which a passed `aria-label` now wins over
+- **`RadioButton` and `RadioButtonGroup` forward a passed `aria-*`.** The button puts it on its
+  input, and the group on its `radiogroup`, which can be named at last
+- **`DateTimePicker` is a named group, and forwards a passed `aria-*` to it.** Its
+  `selectDateText` name sat on a `<div>` with no role, where screen readers ignore it
+- **`DatePicker` forwards a passed `aria-*` to the select-date control, and `Calendar` to its
+  outer element.** Both dropped every one. A passed `aria-label` wins over `selectDateText`
+- **`Loader`, `AppLoader`, `LoaderWrapper`, `StatusMessage` and `Tag` forward a passed
+  `aria-*`.** Each dropped every one. The loaders put it on their status region, and `Tag` lets
+  a passed `aria-label` win over `label`
 - **`FloatingButton`, `OperationsProgressButton` and `MainButtonMobile` forward a passed `aria-*`
   to the circle.** All three dropped it, so the badge could only be named after its icon in
   English. A passed `aria-label` wins over `label`, and names the progress bar too. Pass a

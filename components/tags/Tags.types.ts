@@ -4,7 +4,7 @@ import type { TagClickEvent, TagProps, TagType } from "../tag/Tag.types";
 /** Which tag `onOptionTagClick` was called for: the overflow tag that stands for the hidden tags, or the plus tag drawn by `showCreateTag`. */
 export type TOptionTagKind = "overflow" | "create";
 
-export type TagsProps = {
+export type TagsProps = React.AriaAttributes & {
   /** Applied to the outermost element. */
   id?: string;
   /** Tags to lay out. A bare string is treated as `{ label }`. */

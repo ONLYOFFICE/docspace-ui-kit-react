@@ -22,6 +22,22 @@ describe("<TimePicker />", () => {
     expect(container).toBeTruthy();
   });
 
+  it("puts a passed aria-* on the group, its aria-label over ariaLabel", () => {
+    render(
+      <TimePicker
+        {...baseProps}
+        ariaLabel="Time"
+        aria-label="Start time"
+        aria-describedby="time-hint"
+      />,
+    );
+
+    expect(screen.getByRole("group", { name: "Start time" })).toHaveAttribute(
+      "aria-describedby",
+      "time-hint",
+    );
+  });
+
   it("renders with correct initial time", () => {
     render(<TimePicker {...baseProps} />);
     const hoursInput = screen.getByLabelText("Hours") as HTMLInputElement;

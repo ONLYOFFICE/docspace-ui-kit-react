@@ -1,4 +1,4 @@
-export type TagProps = {
+export type TagProps = React.AriaAttributes & {
   /** Ref to the outermost element. */
   ref?: React.RefObject<HTMLDivElement | null>;
   /** Identifier of the tag. It is handed to `onDelete`, and it is the text shown when `label` is left out. */

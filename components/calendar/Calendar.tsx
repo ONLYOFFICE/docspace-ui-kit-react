@@ -14,6 +14,7 @@ import {
 } from "../../utils/date";
 
 import { getValidDates } from "./utils";
+import { pickAriaProps } from "../../utils/aria-props";
 import { CalendarProps } from "./Calendar.types";
 import styles from "./Calendar.module.scss";
 
@@ -33,6 +34,7 @@ const Calendar = ({
   isScroll = false,
   dataTestId,
   useMaxTime,
+  ...rest
 }: CalendarProps) => {
   const handleDateChange = (date: DateTime) => {
     // Combine the new date with the existing time from selectedDate
@@ -139,6 +141,7 @@ const Calendar = ({
 
   return (
     <div
+      {...pickAriaProps(rest)}
       id={id}
       className={classNames(styles.container, className, {
         [styles.isScroll]: isScroll,

@@ -48,7 +48,7 @@ export type TSeparatorOption = TBaseOption & {
 
 export type TOption = TRegularOption | TSeparatorOption;
 
-export type TComboboxProps = {
+export type TComboboxProps = React.AriaAttributes & {
   /**
    * Element whose children replace the list entirely, for a menu that is not a
    * list of options. `options` is then used only for the button.
@@ -305,6 +305,8 @@ export type TComboButtonProps = {
   tabIndex?: number;
   /** Accessible name of the button */
   ariaLabel?: string;
+  /** The `aria-*` attributes passed to the combo box, set on the button. */
+  aria?: React.AriaAttributes;
   /** Indicates if the button is loading */
   isLoading?: boolean;
   /** Type of the combo box */

@@ -6,6 +6,8 @@ import { InputSize, InputType, TextInput } from "../text-input";
 
 import { parseToDateTime, formatDate, startOf, now } from "../../utils/date";
 
+import { pickAriaProps } from "../../utils/aria-props";
+
 import type { TimePickerProps } from "./TimePicker.types";
 import styles from "./TimePicker.module.scss";
 
@@ -28,6 +30,7 @@ const TimePicker = ({
   hoursLabel = "Hours",
   minutesLabel = "Minutes",
   autoAdvance = true,
+  ...rest
 }: TimePickerProps) => {
   const hoursInputRef = useRef<HTMLInputElement>(null);
   const minutesInputRef = useRef<HTMLInputElement>(null);
@@ -196,8 +199,9 @@ const TimePicker = ({
       })}
       ref={forwardedRef}
       data-testid={testId ?? "time-picker"}
+      {...pickAriaProps(rest)}
       role="group"
-      aria-label={ariaLabel}
+      aria-label={rest["aria-label"] ?? ariaLabel}
     >
       <TextInput
         className={classNameInput ? `${classNameInput}-hours-input` : undefined}

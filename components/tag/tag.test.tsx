@@ -24,6 +24,7 @@ vi.mock("../tooltip", () => ({
     "data-testid": testId,
     onMouseEnter,
     onMouseLeave,
+    ...rest
   }: {
     children: React.ReactNode;
     onClick?: React.MouseEventHandler;
@@ -32,8 +33,11 @@ vi.mock("../tooltip", () => ({
     "data-testid"?: string;
     onMouseEnter?: React.MouseEventHandler;
     onMouseLeave?: React.MouseEventHandler;
-  }) => (
+  } & React.AriaAttributes) => (
     <div
+      {...Object.fromEntries(
+        Object.entries(rest).filter(([key]) => key.startsWith("aria-")),
+      )}
       className={className}
       onClick={onClick}
       data-testid={testId || "tag_item"}
@@ -79,6 +83,24 @@ describe("<Tag />", () => {
   it("renders without error", () => {
     render(<Tag {...baseProps} />);
     expect(screen.getByTestId("tag_item")).toBeInTheDocument();
+  });
+
+  it("keeps a passed aria-*, its aria-label over label", () => {
+    const { rerender } = render(
+      <Tag
+        {...baseProps}
+        aria-label="Filter by Script"
+        aria-describedby="tag-hint"
+        aria-disabled
+      />,
+    );
+    const tag = screen.getByTestId("tag_item");
+    expect(tag).toHaveAttribute("aria-label", "Filter by Script");
+    expect(tag).toHaveAttribute("aria-describedby", "tag-hint");
+    expect(tag).toHaveAttribute("aria-disabled", "true");
+
+    rerender(<Tag {...baseProps} isDisabled aria-disabled={false} />);
+    expect(tag).toHaveAttribute("aria-disabled", "true");
   });
 
   it("accepts id", () => {
