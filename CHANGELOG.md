@@ -295,6 +295,10 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Added
 
+- **`AsideHeader`'s `headerIcons` take a `label`**, the icon button's accessible name. `Aside` and
+  `ModalDialog` pass it on
+- **`RoomIcon` takes `badgeLabel`**, the accessible name of a badge that `onBadgeClick` makes a
+  button
 - **`CategoryItem` takes `className` and `style`**, both on its outer element. It took neither,
   so its variables could only be set on an ancestor
 - **`PortalLogo` takes `dataTestId`**, `portal-logo` by default, on the wrapper or on the
@@ -342,6 +346,18 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **The kit's own icon-only buttons are named**, in its translations. Each was a focusable button
+  announced only as "button": the crosses of `Tag`, `SelectedItem` and the filter chips
+  ("Remove"), `Textarea`'s copy button ("Copy to clipboard"), the table group menu's cross and
+  info panel toggle ("Close", "Info panel"), the back arrows of `Navigation` and of
+  `ContextMenu`'s mobile submenu ("Back"), the filter panel's clear icon ("Clear filter"), and the
+  pencils and pluses of `Avatar` and `RoomIcon` ("Edit", or "Upload picture" for `Avatar`'s plus)
+- **`RoomLogoCoverDialog`'s custom colour plus and pencil are named** by `t("Common:Color")`, the
+  text already shown above the swatches
+- **Some icon buttons take their name from a prop that was only a tooltip.** `Filter`'s sort
+  button is named by `sortByTitle`, and the table's cog by `TableHeader`'s `settingsTitle`, or
+  "Settings". `Navigation`'s plus is named by `titles.actions`, or "Actions", and its folder
+  button by `titles.contextMenu`, which nothing read, or "More options"
 - **`Avatar`, `RoomType`, `SelectedItem` and `CategoryItem` forward a passed `aria-*` to the
   element with the role**: the avatar's button, the row, the chip and the title link. Each
   dropped every one. A passed `aria-label` wins over `userName`, the row's text, the chip's label

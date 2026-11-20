@@ -5,6 +5,7 @@ import { IconButton } from "../icon-button";
 import { TooltipContainer } from "../tooltip";
 import { activateOnButtonKey } from "../../utils/keyboard-activation";
 import { pickAriaProps } from "../../utils/aria-props";
+import { useCommonTranslation } from "../../utils/i18n";
 
 import type { SelectedItemProps } from "./SelectedItem.types";
 import styles from "./SelectedItem.module.scss";
@@ -32,6 +33,7 @@ export const SelectedItemPure = (props: SelectedItemProps) => {
     isActive,
     clickable,
   } = props;
+  const t = useCommonTranslation();
   if (!label) return null;
 
   const onCloseClick = (e: React.MouseEvent) => {
@@ -107,6 +109,7 @@ export const SelectedItemPure = (props: SelectedItemProps) => {
           iconNode={<CrossReactSvgUrl />}
           size={12}
           onClick={onCloseClick}
+          ariaLabel={t("Remove")}
           isFill
           isDisabled={isDisabled}
         />

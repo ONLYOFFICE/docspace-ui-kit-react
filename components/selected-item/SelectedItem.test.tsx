@@ -30,6 +30,12 @@ const renderWithHandlers = () => {
 };
 
 describe("<SelectedItem />", () => {
+  it("names the cross", () => {
+    render(<SelectedItem {...baseProps} />);
+
+    expect(screen.getByRole("button", { name: "Remove" })).toBeInTheDocument();
+  });
+
   it("puts a passed aria-* on the chip and keeps its own aria-pressed", () => {
     render(
       <SelectedItem

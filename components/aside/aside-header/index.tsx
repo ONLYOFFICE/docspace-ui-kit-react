@@ -98,6 +98,7 @@ const AsideHeader = (props: AsideHeaderProps) => {
               iconName={item.url}
               iconNode={item.iconNode}
               onClick={item.onClick}
+              ariaLabel={item.label}
               isClickable
               isFill
             />

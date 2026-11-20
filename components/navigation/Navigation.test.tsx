@@ -76,6 +76,29 @@ describe("Navigation Component", () => {
     vi.clearAllMocks();
   });
 
+  it("names the back arrow and the plus and folder buttons", () => {
+    render(
+      <Navigation
+        {...defaultProps}
+        isPlusButtonVisible
+        isContextButtonVisible
+        titles={{
+          ...defaultProps.titles,
+          actions: "New room",
+          contextMenu: "Show folder actions",
+        }}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "Back" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "New room" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Show folder actions" }),
+    ).toBeInTheDocument();
+  });
+
   it("puts a passed aria-* on the header container", () => {
     const { container } = render(
       <Navigation {...defaultProps} aria-describedby="folder-hint" />,

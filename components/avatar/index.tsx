@@ -10,6 +10,7 @@ import PlusSvgUrl from "../../assets/icons/16/button.plus.react.svg";
 
 import { IconSizeType, useClickOutside } from "../../utils";
 import { pickAriaProps } from "../../utils/aria-props";
+import { useCommonTranslation } from "../../utils/i18n";
 
 import { useInterfaceDirection, useTheme } from "../../context";
 
@@ -58,6 +59,7 @@ const AvatarPure = ({
   ...rest
 }: AvatarProps) => {
   const { isRTL } = useInterfaceDirection();
+  const t = useCommonTranslation();
   const { isBase } = useTheme();
 
   const iconRef = React.useRef<HTMLDivElement>(null);
@@ -250,6 +252,7 @@ const AvatarPure = ({
                   className="edit_icon"
                   iconNode={<PencilReactSvgUrl />}
                   onClick={onEditButtonClick}
+                  ariaLabel={t("EditButton")}
                   size={16}
                   dataTestId="edit_avatar_icon_button"
                 />
@@ -260,6 +263,7 @@ const AvatarPure = ({
                 className="edit_icon"
                 iconNode={<PlusSvgUrl />}
                 onClick={onUploadClick}
+                ariaLabel={t("UploadPicture")}
                 size={16}
                 dataTestId="edit_avatar_icon_button"
               />

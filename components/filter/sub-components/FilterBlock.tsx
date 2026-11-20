@@ -568,6 +568,7 @@ const FilterBlock = ({
                 className="close-button"
                 iconNode={<ClearReactSvgUrl />}
                 onClick={onClearFilter}
+                ariaLabel={t("ClearFilter")}
                 isClickable
                 isFill
                 dataTestId="filter_clear_button"

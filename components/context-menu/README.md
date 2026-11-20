@@ -258,8 +258,8 @@ export function ShareMenu({ onCopy }: { onCopy: () => void }) {
   the menu is taller than 210px or `ignoreChangeView` is set.
 - The sheet is portalled into `#root`, found by that literal id, and only then does the backdrop
   appear. On a desktop `withBackdrop` shows nothing unless `ignoreChangeView` is set too.
-- **On the sheet a submenu replaces the list in place**, with a back button in the header,
-  rather than opening to the side.
+- **On the sheet a submenu replaces the list in place**, rather than opening to the side. A back
+  button named by the translated "Back" sits in its header.
 - **Disabled items are dropped from the list** unless `showDisabledItems` is set. Then they show
   greyed out, and `getTooltipContent` explains on hover why.
 - **Escape, the arrow keys and Enter work** while the menu is open, through a `keyup` listener

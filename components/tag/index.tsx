@@ -9,6 +9,7 @@ import { Text } from "../text";
 import { IconButton } from "../icon-button";
 import { TooltipContainer } from "../tooltip";
 import { pickAriaProps } from "../../utils/aria-props";
+import { useCommonTranslation } from "../../utils/i18n";
 
 import type { TagProps, TagType, TagClickEvent } from "./Tag.types";
 import styles from "./Tag.module.scss";
@@ -39,6 +40,8 @@ const TagPure: FC<TagProps> = ({
   labelSuffixColor,
   ...rest
 }) => {
+  const t = useCommonTranslation();
+
   const onClickAction = React.useCallback(() => {
     if (onClick && !isDisabled && !isDeleted) {
       onClick({ roomType, label: label ?? tag, providerType });
@@ -105,6 +108,7 @@ const TagPure: FC<TagProps> = ({
           iconNode={<CrossIconReactSvgUrl />}
           size={12}
           onClick={onDeleteAction}
+          ariaLabel={t("Remove")}
         />
       ) : null}
     </TooltipContainer>

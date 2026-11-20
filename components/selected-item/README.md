@@ -210,10 +210,9 @@ Set them on any ancestor, or on the chip through `style` or a `className` rule.
   the chip's own, and a button inside a button is announced unreliably.
 - **A passed `aria-*` lands on the chip and is kept.** A clickable chip takes its accessible name
   from the label text unless you pass one; `aria-pressed` stays the component's.
-- **The cross is an [`IconButton`](../icon-button/README.md)**, so it is a focusable button, but
-  nothing names it: a screen reader is told nothing about what it does. Where removal has to be
-  announced, render your own [`Button`](../button/README.md) beside the chip and pass
-  `hideCross`.
+- **The cross is an [`IconButton`](../icon-button/README.md)** named by the translated "Remove".
+  It does not say which chip it removes; where that matters, render your own
+  [`Button`](../button/README.md) beside the chip and pass `hideCross`.
 - `title` feeds the shared pointer tooltip and leaves no `title` attribute on the chip, so it is
   not a label either.
 - `isDisabled` is a colour and a guard in the handlers. The chip gets no `aria-disabled` of its

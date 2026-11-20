@@ -28,6 +28,18 @@ describe("<Avatar />", () => {
     vi.clearAllMocks();
   });
 
+  it("names the edit button: a pencil with a picture, a plus without", () => {
+    const { rerender } = render(
+      <Avatar {...baseProps} editing hasAvatar onChangeFile={vi.fn()} />,
+    );
+    expect(screen.getByRole("button", { name: "Edit" })).toBeInTheDocument();
+
+    rerender(<Avatar {...baseProps} editing onChangeFile={vi.fn()} />);
+    expect(
+      screen.getByRole("button", { name: "Upload picture" }),
+    ).toBeInTheDocument();
+  });
+
   it("puts a passed aria-* on the avatar, whose passed name wins", () => {
     render(
       <Avatar

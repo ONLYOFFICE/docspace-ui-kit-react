@@ -238,7 +238,8 @@ are declared by the theme on the tag itself. A wrapper cannot override them.
   role and no `tabIndex`**, so a clickable tag cannot be reached or activated from the keyboard.
 - `aria-disabled` is set from `isDisabled`, and the CSS additionally makes the tag inert.
 - The delete cross is an [`IconButton`](../icon-button/README.md): a keyboard button, focusable
-  and pressed by Enter and Space. It has no name, so nothing announces which tag it removes.
+  and pressed by Enter and Space. It is named by the translated "Remove", which does not say
+  which tag it removes.
 - **A passed `aria-*` lands on the tag and is kept.** A passed `aria-label` wins over `label`,
   which is the name otherwise. `isDisabled` sets `aria-disabled` over a passed value.
 - A tag with `withLabel={false}` announces only its `aria-label`, so keep `label` filled in

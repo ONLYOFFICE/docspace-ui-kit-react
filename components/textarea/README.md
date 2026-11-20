@@ -242,8 +242,8 @@ than 13px puts the line numbers out of step with the lines.
   and nothing more. The message has to be an element of yours that this prop points at.
 - `hasError` sets no `aria-invalid`; pass it alongside, as
   [Mark text that is too long](#mark-text-that-is-too-long) does.
-- **The copy button has no accessible name.** It is an [`IconButton`](../icon-button/README.md):
-  focusable and pressed with Enter or Space, but announced as an unnamed button.
+- **The copy button is named by the translated "Copy to clipboard".** It is an
+  [`IconButton`](../icon-button/README.md), focusable and pressed with Enter or Space.
 - It is in the tab order by default.
 
 ## Test ids

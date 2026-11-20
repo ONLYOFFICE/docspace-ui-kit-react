@@ -98,7 +98,7 @@ export interface TableHeaderProps extends React.AriaAttributes {
   setHideColumns?: (value: boolean) => void;
   /** `localStorage` key used instead of `columnStorageName` while the info panel is open. Without it the header writes no widths on mount or on a resize. */
   columnInfoPanelStorageName?: string;
-  /** Hover tooltip of the cog. It does not name the cog for a screen reader. */
+  /** Hover tooltip and accessible name of the cog. Without it the cog is named "Settings". */
   settingsTitle?: string;
   /** Ref attached to the header cell of the column that asks for it with `withTagRef`. */
   tagRef?:
@@ -141,6 +141,8 @@ export interface TableSettingsProps {
   columns: TTableColumn[];
   /** Greys the cog out and stops the list of columns opening. */
   disableSettings?: boolean;
+  /** Accessible name of the cog. Without it the cog is named "Settings". */
+  label?: string;
 }
 
 export interface TableBodyProps extends React.AriaAttributes {

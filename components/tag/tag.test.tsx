@@ -55,11 +55,14 @@ vi.mock("../icon-button", () => ({
   IconButton: ({
     onClick,
     dataTestId,
+    ariaLabel,
   }: {
     onClick: Function;
     dataTestId?: string;
+    ariaLabel?: string;
   }) => (
     <button
+      aria-label={ariaLabel}
       onClick={(e) => onClick(e)}
       data-testid={dataTestId || "icon-button"}
       type="button"
@@ -80,6 +83,12 @@ const baseProps: TagProps = {
 };
 
 describe("<Tag />", () => {
+  it("names the delete cross", () => {
+    render(<Tag {...baseProps} isNewTag />);
+
+    expect(screen.getByRole("button", { name: "Remove" })).toBeInTheDocument();
+  });
+
   it("renders without error", () => {
     render(<Tag {...baseProps} />);
     expect(screen.getByTestId("tag_item")).toBeInTheDocument();

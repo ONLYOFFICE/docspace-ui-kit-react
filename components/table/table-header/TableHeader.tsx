@@ -1341,6 +1341,7 @@ export const TableHeader = (props: TableHeaderProps) => {
               <TableSettings
                 columns={columns}
                 disableSettings={hideColumns || Boolean(isIndexEditingModeProp)}
+                label={settingsTitle}
               />
             </TooltipContainer>
           ) : null}

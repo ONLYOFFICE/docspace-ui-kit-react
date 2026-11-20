@@ -5,6 +5,14 @@ import { render, screen } from "@testing-library/react";
 import { Textarea } from ".";
 
 describe("<Textarea />", () => {
+  it("names the copy button", () => {
+    render(<Textarea value="text" enableCopy />);
+
+    expect(
+      screen.getByRole("button", { name: "Copy to clipboard" }),
+    ).toBeInTheDocument();
+  });
+
   it("forwards every passed aria-* to the <textarea>", () => {
     render(
       <Textarea

@@ -100,7 +100,7 @@ The Table README describes it in full.`,
     settingsTitle: {
       control: "text",
       description:
-        "Hover tooltip of the cog. It does not name the cog for a screen reader.",
+        'Hover tooltip and accessible name of the cog. Without it the cog is named "Settings".',
     },
     infoPanelVisible: {
       control: "boolean",

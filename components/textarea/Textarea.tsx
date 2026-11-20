@@ -11,6 +11,7 @@ import { IconButton } from "../icon-button";
 import { Scrollbar } from "../scrollbar";
 import { toastr } from "../toast";
 import { pickAriaProps } from "../../utils/aria-props";
+import { useCommonTranslation } from "../../utils/i18n";
 import { jsonify, isJSON } from "./Textarea.utils";
 import type { TextareaProps } from "./Textarea.types";
 import styles from "./Textarea.module.scss";
@@ -58,6 +59,7 @@ const Textarea = ({
   autoComplete,
   ...rest
 }: TextareaProps) => {
+  const t = useCommonTranslation();
   const { isRTL } = useInterfaceDirection();
   const aria = pickAriaProps(rest);
 
@@ -158,6 +160,7 @@ const Textarea = ({
         <IconButton
           className={`${styles.copyIconWrapper} ${classNameCopyIcon || ""}`}
           onClick={handleCopy}
+          ariaLabel={t("CopyToClipboard")}
           iconNode={<CopyIconUrl />}
           size={16}
         />

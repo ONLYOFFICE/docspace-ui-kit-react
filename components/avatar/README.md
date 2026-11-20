@@ -281,7 +281,8 @@ Each badge also reads `--avatar-owner-stroke` and `--avatar-owner-color`, or the
 - A picture's `alt` text is `userName`; with no `userName` it is empty and the picture is
   treated as decorative.
 - The edit button is an [`IconButton`](../icon-button/README.md) with an `onClick`, so it is a
-  focusable button. It has no accessible name, and it sits inside the avatar's own button.
+  focusable button. It is named by the translated "Edit" as a pencil, "Upload picture" as a plus.
+  It sits inside the avatar's own button.
 - Initials are plain text with no label, and the role badge is an inline SVG with none either.
   The badge's meaning is available only as a hover tooltip.
 - `tooltipContent` is not translated by the component; pass text you have already translated.

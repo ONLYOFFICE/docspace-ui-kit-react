@@ -329,7 +329,7 @@ export type FilterProps = React.AriaAttributes &
 
     /** Tooltip and accessible name of the filter button. */
     filterTitle: string;
-    /** Tooltip of the sort button, set on its wrapper; the button itself stays unnamed. */
+    /** Accessible name of the sort button, and its tooltip on the wrapper. */
     sortByTitle: string;
 
     /** Picks where the view selector goes: beside the sort button on a desktop, inside the sort menu below. */

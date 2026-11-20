@@ -49,6 +49,8 @@ export type TContextButtonProps = {
   ignoreChangeView?: boolean;
   /** Header of the folder's context menu, used where the menu opens as a mobile sheet. */
   contextMenuHeader?: HeaderType;
+  /** Accessible name of the folder button. Without it the button is named "More options". */
+  ariaLabel?: string;
 };
 
 export type TPlusButtonProps = {
@@ -86,9 +88,10 @@ export type TToggleInfoPanelButtonProps = {
   /** Called when the info panel toggle is clicked. */
   toggleInfoPanel: (e?: React.MouseEvent) => void;
   id?: string;
-  /** Hover tooltips of the info panel toggle and the plus button, the AI chat
-   * button's label, and the warning chip's text and icon. `contextMenu` is not
-   * read. */
+  /** Texts of the header buttons. `infoPanel` and `actions` name the info panel
+   * toggle and the plus, and are their hover tooltips; `contextMenu` names the
+   * folder button. `aiChat` labels the AI chat button, and `warningText` and
+   * `warningIcon` fill the warning chip. */
   titles?: TTitles;
 };
 
@@ -175,7 +178,7 @@ export type TRowData = [TNavigationItem[], TOnNavigationItemClick, TRowParam];
 
 export type TControlButtonProps = Omit<TToggleInfoPanelButtonProps, "id"> &
   Omit<TPlusButtonProps, "getData" | "className"> &
-  Omit<TContextButtonProps, "getData" | "className" | "id"> & {
+  Omit<TContextButtonProps, "getData" | "className" | "id" | "ariaLabel"> & {
     /** Whether the person may create anything here. It is one of two conditions for the plus button; `isPlusButtonVisible` is the other, and both must hold. */
     canCreate: boolean;
     /** Returns the model of the folder menu. **It is called on every

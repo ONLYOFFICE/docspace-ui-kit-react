@@ -116,7 +116,7 @@ const meta = {
     headerIcons: {
       control: false,
       description:
-        "Extra icon buttons between the title and the close cross. Each needs a `key`, an `onClick`, and an `iconNode` or a `url` fetched at runtime.",
+        "Extra icon buttons between the title and the close cross. Each needs a `key`, an `onClick`, and an `iconNode` or a `url` fetched at runtime; its optional `label` is the button's accessible name.",
     },
     headerComponent: {
       control: false,

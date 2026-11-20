@@ -168,7 +168,7 @@ const meta = {
     titles: {
       control: "object",
       description:
-        "Hover tooltips of the info panel toggle and the plus button, the AI chat button's label, and the warning chip's text and icon. `contextMenu` is not read.",
+        "Texts of the header buttons. `infoPanel` and `actions` name the info panel toggle and the plus, and are their hover tooltips; `contextMenu` names the folder button. `aiChat` labels the AI chat button, and `warningText` and `warningIcon` fill the warning chip.",
       table: { defaultValue: { summary: "undefined" } },
     },
     navigationItems: {

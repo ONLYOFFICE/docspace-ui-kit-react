@@ -7,6 +7,7 @@ type HeaderIcon = {
   key: string;
   url?: string;
   iconNode?: React.ReactNode;
+  label?: string;
   onClick: () => void;
 };
 
@@ -24,7 +25,8 @@ export type AsideHeaderProps = React.AriaAttributes & {
   header?: string | React.ReactNode;
   /**
    * Extra icon buttons between the title and the close cross. Each needs a
-   * `key`, an `onClick`, and an `iconNode` or a `url` fetched at runtime.
+   * `key`, an `onClick`, and an `iconNode` or a `url` fetched at runtime;
+   * its optional `label` is the button's accessible name.
    */
   headerIcons?: HeaderIcon[];
   /**

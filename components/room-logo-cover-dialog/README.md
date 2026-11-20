@@ -321,8 +321,8 @@ types are, for typing a re-implementation.
 
 - **The swatches, the glyphs and the "without icon" control are pointer-only.** Each is a `<div>`
   with a click handler: no role, no `tabindex`, no key handling.
-- **The plus and the pencil are keyboard buttons without a name.** Tab reaches them, and Enter or
-  Space opens the picker, but a screen reader announces only "button".
+- **The plus and the pencil are keyboard buttons named by `t("Common:Color")`.** Tab reaches them,
+  and Enter or Space opens the picker.
 - Nothing tells a screen reader which swatch or glyph is chosen. The selected state is a class and
   a ring, with no `aria-pressed` or `aria-selected`.
 - The glyphs are injected SVG with no titles and no `aria-hidden`. They are announced, if at all,

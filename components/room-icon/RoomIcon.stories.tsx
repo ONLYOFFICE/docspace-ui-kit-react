@@ -140,6 +140,11 @@ const meta = {
       description:
         "Called when the badge is clicked. The click also reaches the tile, which toggles the logo menu when the tile has one.",
     },
+    badgeLabel: {
+      control: "text",
+      description:
+        "Accessible name of the badge, which is a button only with `onBadgeClick`. Without it that button is unnamed.",
+    },
     tooltipContent: {
       control: "text",
       description:

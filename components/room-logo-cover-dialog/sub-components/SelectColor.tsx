@@ -104,6 +104,7 @@ export const SelectColor = ({
                   size={12}
                   iconNode={<PencilIcon />}
                   onClick={onOpenColorPicker}
+                  ariaLabel={t("Common:Color")}
                   isFill
                 />
               </div>
@@ -113,6 +114,7 @@ export const SelectColor = ({
                 size={12}
                 iconNode={<PencilIcon />}
                 onClick={onOpenColorPicker}
+                ariaLabel={t("Common:Color")}
                 isFill
               />
             )}
@@ -128,6 +130,7 @@ export const SelectColor = ({
               size={16}
               iconNode={<PlusIcon />}
               onClick={onOpenColorPicker}
+              ariaLabel={t("Common:Color")}
               isFill
             />
           </div>

@@ -545,7 +545,7 @@ const meta = {
     sortByTitle: {
       control: "text",
       description:
-        "Tooltip of the sort button, set on its wrapper; the button itself stays unnamed.",
+        "Accessible name of the sort button, and its tooltip on the wrapper.",
     },
     view: {
       control: "text",

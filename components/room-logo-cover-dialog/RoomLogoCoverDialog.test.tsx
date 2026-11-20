@@ -61,6 +61,14 @@ describe("RoomLogoCover", () => {
       />,
     );
 
+  it("names the custom colour button", () => {
+    renderPicker();
+
+    expect(
+      screen.getByRole("button", { name: "Common:Color" }),
+    ).toBeInTheDocument();
+  });
+
   it("asks for the without-icon label in Common", () => {
     renderPicker();
     expect(

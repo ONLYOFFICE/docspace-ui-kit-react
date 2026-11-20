@@ -37,6 +37,31 @@ describe("<RoomIcon />", () => {
     vi.clearAllMocks();
   });
 
+  it("names a clickable badge by badgeLabel", () => {
+    render(
+      <RoomIcon
+        {...baseProps}
+        badgeUrl="badge.svg"
+        onBadgeClick={vi.fn()}
+        badgeLabel="Shared room"
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Shared room" }),
+    ).toBeInTheDocument();
+  });
+
+  it("names the pencil and the empty state's plus", () => {
+    const { rerender } = render(
+      <RoomIcon {...baseProps} withEditing model={mockModel} />,
+    );
+    expect(screen.getByRole("button", { name: "Edit" })).toBeInTheDocument();
+
+    rerender(<RoomIcon {...baseProps} isEmptyIcon model={mockModel} />);
+    expect(screen.getByRole("button", { name: "Edit" })).toBeInTheDocument();
+  });
+
   it("puts a passed aria-* on the outer element", () => {
     render(<RoomIcon {...baseProps} aria-hidden />);
 

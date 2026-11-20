@@ -86,6 +86,8 @@ type RoomIconBadge = {
   badgeIconColor?: string;
   /** Called when the badge is clicked. The click also reaches the tile, which toggles the logo menu when the tile has one. */
   onBadgeClick?: () => void;
+  /** Accessible name of the badge, which is a button only with `onBadgeClick`. Without it that button is unnamed. */
+  badgeLabel?: string;
 };
 
 type RoomIconNonBadge = {
@@ -97,6 +99,8 @@ type RoomIconNonBadge = {
   badgeIconColor?: undefined;
   /** Called when the badge is clicked. The click also reaches the tile, which toggles the logo menu when the tile has one. */
   onBadgeClick?: undefined;
+  /** Accessible name of the badge, which is a button only with `onBadgeClick`. Without it that button is unnamed. */
+  badgeLabel?: undefined;
 };
 
 export type RoomIconProps = React.AriaAttributes &
