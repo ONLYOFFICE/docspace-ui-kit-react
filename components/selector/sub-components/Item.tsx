@@ -122,6 +122,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
       isSystem,
       isMCP,
       isFolder,
+      selectByCheckboxOnly,
       id,
       mark,
     } = item;
@@ -209,7 +210,7 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
     );
 
     const onChangeAction = () => {
-      onSelect?.(item, false);
+      onSelect?.(item, false, true);
     };
 
     const onClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -420,7 +421,12 @@ const Item = React.memo(({ index, style, data }: ItemProps) => {
           <Checkbox
             className={classNames(styles.checkbox, "checkbox")}
             isChecked={isSelected}
-            isDisabled={isItemDisabled}
+            // A folder's row stays live at the limit (it still opens); its
+            // box, which would tick one more, does not.
+            isDisabled={
+              isItemDisabled ||
+              (!!selectByCheckboxOnly && isLimitReached && !isSelected)
+            }
             onChange={onChangeAction}
             // The row is the option the list's arrows and Space act on; its box
             // is no Tab stop of its own inside the listbox.

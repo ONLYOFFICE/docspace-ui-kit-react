@@ -1,0 +1,162 @@
+@use "../../../../styles/variables/colors";
+
+.trigger {
+  --ai-chat-agent-picker-expander: #{colors.$black};
+
+  :global(.dark) & {
+    --ai-chat-agent-picker-expander: #{colors.$white};
+  }
+
+  display: flex;
+  align-items: center;
+  // The picked agent's logo, its name, the expander.
+  gap: 8px;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0;
+
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.title {
+  min-width: 0;
+}
+
+.expander {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+
+  path {
+    fill: var(--ai-chat-agent-picker-expander);
+  }
+
+  &.rotated {
+    transform: rotate(-180deg);
+  }
+}
+
+// The menu lives in a portal on the body, outside `.trigger`: its tokens are
+// its own.
+.menu {
+  --ai-chat-agent-picker-label: #{colors.$gray};
+  --ai-chat-agent-picker-default-bg: #{colors.$gray-light-mid};
+  --ai-chat-agent-picker-default-fg: var(
+    --accent-main,
+    #{colors.$light-blue-main}
+  );
+  --ai-chat-agent-picker-check: var(--accent-main, #{colors.$light-blue-main});
+  --ai-chat-agent-picker-divider: var(
+    --drop-down-item-divider,
+    #{colors.$gray-light-mid}
+  );
+
+  :global(.dark) & {
+    --ai-chat-agent-picker-default-bg: #{colors.$gray-dark-strong};
+    --ai-chat-agent-picker-divider: var(
+      --drop-down-item-divider,
+      #{colors.$gray-dark-strong}
+    );
+  }
+
+  padding-block: 4px;
+}
+
+// The line under the default agent, and the one above "Save as new agent",
+// drawn as DropDownItem's separator is: 1px, 16px in from either side, 4px
+// above and below.
+.agentsGroup,
+.saveGroup {
+  position: relative;
+  margin-top: 9px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -5px;
+    inset-inline: 16px;
+    height: 1px;
+    background-color: var(--ai-chat-agent-picker-divider);
+  }
+}
+
+.sectionLabel {
+  padding: 8px 12px 4px;
+
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  text-transform: uppercase;
+  color: var(--ai-chat-agent-picker-label);
+}
+
+.agents {
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.defaultLogo {
+  background-color: var(--ai-chat-agent-picker-default-bg);
+
+  svg {
+    width: 12px;
+    height: 12px;
+
+    path {
+      fill: var(--ai-chat-agent-picker-default-fg);
+    }
+  }
+}
+
+// "Save as new agent": an action, in the link colour with its plus.
+.saveRow {
+  color: var(--ai-chat-agent-picker-check);
+
+  svg {
+    width: 12px;
+    height: 12px;
+
+    path {
+      fill: currentColor;
+    }
+  }
+}
+
+.name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.check {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  margin-inline-start: 8px;
+
+  path {
+    fill: var(--ai-chat-agent-picker-check);
+  }
+}

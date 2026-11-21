@@ -583,12 +583,15 @@ export type SelectorProps = TSelectorHeader &
     /**
      * Called when a row is clicked, before Selector updates its own selection.
      * The third argument submits with that one item, which is how a double click
-     * confirms a choice.
+     * confirms a choice. The fourth is `true` when the row's checkbox was
+     * ticked rather than the row clicked - what tells the two apart on a row
+     * with `selectByCheckboxOnly`.
      */
     onSelect?: (
       item: TSelectorItem,
       isDoubleClick: boolean,
       doubleClickCallback: () => Promise<void>,
+      fromCheckbox?: boolean,
     ) => void;
 
     /** Whether rows carry checkboxes and more than one can be ticked. */
@@ -677,7 +680,11 @@ export type BodyProps = TSelectorInfo &
     setInputItemVisible: (value: boolean) => void;
 
     renderCustomItem?: TRenderCustomItem;
-    onSelect: (item: TSelectorItem, isDoubleClick: boolean) => void;
+    onSelect: (
+      item: TSelectorItem,
+      isDoubleClick: boolean,
+      fromCheckbox?: boolean,
+    ) => void;
 
     loadMoreItems: (startIndex: number) => void;
 
@@ -1035,6 +1042,12 @@ export type TSelectorItem = TSelectorItemType & {
   templateIsOwner?: boolean;
   /** Whether this row stays single-select while the rest are not. */
   disableMultiSelect?: boolean;
+  /**
+   * In a multi-select list, only the row's checkbox ticks it; a click on the
+   * row is passed to `onSelect` and leaves the selection alone. For a folder
+   * that can be both picked (the box) and opened (the row).
+   */
+  selectByCheckboxOnly?: boolean;
   /** Renders the row as a thin divider, 16px tall, that cannot be clicked. */
   isSeparator?: boolean;
   /** Makes that divider a section break, 25px tall. */
@@ -1047,7 +1060,11 @@ export type TSelectorItem = TSelectorItemType & {
 
 export type Data = {
   items: TSelectorItem[];
-  onSelect?: (item: TSelectorItem, isDoubleClick: boolean) => void;
+  onSelect?: (
+    item: TSelectorItem,
+    isDoubleClick: boolean,
+    fromCheckbox?: boolean,
+  ) => void;
   isMultiSelect: boolean;
   isItemLoaded: (index: number) => boolean;
   rowLoader: React.ReactNode;

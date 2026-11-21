@@ -1,25 +1,17 @@
 "use client";
 
-import { observer } from "mobx-react";
-import { useTranslation } from "react-i18next";
-
 import { useStores } from "@onlyoffice/ai-chat";
-
-import { IconButton } from "../../../../components/icon-button";
 
 import { useAiChatStore } from "../../../providers/ai-chat-store";
 import type { AiChatPresetRoom } from "../../../providers/ai-chat-store";
 
-import SaveIcon from "../../../../assets/icons/17/save.react.svg";
-
 /**
- * The panel header's save button: hands the chat's current settings — the
- * model, the skills room and the knowledge base — to the host's
- * `AiChatStore.onSavePreset`, which keeps them as a named preset. Rendered
- * only while the host has wired that hook.
+ * What "Save as new agent" in the panel title's menu does: hands the chat's
+ * current settings — the model, the skills rooms and the knowledge bases —
+ * to the host's `AiChatStore.onSavePreset`, which keeps them as a named
+ * agent. `null` while the host has not wired that hook: nothing to offer.
  */
-const AiChatPanelSave = observer(() => {
-  const { t } = useTranslation(["Common"]);
+export const useSaveChatAsAgent = (): (() => void) | null => {
   const store = useAiChatStore();
   const { useCloudsStore, useProfilesStore, selectCurrentChatProfile } =
     useStores();
@@ -31,7 +23,10 @@ const AiChatPanelSave = observer(() => {
   const contextFolders = useCloudsStore((s) => s.selectedContextFolders);
   const knowledgeFolders = useCloudsStore((s) => s.selectedKnowledgeFolders);
 
-  if (!store.onSavePreset) return null;
+  // Read here, so an observer that calls the hook follows the host wiring
+  // and unwiring it.
+  const onSavePreset = store.onSavePreset;
+  if (!onSavePreset) return null;
 
   const asPresetRoom = (selected: {
     cloud: string;
@@ -42,35 +37,17 @@ const AiChatPanelSave = observer(() => {
     name: selected.room.name,
   });
 
-  const onClick = () => {
-    // A picked agent shows its profile under the agent's name; the project
+  return () => {
+    // A picked agent shows its profile under the agent's name; the agent
     // stores the model, so the name comes from the profile itself.
     const model = profile
       ? (useProfilesStore.getState().getProfileById(profile.id) ?? profile)
       : null;
-    store.onSavePreset?.({
+    onSavePreset({
       profileId: model?.id ?? null,
       profileName: model?.name ?? null,
       contextRooms: contextFolders.map(asPresetRoom),
       knowledgeRooms: knowledgeFolders.map(asPresetRoom),
     });
   };
-
-  return (
-    <IconButton
-      iconNode={<SaveIcon />}
-      size={17}
-      // A stroked glyph, like the fullscreen and close icons beside it:
-      // recolor the outline (and on hover), never fill it shut.
-      isStroke
-      onClick={onClick}
-      tooltipId="ai-chat-panel-save-tooltip"
-      tooltipContent={t("Common:SaveAIProject", {
-        defaultValue: "Save as AI project",
-      })}
-      dataTestId="ai-chat-panel-save"
-    />
-  );
-});
-
-export default AiChatPanelSave;
+};

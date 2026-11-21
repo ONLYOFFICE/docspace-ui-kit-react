@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { isObservable } from "mobx";
 
 import AiChatStore, { projectToPreset } from "./AiChatStore";
 
@@ -343,6 +344,23 @@ describe("AiChatStore panel width", () => {
 
   it("starts from the default width while nothing is saved", () => {
     expect(new AiChatStore().panelWidth).toBe(400);
+  });
+});
+
+describe("AiChatStore agent the chat runs on", () => {
+  it("is none for the default agent, and keeps the host's agent as it is", () => {
+    const store = new AiChatStore();
+    expect(store.chatAgent).toBeNull();
+
+    // A logo element must reach the chat untouched, not wrapped in a proxy.
+    const logo = { type: "img", props: {} } as unknown as React.ReactElement;
+    const agent = { name: "Legal Reviewer", logo };
+    store.setChatAgent(agent);
+    expect(store.chatAgent).toBe(agent);
+    expect(isObservable(store.chatAgent)).toBe(false);
+
+    store.setChatAgent(null);
+    expect(store.chatAgent).toBeNull();
   });
 });
 

@@ -13,6 +13,7 @@ const clouds = {
   }[],
   selectContextFolder: vi.fn(),
   selectContextFolders: vi.fn(),
+  deselectContextFolder: vi.fn(),
   clearContextFolder: vi.fn(),
   fetchRoomSkills: vi.fn(),
 };
@@ -108,13 +109,77 @@ describe("ContextRoomSync", () => {
     expect(clouds.clearContextFolder).not.toHaveBeenCalled();
   });
 
-  it("drops the connection for a room without skills", async () => {
+  it("connects nothing for a room without skills, and leaves the chat's own skill sets", async () => {
     hasRoomSkills.mockResolvedValue(false);
     renderSync({ id: "12", name: "Sales" });
     await flush();
 
     expect(clouds.selectContextFolders).not.toHaveBeenCalled();
-    expect(clouds.clearContextFolder).toHaveBeenCalledTimes(1);
+    expect(clouds.deselectContextFolder).not.toHaveBeenCalled();
+    expect(clouds.clearContextFolder).not.toHaveBeenCalled();
+  });
+
+  it("drops the rooms it connected when the next room has no skills", async () => {
+    hasRoomSkills.mockResolvedValueOnce(true).mockResolvedValueOnce(false);
+    const { rerender } = renderSync({ id: "12", name: "Sales" });
+    await flush();
+    expect(clouds.selectContextFolders).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <ContextRoomProvider room={{ id: "13", name: "Empty" }}>
+        <ContextRoomSync />
+      </ContextRoomProvider>,
+    );
+    await flush();
+
+    expect(clouds.deselectContextFolder).toHaveBeenCalledExactlyOnceWith(
+      CONTEXT_ROOM_CLOUD,
+      "12",
+    );
+    expect(clouds.clearContextFolder).not.toHaveBeenCalled();
+  });
+
+  // The rooms were handed over, but none was connected: nothing is the sync's to take.
+  it("leaves the user's skill sets when it leaves rooms that held no skills", async () => {
+    hasRoomSkills.mockResolvedValue(false);
+    const { rerender } = renderSync({ id: "12", name: "Sales" });
+    await flush();
+    clouds.selectedContextFolders = [
+      { cloud: CONTEXT_ROOM_CLOUD, room: { id: "40", name: "Picked" } },
+    ];
+
+    rerender(
+      <ContextRoomProvider room={null}>
+        <ContextRoomSync />
+      </ContextRoomProvider>,
+    );
+    await flush();
+
+    expect(clouds.deselectContextFolder).not.toHaveBeenCalled();
+    expect(clouds.clearContextFolder).not.toHaveBeenCalled();
+  });
+
+  it("takes away its own rooms alone, never a skill set picked beside them", async () => {
+    hasRoomSkills.mockResolvedValue(true);
+    const { rerender } = renderSync({ id: "12", name: "Sales" });
+    await flush();
+    clouds.selectedContextFolders = [
+      { cloud: CONTEXT_ROOM_CLOUD, room: { id: "12", name: "Sales" } },
+      { cloud: CONTEXT_ROOM_CLOUD, room: { id: "40", name: "Picked" } },
+    ];
+
+    rerender(
+      <ContextRoomProvider room={null}>
+        <ContextRoomSync />
+      </ContextRoomProvider>,
+    );
+    await flush();
+
+    expect(clouds.deselectContextFolder).toHaveBeenCalledExactlyOnceWith(
+      CONTEXT_ROOM_CLOUD,
+      "12",
+    );
+    expect(clouds.clearContextFolder).not.toHaveBeenCalled();
   });
 
   it("connects only the rooms that hold skills, in the host's order", async () => {
@@ -149,15 +214,22 @@ describe("ContextRoomSync", () => {
     await flush();
 
     expect(clouds.selectContextFolders).not.toHaveBeenCalled();
-    expect(clouds.clearContextFolder).toHaveBeenCalledTimes(1);
+    expect(clouds.clearContextFolder).not.toHaveBeenCalled();
   });
 
-  it("clears without asking when there is no room", async () => {
+  // The chat brings back the skill sets of the open conversation (after a
+  // reload too) before the pane mounts: a first sync with no room must not
+  // wipe them.
+  it("leaves the skill sets alone on a first sync with no room", async () => {
+    clouds.selectedContextFolders = [
+      { cloud: CONTEXT_ROOM_CLOUD, room: { id: "77", name: "Contracts" } },
+    ];
     renderSync(null);
     await flush();
 
     expect(hasRoomSkills).not.toHaveBeenCalled();
-    expect(clouds.clearContextFolder).toHaveBeenCalledTimes(1);
+    expect(clouds.clearContextFolder).not.toHaveBeenCalled();
+    expect(clouds.selectContextFolders).not.toHaveBeenCalled();
   });
 
   it("follows the room while the chat stays open", async () => {
@@ -192,7 +264,11 @@ describe("ContextRoomSync", () => {
       </ContextRoomProvider>,
     );
     await flush();
-    expect(clouds.clearContextFolder).toHaveBeenCalledTimes(1);
+    expect(clouds.deselectContextFolder).toHaveBeenCalledExactlyOnceWith(
+      CONTEXT_ROOM_CLOUD,
+      "13",
+    );
+    expect(clouds.clearContextFolder).not.toHaveBeenCalled();
   });
 
   describe("reopening the chat in the same room", () => {
@@ -267,6 +343,41 @@ describe("ContextRoomSync", () => {
         CONTEXT_ROOM_CLOUD,
         [{ id: "13", name: "HR" }],
       );
+    });
+
+    it("drops the rooms it connected when the chat reopens where there is none", async () => {
+      const view = await openConnectAndClose();
+      clouds.selectedContextFolders = [
+        { cloud: CONTEXT_ROOM_CLOUD, room: sales },
+      ];
+
+      view.rerender(<Chat room={null} open />);
+      await flush();
+
+      expect(clouds.deselectContextFolder).toHaveBeenCalledExactlyOnceWith(
+        CONTEXT_ROOM_CLOUD,
+        "12",
+      );
+      expect(clouds.clearContextFolder).not.toHaveBeenCalled();
+    });
+
+    it("drops the rooms it connected after a move whose check never landed", async () => {
+      const view = await openConnectAndClose();
+      hasRoomSkills.mockReturnValueOnce(new Promise<boolean>(() => {}));
+      view.rerender(<Chat room={{ id: "13", name: "HR" }} open />);
+      await flush();
+      view.rerender(<Chat room={{ id: "13", name: "HR" }} open={false} />);
+      hasRoomSkills.mockResolvedValue(false);
+
+      view.rerender(<Chat room={{ id: "13", name: "HR" }} open />);
+      await flush();
+
+      expect(hasRoomSkills).toHaveBeenCalledTimes(2);
+      expect(clouds.deselectContextFolder).toHaveBeenCalledExactlyOnceWith(
+        CONTEXT_ROOM_CLOUD,
+        "12",
+      );
+      expect(clouds.clearContextFolder).not.toHaveBeenCalled();
     });
 
     it("checks again when the first check never landed", async () => {

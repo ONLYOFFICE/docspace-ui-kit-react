@@ -290,6 +290,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- InfiniteLoader: a tile row of agents (`isAgent`) is 306px high (290px and the 16px gap), the
+  height of the agent card the client draws; at 198px every next row covered the lower part of
+  the cards above it, in the client's Agents, Skill sets and Knowledge bases tiles
 - **`PasswordInput` generates passwords from the cryptographic generator.** The generate link
   and the handle's `onGeneratePassword` drew every character and the final shuffle from
   `Math.random`, which is predictable, while consumers use the result as an account password

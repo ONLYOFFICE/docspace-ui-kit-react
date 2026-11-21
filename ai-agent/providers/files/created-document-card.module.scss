@@ -1,0 +1,90 @@
+// The card of a document a reply created, drawn by the chat library under
+// the tool call's row (inside `.aui-root`), so it reads the chat theme's
+// tokens.
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.card {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  width: 100%;
+  max-width: var(--chat-created-document-card-max-width, 420px);
+  padding: 8px 12px 8px 8px;
+
+  border: 1px solid var(--border-divider);
+  border-radius: 6px;
+  background: var(--background-normal);
+}
+
+.open {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+
+  padding: 4px;
+  margin: 0;
+
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--highlight-button-hover);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--border-control-focus);
+    outline-offset: 1px;
+  }
+}
+
+.icon {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  overflow: hidden;
+
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--text-normal);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.createdBy {
+  overflow: hidden;
+
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.action {
+  flex: 0 0 auto;
+}

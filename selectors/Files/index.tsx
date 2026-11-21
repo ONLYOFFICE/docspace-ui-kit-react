@@ -112,6 +112,8 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     applyFilterOption,
     isMultiSelect,
     onSelectItem,
+    withFolderSelection,
+    onFolderToggle,
     isPortalView,
 
     renderInPortal,
@@ -483,7 +485,13 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       item: TSelectorItem,
       isDoubleClick: boolean,
       doubleClickCallback: () => Promise<void>,
+      fromCheckbox?: boolean,
     ) => {
+      // A folder's checkbox picks it; only a click on its row opens it.
+      if (item.isFolder && fromCheckbox) {
+        onFolderToggle?.(item, breadCrumbs);
+        return;
+      }
       onSelectItem?.(item);
       if (item.isFolder) {
         if (isDoubleClick) return;
@@ -642,6 +650,7 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
       setIsDisabledFolder,
       isMultiSelect,
       onSelectItem,
+      onFolderToggle,
       filesApi,
       t,
     ],
@@ -851,10 +860,24 @@ const FilesSelectorComponent = (props: FilesSelectorProps) => {
     : false;
 
   // itemTitlesVersion stands for titles that changed outside the items.
-  const displayItems = React.useMemo(
-    () => applyResolvedTitles(items, resolveItemTitle),
-    [items, resolveItemTitle, itemTitlesVersion],
-  );
+  // With folder selection every folder below the root gets a checkbox; the
+  // root's sections are places to open, not folders to pick.
+  const withFolderCheckboxes = !!withFolderSelection && !!isMultiSelect;
+  const displayItems = React.useMemo(() => {
+    const titled = applyResolvedTitles(items, resolveItemTitle);
+    if (!withFolderCheckboxes || isRoot) return titled;
+    return titled.map((item) =>
+      item.isFolder
+        ? { ...item, disableMultiSelect: false, selectByCheckboxOnly: true }
+        : item,
+    );
+  }, [
+    items,
+    resolveItemTitle,
+    itemTitlesVersion,
+    withFolderCheckboxes,
+    isRoot,
+  ]);
 
   const SelectorBody = useSelectorBody({
     ...props,

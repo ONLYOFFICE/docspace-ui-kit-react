@@ -234,6 +234,17 @@ const SaveDialog = ({
       }}
       isThirdParty={false}
       withCreate={false}
+      // A title and a close button of its own, as the product's other
+      // selectors have: without them the root crumb stands in the title's
+      // place.
+      withHeader
+      headerProps={{
+        headerLabel: t("Common:SelectFolder", {
+          defaultValue: "Select folder",
+        }),
+        onCloseClick: onFinish,
+        isCloseable: true,
+      }}
       withSearch
       withBreadCrumbs
       withoutBackButton

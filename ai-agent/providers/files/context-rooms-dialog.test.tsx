@@ -69,7 +69,8 @@ describe("ContextRoomsDialog", () => {
     expect(props.useAside).toBe(true);
     // The rows carry numeric ids, and the selector ticks on a strict match.
     expect(props.selectedItems).toEqual([{ id: 12, label: "Skills" }]);
-    expect(props.headerProps?.headerLabel).toBe("Instructions rooms");
+    // Named as the composer names them: Skill sets and Knowledge bases.
+    expect(props.headerProps?.headerLabel).toBe("Skill sets");
   });
 
   it("picks Knowledge rooms for the knowledge slot", () => {
@@ -101,6 +102,48 @@ describe("ContextRoomsDialog", () => {
     );
     expect(clouds.selectKnowledgeFolders).not.toHaveBeenCalled();
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("tells the host what the skills pick connected and disconnected", () => {
+    clouds.selectedContextFolders = [
+      { cloud: CONTEXT_ROOM_CLOUD, room: { id: "12", name: "Skills" } },
+      { cloud: CONTEXT_ROOM_CLOUD, room: { id: "14", name: "Sales" } },
+    ];
+    const onSkillRoomsChange = vi.fn();
+    const { rerender } = render(
+      <ContextRoomsDialog
+        kind="skills"
+        onClose={vi.fn()}
+        onSkillRoomsChange={onSkillRoomsChange}
+      />,
+    );
+    act(() => {
+      selector().onSubmit([
+        { id: 12, label: "Skills" },
+        { id: 13, label: "Legal" },
+      ]);
+    });
+    expect(onSkillRoomsChange).toHaveBeenCalledWith({
+      added: [{ id: "13", name: "Legal" }],
+      removed: ["14"],
+    });
+
+    // The same rooms again: nothing to save.
+    onSkillRoomsChange.mockClear();
+    rerender(
+      <ContextRoomsDialog
+        kind="skills"
+        onClose={vi.fn()}
+        onSkillRoomsChange={onSkillRoomsChange}
+      />,
+    );
+    act(() => {
+      selector().onSubmit([
+        { id: 12, label: "Skills" },
+        { id: 14, label: "Sales" },
+      ]);
+    });
+    expect(onSkillRoomsChange).not.toHaveBeenCalled();
   });
 
   it("sends a room once however many times the pick lists it", () => {

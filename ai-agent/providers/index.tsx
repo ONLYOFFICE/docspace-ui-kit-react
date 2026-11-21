@@ -46,7 +46,9 @@ import type {
   ProviderType,
   ServerAPIConfig,
   Suggestion,
+  ThreadSourceList,
   ToolCallApproveContext,
+  ToolResultRenderer,
   WebSearchProviderId,
 } from "@onlyoffice/ai-chat";
 
@@ -68,6 +70,7 @@ import { AiChatAvailabilityContext } from "./availability";
 import { ChatIntro } from "../chat-intro";
 import { AnalyzeIntro } from "../new-chat/components/analyze-intro";
 import { storageAdapter } from "./storage";
+import { settingsAdapter } from "./settings";
 import { usePlatformAdapter } from "./platform";
 import { componentOverrides } from "./components-overrides";
 import { imageOverrides } from "./images-overrides";
@@ -98,10 +101,12 @@ import { addDialogSubmitInterceptor } from "./components-overrides/dialog-footer
 import { useApi as useFilesApi } from "../../providers/api";
 import { ContextRoomProvider, type ContextRoom } from "./context-room";
 import ContextRoomWatcher from "./context-room/ContextRoomWatcher";
+import { CONTEXT_ROOM_CLOUD } from "./context-room/ContextRoomSync";
 import {
   useAnalyzeQuestions,
   useComposerTyping,
   useFilesIntegration,
+  useSkillSetMenu,
   type AttachedFileInfo,
   type ReadSuggestedQuestions,
   type SuggestedQuestion,
@@ -121,6 +126,12 @@ import {
 import { CHAT_ATTACHMENT_LIMIT } from "./files/limits";
 import { uploadFilesToChat } from "./files/upload-files";
 import { openAttachedFile } from "./files/open-file";
+import { CreatedDocumentsRenderer } from "./files/created-document-card";
+import {
+  CreatedDocumentsContext,
+  type CreatedDocumentsContextValue,
+} from "./files/created-documents";
+import { useComposerSourceLists } from "./files/use-composer-sources";
 
 // The host app (DocSpace) uses `i18n.createInstance()` and provides that
 // instance via `<I18nextProvider>` at the app root. ai-chat, however, calls
@@ -318,6 +329,14 @@ type AiAgentProvidersProps = {
    * travel as a header.
    */
   serverApi?: AiServerApi;
+  /**
+   * The signed-in user's id. The chat remembers the skill sets, knowledge
+   * bases and data sources connected to each conversation in the browser's
+   * storage, and brings them back when the conversation is opened again,
+   * after a reload as well; the id keeps the records of the users of one
+   * browser profile apart. Without it one set of records serves them all.
+   */
+  userId?: string;
   children: ReactNode;
 };
 
@@ -466,6 +485,23 @@ const EDITOR_TOOL_NAME_BY_CHAT_TOOL: Record<string, string> = {
 // returns it in the tool result. We hide the "Always allow" checkbox for them
 // (one-off confirmation only) and open the generated file once approved.
 const GENERATE_TOOL_NAMES = Object.keys(EDITOR_TOOL_NAME_BY_CHAT_TOOL);
+
+// The tools whose result names documents they created, drawn as document
+// cards under their row (`WidgetConfig.toolResultRenderers`): the document
+// agent of ASC.AI.Chat and the editor's generate tools, which take its place
+// while it is not configured. A module constant, so the record the library
+// keys by never changes.
+const DOCUMENT_TOOL_RENDERERS: Record<string, ToolResultRenderer> =
+  Object.fromEntries(
+    ["document_agent", ...GENERATE_TOOL_NAMES].map((name) => [
+      name,
+      CreatedDocumentsRenderer,
+    ]),
+  );
+
+// The lists an agent sets for every conversation it runs: its skill sets and
+// knowledge bases (`WidgetConfig.hostOwnedSources`).
+const HOST_OWNED_SOURCES: ThreadSourceList[] = ["skillSets", "knowledgeBases"];
 
 // The chat tool name of the tool-call the approval dialog is currently
 // showing, or undefined when no call is pending.
@@ -632,6 +668,7 @@ const AiAgentProviders = ({
   contextRoom,
   attachmentLimit,
   serverApi,
+  userId,
   children,
 }: AiAgentProvidersProps) => {
   const { t } = useTranslation("Common");
@@ -661,6 +698,8 @@ const AiAgentProviders = ({
     analyzeFileName,
     composerContextHidden,
     knowledgePickerHidden,
+    sourcesManager,
+    chatAgent,
   } = useObservedFields(() => ({
     analyzeActive: aiChatStore.isAnalyzeMode,
     analyzePending: aiChatStore.isAnalyzePending,
@@ -668,6 +707,8 @@ const AiAgentProviders = ({
     analyzeFileName: aiChatStore.analyzeFormTitle,
     composerContextHidden: aiChatStore.composerContextHidden,
     knowledgePickerHidden: aiChatStore.knowledgePickerHidden,
+    sourcesManager: aiChatStore.sourcesManager,
+    chatAgent: aiChatStore.chatAgent,
   }));
 
   // Ids of attached files the backend flagged as analyzable. The attachments
@@ -724,14 +765,33 @@ const AiAgentProviders = ({
     composerActions: attachActions,
     onPickContextRooms,
     onPickKnowledgeRooms,
+    onAddContextFolder,
     onOpenContextRoom,
     onSaveAsFile,
+    onSaveToRoom,
     exportFormats,
     overlay,
   } = useFilesIntegration({
     entityId: uploadFolderId,
     onFilesAttached,
+    onSkillRoomsChange: sourcesManager?.onSkillRoomsChange,
   });
+
+  // The composer's slash menu changes the Skill sets too. Inside an AI
+  // project they are its settings: a user who may not change them gets no
+  // "Manage skill sets" and no way to disconnect a set, and a change by one
+  // who may is saved through the project (`onSkillRoomsChange`).
+  const skillSetMenu = useSkillSetMenu({ sourcesManager, onPickContextRooms });
+
+  // The slash menu's Knowledge bases follow the same owner. In an AI project
+  // they are saved with it, so a base cannot be dropped from the chat alone
+  // and "Manage knowledge bases" opens the project's settings - or is left
+  // out for a user who may not change them. An ordinary chat picks its own
+  // in the room selector.
+  const sourcesOwned = !!sourcesManager;
+  const onManageKnowledge = sourcesManager
+    ? (sourcesManager.onManage ?? undefined)
+    : onPickKnowledgeRooms;
 
   // Platform adapter passed downstream. Its `file` adapter is wired to the
   // host's save handler, and it tracks the host locale/theme internally (the
@@ -916,10 +976,37 @@ const AiAgentProviders = ({
       // has to be set here — `WidgetConfig.enablePagination` only reaches
       // the stores the library builds for itself.
       enablePagination: true,
+      // The skill sets, knowledge bases and data sources of each
+      // conversation are kept in the browser's storage, per user, and come
+      // back when the conversation is opened again (or the page reloads);
+      // the thread storage has no field for them. Not during SSR, which
+      // has no storage to read.
+      threadSources:
+        typeof window === "undefined"
+          ? undefined
+          : { storage: settingsAdapter, scope: userId || undefined },
     });
 
     return { stores: appStores, ctx: appCtx, serverApiConfig: config };
-  }, [isStandalone, platform, aiChatStore, serverOrigin, serverHeadersKey]);
+  }, [
+    isStandalone,
+    platform,
+    aiChatStore,
+    serverOrigin,
+    serverHeadersKey,
+    userId,
+  ]);
+
+  // The "+" menu's Knowledge bases and Data sources: the connected sources,
+  // each with its remove control, and the "Manage ..." row of each list.
+  const { composerKnowledge, composerDataSources } = useComposerSourceLists({
+    useCloudsStore: stores.useCloudsStore,
+    onPickKnowledgeRooms,
+    onOpenContextRoom,
+    onAddContextFolder,
+    knowledgePickerHidden,
+    sourcesManager,
+  });
 
   // While "Analyze responses" is on, the chat is about that one form: the cap
   // drops to one and the composer's attach actions go away, so the "+" menu
@@ -1104,6 +1191,14 @@ const AiAgentProviders = ({
     ],
   );
 
+  // What the cards of created documents take from the chat: the agent's
+  // name for "created by" and "Save to room...".
+  const agentName = chatAgent?.name ?? null;
+  const createdDocuments = useMemo<CreatedDocumentsContextValue>(
+    () => ({ agentName, onSaveToRoom }),
+    [agentName, onSaveToRoom],
+  );
+
   const ownCallbacks = useMemo<ChatCallbacks>(
     () => analyzeModeCallbacks(aiChatStore),
     [aiChatStore],
@@ -1167,21 +1262,54 @@ const AiAgentProviders = ({
       // AI agents.
       contextRoomScopesRounds: false,
       // The AI project view lists the sources beside the chat, so the
-      // composer drops its own chips and pickers there.
+      // "+" menu drops its Skill sets and Knowledge bases there.
       hideComposerContext: composerContextHidden,
       // With vectorization off on the portal no Knowledge room can be picked
       // for a chat: the composer loses its knowledge base picker.
       hideKnowledgePicker: knowledgePickerHidden,
-      // Instructions rooms and knowledge bases are picked in the room
-      // selector, several at once, and a connected one opens in Files from
-      // its pill's menu.
-      onPickContextRooms,
+      // The "+" menu's Skill sets open the slash menu's skill list: the
+      // connected sets as groups with their skills, a bin per set and
+      // "Manage skill sets...". Inside an agent that row opens the agent's
+      // form for those who may change it (the slash menu's own opens the
+      // Instructions room picker, `onPickContextRooms`); a member who may
+      // not gets neither the row nor the bins.
+      composerSkillList: true,
+      onManageSkillSets: skillSetMenu.onManageSkillSets,
+      // Knowledge bases are picked in the room selector, several at once
+      // ("Manage knowledge bases..."), and a connected one opens in Files
+      // from its row. With knowledge search off the list keeps the bases
+      // connected earlier, each removable, and nothing to add one.
+      composerKnowledge,
+      // Data sources: any folders and rooms of the portal as the chat's
+      // context, up to the library's limit; the AI service tells the model
+      // which they are.
+      composerDataSources,
+      onPickContextRooms: skillSetMenu.onPickContextRooms,
+      hideContextRoomDisconnect: skillSetMenu.hideContextRoomDisconnect,
+      onDisconnectContextRoom: skillSetMenu.onDisconnectContextRoom,
       onOpenContextRoom,
-      onPickKnowledgeRooms,
+      // The slash menu's "Manage knowledge bases" (the "+" menu's list is
+      // built above, in `composerKnowledge`).
+      onPickKnowledgeRooms: onManageKnowledge,
+      hideKnowledgeDisconnect: sourcesOwned,
       onOpenKnowledgeRoom: onOpenContextRoom,
-      // No folder picker (`onPickFolderContext`): the composer has no Folder
-      // slot. In a chat the folder is the one the user is in
-      // (`contextEntityId`); an AI project sets its own beside the chat.
+      // The slash menu's "Manage sources": one more folder or room as a
+      // data source, the same selector the "+" menu's Data sources opens.
+      // The "+" menu's own list is `composerDataSources`, so this adds no
+      // Folder slot to it.
+      onPickFolderContext: onAddContextFolder,
+      // Inside an agent its skill sets and knowledge bases are its settings,
+      // set for every conversation: a conversation opened again does not
+      // bring back its own copy of them. Its data sources stay the user's
+      // own and come back with it.
+      hostOwnedSources: sourcesOwned ? HOST_OWNED_SOURCES : undefined,
+      // Every reply of a chat on an agent starts with the agent's logo; the
+      // default agent's replies carry none.
+      assistantLogo: chatAgent?.logo,
+      // A document a reply created is a card under its tool call: its type
+      // icon and name, "created by <agent>" in a chat on an agent, a click
+      // that opens it and "Save to room...".
+      toolResultRenderers: DOCUMENT_TOOL_RENDERERS,
     }),
     [
       composerActions,
@@ -1203,9 +1331,18 @@ const AiAgentProviders = ({
       chatIntro,
       composerContextHidden,
       knowledgePickerHidden,
-      onPickContextRooms,
-      onPickKnowledgeRooms,
+      skillSetMenu.onPickContextRooms,
+      skillSetMenu.hideContextRoomDisconnect,
+      skillSetMenu.onDisconnectContextRoom,
+      skillSetMenu.onManageSkillSets,
+      onManageKnowledge,
+      sourcesOwned,
+      onAddContextFolder,
       onOpenContextRoom,
+      sourcesManager,
+      chatAgent,
+      composerKnowledge,
+      composerDataSources,
       t,
     ],
   );
@@ -1287,7 +1424,14 @@ const AiAgentProviders = ({
                                 <OnFilesAttachedContext.Provider
                                   value={onFilesAttached}
                                 >
-                                  {children}
+                                  {/* The cards the chat draws for created
+                                      documents read the agent and the copy
+                                      action from here. */}
+                                  <CreatedDocumentsContext.Provider
+                                    value={createdDocuments}
+                                  >
+                                    {children}
+                                  </CreatedDocumentsContext.Provider>
                                 </OnFilesAttachedContext.Provider>
                                 {overlay}
                               </AttachmentLimitContext.Provider>
@@ -1330,4 +1474,4 @@ export {
   AiChatStoreProvider,
   useAiChatStore,
 } from "./ai-chat-store";
-export type { AiChatRouterPage } from "./ai-chat-store";
+export type { AiChatAgent, AiChatRouterPage } from "./ai-chat-store";

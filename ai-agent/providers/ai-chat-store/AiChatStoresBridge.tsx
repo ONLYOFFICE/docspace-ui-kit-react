@@ -11,6 +11,12 @@ import { useAnalyzeLock } from "../files/use-analyze-lock";
 import { endAnalyzeOnChipRemoval, watchAnalyzeClose } from "./AiChatStore";
 import { useAiChatStore } from "./AiChatStoreProvider";
 
+/** Takes the chat's router off the history list, back to the conversation. */
+const leaveHistory = (stores: ReturnType<typeof useStores>) => {
+  const router = stores.useRouter.getState();
+  if (router.currentPage === "history") router.goToChat();
+};
+
 // Sole Zustand → MobX sync point. Mirrors upstream router page and
 // profiles presence into AiChatStore so every consumer can derive
 // fullscreen/header state through computed getters on a single
@@ -55,6 +61,22 @@ const AiChatStoresBridge = () => {
     [store, stores],
   );
 
+  // One chat, on one router, serves the room's panel, the fullscreen chat
+  // and an agent's page. The history list opened in one of them would come
+  // back by itself in the next one, so closing the panel takes the router
+  // back to the conversation. Only the history is left: the setup page is
+  // the chat's own answer to a portal with no model.
+  useEffect(
+    () =>
+      reaction(
+        () => store.isVisible,
+        (visible) => {
+          if (!visible) leaveHistory(stores);
+        },
+      ),
+    [store, stores],
+  );
+
   useEffect(
     () =>
       // `useOpenAiChat` opens the panel by setting `pendingNewChat` on the
@@ -91,6 +113,16 @@ const AiChatStoresBridge = () => {
           stores.useThreadsStore
             .getState()
             .onSwitchToNewThread({ keepSessionProfile: true });
+          // A fresh conversation (an agent's page) opens on itself, not on
+          // the history the chat was left on.
+          leaveHistory(stores);
+        }
+        // Set after the switch, so it is the fresh conversation's draft and
+        // not dropped with the previous one's. The chat applies it once its
+        // composer is mounted: the panel opened by this preset mounts it
+        // only later.
+        if (preset.draft !== undefined) {
+          stores.useThreadsStore.getState().setDraft(preset.draft);
         }
         const clouds = stores.useCloudsStore.getState();
         // The rooms of a preset share one cloud (the portal); a mixed
@@ -141,6 +173,7 @@ const AiChatStoresBridge = () => {
               id: folder.id,
               name: folder.name,
               path: folder.path,
+              kind: folder.kind,
             });
           else clouds.clearFolderContext();
         }
