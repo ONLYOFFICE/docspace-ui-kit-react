@@ -272,8 +272,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `aria-label` set to `title`, with or without a picture; the `<img>` inside has `alt=""`
   instead of the fixed `"mcp icon"`, and the letter is hidden, so a screen reader no longer
   reads a bare letter. With an empty `title` the icon is `aria-hidden`
-- **`MainButton.model` is optional with `isDropdown={false}`, and `opened` no longer reaches the DOM.** `opened` was never read and is now deprecated.
-- **`MainButtonMobile` is operable from the keyboard and reports every open and close.** The floating button carries `aria-haspopup="menu"` and `aria-expanded`; the sheet is a `menu` of `menuitem`s that the arrow keys, Home, End, Enter and Escape operate; the alert badge is a button named "Alert" with `withAlertClick`. `onClose` now fires whenever the sheet closes (button, backdrop, item, Escape, Back) and never on opening, regardless of `isOpenButton`; the new `onOpen` reports opening. `isOpenButton` and five other ignored props are deprecated.
+- **`MainButton.model` is optional with `isDropdown={false}`, and `opened` no longer reaches the DOM.** `opened` was never read and is removed, as listed above.
+- **`MainButtonMobile` is operable from the keyboard and reports every open and close.** The floating button carries `aria-haspopup="menu"` and `aria-expanded`; the sheet is a `menu` of `menuitem`s that the arrow keys, Home, End, Enter and Escape operate; the alert badge is a button named "Alert" with `withAlertClick`. `onClose` now fires whenever the sheet closes (button, backdrop, item, Escape, Back) and never on opening; the new `onOpen` reports opening. `isOpenButton` and the other props it ignored are removed, as listed above.
 - **The `QuickActions` strip is a horizontal toolbar.** The arrow keys (mirrored in RTL), Home and End move focus between tiles and scroll the focused tile into view; Tab still visits every tile.
 - **`TimePicker`'s fields are `type="text"` and take translated names.** They were
   `type="search"` and were announced as search fields. New `ariaLabel`, `hoursLabel` and
