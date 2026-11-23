@@ -251,7 +251,6 @@ describe("FileTile", () => {
         {...defaultProps}
         thumbnailClick={thumbnailClick}
         thumbnail="test.png"
-        thumbSize={96}
       >
         <FileContent />
       </FileTile>,
@@ -271,18 +270,6 @@ describe("FileTile", () => {
       </FileTile>,
     );
     expect(screen.getByTestId("test-badge")).toBeTruthy();
-  });
-
-  it("keeps its dead props off the DOM", () => {
-    render(
-      <FileTile {...defaultProps} contextButtonSpacerWidth={8} sideColor="red">
-        <FileContent />
-      </FileTile>,
-    );
-
-    const tile = screen.getByTestId("tile");
-    expect(tile).not.toHaveAttribute("contextbuttonspacerwidth");
-    expect(tile).not.toHaveAttribute("sidecolor");
   });
 
   it("shows hotkey border when showHotkeyBorder is true", () => {
@@ -390,7 +377,6 @@ describe("FileTile", () => {
       <FileTile
         {...defaultProps}
         thumbnail="invalid.png"
-        thumbSize={96}
         temporaryIcon={<div data-testid="temp-icon" />}
       >
         <FileContent />
@@ -403,9 +389,9 @@ describe("FileTile", () => {
     expect(screen.getByTestId("temp-icon")).toBeTruthy();
   });
 
-  it("renders ReactSVG for thumbnail when thumbSize is undefined", () => {
+  it("renders the thumbnail as an image", () => {
     render(
-      <FileTile {...defaultProps} thumbnail="test.svg" thumbSize={undefined}>
+      <FileTile {...defaultProps} thumbnail="test.svg">
         <FileContent />
       </FileTile>,
     );
@@ -495,7 +481,6 @@ describe("FileTile", () => {
         {...defaultProps}
         setSelection={setSelection}
         thumbnail="test.png"
-        thumbSize={96}
       >
         <FileContent />
       </FileTile>,

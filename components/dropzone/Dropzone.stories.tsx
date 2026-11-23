@@ -582,6 +582,12 @@ export const WithFormatsList: Story = {
     await expect(line).toHaveAttribute("aria-expanded", "true");
     await expect(args.onDrop).not.toHaveBeenCalled();
 
+    // The list is painted over the area, not see-through.
+    const list = full.closest('[class*="dropzoneFormatsDropdown"]');
+    await expect(getComputedStyle(list as Element).backgroundColor).not.toBe(
+      "rgba(0, 0, 0, 0)",
+    );
+
     // Clicking the line again closes it.
     await userEvent.click(line);
     await waitFor(() => expect(full).not.toBeVisible());

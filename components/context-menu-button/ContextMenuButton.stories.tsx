@@ -216,15 +216,6 @@ const meta = {
       control: "text",
       description: "Class added to the icon button inside the wrapper.",
     },
-    columnCount: {
-      control: false,
-      description:
-        "Ignored. It reaches the menu, which does not read it either.",
-    },
-    asideHeader: {
-      control: false,
-      description: "Ignored. Nothing reads this prop.",
-    },
     testId: {
       control: "text",
       description: "Value of `data-testid` on the wrapper.",

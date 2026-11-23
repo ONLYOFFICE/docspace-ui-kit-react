@@ -33,7 +33,6 @@ const Navigation = ({
   titles,
   withMenu,
   onPlusClick,
-  isEmptyPage,
   isDesktop: isDesktopClient,
   isFrame,
   hideInfoPanel,
@@ -58,6 +57,7 @@ const Navigation = ({
   contextButtonAnimation,
   guidAnimationVisible,
   setGuidAnimationVisible,
+  ref,
   isContextButtonVisible,
   isPlusButtonVisible,
   showBackButton,
@@ -76,6 +76,14 @@ const Navigation = ({
 
   const dropBoxRef = React.useRef<HTMLDivElement | null>(null);
   const containerRef = React.useRef<HTMLDivElement | null>(null);
+  const setContainerRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      containerRef.current = node;
+      if (typeof ref === "function") ref(node);
+      else if (ref) ref.current = node;
+    },
+    [ref],
+  );
 
   const isDesktop = currentDeviceType === DeviceType.desktop;
 
@@ -309,7 +317,7 @@ const Navigation = ({
           ) : null}
           <div
             {...pickAriaProps(rest)}
-            ref={containerRef}
+            ref={setContainerRef}
             className={styles.container}
             data-is-root-folder={isRootFolder ? "true" : "false"}
             data-is-show-back-button={showBackButton ? "true" : "false"}
@@ -362,7 +370,6 @@ const Navigation = ({
               onNavigationButtonClick={onNavigationButtonClick}
               tariffBar={tariffBar}
               title={title}
-              isEmptyPage={isEmptyPage}
               onContextOptionsClick={onContextOptionsClick}
               isMobile={currentDeviceType !== DeviceType.desktop}
               isMobileOnly={currentDeviceType === DeviceType.mobile}

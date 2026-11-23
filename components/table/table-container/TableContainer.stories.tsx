@@ -72,7 +72,6 @@ const TableContainerWrapper = (props: TableContainerProps) => {
         columns={mockColumns}
         columnStorageName={COLUMN_STORAGE_NAME}
         columnInfoPanelStorageName={COLUMN_INFO_PANEL_STORAGE_NAME}
-        sectionWidth={800}
         useReactWindow={useReactWindow}
         showSettings
         sortingVisible
@@ -201,7 +200,6 @@ export const Default: Story = {
     columns={columns}
     columnStorageName="my-columns"
     columnInfoPanelStorageName="my-info-panel"
-    sectionWidth={800}
     useReactWindow={false}
     showSettings
     sortingVisible

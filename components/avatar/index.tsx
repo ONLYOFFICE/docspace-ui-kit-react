@@ -56,6 +56,8 @@ const AvatarPure = ({
   isNotIcon = false,
   imgClassName = "",
   dataTestId,
+  id,
+  style,
   ...rest
 }: AvatarProps) => {
   const { isRTL } = useInterfaceDirection();
@@ -221,6 +223,8 @@ const AvatarPure = ({
     <>
       <div
         {...pickAriaProps(rest)}
+        id={id}
+        style={style}
         className={classNames(styles.avatar, className)}
         data-size={size}
         data-no-click={noClick ? "true" : "false"}

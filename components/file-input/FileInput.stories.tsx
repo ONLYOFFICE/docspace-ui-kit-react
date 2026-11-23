@@ -127,8 +127,7 @@ const meta = {
     },
     name: {
       control: false,
-      description:
-        "No effect: it lands on the outer `<div>` as an attribute nothing reads.",
+      description: "Name of the hidden file field.",
     },
     className: {
       control: false,

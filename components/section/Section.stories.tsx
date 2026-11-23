@@ -37,7 +37,6 @@ const meta = {
     setInfoPanelWidth: fn(),
     setIsChatPanelVisible: fn(),
     setChatPanelWidth: fn(),
-    onOpenUploadPanel: fn(),
     cancelUpload: fn(),
     clearSecondaryProgressData: fn(),
     clearPrimaryProgressData: fn(),
@@ -213,11 +212,6 @@ const meta = {
       description:
         "Makes the whole section unfocusable and unclickable, and hides it from assistive technology. It suits a section kept mounted behind a fullscreen panel.",
     },
-    withTabs: {
-      control: "boolean",
-      description:
-        "Marks the filter below the desktop breakpoint as sitting under tabs. No style reads the mark, so it changes nothing on screen.",
-    },
     withoutFooter: {
       control: "boolean",
       description: "Drops both the footer slot and the spacer under the body.",
@@ -335,11 +329,6 @@ const meta = {
       control: "boolean",
       description:
         "Whether the main button is on screen, which moves the progress button clear of it.",
-    },
-    onOpenUploadPanel: {
-      control: false,
-      description:
-        "Called when the operations button asks to open the upload panel.",
     },
     cancelUpload: {
       control: false,
@@ -481,20 +470,16 @@ const NavigationHeader = ({
     title="My Documents"
     isRootFolder={false}
     canCreate
-    showText
     isDesktop={device === DeviceType.desktop}
-    isRoom={false}
     withMenu
     showTitle
     showRootFolderTitle
     showNavigationButton={false}
     isInfoPanelVisible={false}
-    isCurrentFolderInfo={false}
     currentDeviceType={device}
     navigationItems={mockNavigationItems}
     onClickFolder={noop}
     onBackToParentFolder={noop}
-    clearTrash={noop}
     getContextOptionsFolder={() => [
       { key: "rename", label: "Rename" },
       { key: "delete", label: "Delete" },
@@ -505,7 +490,6 @@ const NavigationHeader = ({
     ]}
     toggleInfoPanel={noop}
     hideInfoPanel
-    showFolderInfo={noop}
     onPlusClick={noop}
     withLogo={false}
     burgerLogo=""
@@ -596,7 +580,6 @@ const TableContent = () => {
         columns={mockColumns}
         columnStorageName={COLUMN_STORAGE_NAME}
         columnInfoPanelStorageName={COLUMN_INFO_PANEL_STORAGE_NAME}
-        sectionWidth={800}
         useReactWindow={false}
         showSettings
         sortingVisible

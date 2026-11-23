@@ -75,10 +75,6 @@ export interface TableHeaderProps extends React.AriaAttributes {
    * own, or two tables overwrite each other's layout.
    */
   columnStorageName: string;
-  /** Not read: the header measures its container instead. */
-  sectionWidth: number;
-  /** Not read: the header never calls it. */
-  onClick?: () => void;
   /** Ignores the saved widths and lays the columns out from scratch. */
   resetColumnsSize?: boolean;
   /** Draws the line under the header edge to edge instead of stopping 20px short of each end. */
@@ -107,7 +103,7 @@ export interface TableHeaderProps extends React.AriaAttributes {
   isIndexEditingMode?: boolean;
   /** Shares the width equally between the columns instead of widening the `default` one. */
   withoutWideColumn?: boolean;
-  /** Not read: nothing applies it to the header. */
+  /** Inline style of the header element. */
   style?: React.CSSProperties;
 }
 
@@ -174,8 +170,6 @@ export interface TableBodyProps extends React.AriaAttributes {
   /** Lays the virtualised rows out with the widths saved under `columnInfoPanelStorageName` instead.
    * @default false */
   infoPanelVisible?: boolean;
-  /** Not read: the body is the same while rows are reordered. */
-  isIndexEditingMode?: boolean;
 }
 
 export interface TableRowProps extends React.AriaAttributes {
@@ -212,8 +206,6 @@ export interface TableRowProps extends React.AriaAttributes {
   onDoubleClick?: (e: React.MouseEvent) => void;
   /** Ref of the row element. */
   forwardedRef?: React.ForwardedRef<HTMLDivElement>;
-  /** Changes nothing on screen; nothing in the row reads it. */
-  hideColumns?: boolean;
   /** Marks the row whose context menu is open: children marked `create-share-link` stay shown and the drop fill is off. */
   isActive?: boolean;
   /** Adds a `checked` class for your own highlight, and keeps children marked `create-share-link` shown. */

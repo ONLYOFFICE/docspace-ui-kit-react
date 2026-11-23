@@ -262,10 +262,6 @@ const meta = {
         defaultValue: { summary: "53px" },
       },
     },
-    blur: {
-      control: false,
-      description: "Ignored. Nothing reads this prop.",
-    },
     "aria-label": {
       control: "text",
       description:

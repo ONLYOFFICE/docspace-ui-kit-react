@@ -1,5 +1,5 @@
 import React from "react";
-import { isMobile, isMobileOnly, isIOS } from "react-device-detect";
+import { isMobile } from "react-device-detect";
 
 import { Portal } from "../portal";
 
@@ -58,8 +58,6 @@ const Article = ({
   hideAppsBlock,
 
   setArticleOpen,
-  withSendAgain,
-  mainBarVisible,
 
   isLiveChatAvailable,
   isShowLiveChat,
@@ -72,16 +70,6 @@ const Article = ({
   withCustomArticleHeader,
 
   isBurgerLoading,
-
-  isNonProfit,
-  isFreeTariff,
-  isGracePeriod,
-  isLicenseDateExpired,
-  isPaymentPageAvailable,
-  isTrial,
-  standalone,
-  currentTariffPlanTitle,
-  trialDaysLeft,
 
   languageBaseName,
   isMobileArticle,
@@ -109,12 +97,6 @@ const Article = ({
     React.useState<null | React.JSX.Element>(null);
   const [articleBodyContent, setArticleBodyContent] =
     React.useState<null | React.JSX.Element>(null);
-  const [_correctTabletHeight, setCorrectTabletHeight] = React.useState<
-    null | number
-  >(null);
-  const updateSizeRef = React.useRef<null | ReturnType<typeof setTimeout>>(
-    null,
-  );
 
   const onMobileBack = React.useCallback(() => {
     // close article
@@ -181,42 +163,6 @@ const Article = ({
       }
     });
   }, [children]);
-
-  // TODO: make some better
-  const onResize = React.useCallback(
-    (e?: Event) => {
-      let tableHeight = window.innerHeight;
-
-      if (mainBarVisible) {
-        const mainBar = document.getElementById("main-bar");
-
-        if (mainBar) {
-          if (!mainBar.offsetHeight) {
-            updateSizeRef.current = setTimeout(() => onResize(), 0);
-            return;
-          }
-
-          tableHeight -= mainBar.offsetHeight;
-        }
-      }
-
-      setCorrectTabletHeight(tableHeight);
-    },
-    [mainBarVisible],
-  );
-
-  React.useEffect(() => {
-    onResize();
-    window.addEventListener("resize", onResize);
-    if (isMobile && !isMobileOnly && isIOS) {
-      window?.visualViewport?.addEventListener("resize", onResize);
-    }
-    return () => {
-      window.removeEventListener("resize", onResize);
-      window?.visualViewport?.removeEventListener("resize", onResize);
-      if (updateSizeRef.current) clearTimeout(updateSizeRef.current);
-    };
-  }, [onResize]);
 
   const hideDevTools =
     user?.isVisitor ||

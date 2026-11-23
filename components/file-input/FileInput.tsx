@@ -38,6 +38,7 @@ const FileInputPure = ({
   onReject,
   className,
   "data-test-id": dataTestId,
+  name,
   ...rest
 }: FileInputProps) => {
   const t = useCommonTranslation();
@@ -171,6 +172,7 @@ const FileInputPure = ({
               data-testid="upload-click-input"
               type="file"
               id={id}
+              name={name}
               ref={inputRef}
               style={{ display: "none" }}
               {...getInputProps()}

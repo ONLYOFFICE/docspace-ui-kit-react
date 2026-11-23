@@ -18,7 +18,6 @@ const HelpButton = (props: HelpButtonProps) => {
   const {
     id,
     className = "icon-button",
-    iconName,
     size = 12,
     color,
     dataTip,
@@ -123,7 +122,6 @@ const HelpButton = (props: HelpButtonProps) => {
           id={currentId}
           className={componentClass}
           isClickable={isClickable}
-          iconName={iconName}
           iconNode={iconNode ?? <InfoReactSvg />}
           size={size}
           color={color}

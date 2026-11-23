@@ -58,10 +58,6 @@ const meta = {
       description:
         "CSS `background-image` value of the bar — a whole shorthand such as `url(/banner.png)`, not a bare path.",
     },
-    isMaintenance: {
-      control: false,
-      description: "Ignored. Nothing reads this prop; it is kept off the DOM.",
-    },
     fontSize: {
       control: "text",
       description:
@@ -120,11 +116,6 @@ const meta = {
       action: "onAction",
       description:
         "Called by the action text, by the close cross, when the countdown reaches zero and when a click lands in an iframe. The event is only passed on a real click.",
-    },
-    onClose: {
-      control: false,
-      description:
-        "Ignored. Nothing reads this prop; the close cross calls `onAction`.",
     },
     onLoad: {
       action: "onLoad",
@@ -343,7 +334,7 @@ export const Maintenance: Story = {
     docs: {
       description: {
         story:
-          "A scheduled-maintenance notice is an ordinary bar with its own header and message; there is no separate maintenance look, and `isMaintenance` changes nothing.",
+          "A scheduled-maintenance notice is an ordinary bar with its own header and message; there is no separate maintenance look.",
       },
       source: {
         code: `<SnackBar

@@ -292,16 +292,6 @@ const meta = {
     hideContextMenu: {
       description: "Called when the menu closes.",
     },
-    columnCount: {
-      control: false,
-      description:
-        "Ignored. The type requires it, but the lower half is a two-column list, not a grid.",
-    },
-    thumbnailClick: {
-      control: false,
-      description:
-        "Ignored: the tile has no open handler, and the base tile does not read this prop.",
-    },
   },
   args: {
     onSelect: fn(),
@@ -370,7 +360,6 @@ export const Default: Story = {
     badges,
     showStorageInfo: true,
     getContextModel: () => contextOptions,
-    columnCount: 1,
     SpaceQuotaComponent: MockSpaceQuota,
   },
   beforeEach: () => {
@@ -422,7 +411,6 @@ export const Default: Story = {
   showStorageInfo={true}
   SpaceQuotaComponent={SpaceQuota}
   getContextModel={() => contextOptions}
-  columnCount={1}
   openUser={openOwnerProfile}
 >
   <TileContent>
@@ -738,7 +726,6 @@ export const CssCustomization: Story = {
             showHotkeyBorder={showHotkeyBorder}
             openUser={fn()}
             getContextModel={() => contextOptions}
-            columnCount={1}
             SpaceQuotaComponent={MockSpaceQuota}
           >
             <TileContent>
@@ -786,10 +773,10 @@ Two instances:
   "--tile-sub-color": "light-dark(#006fa6, #4fb0e6)",
   "--tile-hotkey-color": "#e0662e",
 }}>
-  <TemplateTile item={template} element={<TemplateIcon />} contextOptions={options} badges={badges} columnCount={1} openUser={openOwnerProfile} showStorageInfo SpaceQuotaComponent={SpaceQuota}>
+  <TemplateTile item={template} element={<TemplateIcon />} contextOptions={options} badges={badges} openUser={openOwnerProfile} showStorageInfo SpaceQuotaComponent={SpaceQuota}>
     <TileContent><Link>Sample Template</Link></TileContent>
   </TemplateTile>
-  <TemplateTile item={template} element={<TemplateIcon />} contextOptions={options} badges={badges} columnCount={1} openUser={openOwnerProfile} showStorageInfo SpaceQuotaComponent={SpaceQuota} showHotkeyBorder>
+  <TemplateTile item={template} element={<TemplateIcon />} contextOptions={options} badges={badges} openUser={openOwnerProfile} showStorageInfo SpaceQuotaComponent={SpaceQuota} showHotkeyBorder>
     <TileContent><Link>Team Template</Link></TileContent>
   </TemplateTile>
 </div>`,

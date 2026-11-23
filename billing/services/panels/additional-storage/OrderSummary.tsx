@@ -268,7 +268,6 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
                 {isUpgradeStoragePlan && !isNewSubscription && (
                   <HelpButton
                     size={12}
-                    offsetRight={0}
                     place={isRTL ? "left" : "right"}
                     tooltipContent={tooltipText()}
                     dataTestId="total_due_today_help_button"

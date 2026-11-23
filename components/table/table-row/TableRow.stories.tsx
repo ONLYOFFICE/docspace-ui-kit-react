@@ -51,13 +51,6 @@ The Table README describes it in full.`,
         defaultValue: { summary: "false" },
       },
     },
-    hideColumns: {
-      control: "boolean",
-      description: "Changes nothing on screen; nothing in the row reads it.",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
     contextOptions: {
       control: false,
       description:
@@ -190,7 +183,6 @@ export const Default: Story = {
     selectionProp: { className: "selection-class" },
     title: "Context menu",
     contextOptions,
-    hideColumns: true,
   },
   beforeEach: () => {
     onDeleteOption.mockClear();
@@ -198,7 +190,7 @@ export const Default: Story = {
   play: async ({ args, canvas, userEvent }) => {
     const row = canvas.getByTestId("table-row");
     await expect(row).toHaveClass("custom-row-class", "table-container_row");
-    // hideColumns adds no class, an "undefined" one included.
+    // No class named "undefined" lands on the row.
     await expect(row).not.toHaveClass("undefined");
 
     await userEvent.click(canvas.getByText("Annual Report 2025"));

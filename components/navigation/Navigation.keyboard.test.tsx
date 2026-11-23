@@ -17,7 +17,6 @@ const props = {
   isRootFolder: false,
   currentDeviceType: DeviceType.desktop,
   isDesktop: true,
-  showText: true,
   showTitle: true,
   withLogo: false,
   burgerLogo: "",
@@ -32,10 +31,6 @@ const props = {
   isInfoPanelVisible: false,
   toggleInfoPanel: vi.fn(),
   hideInfoPanel: true,
-  isRoom: false,
-  isCurrentFolderInfo: false,
-  showFolderInfo: vi.fn(),
-  clearTrash: vi.fn(),
 };
 
 describe("Navigation from the keyboard", () => {

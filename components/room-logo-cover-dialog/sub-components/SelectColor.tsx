@@ -160,7 +160,6 @@ export const SelectColor = ({
             displayType={ModalDialogType.modal}
             visible={openColorPicker}
             onClose={() => setOpenColorPicker(false)}
-            blur={8}
           >
             <ModalDialog.Body>
               <ColorPicker

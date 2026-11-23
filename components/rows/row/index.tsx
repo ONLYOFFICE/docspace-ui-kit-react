@@ -27,7 +27,6 @@ const Row = React.memo((props: RowProps) => {
     checked,
     children,
     contentElement,
-    contextButtonSpacerWidth = "26px",
     data,
     element,
     indeterminate,
@@ -50,6 +49,8 @@ const Row = React.memo((props: RowProps) => {
     isDisabled,
     isIndexEditingMode,
     dataTestId,
+    id,
+    style,
   } = props;
 
   const cm = useRef<ContextMenuRefType>(null);
@@ -139,6 +140,8 @@ const Row = React.memo((props: RowProps) => {
     <div
       {...pickAriaProps(props)}
       ref={row}
+      id={id}
+      style={style}
       onContextMenu={onContextMenu}
       className={classNames(
         styles.row,
@@ -231,7 +234,6 @@ const Row = React.memo((props: RowProps) => {
       </div>
       <div
         className={classNames(styles.optionButton, "row_context-menu-wrapper")}
-        style={{ ["--manual-width" as string]: contextButtonSpacerWidth }}
       >
         {badgesComponent || null}
         {renderContentElement ? (

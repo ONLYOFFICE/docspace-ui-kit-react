@@ -100,16 +100,9 @@ export type TextareaProps = Omit<
    * height.
    * @default false */
   isFullHeight?: boolean;
-  /** Ignored. The component computes the full height itself and never reads
-   * this prop. */
-  fullHeight?: number;
-  /** Ignored. Nothing in the component or its stylesheet reads this prop. */
-  minHeight?: string;
 
   /** Applied to the copy button, alongside the component's own class. */
   classNameCopyIcon?: string;
-  /** Ignored. The indent for the line numbers is computed from the content. */
-  paddingLeftProp?: string;
 
   /** Moves the scrollbar styling from the inner scroller to the outer wrapper,
    * which is what a chat composer needs.

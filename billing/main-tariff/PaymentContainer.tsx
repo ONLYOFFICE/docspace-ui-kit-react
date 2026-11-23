@@ -104,7 +104,6 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     return (
       <HelpButton
         className="payment-tooltip"
-        offsetRight={0}
         iconNode={<HelpReactSvg />}
         tooltipContent={
           <>
@@ -252,7 +251,6 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
           &nbsp;
           <HelpButton
             className="payment-tooltip"
-            offsetRight={0}
             iconNode={<HelpReactSvg />}
             style={{ display: "inline-block", verticalAlign: "middle" }}
             tooltipContent={<Text>{t("RenewalChargeOrderTooltip")}</Text>}

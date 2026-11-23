@@ -33,7 +33,6 @@ const FileTile = ({
   setSelection,
   temporaryIcon,
   thumbnail,
-  thumbSize,
   isHighlight,
   isBlockingOperation,
   showHotkeyBorder,
@@ -49,9 +48,6 @@ const FileTile = ({
   isEdit,
   forwardRef,
   dataTestId,
-  // Declared but not read; taken out so they do not reach the DOM.
-  contextButtonSpacerWidth: _contextButtonSpacerWidth,
-  sideColor: _sideColor,
   ...rest
 }: FileTileProps) => {
   const t = useCommonTranslation();
@@ -134,22 +130,13 @@ const FileTile = ({
     return (
       <Link type={LinkType.page}>
         {thumbnail && !errorLoadSrc ? (
-          thumbSize !== null ? (
-            <img
-              src={thumbnail}
-              className={styles.thumbnailImage}
-              alt=""
-              onError={onError}
-              data-testid="file-thumbnail"
-            />
-          ) : (
-            <ReactSVG
-              className={styles.temporaryIcon}
-              src=""
-              loading={svgLoader}
-              data-testid="file-thumbnail"
-            />
-          )
+          <img
+            src={thumbnail}
+            className={styles.thumbnailImage}
+            alt=""
+            onError={onError}
+            data-testid="file-thumbnail"
+          />
         ) : isIconElement ? (
           <div className={styles.temporaryIcon} data-testid="file-thumbnail">
             {icon}

@@ -29,7 +29,8 @@ const SelectionArea = ({
   const areaLocation = React.useRef({ x1: 0, x2: 0, y1: 0, y2: 0 });
   const areaRect = React.useRef(new DOMRect());
   const areaRef = React.useRef<null | HTMLDivElement>(null);
-  const arrayOfTypes = React.useRef<TArrayTypes[]>([]);
+  // The height of each group's items, measured from its first element.
+  const arrayOfTypes = React.useRef<{ type: string; itemHeight: number }[]>([]);
   const elemRect = React.useRef({ top: 0, left: 0, width: 0, height: 0 });
   const scrollDelta = React.useRef({ x: 0, y: 0 });
   const scrollElement = React.useRef<null | Element>(null);

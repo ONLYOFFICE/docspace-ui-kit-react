@@ -92,11 +92,6 @@ const meta = {
         defaultValue: { summary: "false" },
       },
     },
-    isDefault: {
-      control: false,
-      description:
-        "Ignored. Nothing reads this prop on a single tag; it is `TagType.isDefault` that `Tags` acts on.",
-    },
     roomType: {
       control: "number",
       description:

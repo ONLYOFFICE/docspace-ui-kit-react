@@ -239,7 +239,7 @@ export const WithChildren: Story = {
           style={{
             fontSize: "13px",
             marginTop: "16px",
-            color: "var(--gray)",
+            opacity: 0.7,
             fontStyle: "italic",
           }}
         >

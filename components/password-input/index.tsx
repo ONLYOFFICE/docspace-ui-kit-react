@@ -49,8 +49,6 @@ const PasswordInput = ({
   ref,
   inputType = InputType.password,
   inputValue,
-  clipActionResource,
-  emailInputName,
   passwordSettings = DEFAULT_PASSWROD_SETTINGS,
   generatorSettings,
   onBlur,
@@ -60,7 +58,6 @@ const PasswordInput = ({
   isDisabled = false,
   simpleView = false,
   generatorSpecial = "!@#$%^&*",
-  clipCopiedResource = "Copied",
   tooltipPasswordTitle,
   tooltipPasswordLength,
   tooltipPasswordDigits,
@@ -108,12 +105,7 @@ const PasswordInput = ({
 
   const prevInputValue = usePrevious(inputValue ?? "") ?? "";
 
-  const { state, setState } = usePasswordState(
-    inputType,
-    inputValue,
-    clipActionResource,
-    emailInputName,
-  );
+  const { state, setState } = usePasswordState(inputType, inputValue);
 
   const { checkPassword } = usePasswordValidation(
     passwordSettings,
@@ -207,10 +199,6 @@ const PasswordInput = ({
     },
     [onKeyDown],
   );
-
-  useEffect(() => {
-    setState((s) => ({ ...s, copyLabel: clipActionResource }));
-  }, [clipActionResource, clipCopiedResource, setState]);
 
   useEffect(() => {
     if (

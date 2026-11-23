@@ -111,14 +111,6 @@ const meta = {
         defaultValue: { summary: "false" },
       },
     },
-    isDesc: {
-      control: "boolean",
-      description:
-        "Adds a class to both headings that no style matches, so nothing changes on screen. It sorts nothing.",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
     id: {
       control: "text",
       description: "Value of `id` on the outer element.",

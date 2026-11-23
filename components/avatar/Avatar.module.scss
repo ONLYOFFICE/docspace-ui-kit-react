@@ -6,7 +6,6 @@
 }
 
 .editContainer {
-  --avatar-edit-container-background: #{$blue-light-mid};
   --avatar-edit-container-fill: #{$white};
   --avatar-edit-container-fill-hover: var(
     --accent-button,
@@ -18,7 +17,6 @@
   );
 
   :global(.dark) & {
-    --avatar-edit-container-background: rgba(255, 255, 255, 0.64);
     --avatar-edit-container-fill: #{$white};
     --avatar-edit-container-fill-hover: var(
       --accent-button,

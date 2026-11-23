@@ -32,9 +32,6 @@ export type ImageEditorProps = React.AriaAttributes & {
   className?: string;
   /** Hides the zoom row and freezes the crop position, leaving the picture as it is. */
   disableImageRescaling?: boolean;
-  /** Ignored. Nothing in this folder reads it; check the file's size in `onChangeFile` instead.
-   * @deprecated */
-  maxImageSize?: number;
   /** Corner radius of the crop window in pixels, measured on the 648px canvas. Half of it, 324, is a circle. */
   editorBorderRadius: number;
   /** Called with the change event of the hidden file input when another picture is chosen. Read the file and put it in `image.uploadedFile` yourself. */

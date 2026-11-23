@@ -121,7 +121,6 @@ describe("TemplateTile", () => {
     const defaultProps: TemplateTileProps = {
       item: mockItem,
       children: <TemplateContent />,
-      columnCount: 3,
       showStorageInfo: false,
       openUser: vi.fn(),
       contextOptions: mockContextOptions,
@@ -205,15 +204,6 @@ describe("TemplateTile", () => {
     expect(baseTile).toBeTruthy();
     expect(topContent).toBeTruthy();
     expect(bottomContent).toBeTruthy();
-  });
-
-  it("adjusts layout based on columnCount", () => {
-    const columnCount = 4;
-    renderTemplateTile({ columnCount });
-
-    // Here we could check for specific layout adjustments based on columnCount
-    // This might involve checking specific class names or styles
-    expect(screen.getByTestId("base-tile")).toBeTruthy();
   });
 
   it("calls onSelect when base item is a template item", () => {

@@ -194,10 +194,6 @@ export function LoadingListing() {
   re-exports the components only.
 - **`TilesSkeleton` and `TileSkeleton` are not re-exported here** either, although the rows family
   does re-export its equivalents.
-- **Several props are inert.** `thumbnailClick` does nothing on the base, folder and template
-  tiles, and `columnCount` nothing on the template tile.
-- On the folder tile `dragging` and `contextMenuHeader` are inert. On the file tile `thumbSize`,
-  `contextButtonSpacerWidth` and `sideColor` are, and the last two reach the DOM as attributes.
 
 ## Sub-components
 
@@ -222,9 +218,8 @@ A group of zero loses its bar too, and `withTitle={false}` drops the bar above t
 folder placeholder is a 64px bar and a file placeholder a 220px card. Both have 12px corners unless
 `borderRadius` says otherwise.
 
-On a tablet each group shows at most seven placeholders, on a phone at most two. `isRooms` is meant
-to widen the columns for room tiles. Its rule matches only a descendant of the grid, so it changes
-nothing.
+On a tablet each group shows at most seven placeholders, on a phone at most two. `isRooms` widens
+the columns to the room tiles' 275px floor.
 
 `TileSkeleton` is one placeholder: a file card by default, a folder bar with `isFolder`. With
 `isRoom` it is a room card with a logo, a title bar, a menu square and two tag bars. Both take the

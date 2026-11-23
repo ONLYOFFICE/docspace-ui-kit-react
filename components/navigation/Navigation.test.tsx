@@ -15,7 +15,6 @@ vi.mock("../tooltip", async (importOriginal) => ({
 describe("Navigation Component", () => {
   const defaultProps = {
     tReady: true,
-    showText: true,
     isRootFolder: false,
     title: "My Documents",
     canCreate: true,
@@ -36,10 +35,6 @@ describe("Navigation Component", () => {
       { key: "create", label: "Create folder" },
     ]),
     isTrashFolder: false,
-    isEmptyFilesList: false,
-    clearTrash: vi.fn(),
-    showFolderInfo: vi.fn(),
-    isCurrentFolderInfo: false,
     toggleInfoPanel: vi.fn(),
     isInfoPanelVisible: false,
     titles: {
@@ -50,9 +45,7 @@ describe("Navigation Component", () => {
     },
     withMenu: true,
     onPlusClick: vi.fn(),
-    isEmptyPage: false,
     isDesktop: true,
-    isRoom: false,
     isFrame: false,
     hideInfoPanel: true,
     withLogo: false,
@@ -74,6 +67,13 @@ describe("Navigation Component", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  it("hands its ref the header row", () => {
+    const ref = React.createRef<HTMLDivElement>();
+    render(<Navigation {...defaultProps} ref={ref} />);
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+    expect(ref.current).toHaveTextContent("My Documents");
   });
 
   it("names the back arrow and the plus and folder buttons", () => {
@@ -117,12 +117,6 @@ describe("Navigation Component", () => {
   it("renders tariff bar when provided", () => {
     render(<Navigation {...defaultProps} />);
     expect(screen.getByTestId("tariff-bar")).toBeInTheDocument();
-  });
-
-  it("handles empty file list state", () => {
-    render(<Navigation {...defaultProps} isEmptyFilesList />);
-    // Add assertions based on your empty state UI
-    expect(screen.getByText("My Documents")).toBeInTheDocument();
   });
 
   it("adapts to tablet view", () => {

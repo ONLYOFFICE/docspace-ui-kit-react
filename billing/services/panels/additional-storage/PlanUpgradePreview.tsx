@@ -134,7 +134,6 @@ const PlanUpgradePreview: React.FC<PlanUpgradePreviewProps> = (props) => {
         </Text>
         <HelpButton
           size={12}
-          offsetRight={0}
           place={isRTL ? "left" : "right"}
           tooltipContent={tooltipText()}
           dataTestId="partial_payment_help_button"

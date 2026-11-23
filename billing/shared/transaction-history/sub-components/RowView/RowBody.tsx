@@ -133,7 +133,7 @@ const TransactionRowView: React.FC<TransactionRowViewProps> = ({
         </Text>
       }
     >
-      <RowContent sectionWidth={sectionWidth}>{getRowChildren()}</RowContent>
+      <RowContent>{getRowChildren()}</RowContent>
     </Row>
   );
 };

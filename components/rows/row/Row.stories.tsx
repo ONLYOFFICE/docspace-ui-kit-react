@@ -90,14 +90,6 @@ const meta = {
       description:
         "Element placed before the context button, after the badges.",
     },
-    contextButtonSpacerWidth: {
-      control: "text",
-      description:
-        "Changes nothing on screen: it sets a CSS variable that no row style reads.",
-      table: {
-        defaultValue: { summary: '"26px"' },
-      },
-    },
     inProgress: {
       control: "boolean",
       description:
@@ -171,11 +163,6 @@ const meta = {
       control: false,
       description:
         "Ignored. Nothing reads this prop and no inline style reaches the DOM.",
-    },
-    item: {
-      control: false,
-      description:
-        "Ignored. The context menu's header is read from the child's own `item` prop.",
     },
   },
 } satisfies Meta<typeof Row>;

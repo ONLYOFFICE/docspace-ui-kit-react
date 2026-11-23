@@ -46,7 +46,7 @@ export type ArticleHideMenuButtonProps = {
   toggleShowText: VoidFunction;
   /** Removes the profile block at the foot of the panel, and moves the collapse handle down to take its place. */
   hideProfileBlock: boolean;
-  /** Not read. The component works out whether there is a custom slot from `customSlot` itself. */
+  /** Whether a custom slot sits above the handle, which then moves down to make room. */
   withCustomSlot: boolean;
 };
 
@@ -58,7 +58,7 @@ export type ArticleDevToolsBarProps = {
   currentDeviceType: DeviceType;
   /** Called on a phone by the header's close button, the backdrop, the back button and the developer tools entry. It is expected to flip `articleOpen`. */
   toggleArticleOpen: TToggleArticleOpen;
-  /** Not read at this level. The component passes its own `/developer-tools` path to the bar. */
+  /** Route of the developer tools page. */
   path?: string;
   navigate?: (path: string) => void;
 };
@@ -102,8 +102,8 @@ export type ArticleProfileProps = {
 export type ArticleProps = React.AriaAttributes &
   ArticleProfileProps &
   ArticleZendeskProps &
-  ArticleHideMenuButtonProps &
-  Omit<ArticleDevToolsBarProps, "withCustomSlot"> &
+  Omit<ArticleHideMenuButtonProps, "withCustomSlot"> &
+  Omit<ArticleDevToolsBarProps, "withCustomSlot" | "path"> &
   Omit<ArticleHeaderProps, "children" | "onClick" | "onIconClick"> &
   Omit<ArticleAppsProps, "withDevTools" | "withCustomSlot"> & {
     /** Called on mount and on every device change: `true` on a desktop or a phone. On a tablet it gets `false`, and only while `showArticle` in local storage is falsy. */
@@ -131,10 +131,6 @@ export type ArticleProps = React.AriaAttributes &
 
     /** Called with `false` when the browser goes back on a phone, to close the panel. */
     setArticleOpen: (value: boolean) => void;
-    /** Not read. Nothing in the component uses it. */
-    withSendAgain: boolean;
-    /** Whether the portal's top bar is on screen. Its height is measured out of the window height on every resize — a measurement the component then does not use. */
-    mainBarVisible: boolean;
 
     /** Whether the live chat is mounted at all. It is also suppressed on a mobile user agent. */
     isLiveChatAvailable: boolean;
@@ -143,25 +139,6 @@ export type ArticleProps = React.AriaAttributes &
     showArticleLoader?: boolean;
     /** Whether the person is an administrator. With `limitedAccessDevToolsForUsers` it decides whether the developer tools entry is shown. */
     isAdmin: boolean;
-
-    /** Not read. Nothing in the component uses it. */
-    isNonProfit?: boolean;
-    /** Not read. Nothing in the component uses it. */
-    isGracePeriod?: boolean;
-    /** Not read. Nothing in the component uses it. */
-    isFreeTariff?: boolean;
-    /** Not read. Nothing in the component uses it. */
-    isPaymentPageAvailable?: boolean;
-    /** Not read. Nothing in the component uses it. */
-    isLicenseDateExpired?: boolean;
-    /** Not read. Nothing in the component uses it. */
-    isTrial?: boolean;
-    /** Not read. Nothing in the component uses it. */
-    standalone?: boolean;
-    /** Not read. Nothing in the component uses it. */
-    currentTariffPlanTitle?: string;
-    /** Not read. Nothing in the component uses it. */
-    trialDaysLeft?: number;
 
     /** Hides the developer tools entry from anyone who is not an administrator. */
     limitedAccessDevToolsForUsers: boolean;

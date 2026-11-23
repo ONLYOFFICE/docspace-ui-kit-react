@@ -22,8 +22,6 @@ export type FolderTileProps = React.AriaAttributes & {
   inProgress?: boolean;
   /** Called with the new checked state and the `item`, from the checkbox or a plain click. A tap on the icon calls it too, in a window 600px wide or narrower. */
   onSelect?: (checked: boolean, item: FolderItem) => void;
-  /** Ignored. Nothing reads it, and the component forwards no unknown props, so it never reaches the DOM either. */
-  thumbnailClick?: (e: React.MouseEvent) => void;
   /** Builds the menu that the three-dot button and a right-click open. Without it neither opens a menu, whatever `contextOptions` holds. */
   getContextModel?: () => ContextMenuModel[];
   /** Called with an empty array before a plain click selects the tile, unless the click landed on an image, an input or an SVG shape. */
@@ -38,8 +36,6 @@ export type FolderTileProps = React.AriaAttributes & {
   children?: React.ReactNode;
   /** Called when the menu closes. */
   hideContextMenu?: () => void;
-  /** Ignored. The header is built from the first child's `item`; nothing reads this prop. */
-  contextMenuHeader?: React.ReactNode;
   /** Called before the menu opens, with `true` when the trigger was a right-click. */
   tileContextClick?: (isRightClick?: boolean) => void;
   /** Badges after the name, or in the picture's top end corner in the tall card. Give their wrapper the class `badges`, so a click on them does not select. */
@@ -50,8 +46,6 @@ export type FolderTileProps = React.AriaAttributes & {
   indeterminate?: boolean;
   /** Marks the tile as being dragged: hovering it does not tint it, underline the name or swap the icon for the checkbox. It does not dim the tile. */
   isDragging?: boolean;
-  /** Ignored. `isDragging` is the one that is read. */
-  dragging?: boolean;
   /** Keeps the hover tint and the underlined name on the tile being acted on, after the pointer leaves it. */
   isActive?: boolean;
   /** Renaming state: removes the icon, the checkbox and the hover tint, so the content gets the name row. */

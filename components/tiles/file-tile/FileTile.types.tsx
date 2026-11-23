@@ -51,8 +51,6 @@ export type FileTileProps = React.AriaAttributes & {
   checked?: boolean;
   /** The tile's content. Only the first element is rendered, in the row beside the icon; the rest are dropped. */
   children?: ReactElement | ReactElement[];
-  /** Ignored. Nothing reads it. */
-  contextButtonSpacerWidth?: number;
   /** Draws the three-dot button when non-empty and `item` carries a `contextOptions` key. The menu lists `getContextModel`'s entries, not these. */
   contextOptions: ContextMenuModel[];
   /** Replaces the icon and the checkbox with the kit's track loader. */
@@ -79,8 +77,6 @@ export type FileTileProps = React.AriaAttributes & {
   getContextModel?: () => ContextMenuModel[];
   /** Called when the menu closes. */
   hideContextMenu?: () => void;
-  /** Ignored. Nothing reads it. */
-  sideColor?: string;
   /** Called with an empty array before a plain click selects the tile, unless the click landed on an image, an input or an SVG shape. */
   setSelection?: (items: FileItem[]) => void;
   /** Quick-action buttons, stacked in a column in the thumbnail's top start corner. */
@@ -95,8 +91,6 @@ export type FileTileProps = React.AriaAttributes & {
   showHotkeyBorder?: boolean;
   /** Marks the tile as being dragged: hovering the icon does not swap it for the checkbox. It does not dim the tile. */
   isDragging?: boolean;
-  /** Ignored. Only its difference from `null` is tested, which a `number | undefined` always satisfies, so the branch it guards is unreachable. */
-  thumbSize?: number;
   /** Keeps the hover tint and the underlined name on the tile being acted on, after the pointer leaves it. */
   isActive?: boolean;
   /** Renaming state: removes the icon and the checkbox, so the content gets the name row. */

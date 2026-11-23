@@ -12,8 +12,6 @@ export type SimpleLinkWithDropdownProps = {
   fontWeight?: number;
   /** Whether the text is truncated with an ellipsis at 200px instead of wrapping. */
   isTextOverflow?: boolean;
-  /** Ignored. Nothing reads this prop; the hover state comes from CSS. */
-  isHovered?: boolean;
   /** Whether the link is drawn at half opacity, the portal's "pending" look. */
   isSemitransparent?: boolean;
   /** CSS colour of the text. */

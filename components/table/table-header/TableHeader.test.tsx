@@ -92,7 +92,6 @@ const defaultProps = {
   columns: mockColumns,
   columnStorageName: COLUMN_STORAGE_NAME,
   columnInfoPanelStorageName: COLUMN_INFO_PANEL_STORAGE_NAME,
-  sectionWidth: 1000,
   useReactWindow: false,
   showSettings: true,
 };
@@ -125,6 +124,13 @@ describe("<TableHeader />", () => {
       "aria-describedby",
       "header-hint",
     );
+  });
+
+  it("puts style on the header", () => {
+    render(<TableHeader {...defaultProps} style={{ marginTop: "4px" }} />);
+    expect(screen.getByTestId("table-header")).toHaveStyle({
+      marginTop: "4px",
+    });
   });
 
   it("renders without errors", () => {

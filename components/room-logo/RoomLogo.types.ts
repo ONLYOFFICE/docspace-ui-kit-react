@@ -3,8 +3,6 @@ import type { RoomsType } from "../../enums";
 export interface RoomLogoProps extends React.AriaAttributes {
   /** Which room type's glyph to draw. An unknown value, or none, renders an empty box of the logo's size. */
   type?: RoomsType;
-  /** Ignored. Nothing reads this prop; there is no privacy glyph in the folder. */
-  isPrivacy?: boolean;
   /** Draws the archive glyph instead, whatever `type` says. It wins over every other flag. */
   isArchive?: boolean;
   /** Draws the generic template glyph, ignoring `type`. Checked after `isArchive`. */

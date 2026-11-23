@@ -115,14 +115,6 @@ const meta = {
         defaultValue: { summary: "false" },
       },
     },
-    isOpenButton: {
-      control: "boolean",
-      description:
-        "Ignored. `onClose` is called whenever the sheet closes, with or without it.",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
     manualWidth: {
       control: "text",
       description: "Width of the menu, as a CSS length.",
@@ -169,34 +161,6 @@ const meta = {
       control: false,
       description:
         "Handle exposing `contains` and `getButtonElement`, for deciding whether a click landed on the button.",
-    },
-    title: {
-      control: false,
-      description:
-        "Ignored. Nothing reads this prop; the groups have no heading.",
-    },
-    percent: {
-      control: false,
-      description:
-        "Ignored. Nothing reads this prop; the button draws no progress.",
-    },
-    withButton: {
-      control: false,
-      description: "Ignored. Nothing reads this prop.",
-    },
-    onUploadClick: {
-      control: false,
-      description:
-        "Ignored. Nothing reads this prop; the button's own handler is `onClick`.",
-    },
-    sectionWidth: {
-      control: false,
-      description: "Ignored. Nothing reads this prop.",
-    },
-    mainButtonRef: {
-      control: false,
-      description:
-        "Ignored. The component uses an internal ref of the same name; use `ref` for the element.",
     },
   },
   args: {

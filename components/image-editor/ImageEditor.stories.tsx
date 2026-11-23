@@ -76,14 +76,6 @@ const meta = {
       description:
         "Added to the element that wraps the cropper and `Preview`. It is the hook for laying those two out side by side.",
     },
-    maxImageSize: {
-      control: "number",
-      description:
-        "Ignored. Nothing in this folder reads it; check the file's size in `onChangeFile` instead.",
-      table: {
-        defaultValue: { summary: "undefined" },
-      },
-    },
   },
 } satisfies Meta<typeof ImageEditor>;
 

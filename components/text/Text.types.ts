@@ -9,8 +9,6 @@ export type TextProps = {
   backgroundColor?: string;
   /** Text colour, as an inline style. `Text` declares none of its own and inherits without it. */
   color?: string;
-  /** Ignored. Nothing reads this prop, and it reaches the DOM as an unknown attribute. Use `isInline` or `style`. */
-  display?: string;
   /** Font size, as an inline style. Unset, `Text` is 13px through `--text-size`. */
   fontSize?: string;
   /** Font weight, as an inline style. Ignored while `isBold` is set. Unset, `Text` is 400 through `--text-weight`. */

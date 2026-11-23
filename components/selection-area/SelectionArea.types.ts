@@ -17,8 +17,6 @@ export type TArrayTypes = {
   type: string;
   /** Vertical gap between rows of this group, in pixels. */
   rowGap?: number;
-  /** Not read: the height of a group's items is measured from its first element. */
-  itemHeight: number;
   /** How many tile slots this group leaves empty at the end of its last row. */
   countOfMissingTiles?: number;
   /** How many rows this group occupies. */

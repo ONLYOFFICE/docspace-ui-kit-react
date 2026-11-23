@@ -36,7 +36,7 @@ export type FileInputProps = Omit<
    * the button has no loading form.
    */
   isLoading?: boolean;
-  /** No effect: it lands on the outer `<div>` as an attribute nothing reads. */
+  /** Name of the hidden file field. */
   name?: string;
   /**
    * Called with the files `accept` turned away. While it is set the component

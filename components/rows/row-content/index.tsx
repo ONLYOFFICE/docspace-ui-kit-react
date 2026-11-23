@@ -22,19 +22,6 @@ const RowContent = (props: RowContentProps) => {
 
   const sideInfo = getSideInfo(children, convertSideInfo, interfaceDirection);
 
-  let mainContainerWidth;
-
-  if (React.isValidElement(children[0]))
-    mainContainerWidth =
-      (children[0].props && children[0].props.containerWidth) || "140px";
-
-  const mainContainerStyle = mainContainerWidth
-    ? ({
-        ...style,
-        "--main-container-width": mainContainerWidth,
-      } as React.CSSProperties)
-    : style;
-
   return (
     <div
       {...pickAriaProps(props)}
@@ -50,7 +37,7 @@ const RowContent = (props: RowContentProps) => {
           styles.mainContainerWrapper,
           "row-main-container-wrapper",
         )}
-        style={mainContainerStyle}
+        style={style}
       >
         <div className={classNames(styles.mainContainer, "rowMainContainer")}>
           {children[0]}

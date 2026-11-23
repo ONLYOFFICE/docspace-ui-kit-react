@@ -157,19 +157,6 @@ describe("<RowContent />", () => {
     expect(sideInfo).toHaveStyle({ color: sideColor });
   });
 
-  it("renders main container with correct width", () => {
-    render(
-      <RowContent>
-        {mainLink}
-        {iconLink}
-        {sideLink}
-      </RowContent>,
-    );
-
-    const mainContainer = screen.getByTestId("main-container-wrapper");
-    expect(mainContainer).toHaveStyle({ "--main-container-width": "140px" });
-  });
-
   it("renders side container with correct width", () => {
     render(
       <RowContent>

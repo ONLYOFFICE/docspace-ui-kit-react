@@ -13,7 +13,6 @@ const Label = (props: LabelProps) => {
     isInline = false,
     htmlFor,
     text,
-    display,
     className,
     id,
     style,
@@ -30,7 +29,6 @@ const Label = (props: LabelProps) => {
       style={style}
       htmlFor={htmlFor}
       isInline={isInline}
-      display={display}
       {...errorProp}
       fontWeight={600}
       truncate={truncate}

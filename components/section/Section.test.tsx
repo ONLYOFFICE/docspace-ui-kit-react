@@ -39,6 +39,19 @@ describe("<Section />", () => {
     clearPrimaryProgressData: () => {},
   };
 
+  it("hands its ref the section container", () => {
+    const ref = React.createRef<HTMLDivElement>();
+    render(
+      <Section {...defaultProps} ref={ref}>
+        <SectionBody withScroll autoFocus={false} settingsStudio={false}>
+          Body Content
+        </SectionBody>
+      </Section>,
+    );
+
+    expect(ref.current).toBe(document.getElementById("section"));
+  });
+
   it("puts a passed aria-* on the section container", () => {
     render(
       <Section {...defaultProps} aria-describedby="section-hint">

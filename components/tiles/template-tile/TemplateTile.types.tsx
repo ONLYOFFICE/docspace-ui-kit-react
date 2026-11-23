@@ -40,9 +40,6 @@ export type TemplateTileProps = React.AriaAttributes & {
   /** Called with the new checked state and the `item` when the checkbox
    * changes, or when the icon is tapped at 600px or narrower. */
   onSelect?: (checked: boolean, item: TemplateItem) => void;
-  /** Ignored: the tile has no open handler, and the base tile does not read
-   * this prop. */
-  thumbnailClick?: (e: React.MouseEvent) => void;
   /** Returns the menu's entries. Without it neither the three-dot button nor a
    * right-click opens anything. */
   getContextModel?: () => ContextMenuModel[];
@@ -64,9 +61,6 @@ export type TemplateTileProps = React.AriaAttributes & {
   tileContextClick?: () => void;
   /** Called when the menu closes. */
   hideContextMenu?: () => void;
-  /** Ignored. The type requires it, but the lower half is a two-column list,
-   * not a grid. */
-  columnCount: number;
   /** Action buttons after the name. */
   badges?: React.ReactNode;
   /** Replaces the icon and the checkbox with a small loader, and sets

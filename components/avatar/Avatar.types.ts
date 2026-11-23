@@ -43,15 +43,13 @@ export type AvatarProps = React.AriaAttributes & {
   editing?: boolean;
   /** Shows the kit's own illustration when there is no `source` and no `userName`. */
   isDefaultSource?: boolean;
-  /** Ignored. Nothing reads this prop; the edit button runs the first `model` entry. */
-  editAction?: () => void;
   /** Hides the role badge that `role` would otherwise draw. */
   hideRoleIcon?: boolean;
   /** Applied to the avatar element and, again, to the picture inside it. */
   className?: string;
-  /** Ignored. Nothing reads this prop and no `id` reaches the DOM. */
+  /** Id of the outer element. */
   id?: string;
-  /** Ignored. Nothing reads this prop and no inline style reaches the DOM. */
+  /** Inline style of the outer element. */
   style?: React.CSSProperties;
   /**
    * Renders a tooltip anchored to the role badge. Without a badge it shows

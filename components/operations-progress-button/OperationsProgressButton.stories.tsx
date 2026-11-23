@@ -117,11 +117,6 @@ const meta = {
       description:
         "Name of the folder under the pointer, shown by the drag preview button.",
     },
-    percent: {
-      control: false,
-      description:
-        "Ignored. Nothing reads this prop; the ring reads the first operation's `percent`.",
-    },
     clearOperationsData: {
       action: "clearOperationsData",
       description:
@@ -146,16 +141,6 @@ const meta = {
       action: "cancelSecondaryOperationById",
       description:
         "Called with the operation and the id of its first item, from a row's own cancel.",
-    },
-    onOpenPanel: {
-      control: false,
-      description:
-        "Ignored. Nothing reads this prop; the panel is opened through `Operation.showPanel`.",
-    },
-    onCancelOperation: {
-      control: false,
-      description:
-        "Ignored. Nothing reads this prop; the cross calls `cancelUpload`.",
     },
   },
   args: {

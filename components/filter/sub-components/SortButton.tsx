@@ -196,7 +196,6 @@ const SortButton = ({
         isDefaultMode={false}
         advancedOptionsCount={advancedOptionsCount}
         onSelect={() => {}}
-        withBlur={false}
         withBackdrop
         onBackdropClick={toggleCombobox}
         type="onlyIcon"

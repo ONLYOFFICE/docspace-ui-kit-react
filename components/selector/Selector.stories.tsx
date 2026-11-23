@@ -660,10 +660,6 @@ const meta = {
       description: "Whether the backdrop behind the aside is transparent.",
       table: { defaultValue: { summary: "false" } },
     },
-    withBlur: {
-      control: false,
-      description: "Ignored. Nothing reads this prop.",
-    },
   },
 } satisfies Meta<typeof Selector>;
 

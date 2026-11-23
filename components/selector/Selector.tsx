@@ -151,7 +151,6 @@ const Selector = ({
 
   useAside,
   onClose,
-  withBlur,
   withoutBackground,
   withInfoBadge,
   injectedElement,
@@ -563,16 +562,17 @@ const Selector = ({
     }
   }, [items, selectedItems, isMultiSelect, selectedItemProp]);
 
-  const breadCrumbsProps: TSelectorBreadCrumbs = withBreadCrumbs
-    ? {
-        withBreadCrumbs,
-        breadCrumbs,
-        onSelectBreadCrumb,
-        breadCrumbsLoader,
-        isBreadCrumbsLoading,
-        bodyIsLoading: isLoading,
-      }
-    : {};
+  const breadCrumbsProps: TSelectorBreadCrumbs & { bodyIsLoading?: boolean } =
+    withBreadCrumbs
+      ? {
+          withBreadCrumbs,
+          breadCrumbs,
+          onSelectBreadCrumb,
+          breadCrumbsLoader,
+          isBreadCrumbsLoading,
+          bodyIsLoading: isLoading,
+        }
+      : {};
 
   const tempRenderedItemsLength = renderedItems.filter(
     (x) => !x.isDisabled,

@@ -774,7 +774,6 @@ const FilterInput = React.memo(
                           isDefaultMode={false}
                           advancedOptionsCount={overflowGroups.length}
                           onSelect={() => {}}
-                          withBlur={false}
                           withBackdrop={!isMobileView}
                           onBackdropClick={toggleOverflow}
                           type="onlyIcon"

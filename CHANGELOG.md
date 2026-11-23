@@ -8,6 +8,54 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **Style rules and custom properties that nothing reads are gone.** `Section` kept a copy of
+  `OperationsProgressButton`'s styles under a class it never sets, `MainButtonMobile` the styles
+  of a progress bar it no longer draws, and `DropDown` a `withColumns` rule. Several components
+  declared properties no rule reads, and a few rules read properties nothing defines.
+  Nothing on screen changes. `ErrorContainer`'s `--error-container-link`, which did nothing, is
+  removed with them
+- **Props that nothing reads are removed from the types.** Each was documented as ignored. Drop
+  them from your calls; a TypeScript caller gets an error where it still passes one, and in plain
+  JavaScript a component that spreads the rest onto its element puts the value there as an
+  attribute:
+  - `Article`: `withSendAgain`, `mainBarVisible`, `isNonProfit`, `isGracePeriod`, `isFreeTariff`,
+    `isPaymentPageAvailable`, `isLicenseDateExpired`, `isTrial`, `standalone`,
+    `currentTariffPlanTitle`, `trialDaysLeft`, and its own `withCustomSlot` and `path`
+  - `Navigation`: `showText`, `isRoom`, `isCurrentFolderInfo`, `showFolderInfo`, `clearTrash`,
+    `isEmptyFilesList`, `isEmptyPage`, and the values it supplies itself: `id`, `forwardedRef`,
+    `onCloseDropBox`, `toggleDropBox`, `isMobileOnly`, `ignoreChangeView`
+  - `Section`: `user`, `getIcon`, `displayFileExtension`, `showText`, `isEmptyPage`,
+    `isTrashFolder`, `isTabletView`, `isHeaderVisible`, `mainBarVisible`, `maintenanceExist`,
+    `snackbarExist`, `progressBarDropDownContent`, `onCancelOperation`, `onOpenUploadPanel`,
+    `uploadFiles`, `withTabs`, `asideInfoPanel`, `chatFiles`, `vectorizedFiles`, every `ai*` prop,
+    and the values it supplies itself: `bannerContent`, `withoutScroll`, `topInfoPanel`,
+    `onClose`, `isDesktop`
+  - `HelpButton` keeps only `color` of `IconButton`'s props, and drops `tooltipId`,
+    `tooltipProps` and the four `offset*` sides. `onClick`, `title`, `iconName`, the hover and
+    press props and the mouse handlers were never passed to the icon
+  - `MainButtonMobile`: `title`, `percent`, `sectionWidth`, `withButton`, `onUploadClick`,
+    `isOpenButton`, `mainButtonRef`. `MainButton`: `opened`
+  - `ComboBox`: `withSearch`, `searchPlaceholder`, `showDisabledItems`, `withBlur`, `role`, and
+    the same two in `AccessRightSelect`. `DropDown`: `columnCount`, `withBlur`,
+    `disableOnClickOutside`. `ContextMenuButton`: `columnCount`, `asideHeader`
+  - `Selector`: `withBlur` (and in the `Groups`, `MCPServers`, `People` and `Room` selectors)
+    and `bodyIsLoading`
+  - `PasswordInput`: `emailInputName`, `clipActionResource`, `clipCopiedResource`. `Textarea`:
+    `fullHeight`, `minHeight`, `paddingLeftProp`. `Text` and `Label`: `display`. `Link`: `label`.
+    `LinkWithDropdown`: `isHovered`. `FieldContainer` and `Label`: `tooltipMaxWidth`
+  - `Toast`: `id`, `title`, `type`, `data`, `withCross`, `timeout`, which are `toastr`'s arguments
+  - `Snackbar`: `isMaintenance`, `onClose`. `ModalDialog`: `blur`. `Tag`: `isDefault`.
+    `OperationsProgressButton`: `percent`, `onOpenPanel`, `onCancelOperation`
+  - `Avatar`: `editAction`. `AvatarEditorDialog` and `ImageEditor`: `maxImageSize`. `RoomLogo`:
+    `isPrivacy`. `ColorPicker`: `forwardedRef`. `DragAndDrop`: `value`, `targetFile`,
+    `forwardedRef`
+  - `Row`: `item`, `contextButtonSpacerWidth`. `RowContent`: `sectionWidth`. `TableHeader`:
+    `sectionWidth`, `onClick`. `TableBody`: `isIndexEditingMode`. `TableRow`: `hideColumns`
+  - `BaseTile`, `FolderTile` and `TemplateTile`: `thumbnailClick`. `FolderTile`: `dragging`,
+    `contextMenuHeader`. `FileTile`: `thumbSize`, `contextButtonSpacerWidth`, `sideColor`.
+    `TemplateTile`: `columnCount`. `TileContainer`: `isDesc`
+  - `InfiniteLoader`: `showSkeleton`, `smallPreview`, `isOneTile`. `SelectionArea`: `itemHeight`
+    in `arrayTypes`
 - **`SearchInput`'s `id` is on the `<input>` alone.** It was set on the outer `<div>` too, so the
   page held the id twice and a `<label htmlFor>` or a `FieldContainer`'s `labelFor` found the
   `<div>` first and named nothing. The label now names the field. A selector or a test that
@@ -350,6 +398,20 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`Dropzone`'s full format list is opaque.** Its stylesheet set the list's background and
+  border from `--background-content` and `--border-color`, which nothing defines, so the list was
+  see-through over the area. The list now takes `DropDown`'s own background and border
+- **`FileTile` shows the pointer cursor**, as the other tiles do. It read `--cursor-pointer`,
+  which nothing defines, and fell back to the arrow
+- **Standard props that were declared and dropped now reach the element.** `Avatar` and `Row`
+  put `id` and `style` on their outer element, `TableHeader` puts `style` on the header, and
+  `Navigation` and `Section` hand a passed `ref` their header row and container. `FileInput` puts
+  `name` on its hidden file field instead of the outer `<div>`
+- **`TilesSkeleton`'s `isRooms` widens the columns** to the room tiles' 275px floor. Its rule
+  matched only a descendant of the grid, so it changed nothing
+- **`MainButton`, `Filter` and `TabItem` drop the grey tap flash on touch screens.** `MainButton`
+  read an undefined `--tap-highlight-color`; `Filter` and `TabItem` declared a custom property
+  named `--webkit-tap-highlight-color` instead of setting `-webkit-tap-highlight-color`
 - **A clickable `Tag`, `ImageEditor`'s replace control and `ButtonDelete` take the keyboard.**
   Each was a `<div>` with a click handler and no tab stop. Each is now `role="button"` in the tab
   order, pressed with Enter or Space; a disabled or deleted tag stays out of it

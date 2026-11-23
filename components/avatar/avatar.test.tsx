@@ -20,12 +20,18 @@ const baseProps = {
   editLabel: "Edit",
   userName: "Demo User",
   editing: false,
-  editAction: vi.fn(),
 };
 
 describe("<Avatar />", () => {
   afterEach(() => {
     vi.clearAllMocks();
+  });
+
+  it("puts id and style on the outer element", () => {
+    render(<Avatar {...baseProps} id="owner" style={{ marginTop: "4px" }} />);
+    const avatar = screen.getByTestId("avatar");
+    expect(avatar).toHaveAttribute("id", "owner");
+    expect(avatar).toHaveStyle({ marginTop: "4px" });
   });
 
   it("names the edit button: a pencil with a picture, a plus without", () => {

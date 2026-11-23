@@ -46,7 +46,6 @@ const FieldContainer = ({
   isRequired,
   labelText,
   labelFor,
-  tooltipMaxWidth,
   tooltipContent,
   tooltipClass,
   place = "bottom",
@@ -181,7 +180,6 @@ const FieldContainer = ({
               text={labelText}
               truncate
               className={styles.fieldLabel}
-              tooltipMaxWidth={tooltipMaxWidth}
               htmlFor={labelFor}
             />
             {tooltipContent ? (
@@ -210,7 +208,6 @@ const FieldContainer = ({
                   tooltipContent={tooltipContent}
                   place={place}
                   style={displayInlineBlock}
-                  offsetRight={0}
                   dataTestId={
                     dataTestId ? `${dataTestId}_help_button` : undefined
                   }

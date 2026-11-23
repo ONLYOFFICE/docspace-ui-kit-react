@@ -66,14 +66,6 @@ const meta = {
         defaultValue: { summary: "false" },
       },
     },
-    withSearch: {
-      control: false,
-      description:
-        "Ignored. Nothing reads this prop; there is no search field.",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
     noBorder: {
       control: "boolean",
       description: "Removes the button's border.",
@@ -120,13 +112,6 @@ const meta = {
         defaultValue: { summary: "true" },
       },
     },
-    showDisabledItems: {
-      control: false,
-      description: "Ignored. The list is always told to keep disabled options.",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
     displaySelectedOption: {
       control: "boolean",
       description:
@@ -156,11 +141,6 @@ const meta = {
       table: {
         defaultValue: { summary: "false" },
       },
-    },
-    searchPlaceholder: {
-      control: false,
-      description:
-        "Ignored. Nothing reads this prop; there is no search field.",
     },
     manualWidth: {
       control: "text",
@@ -396,11 +376,6 @@ const meta = {
         defaultValue: { summary: "false" },
       },
     },
-    withBlur: {
-      control: false,
-      description:
-        "Ignored. It reaches the list, which does not read it either.",
-    },
     withLabel: {
       control: "boolean",
       description:
@@ -443,10 +418,6 @@ const meta = {
       control: "text",
       description:
         "Hover tooltip for the whole control. It needs `RootTooltip` mounted.",
-    },
-    role: {
-      control: false,
-      description: "Ignored. Nothing reads this prop.",
     },
     id: {
       control: "text",

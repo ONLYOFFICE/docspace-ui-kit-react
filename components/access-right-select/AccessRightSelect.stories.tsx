@@ -108,12 +108,6 @@ const meta = {
       description: "Makes that backdrop transparent.",
       table: { defaultValue: { summary: "false" } },
     },
-    withBlur: {
-      control: "boolean",
-      description:
-        "Ignored. It reaches the list, which does not read it either.",
-      table: { defaultValue: { summary: "false" } },
-    },
     directionY: {
       control: { type: "select" },
       options: ["top", "bottom", "both"],
@@ -189,10 +183,6 @@ const meta = {
       description:
         "Keeps the option that is currently selected usable and highlights it. Without it that option is rendered disabled, so the value cannot be picked again.",
       table: { defaultValue: { summary: "false" } },
-    },
-    showDisabledItems: {
-      control: "boolean",
-      description: "Ignored. The list is always told to keep disabled options.",
     },
     title: {
       control: "text",

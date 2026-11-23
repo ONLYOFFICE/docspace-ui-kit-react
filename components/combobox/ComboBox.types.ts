@@ -101,8 +101,6 @@ export type TComboboxProps = React.AriaAttributes & {
   dropDownMaxHeight?: number;
   /** Value of `data-testid` on the list. */
   dropDownTestId?: string;
-  /** Ignored. The list is always told to keep disabled options. */
-  showDisabledItems?: boolean;
   /** Recolours the selected option's icon to the text colour. */
   fillIcon?: boolean;
   /** Keeps `directionX` and `directionY` as given instead of flipping them. */
@@ -161,8 +159,6 @@ export type TComboboxProps = React.AriaAttributes & {
   options: TOption[];
   /** Inline style applied to every option. */
   optionStyle?: React.CSSProperties;
-  /** Ignored. Nothing reads this prop; there is no search field. */
-  searchPlaceholder?: string;
   /**
    * The option to show in the button. The component does not choose it: keep it
    * in your own state and set it from `onSelect`.
@@ -184,8 +180,6 @@ export type TComboboxProps = React.AriaAttributes & {
    */
   size?: `${ComboBoxSize}`;
 
-  /** Ignored. Nothing reads this prop. */
-  role?: string;
   /** Applied to the wrapper and, again, to the list. */
   style?: React.CSSProperties;
   /**
@@ -220,8 +214,6 @@ export type TComboboxProps = React.AriaAttributes & {
   withBackdrop?: boolean;
   /** Gives that backdrop its dimming background. */
   withBackground?: boolean;
-  /** Ignored. It reaches the list, which does not read it either. */
-  withBlur?: boolean;
   /**
    * Whether the selected option is matched by label rather than by key.
    * @default true
@@ -231,8 +223,6 @@ export type TComboboxProps = React.AriaAttributes & {
   withoutBackground?: boolean;
   /** Removes the vertical padding around the button. */
   withoutPadding?: boolean;
-  /** Ignored. Nothing reads this prop; there is no search field. */
-  withSearch?: boolean;
   /** Called when a click outside closes the list, if `withBackdrop` is on. */
   onBackdropClick?: (e: Event) => void;
   /** Called when the option already selected is clicked again. */

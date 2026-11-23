@@ -17,7 +17,6 @@
       );
       --nav-menu-item-bg-hover: #{colors.$gray-light-mid};
       --nav-menu-item-bg-active: #{colors.$light-gray-selected};
-      --nav-menu-story-bg: #{colors.$gray-light};
       --nav-menu-separator-default: #{colors.$gray-light-mid};
       --nav-menu-signal-dot-color: var(
         --color-scheme-main-accent,
@@ -37,7 +36,6 @@
       --nav-menu-item-icon-active-color: #{colors.$white};
       --nav-menu-item-bg-hover: #{colors.$dark-gray-light};
       --nav-menu-item-bg-active: #{colors.$dark-gray-light};
-      --nav-menu-story-bg: #{colors.$dark-gray-light};
       --nav-menu-separator-default: #{colors.$gray-dark-strong};
       --nav-menu-signal-dot-color: #{colors.$white};
     }

@@ -37,10 +37,6 @@ export type RowProps = React.AriaAttributes & {
   className?: string;
   /** Element placed before the context button, after the badges. */
   contentElement?: React.ReactNode;
-  /** Changes nothing on screen: it sets a CSS variable that no row style
-   * reads.
-   * @default "26px" */
-  contextButtonSpacerWidth?: string;
   /**
    * Items of the context menu. They may be given here or as
    * `data.contextOptions`, which wins; an empty list renders no button.
@@ -56,7 +52,7 @@ export type RowProps = React.AriaAttributes & {
    * its presence is what reserves the space.
    */
   element?: React.ReactElement;
-  /** Ignored. Nothing reads this prop and no `id` reaches the DOM. */
+  /** Id of the row element. */
   id?: string;
   /** Draws the checkbox as partly ticked, for a group that is half-selected. */
   indeterminate?: boolean;
@@ -72,7 +68,7 @@ export type RowProps = React.AriaAttributes & {
   onRowClick?: (e: React.MouseEvent) => void;
   /** Called when the context menu is asked for, with `true` for a right-click. */
   onContextClick?: (value?: boolean) => void;
-  /** Ignored. Nothing reads this prop and no inline style reaches the DOM. */
+  /** Inline style of the row element. */
   style?: React.CSSProperties;
   /** Replaces the checkbox and the start element with a spinner. */
   inProgress?: boolean;
@@ -104,8 +100,6 @@ export type RowProps = React.AriaAttributes & {
   isDisabled?: boolean;
   /** Called with the direction when an index arrow is clicked. */
   onChangeIndex?: (action: VDRIndexingAction) => void;
-  /** Ignored. The context menu's header is read from the child's own `item` prop. */
-  item?: RowItemType;
   /** Value of `data-testid` on the row.
    * @default "row" */
   dataTestId?: string;

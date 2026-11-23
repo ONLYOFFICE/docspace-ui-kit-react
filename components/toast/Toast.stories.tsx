@@ -1,4 +1,4 @@
-import type { CSSProperties, ComponentProps } from "react";
+import type { CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, screen, waitFor, within } from "storybook/test";
@@ -25,42 +25,6 @@ const meta = {
     toastr.clear();
   },
   argTypes: {
-    type: {
-      control: "select",
-      options: Object.values(ToastType),
-      description: "Ignored. A toast's type is the `toastr` method you call.",
-    },
-    title: {
-      control: "text",
-      description:
-        "Ignored. A toast's title is the second argument of `toastr.success` and its siblings.",
-    },
-    data: {
-      control: "text",
-      description:
-        "Ignored. A toast's body is the first argument of `toastr.success` and its siblings.",
-    },
-    withCross: {
-      control: "boolean",
-      description:
-        "Ignored. It is the fourth argument of `toastr.success` and its siblings.",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
-    timeout: {
-      control: "number",
-      description:
-        "Ignored. It is the third argument of `toastr.success` and its siblings.",
-      table: {
-        defaultValue: { summary: "5000" },
-      },
-    },
-    id: {
-      control: "text",
-      description:
-        "Ignored. Nothing reads this prop; the container carries no `id`.",
-    },
     className: {
       control: "text",
       description: "Applied to the container the toasts are stacked in.",
@@ -78,9 +42,11 @@ const meta = {
       },
     },
   },
-} satisfies Meta<typeof Toast>;
+} satisfies Meta<ToastTemplateProps>;
 
-type Story = StoryObj<ComponentProps<typeof Toast>>;
+// The story's own controls: the container's props, and the arguments of the
+// `toastr` call its button makes.
+type Story = StoryObj<ToastTemplateProps>;
 
 export default meta;
 

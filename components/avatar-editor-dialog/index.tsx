@@ -21,7 +21,6 @@ const AvatarEditorDialog = ({
   image,
   isLoading = false,
   editorBorderRadius = 110,
-  maxImageSize,
   dataTestId,
   onClose,
   onSave,
@@ -98,7 +97,6 @@ const AvatarEditorDialog = ({
           onChangeFile={onChangeFile}
           isDisabled={isLoading}
           editorBorderRadius={editorBorderRadius}
-          maxImageSize={maxImageSize}
         />
       </ModalDialog.Body>
 

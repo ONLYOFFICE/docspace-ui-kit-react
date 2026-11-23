@@ -11,7 +11,6 @@ vi.mock("react-device-detect", () => ({
 
 const baseProps = {
   type: RoomsType.CustomRoom,
-  isPrivacy: false,
   isArchive: false,
 };
 

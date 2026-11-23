@@ -187,11 +187,6 @@ const meta = {
       control: "object",
       description: "Applied to the outermost element as inline style.",
     },
-    isHovered: {
-      control: false,
-      description:
-        "Ignored. Nothing reads this prop; the hover state comes from CSS.",
-    },
   },
   decorators: [
     (Story) => (

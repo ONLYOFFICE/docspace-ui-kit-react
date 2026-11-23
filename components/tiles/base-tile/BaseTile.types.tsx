@@ -12,8 +12,6 @@ export type BaseTileProps = React.AriaAttributes & {
   item: TileItem;
   /** Called with the new checked state and the `item`, from the checkbox. A tap on the icon calls it too, in a window 600px wide or narrower. */
   onSelect?: (checked: boolean, item: TileItem) => void;
-  /** Ignored. Nothing in this component reads it; put the handler on `onRoomClick` or on your own `topContent`. */
-  thumbnailClick?: (e: React.MouseEvent) => void;
   /** Builds the menu that the three-dot button and a right-click open. Without it neither opens a menu, whatever `contextOptions` holds. */
   getContextModel?: () => ContextMenuModel[];
   /** Draws the checkbox in its indeterminate state. */

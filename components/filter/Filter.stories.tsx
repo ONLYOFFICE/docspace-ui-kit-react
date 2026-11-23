@@ -706,7 +706,13 @@ export const Default: Story = {
       timeout: 3000,
     });
 
-    // The filter button opens the panel; Cancel closes it.
+    // The filter button opens the panel; Cancel closes it. A tap on it
+    // draws no grey flash.
+    await expect(
+      getComputedStyle(
+        canvas.getByTestId("filter_icon_button"),
+      ).getPropertyValue("-webkit-tap-highlight-color"),
+    ).toBe("rgba(0, 0, 0, 0)");
     const panel = await openPanel(context);
     await expect(panel.getByTestId("filter_block_header")).toHaveTextContent(
       "Filter",

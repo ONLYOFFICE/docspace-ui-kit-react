@@ -77,11 +77,6 @@ const meta = {
         defaultValue: { summary: "110" },
       },
     },
-    maxImageSize: {
-      control: "number",
-      description:
-        "Ignored. It is handed to the image editor, which does not read it either; check the file's size in `onChangeFile`.",
-    },
     dataTestId: {
       control: "text",
       description: "Value of `data-testid` on the dialog.",

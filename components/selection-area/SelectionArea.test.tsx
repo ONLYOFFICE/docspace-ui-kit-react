@@ -22,14 +22,12 @@ const defaultProps = {
     {
       type: "folders",
       rowGap: 16,
-      itemHeight: 40,
       countOfMissingTiles: 0,
       rowCount: 2,
     },
     {
       type: "files",
       rowGap: 16,
-      itemHeight: 40,
       countOfMissingTiles: 0,
       rowCount: 2,
     },

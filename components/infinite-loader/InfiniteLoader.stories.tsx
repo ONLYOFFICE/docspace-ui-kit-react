@@ -232,23 +232,10 @@ const meta = {
       description:
         "Identifier of the folder shown. When it changes, the `tile` layout measures its rows again.",
     },
-    showSkeleton: {
-      control: false,
-      description:
-        "Ignored: the loader sets it itself after a scroll jump of more than 800px.",
-    },
     scrollElement: {
       control: false,
       description:
         "The element that scrolls the list. Without it the loader looks for the portal's scroller, then falls back to the window.",
-    },
-    smallPreview: {
-      control: false,
-      description: "Declared, but no layout reads it.",
-    },
-    isOneTile: {
-      control: false,
-      description: "Declared, but no layout reads it.",
     },
   },
 } satisfies Meta<typeof InfiniteLoaderComponent>;

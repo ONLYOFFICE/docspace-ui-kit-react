@@ -41,12 +41,6 @@ export type LabelProps = React.AriaAttributes & {
   /** Caption shown in semibold, as text or an element, before the asterisk and the children. */
   text?: string | React.ReactNode;
 
-  /**
-   * Written onto the label as an HTML `display` attribute, which changes
-   * nothing about its layout. Set `display` through `style` instead.
-   */
-  display?: string;
-
   /** Applied to the label. */
   className?: string;
 
@@ -58,7 +52,4 @@ export type LabelProps = React.AriaAttributes & {
 
   /** Rendered after the text and the asterisk, inside the same label. */
   children?: React.ReactNode;
-
-  /** Ignored. Nothing reads this prop; the shared tooltip sizes itself. */
-  tooltipMaxWidth?: string;
 };

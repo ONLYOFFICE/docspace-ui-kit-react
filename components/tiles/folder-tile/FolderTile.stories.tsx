@@ -202,20 +202,6 @@ const meta = {
         defaultValue: { summary: '"tile"' },
       },
     },
-    thumbnailClick: {
-      control: false,
-      description:
-        "Ignored. Nothing reads it, and the component forwards no unknown props, so it never reaches the DOM either.",
-    },
-    contextMenuHeader: {
-      control: false,
-      description:
-        "Ignored. The header is built from the first child's `item`; nothing reads this prop.",
-    },
-    dragging: {
-      control: false,
-      description: "Ignored. `isDragging` is the one that is read.",
-    },
   },
   args: {
     onSelect: fn(),
