@@ -153,6 +153,7 @@ const preview: Preview = {
             "Forms",
             "Billing",
             "Uploader",
+            "Media Gallery",
             "Document Editor",
             "Selectors",
             "Providers",
