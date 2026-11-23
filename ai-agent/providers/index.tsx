@@ -997,6 +997,12 @@ const AiAgentProviders = ({
     userId,
   ]);
 
+  // The host reaches the data source selector through the panel store.
+  useEffect(() => {
+    aiChatStore.setAddDataSource(onAddContextFolder);
+    return () => aiChatStore.setAddDataSource(null);
+  }, [aiChatStore, onAddContextFolder]);
+
   // The "+" menu's Knowledge bases and Data sources: the connected sources,
   // each with its remove control, and the "Manage ..." row of each list.
   const { composerKnowledge, composerDataSources } = useComposerSourceLists({

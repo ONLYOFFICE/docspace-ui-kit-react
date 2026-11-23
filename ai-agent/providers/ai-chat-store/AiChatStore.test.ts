@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { isObservable } from "mobx";
 
 import AiChatStore, { projectToPreset } from "./AiChatStore";
@@ -398,5 +398,18 @@ describe("projectToPreset", () => {
         knowledgeRooms: [],
       }).folderContext,
     ).toBeNull();
+  });
+});
+
+describe("the data source selector", () => {
+  it("is handed to the host while the providers keep it set", () => {
+    const store = new AiChatStore();
+    expect(store.addDataSource).toBeNull();
+    const open = vi.fn();
+    store.setAddDataSource(open);
+    store.addDataSource?.();
+    expect(open).toHaveBeenCalledTimes(1);
+    store.setAddDataSource(null);
+    expect(store.addDataSource).toBeNull();
   });
 });

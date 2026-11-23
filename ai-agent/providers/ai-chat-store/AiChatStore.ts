@@ -259,6 +259,15 @@ class AiChatStore {
   sourcesManager: AiChatSourcesManager | null = null;
 
   /**
+   * Opens the selector that connects one more folder or room as a data
+   * source of the chat, the one "Manage sources..." of the composer's menus
+   * opens. Set by the providers while they are mounted, so a host view
+   * outside the composer (an agent's Info panel) offers the same action;
+   * `null` until then.
+   */
+  addDataSource: (() => void) | null = null;
+
+  /**
    * The agent the chat runs on, as its replies show it: its logo beside
    * each reply and its name on the documents they create. `null` (the
    * default) for the default agent.
@@ -325,6 +334,7 @@ class AiChatStore {
       agentPicker: observable.ref,
       agentActions: observable.ref,
       sourcesManager: observable.ref,
+      addDataSource: observable.ref,
       chatAgent: observable.ref,
     });
   }
@@ -504,6 +514,10 @@ class AiChatStore {
 
   setSourcesManager = (manager: AiChatSourcesManager | null) => {
     this.sourcesManager = manager;
+  };
+
+  setAddDataSource = (open: (() => void) | null) => {
+    this.addDataSource = open;
   };
 
   setKnowledgePickerHidden = (value: boolean) => {
