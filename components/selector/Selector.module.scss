@@ -150,6 +150,10 @@
   background-color: var(--background-color);
 }
 
+.collapsedControls {
+  display: none;
+}
+
 .tabs {
   padding: 0 16px;
   margin-bottom: 16px;

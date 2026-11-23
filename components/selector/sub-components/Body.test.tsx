@@ -8,7 +8,12 @@ import {
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Selector } from "../Selector";
-import type { SelectorProps, TSelectorItem } from "../Selector.types";
+import type {
+  SelectorProps,
+  TSelectorItem,
+  TSelectorSearch,
+  TSelectorTabs,
+} from "../Selector.types";
 
 const makeItems = (count: number, prefix = "Item") =>
   Array.from({ length: count }, (_, index) => ({
@@ -307,5 +312,139 @@ describe("Selector list from the keyboard", () => {
 
     await waitFor(() => expect(activeOptionText()).toContain("Item 3"));
     expect(props.onSelect).not.toHaveBeenCalled();
+  });
+});
+
+describe("Selector tabs and search on a phone on its side", () => {
+  const tabsProps: TSelectorTabs = {
+    withTabs: true,
+    tabsData: [
+      { id: "members", name: "Members", content: null },
+      { id: "groups", name: "Groups", content: null },
+    ],
+    activeTabId: "members",
+  };
+  const searchProps: TSelectorSearch = {
+    withSearch: true,
+    searchLoader: <div />,
+    isSearchLoading: false,
+    searchPlaceholder: "Search",
+    searchValue: "",
+    onSearch: vi.fn(),
+    onClearSearch: vi.fn(),
+  };
+
+  const setScreen = (width: number, height: number, angle: number) => {
+    Object.defineProperty(window, "innerWidth", {
+      configurable: true,
+      value: width,
+    });
+    Object.defineProperty(window, "innerHeight", {
+      configurable: true,
+      value: height,
+    });
+    Object.defineProperty(window.screen, "orientation", {
+      configurable: true,
+      value: { angle },
+    });
+  };
+
+  const initialWidth = window.innerWidth;
+  const initialHeight = window.innerHeight;
+
+  beforeEach(() => {
+    vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(
+      BODY_HEIGHT,
+    );
+    vi.stubGlobal(
+      "IntersectionObserver",
+      class {
+        observe = vi.fn();
+        unobserve = vi.fn();
+        disconnect = vi.fn();
+      },
+    );
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    setScreen(initialWidth, initialHeight, 0);
+  });
+
+  const controls = () =>
+    screen.getByRole("tablist").closest(".selector_body > div");
+
+  const scrollList = (scrollTop: number) => {
+    const scroller = document.querySelector<HTMLElement>(
+      ".selector-body-scroll",
+    );
+    expect(scroller).not.toBeNull();
+    Object.defineProperty(scroller!, "scrollHeight", {
+      configurable: true,
+      value: 60 * 48,
+    });
+    Object.defineProperty(scroller!, "clientHeight", {
+      configurable: true,
+      value: 300,
+    });
+    scroller!.scrollTop = scrollTop;
+    fireEvent.scroll(scroller!);
+  };
+
+  const renderSelector = async () => {
+    render(<Selector {...makeProps({ ...tabsProps, ...searchProps })} />);
+    await waitFor(() =>
+      expect(screen.getAllByRole("option").length).toBeGreaterThan(0),
+    );
+  };
+
+  it("hides the tabs and the search once the list is scrolled, and shows them again at its top", async () => {
+    setScreen(750, 342, 90);
+    await renderSelector();
+    expect(controls()).not.toHaveClass("collapsedControls");
+
+    scrollList(96);
+    await waitFor(() => expect(controls()).toHaveClass("collapsedControls"));
+
+    scrollList(0);
+    await waitFor(() =>
+      expect(controls()).not.toHaveClass("collapsedControls"),
+    );
+  });
+
+  it("keeps the tabs and the search in place on a phone held upright", async () => {
+    setScreen(342, 750, 0);
+    await renderSelector();
+
+    scrollList(96);
+    await act(async () => {});
+
+    expect(controls()).not.toHaveClass("collapsedControls");
+  });
+
+  it("keeps the tabs and the search in place on a tablet on its side", async () => {
+    setScreen(1024, 768, 90);
+    await renderSelector();
+
+    scrollList(96);
+    await act(async () => {});
+
+    expect(controls()).not.toHaveClass("collapsedControls");
+  });
+
+  it("keeps the search in place while it is being typed in", async () => {
+    setScreen(750, 342, 90);
+    await renderSelector();
+    const input = document.querySelector<HTMLInputElement>(
+      ".selector-search-input input",
+    );
+    expect(input).not.toBeNull();
+    act(() => input!.focus());
+
+    scrollList(96);
+    await act(async () => {});
+
+    expect(controls()).not.toHaveClass("collapsedControls");
   });
 });

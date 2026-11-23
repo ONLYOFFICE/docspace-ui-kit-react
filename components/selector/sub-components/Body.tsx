@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
 import InfiniteLoader from "react-window-infinite-loader";
-import { VariableSizeList as List } from "react-window";
+import { VariableSizeList as List, type ListOnScrollProps } from "react-window";
 import classNames from "classnames";
 import { RoomType } from "@onlyoffice/docspace-api-sdk";
 
@@ -9,6 +9,7 @@ import styles from "../Selector.module.scss";
 import { Scrollbar } from "../../scrollbar";
 import { Text } from "../../text";
 import { consumeKey } from "../../../utils/consume-key";
+import { isMobileDevice } from "../../../utils/device";
 
 import { SearchContext, SearchValueContext } from "../contexts/Search";
 import { BreadCrumbsContext } from "../contexts/BreadCrumbs";
@@ -83,6 +84,9 @@ const ERROR_FOOTER_HEIGHT = 20;
 // How many frames a row scrolled back on screen is waited for to be drawn.
 const ROW_FRAMES = 10;
 
+const isPhoneLandscape = () =>
+  isMobileDevice() && window.innerWidth > window.innerHeight;
+
 const Body = ({
   footerVisible,
 
@@ -140,6 +144,9 @@ const Body = ({
   const { withSelectAll } = React.use(SelectAllContext);
 
   const [bodyHeight, setBodyHeight] = React.useState(0);
+  const [isLandscape, setIsLandscape] = React.useState(false);
+  const [controlsCollapsed, setControlsCollapsed] = React.useState(false);
+  const controlsRef = React.useRef<HTMLDivElement>(null);
   const [savedInputValue, setSavedInputValue] =
     React.useState<Nullable<string>>(null);
 
@@ -246,6 +253,7 @@ const Body = ({
       resizeTimerRef.current = setTimeout(() => {
         if (bodyRef.current) {
           setBodyHeight(bodyRef.current.offsetHeight);
+          setIsLandscape(isPhoneLandscape());
         }
       }, 20);
     }
@@ -334,14 +342,24 @@ const Body = ({
   const showSelectAll =
     (isMultiSelect && withSelectAll && !effectiveIsSearch) || false;
 
+  const controlsHeight =
+    (withTabs ? TABS_HEIGHT : 0) + (showSearch ? SEARCH_HEIGHT : 0);
+  const canCollapseControls =
+    isLandscape &&
+    controlsHeight > 0 &&
+    loadingMode !== "skeleton" &&
+    !showsEmptyScreen;
+  const hideControls = controlsCollapsed && canCollapseControls;
+
+  React.useEffect(() => {
+    if (!canCollapseControls) setControlsCollapsed(false);
+  }, [canCollapseControls]);
+
   if (withPadding) {
     listHeight -= CONTAINER_PADDING;
   }
 
-  if (showSearch) {
-    listHeight -= SEARCH_HEIGHT;
-  }
-  if (withTabs) listHeight -= TABS_HEIGHT;
+  if (!hideControls) listHeight -= controlsHeight;
   if (withInfo) {
     const infoEl = document.getElementById("selector-info-text");
     if (infoEl) {
@@ -380,6 +398,30 @@ const Body = ({
     }
 
     return 48;
+  };
+
+  const onListScroll = ({ scrollOffset }: ListOnScrollProps) => {
+    if (!canCollapseControls) return;
+
+    if (scrollOffset === 0) {
+      if (controlsCollapsed) setControlsCollapsed(false);
+      return;
+    }
+
+    if (
+      controlsCollapsed ||
+      controlsRef.current?.contains(document.activeElement)
+    )
+      return;
+
+    let contentHeight = 0;
+    for (let index = 0; index < itemsCount; index += 1) {
+      contentHeight += getItemSize(index);
+    }
+
+    if (contentHeight > listHeight + controlsHeight) {
+      setControlsCollapsed(true);
+    }
   };
 
   // The keyboard's place in the list. The list's scroll container holds the
@@ -634,15 +676,20 @@ const Body = ({
 
       {injectedElement ? React.cloneElement(injectedElement, cloneProps) : null}
 
-      {withTabs && tabsData ? (
-        <Tabs
-          items={tabsData}
-          selectedItemId={activeTabId}
-          className={classNames(styles.tabs, "selector_body_tabs")}
-        />
-      ) : null}
+      <div
+        ref={controlsRef}
+        className={classNames({ [styles.collapsedControls]: hideControls })}
+      >
+        {withTabs && tabsData ? (
+          <Tabs
+            items={tabsData}
+            selectedItemId={activeTabId}
+            className={classNames(styles.tabs, "selector_body_tabs")}
+          />
+        ) : null}
 
-      <Search isSearch={itemsCount > 0 || !!effectiveIsSearch} />
+        <Search isSearch={itemsCount > 0 || !!effectiveIsSearch} />
+      </div>
 
       {withInfo && loadingMode !== "skeleton" ? (
         <Info
@@ -784,6 +831,7 @@ const Body = ({
                       activeIndex,
                     }}
                     itemSize={getItemSize}
+                    onScroll={onListScroll}
                     onItemsRendered={(props) => {
                       visibleRangeRef.current = {
                         start: props.visibleStartIndex,
