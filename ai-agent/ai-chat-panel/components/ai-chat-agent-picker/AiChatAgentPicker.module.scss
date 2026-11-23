@@ -98,6 +98,14 @@
   width: 100%;
 }
 
+// The scrollbar draws its content as a table cell while it hands the
+// content's height to the holder, and a table cell is as wide as its widest
+// row: the hover fill ended with the agent's name. As a block the content,
+// and each row in it, takes the menu's width.
+.agentsBody {
+  display: block !important;
+}
+
 .row {
   display: flex;
   align-items: center;

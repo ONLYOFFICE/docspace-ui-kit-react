@@ -288,6 +288,7 @@ const AiChatAgentPicker = observer(({ title }: AiChatAgentPickerProps) => {
             </div>
             <Scrollbar
               className={styles.agents}
+              scrollBodyClassName={styles.agentsBody}
               style={{ maxHeight: VISIBLE_AGENTS_COUNT * ROW_HEIGHT }}
               translateContentSizeYToHolder
               noScrollX
