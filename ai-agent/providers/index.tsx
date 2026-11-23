@@ -203,6 +203,13 @@ type AiAgentProvidersProps = {
    */
   contextEntityId?: string;
   /**
+   * The Rooms section is on for the portal. A host passes `false` while it
+   * is switched off in Settings -> Apps: the chat's selectors (attach, data
+   * sources, save, export, "Save to room...") then do not offer Rooms, so
+   * nothing lands in a room nobody can open. Offered by default.
+   */
+  roomsSectionAvailable?: boolean;
+  /**
    * Explicitly controls the composer model picker. The chat lib hides the
    * picker whenever `entityId` is set, but here `entityId` is the AI project
    * the chat is open in, whose picker is a read-only label of its own.
@@ -651,6 +658,7 @@ const AiAgentProviders = ({
   closeEditorPanel,
   entityId,
   contextEntityId,
+  roomsSectionAvailable = true,
   hideProfilePicker = false,
   profilePickerReadOnly,
   isAgentRoom = false,
@@ -775,6 +783,7 @@ const AiAgentProviders = ({
     entityId: uploadFolderId,
     onFilesAttached,
     onSkillRoomsChange: sourcesManager?.onSkillRoomsChange,
+    roomsSectionAvailable,
   });
 
   // The composer's slash menu changes the Skill sets too. Inside an AI
