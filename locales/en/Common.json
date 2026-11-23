@@ -240,7 +240,7 @@
   "EmptyAIAgentsNotActiveYetTitle": "AI features aren’t active yet",
   "EmptyAIChatNotActiveYetAdminDescription": "Activate {{aiChat}} to start conversations in this section.",
   "EmptyAIChatNotActiveYetTitle": "{{aiChat}} isn’t active yet",
-  "EmptyAIChatNotActiveYetUserDescription": "Contact your Full admin to activate {{aiChat}} for this workspace.",
+  "EmptyAIChatNotActiveYetUserDescription": "Only a Full admin can activate {{aiChat}} for this workspace.",
   "EmptyAIChatNotAvailableYetAdminDescription": "Connect your own AI service to start using {{aiChat}} in the workspace. Once connected, {{aiChat}} will be available to all users.",
   "EmptyAIChatNotAvailableYetTitle": "{{aiChat}} is not available yet",
   "EmptyAIChatNotAvailableYetUserDescription": "Contact your Full admin to connect an AI service for this workspace. Once connected, {{aiChat}} will be available to all users.",

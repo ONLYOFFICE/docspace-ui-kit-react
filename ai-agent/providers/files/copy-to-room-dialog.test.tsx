@@ -87,6 +87,23 @@ describe("CopyToRoomDialog", () => {
     });
   });
 
+  it("offers Rooms unless the host says the section is off (Bug 84833)", () => {
+    const { unmount } = render(
+      <CopyToRoomDialog file={FILE} onClose={vi.fn()} />,
+    );
+    expect(selector().withRoomsTreeFolder).toBe(true);
+    unmount();
+
+    render(
+      <CopyToRoomDialog
+        file={FILE}
+        onClose={vi.fn()}
+        withRoomsTreeFolder={false}
+      />,
+    );
+    expect(selector().withRoomsTreeFolder).toBe(false);
+  });
+
   it("lets the user confirm only a place they may add files to", () => {
     render(<CopyToRoomDialog file={FILE} onClose={vi.fn()} />);
     const { getIsDisabled } = selector();

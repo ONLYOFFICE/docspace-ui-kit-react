@@ -63,6 +63,7 @@ export const useFilesIntegration = ({
   entityId,
   onFilesAttached,
   onSkillRoomsChange,
+  roomsSectionAvailable = true,
 }: {
   entityId?: string;
   // Reports every file attached through the dialog or a device upload, so the
@@ -75,6 +76,9 @@ export const useFilesIntegration = ({
     added: { id: string; name: string }[];
     removed: string[];
   }) => void;
+  // The Rooms section is on for the portal; with `false` the selectors do not
+  // offer it (Bug 84833).
+  roomsSectionAvailable?: boolean;
 } = {}): FilesIntegration => {
   const { t, i18n } = useTranslation(["Common"]);
 
@@ -208,7 +212,11 @@ export const useFilesIntegration = ({
   const overlay = (
     <>
       {pickerVisible ? (
-        <AttachDialog onClose={closePicker} onFilesAttached={onFilesAttached} />
+        <AttachDialog
+          onClose={closePicker}
+          onFilesAttached={onFilesAttached}
+          withRoomsTreeFolder={roomsSectionAvailable}
+        />
       ) : null}
       {roomsPicker ? (
         <ContextRoomsDialog
@@ -218,7 +226,11 @@ export const useFilesIntegration = ({
         />
       ) : null}
       {folderPickerVisible ? (
-        <ContextFolderDialog mode="add" onClose={closeFolderPicker} />
+        <ContextFolderDialog
+          mode="add"
+          onClose={closeFolderPicker}
+          withRoomsTreeFolder={roomsSectionAvailable}
+        />
       ) : null}
       {saveRequest ? (
         <SaveDialog
@@ -226,10 +238,15 @@ export const useFilesIntegration = ({
           defaultName={saveRequest.defaultName}
           format={saveRequest.format}
           onFinish={finishSave}
+          withRoomsTreeFolder={roomsSectionAvailable}
         />
       ) : null}
       {copyRequest ? (
-        <CopyToRoomDialog file={copyRequest} onClose={closeCopy} />
+        <CopyToRoomDialog
+          file={copyRequest}
+          onClose={closeCopy}
+          withRoomsTreeFolder={roomsSectionAvailable}
+        />
       ) : null}
       <DeviceUploader
         ref={deviceUploaderRef}

@@ -28,6 +28,12 @@ type ContextFolderDialogProps = {
    * in.
    */
   mode?: "replace" | "add";
+  /**
+   * The Rooms section is offered. A host passes `false` while the section is
+   * switched off in Settings -> Apps: a room nobody can open is no place to
+   * pick. Shown by default.
+   */
+  withRoomsTreeFolder?: boolean;
 };
 
 /**
@@ -57,6 +63,7 @@ const kindOf = (
 const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
   onClose,
   mode = "replace",
+  withRoomsTreeFolder = true,
 }) => {
   const { t } = useTranslation(["Common"]);
   const { currentDeviceType } = useDeviceType();
@@ -177,6 +184,7 @@ const ContextFolderDialog: React.FC<ContextFolderDialogProps> = ({
       withRecentTreeFolder={false}
       withFavoritesTreeFolder={false}
       withAIRoomsTreeFolder={false}
+      withRoomsTreeFolder={withRoomsTreeFolder}
       isRoomsOnly={false}
       isThirdParty={false}
       withCreate={false}

@@ -79,3 +79,34 @@ describe("the chat's file selectors", () => {
     });
   });
 });
+
+// Bug 84833: a section switched off in Settings -> Apps is no place to pick.
+describe("the chat's file selectors and the Rooms section", () => {
+  beforeEach(() => {
+    selectorProps = null;
+  });
+
+  it("offers Rooms unless the host says the section is off", () => {
+    render(
+      <SaveDialog content="text" defaultName="Reply.docx" onFinish={vi.fn()} />,
+    );
+    expect(selector().withRoomsTreeFolder).toBe(true);
+  });
+
+  it("leaves Rooms out of the folder picker of a saved message", () => {
+    render(
+      <SaveDialog
+        content="text"
+        defaultName="Reply.docx"
+        onFinish={vi.fn()}
+        withRoomsTreeFolder={false}
+      />,
+    );
+    expect(selector().withRoomsTreeFolder).toBe(false);
+  });
+
+  it("leaves Rooms out of the storage picker", () => {
+    render(<AttachDialog onClose={vi.fn()} withRoomsTreeFolder={false} />);
+    expect(selector().withRoomsTreeFolder).toBe(false);
+  });
+});

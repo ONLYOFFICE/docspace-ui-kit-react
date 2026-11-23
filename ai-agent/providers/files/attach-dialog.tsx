@@ -25,6 +25,12 @@ type AttachDialogProps = {
   // Reports the attached files so the caller can keep the record flags the
   // attachments store drops (`canAnalyze`).
   onFilesAttached?: OnFilesAttached;
+  /**
+   * The Rooms section is offered. A host passes `false` while the section is
+   * switched off in Settings -> Apps: a room nobody can open is no place to
+   * pick. Shown by default.
+   */
+  withRoomsTreeFolder?: boolean;
 };
 
 // Rendered inside <AiAgentProviders> so `useStores()` resolves the
@@ -32,7 +38,7 @@ type AttachDialogProps = {
 // to the AI backend, which resolves the entryId server-side — `content` here
 // is a placeholder and is ignored by the host integration.
 const AttachDialog: React.FC<AttachDialogProps> = observer((props) => {
-  const { onClose, onFilesAttached } = props;
+  const { onClose, onFilesAttached, withRoomsTreeFolder = true } = props;
   const { t } = useTranslation(["Common"]);
   const { currentDeviceType } = useDeviceType();
   const { getIcon } = useGetIcon();
@@ -169,6 +175,7 @@ const AttachDialog: React.FC<AttachDialogProps> = observer((props) => {
     <FilesSelector
       isPanelVisible
       openRoot
+      withRoomsTreeFolder={withRoomsTreeFolder}
       isMultiSelect
       withRecentTreeFolder
       withFavoritesTreeFolder

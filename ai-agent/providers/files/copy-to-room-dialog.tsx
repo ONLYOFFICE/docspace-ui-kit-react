@@ -26,6 +26,12 @@ type CopyToRoomDialogProps = {
   file: CopyToRoomFile;
   /** Called once the user has picked a place or cancelled. */
   onClose: () => void;
+  /**
+   * The Rooms section is offered. A host passes `false` while the section is
+   * switched off in Settings -> Apps: a room nobody can open is no place to
+   * pick. Shown by default.
+   */
+  withRoomsTreeFolder?: boolean;
 };
 
 // The folder selector behind "Save to room..." on a file a reply produced
@@ -33,7 +39,11 @@ type CopyToRoomDialogProps = {
 // they may add files to, and a copy of the file is put there; the file
 // itself stays where it is, and so does its card. Rendered inside
 // <AiAgentProviders> so useApi()/useGetIcon() resolve their context.
-const CopyToRoomDialog = ({ file, onClose }: CopyToRoomDialogProps) => {
+const CopyToRoomDialog = ({
+  file,
+  onClose,
+  withRoomsTreeFolder = true,
+}: CopyToRoomDialogProps) => {
   const { t } = useTranslation(["Common"]);
   const { currentDeviceType } = useDeviceType();
   const { getIcon } = useGetIcon();
@@ -109,6 +119,9 @@ const CopyToRoomDialog = ({ file, onClose }: CopyToRoomDialogProps) => {
       // are skill sets and knowledge bases, filled in their own lists.
       withFormsTreeFolder={false}
       withAIRoomsTreeFolder={false}
+      // Rooms goes with its section: a copy in a room of a section that is
+      // switched off cannot be opened (Bug 84833).
+      withRoomsTreeFolder={withRoomsTreeFolder}
       // A Form Filling space is still reached through Rooms; the selector
       // says why it cannot take the file instead of letting the copy fail.
       formProps={{
