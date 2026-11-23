@@ -12,8 +12,12 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `OperationsProgressButton`'s styles under a class it never sets, `MainButtonMobile` the styles
   of a progress bar it no longer draws, and `DropDown` a `withColumns` rule. Several components
   declared properties no rule reads, and a few rules read properties nothing defines.
-  Nothing on screen changes. `ErrorContainer`'s `--error-container-link`, which did nothing, is
-  removed with them
+  Nothing on screen changes. `ErrorContainer`'s `--error-container-link`, `CategoryItem`'s
+  `--category-item-subheader-size` and `RoomType`'s `--room-type-dropdown-item-background` and
+  `--room-type-display-item-*`, which did nothing, are removed with them
+- **`RoomType` renders the `listItem` card for a `type` it does not know.** It rendered a fourth,
+  static layout no typed value could select, with no click, keys or test id. Only untyped code
+  passing another string sees the change
 - **Props that nothing reads are removed from the types.** Each was documented as ignored. Drop
   them from your calls; a TypeScript caller gets an error where it still passes one, and in plain
   JavaScript a component that spreads the rest onto its element puts the value there as an

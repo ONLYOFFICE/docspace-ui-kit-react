@@ -14,6 +14,22 @@ const getArrow = (root: HTMLElement) =>
   root.querySelector(".choose_room-forward_btn") as HTMLElement;
 
 describe("<RoomType />", () => {
+  it("renders the list card for a type it does not know", () => {
+    const onClick = vi.fn();
+    render(
+      <RoomType
+        {...baseProps}
+        // Untyped code can pass any string.
+        type={"displayItem" as "listItem"}
+        roomType={RoomsType.EditingRoom}
+        onClick={onClick}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId("room-type-list-item"));
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
   it("puts a passed aria-* on the row and keeps its own aria-disabled", () => {
     render(
       <RoomType

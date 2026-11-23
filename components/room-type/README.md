@@ -195,12 +195,9 @@ export function RoomTypeSelect() {
   receive the class and do nothing with it.
 - **`selectedId` is required and does nothing.** It is written to `data-selected-id` and read
   nowhere in the component.
-- **A fourth layout exists in the stylesheet and cannot be reached.** `displayItem`, a static
-  card with no arrow, is the fallback branch. `type` defaults to `listItem` and names only three
-  layouts, so nothing selects it.
-- **Some theme variables are never read.** `dropdownItem`'s background falls back to the list
-  item's `none`, so `--room-type-dropdown-item-background` is unused. The
-  `--room-type-display-item-*` set belongs to the unreachable layout.
+- **Any other `type` renders `listItem`.** An unknown string from untyped code gets the default
+  card, with its click, keys and test id.
+- **A `dropdownItem` has no background of its own.** It takes the colour of the list it sits in.
 - **The accent border works outside the portal.** The pressed list card and the open or pressed
   dropdown button take `--accent-main`. Without it they take the theme provider's accent, then the
   kit's blue.
@@ -237,7 +234,7 @@ nothing to it.
 
 ## Accessibility
 
-- In the three layouts `type` can select, the row is a `<div role="button" tabindex="0">`. Enter
+- In every layout the row is a `<div role="button" tabindex="0">`. Enter
   and Space click it, so `onClick` still receives a mouse event.
 - A focus ring in the accent colour shows while the keyboard is on the row. Its accessible name is
   its two lines of text.
