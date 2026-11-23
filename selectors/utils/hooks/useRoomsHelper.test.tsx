@@ -150,7 +150,7 @@ describe("useRoomsHelper", () => {
     expect(mocks.getRoomsFolder).toHaveBeenCalledTimes(1);
   });
 
-  it("omits the form filling room from the create-room type dropdown", async () => {
+  it("omits the form filling room and the AI rooms from the create-room type dropdown", async () => {
     mocks.getRoomsFolder.mockResolvedValue({
       data: {
         response: {
@@ -181,6 +181,12 @@ describe("useRoomsHelper", () => {
     // not offer them, so a form restored into a new room cannot land in one.
     expect(roomTypeKeys).not.toContain(String(RoomsType.FormRoom));
     expect(roomTypeKeys).toContain(String(RoomsType.CustomRoom));
+
+    // A skill set, a knowledge base and an agent are created in the AI
+    // section, never from the Rooms section of a selector.
+    expect(roomTypeKeys).not.toContain(String(RoomsType.InstructionsRoom));
+    expect(roomTypeKeys).not.toContain(String(RoomsType.KnowledgeRoom));
+    expect(roomTypeKeys).not.toContain(String(RoomsType.AiProjectRoom));
   });
 
   const emptyRooms = () =>

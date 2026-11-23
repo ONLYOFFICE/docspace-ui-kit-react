@@ -245,6 +245,12 @@ const meta = {
       description: "Any node, rendered as it is after the tariff notice",
       table: { defaultValue: { summary: "undefined" } },
     },
+    beforeContextButton: {
+      control: false,
+      description:
+        "Host controls drawn right before the context button; with them, the controls, the context button and the navigation button stay together in that order right after the title at every width",
+      table: { defaultValue: { summary: "undefined" } },
+    },
     contextMenuHeader: {
       control: false,
       description:

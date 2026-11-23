@@ -57,7 +57,17 @@ vi.mock("@onlyoffice/ai-chat", () => ({
   }),
 }));
 
-import AiChatPanelSave from "./index";
+import { observer } from "mobx-react";
+
+import { useSaveChatAsAgent } from "./index";
+
+// The hook behind a button, as the agents menu puts it behind its row.
+const AiChatPanelSave = observer(() => {
+  const save = useSaveChatAsAgent();
+  return save ? (
+    <button type="button" data-testid="ai-chat-panel-save" onClick={save} />
+  ) : null;
+});
 
 const renderSave = (store: AiChatStore) =>
   render(
@@ -66,7 +76,7 @@ const renderSave = (store: AiChatStore) =>
     </AiChatStoreProvider>,
   );
 
-describe("AiChatPanelSave", () => {
+describe("useSaveChatAsAgent", () => {
   beforeEach(() => {
     profilesState.sessionChatProfile = null;
     profilesState.chatProfile = { id: "p1", name: "GPT 5.6 Luna" };

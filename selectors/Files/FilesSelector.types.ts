@@ -350,6 +350,19 @@ export type FilesSelectorProps = TInfoBar &
 
     isMultiSelect?: boolean;
     onSelectItem?: (item: TSelectorItem) => void;
+    /**
+     * With `isMultiSelect`, gives every folder below the root a checkbox:
+     * the box ticks the folder, a click on the row still opens it. Ticked
+     * folders stay ticked across navigation and are reported through
+     * `onFolderToggle`; `onSubmit` keeps reporting the folder that is open.
+     */
+    withFolderSelection?: boolean;
+    /**
+     * A folder's checkbox was ticked or cleared (`item.isSelected` is its
+     * state before the click). `breadCrumbs` is the path of the folder that
+     * is open, i.e. where the ticked folder sits.
+     */
+    onFolderToggle?: (item: TSelectorItem, breadCrumbs: TBreadCrumb[]) => void;
     isPortalView?: boolean;
     maxSelectedItems?: number;
     renderInPortal?: boolean;

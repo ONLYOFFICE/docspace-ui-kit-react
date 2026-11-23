@@ -1,0 +1,45 @@
+@use "../../../../styles/variables/colors";
+
+// One more button of the header's toolbar: its 32px box, its 8px step from
+// the button before it, its hover fill and icon colour.
+.button {
+  --ai-chat-agent-actions-bg-hover: #{colors.$light-gray-hover};
+  --ai-chat-agent-actions-bg-active: #{colors.$gray-light-mid};
+  --ai-chat-agent-actions-color: #{colors.$gray-text};
+
+  :global(.dark) & {
+    --ai-chat-agent-actions-bg-hover: #{colors.$light-dark-gray-hover};
+    --ai-chat-agent-actions-bg-active: #{colors.$gray-dark-mid};
+    --ai-chat-agent-actions-color: #{colors.$dark-gray-dark};
+  }
+
+  // The box is drawn here, around the 16px icon button centred in it, not
+  // by the menu button's own bordered variant: that one pads the glyph
+  // inside the 16px button, which lands off-centre in a flex box.
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  box-sizing: border-box;
+  border-radius: 6px;
+
+  // The header steps 16px between the toolbar and what follows it.
+  margin-inline-start: -8px;
+
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: var(--ai-chat-agent-actions-bg-hover);
+  }
+
+  // The menu is open.
+  &:has([aria-expanded="true"]) {
+    background-color: var(--ai-chat-agent-actions-bg-active);
+  }
+
+  svg path {
+    fill: var(--ai-chat-agent-actions-color);
+  }
+}

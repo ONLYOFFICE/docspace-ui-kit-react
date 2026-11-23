@@ -102,11 +102,17 @@ const useRoomsHelper = ({
   }, [isInit]);
 
   // The type dropdown only opens outside the Forms section (a forms-scoped
-  // listing gets createRoomType and creates the room straight away), and form
-  // filling rooms cannot be created from the Rooms section.
+  // listing gets createRoomType and creates the room straight away), so it is
+  // the menu of the Rooms section: it offers the rooms that live there. Form
+  // filling rooms belong to the Forms section, and a skill set, a knowledge
+  // base and an agent to the AI section, where each is created.
   const createDropDownItems = React.useMemo(() => {
     return RoomsTypeValues.filter(
-      (value) => value !== ApiRoomType.FillingFormsRoom,
+      (value) =>
+        value !== RoomsType.FormRoom &&
+        value !== RoomsType.InstructionsRoom &&
+        value !== RoomsType.KnowledgeRoom &&
+        value !== RoomsType.AiProjectRoom,
     ).map((value) => {
       const isPublicRoomDisabled =
         !!disabledCreatePublicRoom && value === ApiRoomType.PublicRoom;

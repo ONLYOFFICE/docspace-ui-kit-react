@@ -22,6 +22,10 @@ export {
 } from "./use-attach-to-chat";
 export { CHAT_ATTACHMENT_LIMIT } from "./limits";
 export { useFilesIntegration, type FilesIntegration } from "./use-integration";
+export {
+  useSkillSetMenu,
+  type SkillSetMenuOptions,
+} from "./use-skill-set-menu";
 // The "Add context" folder picker, for a host that offers the same choice
 // outside the composer menu (the AI project view's context card).
 export { default as ContextFolderDialog } from "./context-folder-dialog";

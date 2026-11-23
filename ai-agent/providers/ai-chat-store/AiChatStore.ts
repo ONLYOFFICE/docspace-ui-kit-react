@@ -1,3 +1,4 @@
+import type React from "react";
 import { makeAutoObservable, observable, reaction } from "mobx";
 
 import {
@@ -46,8 +47,15 @@ export const DEFAULT_CHAT_PANEL_WIDTH = 400;
 /** A room as a preset remembers it: the chat library's cloud + id pair, plus the name to show. */
 export type AiChatPresetRoom = { cloud: string; id: string; name: string };
 
-/** A folder connected as the chat's context, with where it sits for its pill. */
-export type AiChatContextFolder = AiChatPresetRoom & { path?: string };
+/**
+ * A folder connected as the chat's context, with where it sits for its pill
+ * and whether it is a room (drawn with the room icon) or a folder; one
+ * remembered before the kind existed has none and is drawn as a folder.
+ */
+export type AiChatContextFolder = AiChatPresetRoom & {
+  path?: string;
+  kind?: "room" | "folder";
+};
 
 /**
  * The chat settings a host saves as a preset and hands back to open one: the
@@ -66,6 +74,14 @@ export type AiChatPresetSettings = {
    * it opens without one.
    */
   folderContext?: AiChatContextFolder | null;
+  /**
+   * The text the chat's composer is to hold, replacing the unsent draft,
+   * such as a skill's call (`"/skill-name "`) for "Use in chat". With
+   * `openPreset` it is the fresh conversation's draft, with `applyPreset`
+   * it replaces the open chat's one. The chat applies it once, as soon as
+   * its composer is mounted. Absent, the draft is left as it is.
+   */
+  draft?: string;
 };
 
 /**
@@ -80,6 +96,59 @@ export type AiChatProjectSettings = {
   knowledgeRooms: AiChatPresetRoom[];
   /** The folder the project's chat last worked in, as the host remembers it. */
   folderContext?: AiChatContextFolder | null;
+};
+
+/** An agent the panel title's menu offers: an id the host knows it by, a name, a logo. */
+export type AiChatAgentPickerItem = {
+  id: string;
+  name: string;
+  /** The agent's logo, drawn at 20px before the name. */
+  icon?: React.ReactNode;
+};
+
+/**
+ * The agents a host offers in the panel title's menu, under the default
+ * agent. The host owns them: it lists them, says which one the chat runs on
+ * (`null` = the default agent) and applies a pick.
+ */
+export type AiChatAgentPicker = {
+  agents: AiChatAgentPickerItem[];
+  selectedId: string | null;
+  /** Called with the picked agent's id, or `null` for the default agent. */
+  onSelect: (id: string | null) => void;
+  /** Called each time the menu opens, for the host to read its agents again. */
+  onOpen?: () => void;
+};
+
+/**
+ * An action the host offers for the agent the chat runs on, in the panel
+ * header's "Agent actions" menu: the host knows what the user may do with
+ * the agent and owns what the action opens.
+ */
+export type AiChatAgentAction = {
+  id: string;
+  label: string;
+  /** URL of the item's icon. */
+  icon?: string;
+  onClick: () => void;
+  /** Listed last, after a separator (Delete agent). */
+  isDanger?: boolean;
+};
+
+/**
+ * The agent the chat runs on, as its replies show it. The host sets it for
+ * a chat on an agent (on the agent's page or picked in the panel) and
+ * clears it for the default agent, whose replies carry neither.
+ */
+export type AiChatAgent = {
+  /** The agent's name, on the documents its replies create ("created by ..."). */
+  name: string;
+  /**
+   * The agent's logo at the start of every reply, in a 24px box with 6px
+   * corners: an image URL, or an element drawn at that size (the room's
+   * logo tile with its colour and initials).
+   */
+  logo?: string | React.ReactElement;
 };
 
 /** The preset a project opens as. */
@@ -103,6 +172,26 @@ const panelWidthStorage = createPanelWidthStorage("chatPanelWidth", {
 // presence. Computed getters express every derived UI decision so
 // consumers can `observer` the store and stay reactive without any local
 // useEffect bridging.
+/** Who manages the chat's Skill sets and Knowledge bases in place of the chat itself. */
+export type AiChatSourcesManager = {
+  /** Opens the owner's settings of those sources; `null` when the user may not change them. */
+  onManage: (() => void) | null;
+  /**
+   * Saves a change of the Skill sets made in the composer's slash menu - a
+   * set disconnected from its row, or the pick of its "Manage skill sets"
+   * selector. Only what changed is handed over, so the rooms the owner keeps
+   * and the chat does not list (a set without skills) stay. Omitted → such
+   * a change stays in the chat.
+   */
+  onSkillRoomsChange?: (change: AiChatSkillRoomsChange) => void;
+};
+
+/** The Skill sets the user connected and disconnected in the chat. */
+export type AiChatSkillRoomsChange = {
+  added: { id: string; name: string }[];
+  removed: string[];
+};
+
 class AiChatStore {
   isVisible = false;
 
@@ -144,6 +233,48 @@ class AiChatStore {
   onSavePreset: ((settings: AiChatPresetSettings) => void) | null = null;
 
   /**
+   * The agents the panel title opens as a menu. `null` (the default), or a
+   * picker with no agents, leaves the title plain text.
+   */
+  agentPicker: AiChatAgentPicker | null = null;
+
+  /**
+   * The host's actions for the agent picked in the title, shown in the
+   * header's "Agent actions" menu. With `null` (the default), or none, the
+   * header has no such menu.
+   */
+  agentActions: AiChatAgentAction[] | null = null;
+
+  /**
+   * Set while the chat's Skill sets and Knowledge bases belong to something
+   * the host manages - an agent, whose rooms are its settings, not the
+   * chat's own pick. The "+" menu then lists them as they are, with no
+   * remove control on a knowledge base, and its "Manage skill sets..." and
+   * "Manage knowledge bases..." call `onManage` (the agent's settings)
+   * instead of the room selector; with `onManage: null` (a member who
+   * cannot change the agent) the lists have no such rows and the skill sets
+   * no remove control. A conversation opened again does not bring back its
+   * own copy of these two lists. `null` for an ordinary chat.
+   */
+  sourcesManager: AiChatSourcesManager | null = null;
+
+  /**
+   * Opens the selector that connects one more folder or room as a data
+   * source of the chat, the one "Manage sources..." of the composer's menus
+   * opens. Set by the providers while they are mounted, so a host view
+   * outside the composer (an agent's Info panel) offers the same action;
+   * `null` until then.
+   */
+  addDataSource: (() => void) | null = null;
+
+  /**
+   * The agent the chat runs on, as its replies show it: its logo beside
+   * each reply and its name on the documents they create. `null` (the
+   * default) for the default agent.
+   */
+  chatAgent: AiChatAgent | null = null;
+
+  /**
    * Settings waiting to be applied to the chat stores by AiChatStoresBridge
    * once the panel is up — set by `openPreset`, cleared when applied.
    */
@@ -164,18 +295,20 @@ class AiChatStore {
   projectTitle: string | null = null;
 
   /**
-   * Whether the composer leaves the connected sources out (no room chips,
-   * no room pickers): set by a host that shows and manages them beside the
-   * chat, as the AI project view does. Mirrored into the widget's
-   * `hideComposerContext`.
+   * Whether the composer's "+" menu leaves the sources out (no Skill sets,
+   * Knowledge bases or Data sources rows): set by a host that shows and
+   * manages them beside the chat, as the AI project view does. Mirrored into
+   * the widget's `hideComposerContext`.
    */
   composerContextHidden = false;
 
   /**
    * Whether the composer leaves the knowledge base picker out: set by the
    * host while knowledge search is off (DocSpace with vectorization
-   * disabled), so no Knowledge room can be picked for a chat. Mirrored into
-   * the widget's `hideKnowledgePicker`.
+   * disabled), so no Knowledge room can be picked for a chat. The "+" menu's
+   * Knowledge bases then lists only the bases connected earlier, each with
+   * its remove control, and no "Manage knowledge bases..." (see
+   * `useComposerSourceLists`).
    */
   knowledgePickerHidden = false;
 
@@ -193,7 +326,17 @@ class AiChatStore {
   constructor() {
     // The save hook is a host callback, kept by reference: wrapping it as an
     // action would hand the button a bound wrapper instead of the function.
-    makeAutoObservable(this, { onSavePreset: observable.ref });
+    // The agent picker carries host callbacks and React nodes (the logos):
+    // kept by reference too, never made deep-observable, as is the agent the
+    // chat runs on, whose logo may be an element.
+    makeAutoObservable(this, {
+      onSavePreset: observable.ref,
+      agentPicker: observable.ref,
+      agentActions: observable.ref,
+      sourcesManager: observable.ref,
+      addDataSource: observable.ref,
+      chatAgent: observable.ref,
+    });
   }
 
   get isAnalyzeMode(): boolean {
@@ -302,6 +445,31 @@ class AiChatStore {
     this.onSavePreset = hook;
   };
 
+  setAgentPicker = (picker: AiChatAgentPicker | null) => {
+    this.agentPicker = picker;
+  };
+
+  setAgentActions = (actions: AiChatAgentAction[] | null) => {
+    this.agentActions = actions;
+  };
+
+  /** Whether the chat runs on an agent picked in the panel title's menu. */
+  get isAgentPicked(): boolean {
+    return (
+      this.hasAgentPicker && (this.agentPicker?.selectedId ?? null) !== null
+    );
+  }
+
+  /**
+   * Whether the panel title opens the agents menu: a picker with at least
+   * one agent, or one of a host that can save the chat as a new agent -
+   * the menu is then where "Save as new agent" lives.
+   */
+  get hasAgentPicker(): boolean {
+    if (!this.agentPicker) return false;
+    return this.agentPicker.agents.length > 0 || !!this.onSavePreset;
+  }
+
   // Open the panel fullscreen on a fresh conversation set up as the preset
   // says: the model, the skills room and the knowledge base are applied by
   // AiChatStoresBridge, which holds the chat stores this store does not.
@@ -323,8 +491,9 @@ class AiChatStore {
 
   // Apply a preset to the chat as it stands — the conversation, the panel
   // size and the page stay; only the model and the rooms change. Used by the
-  // model picker's "Choose AI Preset" entry, which is only reachable while
-  // the panel is open.
+  // host's agents menu in the panel title, and by the host to take the chat
+  // off a project. The host must not apply a pick that arrives after the
+  // panel closed.
   applyPreset = (settings: AiChatPresetSettings) => {
     this.pendingPreset = settings;
     this.pendingPresetFresh = false;
@@ -343,8 +512,20 @@ class AiChatStore {
     this.composerContextHidden = value;
   };
 
+  setSourcesManager = (manager: AiChatSourcesManager | null) => {
+    this.sourcesManager = manager;
+  };
+
+  setAddDataSource = (open: (() => void) | null) => {
+    this.addDataSource = open;
+  };
+
   setKnowledgePickerHidden = (value: boolean) => {
     this.knowledgePickerHidden = value;
+  };
+
+  setChatAgent = (agent: AiChatAgent | null) => {
+    this.chatAgent = agent;
   };
 
   close = () => {

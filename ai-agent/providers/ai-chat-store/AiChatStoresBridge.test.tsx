@@ -2,7 +2,7 @@ import React from "react";
 import { act, render } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { clouds, profiles, threads } = vi.hoisted(() => ({
+const { clouds, profiles, threads, router } = vi.hoisted(() => ({
   clouds: {
     selectContextFolder: vi.fn(),
     selectContextFolders: vi.fn(),
@@ -22,7 +22,11 @@ const { clouds, profiles, threads } = vi.hoisted(() => ({
     getProfileById: vi.fn(),
     setSessionChatProfile: vi.fn(),
   },
-  threads: { onSwitchToNewThread: vi.fn() },
+  threads: { onSwitchToNewThread: vi.fn(), setDraft: vi.fn() },
+  router: {
+    currentPage: "chat" as "chat" | "history" | "initial-setup",
+    goToChat: vi.fn(),
+  },
 }));
 
 // A zustand hook as the bridge uses it: a selector call and `getState`.
@@ -33,7 +37,7 @@ const fakeStore = <T extends object>(state: T) =>
 
 vi.mock("@onlyoffice/ai-chat", () => ({
   useStores: () => ({
-    useRouter: fakeStore({ currentPage: "chat" }),
+    useRouter: fakeStore(router),
     useProfilesStore: fakeStore(profiles),
     useCloudsStore: fakeStore(clouds),
     useThreadsStore: fakeStore(threads),
@@ -67,6 +71,7 @@ const PRESET = {
 describe("AiChatStoresBridge", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    router.currentPage = "chat";
     profiles.initialized = false;
     profiles.profilesLoaded = false;
     profiles.getProfileById.mockImplementation((id: string) =>
@@ -199,6 +204,7 @@ describe("AiChatStoresBridge", () => {
           id: "77",
           name: "Reports",
           path: "My documents / Reports",
+          kind: "room",
         },
       });
     });
@@ -206,6 +212,7 @@ describe("AiChatStoresBridge", () => {
       id: "77",
       name: "Reports",
       path: "My documents / Reports",
+      kind: "room",
     });
     expect(clouds.clearFolderContext).not.toHaveBeenCalled();
 
@@ -252,5 +259,86 @@ describe("AiChatStoresBridge", () => {
       name: "Two",
     });
     expect(clouds.selectContextFolders).not.toHaveBeenCalled();
+  });
+
+  it("leaves the history when the panel closes, so it does not open by itself elsewhere", () => {
+    const store = new AiChatStore();
+    renderBridge(store);
+    act(() => {
+      store.open();
+    });
+    router.currentPage = "history";
+    act(() => {
+      store.close();
+    });
+    expect(router.goToChat).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the setup page when the panel closes", () => {
+    const store = new AiChatStore();
+    renderBridge(store);
+    act(() => {
+      store.open();
+    });
+    router.currentPage = "initial-setup";
+    act(() => {
+      store.toggle();
+    });
+    expect(router.goToChat).not.toHaveBeenCalled();
+  });
+
+  it("puts a fresh preset's draft into the new conversation, after the switch, once", () => {
+    profiles.initialized = true;
+    const store = new AiChatStore();
+    renderBridge(store);
+    act(() => {
+      store.openPreset({ ...PRESET, draft: "/document-summary " });
+    });
+    expect(threads.setDraft).toHaveBeenCalledTimes(1);
+    expect(threads.setDraft).toHaveBeenCalledWith("/document-summary ");
+    expect(
+      threads.onSwitchToNewThread.mock.invocationCallOrder[0],
+    ).toBeLessThan(threads.setDraft.mock.invocationCallOrder[0]);
+    // The preset is consumed: nothing applies the draft a second time.
+    expect(store.pendingPreset).toBeNull();
+  });
+
+  it("replaces the open chat's draft with an applied preset's one", () => {
+    profiles.initialized = true;
+    const store = new AiChatStore();
+    renderBridge(store);
+    act(() => {
+      store.applyPreset({ ...PRESET, draft: "/translate " });
+    });
+    expect(threads.onSwitchToNewThread).not.toHaveBeenCalled();
+    expect(threads.setDraft).toHaveBeenCalledWith("/translate ");
+  });
+
+  it("leaves the draft alone for a preset without one", () => {
+    profiles.initialized = true;
+    const store = new AiChatStore();
+    renderBridge(store);
+    act(() => {
+      store.openPreset(PRESET);
+    });
+    act(() => {
+      store.applyPreset(PRESET);
+    });
+    expect(threads.setDraft).not.toHaveBeenCalled();
+  });
+
+  it("opens a fresh preset on the conversation, an applied one on the page it is on", () => {
+    profiles.initialized = true;
+    const store = new AiChatStore();
+    renderBridge(store);
+    router.currentPage = "history";
+    act(() => {
+      store.applyPreset(PRESET);
+    });
+    expect(router.goToChat).not.toHaveBeenCalled();
+    act(() => {
+      store.openPreset(PRESET);
+    });
+    expect(router.goToChat).toHaveBeenCalledTimes(1);
   });
 });

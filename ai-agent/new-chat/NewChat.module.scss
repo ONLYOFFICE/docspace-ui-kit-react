@@ -391,11 +391,17 @@
   --aui-font-base: 13px;
 }
 
+// The icons of the chat's menus take the colour of the menu's text. A row in
+// the link tone ("Manage sources...") is left out: the library paints its
+// icon with the link colour, as the row's label, and writes that colour as
+// the shape's own fill or stroke, which a rule here would override.
+$link-paint: "var(--drop-down-menu-item-link-color";
+
 :global(.dropdown-menu-item) {
-  svg path[stroke]:not([stroke="none"]) {
+  svg path[stroke]:not([stroke="none"]):not([stroke^="#{$link-paint}"]) {
     stroke: var(--context-menu-header-text-color);
   }
-  svg path[fill]:not([fill="none"]) {
+  svg path[fill]:not([fill="none"]):not([fill^="#{$link-paint}"]) {
     fill: var(--context-menu-header-text-color);
   }
 

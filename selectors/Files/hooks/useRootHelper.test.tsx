@@ -135,7 +135,7 @@ describe("useRootHelper AI sections", () => {
     ).toEqual([1, 2, FORMS_SECTION_ID, 4]);
   });
 
-  it("titles the AI section as the host's AI Workspace", async () => {
+  it("titles the AI section as the host's AI Chat", async () => {
     // The hosts' Common namespace names the section; a key the host dropped
     // would leave the row without a label (the former "AiRooms").
     const setItems = vi.fn();
@@ -160,7 +160,7 @@ describe("useRootHelper AI sections", () => {
     const labels = setItems.mock.calls[0][0].map(
       (item: { id: number | string; label: string }) => [item.id, item.label],
     );
-    expect(labels).toContainEqual([4, "AI Workspace"]);
+    expect(labels).toContainEqual([4, "AI Chat"]);
     expect(labels.every(([, label]: [unknown, string]) => label)).toBe(true);
   });
 

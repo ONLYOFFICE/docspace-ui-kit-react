@@ -25,6 +25,16 @@ vi.mock("./save-dialog", () => ({
 vi.mock("./device-uploader", () => ({
   default: React.forwardRef(() => <div data-testid="device-uploader" />),
 }));
+vi.mock("./context-folder-dialog", () => ({
+  default: ({ mode, onClose }: { mode?: string; onClose: () => void }) => (
+    <button
+      type="button"
+      data-testid="folder-dialog"
+      data-mode={mode}
+      onClick={onClose}
+    />
+  ),
+}));
 vi.mock("./context-rooms-dialog", () => ({
   default: ({ kind, onClose }: { kind: string; onClose: () => void }) => (
     <button
@@ -102,5 +112,19 @@ describe("useFilesIntegration: the composer's source pickers", () => {
     render(<Host />);
     integration().onOpenContextRoom("google", { id: "abc", name: "Drive" });
     expect(navigate).not.toHaveBeenCalled();
+  });
+
+  it("opens the folder picker that adds a folder to the chat's context", () => {
+    render(<Host />);
+    expect(screen.queryByTestId("folder-dialog")).toBeNull();
+
+    act(() => integration().onAddContextFolder());
+    expect(screen.getByTestId("folder-dialog")).toHaveAttribute(
+      "data-mode",
+      "add",
+    );
+
+    act(() => screen.getByTestId("folder-dialog").click());
+    expect(screen.queryByTestId("folder-dialog")).toBeNull();
   });
 });

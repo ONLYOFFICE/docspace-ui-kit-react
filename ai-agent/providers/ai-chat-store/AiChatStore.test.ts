@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { isObservable } from "mobx";
 
 import AiChatStore, { projectToPreset } from "./AiChatStore";
 
@@ -346,6 +347,23 @@ describe("AiChatStore panel width", () => {
   });
 });
 
+describe("AiChatStore agent the chat runs on", () => {
+  it("is none for the default agent, and keeps the host's agent as it is", () => {
+    const store = new AiChatStore();
+    expect(store.chatAgent).toBeNull();
+
+    // A logo element must reach the chat untouched, not wrapped in a proxy.
+    const logo = { type: "img", props: {} } as unknown as React.ReactElement;
+    const agent = { name: "Legal Reviewer", logo };
+    store.setChatAgent(agent);
+    expect(store.chatAgent).toBe(agent);
+    expect(isObservable(store.chatAgent)).toBe(false);
+
+    store.setChatAgent(null);
+    expect(store.chatAgent).toBeNull();
+  });
+});
+
 describe("projectToPreset", () => {
   it("carries the project's rooms, model and remembered folder", () => {
     const folder = {
@@ -380,5 +398,18 @@ describe("projectToPreset", () => {
         knowledgeRooms: [],
       }).folderContext,
     ).toBeNull();
+  });
+});
+
+describe("the data source selector", () => {
+  it("is handed to the host while the providers keep it set", () => {
+    const store = new AiChatStore();
+    expect(store.addDataSource).toBeNull();
+    const open = vi.fn();
+    store.setAddDataSource(open);
+    store.addDataSource?.();
+    expect(open).toHaveBeenCalledTimes(1);
+    store.setAddDataSource(null);
+    expect(store.addDataSource).toBeNull();
   });
 });

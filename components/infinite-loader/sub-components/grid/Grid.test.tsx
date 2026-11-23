@@ -214,6 +214,54 @@ describe("GridComponent", () => {
     expect(screen.getByTestId("tile-skeleton-room")).toBeInTheDocument();
   });
 
+  // The client draws an agent's card 290px high and leaves the row's own
+  // height to this grid: a lower row made the next row cover the card.
+  it("sizes a row of agents as high as the client's agent card", () => {
+    const { container } = render(
+      <GridComponent {...defaultProps} itemCount={2} filesLength={2}>
+        {[
+          <div key="a" className="isAgent">
+            A
+          </div>,
+          <div key="b" className="isAgent">
+            B
+          </div>,
+        ]}
+      </GridComponent>,
+    );
+    const rows = Array.from(
+      container.querySelectorAll<HTMLElement>("[style]"),
+    ).filter((el) => el.style.top !== "" && el.style.height !== "");
+    expect(rows.map((row) => [row.style.top, row.style.height])).toEqual([
+      ["0px", "306px"],
+      ["306px", "306px"],
+    ]);
+  });
+
+  // A skill set's and a knowledge base's cards are lower than a room's row
+  // kinds allow for: the row names its own height.
+  it("sizes a row as high as the row itself tells", () => {
+    const { container } = render(
+      <GridComponent {...defaultProps} itemCount={2} filesLength={2}>
+        {[
+          <div key="a" className="isRoom" data-row-height={170}>
+            A
+          </div>,
+          <div key="b" className="isRoom">
+            B
+          </div>,
+        ]}
+      </GridComponent>,
+    );
+    const rows = Array.from(
+      container.querySelectorAll<HTMLElement>("[style]"),
+    ).filter((el) => el.style.top !== "" && el.style.height !== "");
+    expect(rows.map((row) => [row.style.top, row.style.height])).toEqual([
+      ["0px", "170px"],
+      ["170px", "120px"],
+    ]);
+  });
+
   it("handles non-element children in getItemSize", () => {
     render(
       <GridComponent {...defaultProps} itemCount={1}>
