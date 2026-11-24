@@ -57,13 +57,23 @@ const {
   (active nav item, selected tab underline, links, focus);
   `--color-scheme-main-buttons` fills primary buttons. Portal owners replace
   both at runtime, so read the variables - never hard-code `light-blue-main`.
+- **States are derived, not stored.** The kit keeps one colour per control
+  and computes its states in CSS: a primary button is the fill at opacity
+  0.85 on hover and 0.6 when disabled, and `brightness(90%)` (dark theme
+  82%) when pressed; a badge is `color-mix` of its colour at 85% with
+  transparent on hover and at 90% with black when pressed. The
+  `color-scheme-main-buttons-hover`, `-pressed` and `-disabled` tokens are
+  those results for the default fill - use them as written, and for any
+  other colour apply the same rule rather than picking a shade.
 - **Neutrals do the work.** Surfaces step from `--background-color` through
   the greys (`gray-light` for the nav and cards, `light-gray-hover` for row
   hover, `gray-light-mid` for dividers, `gray-strong` for control borders).
   Colour comes from content - file-type icons, room logos - not chrome.
 - **Type.** Open Sans. Body and table text 13px (`Text` default), secondary
-  12px, captions 11px; labels and names semi-bold (600); `Heading` sizes
-  15 / 19 / 21 / 23 / 27px at 600.
+  12px, captions 11px; labels and names semi-bold (600); `isBold` is 700;
+  `Heading` sizes 15 / 19 / 21 / 23 / 27px at 600. The text styles in
+  `tokens.json` are the size / weight / line-height combinations the kit's
+  own `Text` and `Link` elements use, most used first.
 - **Shape.** 32px controls (buttons, inputs, toolbar icons), 48px table rows,
   36px menu items, radius 3px on controls and nav items, 6px on cards,
   menus and dialogs. Borders are 1px; shadows only on floating layers
@@ -137,12 +147,13 @@ A canvas mounts each component through `<x-import>` and wraps every one in a
   `TableContainer`/`TableHeader` a ref whose `current` is a non-enumerable
   accessor (`Object.defineProperty(ref, "current", { get, set,
 enumerable: false })`).
-- **Fonts: pick the file by its `style` in `tokens.json`, not by its name.**
-  The `memvY…` files are Open Sans normal and `memtY…` italic; the Latin
-  subset is the one without a script suffix
-  (`memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS-muw.woff2`). Copy it into the
-  canvas and declare it in an `@font-face` with weights 300-800; without it
-  the page falls back to Arial.
+- **Fonts: copy every normal-style file, not one.** Open Sans ships split
+  by script: each `memvY…` file in `tokens.json` `type.fonts` (style
+  `normal`) covers one alphabet - Latin, Cyrillic, Greek, Vietnamese and
+  their extensions - and `memtY…` are the italics. Copy all the normal ones
+  into the canvas and declare each in its own `@font-face` (family
+  `Open Sans`, weights 300-800). With only the Latin file, Russian and every
+  other non-Latin text silently falls back to a system font.
 
 ## Screens
 
@@ -208,15 +219,27 @@ a dialog included - a simplified background is still read as the product.
    truncated that the reference shows whole, the right font (not italic, not
    a fallback), every icon present. "It renders without errors" is not this
    check. Fix what the comparison shows, and look again.
-7. **Report the differences.** End every hand-over with three short lists:
+7. **Write no value of your own.** Every colour, shadow, font size,
+   spacing and radius in your markup is a token's value from `tokens.json`
+   (or a `var()` the kit defines) - the tokens are exactly what the
+   product's code uses, and **Token sources** says where each one comes from.
+   No new greys, tints, purples or gradients; no `16px` gap because it looks
+   right when the tokens have 12 and 20. If the design needs something the
+   system does not have - a colour, a component, an icon - draw a labelled
+   placeholder ("Not in the kit: <what>") instead of making it up, and list
+   it in the hand-over. A design is checked with
+   `node .design-sync/artifact/check-design.mjs <its folder>`, which lists
+   every value that is not a token, every inline `<svg>` and every missing
+   font file.
+8. **Report the differences.** End every hand-over with four short lists:
    where the design differs from its reference screenshot, which parts are
-   placeholders, and which behaviour or copy you assumed. Say so even when
-   the difference was deliberate. Nobody should have to compare the
-   pictures to find out.
+   placeholders, what the system lacked (from rule 7), and which behaviour
+   or copy you assumed. Say so even when the difference was deliberate.
+   Nobody should have to compare the pictures to find out.
 
 There is no Figma library of these components. Whatever a design is exported
 to arrives as plain layers that link back to nothing here, so a deviation
-from the product travels with it unnoticed - which is why rules 2, 6 and 7
+from the product travels with it unnoticed - which is why rules 2, 6, 7 and 8
 matter more than polish.
 
 ## Iconography and assets
@@ -248,8 +271,12 @@ matter more than polish.
 - Exports with no Storybook story (e.g. `ComboButton`, `HeadingWithTooltip`,
   `TooltipContainer`, `RowLoader`, `SearchLoader`, the dialog skeletons),
   icon components and `*Pure` variants.
-- Theme variables whose values are shorthands or runtime expressions (border
-  shorthands, `calc()`, `var()` chains) are not listed as tokens; they are in
-  `components/bundle.css`.
+- Component-level custom properties (`--button-*`, `--payment-*` and the
+  like) are not tokens: they are each component's override knobs, in
+  `components/bundle.css`. The tokens are the palette entries and values
+  those properties are built from.
+- Palette entries no code uses, and spacing, radius and text-style values
+  used too rarely to count, are not tokens; **Token sources** lists them
+  all with the rule that left them out.
 - Built from `@onlyoffice/apps-ui-kit` 4.1.0 by the repository's
   design-sync; change it in code and re-run the sync, not on this page.

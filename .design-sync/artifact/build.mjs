@@ -12,6 +12,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { GROUPS, diffGroup } from "./asset-groups.mjs";
+import { buildTokens, RULES } from "./tokens.mjs";
 
 const arg = (name) => {
   const i = process.argv.indexOf(`--${name}`);
@@ -162,72 +163,10 @@ for (const f of faces.values()) {
 }
 
 // ---------- tokens ----------
-// Palette: the kit's Sass colours. Theme colours: the light/dark variables
-// ThemeProviderComponent defines (read from components/theme-provider).
-const palette = [];
-for (const m of fs
-  .readFileSync(path.join(REPO, "styles", "variables", "_colors.scss"), "utf8")
-  .matchAll(/^\$([a-z0-9-]+):\s*([^;]+);/gim)) {
-  const v = m[2].trim();
-  if (/^#|^rgba?\(/i.test(v))
-    palette.push({ name: m[1], value: v.toLowerCase() });
-}
-const themeCss = fs.readFileSync(path.join(DS, "_ds_bundle.css"), "utf8");
-const theme = new Map();
-for (const m of themeCss.matchAll(/(?:^|[\s,}])\.(light|dark)\s*{([^}]*)}/g)) {
-  for (const d of m[2].matchAll(/--([a-z0-9-]+)\s*:\s*([^;]+);/gi)) {
-    if (!theme.has(d[1])) theme.set(d[1], {});
-    theme.get(d[1])[m[1]] ??= d[2].trim();
-  }
-}
-const isColor = (v) =>
-  /^#[0-9a-f]{3,8}$/i.test(v) || /^(rgba?|hsla?)\([0-9.,%\s]+\)$/i.test(v);
-for (let i = palette.length - 1; i >= 0; i--)
-  if (theme.has(palette[i].name)) palette.splice(i, 1);
-const used = new Set(palette.map((p) => p.name));
-const accent = palette.find((p) => p.name === "light-blue-main")?.value;
-const colorTokens = [
-  {
-    name: "color-scheme-main-accent",
-    value: { light: accent, dark: accent },
-    usage:
-      "The accent. ThemeProviderComponent writes it on <html> from currentColorScheme.main.accent (portal owners can change it): active nav item, selected tab underline, links, focus. Read the variable; never hard-code the blue.",
-  },
-  {
-    name: "color-scheme-main-buttons",
-    value: { light: accent, dark: accent },
-    usage: "Primary button fill, from currentColorScheme.main.buttons.",
-  },
-];
-for (const n of ["color-scheme-main-accent", "color-scheme-main-buttons"])
-  used.add(n);
-const spacing = [];
-const skipped = [];
-for (const [n, v] of theme) {
-  if (used.has(n)) continue;
-  const vals = {};
-  for (const th of ["light", "dark"])
-    if (v[th] && isColor(v[th])) vals[th] = v[th].toLowerCase();
-  if (Object.keys(vals).length) {
-    colorTokens.push({
-      name: n,
-      value: vals,
-      usage:
-        "Theme variable set by ThemeProviderComponent (.light / .dark on <html>).",
-    });
-    used.add(n);
-    continue;
-  }
-  const one = v.light ?? v.dark;
-  if (/^\d+(\.\d+)?(px|rem|%)$/.test(one)) {
-    spacing.push({ name: n, value: one, usage: "Theme variable." });
-    used.add(n);
-  } else skipped.push(n);
-}
-const paletteUsage = (n) =>
-  n === "light-blue-main"
-    ? "Default accent. Replaced at runtime by the portal's colour scheme - use --color-scheme-main-accent in designs."
-    : "Kit palette colour (styles/variables/_colors.scss); components expose it through their own variables.";
+// Every token is a value the kit's code uses, with where and how often in its
+// usage note (tokens.mjs); token-sources.md is the full inventory, what
+// became a token and what did not.
+const T = buildTokens(REPO);
 const tokens = {
   name: "ONLYOFFICE Apps UI Kit",
   version: 1,
@@ -236,104 +175,19 @@ const tokens = {
       { id: "light", name: "Light" },
       { id: "dark", name: "Dark" },
     ],
-    tokens: [
-      ...palette.map((p) => ({
-        name: p.name,
-        value: p.value,
-        usage: paletteUsage(p.name),
-      })),
-      ...colorTokens,
-    ],
+    tokens: T.color,
   },
   type: {
     fonts,
     families: { sans: '"Open Sans", sans-serif, Arial' },
     groups: [
-      {
-        name: "Headings",
-        family: "sans",
-        styles: [
-          {
-            name: "heading-xlarge",
-            fontSize: "27px",
-            fontWeight: 600,
-            usage: "Heading size xlarge.",
-          },
-          {
-            name: "heading-large",
-            fontSize: "23px",
-            fontWeight: 600,
-            usage: "Heading size large.",
-          },
-          {
-            name: "heading-medium",
-            fontSize: "21px",
-            fontWeight: 600,
-            usage: "Heading size medium.",
-          },
-          {
-            name: "heading-small",
-            fontSize: "19px",
-            fontWeight: 600,
-            usage: "Heading size small.",
-          },
-          {
-            name: "heading-xsmall",
-            fontSize: "15px",
-            fontWeight: 600,
-            usage: "Heading size xsmall.",
-          },
-        ],
-      },
-      {
-        name: "Text",
-        family: "sans",
-        styles: [
-          {
-            name: "text",
-            fontSize: "13px",
-            fontWeight: 400,
-            usage:
-              "Text default (--text-size): body copy, table cells, menu items.",
-          },
-          {
-            name: "text-semibold",
-            fontSize: "13px",
-            fontWeight: 600,
-            usage: "Labels, names in lists, buttons.",
-          },
-          {
-            name: "text-small",
-            fontSize: "12px",
-            fontWeight: 400,
-            usage: "Secondary cells, descriptions, hints.",
-          },
-          {
-            name: "text-caption",
-            fontSize: "11px",
-            fontWeight: 600,
-            usage: "Status bars and tiny meta.",
-          },
-        ],
-      },
+      { name: "Headings", family: "sans", styles: T.headings },
+      { name: "Text", family: "sans", styles: T.textStyles },
     ],
   },
-  spacing: { tokens: spacing },
-  radius: {
-    tokens: [
-      {
-        name: "radius-control",
-        value: "3px",
-        usage:
-          "Buttons, inputs, nav items (Button --button-root-border-radius).",
-      },
-      {
-        name: "radius-layer",
-        value: "6px",
-        usage: "Floating layers and cards: DropDown, ContextMenu, ModalDialog.",
-      },
-    ],
-  },
+  spacing: { tokens: T.spacing },
+  radius: { tokens: T.radius },
+  shadow: { tokens: T.shadow },
   meta: {
     source: "github",
     repo: "ONLYOFFICE/docspace-ui-kit-react",
@@ -341,16 +195,29 @@ const tokens = {
     paths: {
       tokens: [
         "styles/variables/_colors.scss",
-        "components/theme-provider/ThemeProvider.scss",
+        "components/**/*.scss",
+        "components/**/*.tsx",
+        "components/theme-provider/index.tsx",
       ],
       fonts: ["css/fonts.css"],
       assets: ["assets/logo"],
       docs: [".design-sync/artifact/README.md", "docs/guides/screens.md"],
     },
+    rules: RULES,
     synced: new Date().toISOString().slice(0, 10),
   },
 };
 write("tokens.json", `${JSON.stringify(tokens, null, 2)}\n`);
+write(
+  "token-sources.md",
+  [
+    "# Token sources",
+    "",
+    "Where every token comes from, and what the code has that did not become one. Generated from the kit's source by `.design-sync/artifact/tokens.mjs` on every build; nothing here is chosen by hand. A colour, size or shadow that is in neither the tokens nor this inventory is not in the product.",
+    "",
+    T.report,
+  ].join("\n"),
+);
 
 // ---------- docs ----------
 write("README.md", fs.readFileSync(path.join(HERE, "README.md")));
@@ -463,5 +330,5 @@ fs.writeFileSync(
 );
 
 console.log(
-  `components ${comps.length}, fonts ${fonts.length}, palette ${palette.length}, theme colours ${colorTokens.length}, spacing ${spacing.length}, skipped ${skipped.length}`,
+  `components ${comps.length}, fonts ${fonts.length}, colours ${T.color.length}, text styles ${T.headings.length + T.textStyles.length}, spacing ${T.spacing.length}, radius ${T.radius.length}, shadows ${T.shadow.length}`,
 );
