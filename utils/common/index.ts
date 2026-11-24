@@ -4,12 +4,18 @@ import { AvatarRole } from "../../components/avatar/Avatar.enums";
 import { getCommonTranslation } from "../i18n";
 import { getBrandName } from "../../constants/brands";
 
-export type TTranslation = (
+// Two call signatures rather than one with an optional second parameter: the
+// `t` of i18next 27 is typed over a union of argument tuples, none of which
+// has an optional element, so it is assignable to this shape only.
+export type TTranslation = {
+  (key: string): string;
+  (key: string, params: Record<string, unknown>): string;
+};
+
+const defaultTranslation: TTranslation = (
   key: string,
   params?: Record<string, unknown>,
-) => string;
-
-const defaultTranslation: TTranslation = (key, params) => {
+) => {
   const keyParts = key.split(":");
   const translationKey = keyParts.length > 1 ? keyParts[1] : key;
 

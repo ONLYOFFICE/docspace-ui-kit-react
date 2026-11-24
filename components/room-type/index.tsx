@@ -5,7 +5,6 @@ import classNames from "classnames";
 import ArrowReactSvg from "../../assets/arrow.react.svg";
 
 import { RoomsType } from "../../enums";
-import type { TTranslation } from "../../utils/common";
 
 import { RoomLogo } from "../room-logo";
 import { IconButton } from "../icon-button";
@@ -34,10 +33,7 @@ const RoomType = ({
   isTemplateRoom,
   isFormSection,
 }: RoomTypeProps) => {
-  const { t: translate } = useTranslation(["Common"]);
-  // The i18next 27 typing of `t` has no overload with an optional second
-  // argument, so it no longer fits TTranslation as is.
-  const t: TTranslation = (key, params) => translate(key, params ?? {});
+  const { t } = useTranslation(["Common"]);
 
   const room = {
     type: roomType,
