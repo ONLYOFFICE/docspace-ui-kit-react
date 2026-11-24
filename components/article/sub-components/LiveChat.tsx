@@ -95,7 +95,7 @@ const ArticleLiveChat = ({
         onSecondaryAction: accent,
         message: accent,
         onMessage: onAccent,
-        background: isBase ? globalColors.white : globalColors.darkGrayLight,
+        background: isBase ? globalColors.white : globalColors.black,
         onBackground: isBase ? globalColors.black : globalColors.white,
         businessMessage: isBase
           ? globalColors.paleGray
