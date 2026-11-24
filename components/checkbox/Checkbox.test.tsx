@@ -11,6 +11,43 @@ const defaultProps: CheckboxProps = {
   isIndeterminate: false,
 };
 
+describe("<Checkbox /> with an external caption", () => {
+  // A caption laid out apart from the box is tied to it with htmlFor.
+  it("toggles from a caption bound with inputId", async () => {
+    const onChange = vi.fn();
+    render(
+      <>
+        <Checkbox {...defaultProps} inputId="contacts" onChange={onChange} />
+        <label htmlFor="contacts">Invite via Contacts</label>
+      </>,
+    );
+
+    const box = screen.getByRole("checkbox", { name: "Invite via Contacts" });
+    await userEvent.click(screen.getByText("Invite via Contacts"));
+
+    expect(box).toBeChecked();
+    expect(onChange).toHaveBeenCalledTimes(1);
+  });
+
+  it("ignores the caption while disabled", async () => {
+    const onChange = vi.fn();
+    render(
+      <>
+        <Checkbox
+          {...defaultProps}
+          inputId="contacts"
+          onChange={onChange}
+          isDisabled
+        />
+        <label htmlFor="contacts">Invite via Contacts</label>
+      </>,
+    );
+
+    await userEvent.click(screen.getByText("Invite via Contacts"));
+    expect(onChange).not.toHaveBeenCalled();
+  });
+});
+
 describe("<Checkbox />", () => {
   it("renders without error", () => {
     render(<Checkbox {...defaultProps} />);
