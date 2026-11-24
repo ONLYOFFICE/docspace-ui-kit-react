@@ -124,7 +124,7 @@ describe("ArticleLiveChat", () => {
     expect(customization()?.theme).toMatchObject({
       primary: "#4781D1",
       onPrimary: "#ffffff",
-      background: "#333333",
+      background: "#282828",
       onBackground: "#ffffff",
       onBusinessMessage: "#ffffff",
     });
