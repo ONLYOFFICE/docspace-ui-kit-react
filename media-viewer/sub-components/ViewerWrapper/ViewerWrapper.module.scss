@@ -1,0 +1,35 @@
+:global(.rtl) {
+  :local {
+    .dropDown {
+      direction: rtl;
+    }
+  }
+}
+:global(.ltr) {
+  :local {
+    .dropDown {
+      direction: ltr;
+    }
+  }
+}
+.dropDown {
+  background: var(--viewer-dropdown-bg);
+}
+
+.dropDownItem {
+  color: var(--viewer-dropdown-item-color);
+
+  :global {
+    .drop-down-item_icon {
+      svg {
+        path {
+          fill: var(--viewer-dropdown-item-color) !important;
+        }
+      }
+    }
+  }
+
+  &:hover {
+    background-color: var(--viewer-dropdown-item-hover-bg) !important;
+  }
+}

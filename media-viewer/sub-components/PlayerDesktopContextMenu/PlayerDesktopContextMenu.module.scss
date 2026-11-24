@@ -1,0 +1,45 @@
+.playerDesktopContextMenuWrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 48px;
+  height: 48px;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  & > svg {
+    padding-inline-start: 19px;
+    padding-bottom: 3px;
+    width: 18px;
+    height: 20px;
+
+    path {
+      fill: var(--player-icon-fill);
+    }
+
+    rect {
+      stroke: var(--player-icon-fill);
+    }
+  }
+}
+
+.downloadIconWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 48px;
+  height: 48px;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  svg {
+    path {
+      fill: var(--player-icon-fill);
+    }
+  }
+}

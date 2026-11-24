@@ -30,6 +30,7 @@
     "selectors/**/*",
     "document-editor",
     "uploader",
+    "media-viewer/**/*",
     "ai-agent/**/*",
     "enums/**/*",
     "constants/**/*",

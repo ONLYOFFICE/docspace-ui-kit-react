@@ -76,6 +76,11 @@ const meta = {
       description:
         "Id put on the outer element and on the inner `<label>`, so it appears twice in the document",
     },
+    inputId: {
+      control: "text",
+      description:
+        "Id of the hidden checkbox input, for a `<label htmlFor>` caption laid out apart from the switch",
+    },
     className: {
       control: "text",
       description:
@@ -179,6 +184,44 @@ export const Default: Story = {
       },
       source: {
         code: `<ToggleButton label="Toggle me" isChecked={isOn} onChange={handleChange} />`,
+      },
+    },
+  },
+};
+
+const ExternalCaptionTemplate = (args: ToggleButtonProps) => (
+  <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+    <label htmlFor="daily-feed-toggle" style={{ cursor: "pointer" }}>
+      Daily feed
+    </label>
+    <div style={{ height: 16, width: 28 }}>
+      <Template {...args} inputId="daily-feed-toggle" />
+    </div>
+  </div>
+);
+
+export const ExternalCaption: Story = {
+  render: (args) => <ExternalCaptionTemplate {...args} />,
+  args: {
+    isChecked: false,
+    onChange: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const toggle = canvas.getByRole("checkbox", { name: "Daily feed" });
+
+    await userEvent.click(canvas.getByText("Daily feed"));
+    await expect(toggle).toBeChecked();
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A caption laid out apart from the switch, tied to it with `inputId` and a `<label htmlFor>`: clicking the caption toggles the switch, and the caption is the switch's accessible name.",
+      },
+      source: {
+        code: `<label htmlFor="daily-feed-toggle">Daily feed</label>
+<ToggleButton inputId="daily-feed-toggle" isChecked={isOn} onChange={handleChange} />`,
       },
     },
   },

@@ -20,6 +20,13 @@ type InputProps = {
   /** Name of the hidden checkbox input, for a form that reads the control by
    * name rather than by state. */
   name?: string;
+  /** `id` of the hidden checkbox input, unlike `id`, which lands on the outer
+   * element and the inner `<label>`. A `<label htmlFor={inputId}>` anywhere
+   * on the page then works as the switch's caption: a click on it toggles the
+   * switch through `onChange`, does nothing while `isDisabled`, and names the
+   * switch for assistive technology. Use it when the caption is laid out apart
+   * from the switch rather than passed as `label`. */
+  inputId?: string;
   /** Called with the checkbox's change event; the new state is
    * `event.target.checked`. Required in practice, since `isChecked` makes the
    * input controlled. */
