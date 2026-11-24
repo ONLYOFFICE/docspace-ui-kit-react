@@ -63,6 +63,7 @@ export enum SocketEvents {
   QuotaExceeded = "s:quota_exceeded",
   ExternalDbSettings = "s:external-db-settings",
   ChangeWebPlugin = "s:change-web-plugin",
+  ChangePersonalWebPlugin = "s:change-personal-web-plugin",
   ChangeAiConfig = "s:change-ai-config",
   ChangeAiAccessSettings = "s:change-ai-access-settings",
   ChangeAppEnabled = "s:change-app-enabled",
@@ -414,6 +415,7 @@ export type TListenEventCallbackMap = {
     settings: Partial<Record<string, unknown>>,
   ) => void;
   [SocketEvents.ChangeWebPlugin]: (data: TChangeWebPluginData) => void;
+  [SocketEvents.ChangePersonalWebPlugin]: (data: TChangeWebPluginData) => void;
   [SocketEvents.ChangeAiConfig]: () => void;
   [SocketEvents.ChangeAiAccessSettings]: () => void;
   [SocketEvents.ChangeAppEnabled]: (data: TChangeAppEnabledData) => void;
