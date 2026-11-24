@@ -703,10 +703,13 @@ const MediaViewer = (props: MediaViewerProps): JSX.Element | undefined => {
     }
   }
 
+  const isPluginTitleFile =
+    !!pluginTitle && pluginFileId?.toString() === fileId?.toString();
+
   return canOpen ? (
     <PdfViewerScriptContext value={getPdfViewerScriptUrl}>
       <ViewerWrapper
-        title={pluginTitle || title}
+        title={isPluginTitleFile ? pluginTitle : title}
         isPdf={isPdf}
         visible={visible}
         isImage={isImage}
