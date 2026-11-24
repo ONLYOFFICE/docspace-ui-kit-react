@@ -206,6 +206,10 @@ export type TControlButtonProps = Omit<TToggleInfoPanelButtonProps, "id"> &
     isEmptyPage?: boolean;
     /** Rendered as-is at the end of the button row, after the tariff notice. */
     analyzeResponsesButton?: React.ReactNode;
+    /** Host controls drawn right before the context button, such as an
+     * agent's chat toolbar. They, that button and the navigation button stay
+     * in this order right after the title at every width. */
+    beforeContextButton?: React.ReactNode;
     /** Called when the AI chat button is clicked. Without it the button is not
      * rendered. */
     toggleChatPanel?: (e?: React.MouseEvent) => void;
@@ -242,6 +246,7 @@ export type TDropBoxProps = TArrowButtonProps &
     | "showTitle"
     | "isMobile"
     | "analyzeResponsesButton"
+    | "beforeContextButton"
   > &
   TRowParam & {
     /** Ref of the drop box element. Supplied internally, so a ref you pass never reaches the DOM. */
@@ -294,6 +299,10 @@ export type TNavigationProps = React.AriaAttributes &
     /** Name of the current folder, shown as the heading. It is also the hover
      * tooltip of the folder button, and is added to `tariffBar` as a prop. */
     title: string;
+    /** Drawn in place of the current folder's heading, such as a menu that
+     * switches to a sibling. It gets no navigation click handler, so the
+     * breadcrumb drop box does not open from it. */
+    titleContent?: React.ReactNode;
     /** Called with a crumb's id when one is chosen from the drop box, and when
      * the room title is clicked. */
     onClickFolder: TOnNavigationItemClick;

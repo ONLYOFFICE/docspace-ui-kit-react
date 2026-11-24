@@ -19,6 +19,7 @@ import {
 import { LoadersContext } from "../../utils/contexts/Loaders";
 
 import CatalogDocumentsSvg from "../../../assets/icons/16/catalog.documents.react.svg";
+import CatalogFormSvg from "../../../assets/icons/16/catalog.form.react.svg";
 import CatalogRoomsSvg from "../../../assets/icons/16/catalog.rooms.react.svg";
 import CatalogArchiveSvg from "../../../assets/icons/16/catalog.archive.react.svg";
 import CatalogSharedSvg from "../../../assets/icons/16/catalog.shared.outline.svg";
@@ -156,7 +157,7 @@ const useRootHelper = ({
               title = t("Rooms");
               break;
             case AI_HUB_ROOT_FOLDER_TYPE as FolderType:
-              title = t("AiWorkspace");
+              title = t("Common:AIChat");
               break;
             default:
               break;
@@ -188,7 +189,9 @@ const useRootHelper = ({
             foldersCount: folder.foldersCount!,
             security: folder.security!,
             isFolder: true,
-            avatar: <CatalogDocumentsSvg />,
+            // The Forms section's own icon, as the sidebar draws it: My
+            // documents already has the documents one.
+            avatar: <CatalogFormSvg />,
             disableMultiSelect: true,
           });
         }

@@ -9,6 +9,13 @@ type PickedTextProps = Pick<TextProps, "title" | "truncate">;
 type InputProps = {
   /** Name of the input, under which a form submits `value` while it is checked. */
   name?: string;
+  /** `id` of the underlying checkbox input, unlike `id`, which lands on the
+   * wrapping `<label>`. A `<label htmlFor={inputId}>` anywhere on the page
+   * then works as the checkbox's caption: a click on it toggles the box
+   * through `onChange`, does nothing while `isDisabled`, and names the
+   * checkbox for assistive technology. Use it when the caption is laid out
+   * apart from the box rather than passed as `label`. */
+  inputId?: string;
   // React's own type for `<input value>`, kept wide on purpose: narrowing it to
   // `string` would reject `value={1}` in code that compiled before.
   /** Value the form submits under `name` while the box is checked. */

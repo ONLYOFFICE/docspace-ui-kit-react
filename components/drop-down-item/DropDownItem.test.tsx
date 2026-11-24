@@ -238,7 +238,7 @@ describe("<DropDownItem /> icon source", () => {
     );
   });
 
-  it("draws an element as it is", () => {
+  it("draws an element as it is, without fetching anything", () => {
     render(
       <DropDownItem {...baseProps} icon={<svg data-testid="own-icon" />} />,
     );

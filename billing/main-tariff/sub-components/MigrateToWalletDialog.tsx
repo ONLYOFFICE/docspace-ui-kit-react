@@ -55,7 +55,7 @@ const MigrateToWalletDialog = observer(
       formatWalletCurrency,
       futureSubscriptionAmount,
       language,
-      walletBalance,
+      availableCredits,
       walletCodeCurrency,
       managersCount,
     } = store;
@@ -68,7 +68,7 @@ const MigrateToWalletDialog = observer(
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isAgreed, setIsAgreed] = useState(false);
-    const initialWalletBalance = useRef(walletBalance).current;
+    const initialWalletBalance = useRef(availableCredits).current;
     const initialDaysUntilPayment = useRef(daysUntilPayment).current;
     const initialPaymentDate = useRef(paymentDate).current;
 

@@ -1,0 +1,8 @@
+.wrapper {
+  position: absolute;
+  top: 50%;
+  // doesn't require mirroring for RTL
+  left: 50%;
+  transform: translate(-50%, -50%);
+  cursor: var(--player-big-play-button-cursor);
+}

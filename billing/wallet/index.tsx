@@ -28,6 +28,7 @@ const Wallet = observer((props: WalletProps) => {
     isShowStorageTariffDeactivatedModal,
     walletInit,
     fetchBalance,
+    fetchGoodwill,
     fetchTransactionHistory,
   } = paymentStore;
 
@@ -41,6 +42,8 @@ const Wallet = observer((props: WalletProps) => {
 
   useEffect(() => {
     const onTopUpWallet = (data: { auto: boolean }) => {
+      fetchGoodwill();
+
       if (!data || data?.auto === false) return;
 
       fetchBalance(true);
@@ -52,7 +55,7 @@ const Wallet = observer((props: WalletProps) => {
     return () => {
       socket?.off(SocketEvents.TopUpWallet, onTopUpWallet);
     };
-  }, [fetchBalance, fetchTransactionHistory]);
+  }, [fetchBalance, fetchGoodwill, fetchTransactionHistory]);
 
   return shouldShowLoader || showPortalSettingsLoader ? (
     <WalletLoader />

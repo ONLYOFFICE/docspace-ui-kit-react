@@ -23,6 +23,14 @@ minimumReleaseAgeExclude:
   - "@rolldown/binding-linux-x64-musl@1.2.2"
   - "@onlyoffice/doceditor-types@10.0.0"
   - "@onlyoffice/document-editor-react@2.3.0"
+  - "@storybook/addon-docs@10.6.8"
+  - "@storybook/addon-links@10.6.8"
+  - "@storybook/addon-vitest@10.6.8"
+  - "@storybook/builder-vite@10.6.8"
+  - "@storybook/react-dom-shim@10.6.8"
+  - "@storybook/react-vite@10.6.8"
+  - "@storybook/react@10.6.8"
+  - storybook@10.6.8
 # Security overrides. These rewrite only this repository's lockfile - they are
 # not published, so a package that ships to consumers through `dependencies`
 # or `peerDependencies` still needs its fix there (see the audit-deps skill).
@@ -36,6 +44,13 @@ overrides:
   # minimatch 3.1.2; drop both once serve lifts them
   "compression@^1": "^1.8.2"
   "minimatch@^3": "^3.1.4"
+  # @storybook/react-vite (10.6.8 included) pins
+  # @joshwooding/vite-plugin-react-docgen-typescript ^0.7.0, which asks for
+  # glob ^13; glob 14 fixes GHSA-3g3m-2fjr-6pw4 and, through its minimatch ^11,
+  # GHSA-g3hv-75wg-m249. The plugin only calls globSync, unchanged in 14.
+  # Dev only (Storybook). Drop once storybook moves to plugin 0.9, which uses
+  # tinyglobby instead.
+  "glob@^13": "^14.0.6"
   # sass, postcss and css-tree accept ^1.0.x and the lockfile kept 1.2.1
   "source-map-js@^1": "^1.2.2"
   # Reaches consumers through @onlyoffice/ai-chat's peers; DocSpace pins

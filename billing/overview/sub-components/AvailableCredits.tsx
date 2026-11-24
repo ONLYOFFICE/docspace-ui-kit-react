@@ -4,17 +4,17 @@ import { DateTime } from "luxon";
 
 import { Button, ButtonSize } from "../../../components/button";
 import { Text } from "../../../components/text";
-import { toastr } from "../../../components/toast";
 import { useCommonTranslation } from "../../../utils/i18n";
 import { CommonTrans } from "../../../utils/i18n/CommonTrans";
 import { getAppTimezone } from "../../../utils/date";
 
 import { usePaymentStore } from "../../store/PaymentStoreProvider";
-import { finishRefreshingWithMinCycle } from "../../utils/refreshing";
+import { useBalanceRefresh } from "../../shared/balance-amount/useBalanceRefresh";
 import BalanceAmount from "../../shared/balance-amount";
 import UnlinkedCardBanner from "../../shared/unlinked-card-banner";
 import AutoPaymentInfo from "../../wallet/sub-components/AutoPaymentInfo";
 import SimpleTopUpDialog from "../../shared/top-up-balance/SimpleTopUpDialogWrapper";
+import { useTopUpDialogVisible } from "../../shared/top-up-balance/useTopUpDialogVisible";
 import WalletRefilledModal from "../../wallet/WalletRefilledModal";
 
 import WarningIcon from "../../../assets/danger.toast.react.svg";
@@ -31,12 +31,11 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
 
   const {
     formatPaymentCurrency,
-    walletBalance,
+    availableCredits,
     walletCodeCurrency,
     isCardLinkedToPortal,
-    isPayer,
+    canUpdateTariff,
     recommendedAmount,
-    fetchBalance,
     isAutoPaymentExist,
     autoPayments,
     wasFirstTopUp,
@@ -49,7 +48,7 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
 
   const { isNotPaidPeriod, isGracePeriod, gracePeriodEndDate } = store.tariff;
   const overduePlanCost = store.quotas.currentPlanCost?.value ?? 0;
-  const graceShortfall = overduePlanCost - walletBalance;
+  const graceShortfall = overduePlanCost - availableCredits;
 
   const toDueDay = (dueDate: string) =>
     DateTime.fromISO(dueDate).setZone(getAppTimezone()).toISODate();
@@ -59,13 +58,14 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
   const nextPaymentsTotal = upcomingPayments
     .filter((item) => toDueDay(item.dueDate) === nextDueDay)
     .reduce((sum, item) => sum + item.amount, 0);
-  const topUpShortfall = nextPayment ? nextPaymentsTotal - walletBalance : 0;
+  const topUpShortfall = nextPayment ? nextPaymentsTotal - availableCredits : 0;
 
   const isNextPayment = nextPayment && topUpShortfall > 0;
 
-  const [isTopUpDialogVisible, setIsTopUpDialogVisible] = useState(false);
+  const [isTopUpDialogVisible, setIsTopUpDialogVisible] =
+    useTopUpDialogVisible();
   const [isWalletRefilledOpen, setIsWalletRefilledOpen] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { isRefreshing, onRefresh } = useBalanceRefresh();
 
   const isAutoPaymentSetup = Boolean(
     isAutoPaymentExist &&
@@ -74,26 +74,6 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
     autoPayments?.minBalance &&
     autoPayments?.upToBalance,
   );
-
-  const onRefreshBalance = async () => {
-    if (isRefreshing) return;
-    setIsRefreshing(true);
-    const startTime = Date.now();
-
-    try {
-      await Promise.all([
-        fetchBalance?.(true),
-        store.tariff.fetchCustomerInfo(true),
-      ]);
-    } catch (e) {
-      toastr.error(e as Error);
-    } finally {
-      finishRefreshingWithMinCycle({
-        startTime,
-        setRefreshing: setIsRefreshing,
-      });
-    }
-  };
 
   const renderStatusBanner = () => {
     if (showUnlinkedCardBanner)
@@ -166,13 +146,13 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
           fractionFontSize="20px"
           showRefresh={!isNotPaidPeriod && isCardLinkedToPortal}
           isRefreshing={isRefreshing}
-          onRefresh={onRefreshBalance}
-          amount={walletBalance}
+          onRefresh={onRefresh}
+          amount={availableCredits}
           currency={walletCodeCurrency}
           language={language}
           withoutMargin
         />
-        {isPayer ? (
+        {canUpdateTariff ? (
           <div className={styles.cardButtons}>
             <Button
               size={isMobile ? ButtonSize.normal : ButtonSize.small}

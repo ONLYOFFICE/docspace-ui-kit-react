@@ -3,7 +3,7 @@ import type { PaymentApi } from "@onlyoffice/docspace-api-sdk";
 import { toastr } from "../../components/toast";
 import type { TBalance } from "../types";
 import type { TTranslation } from "../../utils/common";
-import { formatCurrencyValue } from "../utils/common";
+import { formatCurrencyValue, sumAmounts } from "../utils/common";
 import { parseAiPrices } from "../utils/parsers";
 import {
   AI_ENUM,
@@ -408,7 +408,17 @@ class ServicesStore {
   };
 
   get walletMonthToDateSpend(): number {
-    return this.serviceUsage.reduce((sum, item) => sum + item.totalAmount, 0);
+    return sumAmounts(this.serviceUsage.map((item) => item.totalAmount));
+  }
+
+  get walletMonthToDatePromoSpend(): number | null {
+    if (!this.serviceUsage.some((item) => item.sources)) return null;
+
+    return sumAmounts(
+      this.serviceUsage.map(
+        (item) => item.sources?.find((source) => source.isBonus)?.amount ?? 0,
+      ),
+    );
   }
 
   get backupUsage() {
@@ -614,6 +624,7 @@ class ServicesStore {
         await fetchCardLinked();
       }
 
+      this.paymentStore.applyPromoCodeReturn();
       this.setIsInitServicesPage(true);
 
       if (!isRefresh) {

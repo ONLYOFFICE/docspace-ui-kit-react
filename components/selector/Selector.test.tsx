@@ -274,6 +274,66 @@ describe("<Selector /> selection limit", () => {
   });
 });
 
+describe("<Selector /> rows ticked by the checkbox only", () => {
+  const folders = [
+    {
+      id: "1",
+      label: "First item",
+      isFolder: true,
+      selectByCheckboxOnly: true,
+    },
+    {
+      id: "2",
+      label: "Second item",
+      isFolder: true,
+      selectByCheckboxOnly: true,
+    },
+  ] as TSelectorItem[];
+  const option = (index: number) =>
+    screen.getByTestId(`selector-item-${index}`);
+  const box = (index: number) =>
+    option(index).querySelector("input[type='checkbox']") as HTMLInputElement;
+
+  it("passes a row click on without ticking the row", () => {
+    const onSelect = vi.fn();
+    renderSelector({ items: folders, isMultiSelect: true, onSelect });
+
+    fireEvent.click(screen.getByText("First item"));
+
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(onSelect.mock.calls[0][3]).toBeUndefined();
+    expect(box(0).checked).toBe(false);
+  });
+
+  it("ticks and unticks the row from its checkbox, saying so", () => {
+    const onSelect = vi.fn();
+    renderSelector({ items: folders, isMultiSelect: true, onSelect });
+
+    fireEvent.click(box(0));
+    expect(onSelect.mock.calls[0][3]).toBe(true);
+    expect(box(0).checked).toBe(true);
+
+    fireEvent.click(box(0));
+    expect(box(0).checked).toBe(false);
+  });
+
+  it("disables the box, not the row, of an unticked folder at the limit", () => {
+    const onSelect = vi.fn();
+    renderSelector({
+      items: folders,
+      isMultiSelect: true,
+      maxSelectedItems: 1,
+      onSelect,
+    });
+
+    fireEvent.click(box(0));
+    expect(box(1).disabled).toBe(true);
+
+    fireEvent.click(screen.getByText("Second item"));
+    expect(onSelect).toHaveBeenCalledTimes(2);
+  });
+});
+
 describe("<Selector /> Enter", () => {
   it("submits the selector", async () => {
     const onSubmit = vi.fn();

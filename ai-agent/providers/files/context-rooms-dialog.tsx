@@ -26,6 +26,14 @@ const toSelectorId = (id: string): string | number =>
 type ContextRoomsDialogProps = {
   kind: ContextRoomsKind;
   onClose: () => void;
+  /**
+   * Hears what a pick of skills rooms connected and disconnected, for a
+   * host that saves them (an AI project); not called for an unchanged pick.
+   */
+  onSkillRoomsChange?: (change: {
+    added: { id: string; name: string }[];
+    removed: string[];
+  }) => void;
 };
 
 /**
@@ -38,6 +46,7 @@ type ContextRoomsDialogProps = {
 const ContextRoomsDialog: React.FC<ContextRoomsDialogProps> = ({
   kind,
   onClose,
+  onSkillRoomsChange,
 }) => {
   const { t } = useTranslation(["Common"]);
   const { useCloudsStore } = useStores();
@@ -72,10 +81,19 @@ const ContextRoomsDialog: React.FC<ContextRoomsDialogProps> = ({
         return [{ id, name: String(item.label ?? "") }];
       });
       if (isKnowledge) state.selectKnowledgeFolders(CONTEXT_ROOM_CLOUD, rooms);
-      else state.selectContextFolders(CONTEXT_ROOM_CLOUD, rooms);
+      else {
+        const before = state.selectedContextFolders
+          .filter((item) => item.cloud === CONTEXT_ROOM_CLOUD)
+          .map((item) => item.room.id);
+        state.selectContextFolders(CONTEXT_ROOM_CLOUD, rooms);
+        const added = rooms.filter((room) => !before.includes(room.id));
+        const removed = before.filter((id) => !seen.has(id));
+        if (added.length > 0 || removed.length > 0)
+          onSkillRoomsChange?.({ added, removed });
+      }
       onClose();
     },
-    [isKnowledge, onClose, useCloudsStore],
+    [isKnowledge, onClose, onSkillRoomsChange, useCloudsStore],
   );
 
   return (
@@ -96,9 +114,7 @@ const ContextRoomsDialog: React.FC<ContextRoomsDialogProps> = ({
           ? t("Common:AIProjectKnowledgeRooms", {
               defaultValue: "Knowledge bases",
             })
-          : t("Common:InstructionsRooms", {
-              defaultValue: "Instructions rooms",
-            }),
+          : t("Common:SkillSets", { defaultValue: "Skill sets" }),
         onCloseClick: onClose,
         isCloseable: true,
       }}

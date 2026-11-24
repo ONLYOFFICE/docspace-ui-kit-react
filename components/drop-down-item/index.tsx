@@ -51,7 +51,19 @@ const IconComponent = ({
   }
 
   // An element is drawn as given; a component, memoised or not, is rendered.
-  if (React.isValidElement(icon)) return <div>{icon}</div>;
+  if (React.isValidElement(icon)) {
+    return (
+      <div
+        className={
+          fillIcon
+            ? classNames(styles.dropDownItemIcon, "drop-down-item_icon")
+            : ""
+        }
+      >
+        {icon}
+      </div>
+    );
+  }
 
   if (typeof icon !== "string") return <div>{React.createElement(icon)}</div>;
 

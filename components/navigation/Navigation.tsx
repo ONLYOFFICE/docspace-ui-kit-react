@@ -21,6 +21,7 @@ import Badges from "./sub-components/Badges";
 const Navigation = ({
   isRootFolder,
   title,
+  titleContent,
   canCreate,
   onClickFolder,
   navigationItems,
@@ -63,6 +64,7 @@ const Navigation = ({
   showBackButton,
   contextMenuHeader,
   analyzeResponsesButton,
+  beforeContextButton,
   titleTooltip,
   toggleChatPanel,
   isChatPanelVisible,
@@ -160,7 +162,11 @@ const Navigation = ({
     ((navigationItems && navigationItems.length > 1) || rootRoomTitle) &&
     currentDeviceType !== DeviceType.mobile;
 
-  const navigationTitleNode = (
+  const navigationTitleNode = titleContent ? (
+    <div className="title-block" data-testid="navigation-title-content">
+      {titleContent}
+    </div>
+  ) : (
     <div className="title-block">
       <NavigationText
         className="title-block-text"
@@ -275,6 +281,7 @@ const Navigation = ({
             data-show-navigation-button={
               showNavigationButton ? "true" : "false"
             }
+            data-with-leading-controls={beforeContextButton ? "true" : "false"}
             data-is-drop-box-component="false"
           >
             {withLogo ? (
@@ -325,6 +332,7 @@ const Navigation = ({
               isPlusButtonVisible={isPlusButtonVisible}
               contextMenuHeader={contextMenuHeader}
               analyzeResponsesButton={analyzeResponsesButton}
+              beforeContextButton={beforeContextButton}
               toggleChatPanel={toggleChatPanel}
               isChatPanelVisible={isChatPanelVisible}
               hideChatButton={hideChatButton}

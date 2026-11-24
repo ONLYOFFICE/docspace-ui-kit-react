@@ -226,10 +226,20 @@ const Selector = ({
   const onSelectLimitReachedRef = React.useRef(onSelectLimitReached);
   onSelectLimitReachedRef.current = onSelectLimitReached;
 
-  const onSelectAction = (item: TSelectorItem, isDoubleClick: boolean) => {
+  const onSelectAction = (
+    item: TSelectorItem,
+    isDoubleClick: boolean,
+    fromCheckbox?: boolean,
+  ) => {
+    // A row ticked only through its checkbox: a click on the row itself is
+    // the host's (it opens the folder) and changes no selection.
+    const isRowClickOnly =
+      isMultiSelect && !!item.selectByCheckboxOnly && !fromCheckbox;
+
     if (
       onSelectLimitReachedRef.current &&
       isMultiSelect &&
+      !isRowClickOnly &&
       !item.isSelected &&
       !(item.disableMultiSelect && !forceIsMultiSelect) &&
       maxSelectedItems &&
@@ -245,10 +255,12 @@ const Selector = ({
       },
       isDoubleClick,
       () => onSubmitAction(item, true),
+      fromCheckbox,
     );
 
     if (isMultiSelect) {
       if (item.disableMultiSelect && !forceIsMultiSelect) return;
+      if (isRowClickOnly) return;
 
       if (item.isSelected) {
         setNewSelectedItems((value) => {

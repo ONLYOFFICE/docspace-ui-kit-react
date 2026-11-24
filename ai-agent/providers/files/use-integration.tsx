@@ -14,10 +14,12 @@ import type { SaveAsFileHandler } from "../platform";
 import DeviceUploader, { type DeviceUploaderHandle } from "./device-uploader";
 import type { OnFilesAttached } from "./attach-files";
 import AttachDialog from "./attach-dialog";
+import ContextFolderDialog from "./context-folder-dialog";
 import ContextRoomsDialog, {
   type ContextRoomsKind,
 } from "./context-rooms-dialog";
 import SaveDialog from "./save-dialog";
+import CopyToRoomDialog, { type CopyToRoomFile } from "./copy-to-room-dialog";
 import { CONTEXT_ROOM_CLOUD } from "../context-room/ContextRoomSync";
 import { EXPORT_FORMAT_IDS, EXTENSION_BY_FORMAT } from "./export-format";
 import styles from "./styles.module.scss";
@@ -29,6 +31,9 @@ export type FilesIntegration = {
   onPickContextRooms: () => void;
   // Opens the Knowledge room picker behind the composer's knowledge slot.
   onPickKnowledgeRooms: () => void;
+  // Opens the folder picker that adds one more folder or room to the chat's
+  // context (the "+" menu's Data sources).
+  onAddContextFolder: () => void;
   // Opens a connected Instructions or Knowledge room from the composer's
   // rooms menus.
   onOpenContextRoom: (
@@ -37,6 +42,9 @@ export type FilesIntegration = {
   ) => void;
   // Message "Save as file" handler, wired into platform.file.saveAsFile.
   onSaveAsFile: SaveAsFileHandler;
+  // "Save to room..." on a file a reply produced: the folder selector, then
+  // a copy of the file in the room or folder picked.
+  onSaveToRoom: (file: CopyToRoomFile) => void;
   // Thread export formats, wired into platform.file.getExportFormats.
   exportFormats: ExportFormat[];
   // Dialogs + hidden device-upload input; render inside <AiAgentProviders> so
@@ -54,12 +62,23 @@ export type FilesIntegration = {
 export const useFilesIntegration = ({
   entityId,
   onFilesAttached,
+  onSkillRoomsChange,
+  roomsSectionAvailable = true,
 }: {
   entityId?: string;
   // Reports every file attached through the dialog or a device upload, so the
   // caller can keep the record flags the attachments store drops
   // (`canAnalyze`).
   onFilesAttached?: OnFilesAttached;
+  // Hears what the skills room picker connected and disconnected, for a host
+  // that saves the chat's Skill sets (an AI project).
+  onSkillRoomsChange?: (change: {
+    added: { id: string; name: string }[];
+    removed: string[];
+  }) => void;
+  // The Rooms section is on for the portal; with `false` the selectors do not
+  // offer it (Bug 84833).
+  roomsSectionAvailable?: boolean;
 } = {}): FilesIntegration => {
   const { t, i18n } = useTranslation(["Common"]);
 
@@ -77,6 +96,15 @@ export const useFilesIntegration = ({
   );
   const onPickKnowledgeRooms = React.useCallback(
     () => setRoomsPicker("knowledge"),
+    [],
+  );
+  const [folderPickerVisible, setFolderPickerVisible] = React.useState(false);
+  const closeFolderPicker = React.useCallback(
+    () => setFolderPickerVisible(false),
+    [],
+  );
+  const onAddContextFolder = React.useCallback(
+    () => setFolderPickerVisible(true),
     [],
   );
   // A room of this portal opens in Files; the chat panel stays as it is.
@@ -139,6 +167,16 @@ export const useFilesIntegration = ({
     [t, i18n.language],
   );
 
+  // The file "Save to room..." is copying; `null` while the selector is closed.
+  const [copyRequest, setCopyRequest] = React.useState<CopyToRoomFile | null>(
+    null,
+  );
+  const onSaveToRoom = React.useCallback(
+    (file: CopyToRoomFile) => setCopyRequest(file),
+    [],
+  );
+  const closeCopy = React.useCallback(() => setCopyRequest(null), []);
+
   const finishSave = React.useCallback(() => {
     setSaveRequest((prev) => {
       prev?.resolve();
@@ -174,10 +212,25 @@ export const useFilesIntegration = ({
   const overlay = (
     <>
       {pickerVisible ? (
-        <AttachDialog onClose={closePicker} onFilesAttached={onFilesAttached} />
+        <AttachDialog
+          onClose={closePicker}
+          onFilesAttached={onFilesAttached}
+          withRoomsTreeFolder={roomsSectionAvailable}
+        />
       ) : null}
       {roomsPicker ? (
-        <ContextRoomsDialog kind={roomsPicker} onClose={closeRoomsPicker} />
+        <ContextRoomsDialog
+          kind={roomsPicker}
+          onClose={closeRoomsPicker}
+          onSkillRoomsChange={onSkillRoomsChange}
+        />
+      ) : null}
+      {folderPickerVisible ? (
+        <ContextFolderDialog
+          mode="add"
+          onClose={closeFolderPicker}
+          withRoomsTreeFolder={roomsSectionAvailable}
+        />
       ) : null}
       {saveRequest ? (
         <SaveDialog
@@ -185,6 +238,14 @@ export const useFilesIntegration = ({
           defaultName={saveRequest.defaultName}
           format={saveRequest.format}
           onFinish={finishSave}
+          withRoomsTreeFolder={roomsSectionAvailable}
+        />
+      ) : null}
+      {copyRequest ? (
+        <CopyToRoomDialog
+          file={copyRequest}
+          onClose={closeCopy}
+          withRoomsTreeFolder={roomsSectionAvailable}
         />
       ) : null}
       <DeviceUploader
@@ -199,8 +260,10 @@ export const useFilesIntegration = ({
     composerActions,
     onPickContextRooms,
     onPickKnowledgeRooms,
+    onAddContextFolder,
     onOpenContextRoom,
     onSaveAsFile,
+    onSaveToRoom,
     exportFormats,
     overlay,
   };

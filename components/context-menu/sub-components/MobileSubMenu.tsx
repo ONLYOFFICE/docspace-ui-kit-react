@@ -67,6 +67,10 @@ const MenuItem = ({
   });
 
   const renderIcon = () => {
+    if (item.iconNode) {
+      return <span className={iconClassName}>{item.iconNode}</span>;
+    }
+
     if (!item.icon) return null;
 
     return isInlinedSvgUrl(item.icon) ? (

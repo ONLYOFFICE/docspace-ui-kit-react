@@ -299,6 +299,30 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   so its variables could only be set on an ancestor
 - **`PortalLogo` takes `dataTestId`**, `portal-logo` by default, on the wrapper or on the
   fallback logo that replaces it. It carried no test id at all
+- **`media-viewer`: the media viewer of the DocSpace client, and `MediaGallery`.** Both are
+  imported from `@onlyoffice/apps-ui-kit/media-viewer`.
+  - `MediaViewer` shows the images and plays the video and audio of a playlist the host passes
+    in, with previous / next navigation, a toolbar and a context menu. Decrypting private-room
+    files, the shown file name and the PDF viewer script come from the host through
+    `decryptFile`, `resolveTitle` and `getPdfViewerScriptUrl`, and the message of a decryption
+    error that has one of its own (a file not shared with the user yet) through
+    `getDecryptionErrorMessage`. The PDF menu of an encrypted file offers no member link and no
+    Download as; a decrypted HEIC or TIFF the converter cannot read is shown as it is. A script
+    URL that fails to load shows the load error. `onError` is called once per file that is both playable and
+    previewable as an image. A HEIC or TIFF the portal refuses shows the media error instead of
+    the loader, and new identities of the host's callbacks do not read the current file again.
+  - `MediaGallery` reads one folder or room through the nearest `ApiProvider`, page by page and
+    without subfolders, and keeps the playlist itself. `startFileId` keeps loading pages under
+    the loader until the file turns up, ten at most, and opens the first media file otherwise.
+    Files of a portal on another origin are read through the API client, and with
+    `readThroughApiClient` on the portal's own origin too (a frame signed in with a token);
+    without `onDownload` such a file is downloaded through it as well. `currentRoomId` goes on
+    to decryption. The viewer lies over an opaque backdrop.
+  - The theme variables ship with the module. The host's `Common` namespace needs the viewer's
+    keys (`MediaError`, `Download`, `DownloadAs`, `Rename`, ...).
+  - `@react-spring/web` (`9.7.5`), `@use-gesture/react` (`10.3.1`), `heic2any` (`0.0.4`) and
+    `utif` (`3.1.0`) are new optional peers, needed only by the media viewer. `heic2any` and
+    `utif` load when a HEIC or TIFF file opens.
 - **`ComboBox` and `AccessRightSelect` take `ariaLabel`**, the accessible name of the button.
   Without it the button is still named by the option it shows.
 - **`FolderType.PrivateRooms` (42)**: the root of the Private section. It holds no rooms
@@ -518,7 +542,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   badge only for a paid item, while the desktop list drew a plain one in blue; both draw it now
 - **`DropDownItem` draws an `icon` passed as an element or a memoised component.** An element
   such as `<Icon />`, or a component wrapped in `memo` or `forwardRef`, fell through to
-  `react-svg` with an empty address and drew nothing, though the type allows both
+  `react-svg` with an empty address and drew nothing, though the type allows both. The mobile
+  submenu of `ContextMenu` shows an item's `iconNode` as well
 - **`DropDown`'s virtual list keeps the markup of a child of its own.** With `maxHeight` every
   child was rendered again as a `DropDownItem` built from its props, so a component of your own
   lost its markup. A `DropDownItem` is still drawn that way; any other child is placed in its
@@ -570,6 +595,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   slot empty. The attribute is still set
 - **`EmailInput` keeps a passed `className`.** Its own class was set after the rest of the props
   and replaced it; the two are now joined
+- InfiniteLoader: a tile row of agents (`isAgent`) is 306px high (290px and the 16px gap), the
+  height of the agent card the client draws; at 198px every next row covered the lower part of
+  the cards above it, in the client's Agents, Skill sets and Knowledge bases tiles
 - **`PasswordInput` generates passwords from the cryptographic generator.** The generate link
   and the handle's `onGeneratePassword` drew every character and the final shuffle from
   `Math.random`, which is predictable, while consumers use the result as an account password

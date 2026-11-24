@@ -78,6 +78,7 @@ const ToggleButton = ({
   isLoading,
   noAnimation,
   name,
+  inputId,
   fontWeight,
   fontSize,
   dataTestId,
@@ -105,6 +106,7 @@ const ToggleButton = ({
         data-testid="toggle-button-container"
       >
         <input
+          id={inputId}
           className={styles.hiddenInput}
           name={name}
           type="checkbox"

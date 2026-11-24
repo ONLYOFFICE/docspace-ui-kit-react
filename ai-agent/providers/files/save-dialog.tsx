@@ -104,6 +104,12 @@ type SaveDialogProps = {
   // Called once the user has saved or cancelled, to close the dialog and
   // resolve the library's awaiting saveAsFile promise.
   onFinish: () => void;
+  /**
+   * The Rooms section is offered. A host passes `false` while the section is
+   * switched off in Settings -> Apps: a room nobody can open is no place to
+   * pick. Shown by default.
+   */
+  withRoomsTreeFolder?: boolean;
 };
 
 // Folder selector for the chat library's message "Save" action. The user picks
@@ -115,6 +121,7 @@ const SaveDialog = ({
   defaultName,
   format,
   onFinish,
+  withRoomsTreeFolder = true,
 }: SaveDialogProps) => {
   const { t } = useTranslation(["Common"]);
   const { currentDeviceType } = useDeviceType();
@@ -219,6 +226,9 @@ const SaveDialog = ({
       // a Knowledge room is a RAG source, not a place for chat exports, so
       // the AI rooms section is no save target either.
       withAIRoomsTreeFolder={false}
+      // Rooms goes with its section: a file saved to a room of a section
+      // that is switched off cannot be opened (Bug 84833).
+      withRoomsTreeFolder={withRoomsTreeFolder}
       // Form-filling rooms are still reachable through the Rooms section and
       // pass the security.Create check, but the export into them dies
       // silently in the AI Worker. Block entering them with the selector's
@@ -234,6 +244,17 @@ const SaveDialog = ({
       }}
       isThirdParty={false}
       withCreate={false}
+      // A title and a close button of its own, as the product's other
+      // selectors have: without them the root crumb stands in the title's
+      // place.
+      withHeader
+      headerProps={{
+        headerLabel: t("Common:SelectFolder", {
+          defaultValue: "Select folder",
+        }),
+        onCloseClick: onFinish,
+        isCloseable: true,
+      }}
       withSearch
       withBreadCrumbs
       withoutBackButton

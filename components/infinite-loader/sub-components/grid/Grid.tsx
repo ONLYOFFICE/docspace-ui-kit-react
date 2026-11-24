@@ -66,7 +66,9 @@ const GridComponent = ({
     const itemClassNames = (elem.props as { className?: string })?.className;
 
     const isFolder = itemClassNames?.includes("isFolder");
-    const isRoom = itemClassNames?.includes("isRoom");
+    // A row of agents (AI projects) is a row of rooms with taller tiles.
+    const isRoom =
+      itemClassNames?.includes("isRoom") || itemClassNames?.includes("isAgent");
     const isHeader =
       itemClassNames?.includes("folder_header") ||
       itemClassNames?.includes("files_header");
@@ -119,12 +121,22 @@ const GridComponent = ({
       typeof elem !== "boolean" &&
       typeof elem !== "number"
     ) {
-      const props = elem?.props as { className?: string };
+      const props = elem?.props as {
+        className?: string;
+        "data-row-height"?: number | string;
+      };
+
+      // A row that knows the height of its own cards tells it: the client
+      // draws tiles this component has no size for.
+      const ownHeight = Number(props?.["data-row-height"]);
+      if (ownHeight > 0) return ownHeight;
+
       const itemClassNames = props?.className;
       const isFile = itemClassNames?.includes("isFile");
       const isFolder = itemClassNames?.includes("isFolder");
       const isRoom = itemClassNames?.includes("isRoom");
       const isTemplate = itemClassNames?.includes("isTemplate");
+      const isAgent = itemClassNames?.includes("isAgent");
       const isFolderHeader = itemClassNames?.includes("folder_header");
 
       const horizontalGap = 16;
@@ -136,8 +148,14 @@ const GridComponent = ({
       const roomHeight = 104 + verticalRoomGap;
       const fileHeight = 220 + horizontalGap;
       const templateHeight = 126 + verticalRoomGap;
+      // The height of the client's agent card (its name row and five lines:
+      // category, model, skill sets, knowledge bases, owner). The client
+      // draws a skill set's and a knowledge base's card as high, and sizes
+      // the card itself, so a smaller number here makes the rows overlap.
+      const agentHeight = 290 + verticalRoomGap;
       const titleHeight = 20 + headerMargin + (isFolderHeader ? 0 : 11);
 
+      if (isAgent) return agentHeight;
       if (isRoom) return roomHeight;
       if (isFolder) return folderHeight;
       if (isFile) return fileHeight;
