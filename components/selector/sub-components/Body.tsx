@@ -87,6 +87,14 @@ const ROW_FRAMES = 10;
 const isPhoneLandscape = () =>
   isMobileDevice() && window.innerWidth > window.innerHeight;
 
+const getRowHeight = (item?: TSelectorItem): number => {
+  if (item?.isSeparator) {
+    return item.isSectionSeparator ? 25 : 16;
+  }
+
+  return 48;
+};
+
 const Body = ({
   footerVisible,
 
@@ -391,14 +399,15 @@ const Body = ({
 
   const cloneProps = { ref: injectedElementRef };
 
-  const getItemSize = (index: number): number => {
-    const item = items[index];
-    if (item?.isSeparator) {
-      return item?.isSectionSeparator ? 25 : 16;
-    }
+  const getItemSize = (index: number): number => getRowHeight(items[index]);
 
-    return 48;
-  };
+  const contentHeight = React.useMemo(() => {
+    let height = 0;
+    for (let index = 0; index < itemsCount; index += 1) {
+      height += getRowHeight(items[index]);
+    }
+    return height;
+  }, [items, itemsCount]);
 
   const onListScroll = ({ scrollOffset }: ListOnScrollProps) => {
     if (!canCollapseControls) return;
@@ -413,11 +422,6 @@ const Body = ({
       controlsRef.current?.contains(document.activeElement)
     )
       return;
-
-    let contentHeight = 0;
-    for (let index = 0; index < itemsCount; index += 1) {
-      contentHeight += getItemSize(index);
-    }
 
     if (contentHeight > listHeight + controlsHeight) {
       setControlsCollapsed(true);
