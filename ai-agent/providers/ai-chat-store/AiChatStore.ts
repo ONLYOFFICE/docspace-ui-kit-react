@@ -172,14 +172,20 @@ const panelWidthStorage = createPanelWidthStorage("chatPanelWidth", {
 // presence. Computed getters express every derived UI decision so
 // consumers can `observer` the store and stay reactive without any local
 // useEffect bridging.
+/** The two lists of rooms a host may manage: the Skill sets and the Knowledge bases. */
+export type AiChatSourcesKind = "skills" | "knowledge";
+
 /** Who manages the chat's Skill sets and Knowledge bases in place of the chat itself. */
 export type AiChatSourcesManager = {
-  /** Opens the owner's settings of those sources; `null` when the user may not change them. */
-  onManage: (() => void) | null;
+  /**
+   * Opens the owner's selector of one of those lists - every "Manage skill
+   * sets..." and "Manage knowledge bases..." of the composer calls it with
+   * its list; `null` when the user may not change them.
+   */
+  onManage: ((kind: AiChatSourcesKind) => void) | null;
   /**
    * Saves a change of the Skill sets made in the composer's slash menu - a
-   * set disconnected from its row, or the pick of its "Manage skill sets"
-   * selector. Only what changed is handed over, so the rooms the owner keeps
+   * set disconnected from its row. Only what changed is handed over, so the rooms the owner keeps
    * and the chat does not list (a set without skills) stay. Omitted → such
    * a change stays in the chat.
    */
@@ -249,9 +255,10 @@ class AiChatStore {
    * Set while the chat's Skill sets and Knowledge bases belong to something
    * the host manages - an agent, whose rooms are its settings, not the
    * chat's own pick. The "+" menu then lists them as they are, with no
-   * remove control on a knowledge base, and its "Manage skill sets..." and
-   * "Manage knowledge bases..." call `onManage` (the agent's settings)
-   * instead of the room selector; with `onManage: null` (a member who
+   * remove control on a knowledge base, and every "Manage skill sets..."
+   * and "Manage knowledge bases..." (the "+" menu's and the slash menu's)
+   * calls `onManage` with its list (the host's selector of the agent's
+   * rooms) instead of the chat's own room selector; with `onManage: null` (a member who
    * cannot change the agent) the lists have no such rows and the skill sets
    * no remove control. A conversation opened again does not bring back its
    * own copy of these two lists. `null` for an ordinary chat.

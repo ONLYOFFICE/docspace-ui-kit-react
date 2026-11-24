@@ -45,7 +45,9 @@ const useCloudsStore = ((selector: (s: typeof state) => unknown) =>
 const onPickKnowledgeRooms = vi.fn();
 const onOpenContextRoom = vi.fn();
 
-let sourcesManager: { onManage: (() => void) | null } | null = null;
+let sourcesManager: {
+  onManage: ((kind: "skills" | "knowledge") => void) | null;
+} | null = null;
 const lists = (knowledgePickerHidden = false) =>
   renderHook(() =>
     useComposerSourceLists({
@@ -219,13 +221,14 @@ describe("useComposerSourceLists", () => {
       room: { id: "12", name: "Legal" },
     };
 
-    it("opens the agent's form from Manage knowledge bases, not the room selector", () => {
+    it("opens the agent's knowledge base selector from Manage knowledge bases, not the chat's own", () => {
       const onManage = vi.fn();
       sourcesManager = { onManage };
       state.selectedKnowledgeFolders = [room];
       const { composerKnowledge } = lists();
       composerKnowledge.at(-1)?.onClick?.();
       expect(onManage).toHaveBeenCalledTimes(1);
+      expect(onManage).toHaveBeenCalledWith("knowledge");
       expect(onPickKnowledgeRooms).not.toHaveBeenCalled();
     });
 
