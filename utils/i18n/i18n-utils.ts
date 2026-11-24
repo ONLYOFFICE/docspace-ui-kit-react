@@ -53,7 +53,7 @@ const DEFAULT_NAMESPACES = ["Common"];
 const MISSING_KEY = "\u0000missing\u0000";
 
 type TCommonI18nInstance = {
-  t: (key: string, options?: Record<string, string | number>) => string;
+  t: (key: string, options: Record<string, string | number>) => string;
 };
 
 // The host's i18next instance holding Common resources. TranslationProvider
