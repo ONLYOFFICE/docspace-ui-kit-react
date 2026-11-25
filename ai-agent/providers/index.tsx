@@ -112,6 +112,7 @@ import {
   type SuggestedQuestion,
 } from "./files";
 import { resolveSuggestions, type SuggestionSet } from "./suggestions";
+import { getSettingsEntryConfig } from "./settings-links";
 import { composeCallbacks } from "./compose-callbacks";
 import {
   analyzeModeCallbacks,
@@ -274,6 +275,13 @@ type AiAgentProvidersProps = {
    * Return `null` to keep the library default (localized text + Retry).
    */
   formatChatError?: WidgetConfig["formatChatError"];
+  /**
+   * Whether the user may open the portal's AI settings. Only then the chat
+   * offers "Set up Web search..." in the "+" menu and "Add model..." in the
+   * model picker, and both open those settings. Off by default, so a host
+   * that does not say gets neither row.
+   */
+  canManageAiSettings?: boolean;
   /**
    * Fired when an opened thread's persisted context settles: the agent
    * entity the conversation last ran against, or `null` for a plain
@@ -667,6 +675,7 @@ const AiAgentProviders = ({
   onProfilePickerSelect,
   onProfilePickerOpen,
   formatChatError,
+  canManageAiSettings = false,
   onThreadContextChange,
   composerHeader,
   composerDisabled,
@@ -686,11 +695,8 @@ const AiAgentProviders = ({
   const aiChatTranslations = useMemo(
     () => ({
       ModelAssignmentDescription: t("Common:ModelAssignmentDescription"),
-      ...(isStandalone
-        ? null
-        : { EnableWebSearch: t("Common:EnableWebSearchInBilling") }),
     }),
-    [isStandalone, t],
+    [t],
   );
 
   // The panel store is created here rather than by `AiChatStoreProvider`
@@ -1257,6 +1263,7 @@ const AiAgentProviders = ({
       onProfilePickerOpen,
       dropdownNavigation: isMobile ? "drilldown" : "flyout",
       formatChatError,
+      ...getSettingsEntryConfig(canManageAiSettings),
       // Hide "Always allow" only for generate tools (matched by full name).
       hideToolAllowAlways: GENERATE_TOOL_NAMES,
       onToolCallApproveResult,
@@ -1354,6 +1361,7 @@ const AiAgentProviders = ({
       onProfilePickerSelect,
       isMobile,
       formatChatError,
+      canManageAiSettings,
       onToolCallApproveResult,
       onDropFiles,
       resolvedSuggestions,
