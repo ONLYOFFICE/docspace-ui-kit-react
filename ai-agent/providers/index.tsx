@@ -1214,11 +1214,17 @@ const AiAgentProviders = ({
   );
 
   // What the cards of created documents take from the chat: the agent's
-  // name for "created by" and "Save to room...".
+  // name for "created by" and "Save to room...". Only a chat on an agent
+  // offers the copy: its documents lie in the conversation's own folder,
+  // while a chat with no agent (in Files, say) saves them where the user is.
   const agentName = chatAgent?.name ?? null;
+  const isChatOnAgent = !!chatAgent;
   const createdDocuments = useMemo<CreatedDocumentsContextValue>(
-    () => ({ agentName, onSaveToRoom }),
-    [agentName, onSaveToRoom],
+    () => ({
+      agentName,
+      onSaveToRoom: isChatOnAgent ? onSaveToRoom : undefined,
+    }),
+    [agentName, isChatOnAgent, onSaveToRoom],
   );
 
   const ownCallbacks = useMemo<ChatCallbacks>(
