@@ -1,4 +1,6 @@
 import {
+  lazy,
+  Suspense,
   useCallback,
   useEffect,
   useMemo,
@@ -165,6 +167,10 @@ const AiChatI18nIsolator = ({
     </ReactI18nextProvider>
   );
 };
+
+// Loaded with the first picture opened: the media viewer brings its players
+// and its PDF view, which a chat that opens no picture never needs.
+const ChatImageViewer = lazy(() => import("./image-viewer"));
 
 type AiAgentProvidersProps = {
   locale: string;
@@ -739,6 +745,12 @@ const AiAgentProviders = ({
   // attachments are harmless — the lookup always intersects with the current
   // refs.
   const [analyzableIds, setAnalyzableIds] = useState<string[]>([]);
+  // The picture of the chat the user clicked, shown in the portal's media
+  // viewer rather than the chat library's own.
+  const [openedImage, setOpenedImage] = useState<
+    Parameters<NonNullable<WidgetConfig["onOpenImage"]>>[0] | null
+  >(null);
+  const closeOpenedImage = useCallback(() => setOpenedImage(null), []);
 
   const isMobile = useIsMobile();
 
@@ -1273,6 +1285,7 @@ const AiAgentProviders = ({
       formatChatError,
       ...getSettingsEntryConfig(canManageAiSettings),
       disableAskUserTool: !askUserQuestions || analyzeActive,
+      onOpenImage: setOpenedImage,
       // Hide "Always allow" only for generate tools (matched by full name).
       hideToolAllowAlways: GENERATE_TOOL_NAMES,
       onToolCallApproveResult,
@@ -1481,6 +1494,14 @@ const AiAgentProviders = ({
                                   </CreatedDocumentsContext.Provider>
                                 </OnFilesAttachedContext.Provider>
                                 {overlay}
+                                {openedImage ? (
+                                  <Suspense fallback={null}>
+                                    <ChatImageViewer
+                                      request={openedImage}
+                                      onClose={closeOpenedImage}
+                                    />
+                                  </Suspense>
+                                ) : null}
                               </AttachmentLimitContext.Provider>
                             </ContextRoomProvider>
                           </AiChatStoreProvider>
