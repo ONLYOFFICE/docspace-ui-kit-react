@@ -247,6 +247,35 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Added
 
+- **`SocketEvents.ModifyThreadFiles` (`s:modify-thread-files`) and `TModifyThreadFilesData`**
+  (`utils/socket`). The event a server sends to the author of a conversation with an AI agent
+  when a file is saved to it: `{ cmd: "create", id, threadId, kind }`, `kind` being `"artifacts"`
+  or `"attachments"`. It is in `TListenEventCallbackMap`, so a listener takes the payload
+  without a cast
+- **`media-viewer`: the media viewer of the DocSpace client, and `MediaGallery`.** Both are
+  imported from `@onlyoffice/apps-ui-kit/media-viewer`.
+  - `MediaViewer` shows the images and plays the video and audio of a playlist the host passes
+    in, with previous / next navigation, a toolbar and a context menu. Decrypting private-room
+    files, the shown file name and the PDF viewer script come from the host through
+    `decryptFile`, `resolveTitle` and `getPdfViewerScriptUrl`, and the message of a decryption
+    error that has one of its own (a file not shared with the user yet) through
+    `getDecryptionErrorMessage`. The PDF menu of an encrypted file offers no member link and no
+    Download as; a decrypted HEIC or TIFF the converter cannot read is shown as it is. A script
+    URL that fails to load shows the load error. `onError` is called once per file that is both playable and
+    previewable as an image. A HEIC or TIFF the portal refuses shows the media error instead of
+    the loader, and new identities of the host's callbacks do not read the current file again.
+  - `MediaGallery` reads one folder or room through the nearest `ApiProvider`, page by page and
+    without subfolders, and keeps the playlist itself. `startFileId` keeps loading pages under
+    the loader until the file turns up, ten at most, and opens the first media file otherwise.
+    Files of a portal on another origin are read through the API client, and with
+    `readThroughApiClient` on the portal's own origin too (a frame signed in with a token);
+    without `onDownload` such a file is downloaded through it as well. `currentRoomId` goes on
+    to decryption. The viewer lies over an opaque backdrop.
+  - The theme variables ship with the module. The host's `Common` namespace needs the viewer's
+    keys (`MediaError`, `Download`, `DownloadAs`, `Rename`, ...).
+  - `@react-spring/web` (`9.7.5`), `@use-gesture/react` (`10.3.1`), `heic2any` (`0.0.4`) and
+    `utif` (`3.1.0`) are new optional peers, needed only by the media viewer. `heic2any` and
+    `utif` load when a HEIC or TIFF file opens.
 - **`ComboBox` and `AccessRightSelect` take `ariaLabel`**, the accessible name of the button.
   Without it the button is still named by the option it shows.
 - **`FolderType.PrivateRooms` (42)**: the root of the Private section. It holds no rooms
@@ -290,6 +319,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`DropDownItem` renders an icon passed as an element.** Such an icon used to go to
+  `ReactSVG` with an empty `src` and show nothing. The mobile submenu of `ContextMenu` now shows
+  an item's `iconNode` as well.
 - InfiniteLoader: a tile row of agents (`isAgent`) is 306px high (290px and the 16px gap), the
   height of the agent card the client draws; at 198px every next row covered the lower part of
   the cards above it, in the client's Agents, Skill sets and Knowledge bases tiles

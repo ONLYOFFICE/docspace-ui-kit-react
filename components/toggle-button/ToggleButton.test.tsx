@@ -49,6 +49,47 @@ describe("<ToggleButton />", () => {
     expect(onChange).toHaveBeenCalledTimes(1);
   });
 
+  // A caption laid out apart from the switch is tied to it with htmlFor.
+  it("toggles from an external caption bound with inputId", async () => {
+    const onChange = vi.fn();
+    render(
+      <>
+        <label htmlFor="sync-toggle">Sync with desktop</label>
+        <ToggleButton
+          {...defaultProps}
+          label={undefined}
+          inputId="sync-toggle"
+          onChange={onChange}
+        />
+      </>,
+    );
+
+    expect(screen.getByRole("checkbox", { name: "Sync with desktop" })).toBe(
+      screen.getByTestId("toggle-button-input"),
+    );
+
+    await userEvent.click(screen.getByText("Sync with desktop"));
+    expect(onChange).toHaveBeenCalledTimes(1);
+  });
+
+  it("ignores an external caption while disabled", async () => {
+    const onChange = vi.fn();
+    render(
+      <>
+        <label htmlFor="sync-toggle">Sync with desktop</label>
+        <ToggleButton
+          {...defaultProps}
+          inputId="sync-toggle"
+          onChange={onChange}
+          isDisabled
+        />
+      </>,
+    );
+
+    await userEvent.click(screen.getByText("Sync with desktop"));
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
   it("respects disabled state", () => {
     render(<ToggleButton {...defaultProps} isDisabled />);
     const input = screen.getByTestId("toggle-button-input");

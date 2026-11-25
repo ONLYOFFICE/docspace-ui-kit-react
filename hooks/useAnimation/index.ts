@@ -25,6 +25,16 @@ export const useAnimation = (isActive: boolean): UseAnimationReturn => {
   const [endWidth, setEndWidth] = useState(90);
 
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
+  // The phase as of now, not as of the last render: a page that has loaded
+  // may say so (`END_ANIMATION`) in the same commit that started the fill,
+  // before a listener reading the rendered phase sees "progress", and the
+  // fill then stopped short of the end.
+  const phaseRef = useRef<"none" | "start" | "progress" | "finish">("none");
+  const finishTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const setPhase = (phase: "none" | "start" | "progress" | "finish") => {
+    phaseRef.current = phase;
+    setAnimationPhase(phase);
+  };
   const animationElementRef = useRef<HTMLDivElement>(null);
   const parentElementRef = useRef<HTMLDivElement>(null);
 
@@ -38,9 +48,15 @@ export const useAnimation = (isActive: boolean): UseAnimationReturn => {
       progressInterval.current = null;
     }
 
+    // A fill finishing from a click before starts over.
+    if (finishTimer.current) {
+      clearTimeout(finishTimer.current);
+      finishTimer.current = null;
+    }
+
     // Start the animation sequence
     setIsAnimationReady(false);
-    setAnimationPhase("progress");
+    setPhase("progress");
 
     // CSS animation will handle the progress from 10% to 90%
     // No JavaScript interval needed
@@ -62,7 +78,11 @@ export const useAnimation = (isActive: boolean): UseAnimationReturn => {
         clearInterval(progressInterval.current);
         progressInterval.current = null;
       }
-      setAnimationPhase("none");
+      if (finishTimer.current) {
+        clearTimeout(finishTimer.current);
+        finishTimer.current = null;
+      }
+      setPhase("none");
       setIsAnimationReady(false);
     }
   }, [isActive]);
@@ -74,13 +94,18 @@ export const useAnimation = (isActive: boolean): UseAnimationReturn => {
         clearInterval(progressInterval.current);
         progressInterval.current = null;
       }
+      if (finishTimer.current) {
+        clearTimeout(finishTimer.current);
+        finishTimer.current = null;
+      }
     };
   }, []);
 
-  // Event listener for ending animation
+  // Event listener for ending animation: attached once, it reads the phase
+  // from `phaseRef`, so an end said right after the click is not missed.
   useEffect(() => {
     const onEndAnimation = () => {
-      if (animationPhase === "progress") {
+      if (phaseRef.current === "progress") {
         // Clear the interval
         if (progressInterval.current) {
           clearInterval(progressInterval.current);
@@ -98,10 +123,11 @@ export const useAnimation = (isActive: boolean): UseAnimationReturn => {
           );
         }
         // Set to finish phase and complete the animation
-        setAnimationPhase("finish");
+        setPhase("finish");
         // Reset after a brief moment
-        setTimeout(() => {
-          setAnimationPhase("none");
+        finishTimer.current = setTimeout(() => {
+          finishTimer.current = null;
+          setPhase("none");
           setIsAnimationReady(false);
           window.dispatchEvent(
             new CustomEvent(AnimationEvents.ANIMATION_ENDED),
@@ -115,7 +141,7 @@ export const useAnimation = (isActive: boolean): UseAnimationReturn => {
     return () => {
       window.removeEventListener(AnimationEvents.END_ANIMATION, onEndAnimation);
     };
-  }, [animationPhase]);
+  }, []);
 
   return {
     animationPhase,

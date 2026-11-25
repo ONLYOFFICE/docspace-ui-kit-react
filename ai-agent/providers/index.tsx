@@ -794,13 +794,20 @@ const AiAgentProviders = ({
 
   // The slash menu's Knowledge bases follow the same owner. In an AI project
   // they are saved with it, so a base cannot be dropped from the chat alone
-  // and "Manage knowledge bases" opens the project's settings - or is left
-  // out for a user who may not change them. An ordinary chat picks its own
+  // and "Manage knowledge bases" opens the project's selector of them - or
+  // is left out for a user who may not change them. An ordinary chat picks its own
   // in the room selector.
   const sourcesOwned = !!sourcesManager;
-  const onManageKnowledge = sourcesManager
-    ? (sourcesManager.onManage ?? undefined)
-    : onPickKnowledgeRooms;
+  const manageSources = sourcesManager?.onManage ?? null;
+  const onManageKnowledge = useMemo(
+    () =>
+      sourcesManager
+        ? manageSources
+          ? () => manageSources("knowledge")
+          : undefined
+        : onPickKnowledgeRooms,
+    [sourcesManager, manageSources, onPickKnowledgeRooms],
+  );
 
   // Platform adapter passed downstream. Its `file` adapter is wired to the
   // host's save handler, and it tracks the host locale/theme internally (the
@@ -1207,11 +1214,17 @@ const AiAgentProviders = ({
   );
 
   // What the cards of created documents take from the chat: the agent's
-  // name for "created by" and "Save to room...".
+  // name for "created by" and "Save to room...". Only a chat on an agent
+  // offers the copy: its documents lie in the conversation's own folder,
+  // while a chat with no agent (in Files, say) saves them where the user is.
   const agentName = chatAgent?.name ?? null;
+  const isChatOnAgent = !!chatAgent;
   const createdDocuments = useMemo<CreatedDocumentsContextValue>(
-    () => ({ agentName, onSaveToRoom }),
-    [agentName, onSaveToRoom],
+    () => ({
+      agentName,
+      onSaveToRoom: isChatOnAgent ? onSaveToRoom : undefined,
+    }),
+    [agentName, isChatOnAgent, onSaveToRoom],
   );
 
   const ownCallbacks = useMemo<ChatCallbacks>(
@@ -1284,8 +1297,9 @@ const AiAgentProviders = ({
       hideKnowledgePicker: knowledgePickerHidden,
       // The "+" menu's Skill sets open the slash menu's skill list: the
       // connected sets as groups with their skills, a bin per set and
-      // "Manage skill sets...". Inside an agent that row opens the agent's
-      // form for those who may change it (the slash menu's own opens the
+      // "Manage skill sets...". Inside an agent that row, as the slash
+      // menu's own, opens the host's selector of the agent's skill sets for
+      // those who may change it (an ordinary chat's opens the
       // Instructions room picker, `onPickContextRooms`); a member who may
       // not gets neither the row nor the bins.
       composerSkillList: true,

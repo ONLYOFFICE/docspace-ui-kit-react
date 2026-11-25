@@ -434,7 +434,7 @@ export const NotConfiguredForUser: Story = {
     await waitFor(() =>
       expect(
         screen.getByText(
-          "Contact your Full admin to activate AI Chat for this workspace.",
+          "Only a Full admin can activate AI Chat for this workspace.",
         ),
       ).toBeVisible(),
     );
@@ -448,7 +448,7 @@ export const NotConfiguredForUser: Story = {
     docs: {
       description: {
         story:
-          "The same portal, seen by someone who is not an admin: nothing to set up, so the screen tells them to ask their administrator.",
+          "The same portal, seen by someone who is not an admin: nothing to set up, so the screen says only a Full admin can activate AI Chat.",
       },
       source: {
         code: `const { chatPanelContent } = useAiChatPanel(true, {

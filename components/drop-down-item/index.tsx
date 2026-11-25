@@ -50,6 +50,20 @@ const IconComponent = ({
     );
   }
 
+  if (React.isValidElement(icon)) {
+    return (
+      <div
+        className={
+          fillIcon
+            ? classNames(styles.dropDownItemIcon, "drop-down-item_icon")
+            : ""
+        }
+      >
+        {icon}
+      </div>
+    );
+  }
+
   if (
     typeof icon === "function" &&
     React.isValidElement(React.createElement(icon))

@@ -87,6 +87,11 @@ const meta = {
       control: "text",
       description: "Name of the underlying checkbox input",
     },
+    inputId: {
+      control: "text",
+      description:
+        "Id of the underlying checkbox input, for a `<label htmlFor>` caption laid out apart from the box",
+    },
     value: {
       control: "text",
       description:
@@ -433,6 +438,39 @@ export const WithHelpButton: Story = {
   helpButton={<HelpButton tooltipContent="Keeps you signed in on this device" />}
 />
 <RootTooltip />`,
+      },
+    },
+  },
+};
+
+export const ExternalCaption: Story = {
+  render: (args) => (
+    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      <Checkbox {...args} inputId="invite-contacts-checkbox" />
+      <label htmlFor="invite-contacts-checkbox" style={{ cursor: "pointer" }}>
+        Invite via Contacts
+      </label>
+    </div>
+  ),
+  args: {
+    onChange: fn(),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const box = canvas.getByRole("checkbox", { name: "Invite via Contacts" });
+
+    await userEvent.click(canvas.getByText("Invite via Contacts"));
+    await expect(box).toBeChecked();
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A caption laid out apart from the box, tied to it with `inputId` and a `<label htmlFor>`: clicking the caption toggles the box, and the caption is the box's accessible name.",
+      },
+      source: {
+        code: `<Checkbox inputId="invite-contacts-checkbox" onChange={handleChange} />
+<label htmlFor="invite-contacts-checkbox">Invite via Contacts</label>`,
       },
     },
   },

@@ -152,16 +152,17 @@ The `exports` map therefore declares them, and the build emits them. The distinc
 editorial, not mechanical — which is why it has to be written down here rather than enforced by
 resolution alone.
 
-| Module            | Client imports | Why not public API                                                                                      |
-| ----------------- | -------------- | ------------------------------------------------------------------------------------------------------- |
-| `ai-agent`        | 80             | Depends on `@onlyoffice/ai-chat`, an optional peer the consumer installs from npm — see below           |
-| `billing`         | 68             | Portal tariff/payment flows; depends on the API layer and MobX stores                                   |
-| `selectors`       | 70             | Data-driven pickers (People, Room, Files, Groups, MCPServers, AIAgent) built on the API layer and MobX  |
-| `uploader`        | 7              | Depends on `selectors/Files` and `providers/api`                                                        |
-| `document-editor` | 2              | Wrapper around `@onlyoffice/document-editor-react`; external consumers should use that package directly |
-| `api`             | —              | Portal REST client                                                                                      |
-| `providers/api`   | —              | Portal API provider; sole importer of `axios`                                                           |
-| `utils/socket`    | —              | See above                                                                                               |
+| Module            | Client imports | Why not public API                                                                                                                                                                                                                                                      |
+| ----------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ai-agent`        | 80             | Depends on `@onlyoffice/ai-chat`, an optional peer the consumer installs from npm — see below                                                                                                                                                                           |
+| `billing`         | 68             | Portal tariff/payment flows; depends on the API layer and MobX stores                                                                                                                                                                                                   |
+| `selectors`       | 70             | Data-driven pickers (People, Room, Files, Groups, MCPServers, AIAgent) built on the API layer and MobX                                                                                                                                                                  |
+| `uploader`        | 7              | Depends on `selectors/Files` and `providers/api`                                                                                                                                                                                                                        |
+| `media-viewer`    | 9              | Viewer for portal media files; decryption and the PDF script come from the consumer. The `media-viewer` entry exports both components, `getPlaylist` and the types; the client also reaches `MediaViewer.utils` and `sub-components/ViewerLoader` by their own subpaths |
+| `document-editor` | 2              | Wrapper around `@onlyoffice/document-editor-react`; external consumers should use that package directly                                                                                                                                                                 |
+| `api`             | —              | Portal REST client                                                                                                                                                                                                                                                      |
+| `providers/api`   | —              | Portal API provider; sole importer of `axios`                                                                                                                                                                                                                           |
+| `utils/socket`    | —              | See above                                                                                                                                                                                                                                                               |
 
 **Two of them are in the root barrel**: `index.ts` exports `uploader` and `billing` alongside
 the public modules, so they are portal-internal by tiering and public by resolution — and, since
