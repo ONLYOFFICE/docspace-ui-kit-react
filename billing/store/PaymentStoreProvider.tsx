@@ -1,6 +1,7 @@
 import React from "react";
 import PaymentStore from "./PaymentStore";
 import { useApi } from "../../providers/api";
+import socket, { SocketEvents } from "../../utils/socket";
 import type { TPaymentConfig } from "../types";
 
 type TPaymentStoreProviderProps = {
@@ -68,6 +69,19 @@ const PaymentStoreProviderInner = ({
       const isRefresh = url.includes("complete=true");
       store.quotas.fetchPortalQuota(isRefresh);
     }
+  }, [store]);
+
+  React.useEffect(() => {
+    const onChangeTariff = () => {
+      store.tariff.fetchPortalTariff(true);
+      store.tariff.fetchCustomerInfo(true);
+    };
+
+    socket?.on(SocketEvents.ChangeTariff, onChangeTariff);
+
+    return () => {
+      socket?.off(SocketEvents.ChangeTariff, onChangeTariff);
+    };
   }, [store]);
 
   React.useEffect(() => {

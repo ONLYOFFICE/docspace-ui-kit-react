@@ -67,6 +67,7 @@ export enum SocketEvents {
   ChangeAiAccessSettings = "s:change-ai-access-settings",
   ChangeAppEnabled = "s:change-app-enabled",
   TopUpWallet = "s:top-up-wallet",
+  ChangeTariff = "s:change-tariff",
   WalletLowBalance = "s:wallet-low-balance",
   ChangeServiceLimits = "s:change-service-limits",
   UpdateExternalShareSettings = "s:change-external-sharing-settings",
@@ -418,6 +419,7 @@ export type TListenEventCallbackMap = {
   [SocketEvents.ChangeAiAccessSettings]: () => void;
   [SocketEvents.ChangeAppEnabled]: (data: TChangeAppEnabledData) => void;
   [SocketEvents.TopUpWallet]: (data: TTopUpWalletData) => void;
+  [SocketEvents.ChangeTariff]: () => void;
   [SocketEvents.WalletLowBalance]: (data: TWalletLowBalanceData) => void;
   [SocketEvents.ChangeServiceLimits]: (data: TChangeServiceLimitsData) => void;
   [SocketEvents.FormSuggestedQuestions]: (
