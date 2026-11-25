@@ -40,8 +40,6 @@ export type FieldContainerProps = {
   id?: string;
   /** Inline style of the container, applied to the error message as well */
   style?: CSSProperties;
-  /** Ignored: it reaches only `Label`, which does not read it */
-  tooltipMaxWidth?: string;
   /** Class added to the help button */
   tooltipClass?: string;
 

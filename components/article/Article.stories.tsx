@@ -205,12 +205,6 @@ const meta = {
       description:
         "Extra content under the body, above the developer tools entry. Its presence also shifts the collapse handle and the developer tools entry.",
     },
-    mainBarVisible: {
-      control: "boolean",
-      description:
-        "Whether the portal's top bar is on screen. Its height is measured out of the window height on every resize — a measurement the component then does not use.",
-      table: { type: { summary: "boolean" } },
-    },
     isLiveChatAvailable: {
       control: false,
       description:
@@ -287,13 +281,10 @@ const defaultProps: ArticleProps = {
   toggleArticleOpen: fn(),
   setIsMobileArticle: fn(),
   setArticleOpen: fn(),
-  withSendAgain: false,
-  mainBarVisible: true,
   hideProfileBlock: false,
   logoText: "",
   isShowLiveChat: false,
   hideAppsBlock: false,
-  withCustomSlot: false,
   isLiveChatAvailable: false,
   isAdmin: false,
   currentDeviceType: DeviceType.desktop,
@@ -797,7 +788,7 @@ export const CollapsedOnTablet: Story = {
     await expect(
       within(article(canvasElement)).getAllByTestId("icon-button")[0],
     ).toBeVisible();
-    await expect(canvas.queryByAltText("ONLYOFFICE")).toBeNull();
+    await expect(canvas.queryByAltText("ONLYOFFICE Apps")).toBeNull();
   },
   parameters: {
     docs: {

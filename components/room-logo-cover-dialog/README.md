@@ -319,18 +319,19 @@ types are, for typing a re-implementation.
 
 ## Accessibility
 
-- **The swatches, the glyphs and the "without icon" control are pointer-only.** Each is a `<div>`
-  with a click handler: no role, no `tabindex`, no key handling.
-- **The plus and the pencil are keyboard buttons without a name.** Tab reaches them, and Enter or
-  Space opens the picker, but a screen reader announces only "button".
-- Nothing tells a screen reader which swatch or glyph is chosen. The selected state is a class and
-  a ring, with no `aria-pressed` or `aria-selected`.
-- The glyphs are injected SVG with no titles and no `aria-hidden`. They are announced, if at all,
-  as unlabelled graphics.
+- **The swatches, the glyphs and the "without icon" control are toggle buttons.** Each has
+  `role="button"` and `aria-pressed`, takes Tab focus and answers Enter and Space. The chosen one
+  stays in the tab order, pressed.
+- **A swatch is named by its hex value**, and a glyph by `t("CreateEditRoomDialog:Icon")` and its
+  place in the row: "Icon 3". The glyph's SVG carries no title to name it by.
+- The swatches and the glyphs each sit in a `role="group"`, named by `t("Common:Color")` and
+  `t("CreateEditRoomDialog:Icon")`, the texts above them.
+- **The plus and the pencil are keyboard buttons named by `t("Common:Color")`.** Tab reaches them,
+  and Enter or Space opens the picker.
 - **While the colour picker is open, Escape does not close the dialog.** With focus inside the
   picker, Escape or its "Close color picker" cross closes the picker.
-- The dialog has no accessible name of its own. The header is a plain string, not a heading
-  element. Pass `aria-label` or `aria-labelledby`.
+- The dialog is named by `t("Common:RoomCover")`, the text of its header, which is a plain string
+  rather than a heading. A passed `aria-label` or `aria-labelledby` replaces it.
 - **A passed `aria-*` lands on the `role="dialog"` element and is kept.**
 
 ## Test ids

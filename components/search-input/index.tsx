@@ -144,7 +144,6 @@ const SearchInput = ({
         { [styles.scale]: scale, [styles.isFilled]: !!inputValue },
         className,
       )}
-      id={id}
       style={style}
       data-testid={dataTestId ?? "search-input"}
     >

@@ -180,6 +180,8 @@ export function BrandedApp() {
 - **The `.light` and `.dark` classes also carry seven `--payment-callback-*` properties.** Only the
   ONLYOFFICE Apps billing screens read them; the classes also set the page background and text
   colour.
+- **They also set `--info-panel-members-subtitle-color`, grey in both themes.** No kit component
+  reads it; the ONLYOFFICE Apps member lists take their subtitle colour from it.
 
 ## Accessibility
 

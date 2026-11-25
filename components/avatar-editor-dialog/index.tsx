@@ -21,7 +21,6 @@ const AvatarEditorDialog = ({
   image,
   isLoading = false,
   editorBorderRadius = 110,
-  maxImageSize,
   dataTestId,
   onClose,
   onSave,
@@ -61,6 +60,7 @@ const AvatarEditorDialog = ({
   return (
     <ModalDialog
       {...pickAriaProps(rest)}
+      aria-label={rest["aria-label"] ?? title}
       className={styles.modalDialog}
       displayType={ModalDialogType.modal}
       withBodyScroll
@@ -97,7 +97,6 @@ const AvatarEditorDialog = ({
           onChangeFile={onChangeFile}
           isDisabled={isLoading}
           editorBorderRadius={editorBorderRadius}
-          maxImageSize={maxImageSize}
         />
       </ModalDialog.Body>
 

@@ -43,8 +43,6 @@ export type InfiniteLoaderProps = InfiniteLoaderAriaProps & {
    * @default 1
    */
   countTilesInRow?: number;
-  /** Ignored: the loader sets it itself after a scroll jump of more than 800px. */
-  showSkeleton?: boolean;
   /**
    * The element that scrolls the list. Without it the loader looks for the
    * portal's scroller, then falls back to the window.
@@ -52,13 +50,11 @@ export type InfiniteLoaderProps = InfiniteLoaderAriaProps & {
   scrollElement?: Element | null;
   /** Identifier of the folder shown. When it changes, the `tile` layout measures its rows again. */
   currentFolderId?: string | number;
-  /** Declared, but no layout reads it. */
-  smallPreview?: boolean;
-  /** Declared, but no layout reads it. */
-  isOneTile?: boolean;
 };
 
 export type ListComponentProps = InfiniteLoaderProps & {
   /** The element the list watches for scrolling, resolved by the loader. */
   scroll: Element | (Window & typeof globalThis);
+  /** Draws the rows still scrolling as skeletons; the loader sets it after a jump of more than 800px. */
+  showSkeleton?: boolean;
 };

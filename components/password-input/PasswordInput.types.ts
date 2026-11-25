@@ -41,10 +41,6 @@ export type TPasswordState = {
   type: InputType.text | InputType.password;
   /** Current input value */
   value?: string;
-  /** Copy button label */
-  copyLabel?: string;
-  /** Whether copy action is disabled */
-  disableCopyAction?: boolean;
   /** Whether tooltip is displayed */
   displayTooltip: boolean;
   /** Validation states */
@@ -97,8 +93,6 @@ type PasswordInputBaseProps = {
    * `isSimulateType` is set.
    */
   inputValue?: string;
-  /** Ignored. It only sets an internal flag for a copy button that is not rendered. */
-  emailInputName?: string;
   /**
    * The rules the checker uses, and the generator too unless
    * `generatorSettings` is given. Left out, only a minimum length of 8 is
@@ -141,10 +135,6 @@ type PasswordInputBaseProps = {
    * @default "•"
    */
   simulateSymbol?: string;
-  /** Ignored. It feeds a copy button that is not rendered. */
-  clipActionResource?: string;
-  /** Ignored. It feeds a copy button that is not rendered. */
-  clipCopiedResource?: string;
 };
 
 export type PasswordInputProps = Omit<

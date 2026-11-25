@@ -53,7 +53,8 @@ const meta = {
     },
     title: {
       control: "text",
-      description: "Text of the dialog's header. It is not translated for you.",
+      description:
+        "Text of the dialog's header, and its accessible name. It is not translated for you.",
     },
     image: {
       control: false,
@@ -75,11 +76,6 @@ const meta = {
       table: {
         defaultValue: { summary: "110" },
       },
-    },
-    maxImageSize: {
-      control: "number",
-      description:
-        "Ignored. It is handed to the image editor, which does not read it either; check the file's size in `onChangeFile`.",
     },
     dataTestId: {
       control: "text",

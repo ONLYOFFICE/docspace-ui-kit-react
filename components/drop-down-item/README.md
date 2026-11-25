@@ -216,8 +216,9 @@ export function SharingLevel({
   element is drawn as it is and keeps its own colours.
 - An SVG data URL, or a `.svg` on the page's own origin, is inlined by `react-svg`, so it takes
   the item's icon colour.
-- Any other URL — a cross-origin `.svg`, a bitmap, a web plugin's asset — becomes an `<img>`
-  with the fixed alt text `plugin-logo`. It needs no CORS headers and keeps its own colours.
+- Any other URL — a cross-origin `.svg`, a bitmap, a web plugin's asset — becomes an `<img>`.
+  Its `alt` is empty, since the label beside it names the item. It needs no CORS headers and
+  keeps its own colours.
 - **The external-link icon navigates only through `onExternalLinkClick`.** With the callback it
   is a link to `externalLinkPath`. A plain click or Enter calls the callback instead of following
   the `href`, so a router can navigate.

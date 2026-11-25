@@ -247,19 +247,6 @@ const meta = {
         defaultValue: { summary: '"tile"' },
       },
     },
-    thumbSize: {
-      control: false,
-      description:
-        "Ignored. Only its difference from `null` is tested, which a `number | undefined` always satisfies, so the branch it guards is unreachable.",
-    },
-    contextButtonSpacerWidth: {
-      control: false,
-      description: "Ignored. Nothing reads it.",
-    },
-    sideColor: {
-      control: false,
-      description: "Ignored. Nothing reads it.",
-    },
   },
   args: {
     onSelect: fn(),
@@ -338,6 +325,7 @@ export const Default: Story = {
   play: async ({ args, canvas, userEvent }) => {
     const tile = canvas.getByTestId("tile");
     const content = within(tile).getByText("Document");
+    await expect(getComputedStyle(tile).cursor).toBe("pointer");
 
     // A click on the tile selects it, alone.
     await userEvent.click(content);

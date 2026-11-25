@@ -196,10 +196,10 @@ const SortButton = ({
         isDefaultMode={false}
         advancedOptionsCount={advancedOptionsCount}
         onSelect={() => {}}
-        withBlur={false}
         withBackdrop
         onBackdropClick={toggleCombobox}
         type="onlyIcon"
+        aria-label={title}
         dataTestId="filter_sort_combobox"
       >
         <IconButton iconNode={<SortReactSvg />} size={16} />

@@ -100,7 +100,7 @@ The Table README describes it in full.`,
     settingsTitle: {
       control: "text",
       description:
-        "Hover tooltip of the cog. It does not name the cog for a screen reader.",
+        'Hover tooltip and accessible name of the cog. Without it the cog is named "Settings".',
     },
     infoPanelVisible: {
       control: "boolean",
@@ -144,10 +144,6 @@ The Table README describes it in full.`,
         defaultValue: { summary: "false" },
       },
     },
-    sectionWidth: {
-      control: "number",
-      description: "Not read: the header measures its container instead.",
-    },
     setHideColumns: {
       control: false,
       description:
@@ -158,13 +154,9 @@ The Table README describes it in full.`,
       description:
         "Ref attached to the header cell of the column that asks for it with `withTagRef`.",
     },
-    onClick: {
-      control: false,
-      description: "Not read: the header never calls it.",
-    },
     style: {
       control: false,
-      description: "Not read: nothing applies it to the header.",
+      description: "Inline style of the header element.",
     },
   },
   tags: ["!autodocs"],
@@ -222,7 +214,6 @@ export const Default: Story = {
     ],
     columnStorageName: COLUMN_STORAGE_NAME,
     columnInfoPanelStorageName: COLUMN_INFO_PANEL_STORAGE_NAME,
-    sectionWidth: 1000,
     sortBy: SortByFieldName.Name,
     sorted: true,
     useReactWindow: false,
@@ -293,7 +284,6 @@ export const Default: Story = {
   columns={columns}
   columnStorageName="my-columns"
   columnInfoPanelStorageName="my-info-panel"
-  sectionWidth={1000}
   sortBy={SortByFieldName.Name}
   sorted
   showSettings
@@ -326,7 +316,6 @@ export const WithoutSettings: Story = {
   columns={columns}
   columnStorageName="my-columns"
   columnInfoPanelStorageName="my-info-panel"
-  sectionWidth={1000}
   sortBy={SortByFieldName.Name}
   sorted
   showSettings={false}
@@ -365,7 +354,6 @@ export const WithoutSorting: Story = {
   columns={columns}
   columnStorageName="my-columns"
   columnInfoPanelStorageName="my-info-panel"
-  sectionWidth={1000}
   sortBy={SortByFieldName.Name}
   sorted
   showSettings
@@ -411,7 +399,6 @@ export const RightToLeft: Story = {
     columns={columns}
     columnStorageName="my-columns"
     columnInfoPanelStorageName="my-info-panel"
-    sectionWidth={1000}
     sortBy={SortByFieldName.Name}
     sorted
   />

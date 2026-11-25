@@ -43,6 +43,7 @@ export const TableHeader = (props: TableHeaderProps) => {
     resetColumnsSize,
     setHideColumns: setHideColumnsProp,
     withoutWideColumn = false,
+    style,
   } = props;
 
   const isMountedRef = useRef(false);
@@ -1307,6 +1308,7 @@ export const TableHeader = (props: TableHeaderProps) => {
           "lengthen-header": isLengthenHeader,
         })}
         ref={headerRef}
+        style={style}
         data-testid="table-header"
       >
         <div className={styles.tableHeaderRow}>
@@ -1341,6 +1343,7 @@ export const TableHeader = (props: TableHeaderProps) => {
               <TableSettings
                 columns={columns}
                 disableSettings={hideColumns || Boolean(isIndexEditingModeProp)}
+                label={settingsTitle}
               />
             </TooltipContainer>
           ) : null}

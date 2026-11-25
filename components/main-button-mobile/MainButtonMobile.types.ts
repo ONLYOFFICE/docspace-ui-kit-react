@@ -17,33 +17,6 @@ export type ButtonOption = {
   items?: ButtonOption[];
 };
 
-/**
- * Left over from the progress section this menu used to carry. Nothing accepts
- * it any more: there is no `progressOptions` prop.
- */
-export type ProgressOption = {
-  /** Controls visibility of the progress item */
-  open?: boolean;
-  /** Unique identifier for the progress option */
-  key: string;
-  /** Display text for the progress item */
-  label: string;
-  /** Additional CSS classes */
-  className?: string;
-  /** Icon URL or component */
-  icon?: string;
-  /** Progress completion percentage */
-  percent?: number;
-  /** Status text to display */
-  status?: string;
-  /** Handler for canceling the operation */
-  onCancel?: () => void;
-  /** Click handler for the progress item */
-  onClick?: () => void;
-  /** Indicates if the progress is in error state */
-  error?: boolean;
-};
-
 export type ActionOption = {
   /** Action identifier */
   action?: string;
@@ -80,36 +53,6 @@ export type MainButtonMobileProps = React.AriaAttributes & {
   actionOptions?: ActionOption[];
   /** Items of the lower group, drawn on a background of its own. An item with `items` becomes a submenu. */
   buttonOptions?: ButtonOption[];
-  /**
-   * Ignored. Nothing reads this prop; the button's own handler is `onClick`.
-   * @deprecated Use `onClick` with `withMenu={false}`.
-   */
-  onUploadClick?: () => void;
-  /**
-   * Ignored. Nothing reads this prop.
-   * @deprecated
-   */
-  withButton?: boolean;
-  /**
-   * Ignored. `onClose` is called whenever the sheet closes, with or without it.
-   * @deprecated
-   */
-  isOpenButton?: boolean;
-  /**
-   * Ignored. Nothing reads this prop; the groups have no heading.
-   * @deprecated
-   */
-  title?: string;
-  /**
-   * Ignored. Nothing reads this prop; the button draws no progress.
-   * @deprecated
-   */
-  percent?: number;
-  /**
-   * Ignored. Nothing reads this prop.
-   * @deprecated
-   */
-  sectionWidth?: number;
   /** Width of the menu, as a CSS length. */
   manualWidth?: string;
   /** Applied to the wrapper that carries the button and the menu. */
@@ -134,11 +77,6 @@ export type MainButtonMobileProps = React.AriaAttributes & {
   onClick?: (e: React.MouseEvent) => void;
   /** Merged into the menu's inline style. The measured height is applied after it and wins. */
   dropdownStyle?: React.CSSProperties;
-  /**
-   * Ignored. The component uses an internal ref of the same name; use `ref` for the element.
-   * @deprecated Use `ref`.
-   */
-  mainButtonRef?: React.RefObject<HTMLDivElement | null>;
 };
 
 export type SubmenuItemProps = {

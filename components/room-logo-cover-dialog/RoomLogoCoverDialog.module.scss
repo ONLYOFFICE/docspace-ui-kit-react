@@ -443,3 +443,14 @@
   justify-content: space-between;
   margin-bottom: 4px;
 }
+
+// Inset, so the scroll area around the pickers cannot clip it.
+.colorItem,
+.selectedColorItem,
+.withoutIcon,
+.iconContainer {
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: -2px;
+  }
+}

@@ -41,6 +41,15 @@ describe("<FileInput />", () => {
     expect(screen.getByTestId("icon-button")).toBeInTheDocument();
   });
 
+  it("puts name on the hidden file field", () => {
+    render(<FileInput {...defaultProps} name="attachments" />);
+    expect(screen.getByTestId("upload-click-input")).toHaveAttribute(
+      "name",
+      "attachments",
+    );
+    expect(screen.getByTestId("file-input")).not.toHaveAttribute("name");
+  });
+
   it("handles file input correctly", async () => {
     render(<FileInput {...defaultProps} />);
     const fileInput = screen.getByRole("button");

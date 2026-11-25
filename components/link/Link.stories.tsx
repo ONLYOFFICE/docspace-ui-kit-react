@@ -160,11 +160,6 @@ const meta = {
         defaultValue: { summary: "link" },
       },
     },
-    label: {
-      control: false,
-      description:
-        "Ignored. The component reads its text from `children`; this prop is spread onto the anchor as an unknown attribute and does nothing.",
-    },
   },
 } satisfies Meta<typeof Link>;
 

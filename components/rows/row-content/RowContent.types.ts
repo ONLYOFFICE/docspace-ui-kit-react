@@ -20,8 +20,6 @@ export type RowContentProps = React.AriaAttributes & {
   sideColor?: string;
   /** Applied to the content element, and again to the title's wrapper. */
   style?: React.CSSProperties;
-  /** Changes nothing on screen; nothing reads it. */
-  sectionWidth?: number;
   /**
    * Whether the last side element is joined into the line as text like the
    * others. Turn it off to show it at the end of the line as the element it is.

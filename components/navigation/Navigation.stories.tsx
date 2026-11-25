@@ -22,10 +22,6 @@ const meta = {
       description:
         "Name of the current folder, shown as the heading. It is also the hover tooltip of the folder button, and is added to `tariffBar` as a prop.",
     },
-    showText: {
-      control: "boolean",
-      description: "Not read. Nothing destructures it.",
-    },
     isRootFolder: {
       control: "boolean",
       description:
@@ -61,10 +57,6 @@ const meta = {
       description:
         "Shifts the folder menu further to the side of its button. Nothing else in the header changes.",
       table: { defaultValue: { summary: "undefined" } },
-    },
-    isRoom: {
-      control: "boolean",
-      description: "Not read. Nothing destructures it.",
     },
     isDesktop: {
       control: "boolean",
@@ -168,7 +160,7 @@ const meta = {
     titles: {
       control: "object",
       description:
-        "Hover tooltips of the info panel toggle and the plus button, the AI chat button's label, and the warning chip's text and icon. `contextMenu` is not read.",
+        "Texts of the header buttons. `infoPanel` and `actions` name the info panel toggle and the plus, and are their hover tooltips; `contextMenu` names the folder button. `aiChat` labels the AI chat button, and `warningText` and `warningIcon` fill the warning chip.",
       table: { defaultValue: { summary: "undefined" } },
     },
     navigationItems: {
@@ -297,8 +289,6 @@ const HeaderRow = (props: { children: React.ReactNode }) => (
   </div>
 );
 
-const noop = () => {};
-
 const part = (root: HTMLElement, selector: string) =>
   root.querySelector<HTMLElement>(selector);
 
@@ -312,7 +302,6 @@ const menuItem = async (name: string) => {
 };
 
 const defaultArgs = {
-  showText: true,
   isRootFolder: false,
   title: "My Documents",
   canCreate: true,
@@ -332,10 +321,6 @@ const defaultArgs = {
     { key: "create", label: "Create folder" },
   ],
   isTrashFolder: false,
-  isEmptyFilesList: false,
-  clearTrash: noop,
-  showFolderInfo: noop,
-  isCurrentFolderInfo: false,
   toggleInfoPanel: fn(),
   isInfoPanelVisible: false,
   titles: {
@@ -345,9 +330,7 @@ const defaultArgs = {
   },
   withMenu: true,
   onPlusClick: fn(),
-  isEmptyPage: false,
   isDesktop: true,
-  isRoom: false,
   isFrame: false,
   // The info panel toggle stays hidden; WithInfoPanel clears it
   hideInfoPanel: true,
@@ -413,7 +396,6 @@ export const Default: Story = {
       source: {
         code: `<Navigation
   title="My Documents"
-  showText
   canCreate
   isDesktop
   navigationItems={[
@@ -459,7 +441,7 @@ export const RootFolder: Story = {
           "The header of a root folder, with no parent to go back to (`isRootFolder`). The back arrow, the parent's name and the drop-down arrow are gone, and the name opens nothing.",
       },
       source: {
-        code: `<Navigation title="Documents" isRootFolder showText canCreate />`,
+        code: `<Navigation title="Documents" isRootFolder canCreate />`,
       },
     },
   },

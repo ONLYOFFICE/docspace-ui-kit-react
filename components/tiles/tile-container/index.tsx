@@ -14,7 +14,6 @@ export const TileContainer = ({
   infiniteGrid: InfiniteGrid,
   headingFolders,
   headingFiles,
-  isDesc,
   style,
   noSelect,
   ...rest
@@ -99,9 +98,7 @@ export const TileContainer = ({
     }
   });
 
-  const headingClassNames = classNames(styles.header, {
-    [styles.isDesc]: isDesc,
-  });
+  const headingClassNames = styles.header;
 
   const renderTile = (
     <>

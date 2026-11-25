@@ -72,11 +72,9 @@ SectionSubmenu.displayName = SECTION_SUBMENU_NAME;
 const Section = (props: SectionProps) => {
   const {
     onDrop,
-    uploadFiles,
     viewAs,
     withBodyScroll = true,
     children,
-    onOpenUploadPanel,
     isInfoPanelAvailable = true,
     settingsStudio = false,
     isInfoPanelScrollLocked,
@@ -123,8 +121,6 @@ const Section = (props: SectionProps) => {
     primaryOperationsCanceled,
     needErrorChecking,
 
-    withTabs,
-
     withoutFooter = false,
     onDragOverEmpty,
     onDragLeaveEmpty,
@@ -133,7 +129,6 @@ const Section = (props: SectionProps) => {
     dropTargetPreview,
     startDropPreview,
     fullHeightBody,
-    asideInfoPanel,
 
     pluginOperations = [],
     pluginOperationsCompleted,
@@ -141,6 +136,7 @@ const Section = (props: SectionProps) => {
     pluginShowCancelButton,
     scrollableBanner,
     stickyTableHeader,
+    ref,
   } = props;
 
   const [sectionSize, setSectionSize] = React.useState<{
@@ -149,6 +145,14 @@ const Section = (props: SectionProps) => {
   }>({});
 
   const containerRef = React.useRef<null | HTMLDivElement>(null);
+  const setContainerRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      containerRef.current = node;
+      if (typeof ref === "function") ref(node);
+      else if (ref) ref.current = node;
+    },
+    [ref],
+  );
   const timerRef = React.useRef<null | ReturnType<typeof setTimeout>>(null);
 
   const [infoPanelShownWidth, setInfoPanelShownWidth] =
@@ -365,7 +369,7 @@ const Section = (props: SectionProps) => {
     <Provider value={providerValue}>
       <SectionContainer
         viewAs={viewAs}
-        ref={containerRef}
+        ref={setContainerRef}
         isSectionHeaderAvailable={isSectionHeaderAvailable}
         isInfoPanelVisible={isInfoPanelVisible}
         withBodyScroll={withBodyScroll}
@@ -403,7 +407,6 @@ const Section = (props: SectionProps) => {
             onDrop={onDrop}
             onDragOverEmpty={onDragOverEmpty}
             onDragLeaveEmpty={onDragLeaveEmpty}
-            uploadFiles={uploadFiles}
             withScroll={withBodyScroll}
             autoFocus={currentDeviceType === DeviceType.desktop}
             viewAs={viewAs}
@@ -440,10 +443,7 @@ const Section = (props: SectionProps) => {
             ) : null}
             {isSectionFilterAvailable &&
             currentDeviceType !== DeviceType.desktop ? (
-              <SubSectionFilter
-                withTabs={withTabs}
-                className="section-body_filter"
-              >
+              <SubSectionFilter className="section-body_filter">
                 {sectionFilterContent}
               </SubSectionFilter>
             ) : null}
@@ -475,7 +475,6 @@ const Section = (props: SectionProps) => {
             needErrorChecking={needErrorChecking}
             panelOperations={primaryOperationsArray}
             cancelUpload={cancelUpload}
-            onOpenPanel={onOpenUploadPanel}
             mainButtonVisible={mainButtonVisible}
             showCancelButton={showCancelButton}
             isInfoPanelVisible={isInfoVisible}
@@ -494,7 +493,6 @@ const Section = (props: SectionProps) => {
           anotherDialogOpen={anotherDialogOpen}
           viewAs={viewAs}
           currentDeviceType={currentDeviceType}
-          asideInfoPanel={asideInfoPanel}
           withoutBodyScroll={infoPanelWithoutScroll}
           isResizable={isInfoPanelResizable}
           width={infoPanelWidth}

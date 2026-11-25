@@ -88,9 +88,6 @@ export type TileContainerProps = React.AriaAttributes & {
   /** Heading above the files group, an `<h1>`. It is rendered only when that
    * group has something in it. */
   headingFiles?: React.ReactNode;
-  /** Adds a class to both headings that no style matches, so nothing changes
-   * on screen. It sorts nothing. */
-  isDesc?: boolean;
   /** Turns off text selection across the whole container. */
   noSelect?: boolean;
 };

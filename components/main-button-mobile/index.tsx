@@ -40,7 +40,6 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
     buttonOptions,
     withoutButton,
     manualWidth,
-    isOpenButton,
     onClose,
     onOpen,
     alert,
@@ -186,7 +185,7 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
 
   useLayoutEffect(() => {
     recalculateHeight();
-  }, [isOpen, isOpenButton, recalculateHeight]);
+  }, [isOpen, recalculateHeight]);
 
   useEffect(() => {
     window.addEventListener("resize", recalculateHeight);

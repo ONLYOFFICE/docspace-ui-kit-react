@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 
 import type { TTranslation } from "../../utils";
 
@@ -13,6 +13,22 @@ const dialogHeight = () =>
     ?.style.getPropertyValue("--dialog-height");
 
 describe("RoomLogoCoverDialog", () => {
+  it("is named by its heading", async () => {
+    render(
+      <RoomLogoCoverDialog
+        t={t}
+        visible
+        covers={[]}
+        onClose={() => {}}
+        onApply={() => {}}
+      />,
+    );
+
+    expect(
+      await screen.findByRole("dialog", { name: "Common:RoomCover" }),
+    ).toBeInTheDocument();
+  });
+
   it("puts a passed aria-* on the dialog", async () => {
     render(
       <RoomLogoCoverDialog
@@ -61,11 +77,63 @@ describe("RoomLogoCover", () => {
       />,
     );
 
+  it("names the custom colour button", () => {
+    renderPicker();
+
+    expect(
+      screen.getByRole("button", { name: "Common:Color" }),
+    ).toBeInTheDocument();
+  });
+
   it("asks for the without-icon label in Common", () => {
     renderPicker();
     expect(
       screen.getByTestId("room_logo_cover_without_icon"),
     ).toHaveTextContent("Common:WithoutIcon");
+  });
+
+  it("picks a colour from the keyboard and says which is chosen", () => {
+    const onChange = vi.fn();
+    renderPicker(onChange);
+
+    const swatches = within(
+      screen.getByRole("group", { name: "Common:Color" }),
+    ).getAllByRole("button", { name: /^#/ });
+    expect(swatches.filter((s) => s.ariaPressed === "true")).toHaveLength(1);
+
+    const other = swatches.find((s) => s.ariaPressed === "false");
+    const color = other?.getAttribute("aria-label");
+    expect(other).toHaveAttribute("tabindex", "0");
+
+    fireEvent.keyDown(other as HTMLElement, { key: "Enter" });
+
+    expect(onChange).toHaveBeenLastCalledWith(color, null);
+    expect(
+      screen.getByRole("button", { name: color as string }),
+    ).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("picks a glyph and without icon from the keyboard", () => {
+    renderPicker();
+
+    const glyph = screen.getByRole("button", {
+      name: "CreateEditRoomDialog:Icon 1",
+    });
+    const withoutIcon = screen.getByRole("button", {
+      name: "Common:WithoutIcon",
+    });
+    expect(glyph).toHaveAttribute("aria-pressed", "false");
+    expect(withoutIcon).toHaveAttribute("aria-pressed", "true");
+
+    fireEvent.keyDown(glyph, { key: " " });
+
+    expect(glyph).toHaveAttribute("aria-pressed", "true");
+    expect(withoutIcon).toHaveAttribute("aria-pressed", "false");
+
+    fireEvent.keyDown(withoutIcon, { key: "Enter" });
+
+    expect(glyph).toHaveAttribute("aria-pressed", "false");
+    expect(withoutIcon).toHaveAttribute("aria-pressed", "true");
   });
 
   // The first click used to turn it off, and nothing could turn it back on.

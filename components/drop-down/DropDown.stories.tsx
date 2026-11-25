@@ -243,18 +243,6 @@ const meta = {
       description:
         "`id` of the menu element, for `aria-controls` on the control that opens it.",
     },
-    columnCount: {
-      control: false,
-      description: "Ignored. Nothing reads this prop.",
-    },
-    disableOnClickOutside: {
-      control: false,
-      description: "Ignored. Nothing reads this prop.",
-    },
-    withBlur: {
-      control: false,
-      description: "Ignored. Nothing reads this prop.",
-    },
   },
 } satisfies Meta<typeof DropDown>;
 

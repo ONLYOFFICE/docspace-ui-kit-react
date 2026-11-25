@@ -73,7 +73,6 @@ const MCPServersSelector = ({
   onBackClick,
   useAside,
   withoutBackground,
-  withBlur,
 }: MCPServersSelectorProps) => {
   const t = useCommonTranslation();
   const { apiClient, baseUrl } = useApi();
@@ -188,7 +187,7 @@ const MCPServersSelector = ({
   };
 
   const withAsideProps: TSelectorWithAside = useAside
-    ? { useAside, onClose, withBlur, withoutBackground }
+    ? { useAside, onClose, withoutBackground }
     : {};
 
   React.useEffect(() => {

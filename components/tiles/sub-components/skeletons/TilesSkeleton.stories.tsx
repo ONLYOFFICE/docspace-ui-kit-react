@@ -43,8 +43,7 @@ const meta = {
     },
     isRooms: {
       control: false,
-      description:
-        "Meant to widen the columns for room tiles; its rule never matches, so it changes nothing",
+      description: "Widens the columns to the width of room tiles",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -198,6 +197,40 @@ export const FilesWithoutHeading: Story = {
       },
       source: {
         code: `<TilesSkeleton foldersCount={0} filesCount={3} withTitle={false} />`,
+      },
+    },
+  },
+};
+
+export const Rooms: Story = {
+  name: "Room columns",
+  render: (args) => (
+    <div style={{ width: 500 }}>
+      <TilesSkeleton {...args} />
+    </div>
+  ),
+  args: {
+    foldersCount: 0,
+    filesCount: 2,
+    withTitle: false,
+    isRooms: true,
+  },
+  play: async ({ canvas }) => {
+    // Two 216px file columns would fit in 500px; room columns are at least
+    // 275px, so each placeholder takes a row of its own.
+    const [tile] = canvas.getAllByTestId("tile-skeleton-file");
+    await expect(tile.getBoundingClientRect().width).toBeGreaterThanOrEqual(
+      275,
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Placeholders in columns as wide as room tiles (`isRooms`), so a 500px listing holds one per row.",
+      },
+      source: {
+        code: `<TilesSkeleton foldersCount={0} filesCount={2} withTitle={false} isRooms />`,
       },
     },
   },

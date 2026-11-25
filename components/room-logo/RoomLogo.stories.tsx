@@ -77,11 +77,6 @@ const meta = {
       description:
         "Called by the checkbox, and by a tap on the glyph. The glyph calls it only where `react-device-detect` reports a mobile device.",
     },
-    isPrivacy: {
-      control: false,
-      description:
-        "Ignored. Nothing reads this prop; there is no privacy glyph in the folder.",
-    },
     id: {
       control: "text",
       description: "`id` of the outer element.",

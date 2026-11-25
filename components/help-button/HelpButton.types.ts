@@ -1,18 +1,9 @@
 import type { IconButtonProps } from "../icon-button";
-import type {
-  TTooltipPlace,
-  TooltipProps,
-  TGetTooltipContent,
-} from "../tooltip";
+import type { TTooltipPlace, TGetTooltipContent } from "../tooltip";
 
-// `role` and `ariaLabel` stay out: the info icon is rendered with props of its
-// own choosing, so they would never reach it. A passed `aria-*` lands on the
-// anchor. `className`, `size` and `isClickable` are declared again for
-// HelpButton's own defaults.
-export type HelpButtonProps = Omit<
-  IconButtonProps,
-  "tooltipContent" | "role" | "ariaLabel" | "className" | "size" | "isClickable"
-> &
+// Only `color` is taken from IconButton: the info icon is rendered with props
+// of the component's own choosing. A passed `aria-*` lands on the anchor.
+export type HelpButtonProps = Pick<IconButtonProps, "color"> &
   React.AriaAttributes & {
     /** Class of the info icon, or of the element around `children`.
      * @default "icon-button" */
@@ -53,8 +44,6 @@ export type HelpButtonProps = Omit<
     afterShow?: () => void;
     /** Called after the tooltip has been hidden. Not called for a string tooltip. */
     afterHide?: () => void;
-    /** Ignored. Nothing reads this prop. */
-    tooltipId?: string;
     /** Maximum width of the tooltip as a CSS length. */
     tooltipMaxWidth?: string;
     /**
@@ -63,19 +52,9 @@ export type HelpButtonProps = Omit<
      * own `Tooltip` instead.
      */
     tooltipContent?: React.ReactNode;
-    /** Ignored. Nothing reads this prop. */
-    tooltipProps?: TooltipProps;
     /** Whether the tooltip opens on click rather than on hover.
      * @default true */
     openOnClick?: boolean;
-    /** Ignored. Nothing reads this prop. */
-    offsetTop?: number;
-    /** Ignored. Nothing reads this prop. */
-    offsetRight?: number;
-    /** Ignored. Nothing reads this prop. */
-    offsetBottom?: number;
-    /** Ignored. Nothing reads this prop. */
-    offsetLeft?: number;
     /** Forces the tooltip open or closed. Only for a tooltip rendered by this component. */
     isOpen?: boolean;
     /** Stops the tooltip's text being selected. */

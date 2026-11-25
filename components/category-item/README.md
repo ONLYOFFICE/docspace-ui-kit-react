@@ -210,8 +210,6 @@ export function SettingsList() {
   the theme provider puts on `<body>`.
 - **Two literal classes serve portal stylesheets**: `settings_unavailable` on the arrow and
   `header` on the title link.
-- **`--category-item-subheader-size` does nothing.** The class that reads it is not applied to
-  any element the component renders.
 - **The subtitle stops growing at 1024px**, whatever the width of its container.
 
 ## CSS variables

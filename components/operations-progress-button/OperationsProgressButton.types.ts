@@ -71,18 +71,12 @@ export interface OperationsProgressProps extends React.AriaAttributes {
     operation: string,
     operationId: string,
   ) => void;
-  /** Ignored. Nothing reads this prop; the panel is opened through `Operation.showPanel`. */
-  onOpenPanel?: () => void;
   /** Whether the mobile main button is on screen, which lifts this one clear of it. */
   mainButtonVisible?: boolean;
   /** Whether a completed run may still hold errors, which stops the button from auto-hiding. */
   needErrorChecking?: boolean;
   /** Whether the cancel cross is offered. Only while there is exactly one operation. */
   showCancelButton?: boolean;
-  /** Ignored. Nothing reads this prop; the cross calls `cancelUpload`. */
-  onCancelOperation?: (callback: () => void) => void;
-  /** Ignored. Nothing reads this prop; the ring reads the first operation's `percent`. */
-  percent?: number;
   /** Whether the info panel, or the AI chat in its place, is open. The button then moves 24px clear of its edge. */
   isInfoPanelVisible?: boolean;
   /** Width in px of that open panel, for a resizable one, so the button stays clear of the width chosen. Without it the button assumes 400px. */

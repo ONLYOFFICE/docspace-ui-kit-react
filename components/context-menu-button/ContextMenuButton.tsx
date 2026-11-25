@@ -58,7 +58,6 @@ const ContextMenuButtonPure = ({
   dropDownClassName,
   directionX = "left",
   directionY,
-  columnCount,
   zIndex,
   usePortal = true,
   iconName,
@@ -445,7 +444,6 @@ const ContextMenuButtonPure = ({
           open={state.isOpen}
           forwardedRef={ref}
           clickOutsideAction={clickOutsideAction}
-          columnCount={columnCount}
           withBackdrop={isTablet() || isMobile() || Tablet}
           withoutBackground
           zIndex={zIndex}

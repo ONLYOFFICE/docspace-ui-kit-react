@@ -188,7 +188,7 @@ export type FilterBlockProps = {
 
   selectedFilterValue: Map<FilterGroups, Map<string | number, TItem>>;
 
-  /** Heading of the filter panel. Nothing translates it for you. */
+  /** Heading of the filter panel, and its accessible name. Nothing translates it for you. */
   filterHeader: string;
   /** Passed to `renderSelector` as the heading of its step. */
   selectorLabel: string;
@@ -329,7 +329,7 @@ export type FilterProps = React.AriaAttributes &
 
     /** Tooltip and accessible name of the filter button. */
     filterTitle: string;
-    /** Tooltip of the sort button, set on its wrapper; the button itself stays unnamed. */
+    /** Accessible name of the sort button, and its tooltip on the wrapper. */
     sortByTitle: string;
 
     /** Picks where the view selector goes: beside the sort button on a desktop, inside the sort menu below. */

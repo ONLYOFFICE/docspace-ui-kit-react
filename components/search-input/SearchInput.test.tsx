@@ -98,10 +98,22 @@ describe("<SearchInput />", () => {
     render(
       <SearchInput {...baseProps} className="custom-class" id="custom-id" />,
     );
-    const input = screen.getByTestId("search-input");
+    const block = screen.getByTestId("search-input");
 
-    expect(input).toHaveClass("custom-class");
-    expect(input).toHaveAttribute("id", "custom-id");
+    expect(block).toHaveClass("custom-class");
+    expect(block).not.toHaveAttribute("id");
+    expect(block.querySelector("input")).toHaveAttribute("id", "custom-id");
+  });
+
+  it("can be captioned by a label pointing at its id", () => {
+    render(
+      <>
+        <label htmlFor="people-search">Find people</label>
+        <SearchInput {...baseProps} id="people-search" />
+      </>,
+    );
+
+    expect(screen.getByLabelText("Find people").tagName).toBe("INPUT");
   });
 
   it("handles focus events", async () => {

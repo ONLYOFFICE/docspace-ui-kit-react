@@ -71,21 +71,6 @@ const meta = {
       description:
         "Inline style of the outer element, and where the `--dnd-*` custom properties go.",
     },
-    value: {
-      control: false,
-      description:
-        "Ignored. Nothing reads it, and it is spread onto the outer element as an unknown attribute.",
-    },
-    targetFile: {
-      control: false,
-      description:
-        "Ignored. Nothing reads it, and React warns about a function landing on a DOM element.",
-    },
-    forwardedRef: {
-      control: false,
-      description:
-        "Ignored. The drop library supplies the element's ref, and this one is never attached.",
-    },
   },
   args: {
     onDrop: fn(),

@@ -39,7 +39,7 @@
   --tile-line-height: 16px;
   --tile-icon-button-color: #{$gray};
 
-  cursor: var(--cursor-pointer);
+  cursor: pointer;
   box-sizing: border-box;
   position: relative;
 

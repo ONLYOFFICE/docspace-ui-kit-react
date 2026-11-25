@@ -221,19 +221,6 @@ const meta = {
       action: "onKeyDown",
       description: "Called on every key press in the field",
     },
-    emailInputName: {
-      control: false,
-      description:
-        "Ignored. It only sets an internal flag for a copy button that is not rendered.",
-    },
-    clipActionResource: {
-      control: false,
-      description: "Ignored. It feeds a copy button that is not rendered.",
-    },
-    clipCopiedResource: {
-      control: false,
-      description: "Ignored. It feeds a copy button that is not rendered.",
-    },
   },
 } satisfies Meta<typeof PasswordInput>;
 

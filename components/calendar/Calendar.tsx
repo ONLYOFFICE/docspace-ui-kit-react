@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 import { Scrollbar } from "../scrollbar";
 import { Days, Months, Years } from "./sub-components";
@@ -54,6 +54,24 @@ const Calendar = ({
 
   const [observedDate, setObservedDate] = useState<DateTime>(now());
   const [selectedScene, setSelectedScene] = useState(0);
+
+  // A scene change unmounts the control that had the focus. When the focus was
+  // inside the calendar, it goes to the new scene's title instead of the page.
+  const fallbackRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = forwardedRef ?? fallbackRef;
+  const focusTitleRef = useRef(false);
+  const changeScene: React.Dispatch<React.SetStateAction<number>> = (value) => {
+    focusTitleRef.current = !!containerRef.current?.contains(
+      document.activeElement,
+    );
+    setSelectedScene(value);
+  };
+
+  useEffect(() => {
+    if (!focusTitleRef.current) return;
+    focusTitleRef.current = false;
+    containerRef.current?.querySelector<HTMLElement>("h2")?.focus();
+  }, [selectedScene, containerRef]);
   const [resultMinDate, setResultMinDate] = useState<DateTime>(now());
   const [resultMaxDate, setResultMaxDate] = useState<DateTime>(now());
 
@@ -99,7 +117,7 @@ const Calendar = ({
       <Days
         observedDate={observedDate}
         setObservedDate={setObservedDate}
-        setSelectedScene={setSelectedScene}
+        setSelectedScene={changeScene}
         selectedDate={selectedDate}
         handleDateChange={handleDateChange}
         minDate={resultMinDate}
@@ -112,7 +130,7 @@ const Calendar = ({
       <Months
         observedDate={observedDate}
         setObservedDate={setObservedDate}
-        setSelectedScene={setSelectedScene}
+        setSelectedScene={changeScene}
         selectedDate={selectedDate}
         minDate={resultMinDate}
         maxDate={resultMaxDate}
@@ -124,7 +142,7 @@ const Calendar = ({
       <Years
         observedDate={observedDate}
         setObservedDate={setObservedDate}
-        setSelectedScene={setSelectedScene}
+        setSelectedScene={changeScene}
         selectedDate={selectedDate}
         minDate={resultMinDate}
         maxDate={resultMaxDate}
@@ -147,7 +165,7 @@ const Calendar = ({
         [styles.isScroll]: isScroll,
       })}
       style={style}
-      ref={forwardedRef}
+      ref={containerRef}
       data-testid={dataTestId ?? "calendar"}
     >
       {CalendarNode}

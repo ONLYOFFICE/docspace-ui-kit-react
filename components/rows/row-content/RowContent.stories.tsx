@@ -49,10 +49,6 @@ const meta = {
       control: "color",
       description: "Any CSS colour for the line of side text.",
     },
-    sectionWidth: {
-      control: "number",
-      description: "Changes nothing on screen; nothing reads it.",
-    },
     onClick: {
       control: false,
       description: "Called on a click anywhere in the content.",
@@ -105,11 +101,10 @@ export const Default: Story = {
     disableSideInfo: false,
     convertSideInfo: true,
     sideColor: globalColors.gray,
-    sectionWidth: 600,
     onClick: fn(),
   },
   play: async ({ args, canvas }) => {
-    // sectionWidth adds no class, an "undefined" one included.
+    // No class named "undefined" lands on the element.
     await expect(canvas.getByTestId("row-content")).not.toHaveClass(
       "undefined",
     );

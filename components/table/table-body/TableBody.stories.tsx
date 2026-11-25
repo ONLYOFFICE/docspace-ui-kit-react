@@ -76,10 +76,6 @@ The Table README describes it in full.`,
       description:
         "`localStorage` key of the widths used while an info panel is open. Without it the body renders an empty element.",
     },
-    isIndexEditingMode: {
-      control: "boolean",
-      description: "Not read: the body is the same while rows are reordered.",
-    },
     fetchMoreFiles: {
       control: false,
       action: "fetchMoreFiles",

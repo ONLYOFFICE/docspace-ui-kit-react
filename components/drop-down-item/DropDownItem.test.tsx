@@ -224,7 +224,7 @@ describe("<DropDownItem /> icon source", () => {
       "data-src",
       ownSvg,
     );
-    expect(screen.queryByAltText("plugin-logo")).not.toBeInTheDocument();
+    expect(document.querySelector("img")).not.toBeInTheDocument();
   });
 
   it("inlines an SVG data URL", () => {
@@ -260,17 +260,16 @@ describe("<DropDownItem /> icon source", () => {
 
     render(<DropDownItem {...baseProps} icon={foreignSvg} />);
 
-    expect(screen.getByAltText("plugin-logo")).toHaveAttribute(
-      "src",
-      foreignSvg,
-    );
+    // The icon sits beside the item's label, so it is decorative.
+    expect(document.querySelector("img")).toHaveAttribute("alt", "");
+    expect(document.querySelector("img")).toHaveAttribute("src", foreignSvg);
     expect(screen.queryByTestId("mocked-react-svg")).not.toBeInTheDocument();
   });
 
   it("draws a bitmap as an image, even under images/", () => {
     render(<DropDownItem {...baseProps} icon="/static/images/logo.png" />);
 
-    expect(screen.getByAltText("plugin-logo")).toHaveAttribute(
+    expect(document.querySelector("img")).toHaveAttribute(
       "src",
       "/static/images/logo.png",
     );

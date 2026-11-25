@@ -53,11 +53,6 @@ const meta = {
       description:
         'Colour of the info icon: any CSS colour, `"accent"` for the theme accent, or the name of a custom property starting with `--`',
     },
-    iconName: {
-      control: "text",
-      description:
-        "URL of an SVG to draw instead of the info icon, fetched by the browser at runtime",
-    },
     iconNode: {
       control: false,
       description: "Icon to draw instead of the kit's info glyph.",
@@ -138,105 +133,6 @@ const meta = {
         defaultValue: { summary: "help-button" },
       },
     },
-    tooltipId: {
-      control: false,
-      description: "Ignored. Nothing reads this prop.",
-    },
-    tooltipProps: {
-      control: false,
-      description: "Ignored. Nothing reads this prop.",
-    },
-    offsetTop: {
-      control: false,
-      description: "Ignored. Nothing reads this prop.",
-    },
-    offsetRight: {
-      control: false,
-      description: "Ignored. Nothing reads this prop.",
-    },
-    offsetBottom: {
-      control: false,
-      description: "Ignored. Nothing reads this prop.",
-    },
-    offsetLeft: {
-      control: false,
-      description: "Ignored. Nothing reads this prop.",
-    },
-    hoverColor: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    clickColor: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    isDisabled: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    isFill: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    isStroke: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    iconHoverName: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    iconClickName: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    onClick: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    onMouseEnter: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    onMouseLeave: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    onMouseDown: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    onMouseUp: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    tabIndex: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    onKeyDown: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    title: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
   },
 } satisfies Meta<typeof HelpButton>;
 
@@ -281,6 +177,15 @@ const rect = (element: Element) => element.getBoundingClientRect();
 export const Default: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(icon(canvas));
+    await tooltipShows("This is a help tooltip");
+
+    // Escape closes it, and the keyboard opens it again.
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(screen.queryByText("This is a help tooltip")).toBeNull(),
+    );
+    canvas.getByRole("button", { name: "Info" }).focus();
+    await userEvent.keyboard("{Enter}");
     await tooltipShows("This is a help tooltip");
   },
   render: (args) => (
@@ -528,6 +433,17 @@ export const WithTextContent: Story = {
     );
     // RootTooltip's info tooltip opens on a click, not on hover.
     await userEvent.click(anchor);
+    await tooltipShows("Plain text opens in the shared tooltip");
+
+    // Escape closes it, and the keyboard opens it again.
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(
+        screen.queryByText("Plain text opens in the shared tooltip"),
+      ).toBeNull(),
+    );
+    anchor.focus();
+    await userEvent.keyboard("{Enter}");
     await tooltipShows("Plain text opens in the shared tooltip");
   },
   parameters: {

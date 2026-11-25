@@ -23,12 +23,6 @@ export interface DragAndDropProps {
   onDragOver?: (isDragActive: boolean, e: React.DragEvent<HTMLElement>) => void;
   /** Called when the dragged selection leaves the target. */
   onDragLeave?: (e: React.DragEvent<HTMLElement>) => void;
-  /** Ignored. Nothing reads it, and it is spread onto the outer element as an unknown attribute. */
-  value?: string;
-  /** Ignored. Nothing reads it, and React warns about a function landing on a DOM element. */
-  targetFile?: (file?: File | null) => void;
   /** Inline style of the outer element, and where the `--dnd-*` custom properties go. */
   style?: React.CSSProperties;
-  /** Ignored. The drop library supplies the element's ref, and this one is never attached. */
-  forwardedRef?: React.RefObject<HTMLDivElement | null>;
 }

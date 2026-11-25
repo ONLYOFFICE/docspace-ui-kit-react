@@ -456,7 +456,7 @@ const meta = {
     filterHeader: {
       control: "text",
       description:
-        "Heading of the filter panel. Nothing translates it for you.",
+        "Heading of the filter panel, and its accessible name. Nothing translates it for you.",
     },
     filterTitle: {
       control: "text",
@@ -545,7 +545,7 @@ const meta = {
     sortByTitle: {
       control: "text",
       description:
-        "Tooltip of the sort button, set on its wrapper; the button itself stays unnamed.",
+        "Accessible name of the sort button, and its tooltip on the wrapper.",
     },
     view: {
       control: "text",
@@ -706,7 +706,13 @@ export const Default: Story = {
       timeout: 3000,
     });
 
-    // The filter button opens the panel; Cancel closes it.
+    // The filter button opens the panel; Cancel closes it. A tap on it
+    // draws no grey flash.
+    await expect(
+      getComputedStyle(
+        canvas.getByTestId("filter_icon_button"),
+      ).getPropertyValue("-webkit-tap-highlight-color"),
+    ).toBe("rgba(0, 0, 0, 0)");
     const panel = await openPanel(context);
     await expect(panel.getByTestId("filter_block_header")).toHaveTextContent(
       "Filter",

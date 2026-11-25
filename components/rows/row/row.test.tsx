@@ -21,6 +21,13 @@ describe("<Row />", () => {
     );
   });
 
+  it("puts id and style on the row", () => {
+    render(<Row {...baseProps} id="row-1" style={{ marginTop: "4px" }} />);
+    const row = screen.getByTestId("row");
+    expect(row).toHaveAttribute("id", "row-1");
+    expect(row).toHaveStyle({ marginTop: "4px" });
+  });
+
   it("renders without error", () => {
     render(
       <Row {...baseProps} isIndexEditingMode={false} onRowClick={() => {}} />,

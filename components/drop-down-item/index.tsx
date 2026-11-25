@@ -45,9 +45,7 @@ const IconComponent = ({
   }
 
   if (typeof icon === "string" && !isInlinedSvgUrl(icon)) {
-    return (
-      <img className="drop-down-icon_image" src={icon} alt="plugin-logo" />
-    );
+    return <img className="drop-down-icon_image" src={icon} alt="" />;
   }
 
   // An element is drawn as given; a component, memoised or not, is rendered.

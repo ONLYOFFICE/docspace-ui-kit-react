@@ -61,11 +61,6 @@ const meta = {
         defaultValue: { summary: "false" },
       },
     },
-    display: {
-      control: false,
-      description:
-        "Written onto the label as an HTML `display` attribute, which changes nothing about its layout. Set `display` through `style` instead.",
-    },
     children: {
       control: "text",
       description:
@@ -82,11 +77,6 @@ const meta = {
     style: {
       control: false,
       description: "Applied to the label.",
-    },
-    tooltipMaxWidth: {
-      control: false,
-      description:
-        "Ignored. Nothing reads this prop; the shared tooltip sizes itself.",
     },
   },
 } satisfies Meta<typeof Label>;

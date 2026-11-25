@@ -227,7 +227,6 @@ export const FolderPicker = ({
       breadCrumbsLoader={<BreadCrumbsLoader />}
       isBreadCrumbsLoading={false}
       onSelectBreadCrumb={onSelectBreadCrumb}
-      bodyIsLoading={loading}
       items={rows}
       onSelect={open}
       isMultiSelect={false}

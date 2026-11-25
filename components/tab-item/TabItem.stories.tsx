@@ -114,6 +114,12 @@ export const Default: Story = {
       "aria-selected",
       "false",
     );
+    // A tap draws no grey flash over the pill.
+    await expect(
+      getComputedStyle(pill(canvas, "Tab Item")).getPropertyValue(
+        "-webkit-tap-highlight-color",
+      ),
+    ).toBe("rgba(0, 0, 0, 0)");
     await userEvent.click(pill(canvas, "Tab Item"));
     await expect(pill(canvas, "Tab Item")).toHaveAttribute(
       "aria-selected",

@@ -1,4 +1,5 @@
 import React from "react";
+import { getProductName } from "../../../utils/product-name";
 import { TNavigationLogoProps } from "../Navigation.types";
 
 const NavigationLogo = ({
@@ -9,9 +10,11 @@ const NavigationLogo = ({
 }: TNavigationLogoProps) => {
   return (
     <div {...rest}>
-      {logo ? <img className="logo-icon_svg" alt="logo" src={logo} /> : null}
+      {logo ? (
+        <img className="logo-icon_svg" alt={getProductName()} src={logo} />
+      ) : null}
       <div className="header-burger">
-        <img src={burgerLogo} alt="burger logo" />
+        <img src={burgerLogo} alt="" />
       </div>
       <div className="header_separator" />
     </div>

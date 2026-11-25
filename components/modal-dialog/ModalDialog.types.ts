@@ -90,8 +90,6 @@ export type ModalSubComponentsProps = AsideHeaderProps &
     /** Renders the backdrop without the dialog surface, so none of the content
      * mounts. */
     hideContent?: boolean;
-    /** Ignored. Nothing reads this prop. */
-    blur?: number;
     /** Draws the invite panel's skeleton while the side panel is loading. */
     isInvitePanelLoader?: boolean;
     /** Forces body scroll regardless of display type */

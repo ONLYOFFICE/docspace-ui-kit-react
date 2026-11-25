@@ -132,10 +132,6 @@ const meta = {
       control: "text",
       description: "Class added to the help button",
     },
-    tooltipMaxWidth: {
-      control: "text",
-      description: "Ignored: it reaches only `Label`, which does not read it",
-    },
     dataTestId: {
       control: "text",
       description:

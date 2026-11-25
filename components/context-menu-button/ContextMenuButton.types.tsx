@@ -65,11 +65,6 @@ export interface ContextMenuButtonProps extends React.AriaAttributes {
   /** Applied to that wrapper. */
   style?: React.CSSProperties;
   /**
-   * Ignored. It reaches the menu, which does not read it either.
-   * @deprecated Has no effect.
-   */
-  columnCount?: number;
-  /**
    * `toggle` renders no menu of its own and leaves `onClick` to open one;
    * `auto` behaves exactly like `dropdown`.
    * @default ContextMenuButtonDisplayType.dropdown
@@ -95,11 +90,6 @@ export interface ContextMenuButtonProps extends React.AriaAttributes {
   isFill?: boolean;
   /** Stacking order of the menu. */
   zIndex?: number;
-  /**
-   * Ignored. Nothing reads this prop.
-   * @deprecated Has no effect.
-   */
-  asideHeader?: React.ReactNode;
   /** Value of `data-testid` on the wrapper.
    * @default "context-menu-button" */
   testId?: string;

@@ -250,8 +250,8 @@ export function UploadWithFormats({ send }: { send: (files: File[]) => void }) {
 - **Folder mode has no format line.** With `isFolderUpload` the short list, the `+N` pill and the
   full-list drop-down are not rendered, so `exstsText`, `fullExstsText` and
   `formatsPlusBadgeValue` show nothing.
-- **The icon is rendered two different ways.** A string becomes an `<img>` with the fixed English
-  `alt="Upload"`; a component is called with the class and the test id as props.
+- **The icon is rendered two different ways.** A string becomes a decorative `<img>` with an empty
+  `alt`; a component is called with the class and the test id as props.
 - **The format line is only clickable with `fullExstsText`.** Without it the chevron, the
   drop-down and the pointer cursor are all absent. With it, a click on the line toggles the full
   list, and a click anywhere outside the line and the list closes it.
@@ -300,7 +300,7 @@ is no shadow at all.
 - In folder mode Enter or Space on the area opens the directory picker instead. With `isDisabled`
   the area leaves the tab order.
 - **Every ARIA label here is hard-coded English**: `File upload area`, `Folder upload area`,
-  `File input`, `Folder input`, `Supported file types` and the image's `alt="Upload"`.
+  `File input`, `Folder input` and `Supported file types`.
 - Only the drop area's name can be replaced: a passed `aria-label` wins over it. The other labels
   take no prop, so a localised application still announces them in English.
 - **A passed `aria-*` lands on the drop area and is kept.** It is the library's `role="button"`.

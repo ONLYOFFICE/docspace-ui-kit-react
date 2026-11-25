@@ -162,8 +162,6 @@ export function ExpiredLinkPage() {
   the portal's `header` type and the stylesheet then overrides the size and line height.
 - **`customizedBodyText` is plain text.** Despite the name it is passed to a `Text` as a child,
   so markup in the string is escaped rather than rendered.
-- **`--error-container-link` does nothing.** The class that reads the link colour is never put
-  on an element, and it reads the internal variable rather than the overridable one.
 - **Each text line is rendered only when its string is non-empty.** An empty `headerText`,
   `bodyText` or `customizedBodyText` leaves no element and no gap behind.
 - **Below 1024px the page tightens.** The top padding drops from 100px to 80px, the margins

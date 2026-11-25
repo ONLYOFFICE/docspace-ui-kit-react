@@ -275,7 +275,7 @@ const Dropzone = ({
               (typeof icon === "string" ? (
                 <img
                   src={icon}
-                  alt="Upload"
+                  alt=""
                   className={classNames(styles.dropzoneIcon, iconClassName)}
                   data-testid="dropzone-icon"
                 />

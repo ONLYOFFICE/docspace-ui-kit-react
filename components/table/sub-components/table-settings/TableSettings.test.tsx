@@ -30,6 +30,22 @@ describe("<TableSettings />", () => {
     vi.clearAllMocks();
   });
 
+  it("names the settings button", () => {
+    render(<TableSettings columns={mockColumns} />);
+
+    expect(
+      screen.getByRole("button", { name: "Settings" }),
+    ).toBeInTheDocument();
+  });
+
+  it("names the settings button by label when given", () => {
+    render(<TableSettings columns={mockColumns} label="Column settings" />);
+
+    expect(
+      screen.getByRole("button", { name: "Column settings" }),
+    ).toBeInTheDocument();
+  });
+
   it("renders without errors", () => {
     render(<TableSettings columns={mockColumns} />);
 

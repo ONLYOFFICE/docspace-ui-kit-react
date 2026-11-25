@@ -167,11 +167,6 @@ export type TSelectorBreadCrumbs = WithFlag<
      * folder and hand back new `items` and `breadCrumbs`.
      */
     onSelectBreadCrumb: (item: TBreadCrumb) => void;
-    /**
-     * Ignored. Selector overwrites it with its own `isLoading` before the trail
-     * ever sees it; the type demands the field all the same.
-     */
-    bodyIsLoading: boolean;
   }
 >;
 
@@ -445,8 +440,6 @@ type TWithAccessRightsProps = {
 type TAsideCommonProps = {
   /** Whether the backdrop behind the aside is transparent. */
   withoutBackground?: boolean;
-  /** Ignored. Nothing reads this prop. */
-  withBlur?: boolean;
 };
 
 export type TSelectorWithAside =
@@ -914,7 +907,7 @@ export type TSelectorItemGroup = MergeTypes<
      * to the top and a divider is inserted under the first of them.
      */
     isSystem?: boolean;
-    /** Required by the group type but not read; the row shows `label`. */
+    /** The group's name, carried for your own use; the row shows `label`. */
     name: string;
   }
 >;
@@ -1037,9 +1030,9 @@ export type TSelectorItem = TSelectorItemType & {
   viewUrl?: string;
   /** Whether the room is a template, which changes its logo. */
   isTemplate?: boolean;
-  /** Not read: a template row looks the same whatever the access. */
+  /** The template's access level, carried for your own use; the row does not show it. */
   templateAccess?: FileShare;
-  /** Not read: a template row looks the same whoever owns it. */
+  /** Whether you own the template, carried for your own use; the row does not show it. */
   templateIsOwner?: boolean;
   /** Whether this row stays single-select while the rest are not. */
   disableMultiSelect?: boolean;
@@ -1092,7 +1085,8 @@ export interface ItemProps {
 
 export type ProvidersProps = {
   emptyScreenProps: TSelectorEmptyScreen;
-  breadCrumbsProps: TSelectorBreadCrumbs;
+  /** The trail's props, with the list's own loading state for it to wait on. */
+  breadCrumbsProps: TSelectorBreadCrumbs & { bodyIsLoading?: boolean };
   infoBarProps: TInfoBar;
   searchProps: TSelectorSearch;
   selectAllProps: TSelectorSelectAll & {

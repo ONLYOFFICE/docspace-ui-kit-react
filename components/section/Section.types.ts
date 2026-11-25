@@ -1,6 +1,6 @@
 import type { Operation } from "../operations-progress-button/OperationsProgressButton.types";
 import { DeviceType } from "../../enums";
-import { TViewAs, TUser, TFile, TFolder } from "../../types";
+import { TViewAs } from "../../types";
 
 import { ContextMenuModel } from "../context-menu";
 
@@ -12,7 +12,7 @@ export type SubInfoPanelBodyProps = {
   children: React.JSX.Element | null;
   /** Freezes the info panel's own scroller, for a drag or a menu that must not scroll the panel under it. */
   isInfoPanelScrollLocked?: boolean;
-  /** Not read at this level. The component passes `infoPanelWithoutScroll` here instead. */
+  /** Leaves the body unscrolled. Supplied internally from `infoPanelWithoutScroll`. */
   withoutScroll?: boolean;
 };
 
@@ -30,11 +30,9 @@ export type InfoPanelProps = {
   viewAs?: TViewAs;
   /** Which layout to render. It places the header and the filter, decides whether the body scrolls, and puts the info panel inline or over the page. Nothing here measures the viewport. */
   currentDeviceType?: DeviceType;
-  /** Not read. The info panel reads `topInfoPanel`, which the section never passes on. */
-  asideInfoPanel?: boolean;
-  /** Not read by the section: it is never forwarded to the info panel. */
+  /** Opens the panel as an aside over a backdrop. The section never sets it. */
   topInfoPanel?: boolean;
-  /** Not read by the section: it is never forwarded to the info panel. */
+  /** Called by that backdrop. */
   onClose?: () => void;
   withoutBodyScroll?: boolean;
   /** Enables the drag resizer on the panel's inline-start edge, from `INFO_PANEL_WIDTH` up to `INFO_PANEL_MAX_WIDTH` while the section keeps its own minimum. Desktop only; a double click on the edge restores the default width. */
@@ -113,14 +111,12 @@ export type SectionBodyProps = {
   autoFocus: boolean;
   /** Called with the files dropped anywhere on the body, which is itself a drop target. Nothing is filtered and nothing is highlighted — see `DragAndDrop`. */
   onDrop?: TOnDrop;
-  /** Not read. Nothing in the body destructures it. */
-  uploadFiles?: boolean;
   children: React.ReactNode;
   viewAs?: TViewAs;
   /** Applies the settings pages' narrower body padding. */
   settingsStudio: boolean;
 
-  /** Not read by the section: it is never forwarded to the body. */
+  /** Lets the body take its content's height. The section never sets it. */
   isDesktop?: boolean;
   currentDeviceType?: DeviceType;
   /** Returns the model for the body's own right-click menu. Without it no menu is mounted; it is also suppressed while `isIndexEditingMode` is set. */
@@ -142,8 +138,8 @@ export type SectionBodyProps = {
 export type SectionContainerProps = {
   /** The `aria-*` attributes passed to the section, set on the container. */
   aria?: React.AriaAttributes;
-  /** Not read by the section: it keeps its own ref on the container. */
-  ref?: React.RefObject<HTMLDivElement | null>;
+  /** The section's container element. */
+  ref?: React.Ref<HTMLDivElement>;
   isSectionHeaderAvailable: boolean;
   /** Whether the info panel is open. It narrows the section and is one of the two conditions for the panel being rendered at all — `canDisplay` is the other. */
   isInfoPanelVisible?: boolean;
@@ -152,7 +148,7 @@ export type SectionContainerProps = {
   /** Whether the section scrolls its own body. With `false` the page scrolls instead and the section takes a 20px inline-start padding. On a phone the page always scrolls. */
   withBodyScroll: boolean;
   currentDeviceType?: DeviceType;
-  /** Not read by the section: the banner comes from the `SectionBanner` slot instead. */
+  /** Content of the banner above the section. Supplied internally from the `SectionBanner` slot. */
   bannerContent?: React.ReactNode;
   /** Puts the banner at the top of the scrolling body, so it scrolls away under the header. Off, the banner stays pinned above the scroller. */
   scrollableBanner?: boolean;
@@ -165,8 +161,6 @@ export type SectionContainerProps = {
 export type SectionFilterProps = {
   children: React.ReactNode;
   className?: string;
-  /** Marks the filter below the desktop breakpoint as sitting under tabs. No style reads the mark, so it changes nothing on screen. */
-  withTabs?: boolean;
 };
 
 export type SectionFooterProps = {
@@ -189,7 +183,7 @@ export type SectionSubmenuProps = {
 export type SectionProps = React.AriaAttributes &
   Omit<SubInfoPanelHeaderProps, "children"> &
   Omit<SectionSubmenuProps, "children"> &
-  Omit<SubInfoPanelBodyProps, "children"> &
+  Omit<SubInfoPanelBodyProps, "children" | "withoutScroll"> &
   Omit<SectionWarningProps, "children"> &
   Omit<SectionFooterProps, "children"> &
   Omit<SectionFilterProps, "children" | "className"> &
@@ -204,23 +198,24 @@ export type SectionProps = React.AriaAttributes &
     | "onResize"
     | "onLiveResize"
     | "onShownWidthChange"
+    | "topInfoPanel"
+    | "onClose"
   > &
   Omit<SectionHeaderProps, "children" | "className"> &
-  Omit<SectionContainerProps, "children" | "isSectionHeaderAvailable"> &
+  Omit<
+    SectionContainerProps,
+    "children" | "isSectionHeaderAvailable" | "bannerContent" | "aria"
+  > &
   Omit<
     SectionBodyProps,
-    "children" | "isSectionHeaderAvailable" | "autoFocus" | "withScroll"
+    | "children"
+    | "isSectionHeaderAvailable"
+    | "autoFocus"
+    | "withScroll"
+    | "isDesktop"
   > & {
     /** The slots: each child is one of the ten `Section.*` markers, whose contents the section renders in its own places. Anything else is dropped. With no header, filter or body slot it renders nothing at all. */
     children: React.ReactNode;
-    /** Not read. Nothing in the component destructures it. */
-    progressBarDropDownContent?: React.ReactNode;
-    /** Called when the operations button asks to open the upload panel. */
-    onOpenUploadPanel?: () => void;
-    /** Not read. Nothing in the component destructures it. */
-    isTabletView?: boolean;
-    /** Not read. Nothing in the component destructures it. */
-    isHeaderVisible?: boolean;
     /** Whether the info panel region exists at all. It defaults to `true`, so the panel's markup is mounted unless you turn it off. */
     isInfoPanelAvailable?: boolean;
     /** Removes the info panel body's scroller and the aside's, for a body that scrolls its own regions. */
@@ -263,16 +258,6 @@ export type SectionProps = React.AriaAttributes &
     unsetChatPanelFullscreen?: () => void;
     /** Whether the host renders the chat panel fullscreen right now. */
     isChatPanelFullscreen?: boolean;
-    /** Not read. Nothing in the component destructures it. */
-    isEmptyPage?: boolean;
-    /** Not read. Nothing in the component destructures it. */
-    maintenanceExist?: boolean;
-    /** Not read. Nothing in the component destructures it. */
-    snackbarExist?: boolean;
-    /** Not read. Nothing in the component destructures it. */
-    showText?: boolean;
-    /** Not read. Nothing in the component destructures it. */
-    isTrashFolder?: boolean;
     /** Called with `false` when the info panel closes itself — a click beside it, or the browser going back below the desktop breakpoint. */
     setIsInfoPanelVisible?: (value: boolean) => void;
     /** Whether the background operations have finished, for the progress button's completed state. */
@@ -310,33 +295,7 @@ export type SectionProps = React.AriaAttributes &
     primaryOperationsCanceled?: boolean;
     /** Makes the progress button check its operations for errors before reporting them complete. */
     needErrorChecking?: boolean;
-    /** Not read. Nothing in the component destructures it. */
-    onCancelOperation?: (callback: () => void) => void;
-    /** Not read. Nothing in the component destructures it. */
-    chatFiles?: (TFile | TFolder)[];
-    /** Not read. Nothing in the component destructures it. */
-    aiChatIsVisible?: boolean;
-    /** Not read. Nothing in the component destructures it. */
-    setAiChatIsVisible?: () => void;
-    /** Not read. Nothing in the component destructures it. */
-    mainBarVisible?: boolean;
 
-    /** Not read. Nothing in the component destructures it. */
-    getIcon?: (size: number, fileExst: string) => string;
-    /** Not read. Nothing in the component destructures it. */
-    displayFileExtension?: boolean;
-    /** Not read. Nothing in the component destructures it. */
-    aiChatID?: string;
-    /** Not read. Nothing in the component destructures it. */
-    aiSelectedFolder?: string | number;
-    /** Not read. Nothing in the component destructures it. */
-    aiUserId?: string;
-    /** Not read. Nothing in the component destructures it. */
-    vectorizedFiles?: TFile[];
-    /** Not read. Nothing in the component destructures it. */
-    user?: TUser;
-    /** Marks the filter below the desktop breakpoint as sitting under tabs. No style reads the mark, so it changes nothing on screen. */
-    withTabs?: boolean;
     /** Drops both the footer slot and the spacer under the body. */
     withoutFooter?: boolean;
     /** Whether a drag of the host's own items is in progress, which the progress button uses for its drop-preview state. */
@@ -347,8 +306,6 @@ export type SectionProps = React.AriaAttributes &
     clearDropPreviewLocation?: () => void;
     /** Its mere presence makes the progress button appear, even with no operations, so that a drag can show its drop preview. */
     startDropPreview?: () => void;
-    /** Not read. The info panel reads `topInfoPanel`, which is never forwarded. */
-    asideInfoPanel?: boolean;
     // Plugin operations props
     /** Operations contributed by plugins, merged into the background operations of the progress button. */
     pluginOperations?: Operation[];

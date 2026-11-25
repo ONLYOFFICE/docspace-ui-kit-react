@@ -89,11 +89,6 @@ const meta = {
         defaultValue: { summary: "true" },
       },
     },
-    opened: {
-      control: false,
-      description:
-        "Ignored. Nothing reads this prop, and it is not passed to the DOM.",
-    },
     onAction: {
       action: "onAction",
       description:
@@ -180,6 +175,10 @@ export const Default: Story = {
   play: async (context) => {
     const button = await clickButton(context, "Main Button");
     const item = await findVisibleItem("New document");
+    // A tap draws no grey flash over the button.
+    await expect(
+      getComputedStyle(button).getPropertyValue("-webkit-tap-highlight-color"),
+    ).toBe("rgba(0, 0, 0, 0)");
     await expect(button).toHaveAttribute("aria-haspopup", "menu");
     await expect(button).toHaveAttribute("aria-expanded", "true");
 

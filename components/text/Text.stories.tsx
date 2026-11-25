@@ -191,11 +191,6 @@ const meta = {
       description:
         "Inline style of the element. `Text` merges it over the style props above, so a `fontSize` here wins over the `fontSize` prop.",
     },
-    display: {
-      control: false,
-      description:
-        "Ignored. Nothing reads this prop, and it reaches the DOM as an unknown attribute. Use `isInline` or `style`.",
-    },
     containerWidth: {
       control: false,
       description:

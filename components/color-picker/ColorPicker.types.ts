@@ -57,7 +57,4 @@ export type ColorPickerProps = React.AriaAttributes & {
    * not translated for you.
    */
   closeButtonLabel?: string;
-
-  /** Ignored. Nothing reads this prop. */
-  forwardedRef?: React.RefObject<HTMLDivElement | null>;
 };

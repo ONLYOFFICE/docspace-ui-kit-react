@@ -9,6 +9,7 @@ import TemplateRoomIcon from "../../assets/template-room-icon.react.svg";
 
 import { useClickOutside, getTextColor } from "../../utils";
 import { pickAriaProps } from "../../utils/aria-props";
+import { useCommonTranslation } from "../../utils/i18n";
 import { ROOM_ACTION_KEYS } from "../../constants";
 
 import { useInterfaceDirection, useTheme } from "../../context";
@@ -38,6 +39,7 @@ const RoomIcon = ({
   badgeIconNode,
   badgeIconColor,
   onBadgeClick,
+  badgeLabel,
   className,
   withEditing,
   hoverSrc,
@@ -51,6 +53,7 @@ const RoomIcon = ({
   dataTestId,
   ...rest
 }: RoomIconProps) => {
+  const t = useCommonTranslation();
   const [correctImage, setCorrectImage] = React.useState(true);
   const [openEditLogo, setOpenLogoEdit] = React.useState(false);
   const fileInputId = `${React.useId()}-room-icon-file`;
@@ -238,7 +241,7 @@ const RoomIcon = ({
               <img
                 className={classNames([imgClassName, "room-image"])}
                 src={imgSrc}
-                alt="room icon"
+                alt={title}
               />
             ) : (
               <ReactSVG
@@ -265,6 +268,7 @@ const RoomIcon = ({
                 size={12}
                 iconNode={<PlusSvgUrl />}
                 onClick={onEditButtonClick}
+                ariaLabel={t("EditButton")}
                 isFill
               />
               {dropdownElement}
@@ -301,7 +305,7 @@ const RoomIcon = ({
               "not-selectable",
             ])}
             src={imgSrc as string}
-            alt="room icon"
+            alt={title}
             data-testid="room-icon-image"
           />
         )}
@@ -314,7 +318,7 @@ const RoomIcon = ({
             <img
               className={styles.roomIconHover}
               src={hoverSrc}
-              alt="room icon hover"
+              alt=""
               data-testid="hover-image"
             />
             {dropdownElement}
@@ -332,6 +336,7 @@ const RoomIcon = ({
             <IconButton
               data-tooltip-id={tooltipId}
               onClick={onBadgeClick}
+              ariaLabel={badgeLabel}
               iconName={badgeUrl}
               iconNode={badgeIconNode}
               size={isBigSize ? 28 : 12}
@@ -365,6 +370,7 @@ const RoomIcon = ({
               size={12}
               iconNode={<EditPenSvgUrl />}
               onClick={onEditButtonClick}
+              ariaLabel={t("EditButton")}
               isFill
             />
             {dropdownElement}

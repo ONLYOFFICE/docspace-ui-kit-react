@@ -174,11 +174,6 @@ const meta = {
         defaultValue: { summary: "false" },
       },
     },
-    editAction: {
-      control: false,
-      description:
-        "Ignored. Nothing reads this prop; the edit button runs the first `model` entry.",
-    },
     onClick: {
       action: "onClick",
       description:

@@ -27,8 +27,6 @@ export type TagProps = React.AriaAttributes & {
   icon?: string | React.FC<React.SVGProps<SVGSVGElement>>;
   /** Applied to that glyph. */
   iconClassName?: string;
-  /** Ignored. Nothing reads this prop on a single tag; it is `TagType.isDefault` that `Tags` acts on. */
-  isDefault?: boolean;
   /** Whether the trailing margin is dropped, for the last tag in a row. */
   isLast?: boolean;
   /** Passed straight back through `onClick`. The component itself does nothing with it. */

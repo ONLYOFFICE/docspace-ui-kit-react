@@ -58,7 +58,7 @@
     opacity: var(--tab-item-opacity-disabled);
   }
 
-  --webkit-tap-highlight-color: #{$tap-highlight};
+  -webkit-tap-highlight-color: #{$tap-highlight};
 }
 
 .tabItemText {

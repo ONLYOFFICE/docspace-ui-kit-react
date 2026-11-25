@@ -236,6 +236,48 @@ describe("Filter Component", () => {
       expect(button).toHaveAttribute("aria-expanded", "true");
     });
 
+    it("names the sort button by sortByTitle", async () => {
+      await act(async () => {
+        renderComponent();
+      });
+
+      expect(
+        screen.getByRole("button", { name: "Sort by" }),
+      ).toBeInTheDocument();
+    });
+
+    it("names the panel by filterHeader", async () => {
+      await act(async () => {
+        renderComponent();
+      });
+
+      await userEvent.click(screen.getByTestId("filter_icon_button"));
+
+      expect(
+        await screen.findByRole("dialog", { name: "Filter" }),
+      ).toBeInTheDocument();
+    });
+
+    it("names the panel's clear button", async () => {
+      await act(async () => {
+        renderComponent({
+          getSelectedFilterData: () =>
+            Promise.resolve([
+              {
+                key: "state",
+                group: FilterGroups.filterOther,
+                label: "Case file",
+              },
+            ]),
+        });
+      });
+
+      await userEvent.click(screen.getByTestId("filter_icon_button"));
+
+      expect(
+        await screen.findByRole("button", { name: "Clear filter" }),
+      ).toBeInTheDocument();
+    });
     it("opens the sort list from the keyboard and sorts with Enter", async () => {
       const user = userEvent.setup();
       const onSort = vi.fn();

@@ -141,6 +141,7 @@ const TableGroupMenu = memo((props: TableGroupMenuProps) => {
             className={styles.tableHeaderIconButton}
             size={16}
             onClick={onCloseClick}
+            ariaLabel={t("CloseButton")}
             iconNode={<CrossIconSvg />}
             isFill
             dataTestId="close-button"
@@ -174,6 +175,7 @@ const TableGroupMenu = memo((props: TableGroupMenuProps) => {
               size={16}
               isFill
               onClick={toggleInfoPanel}
+              ariaLabel={t("InfoPanel")}
               color={toggleIconColor}
               hoverColor={toggleIconColor}
               dataTestId="info-panel-toggle-button"

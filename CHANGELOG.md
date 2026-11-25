@@ -8,6 +8,62 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **Style rules and custom properties that nothing reads are gone.** `Section` kept a copy of
+  `OperationsProgressButton`'s styles under a class it never sets, `MainButtonMobile` the styles
+  of a progress bar it no longer draws, and `DropDown` a `withColumns` rule. Several components
+  declared properties no rule reads, and a few rules read properties nothing defines.
+  Nothing on screen changes. `ErrorContainer`'s `--error-container-link`, `CategoryItem`'s
+  `--category-item-subheader-size` and `RoomType`'s `--room-type-dropdown-item-background` and
+  `--room-type-display-item-*`, which did nothing, are removed with them
+- **`RoomType` renders the `listItem` card for a `type` it does not know.** It rendered a fourth,
+  static layout no typed value could select, with no click, keys or test id. Only untyped code
+  passing another string sees the change
+- **Props that nothing reads are removed from the types.** Each was documented as ignored. Drop
+  them from your calls; a TypeScript caller gets an error where it still passes one, and in plain
+  JavaScript a component that spreads the rest onto its element puts the value there as an
+  attribute:
+  - `Article`: `withSendAgain`, `mainBarVisible`, `isNonProfit`, `isGracePeriod`, `isFreeTariff`,
+    `isPaymentPageAvailable`, `isLicenseDateExpired`, `isTrial`, `standalone`,
+    `currentTariffPlanTitle`, `trialDaysLeft`, and its own `withCustomSlot` and `path`
+  - `Navigation`: `showText`, `isRoom`, `isCurrentFolderInfo`, `showFolderInfo`, `clearTrash`,
+    `isEmptyFilesList`, `isEmptyPage`, and the values it supplies itself: `id`, `forwardedRef`,
+    `onCloseDropBox`, `toggleDropBox`, `isMobileOnly`, `ignoreChangeView`
+  - `Section`: `user`, `getIcon`, `displayFileExtension`, `showText`, `isEmptyPage`,
+    `isTrashFolder`, `isTabletView`, `isHeaderVisible`, `mainBarVisible`, `maintenanceExist`,
+    `snackbarExist`, `progressBarDropDownContent`, `onCancelOperation`, `onOpenUploadPanel`,
+    `uploadFiles`, `withTabs`, `asideInfoPanel`, `chatFiles`, `vectorizedFiles`, every `ai*` prop,
+    and the values it supplies itself: `bannerContent`, `withoutScroll`, `topInfoPanel`,
+    `onClose`, `isDesktop`
+  - `HelpButton` keeps only `color` of `IconButton`'s props, and drops `tooltipId`,
+    `tooltipProps` and the four `offset*` sides. `onClick`, `title`, `iconName`, the hover and
+    press props and the mouse handlers were never passed to the icon
+  - `MainButtonMobile`: `title`, `percent`, `sectionWidth`, `withButton`, `onUploadClick`,
+    `isOpenButton`, `mainButtonRef`. `MainButton`: `opened`
+  - `ComboBox`: `withSearch`, `searchPlaceholder`, `showDisabledItems`, `withBlur`, `role`, and
+    the same two in `AccessRightSelect`. `DropDown`: `columnCount`, `withBlur`,
+    `disableOnClickOutside`. `ContextMenuButton`: `columnCount`, `asideHeader`
+  - `Selector`: `withBlur` (and in the `Groups`, `MCPServers`, `People` and `Room` selectors)
+    and `bodyIsLoading`
+  - `PasswordInput`: `emailInputName`, `clipActionResource`, `clipCopiedResource`. `Textarea`:
+    `fullHeight`, `minHeight`, `paddingLeftProp`. `Text` and `Label`: `display`. `Link`: `label`.
+    `LinkWithDropdown`: `isHovered`. `FieldContainer` and `Label`: `tooltipMaxWidth`
+  - `Toast`: `id`, `title`, `type`, `data`, `withCross`, `timeout`, which are `toastr`'s arguments
+  - `Snackbar`: `isMaintenance`, `onClose`. `ModalDialog`: `blur`. `Tag`: `isDefault`.
+    `OperationsProgressButton`: `percent`, `onOpenPanel`, `onCancelOperation`
+  - `Avatar`: `editAction`. `AvatarEditorDialog` and `ImageEditor`: `maxImageSize`. `RoomLogo`:
+    `isPrivacy`. `ColorPicker`: `forwardedRef`. `DragAndDrop`: `value`, `targetFile`,
+    `forwardedRef`
+  - `Row`: `item`, `contextButtonSpacerWidth`. `RowContent`: `sectionWidth`. `TableHeader`:
+    `sectionWidth`, `onClick`. `TableBody`: `isIndexEditingMode`. `TableRow`: `hideColumns`
+  - `BaseTile`, `FolderTile` and `TemplateTile`: `thumbnailClick`. `FolderTile`: `dragging`,
+    `contextMenuHeader`. `FileTile`: `thumbSize`, `contextButtonSpacerWidth`, `sideColor`.
+    `TemplateTile`: `columnCount`. `TileContainer`: `isDesc`
+  - `InfiniteLoader`: `showSkeleton`, `smallPreview`, `isOneTile`. `SelectionArea`: `itemHeight`
+    in `arrayTypes`
+- **`SearchInput`'s `id` is on the `<input>` alone.** It was set on the outer `<div>` too, so the
+  page held the id twice and a `<label htmlFor>` or a `FieldContainer`'s `labelFor` found the
+  `<div>` first and named nothing. The label now names the field. A selector or a test that
+  found the outer element by `#id` finds the field instead; use `dataTestId` for the block
 - **`Button` keeps a passed `aria-label`, `aria-disabled` and `aria-busy`.** All three were
   overwritten: the name always came from `label`, so an icon-only button could not be named. A
   passed `aria-label` now wins over `label`, which stays the fallback. `isDisabled` and
@@ -216,8 +272,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `aria-label` set to `title`, with or without a picture; the `<img>` inside has `alt=""`
   instead of the fixed `"mcp icon"`, and the letter is hidden, so a screen reader no longer
   reads a bare letter. With an empty `title` the icon is `aria-hidden`
-- **`MainButton.model` is optional with `isDropdown={false}`, and `opened` no longer reaches the DOM.** `opened` was never read and is now deprecated.
-- **`MainButtonMobile` is operable from the keyboard and reports every open and close.** The floating button carries `aria-haspopup="menu"` and `aria-expanded`; the sheet is a `menu` of `menuitem`s that the arrow keys, Home, End, Enter and Escape operate; the alert badge is a button named "Alert" with `withAlertClick`. `onClose` now fires whenever the sheet closes (button, backdrop, item, Escape, Back) and never on opening, regardless of `isOpenButton`; the new `onOpen` reports opening. `isOpenButton` and five other ignored props are deprecated.
+- **`MainButton.model` is optional with `isDropdown={false}`, and `opened` no longer reaches the DOM.** `opened` was never read and is removed, as listed above.
+- **`MainButtonMobile` is operable from the keyboard and reports every open and close.** The floating button carries `aria-haspopup="menu"` and `aria-expanded`; the sheet is a `menu` of `menuitem`s that the arrow keys, Home, End, Enter and Escape operate; the alert badge is a button named "Alert" with `withAlertClick`. `onClose` now fires whenever the sheet closes (button, backdrop, item, Escape, Back) and never on opening; the new `onOpen` reports opening. `isOpenButton` and the other props it ignored are removed, as listed above.
 - **The `QuickActions` strip is a horizontal toolbar.** The arrow keys (mirrored in RTL), Home and End move focus between tiles and scroll the focused tile into view; Tab still visits every tile.
 - **`TimePicker`'s fields are `type="text"` and take translated names.** They were
   `type="search"` and were announced as search fields. New `ariaLabel`, `hoursLabel` and
@@ -295,6 +351,10 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Added
 
+- **`AsideHeader`'s `headerIcons` take a `label`**, the icon button's accessible name. `Aside` and
+  `ModalDialog` pass it on
+- **`RoomIcon` takes `badgeLabel`**, the accessible name of a badge that `onBadgeClick` makes a
+  button
 - **`CategoryItem` takes `className` and `style`**, both on its outer element. It took neither,
   so its variables could only be set on an ancestor
 - **`PortalLogo` takes `dataTestId`**, `portal-logo` by default, on the wrapper or on the
@@ -366,6 +426,65 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`Dropzone`'s full format list is opaque.** Its stylesheet set the list's background and
+  border from `--background-content` and `--border-color`, which nothing defines, so the list was
+  see-through over the area. The list now takes `DropDown`'s own background and border
+- **`FileTile` shows the pointer cursor**, as the other tiles do. It read `--cursor-pointer`,
+  which nothing defines, and fell back to the arrow
+- **Standard props that were declared and dropped now reach the element.** `Avatar` and `Row`
+  put `id` and `style` on their outer element, `TableHeader` puts `style` on the header, and
+  `Navigation` and `Section` hand a passed `ref` their header row and container. `FileInput` puts
+  `name` on its hidden file field instead of the outer `<div>`
+- **`TilesSkeleton`'s `isRooms` widens the columns** to the room tiles' 275px floor. Its rule
+  matched only a descendant of the grid, so it changed nothing
+- **`MainButton`, `Filter` and `TabItem` drop the grey tap flash on touch screens.** `MainButton`
+  read an undefined `--tap-highlight-color`; `Filter` and `TabItem` declared a custom property
+  named `--webkit-tap-highlight-color` instead of setting `-webkit-tap-highlight-color`
+- **A clickable `Tag`, `ImageEditor`'s replace control and `ButtonDelete` take the keyboard.**
+  Each was a `<div>` with a click handler and no tab stop. Each is now `role="button"` in the tab
+  order, pressed with Enter or Space; a disabled or deleted tag stays out of it
+- **`Calendar`'s title opens the month and year views from the keyboard.** It was an `<h2>` that
+  answered the mouse only. When the view changes, the focus moves to the new view's title instead
+  of falling back to the page
+- **`Navigation`'s trail takes the keyboard.** The folder name, the room title and the drop box
+  rows were `<div>`s that answered the mouse only. Each is now `role="button"` in the tab order,
+  pressed with Enter or Space, inside its heading where it has one. The folder name carries
+  `aria-expanded`, the focus moves into the drop box and back, and Escape closes the box
+- **`RoomLogoCoverDialog`'s swatches, glyphs and "without icon" control take the keyboard.** Each
+  was a `<div>` that answered the mouse only, and nothing said which was chosen. Each is now a
+  `role="button"` with `aria-pressed`. A swatch is named by its hex value, a glyph by "Icon" and
+  its place in the row
+- **`HelpButton`'s tooltip opens from the keyboard.** The info icon was a `<div>` that answered the
+  mouse only. While the tooltip opens on click, the icon is a `role="button"` named "Info", and Enter
+  or Space opens it. A passed `aria-label` replaces the name
+- **`Article`'s collapse handle and logo take the keyboard.** Both answered the mouse only. The
+  handle is now a `role="button"`, named "Show menu" while collapsed. The logo, which navigates
+  home, is a `role="link"` named by the product name, followed with Enter
+- **`AvatarEditorDialog`, `RoomLogoCoverDialog` and the filter panel are named by their
+  heading**: `title`, `t("Common:RoomCover")` and `filterHeader`. Each was announced as an
+  unnamed dialog. A passed `aria-label` or `aria-labelledby` still wins
+- **Images beside their own label have an empty `alt`**: the plugin icons of `ContextMenu` and
+  `DropDownItem`, `Dropzone`'s icon, `Selector`'s empty-screen picture, `FileTile`'s thumbnail,
+  `RoomIcon`'s hover image and the burger images of `Navigation` and `Article`. Each was
+  announced by English filler such as "plugin-logo" or "Thumbnail-img"
+- **Logos are named by what they show.** A `RoomIcon` logo is named by `title`, like the
+  initials it replaces, and the logos of `Navigation` and `Article` by the product name as the
+  portal brands it. They read "room icon", "logo" and "burger-logo"
+- **`PortalLogo`'s `alt` defaults to the product name** as the portal brands it, instead of the
+  English "portal logo"
+- **`Calendar`'s month arrows are named in the kit's translations**, "Previous" and "Next"
+- **The kit's own icon-only buttons are named**, in its translations. Each was a focusable button
+  announced only as "button": the crosses of `Tag`, `SelectedItem` and the filter chips
+  ("Remove"), `Textarea`'s copy button ("Copy to clipboard"), the table group menu's cross and
+  info panel toggle ("Close", "Info panel"), the back arrows of `Navigation` and of
+  `ContextMenu`'s mobile submenu ("Back"), the filter panel's clear icon ("Clear filter"), and the
+  pencils and pluses of `Avatar` and `RoomIcon` ("Edit", or "Upload picture" for `Avatar`'s plus)
+- **`RoomLogoCoverDialog`'s custom colour plus and pencil are named** by `t("Common:Color")`, the
+  text already shown above the swatches
+- **Some icon buttons take their name from a prop that was only a tooltip.** `Filter`'s sort
+  button is named by `sortByTitle`, and the table's cog by `TableHeader`'s `settingsTitle`, or
+  "Settings". `Navigation`'s plus is named by `titles.actions`, or "Actions", and its folder
+  button by `titles.contextMenu`, which nothing read, or "More options"
 - **`Avatar`, `RoomType`, `SelectedItem` and `CategoryItem` forward a passed `aria-*` to the
   element with the role**: the avatar's button, the row, the chip and the title link. Each
   dropped every one. A passed `aria-label` wins over `userName`, the row's text, the chip's label

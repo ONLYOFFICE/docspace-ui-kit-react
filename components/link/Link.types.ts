@@ -36,9 +36,6 @@ export type LinkProps = TextProps & {
   type?: LinkType;
   /** Where the address opens, such as `_blank` for a new tab. */
   target?: LinkTarget;
-  /** Ignored. The component reads its text from `children`; this prop is
-   * spread onto the anchor as an unknown attribute and does nothing. */
-  label?: string;
   /** Line drawn under the label at rest, over the stylesheet's `none`. */
   textDecoration?:
     | "none"

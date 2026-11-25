@@ -7,6 +7,8 @@ import { useTheme } from "../../../context/ThemeContext";
 
 import { AsideHeader } from "../../aside";
 import BackButton from "./BackButton";
+import { getProductName } from "../../../utils/product-name";
+import { activateOnButtonKey } from "../../../utils/keyboard-activation";
 
 import styles from "../Article.module.scss";
 
@@ -41,6 +43,17 @@ const ArticleHeader = ({
 
     e.preventDefault();
     window.open("/", "_blank");
+  };
+
+  // The logo navigates, so it is a link to the keyboard: Enter only.
+  const logoLink = {
+    role: "link",
+    tabIndex: 0,
+    onClick: onLogoClick,
+    onAuxClick: onLogoAuxClick,
+    onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => {
+      if (e.key === "Enter") activateOnButtonKey(e, onLogoClick);
+    },
   };
 
   const burgerLogo = getLogoUrl(
@@ -100,9 +113,9 @@ const ArticleHeader = ({
           <img
             src={burgerLogo}
             className="burger-logo"
-            alt="burger-logo"
-            onClick={onLogoClick}
-            onAuxClick={onLogoAuxClick}
+            alt=""
+            aria-label={getProductName()}
+            {...logoLink}
           />
         </div>
       ) : null}
@@ -113,14 +126,13 @@ const ArticleHeader = ({
         {currentDeviceType === DeviceType.tablet ? (
           <img
             className="logo-icon_svg"
-            alt="burger-logo"
+            alt={getProductName()}
             src={logo}
-            onClick={onLogoClick}
-            onAuxClick={onLogoAuxClick}
+            {...logoLink}
           />
         ) : (
-          <div onClick={onLogoClick} onAuxClick={onLogoAuxClick}>
-            <img className="logo-icon_svg" alt="burger-logo" src={logo} />
+          <div {...logoLink}>
+            <img className="logo-icon_svg" alt={getProductName()} src={logo} />
           </div>
         )}
       </div>

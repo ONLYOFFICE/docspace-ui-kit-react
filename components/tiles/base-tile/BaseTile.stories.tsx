@@ -242,11 +242,6 @@ const meta = {
       description:
         "A ref the component clicks on a right-click, before the menu is mounted. It is not attached to anything here.",
     },
-    thumbnailClick: {
-      control: false,
-      description:
-        "Ignored. Nothing in this component reads it; put the handler on `onRoomClick` or on your own `topContent`.",
-    },
   },
   args: {
     onSelect: fn(),

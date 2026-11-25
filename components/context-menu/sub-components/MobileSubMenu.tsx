@@ -76,7 +76,7 @@ const MenuItem = ({
     return isInlinedSvgUrl(item.icon) ? (
       <ReactSVG wrapper="span" className={iconClassName} src={item.icon} />
     ) : (
-      <img src={item.icon} alt="plugin img" className={iconClassName} />
+      <img src={item.icon} alt="" className={iconClassName} />
     );
   };
 

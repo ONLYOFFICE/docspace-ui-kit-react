@@ -145,7 +145,7 @@ export function LabelledTiles() {
         countTilesInRow={3}
         folderHeaderHeight={0}
         defaultHeaderHeight={0}
-        arrayTypes={[{ type: "room", itemHeight: 180, rowGap: 16 }]}
+        arrayTypes={[{ type: "room", rowGap: 16 }]}
         isRooms
         onMove={({ added }) => console.info(added.length)}
       />
@@ -222,8 +222,7 @@ export function ControlledSelection({ ids }: { ids: string[] }) {
   measured size and the gaps in `arrayTypes`. Items that differ in height select the wrong ones.
 - The first selectable element in `itemsContainerClass` gives the size, read at the start of each
   drag. In tile view each group's row height comes from the first element of that group.
-- **A group's row height is measured once and kept** until `viewAs` or `isRooms` changes. The
-  `itemHeight` in `arrayTypes` is not read.
+- **A group's row height is measured once and kept** until `viewAs` or `isRooms` changes.
 - **`added` and `removed` are not deltas.** On each report every selectable element is classified
   afresh: `added` is everything the rectangle covers now, `removed` everything it does not.
 - **Reports come at most once per animation frame**, after a pointer move or a scroll. Several

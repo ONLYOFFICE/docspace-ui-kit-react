@@ -6,7 +6,7 @@ export type AvatarEditorDialogProps = React.AriaAttributes & {
   t: TTranslation;
   /** Puts the dialog on screen; while false it stays mounted but hidden. */
   visible: boolean;
-  /** Text of the dialog's header. It is not translated for you. */
+  /** Text of the dialog's header, and its accessible name. It is not translated for you. */
   title: string;
   /** The picture and its crop, held in your state. The body is empty until `uploadedFile` is set. */
   image: TImage;
@@ -15,9 +15,6 @@ export type AvatarEditorDialogProps = React.AriaAttributes & {
   /** Corner radius of the crop window in pixels, on the editor's 648px canvas.
    * @default 110 */
   editorBorderRadius?: number;
-  /** Ignored. It is handed to the image editor, which does not read it either; check the file's size in `onChangeFile`.
-   * @deprecated */
-  maxImageSize?: number;
   /** Value of `data-testid` on the dialog. */
   dataTestId?: string;
   /** Called on every way out, after the dialog has reset `image` to an empty, centred, unzoomed one. */

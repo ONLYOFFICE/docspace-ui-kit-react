@@ -45,10 +45,12 @@ export type TContextButtonProps = {
   guidAnimationVisible?: boolean;
   /** Called with `false` when the guidance animation is reset or the button unmounts. */
   setGuidAnimationVisible?: (visible: boolean) => void;
-  /** Not read at this level. The component computes its own value from the viewport and the menu header. */
+  /** Keeps the menu from turning into a sheet. Supplied internally, from the viewport and the menu header. */
   ignoreChangeView?: boolean;
   /** Header of the folder's context menu, used where the menu opens as a mobile sheet. */
   contextMenuHeader?: HeaderType;
+  /** Accessible name of the folder button. Without it the button is named "More options". */
+  ariaLabel?: string;
 };
 
 export type TPlusButtonProps = {
@@ -58,8 +60,7 @@ export type TPlusButtonProps = {
    * click only calls `onPlusClick` or `onContextOptionsClick`.
    * @default true */
   withMenu?: boolean;
-  /** Not read at this level. The plus button's icon always gets the id
-   * `header_add-button`. */
+  /** Id of the plus button's icon. Supplied internally as `header_add-button`. */
   id?: string;
   /** Name of the current folder, shown as the heading. It is also the hover
    * tooltip of the folder button, and is added to `tariffBar` as a prop. */
@@ -73,8 +74,7 @@ export type TPlusButtonProps = {
   /** Supplied internally to close the drop box when a menu closes. A value
    * you pass is ignored. */
   onCloseDropBox?: () => void;
-  /** Not read at this level. `addButtonRef` is the ref that reaches the plus
-   * button's wrapper. */
+  /** Ref attached to the plus button's wrapper. Supplied internally from `addButtonRef`. */
   forwardedRef?: React.RefObject<HTMLDivElement | null>;
 };
 
@@ -86,9 +86,10 @@ export type TToggleInfoPanelButtonProps = {
   /** Called when the info panel toggle is clicked. */
   toggleInfoPanel: (e?: React.MouseEvent) => void;
   id?: string;
-  /** Hover tooltips of the info panel toggle and the plus button, the AI chat
-   * button's label, and the warning chip's text and icon. `contextMenu` is not
-   * read. */
+  /** Texts of the header buttons. `infoPanel` and `actions` name the info panel
+   * toggle and the plus, and are their hover tooltips; `contextMenu` names the
+   * folder button. `aiChat` labels the AI chat button, and `warningText` and
+   * `warningIcon` fill the warning chip. */
   titles?: TTitles;
 };
 
@@ -121,6 +122,10 @@ export type TTextProps = {
   isRootFolder: boolean;
   isRootFolderTitle: boolean;
   onClick: () => void;
+  /** Makes the title a keyboard button. */
+  isButton?: boolean;
+  /** Whether the drop box the title opens is open; unset on a title that opens none. */
+  isExpanded?: boolean;
   className?: string;
   /** Text of the small badge after the title. It follows the room title when
    * one is shown, and the folder name otherwise. */
@@ -175,7 +180,7 @@ export type TRowData = [TNavigationItem[], TOnNavigationItemClick, TRowParam];
 
 export type TControlButtonProps = Omit<TToggleInfoPanelButtonProps, "id"> &
   Omit<TPlusButtonProps, "getData" | "className"> &
-  Omit<TContextButtonProps, "getData" | "className" | "id"> & {
+  Omit<TContextButtonProps, "getData" | "className" | "id" | "ariaLabel"> & {
     /** Whether the person may create anything here. It is one of two conditions for the plus button; `isPlusButtonVisible` is the other, and both must hold. */
     canCreate: boolean;
     /** Returns the model of the folder menu. **It is called on every
@@ -183,8 +188,6 @@ export type TControlButtonProps = Omit<TToggleInfoPanelButtonProps, "id"> &
     getContextOptionsFolder: TGetContextMenuModel;
     /** Returns the model of the plus button's menu. It is called on every render of that button. */
     getContextOptionsPlus: TGetContextMenuModel;
-    /** Not read. Nothing in this component or its children destructures it. */
-    isEmptyFilesList?: boolean;
     /** Closes the breadcrumb drop box after the info panel is toggled from inside it. Supplied internally; a value you pass is overwritten. */
     toggleDropBox?: () => void;
     /** Whether the host is the desktop application. It only caps the drop
@@ -202,8 +205,6 @@ export type TControlButtonProps = Omit<TToggleInfoPanelButtonProps, "id"> &
     onNavigationButtonClick?: () => void;
     /** Portal element for the tariff notice. It is cloned with the folder's `title` added as a prop, so the element has to tolerate one. Hidden inside a frame. */
     tariffBar?: React.ReactElement;
-    /** Not read. Nothing in this component or its children destructures it. */
-    isEmptyPage?: boolean;
     /** Rendered as-is at the end of the button row, after the tariff notice. */
     analyzeResponsesButton?: React.ReactNode;
     /** Host controls drawn right before the context button, such as an
@@ -288,14 +289,30 @@ export type TNavigationProps = React.AriaAttributes &
     | "isDesktopClient"
     | "isTabletView"
     | "navigationTitleContainerNode"
+    | "ref"
   > &
-  Omit<TControlButtonProps, "isMobile"> &
+  Omit<
+    TControlButtonProps,
+    | "isMobile"
+    | "isMobileOnly"
+    | "toggleDropBox"
+    | "onCloseDropBox"
+    | "ignoreChangeView"
+    | "id"
+    | "forwardedRef"
+  > &
   Omit<
     TTextProps,
-    "isOpen" | "title" | "className" | "isRootFolderTitle" | "onClick"
+    | "isOpen"
+    | "title"
+    | "className"
+    | "isRootFolderTitle"
+    | "onClick"
+    | "isButton"
+    | "isExpanded"
   > & {
-    /** Not read. Nothing destructures it. */
-    showText: boolean;
+    /** The header row element. */
+    ref?: React.Ref<HTMLDivElement>;
     /** Name of the current folder, shown as the heading. It is also the hover
      * tooltip of the folder button, and is added to `tariffBar` as a prop. */
     title: string;
@@ -307,15 +324,6 @@ export type TNavigationProps = React.AriaAttributes &
      * the room title is clicked. */
     onClickFolder: TOnNavigationItemClick;
 
-    /** Not read. Nothing destructures it. */
-    clearTrash: () => void;
-    /** Not read. Nothing destructures it. */
-    showFolderInfo: () => void;
-    /** Not read. Nothing destructures it. */
-    isCurrentFolderInfo: boolean;
-
-    /** Not read. Nothing destructures it. */
-    isRoom: boolean;
     /** Hides the info panel toggle on a desktop. */
     hideInfoPanel?: boolean;
     /** URL of the logo shown below the desktop breakpoint while `withLogo` is

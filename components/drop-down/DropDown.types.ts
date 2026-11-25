@@ -16,8 +16,6 @@ export interface DropDownProps extends React.AriaAttributes {
    * not the current value.
    */
   clickOutsideAction?: (e: Event, open: boolean) => void;
-  /** Ignored. Nothing reads this prop. */
-  disableOnClickOutside?: boolean;
   /** Called once each time the dropdown opens. */
   enableOnClickOutside?: () => void;
   /** Side the menu extends to: `right` lines it up with the anchor's start
@@ -62,8 +60,6 @@ export interface DropDownProps extends React.AriaAttributes {
    * @default true
    */
   withBackdrop?: boolean;
-  /** Ignored. Nothing reads this prop. */
-  columnCount?: number;
   /**
    * Keeps children whose `disabled` prop is true in the list. They are dropped
    * by default, together with a separator that ends up first or last.
@@ -88,8 +84,6 @@ export interface DropDownProps extends React.AriaAttributes {
    * @default false
    */
   fixedDirection?: boolean;
-  /** Ignored. Nothing reads this prop. */
-  withBlur?: boolean;
   /** Horizontal shift from the anchor's edge, in pixels. Read only in the
    * default portal mode. */
   offsetX?: number;

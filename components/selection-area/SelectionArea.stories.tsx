@@ -246,7 +246,6 @@ export const Default: Story = {
     arrayTypes: [
       {
         type: "item",
-        itemHeight: 150,
         rowGap: 16,
       },
     ],
@@ -298,7 +297,7 @@ export const Default: Story = {
   itemClass="item-name"
   onMove={handleMove}
   countTilesInRow={4}
-  arrayTypes={[{ type: "item", itemHeight: 150, rowGap: 16 }]}
+  arrayTypes={[{ type: "item", rowGap: 16 }]}
 />`,
       },
     },
@@ -385,7 +384,7 @@ export const RightToLeft: Story = {
     itemClass="item-name"
     onMove={handleMove}
     countTilesInRow={4}
-    arrayTypes={[{ type: "item", itemHeight: 150, rowGap: 16 }]}
+    arrayTypes={[{ type: "item", rowGap: 16 }]}
   />
 </div>`,
       },
@@ -413,7 +412,7 @@ export const CssCustomization: Story = {
     folderHeaderHeight: 0,
     defaultHeaderHeight: 0,
     countTilesInRow: 4,
-    arrayTypes: [{ type: "item", itemHeight: 150, rowGap: 16 }],
+    arrayTypes: [{ type: "item", rowGap: 16 }],
     isRooms: false,
   },
   play: async () => {
@@ -453,7 +452,7 @@ export const CssCustomization: Story = {
     itemClass="item-name"
     onMove={handleMove}
     countTilesInRow={4}
-    arrayTypes={[{ type: "item", itemHeight: 150, rowGap: 16 }]}
+    arrayTypes={[{ type: "item", rowGap: 16 }]}
   />
 </div>`,
       },

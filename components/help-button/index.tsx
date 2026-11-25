@@ -7,6 +7,8 @@ import InfoReactSvg from "../../assets/info.react.svg";
 import { IconButton } from "../icon-button";
 import { Tooltip } from "../tooltip";
 import { pickAriaProps } from "../../utils/aria-props";
+import { useCommonTranslation } from "../../utils/i18n";
+import { activateOnButtonKey } from "../../utils/keyboard-activation";
 
 import type { HelpButtonProps } from "./HelpButton.types";
 
@@ -16,7 +18,6 @@ const HelpButton = (props: HelpButtonProps) => {
   const {
     id,
     className = "icon-button",
-    iconName,
     size = 12,
     color,
     dataTip,
@@ -38,6 +39,7 @@ const HelpButton = (props: HelpButtonProps) => {
     iconNode,
   } = props;
 
+  const t = useCommonTranslation();
   const aria = pickAriaProps(props);
   const currentId = id || uniqueId();
   const ref = React.useRef(null);
@@ -52,6 +54,29 @@ const HelpButton = (props: HelpButtonProps) => {
   }, [getContent, tooltipContent]);
 
   const useGlobalTooltip = contentString !== null;
+
+  // Both tooltips open on a click on their anchor, which the keyboard can
+  // give: the shared one's anchor is the icon, the local one's its SVG. A
+  // tooltip that opens on hover has no such route, so its icon stays as it is.
+  const isKeyboardButton =
+    !!(getContent || tooltipContent) && (useGlobalTooltip || openOnClick);
+
+  const openFromKey = (e: React.KeyboardEvent<HTMLDivElement>) =>
+    activateOnButtonKey(e, ({ currentTarget }) => {
+      const anchor = useGlobalTooltip
+        ? currentTarget
+        : (currentTarget.querySelector("svg") ?? currentTarget);
+      anchor.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+  const keyboardProps = isKeyboardButton
+    ? {
+        role: "button",
+        tabIndex: 0,
+        onKeyDown: openFromKey,
+        ariaLabel: t("Info"),
+      }
+    : {};
 
   const globalTooltipProps = useGlobalTooltip
     ? {
@@ -92,11 +117,11 @@ const HelpButton = (props: HelpButtonProps) => {
         </div>
       ) : (
         <IconButton
+          {...keyboardProps}
           {...aria}
           id={currentId}
           className={componentClass}
           isClickable={isClickable}
-          iconName={iconName}
           iconNode={iconNode ?? <InfoReactSvg />}
           size={size}
           color={color}

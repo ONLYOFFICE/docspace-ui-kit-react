@@ -132,6 +132,7 @@ const ControlButtons = ({
         getData={getContextOptionsFolder}
         withMenu={withMenu}
         title={title}
+        ariaLabel={titles?.contextMenu}
         isTrashFolder={isTrashFolder}
         isMobile={isMobile || false}
         isMobileOnly={isMobileOnly || false}
