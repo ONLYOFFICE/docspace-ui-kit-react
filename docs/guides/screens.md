@@ -12,7 +12,7 @@ hex values.
 
 ```
 +--------------+------------------------------------------------------+
-| Article      | Section header (70px): title, actions, info toggle   |
+| Article      | Section header (69px): title, actions, info toggle   |
 | 252px        +------------------------------------------------------+
 | nav          | toolbar (32px): + New | FilterInput search | filter  |
 |              |                 sort | view                          |
@@ -23,13 +23,25 @@ hex values.
 +--------------+------------------------------------------------------+
 ```
 
-- **Left navigation (`Article`)**: 252px wide, light grey surface, 1px right
-  border, 20px side padding. Top row: `PortalLogo` + collapse `IconButton`.
-  Items 36px tall: 16px icon + 13-14px semi-bold label; the active item is a
-  grey pill (radius 3px) with accent-blue icon and label; sub-items indent 24px.
-  Group captions ("Apps") 12px grey; `Badge` "BETA" as a violet pill. Footer:
-  a 40px light-blue "Developer Tools" bar, then a 72px user block - `Avatar`
-  40px, name, `ContextMenuButton` (its menu opens upward).
+- **Left navigation (`Article`)**: 252px wide, light grey surface (`#F8F9F9`),
+  1px right border (`#ECEEF1`), 20px side padding. Top row 24px: `PortalLogo`
+  (24px tall) + collapse `IconButton` (20px, stroke `#A3A9AE`), 22px above the
+  first item. Items 36px tall with no gap between them, padding 0 12px: 16px
+  icon (`#657077`) + 8px gap + 13px/600 label (`#555F65`); the active item is
+  a grey pill (radius 3px) with accent icon and label; sub-items indent 24px
+  (padding-start 36px). Group captions ("Apps") 12px/600 `#555F65` in a 28px
+  row, padding 8px 12px 4px, 16px above. `Badge` "BETA" as a violet pill
+  (11px/800, `#533ED1`); an unread counter on an item is the same `Badge` in
+  the accent colour. Desktop uses the 16px **Navigation** icons. Footer: a 40px
+  "Developer Tools" bar (padding 12px 16px, radius 6px, accent at 15%, 12px/600
+  `#555F65`), then a 73px user block on `#F3F4F4` with a top border, padding
+  16px 20px - `Avatar` size `base` (40px), 12px gap, name 13px/600, and a
+  `ContextMenuButton` in `#A3A9AE` (its menu opens upward).
+- **Tablet (768)**: the panel collapses to 60px - logo mark, toggle, then
+  icon-only items 40x40 on a 44px step with the 20px icon set; the active item
+  is `#DFE2E3`; an unread counter becomes an 8px accent dot on the icon.
+- **Mobile (375)**: no panel. A 48px top bar, padding 0 16px, no border:
+  burger (20px), logo (24px tall, centred), `Avatar` 32px.
 - The tree, exactly as the owner sees it with Rooms open
   (`screenshots/97-room-invite-dialog.png`). Copy it as written - entries,
   order, nesting and the gaps between groups - rather than from memory:
@@ -94,18 +106,29 @@ hex values.
 
 - **Content** starts 20px right of the nav (x=272) with a 20px right gutter.
 
-## Section header (70px)
+## Section header
 
-- Title: `Heading`, ~20px bold. Inside a folder or room, `Navigation`: back
+- Height: desktop 69px, tablet 61px, mobile 53px (padding 0 16px).
+- Title: `Heading`, bold - 18px on desktop and mobile, 21px on tablet. Inside a folder or room, `Navigation`: back
   arrow, title, caret, `ContextMenuButton`.
-- Right side: a light-blue "AI Chat" button and the info-panel `IconButton`
-  toggle at the far right edge.
+- Right side: a light-blue "AI Chat" button (32px, padding 6px 10px, radius
+  6px, the buttons colour at 10% behind 13px/600 text in the buttons colour,
+  16px AI Chat icon) and, on desktop only, the info-panel `IconButton` toggle
+  (16px, `#A3A9AE`) at the far right edge.
 
 ## Lists: toolbar + table
 
 - Toolbar 32px: primary `MainButton` / `Button` "+ New", "+ New room",
   "+ Invite" (32px, accent blue), then `FilterInput` (search fills the width),
-  then three 32px square `IconButton`s - filter, sort, view switch - 8px gaps.
+  then three 32px square `IconButton`s - filter, sort, view switch - 8px gaps
+  (1px `#D0D5DA` border, radius 3px, icons `#A3A9AE`). Tablet drops the view
+  switch; mobile drops the "+ New" button too and uses a 48px round accent
+  button 16px from the bottom-right corner instead.
+- Forms and Rooms add a groups row 16px under the toolbar (34px): the selected
+  group ("All spaces": accent at 15%, accent 13px/600 text, radius 6px, padding
+  7px 12px), "+ Add group" (`#F8F9F9`, `#657077` text and plus) and, on the
+  right, a 40x30 group-settings button (`#F8F9F9`, radius 3px, `#A3A9AE` icon).
+  The list or tiles begin 13px under it.
 - `TableContainer` / `TableHeader` / `TableRow`: header labels 12-13px
   semi-bold grey with column resize ticks and a settings gear at the end; rows
   48px with a 1px light divider. First cell: 32px file icon / `RoomLogo` +
@@ -121,9 +144,36 @@ hex values.
   `TableGroupMenu`.
 - The tile view uses `FileTile` / `FolderTile` / `RoomTile` in a
   `TileContainer`; `Tag`s on rooms are outlined grey.
-- Files, Rooms and Forms show a strip of create tiles (~184x146, light grey,
-  radius 6-12px) above the toolbar - **not a kit component**; build it from
-  plain boxes if needed. Read-only roles do not see it.
+- Files, Rooms and Forms show a strip of create tiles above the toolbar: the
+  kit's `QuickActions` (Forms: Form space, Space template, Template gallery,
+  AI Chat), with `onClose` so its close control shows. Tiles `#F8F9F9`, radius
+  12px, 8px apart, 4px between icon and 13px label. Desktop: 184x147, padding
+  22px, 81x75 icons, tiles centred, 23px under the header. Tablet and mobile:
+  184x120 (mobile 152x120), padding 12px, 48x45 icons, the strip spans the
+  content edge to edge with 0 16px inside and the tiles start at the left, 4px
+  under the header. 16px below the strip. Read-only roles do not see it.
+
+## Forms section (approved reference)
+
+The Forms page as approved on 25 November 2026 against production; the three
+screens (1440, 768, 375) are on the "Страница Форм" canvas.
+
+- Order: header, `QuickActions`, toolbar, groups row, space tiles (above).
+- **Space tile** (Room Thumbnail spec): height 104px (production draws 106px),
+  padding 16px on every side, 1px `#D0D5DA` border, radius 12px, white. Header
+  row 40px: `RoomIcon` 32px (radius 6px, white initials, globe badge for a
+  public space), 12px, the name 15px/600/20px on at most two lines then an
+  ellipsis, a pin (`#A3A9AE`, 24x32 hit area) on pinned spaces, and a
+  `ContextMenuButton`. `Tags` at the bottom; tags that do not fit collapse
+  into "+N". A counter `Badge` (11px/800) sits on the top-right corner with a
+  2px white ring - accent, or `#A3A9AE` when the space is muted.
+- Grid gap 16px: desktop (1440) 3 columns, tablet 2, mobile 1 full width.
+- States are interactive, not drawn: hover `#F3F4F4`; the name underlines on
+  its own hover; hovering the logo swaps it for a checkbox on a white 32x32
+  plate; selected keeps the checkbox checked on `#F3F4F4`; keyboard focus adds
+  an accent border.
+- The Forms navigation item carries the sum of unread updates of the spaces
+  that are not muted.
 
 ## Menus
 
