@@ -58,6 +58,7 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     isPaymentDateValid,
     isGracePeriod,
     isNotPaidPeriod,
+    isGracePeriodUnrestricted,
     gracePeriodEndDate,
     delayDaysCount,
     paymentDate,
@@ -203,23 +204,35 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
   const planDescription = () => {
     if (isFreeTariff) return;
 
-    if (isGracePeriod)
+    if (isGracePeriod) {
+      const gracePeriodValues = {
+        fromDate: paymentDate,
+        byDate: gracePeriodEndDate,
+        delayDaysCount,
+        productName: getBrandName("ProductName"),
+      };
+      const gracePeriodComponents = {
+        1: <Text as="span" fontWeight={600} />,
+      };
+
       return (
         <Text fontSize="14px" lineHeight="16px">
-          <CommonTrans
-            i18nKey="GracePeriodActivatedNotice"
-            values={{
-              fromDate: paymentDate,
-              byDate: gracePeriodEndDate,
-              delayDaysCount,
-              productName: getBrandName("ProductName"),
-            }}
-            components={{
-              1: <Text as="span" fontWeight={600} />,
-            }}
-          />
+          {isGracePeriodUnrestricted ? (
+            <CommonTrans
+              i18nKey="GracePeriodAwaitingPaymentNotice"
+              values={gracePeriodValues}
+              components={gracePeriodComponents}
+            />
+          ) : (
+            <CommonTrans
+              i18nKey="GracePeriodActivatedNotice"
+              values={gracePeriodValues}
+              components={gracePeriodComponents}
+            />
+          )}
         </Text>
       );
+    }
 
     if (isPaidPeriod && isPaymentDateValid && !isNonProfit)
       return (
