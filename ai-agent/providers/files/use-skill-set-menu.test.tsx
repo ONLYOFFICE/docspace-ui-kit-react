@@ -35,7 +35,7 @@ describe("useSkillSetMenu: the Skill sets of the agent's slash menu", () => {
     ).not.toThrow();
   });
 
-  it("gives an Agent manager the picker and a disconnect saved to the agent", () => {
+  it("gives an Agent manager the agent's skill set selector and a disconnect saved to the agent", () => {
     const onManage = vi.fn();
     const onSkillRoomsChange = vi.fn();
     const { menu, onPickContextRooms } = menuFor({
@@ -43,9 +43,14 @@ describe("useSkillSetMenu: the Skill sets of the agent's slash menu", () => {
       onSkillRoomsChange,
     });
 
-    expect(menu.onPickContextRooms).toBe(onPickContextRooms);
+    // Both "Manage skill sets..." open the host's selector of the agent's
+    // skill sets, not the chat's own picker.
     expect(menu.hideContextRoomDisconnect).toBe(false);
-    expect(menu.onManageSkillSets).toBe(onManage);
+    menu.onPickContextRooms?.();
+    menu.onManageSkillSets?.();
+    expect(onPickContextRooms).not.toHaveBeenCalled();
+    expect(onManage).toHaveBeenCalledTimes(2);
+    expect(onManage).toHaveBeenCalledWith("skills");
 
     menu.onDisconnectContextRoom?.(CONTEXT_ROOM_CLOUD, "7");
     expect(onSkillRoomsChange).toHaveBeenCalledTimes(1);

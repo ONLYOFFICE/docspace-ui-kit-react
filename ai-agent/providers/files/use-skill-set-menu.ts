@@ -7,14 +7,14 @@ import { CONTEXT_ROOM_CLOUD } from "../context-room/ContextRoomSync";
 
 /** The widget options behind the Skill sets of the composer's slash menu. */
 export type SkillSetMenuOptions = {
-  /** Opens the Instructions room picker ("Manage skill sets..."). */
+  /** The slash menu's "Manage skill sets...": the room picker, or the owner's. */
   onPickContextRooms: (() => void) | undefined;
   /** Hears a set disconnected from its row. */
   onDisconnectContextRoom:
     ((cloud: string, roomId: string) => void) | undefined;
   /** Hides the bin of every set. */
   hideContextRoomDisconnect: boolean;
-  /** The "+" menu's "Manage skill sets...": the owner's settings. */
+  /** The "+" menu's "Manage skill sets...": the owner's room picker. */
   onManageSkillSets: (() => void) | undefined;
 };
 
@@ -25,10 +25,10 @@ export type SkillSetMenuOptions = {
  *   gets the Instructions room picker and the disconnect callback, which has
  *   nothing to save.
  * - Inside an agent the sets are its settings. One who may change them (an
- *   Agent manager, `onManage` set) gets the picker and the disconnect
- *   callback, which hands the removed set to the agent
- *   (`onSkillRoomsChange`), and the "+" menu's "Manage skill sets..." opens
- *   the agent's form.
+ *   Agent manager, `onManage` set) gets the disconnect callback, which
+ *   hands the removed set to the agent (`onSkillRoomsChange`), and both
+ *   "Manage skill sets..." (the slash menu's and the "+" menu's) open the
+ *   host's selector of the agent's skill sets (`onManage("skills")`).
  * - A Member (`onManage` null) gets neither: no "Manage skill sets...", no
  *   bin and no callback.
  */
@@ -39,7 +39,12 @@ export const useSkillSetMenu = ({
   sourcesManager: AiChatSourcesManager | null | undefined;
   onPickContextRooms: () => void;
 }): SkillSetMenuOptions => {
-  const locked = !!sourcesManager && !sourcesManager.onManage;
+  const manage = sourcesManager?.onManage ?? null;
+  const locked = !!sourcesManager && !manage;
+  const onManageSkillSets = React.useMemo(
+    () => (manage ? () => manage("skills") : undefined),
+    [manage],
+  );
   const onSkillRoomsChange = sourcesManager?.onSkillRoomsChange;
 
   const onDisconnectContextRoom = React.useCallback(
@@ -51,9 +56,11 @@ export const useSkillSetMenu = ({
   );
 
   return {
-    onPickContextRooms: locked ? undefined : onPickContextRooms,
+    onPickContextRooms: locked
+      ? undefined
+      : (onManageSkillSets ?? onPickContextRooms),
     onDisconnectContextRoom: locked ? undefined : onDisconnectContextRoom,
     hideContextRoomDisconnect: locked,
-    onManageSkillSets: sourcesManager?.onManage ?? undefined,
+    onManageSkillSets,
   };
 };

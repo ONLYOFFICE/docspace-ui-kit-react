@@ -794,13 +794,20 @@ const AiAgentProviders = ({
 
   // The slash menu's Knowledge bases follow the same owner. In an AI project
   // they are saved with it, so a base cannot be dropped from the chat alone
-  // and "Manage knowledge bases" opens the project's settings - or is left
-  // out for a user who may not change them. An ordinary chat picks its own
+  // and "Manage knowledge bases" opens the project's selector of them - or
+  // is left out for a user who may not change them. An ordinary chat picks its own
   // in the room selector.
   const sourcesOwned = !!sourcesManager;
-  const onManageKnowledge = sourcesManager
-    ? (sourcesManager.onManage ?? undefined)
-    : onPickKnowledgeRooms;
+  const manageSources = sourcesManager?.onManage ?? null;
+  const onManageKnowledge = useMemo(
+    () =>
+      sourcesManager
+        ? manageSources
+          ? () => manageSources("knowledge")
+          : undefined
+        : onPickKnowledgeRooms,
+    [sourcesManager, manageSources, onPickKnowledgeRooms],
+  );
 
   // Platform adapter passed downstream. Its `file` adapter is wired to the
   // host's save handler, and it tracks the host locale/theme internally (the
@@ -1284,8 +1291,9 @@ const AiAgentProviders = ({
       hideKnowledgePicker: knowledgePickerHidden,
       // The "+" menu's Skill sets open the slash menu's skill list: the
       // connected sets as groups with their skills, a bin per set and
-      // "Manage skill sets...". Inside an agent that row opens the agent's
-      // form for those who may change it (the slash menu's own opens the
+      // "Manage skill sets...". Inside an agent that row, as the slash
+      // menu's own, opens the host's selector of the agent's skill sets for
+      // those who may change it (an ordinary chat's opens the
       // Instructions room picker, `onPickContextRooms`); a member who may
       // not gets neither the row nor the bins.
       composerSkillList: true,

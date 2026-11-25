@@ -50,6 +50,7 @@ const CheckboxPure = ({
   isIndeterminate = false,
   isDisabled,
   name,
+  inputId,
   // Goes on the input, the focusable element; this used to default to -1,
   // which took the whole control out of the tab order.
   tabIndex = 0,
@@ -102,6 +103,7 @@ const CheckboxPure = ({
       data-testid={dataTestId ?? "checkbox"}
     >
       <input
+        id={inputId}
         className={styles.hiddenInput}
         name={name}
         type="checkbox"
