@@ -32,9 +32,9 @@ type CloudsStore = ReturnType<typeof useStores>["useCloudsStore"];
  *   "Manage sources..." to connect one more until the library's limit.
  *
  * Inside an agent its knowledge bases are its settings: nobody removes one
- * from the chat, and "Manage knowledge bases..." opens the agent's form
- * (`sourcesManager.onManage`), or is left out for a user who may not change
- * it. The data sources stay the user's own there.
+ * from the chat, and "Manage knowledge bases..." opens the host's selector
+ * of the agent's knowledge bases (`sourcesManager.onManage("knowledge")`),
+ * or is left out for a user who may not change it. The data sources stay the user's own there.
  */
 export const useComposerSourceLists = ({
   useCloudsStore,
@@ -58,7 +58,9 @@ export const useComposerSourceLists = ({
    * left out when the user may not change them. `null` for an ordinary
    * chat, which picks its own rooms.
    */
-  sourcesManager?: { onManage: (() => void) | null } | null;
+  sourcesManager?: {
+    onManage: ((kind: "skills" | "knowledge") => void) | null;
+  } | null;
 }): {
   composerKnowledge: ComposerMenuItem[];
   composerDataSources: ComposerMenuItem[];
@@ -87,7 +89,11 @@ export const useComposerSourceLists = ({
     [t, i18n.language],
   );
 
-  const onManageOwned = sourcesManager?.onManage ?? null;
+  const manage = sourcesManager?.onManage ?? null;
+  const onManageOwned = React.useMemo(
+    () => (manage ? () => manage("knowledge") : null),
+    [manage],
+  );
   const owned = !!sourcesManager;
 
   const composerKnowledge = React.useMemo(() => {
@@ -105,7 +111,7 @@ export const useComposerSourceLists = ({
             ),
       }));
     // No base can be picked while knowledge search is off, not even
-    // through the agent's form.
+    // through the agent's selector.
     const onManage = knowledgePickerHidden
       ? null
       : owned
