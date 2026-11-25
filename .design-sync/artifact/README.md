@@ -154,6 +154,15 @@ enumerable: false })`).
   into the canvas and declare each in its own `@font-face` (family
   `Open Sans`, weights 300-800). With only the Latin file, Russian and every
   other non-Latin text silently falls back to a system font.
+- **`RoomIcon` initials are dark unless you set them.** The title reads
+  `var(--room-icon-text-color, #333)`; production sets it to `#fff`. Set it on
+  a wrapper (or colour the initials white), or a coloured tile gets dark
+  letters.
+- **`RoomIcon` draws its initials in an element with the global class
+  `room-title`.** A page class of the same name restyles the initials (size,
+  clamp, underline). Name your own classes differently.
+- **Counters and "BETA" are `Badge`** (11px, weight 800): a hand-made pill
+  with a guessed line height sets the digits below centre.
 
 ## Screens
 
