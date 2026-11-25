@@ -15,7 +15,8 @@ vi.mock("react-device-detect", async (importOriginal) => {
   };
 });
 import styles from "./DropDown.module.scss";
-import { DropDownItem } from "../drop-down-item";
+import { DropDownItem, type DropDownItemProps } from "../drop-down-item";
+import { markAsDropDownItem } from "../../utils/drop-down-item-mark";
 import { DropDown } from ".";
 
 const baseProps = {
@@ -195,6 +196,33 @@ describe("<DropDown />", () => {
 
     expect(screen.getByTestId("own-row").tagName).toBe("BUTTON");
     expect(screen.getByText("First")).toBeInTheDocument();
+  });
+
+  it("highlights a marked DropDownItem wrapper and keeps its markup", () => {
+    const LabelledItem = markAsDropDownItem((props: DropDownItemProps) => (
+      <DropDownItem {...props} label={`${props.label} (wrapped)`} />
+    ));
+
+    render(
+      <DropDown {...baseProps} open maxHeight={200}>
+        {[
+          <LabelledItem key="a" label="First" />,
+          <LabelledItem key="b" label="Second" />,
+        ]}
+      </DropDown>,
+    );
+
+    fireEvent.keyDown(window, { key: "ArrowDown", code: "ArrowDown" });
+
+    const focused = ["First (wrapped)", "Second (wrapped)"].filter(
+      (text) =>
+        screen
+          .getByText(text)
+          .closest("[data-focused]")
+          ?.getAttribute("data-focused") === "true",
+    );
+
+    expect(focused).toHaveLength(1);
   });
 
   it("doesn't handle keyboard events when enableKeyboardEvents is false", () => {

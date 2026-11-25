@@ -665,8 +665,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   submenu of `ContextMenu` shows an item's `iconNode` as well
 - **`DropDown`'s virtual list keeps the markup of a child of its own.** With `maxHeight` every
   child was rendered again as a `DropDownItem` built from its props, so a component of your own
-  lost its markup. A `DropDownItem` is still drawn that way; any other child is placed in its
-  row as it is
+  lost its markup. A `DropDownItem` is still drawn that way, and a component marked with
+  `markAsDropDownItem` keeps its own markup and still takes the keyboard highlight; any other
+  child is placed in its row as it is
 - **An open `DropDown` takes only the arrows and Enter from the page.** Its virtual list, with
   `maxHeight` and keyboard navigation on, prevented the default of every key press on the page
   before looking at the key, so a text field elsewhere took no characters and Tab did not move.
