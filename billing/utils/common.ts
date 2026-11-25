@@ -1,4 +1,5 @@
 import { Duration } from "luxon";
+import { TariffState } from "@onlyoffice/docspace-api-sdk";
 
 import { isLanguageRtl } from "../../providers/theme/rtl-utils";
 import {
@@ -193,3 +194,26 @@ export const getCurrencySymbol = (
     return currency;
   }
 };
+
+export type TTariffStateInput =
+  | {
+      state?: number;
+      restricted?: boolean;
+    }
+  | null
+  | undefined;
+
+export const getIsGracePeriod = (tariff: TTariffStateInput) =>
+  tariff?.state === TariffState.Delay;
+
+export const getIsTariffRestricted = (tariff: TTariffStateInput) => {
+  if (!tariff) return false;
+  if (typeof tariff.restricted === "boolean") return tariff.restricted;
+
+  return (
+    tariff.state === TariffState.Delay || tariff.state === TariffState.NotPaid
+  );
+};
+
+export const getIsGracePeriodRestricted = (tariff: TTariffStateInput) =>
+  getIsGracePeriod(tariff) && getIsTariffRestricted(tariff);

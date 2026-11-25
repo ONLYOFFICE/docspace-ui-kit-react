@@ -2,7 +2,6 @@ import { makeAutoObservable, runInAction } from "mobx";
 import {
   type PaymentApi,
   type PortalQuotaApi,
-  type Tariff,
   type Quota,
   PaymentMethodStatus,
 } from "@onlyoffice/docspace-api-sdk";
@@ -13,10 +12,19 @@ import {
   isValidDate,
   now,
 } from "../../utils/date";
-import { daysUntil } from "../utils/common";
+import {
+  daysUntil,
+  getIsGracePeriod,
+  getIsGracePeriodRestricted,
+  getIsTariffRestricted,
+} from "../utils/common";
 import { TOTAL_SIZE } from "../constants";
 import { isDocsConnectService } from "../utils/docs-connect";
-import type { TCustomerInfo, TWalletServiceQuota } from "../types";
+import type {
+  TCustomerInfo,
+  TPortalTariff,
+  TWalletServiceQuota,
+} from "../types";
 
 class CurrentTariffStatusStore {
   private portalQuotaApi: PortalQuotaApi;
@@ -25,7 +33,7 @@ class CurrentTariffStatusStore {
 
   private abortControllers: AbortController[] = [];
 
-  portalTariffStatus: Tariff | null = null;
+  portalTariffStatus: TPortalTariff | null = null;
 
   private _walletQuotas: Quota[] = [];
 
@@ -78,8 +86,7 @@ class CurrentTariffStatusStore {
   };
 
   get isGracePeriod() {
-    // TariffState.Delay = 2
-    return (this.portalTariffStatus?.state as unknown as number) === 2;
+    return getIsGracePeriod(this.portalTariffStatus);
   }
 
   get isPaidPeriod() {
@@ -90,6 +97,18 @@ class CurrentTariffStatusStore {
   get isNotPaidPeriod() {
     // TariffState.NotPaid = 3
     return (this.portalTariffStatus?.state as unknown as number) === 3;
+  }
+
+  get isRestricted() {
+    return getIsTariffRestricted(this.portalTariffStatus);
+  }
+
+  get isGracePeriodRestricted() {
+    return getIsGracePeriodRestricted(this.portalTariffStatus);
+  }
+
+  get isGracePeriodUnrestricted() {
+    return this.isGracePeriod && !this.isRestricted;
   }
 
   get customerId() {
@@ -275,7 +294,7 @@ class CurrentTariffStatusStore {
 
       if (!res?.data?.response) return;
 
-      const tariff = res.data.response as unknown as Tariff;
+      const tariff = res.data.response as unknown as TPortalTariff;
 
       // After an await, so outside the action makeAutoObservable made of this
       // method; MobX strict mode wants every write wrapped.

@@ -3,6 +3,7 @@ import type {
   Balance,
   CustomerInfoDto,
   QuotaDto,
+  Tariff,
 } from "@onlyoffice/docspace-api-sdk";
 
 /** Feature with a numeric value (e.g. manager count, storage size). */
@@ -48,6 +49,10 @@ export type TWalletServiceQuota = QuotaDto & { serviceName?: string };
 export type TCustomerInfo = CustomerInfoDto & {
   paymentMethodType?: string | null;
   isDelayedPaymentMethod?: boolean;
+};
+
+export type TPortalTariff = Tariff & {
+  restricted?: boolean;
 };
 
 export type TServiceFeatureWithPrice = TNumericPaymentFeature & {
