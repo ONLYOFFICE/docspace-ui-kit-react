@@ -100,6 +100,27 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `ContextRoomSync` connects each offered room that holds skills and `ContextRoomWatcher`
   follows every connected room on its own (one losing its skills is disconnected alone)
 - `@onlyoffice/ai-chat` peer requirement raised to `^1.0.2`
+- **The AI chat's settings rows and clarifying questions are opt-in on `AiAgentProviders`.**
+  `@onlyoffice/ai-chat` 1.0.2-progress.75 adds "Set up Web search..." to the composer's "+"
+  menu, "Add model..." to the model picker, and an `ask_user_question` tool that pauses a round
+  on a question panel. A host that passes nothing gets none of them: the rows are hidden and
+  the tool is not sent. `canManageAiSettings` shows both rows to a user who may open the
+  portal's AI settings and sends each to its page there
+  (`/portal-settings/ai-settings/web-search`, `.../ai-models`) through `window.DocSpace.navigate`,
+  not to the library's own settings page or dialog; `askUserQuestions` lets the model ask, and
+  is off in the analyze mode whatever the host says. `@onlyoffice/ai-chat` peer requirement
+  raised to `>=1.0.2-progress.75`
+- **A picture of the AI chat opens in `MediaViewer`, not in the chat library's own viewer.** An
+  attachment's chip, a sent message's thumbnail, a generated image and an image a tool returned
+  open the kit's media viewer with zoom, rotation and the chat's download, and none of the
+  actions of a file. The viewer is loaded with the first picture opened. It needs the host's
+  `Common` translations the media viewer reads, and `Common:Image` for a picture with no name
+- **The AI chat no longer passes `Common:EnableWebSearchInBilling` to the chat library.** The
+  library dropped the switched-off web search toggle the string labelled, and with it the
+  `EnableWebSearch` key; a host may delete the string
+- **The reasoning depth after the model's name in the AI chat composer is muted.** It is drawn
+  in regular weight and the colour of a placeholder (`--text-tertiary`); in the light theme it
+  had the colour and the weight of the name
 - **`AiAgentProviders`' `entityId` is the AI project the chat is open in, `contextEntityId` the
   location.** With the AI agents gone, threads are global per user and nothing but a project
   scopes the chat; the folder or room the user is in goes in `contextEntityId`, which the AI
