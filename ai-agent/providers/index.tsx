@@ -283,6 +283,13 @@ type AiAgentProvidersProps = {
    */
   canManageAiSettings?: boolean;
   /**
+   * Whether the model may ask the user a clarifying question: the round
+   * pauses and a panel with the question takes the composer's place. Off by
+   * default, so a host that does not say keeps rounds that never pause; in
+   * the analyze mode it is off whatever the host says.
+   */
+  askUserQuestions?: boolean;
+  /**
    * Fired when an opened thread's persisted context settles: the agent
    * entity the conversation last ran against, or `null` for a plain
    * conversation. Not fired while the value is unknown (fetch in flight,
@@ -676,6 +683,7 @@ const AiAgentProviders = ({
   onProfilePickerOpen,
   formatChatError,
   canManageAiSettings = false,
+  askUserQuestions = false,
   onThreadContextChange,
   composerHeader,
   composerDisabled,
@@ -1264,6 +1272,7 @@ const AiAgentProviders = ({
       dropdownNavigation: isMobile ? "drilldown" : "flyout",
       formatChatError,
       ...getSettingsEntryConfig(canManageAiSettings),
+      disableAskUserTool: !askUserQuestions || analyzeActive,
       // Hide "Always allow" only for generate tools (matched by full name).
       hideToolAllowAlways: GENERATE_TOOL_NAMES,
       onToolCallApproveResult,
@@ -1362,6 +1371,7 @@ const AiAgentProviders = ({
       isMobile,
       formatChatError,
       canManageAiSettings,
+      askUserQuestions,
       onToolCallApproveResult,
       onDropFiles,
       resolvedSuggestions,
