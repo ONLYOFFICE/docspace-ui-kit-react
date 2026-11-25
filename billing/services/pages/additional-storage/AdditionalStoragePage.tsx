@@ -72,7 +72,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
     storageExpiryDate = "",
     hasScheduledStorageChange,
     previousStoragePlanSize,
-    isGracePeriod,
+    isGracePeriodRestricted,
     hasStorageSubscription = false,
     isDelayedPaymentMethod,
     fetchPortalTariff,
@@ -107,7 +107,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
   }, [previousStoragePlanSize]);
 
   const openUpgradeDialog = () => {
-    if (isGracePeriod) {
+    if (isGracePeriodRestricted) {
       setIsGracePeriodModalVisible(true);
       return;
     }
@@ -115,7 +115,7 @@ const AdditionalStoragePage: React.FC<AdditionalStoragePageProps> = ({
   };
 
   const openCancelDialog = () => {
-    if (isGracePeriod) {
+    if (isGracePeriodRestricted) {
       setIsGracePeriodModalVisible(true);
       return;
     }

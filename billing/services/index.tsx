@@ -98,7 +98,8 @@ const Services = observer(
       servicesInit,
     } = servicesStore;
 
-    const { isGracePeriod, previousStoragePlanSize } = paymentStore.tariff;
+    const { isGracePeriodRestricted, previousStoragePlanSize } =
+      paymentStore.tariff;
 
     const t = useCommonTranslation();
 
@@ -206,7 +207,7 @@ const Services = observer(
       setIsCurrentConfirmState(currentEnabled);
 
       if (id === TOTAL_SIZE) {
-        if (isGracePeriod) {
+        if (isGracePeriodRestricted) {
           setIsGracePeriodModalVisible(true);
           return;
         }
