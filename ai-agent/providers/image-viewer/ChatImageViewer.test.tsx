@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
-import { render, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 import ChatImageViewer from ".";
 
@@ -37,5 +37,19 @@ describe("ChatImageViewer", () => {
       const image = document.querySelector(`img[src="${PNG}"]`);
       expect(image).not.toBeNull();
     });
+  });
+
+  it("closes from the viewer's own close button", async () => {
+    const onClose = vi.fn();
+    render(
+      <ChatImageViewer
+        request={{ src: PNG, title: "chart.png" }}
+        onClose={onClose}
+      />,
+    );
+
+    fireEvent.click(await screen.findByTestId("desktop-details-close"));
+
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

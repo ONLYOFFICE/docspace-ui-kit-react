@@ -82,8 +82,9 @@ const ChatImageViewer = ({ request, onClose }: ChatImageViewerProps) => {
     <MediaViewer
       t={t}
       visible
+      // Hides the menus of a file. `isPublicFile` would do that too, but it
+      // also takes away the close button and the swipe that closes.
       isPreviewFile
-      isPublicFile
       files={files}
       playlist={item.playlist}
       playlistPos={0}
