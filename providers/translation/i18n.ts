@@ -48,6 +48,10 @@ export const getI18NInstance = (
         useSuspense: false,
       },
       initAsync: false,
+      // i18next 25 otherwise prints an advertisement for its hosted service to
+      // the console of every app and test run that loads the kit. Ignored by
+      // the releases before the option existed, which print nothing anyway.
+      showSupportNotice: false,
     });
     isInitialized = true;
   } else if (instance.language !== lng) {
