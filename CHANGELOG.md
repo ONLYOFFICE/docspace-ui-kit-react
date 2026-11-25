@@ -359,6 +359,11 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   so its variables could only be set on an ancestor
 - **`PortalLogo` takes `dataTestId`**, `portal-logo` by default, on the wrapper or on the
   fallback logo that replaces it. It carried no test id at all
+- **`SocketEvents.ModifyThreadFiles` (`s:modify-thread-files`) and `TModifyThreadFilesData`**
+  (`utils/socket`). The event a server sends to the author of a conversation with an AI agent
+  when a file is saved to it: `{ cmd: "create", id, threadId, kind }`, `kind` being `"artifacts"`
+  or `"attachments"`. It is in `TListenEventCallbackMap`, so a listener takes the payload
+  without a cast
 - **`media-viewer`: the media viewer of the DocSpace client, and `MediaGallery`.** Both are
   imported from `@onlyoffice/apps-ui-kit/media-viewer`.
   - `MediaViewer` shows the images and plays the video and audio of a playlist the host passes

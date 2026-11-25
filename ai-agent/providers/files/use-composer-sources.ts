@@ -31,10 +31,11 @@ type CloudsStore = ReturnType<typeof useStores>["useCloudsStore"];
  *   a room with the room icon and a folder with the folder icon, and
  *   "Manage sources..." to connect one more until the library's limit.
  *
- * Inside an agent its knowledge bases are its settings: nobody removes one
- * from the chat, and "Manage knowledge bases..." opens the host's selector
- * of the agent's knowledge bases (`sourcesManager.onManage("knowledge")`),
- * or is left out for a user who may not change it. The data sources stay the user's own there.
+ * Inside an agent its knowledge bases are its settings: the bin of a row
+ * unlinks the base from the agent (`sourcesManager.onKnowledgeRoomRemove`)
+ * and "Manage knowledge bases..." opens the host's selector of the agent's
+ * knowledge bases (`sourcesManager.onManage("knowledge")`); a user who may
+ * not change the agent gets neither. The data sources stay the user's own there.
  */
 export const useComposerSourceLists = ({
   useCloudsStore,
@@ -54,12 +55,14 @@ export const useComposerSourceLists = ({
   knowledgePickerHidden: boolean;
   /**
    * Set inside an agent, whose knowledge bases are its settings:
-   * "Manage knowledge bases..." opens those settings (`onManage`), or is
-   * left out when the user may not change them. `null` for an ordinary
-   * chat, which picks its own rooms.
+   * "Manage knowledge bases..." opens those settings (`onManage`) and a
+   * row's bin unlinks its base from the agent (`onKnowledgeRoomRemove`);
+   * each is left out when the user may not change them. `null` for an
+   * ordinary chat, which picks its own rooms.
    */
   sourcesManager?: {
     onManage: ((kind: "skills" | "knowledge") => void) | null;
+    onKnowledgeRoomRemove?: (roomId: string) => void;
   } | null;
 }): {
   composerKnowledge: ComposerMenuItem[];
@@ -95,6 +98,7 @@ export const useComposerSourceLists = ({
     [manage],
   );
   const owned = !!sourcesManager;
+  const removeOwned = sourcesManager?.onKnowledgeRoomRemove ?? null;
 
   const composerKnowledge = React.useMemo(() => {
     const rows = knowledgeRooms
@@ -105,7 +109,9 @@ export const useComposerSourceLists = ({
         icon: "btn-room",
         onClick: () => onOpenContextRoom(cloud, room),
         trailingAction: owned
-          ? undefined
+          ? removeOwned
+            ? removeAction(room.name, () => removeOwned(room.id))
+            : undefined
           : removeAction(room.name, () =>
               deselectKnowledgeFolder(cloud, room.id),
             ),
@@ -134,6 +140,7 @@ export const useComposerSourceLists = ({
     knowledgeRooms,
     knowledgePickerHidden,
     owned,
+    removeOwned,
     onManageOwned,
     onPickKnowledgeRooms,
     onOpenContextRoom,
