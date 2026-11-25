@@ -64,6 +64,7 @@ export enum SocketEvents {
   ExternalDbSettings = "s:external-db-settings",
   ChangeWebPlugin = "s:change-web-plugin",
   ChangePersonalWebPlugin = "s:change-personal-web-plugin",
+  ChangePersonalWebPlugins = "s:change-personal-web-plugins",
   ChangeAiConfig = "s:change-ai-config",
   ChangeAiAccessSettings = "s:change-ai-access-settings",
   ChangeAppEnabled = "s:change-app-enabled",
@@ -277,6 +278,10 @@ export type TChangeAppEnabledData = {
   enabled: boolean;
 };
 
+export type TChangePersonalWebPluginsData = {
+  enabled: boolean;
+};
+
 export type TTopUpWalletData = {
   auto: boolean;
 };
@@ -416,6 +421,9 @@ export type TListenEventCallbackMap = {
   ) => void;
   [SocketEvents.ChangeWebPlugin]: (data: TChangeWebPluginData) => void;
   [SocketEvents.ChangePersonalWebPlugin]: (data: TChangeWebPluginData) => void;
+  [SocketEvents.ChangePersonalWebPlugins]: (
+    data: TChangePersonalWebPluginsData,
+  ) => void;
   [SocketEvents.ChangeAiConfig]: () => void;
   [SocketEvents.ChangeAiAccessSettings]: () => void;
   [SocketEvents.ChangeAppEnabled]: (data: TChangeAppEnabledData) => void;

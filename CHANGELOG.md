@@ -251,6 +251,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   it to the owner's own connections when they upload, switch, save the settings of or delete a
   personal web plugin, with the same `TChangeWebPluginData` as `ChangeWebPlugin`. A connection is put into the
   owner's room on its own; there is nothing to subscribe to.
+- **`SocketEvents.ChangePersonalWebPlugins` (`s:change-personal-web-plugins`).** The portal sends
+  it to the quota room when an administrator switches personal web plugins on or off for the
+  portal, with `TChangePersonalWebPluginsData` (`enabled`).
 - **`media-viewer`: the media viewer of the DocSpace client, and `MediaGallery`.** Both are
   imported from `@onlyoffice/apps-ui-kit/media-viewer`.
   - `MediaViewer` shows the images and plays the video and audio of a playlist the host passes
