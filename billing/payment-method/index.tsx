@@ -56,6 +56,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
     walletCustomerStatusNotActive,
     walletCustomerEmail,
     fetchCustomerInfo,
+    fetchPortalTariff,
     isNotPaidPeriod,
   } = paymentStore.tariff;
 
@@ -82,7 +83,7 @@ const PaymentMethod: React.FC<PaymentMethodProps> = ({
     const startTime = Date.now();
 
     try {
-      await fetchCustomerInfo(true);
+      await Promise.all([fetchCustomerInfo(true), fetchPortalTariff(true)]);
 
       if (paymentStore.tariff.walletCustomerStatusNotActive) {
         await fetchCardLinked(integrationUrl);
