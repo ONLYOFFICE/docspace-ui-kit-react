@@ -46,7 +46,12 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
     isLoading,
   } = store;
 
-  const { isNotPaidPeriod, isGracePeriod, gracePeriodEndDate } = store.tariff;
+  const {
+    isNotPaidPeriod,
+    isGracePeriod,
+    isGracePeriodRestricted,
+    gracePeriodEndDate,
+  } = store.tariff;
   const overduePlanCost = store.quotas.currentPlanCost?.value ?? 0;
   const graceShortfall = overduePlanCost - availableCredits;
 
@@ -94,10 +99,14 @@ const AvailableCredits = ({ isMobile }: AvailableCreditsProps) => {
             lineHeight="16px"
             className={styles.topUpWarningText}
           >
-            {t("InsufficientCreditsTopUpToday", {
-              amount: formatPaymentCurrency(graceShortfall, 2),
-              date: gracePeriodEndDate,
-            })}
+            {isGracePeriodRestricted
+              ? t("InsufficientCreditsTopUpToday", {
+                  amount: formatPaymentCurrency(graceShortfall, 2),
+                  date: gracePeriodEndDate,
+                })
+              : t("AwaitingPaymentPayBeforeBlocking", {
+                  date: gracePeriodEndDate,
+                })}
           </Text>
         </div>
       );
