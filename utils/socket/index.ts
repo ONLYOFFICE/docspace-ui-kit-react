@@ -29,6 +29,7 @@ export enum SocketEvents {
   StorageEncryption = "storage-encryption",
   LogoutSession = "s:logout-session",
   ModifyFolder = "s:modify-folder",
+  ModifyThreadFiles = "s:modify-thread-files",
   ModifyRoom = "s:modify-room",
   UpdateHistory = "s:update-history",
   RefreshFolder = "refresh-folder",
@@ -245,6 +246,21 @@ export type TOptSocket = {
 } & TOptQuota;
 
 /**
+ * A file saved to a conversation of an AI agent: an artifact of a reply or an
+ * attachment of a message. Sent to the conversation's author only, in the
+ * agent's room `DIR-{projectId}`, which carries the ids alone - the list
+ * named by `kind` is read again.
+ */
+export type TModifyThreadFilesData = {
+  cmd: "create";
+  /** The id of the saved file. */
+  id: number;
+  /** The id of the conversation, a GUID in the server's own case. */
+  threadId: string;
+  kind: "artifacts" | "attachments";
+};
+
+/**
  * Export chat event data type.
  */
 export type ExportChatEventData =
@@ -336,6 +352,7 @@ export type TListenEventCallbackMap = {
   }) => void;
   [SocketEvents.ModifyFolder]: (data?: TOptSocket) => void;
   [SocketEvents.ModifyRoom]: (data: TOptSocket) => void;
+  [SocketEvents.ModifyThreadFiles]: (data?: TModifyThreadFilesData) => void;
   [SocketEvents.UpdateHistory]: (data: {
     id: number | string;
     type: string;
