@@ -1,4 +1,6 @@
 import {
+  lazy,
+  Suspense,
   useCallback,
   useEffect,
   useMemo,
@@ -74,6 +76,7 @@ import { settingsAdapter } from "./settings";
 import { usePlatformAdapter } from "./platform";
 import { componentOverrides } from "./components-overrides";
 import { imageOverrides } from "./images-overrides";
+import { ImageViewerBoundary } from "./image-viewer/boundary";
 import { storeKeys } from "./stores";
 import { normalizeAiChatLocale } from "./locale";
 import { portalThemes } from "./themes";
@@ -112,6 +115,7 @@ import {
   type SuggestedQuestion,
 } from "./files";
 import { resolveSuggestions, type SuggestionSet } from "./suggestions";
+import { getSettingsEntryConfig } from "./settings-links";
 import { composeCallbacks } from "./compose-callbacks";
 import {
   analyzeModeCallbacks,
@@ -164,6 +168,10 @@ const AiChatI18nIsolator = ({
     </ReactI18nextProvider>
   );
 };
+
+// Loaded with the first picture opened: the media viewer brings its players
+// and its PDF view, which a chat that opens no picture never needs.
+const ChatImageViewer = lazy(() => import("./image-viewer"));
 
 type AiAgentProvidersProps = {
   locale: string;
@@ -274,6 +282,20 @@ type AiAgentProvidersProps = {
    * Return `null` to keep the library default (localized text + Retry).
    */
   formatChatError?: WidgetConfig["formatChatError"];
+  /**
+   * Whether the user may open the portal's AI settings. Only then the chat
+   * offers "Set up Web search..." in the "+" menu and "Add model..." in the
+   * model picker, and both open those settings. Off by default, so a host
+   * that does not say gets neither row.
+   */
+  canManageAiSettings?: boolean;
+  /**
+   * Whether the model may ask the user a clarifying question: the round
+   * pauses and a panel with the question takes the composer's place. Off by
+   * default, so a host that does not say keeps rounds that never pause; in
+   * the analyze mode it is off whatever the host says.
+   */
+  askUserQuestions?: boolean;
   /**
    * Fired when an opened thread's persisted context settles: the agent
    * entity the conversation last ran against, or `null` for a plain
@@ -667,6 +689,8 @@ const AiAgentProviders = ({
   onProfilePickerSelect,
   onProfilePickerOpen,
   formatChatError,
+  canManageAiSettings = false,
+  askUserQuestions = false,
   onThreadContextChange,
   composerHeader,
   composerDisabled,
@@ -686,11 +710,8 @@ const AiAgentProviders = ({
   const aiChatTranslations = useMemo(
     () => ({
       ModelAssignmentDescription: t("Common:ModelAssignmentDescription"),
-      ...(isStandalone
-        ? null
-        : { EnableWebSearch: t("Common:EnableWebSearchInBilling") }),
     }),
-    [isStandalone, t],
+    [t],
   );
 
   // The panel store is created here rather than by `AiChatStoreProvider`
@@ -725,6 +746,12 @@ const AiAgentProviders = ({
   // attachments are harmless — the lookup always intersects with the current
   // refs.
   const [analyzableIds, setAnalyzableIds] = useState<string[]>([]);
+  // The picture of the chat the user clicked, shown in the portal's media
+  // viewer rather than the chat library's own.
+  const [openedImage, setOpenedImage] = useState<
+    Parameters<NonNullable<WidgetConfig["onOpenImage"]>>[0] | null
+  >(null);
+  const closeOpenedImage = useCallback(() => setOpenedImage(null), []);
 
   const isMobile = useIsMobile();
 
@@ -1257,6 +1284,9 @@ const AiAgentProviders = ({
       onProfilePickerOpen,
       dropdownNavigation: isMobile ? "drilldown" : "flyout",
       formatChatError,
+      ...getSettingsEntryConfig(canManageAiSettings),
+      disableAskUserTool: !askUserQuestions || analyzeActive,
+      onOpenImage: setOpenedImage,
       // Hide "Always allow" only for generate tools (matched by full name).
       hideToolAllowAlways: GENERATE_TOOL_NAMES,
       onToolCallApproveResult,
@@ -1354,6 +1384,8 @@ const AiAgentProviders = ({
       onProfilePickerSelect,
       isMobile,
       formatChatError,
+      canManageAiSettings,
+      askUserQuestions,
       onToolCallApproveResult,
       onDropFiles,
       resolvedSuggestions,
@@ -1463,6 +1495,18 @@ const AiAgentProviders = ({
                                   </CreatedDocumentsContext.Provider>
                                 </OnFilesAttachedContext.Provider>
                                 {overlay}
+                                {openedImage ? (
+                                  <ImageViewerBoundary
+                                    onClose={closeOpenedImage}
+                                  >
+                                    <Suspense fallback={null}>
+                                      <ChatImageViewer
+                                        request={openedImage}
+                                        onClose={closeOpenedImage}
+                                      />
+                                    </Suspense>
+                                  </ImageViewerBoundary>
+                                ) : null}
                               </AttachmentLimitContext.Provider>
                             </ContextRoomProvider>
                           </AiChatStoreProvider>
