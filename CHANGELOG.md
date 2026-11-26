@@ -340,6 +340,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- AI chat: the composer's "+" menu does not end on a separator when web search is hidden - the
+  line stayed under the last row when web search was off and its settings could not be opened
+  (ai-chat 1.0.2-progress.76)
 - **`DropDownItem` renders an icon passed as an element.** Such an icon used to go to
   `ReactSVG` with an empty `src` and show nothing. The mobile submenu of `ContextMenu` now shows
   an item's `iconNode` as well.
