@@ -58,9 +58,10 @@ const MigrateToWalletDialog = observer(
       availableCredits,
       walletCodeCurrency,
       managersCount,
+      tariffWalletProduct,
     } = store;
     const { planCost, futurePlanCost } = store.paymentQuotas;
-    const { maxCountManagersByQuota } = store.quotas;
+    const { maxCountManagersByQuota, isYearTariff } = store.quotas;
     const { paymentDate, daysUntilPayment } = store.tariff;
 
     const [subscriptionDetails, setSubscriptionDetails] =
@@ -73,6 +74,14 @@ const MigrateToWalletDialog = observer(
     const initialPaymentDate = useRef(paymentDate).current;
 
     const organizationName = getBrandName("ProductName");
+    const formatPerPeriod = (price: string) =>
+      isYearTariff
+        ? t("MigratePerYear", { price })
+        : t("MigratePerMonth", { price });
+    const formatAutoRenews = (price: string) =>
+      isYearTariff
+        ? t("MigrateAutoRenewsBalanceFirstYear", { price })
+        : t("MigrateAutoRenewsBalanceFirst", { price });
 
     const hasFetchedRef = useRef(false);
 
@@ -110,7 +119,7 @@ const MigrateToWalletDialog = observer(
         const { data } = await rawApiClient.instance.post(
           "api/2.0/portal/payment/subscription/movetowallet",
           {
-            quantity: { adminwallet: managersCount },
+            quantity: { [tariffWalletProduct]: managersCount },
           },
         );
 
@@ -244,9 +253,7 @@ const MigrateToWalletDialog = observer(
                   <div className={styles.card}>
                     {renderRow(
                       t("MigrateCurrentTariff"),
-                      t("MigratePerMonth", {
-                        price: formatPaymentCurrency(currentTariffCost),
-                      }),
+                      formatPerPeriod(formatPaymentCurrency(currentTariffCost)),
                     )}
                     {renderRow(
                       t("RemainingPeriod"),
@@ -299,9 +306,9 @@ const MigrateToWalletDialog = observer(
                       count: newAdmins,
                       price: formatFuturePaymentCurrency(futurePricePerAdmin),
                     }),
-                    t("MigratePerMonth", {
-                      price: formatFuturePaymentCurrency(newSubscriptionAmount),
-                    }),
+                    formatPerPeriod(
+                      formatFuturePaymentCurrency(newSubscriptionAmount),
+                    ),
                   )}
                   {renderRow(
                     t("MigrateFromWallet"),
@@ -327,9 +334,9 @@ const MigrateToWalletDialog = observer(
                   fontSize="13px"
                   color="var(--payment-benefits-icons-color)"
                 >
-                  {t("MigrateAutoRenewsBalanceFirst", {
-                    price: formatFuturePaymentCurrency(newSubscriptionAmount),
-                  })}
+                  {formatAutoRenews(
+                    formatFuturePaymentCurrency(newSubscriptionAmount),
+                  )}
                 </Text>,
               )}
             </ol>

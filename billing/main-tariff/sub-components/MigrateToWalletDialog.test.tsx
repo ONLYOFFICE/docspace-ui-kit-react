@@ -53,6 +53,7 @@ const createStore = () => {
     availableCredits: 541.4,
     walletCodeCurrency: "USD",
     managersCount: 5,
+    tariffWalletProduct: "adminwallet",
     fetchBalance: vi.fn(),
     paymentQuotas: {
       planCost: { value: 20 },
@@ -60,6 +61,7 @@ const createStore = () => {
     },
     quotas: {
       maxCountManagersByQuota: 4,
+      isYearTariff: false,
       fetchPortalQuota: vi.fn(),
     },
     tariff: {

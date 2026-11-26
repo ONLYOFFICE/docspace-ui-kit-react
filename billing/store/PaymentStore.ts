@@ -101,6 +101,8 @@ import {
   DOCS_CONNECT_DEVPACK_SERVICE,
   DOCS_CONNECT_PRODUCT,
   DOCS_CONNECT_DEVPACK_PRODUCT,
+  ADMIN_WALLET,
+  ADMIN_WALLET_YEAR,
 } from "../constants";
 import type { TTranslation } from "../../utils/common";
 import {
@@ -510,6 +512,10 @@ class PaymentStore {
       !this.tariff.isNotPaidPeriod &&
       !!this.tariff.walletCustomerStatusNotActive
     );
+  }
+
+  get tariffWalletProduct() {
+    return this.quotas.isYearTariff ? ADMIN_WALLET_YEAR : ADMIN_WALLET;
   }
 
   get needsWalletMigration() {

@@ -5,12 +5,14 @@ import type {
   QuotaDto,
 } from "@onlyoffice/docspace-api-sdk";
 import type { TNumericPaymentFeature, TBooleanPaymentFeature } from "../types";
-import { MANAGER, YEAR_KEY } from "../constants";
+import {
+  MANAGER,
+  YEAR_KEY,
+  WALLET_TARIFF_QUOTA_ID,
+  WALLET_YEAR_TARIFF_QUOTA_ID,
+} from "../constants";
 import { TOTAL_SIZE } from "./CurrentQuotasStore";
 import type CurrentQuotasStore from "./CurrentQuotasStore";
-
-/** Quota id of the future tariff used by MigrateToWalletDialog. */
-const FUTURE_TARIFF_QUOTA_ID = -14;
 
 class PaymentQuotasStore {
   private paymentApi: PaymentApi;
@@ -23,7 +25,7 @@ class PaymentQuotasStore {
 
   portalPaymentQuotasFeatures: Map<string, TenantQuotaFeatureDto> = new Map();
 
-  /** Future tariff quota (id -14), kept for MigrateToWalletDialog. */
+  /** Wallet tariff quota (id -14 monthly, -19 yearly), kept for MigrateToWalletDialog. */
   futurePaymentQuotas: QuotaDto | null = null;
 
   futurePaymentQuotasFeatures: Map<string, TenantQuotaFeatureDto> = new Map();
@@ -141,6 +143,9 @@ class PaymentQuotasStore {
 
       const isFreeTariff = this.currentQuotasStore?.isFreeTariff ?? true;
       const currentQuotaId = this.currentQuotasStore?.currentQuotaId ?? null;
+      const futureQuotaId = this.currentQuotasStore?.isYearTariff
+        ? WALLET_YEAR_TARIFF_QUOTA_ID
+        : WALLET_TARIFF_QUOTA_ID;
 
       let matchedQuota: QuotaWithMap | undefined;
 
@@ -157,8 +162,8 @@ class PaymentQuotasStore {
       // of this method; one action also keeps observers from seeing the new
       // future quota beside the old portal one.
       runInAction(() => {
-        if (currentQuotaId !== FUTURE_TARIFF_QUOTA_ID) {
-          const futureQuota = quotasById.get(FUTURE_TARIFF_QUOTA_ID);
+        if (currentQuotaId !== futureQuotaId) {
+          const futureQuota = quotasById.get(futureQuotaId);
           this.futurePaymentQuotas = futureQuota ?? null;
           this.futurePaymentQuotasFeatures =
             futureQuota?.featuresMap ?? new Map();

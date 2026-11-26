@@ -1,5 +1,9 @@
 export const MANAGER = "manager";
 export const ADMIN = "admin";
+export const ADMIN_WALLET = "adminwallet";
+export const ADMIN_WALLET_YEAR = "adminwalletyear";
+export const WALLET_TARIFF_QUOTA_ID = -14;
+export const WALLET_YEAR_TARIFF_QUOTA_ID = -19;
 export const TOTAL_SIZE = "total_size";
 export const ROOM = "room";
 export const YEAR_KEY = "year";
