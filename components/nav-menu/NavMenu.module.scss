@@ -17,7 +17,6 @@
       );
       --nav-menu-item-bg-hover: #{colors.$gray-light-mid};
       --nav-menu-item-bg-active: #{colors.$light-gray-selected};
-      --nav-menu-separator-default: #{colors.$gray-light-mid};
       --nav-menu-signal-dot-color: var(
         --color-scheme-main-accent,
         #{colors.$light-blue-main}
@@ -36,7 +35,6 @@
       --nav-menu-item-icon-active-color: #{colors.$white};
       --nav-menu-item-bg-hover: #{colors.$dark-gray-light};
       --nav-menu-item-bg-active: #{colors.$dark-gray-light};
-      --nav-menu-separator-default: #{colors.$gray-dark-strong};
       --nav-menu-signal-dot-color: #{colors.$white};
     }
   }
@@ -334,12 +332,10 @@
 .subItemWithSeparator {
   margin-top: 8px;
   padding-top: 8px;
-  // The theme default is a private token, so the public one still inherits.
+  // No line unless a variable is set: with both undefined the declaration
+  // is dropped, and the portal shows the gap alone.
   border-top: 1px solid
-    var(
-      --nav-menu-separator-color,
-      var(--quick-buttons-color, var(--nav-menu-separator-default))
-    );
+    var(--nav-menu-separator-color, var(--quick-buttons-color));
 }
 
 .subItemSibling {

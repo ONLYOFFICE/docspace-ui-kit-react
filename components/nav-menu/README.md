@@ -347,15 +347,15 @@ export function SidebarWithDialog() {
 | `--nav-menu-item-bg-hover`          | theme-based              | Highlight under the entry the pointer is on                                |
 | `--nav-menu-item-bg-active`         | theme-based              | Highlight under the active entry                                           |
 | `--nav-menu-signal-dot-color`       | theme-based (the accent) | Dot on the icon of an entry with a badge; only the collapsed rail shows it |
-| `--nav-menu-separator-color`        | theme-based              | Line above a sub-item with `withTopSeparator`                              |
+| `--nav-menu-separator-color`        | none — no line is drawn  | Line above a sub-item with `withTopSeparator`                              |
 
 **Every variable but the last is declared on the menu's own `nav` element**, under the theme
 class (`.light .root`, `.dark .root`). A value set on a wrapper never arrives. Set them in a rule
 that outranks that one, on a class passed through `className`: `.light nav.my-nav` does.
 
-`--nav-menu-separator-color` is not declared on the menu, so it can be set on the menu or an
-ancestor. Without it the line takes the portal's `--quick-buttons-color`, then the theme's own
-divider grey.
+`--nav-menu-separator-color` is declared nowhere, so it can be set on the menu or an ancestor. The
+line falls back to `--quick-buttons-color`, which the kit does not define either. With neither set
+there is no line.
 
 The sliding highlight is driven by `--end-width` and `--flatten-index`, which the component sets
 itself on each animated element.

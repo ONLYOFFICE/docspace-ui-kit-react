@@ -640,10 +640,6 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 - **`Article` survives a `showArticle` value in local storage that is not JSON.** The parse ran
   unguarded in an effect, so such a value threw on mount and on every device change. It now
   counts as its raw text, and storage that cannot be read counts as an absent key
-- **`NavMenu` draws the line of `withTopSeparator` without any setup.** The border fell back to
-  `--quick-buttons-color`, which the kit does not define, so with neither that nor
-  `--nav-menu-separator-color` set there was no line. The theme now supplies a divider grey last;
-  both variables still win over it
 - **`Navigation`'s header holds up in four corner cases.** The room title with `rootRoomTitle` and
   a single crumb threw on click; it now only closes the drop box. Each title icon's tooltip has
   its own id, where every header shared `iconTooltip`. `withLogo={true}` no longer draws an
