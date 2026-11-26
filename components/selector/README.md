@@ -611,7 +611,6 @@ export function SaveAs({
         onSelectBreadCrumb={openFolder}
         isBreadCrumbsLoading={false}
         breadCrumbsLoader={<BreadCrumbsLoader />}
-        bodyIsLoading={false}
         withFooterInput
         footerInputHeader="File name"
         currentFooterInputValue="Report.docx"
