@@ -106,6 +106,36 @@ describe("<Tag />", () => {
     expect(screen.getByTestId("tag_item")).not.toHaveAttribute("role");
   });
 
+  // With no label drawn, the name was on a div with no role, so a screen
+  // reader found nothing to read.
+  it("makes a tag that draws only its icon an image named by its label", () => {
+    const { rerender } = render(
+      <Tag {...baseProps} onClick={undefined} withLabel={false} />,
+    );
+    expect(screen.getByRole("img", { name: "Script" })).toBe(
+      screen.getByTestId("tag_item"),
+    );
+
+    // A drawn label is read as text and needs no role.
+    rerender(<Tag {...baseProps} onClick={undefined} />);
+    expect(screen.getByTestId("tag_item")).not.toHaveAttribute("role");
+
+    // An image would hide the delete cross, so that tag is a named group.
+    rerender(
+      <Tag
+        {...baseProps}
+        onClick={undefined}
+        withLabel={false}
+        isNewTag
+        onDelete={vi.fn()}
+      />,
+    );
+    expect(screen.getByRole("group", { name: "Script" })).toBe(
+      screen.getByTestId("tag_item"),
+    );
+    expect(screen.getByRole("button", { name: "Remove" })).toBeInTheDocument();
+  });
+
   it("names the delete cross", () => {
     render(<Tag {...baseProps} isNewTag />);
 

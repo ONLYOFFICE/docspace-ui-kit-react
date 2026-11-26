@@ -240,8 +240,9 @@ are declared by the theme on the tag itself. A wrapper cannot override them.
   which tag it removes.
 - **A passed `aria-*` lands on the tag and is kept.** A passed `aria-label` wins over `label`,
   which is the name otherwise. `isDisabled` sets `aria-disabled` over a passed value. On a tag that is not a button, a passed name makes it a `role="group"`.
-- A tag with `withLabel={false}` announces only its `aria-label`, so keep `label` filled in
-  even when it is not drawn.
+- **A tag that is not a button and draws only its icon is a `role="img"`**, named by its
+  `aria-label` or `label`. Keep `label` filled in even when it is not drawn. With the delete
+  cross it is a named `role="group"` instead, since an image would hide the cross.
 
 ## Test ids
 

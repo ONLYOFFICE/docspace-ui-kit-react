@@ -20,6 +20,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   held key is now kept from the page and does nothing; a modified one is left to the browser
   and the page. This covers every `<div>` the kit makes a button, such as `Navigation`'s title
   and drop box rows, `Article`'s collapse handle and a clickable `Tag`
+- **A `Tag` that draws only its icon is an image named by its label.** With `withLabel={false}`
+  and no `onClick`, its name sat on a `<div>` with no role, and a screen reader read nothing.
+  It is now `role="img"`, or a named `role="group"` while it shows its delete cross
 - **`ImageEditor`'s region has no English name of its own.** It was labelled "Image editor"
   whatever the language. Pass a translated `aria-label` to name it
 - **Style rules and custom properties that nothing reads are gone.** `Section` kept a copy of

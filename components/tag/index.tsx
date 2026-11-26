@@ -52,6 +52,19 @@ const TagPure: FC<TagProps> = ({
   // A tag that does something on a click is a button to the keyboard too.
   const isInteractive = !!onClick && !isDisabled && !isDeleted;
 
+  // A tag that draws only its icon has no text to read, so its name is all
+  // there is: it is an image named by it. An image hides what is inside it,
+  // so a tag with its delete cross stays a group instead.
+  const name = rest["aria-label"] ?? label;
+  const hasDeleteButton = isNewTag && !!onDelete;
+  const isNamedIcon =
+    !withLabel && !hasDeleteButton && !!(name || rest["aria-labelledby"]);
+  const role = isInteractive
+    ? "button"
+    : isNamedIcon
+      ? "img"
+      : groupRoleWhenNamed(withLabel ? rest : { ...rest, "aria-label": name });
+
   const onDeleteAction = React.useCallback(() => {
     onDelete?.(tag);
   }, [onDelete, tag]);
@@ -64,7 +77,7 @@ const TagPure: FC<TagProps> = ({
       ref={ref}
       title={label}
       onClick={onClickAction}
-      role={isInteractive ? "button" : groupRoleWhenNamed(rest)}
+      role={role}
       tabIndex={isInteractive ? 0 : undefined}
       onKeyDown={
         isInteractive
@@ -83,7 +96,7 @@ const TagPure: FC<TagProps> = ({
         [styles.thirdPartyTag]: icon,
       })}
       style={{ ...style, maxWidth: tagMaxWidth }}
-      aria-label={rest["aria-label"] ?? label}
+      aria-label={name}
       aria-disabled={isDisabled || rest["aria-disabled"]}
       data-testid={dataTestId ?? "tag_item"}
       onMouseEnter={onMouseEnter}
@@ -116,7 +129,7 @@ const TagPure: FC<TagProps> = ({
           ) : null}
         </Text>
       ) : null}
-      {isNewTag && onDelete ? (
+      {hasDeleteButton ? (
         <IconButton
           className={styles.tagIcon}
           iconNode={<CrossIconReactSvgUrl />}
