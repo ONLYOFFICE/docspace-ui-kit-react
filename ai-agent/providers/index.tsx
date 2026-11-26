@@ -76,6 +76,7 @@ import { settingsAdapter } from "./settings";
 import { usePlatformAdapter } from "./platform";
 import { componentOverrides } from "./components-overrides";
 import { imageOverrides } from "./images-overrides";
+import { ImageViewerBoundary } from "./image-viewer/boundary";
 import { storeKeys } from "./stores";
 import { normalizeAiChatLocale } from "./locale";
 import { portalThemes } from "./themes";
@@ -1495,12 +1496,16 @@ const AiAgentProviders = ({
                                 </OnFilesAttachedContext.Provider>
                                 {overlay}
                                 {openedImage ? (
-                                  <Suspense fallback={null}>
-                                    <ChatImageViewer
-                                      request={openedImage}
-                                      onClose={closeOpenedImage}
-                                    />
-                                  </Suspense>
+                                  <ImageViewerBoundary
+                                    onClose={closeOpenedImage}
+                                  >
+                                    <Suspense fallback={null}>
+                                      <ChatImageViewer
+                                        request={openedImage}
+                                        onClose={closeOpenedImage}
+                                      />
+                                    </Suspense>
+                                  </ImageViewerBoundary>
                                 ) : null}
                               </AttachmentLimitContext.Provider>
                             </ContextRoomProvider>

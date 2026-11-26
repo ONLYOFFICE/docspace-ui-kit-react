@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { getMobileMediaContextModel } from "../../../media-viewer/MediaViewer.helpers";
 import { CHAT_IMAGE_FILE_ID, getChatImageMediaItem } from "./media-item";
 
 const PNG = "data:image/png;base64,AAAA";
@@ -69,5 +70,33 @@ describe("getChatImageMediaItem", () => {
     expect(withDownload.file.security?.Download).toBe(true);
     expect(withoutDownload.file.security?.Download).toBe(false);
     expect(Object.keys(withDownload.file.security ?? {})).toEqual(["Download"]);
+  });
+});
+
+// A phone and a tablet have no toolbar: the viewer's menu is their only way
+// to the download, and it must offer nothing else of a file.
+describe("the viewer's menu for a chat picture on a phone", () => {
+  const t = ((key: string) => key) as never;
+
+  const menuOf = (onDownload?: VoidFunction) => {
+    const { file } = getChatImageMediaItem(
+      { src: PNG, title: "chart.png", onDownload },
+      PNG,
+      "Image",
+    );
+
+    return getMobileMediaContextModel(t, file, false, {
+      onClickDownload: onDownload,
+    })
+      .filter((option) => !option.disabled)
+      .map((option) => option.key);
+  };
+
+  it("has Download alone for a picture the chat can download", () => {
+    expect(menuOf(() => {})).toEqual(["download"]);
+  });
+
+  it("has no row for a picture the chat cannot download", () => {
+    expect(menuOf()).toEqual([]);
   });
 });

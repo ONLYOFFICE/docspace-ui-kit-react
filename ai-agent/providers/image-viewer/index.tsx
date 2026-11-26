@@ -83,8 +83,11 @@ const ChatImageViewer = ({ request, onClose }: ChatImageViewerProps) => {
       t={t}
       visible
       // Hides the menus of a file. `isPublicFile` would do that too, but it
-      // also takes away the close button and the swipe that closes.
-      isPreviewFile
+      // also takes away the close button and the swipe that closes. A picture
+      // the chat can download keeps the menu: a phone and a tablet have no
+      // toolbar, so the menu's Download is their only way to it, and with no
+      // other action of a file allowed it is the menu's only row.
+      isPreviewFile={!request.onDownload}
       files={files}
       playlist={item.playlist}
       playlistPos={0}
@@ -94,6 +97,7 @@ const ChatImageViewer = ({ request, onClose }: ChatImageViewerProps) => {
       getIcon={getIcon}
       onClose={onClose}
       onDownload={onDownload}
+      onClickDownload={onDownload}
     />
   );
 };

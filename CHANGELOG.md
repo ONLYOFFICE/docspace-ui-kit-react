@@ -340,6 +340,14 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **A failure to load the AI chat's image viewer stays in the viewer.** The viewer is loaded with
+  the first picture opened, and with no error boundary of its own a chunk that failed to load -
+  a tab opened before a deployment - reached the host's boundary, above the whole app:
+  `AiAgentProviders` wraps it. The picture now stays closed and the chat goes on
+- **A picture of the AI chat can be downloaded on a phone and a tablet.** They have no toolbar,
+  and the viewer's menu was hidden, so there was no way to the download the changelog promised.
+  The menu is shown for a picture the chat can download and has Download as its only row.
+  `MediaViewer`'s mobile menu no longer lists Info for a host that passes no `onShowInfoPanel`
 - AI chat: the composer's "+" menu does not end on a separator when web search is hidden - the
   line stayed under the last row when web search was off and its settings could not be opened
   (ai-chat 1.0.2-progress.76)
