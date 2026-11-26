@@ -8,7 +8,7 @@ import PlusSvgUrl from "../../assets/icons/16/button.plus.react.svg";
 import TemplateRoomIcon from "../../assets/template-room-icon.react.svg";
 
 import { useClickOutside, getTextColor } from "../../utils";
-import { pickAriaProps } from "../../utils/aria-props";
+import { groupRoleWhenNamed, pickAriaProps } from "../../utils/aria-props";
 import { useCommonTranslation } from "../../utils/i18n";
 import { ROOM_ACTION_KEYS } from "../../constants";
 
@@ -202,6 +202,7 @@ const RoomIcon = ({
     <>
       <div
         {...pickAriaProps(rest)}
+        role={groupRoleWhenNamed(rest)}
         ref={iconRef}
         className={classNames(
           {

@@ -254,8 +254,7 @@ matches no element, so they have no effect.
 - Make the item's name a real link, so that it can be opened without a mouse.
 - The right-click menu is pointer-only. The three-dot button is the keyboard path to the same
   actions, so a listing that fails its two-part gate has no keyboard access to them.
-- **A passed `aria-*` lands on each tile's outer `<div>` and is kept.** The tile has no role, so
-  a name there is not read.
+- **A passed `aria-*` lands on each tile's outer `<div>` and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
 - Only the folders and files groups get a heading. A listing that is only rooms or only templates
   has none; supply one above the container.
 - Ctrl-click and Shift-click, on the tiles that support them, have no keyboard equivalent.

@@ -404,8 +404,8 @@ go on `:root` or another ancestor of `#root`.
 - Its labels come from the kit's shared translations. Without a `TranslationProvider` they are
   empty strings, and those controls have no accessible name.
 - The panel sets `user-select: none` over its whole area, so its text cannot be selected or copied.
-- **A passed `aria-*` lands on the panel and is kept.** The panel has no role, so for a landmark
-  wrap it in a labelled `<nav>` of your own.
+- **A passed `aria-*` lands on the panel and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
+  For a landmark, wrap the panel in a labelled `<nav>` of your own.
 
 ## Test ids
 

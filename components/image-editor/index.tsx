@@ -32,7 +32,6 @@ const ImageEditor = ({
       {...pickAriaProps(rest)}
       className={className}
       role="region"
-      aria-label={rest["aria-label"] ?? "Image editor"}
       data-testid="image-editor"
     >
       {image.uploadedFile && !isDefaultAvatar ? (

@@ -6,11 +6,12 @@ import classNames from "classnames";
 import InfoReactSvg from "../../assets/info.react.svg";
 import { IconButton } from "../icon-button";
 import { Tooltip } from "../tooltip";
-import { pickAriaProps } from "../../utils/aria-props";
+import { groupRoleWhenNamed, pickAriaProps } from "../../utils/aria-props";
 import { useCommonTranslation } from "../../utils/i18n";
 import { activateOnButtonKey } from "../../utils/keyboard-activation";
 
 import type { HelpButtonProps } from "./HelpButton.types";
+import styles from "./HelpButton.module.scss";
 
 export type { HelpButtonProps };
 
@@ -61,13 +62,52 @@ const HelpButton = (props: HelpButtonProps) => {
   const isKeyboardButton =
     !!(getContent || tooltipContent) && (useGlobalTooltip || openOnClick);
 
+  // The shared tooltip has a fixed id; the local one gets its own, so the
+  // icon can point at it while it is open.
+  const localTooltipId = `help-tooltip-${React.useId()}`;
+  const tooltipId = useGlobalTooltip ? "info-tooltip" : localTooltipId;
+
+  // A tooltip opened from the keyboard is a toggletip: its text goes into a
+  // live region, which a screen reader announces, and it closes when the
+  // focus leaves the icon for anything but the tooltip itself.
+  const [shownFromKey, setShownFromKey] = React.useState(false);
+  const [announcement, setAnnouncement] = React.useState("");
+  const anchorRef = React.useRef<Element | null>(null);
+
+  const getShownTooltip = () => document.getElementById(tooltipId);
+
+  const toggleFromAnchor = (anchor: Element) =>
+    anchor.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
   const openFromKey = (e: React.KeyboardEvent<HTMLDivElement>) =>
     activateOnButtonKey(e, ({ currentTarget }) => {
       const anchor = useGlobalTooltip
         ? currentTarget
         : (currentTarget.querySelector("svg") ?? currentTarget);
-      anchor.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      anchorRef.current = anchor;
+      // Emptied first, so the same text shown again is a change to announce.
+      setAnnouncement("");
+      toggleFromAnchor(anchor);
+
+      // The tooltip renders after the click; its text is read from the page
+      // once it is there, whatever getContent drew.
+      window.setTimeout(() => {
+        const tooltip = getShownTooltip();
+        setShownFromKey(!!tooltip);
+        setAnnouncement(tooltip?.textContent?.trim() ?? "");
+      }, 0);
     });
+
+  const onBlur = (e: React.FocusEvent<HTMLDivElement>) => {
+    if (!shownFromKey) return;
+    const tooltip = getShownTooltip();
+    const next = e.relatedTarget as Node | null;
+    if (next && (tooltip?.contains(next) || e.currentTarget.contains(next)))
+      return;
+    setShownFromKey(false);
+    setAnnouncement("");
+    if (tooltip && anchorRef.current) toggleFromAnchor(anchorRef.current);
+  };
 
   const keyboardProps = isKeyboardButton
     ? {
@@ -75,6 +115,7 @@ const HelpButton = (props: HelpButtonProps) => {
         tabIndex: 0,
         onKeyDown: openFromKey,
         ariaLabel: t("Info"),
+        "aria-describedby": shownFromKey ? tooltipId : undefined,
       }
     : {};
 
@@ -91,6 +132,7 @@ const HelpButton = (props: HelpButtonProps) => {
     : `div[id='${currentId}'] svg`;
 
   const localTooltipProps = {
+    id: localTooltipId,
     clickable: true,
     openOnClick,
     place: place || "top",
@@ -105,10 +147,16 @@ const HelpButton = (props: HelpButtonProps) => {
   };
 
   return (
-    <div ref={ref} style={style} data-testid={dataTestId ?? "help-button"}>
+    <div
+      ref={ref}
+      style={style}
+      data-testid={dataTestId ?? "help-button"}
+      onBlur={isKeyboardButton ? onBlur : undefined}
+    >
       {children ? (
         <div
           {...aria}
+          role={groupRoleWhenNamed(aria)}
           id={currentId}
           className={componentClass}
           {...globalTooltipProps}
@@ -137,6 +185,16 @@ const HelpButton = (props: HelpButtonProps) => {
         ) : (
           <Tooltip {...localTooltipProps}>{tooltipContent}</Tooltip>
         )
+      ) : null}
+
+      {isKeyboardButton && !children ? (
+        <span
+          className={styles.visuallyHidden}
+          role="status"
+          data-testid="help-button-announcement"
+        >
+          {announcement}
+        </span>
       ) : null}
     </div>
   );

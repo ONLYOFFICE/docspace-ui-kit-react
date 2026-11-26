@@ -209,8 +209,7 @@ platform's:
 - The selected day has `aria-pressed="true"` and every other day `aria-pressed="false"`; today
   has `aria-current="date"`. The current and the selected month and year are marked by colour
   only.
-- **A passed `aria-*` lands on the outer element and is kept.** That element has no role, so a
-  name there is not read; name the region around the calendar instead.
+- **A passed `aria-*` lands on the outer element and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
 
 ## Test ids
 

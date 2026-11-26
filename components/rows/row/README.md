@@ -221,10 +221,9 @@ export function LockedRow({ name }: { name: string }) {
   options there is no button, and the menu is reachable only by right-click.
 - The index-editing arrows have no role, no tab stop and no name, so they work by pointer only.
 - Nothing announces selection: the row carries no `aria-selected`, only a class.
-- `inProgress` sets `aria-busy="true"` on the row. The spinner is decorative, so the row alone
-  announces the busy state.
-- **A passed `aria-*` lands on the row and is kept.** It has no role, so a name there is not
-  read.
+- `inProgress` sets `aria-busy="true"` on the row, over a passed value. The spinner is decorative,
+  so the row alone announces the busy state.
+- **A passed `aria-*` lands on the row and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
 
 ## Test ids
 

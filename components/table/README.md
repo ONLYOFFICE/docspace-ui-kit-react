@@ -565,8 +565,8 @@ wins over a value set on a wrapper.
   "Close" and "Info panel".
 - The select-all checkbox has no visible label. Its only text is the translated "Select all", as
   a `title` on the label around it.
-- **A passed `aria-*` lands on the outer element of each part and is kept.** No part has a role,
-  so a name there is not read.
+- **A passed `aria-*` lands on the outer element of each part and is kept.** A passed
+  `aria-label` or `aria-labelledby` makes that part a `role="group"`, so the name is read.
 - Data a keyboard or screen-reader user has to work through is better served by a real
   `<table>` of your own, styled with the kit's `Text`.
 

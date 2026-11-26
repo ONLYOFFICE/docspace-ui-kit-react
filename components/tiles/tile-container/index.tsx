@@ -2,7 +2,7 @@ import React from "react";
 import classNames from "classnames";
 import { TileContainerProps, TileItemProps } from "./TileContainer.types";
 
-import { pickAriaProps } from "../../../utils/aria-props";
+import { groupRoleWhenNamed, pickAriaProps } from "../../../utils/aria-props";
 import styles from "./TileContainer.module.scss";
 import { Heading, HeadingSize } from "../../heading";
 
@@ -169,6 +169,7 @@ export const TileContainer = ({
   return (
     <div
       {...pickAriaProps(rest)}
+      role={groupRoleWhenNamed(rest)}
       className={classNames(className, styles.tileContainer, {
         [styles.noSelect]: noSelect,
       })}

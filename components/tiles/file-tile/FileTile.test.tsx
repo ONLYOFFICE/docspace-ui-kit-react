@@ -198,6 +198,13 @@ describe("FileTile", () => {
     );
   });
 
+  it("makes a named tile a group and keeps a passed aria-busy", () => {
+    render(<FileTile {...defaultProps} aria-label="Report.docx" aria-busy />);
+    const tile = screen.getByRole("group", { name: "Report.docx" });
+    expect(tile).toBe(screen.getByTestId("tile"));
+    expect(tile).toHaveAttribute("aria-busy", "true");
+  });
+
   it("renders file title correctly", () => {
     render(
       <FileTile {...defaultProps}>

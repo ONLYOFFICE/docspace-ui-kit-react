@@ -212,8 +212,8 @@ away from its back arrow.
   when none is loaded); the arrow by `backLabel`, by default "Back".
 - The title, string or node, is truncated with an ellipsis, so a long one is unreadable rather
   than wrapped; keep titles short.
-- **A passed `aria-*` lands on the header's outer element and is kept.** That element has no
-  role, so name a dialog on the element that holds the header.
+- **A passed `aria-*` lands on the header's outer element and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
+  Name the dialog itself on the element that holds the header.
 
 ## Test ids
 

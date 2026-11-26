@@ -2,7 +2,7 @@ import { Text } from "../text";
 
 import EmptyViewOption from "./sub-components/EmptyViewOption";
 
-import { pickAriaProps } from "../../utils/aria-props";
+import { groupRoleWhenNamed, pickAriaProps } from "../../utils/aria-props";
 import styles from "./EmptyView.module.scss";
 import type { EmptyViewProps } from "./EmptyView.types";
 
@@ -20,6 +20,7 @@ const EmptyView = ({
   return (
     <div
       {...pickAriaProps(rest)}
+      role={groupRoleWhenNamed(rest)}
       className={`${styles.wrapper}${className ? ` ${className}` : ""}`}
       data-testid="empty-view"
     >

@@ -181,6 +181,13 @@ describe("FolderTile", () => {
     );
   });
 
+  it("makes a named tile a group and keeps a passed aria-busy", () => {
+    renderFolderTile({ "aria-label": "Contracts", "aria-busy": true });
+    const tile = screen.getByRole("group", { name: "Contracts" });
+    expect(tile).toBe(screen.getByTestId("tile"));
+    expect(tile).toHaveAttribute("aria-busy", "true");
+  });
+
   it("renders folder title correctly", () => {
     renderFolderTile();
     expect(screen.getByTestId("folder-content")).toBeTruthy();

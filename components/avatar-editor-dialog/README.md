@@ -280,7 +280,7 @@ variable on `<body>` or `:root`.
 - **The dialog is named by `title`.** The header is a `Text`, not a heading, so the name is an
   `aria-label`; a passed `aria-label` or `aria-labelledby` replaces it.
 - **A passed `aria-*` lands on the `role="dialog"` element and is kept.**
-- The editor inside is a `role="region"` labelled "Image editor", in English whatever `t` says.
+- The editor inside is a `role="region"` with no name, so it is not announced as a landmark.
 - The replace control is a keyboard button, named by its "Choose another" text.
 - The zoom buttons are focusable buttons with no accessible name, and the zoom slider is
   reachable. The crop position is pointer-only.

@@ -148,8 +148,7 @@ export function FileDetails({
   with the pipes between the facts.
 - `onClick` is on the content element, which is not focusable and has no keyboard route. The
   row around it is not focusable either.
-- **A passed `aria-*` lands on the content and is kept.** It has no role, so a name there is not
-  read.
+- **A passed `aria-*` lands on the content and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
 
 ## Test ids
 

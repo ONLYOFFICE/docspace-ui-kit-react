@@ -15,6 +15,16 @@ export const pickAriaProps = (props: object): React.AriaAttributes => {
 };
 
 /**
+ * `"group"` when `props` name the element (`aria-label` or `aria-labelledby`),
+ * otherwise `undefined`. For an element with no role of its own: a screen
+ * reader ignores a name on a plain `div`, and reads it on a group.
+ */
+export const groupRoleWhenNamed = (props: object): "group" | undefined => {
+  const aria = props as React.AriaAttributes;
+  return aria["aria-label"] || aria["aria-labelledby"] ? "group" : undefined;
+};
+
+/**
  * Everything in `props` but the `aria-*` attributes, for the parts of a
  * component that must not repeat the name or state its role element carries.
  */

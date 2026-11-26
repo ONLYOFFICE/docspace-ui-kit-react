@@ -161,8 +161,7 @@ export function TitleWithSize({ name, size }: { name: string; size: string }) {
   title opens the item, make the child itself a link or a button.
 - The truncation is visual only, so the full name stays in the accessibility tree. A `title` on
   the child helps a sighted mouse user, not a screen reader.
-- **A passed `aria-*` lands on the content and is kept.** It has no role, so a name there is not
-  read.
+- **A passed `aria-*` lands on the content and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
 
 ## Test ids
 

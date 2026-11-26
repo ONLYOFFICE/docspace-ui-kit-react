@@ -14,7 +14,7 @@ import {
 } from "../../utils/date";
 
 import { getValidDates } from "./utils";
-import { pickAriaProps } from "../../utils/aria-props";
+import { groupRoleWhenNamed, pickAriaProps } from "../../utils/aria-props";
 import { CalendarProps } from "./Calendar.types";
 import styles from "./Calendar.module.scss";
 
@@ -160,6 +160,7 @@ const Calendar = ({
   return (
     <div
       {...pickAriaProps(rest)}
+      role={groupRoleWhenNamed(rest)}
       id={id}
       className={classNames(styles.container, className, {
         [styles.isScroll]: isScroll,

@@ -18,7 +18,7 @@ import {
   BaseTileItemProps,
 } from "./BaseTile.types";
 
-import { pickAriaProps } from "../../../utils/aria-props";
+import { groupRoleWhenNamed, pickAriaProps } from "../../../utils/aria-props";
 import styles from "./BaseTile.module.scss";
 
 export const BaseTile = ({
@@ -142,6 +142,7 @@ export const BaseTile = ({
   return (
     <div
       {...pickAriaProps(rest)}
+      role={groupRoleWhenNamed(rest)}
       className={tileClassName}
       onClick={onRoomClick}
       onContextMenu={onContextMenu}

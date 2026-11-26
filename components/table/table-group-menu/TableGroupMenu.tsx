@@ -16,7 +16,7 @@ import { IconButton } from "../../icon-button";
 import { Scrollbar } from "../../scrollbar";
 
 import { GroupMenuItem } from "../sub-components/group-menu-item";
-import { pickAriaProps } from "../../../utils/aria-props";
+import { groupRoleWhenNamed, pickAriaProps } from "../../../utils/aria-props";
 import type { TableGroupMenuProps, TGroupMenuProps } from "../Table.types";
 
 import styles from "./TableGroupMenu.module.scss";
@@ -70,6 +70,7 @@ const TableGroupMenu = memo((props: TableGroupMenuProps) => {
   return (
     <div
       {...pickAriaProps(props)}
+      role={groupRoleWhenNamed(props)}
       className={classNames(
         styles.tableGroupMenu,
         "table-container_group-menu",

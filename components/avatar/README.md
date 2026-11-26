@@ -276,7 +276,7 @@ Each badge also reads `--avatar-owner-stroke` and `--avatar-owner-color`, or the
 - As a button it carries `role="button"`, `tabindex="0"` and `aria-label` set to `userName`.
   Enter and Space click it, which opens the edit menu or the file dialog.
 - **A passed `aria-*` lands on the avatar and is kept.** A passed `aria-label` wins over
-  `userName`.
+  `userName`. On an avatar that is not a button, a passed name makes it a `role="group"`.
 - A picture's `alt` text is `userName`; with no `userName` it is empty and the picture is
   treated as decorative.
 - The edit button is an [`IconButton`](../icon-button/README.md) with an `onClick`, so it is a

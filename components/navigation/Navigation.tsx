@@ -1,6 +1,7 @@
 import React, { useCallback } from "react";
 
 import { Consumer, DomHelpers } from "../../utils";
+import { consumeKey } from "../../utils/consume-key";
 import { Backdrop } from "../backdrop";
 
 import ArrowButton from "./sub-components/ArrowBtn";
@@ -14,7 +15,11 @@ import NavigationText from "./sub-components/Text";
 
 import { DeviceType } from "../../enums";
 import styles from "./Navigation.module.scss";
-import { omitAriaProps, pickAriaProps } from "../../utils/aria-props";
+import {
+  groupRoleWhenNamed,
+  omitAriaProps,
+  pickAriaProps,
+} from "../../utils/aria-props";
 import { TNavigationProps } from "./Navigation.types";
 import Badges from "./sub-components/Badges";
 
@@ -159,15 +164,37 @@ const Navigation = ({
     }
   }, [navigationItems]);
 
-  // Focus follows the box: into its copy of the title when it opens from the
-  // header, and back to the header's title when it closes with the focus in
-  // it -- unless something else has taken the focus by then.
+  // Whether the last input was a key rather than a pointer, the same signal
+  // :focus-visible goes by. Only a keyboard user needs the focus moved for
+  // them; a mouse click leaves it where the click put it.
+  const keyboardInputRef = React.useRef(false);
+
+  React.useEffect(() => {
+    const onKey = () => {
+      keyboardInputRef.current = true;
+    };
+    const onPointer = () => {
+      keyboardInputRef.current = false;
+    };
+    document.addEventListener("keydown", onKey, true);
+    document.addEventListener("pointerdown", onPointer, true);
+    return () => {
+      document.removeEventListener("keydown", onKey, true);
+      document.removeEventListener("pointerdown", onPointer, true);
+    };
+  }, []);
+
+  // Focus follows the box: into its copy of the title when the keyboard
+  // opens it from the header, and back to the header's title when the
+  // keyboard closes it with the focus in it -- unless something else has
+  // taken the focus by then.
   const focusInDropBoxRef = React.useRef(false);
 
   React.useEffect(() => {
     if (!isOpen) {
       if (!focusInDropBoxRef.current) return;
       focusInDropBoxRef.current = false;
+      if (!keyboardInputRef.current) return;
       const active = document.activeElement;
       if (active && active !== document.body) return;
       containerRef.current
@@ -176,7 +203,10 @@ const Navigation = ({
       return;
     }
 
-    if (containerRef.current?.contains(document.activeElement))
+    if (
+      keyboardInputRef.current &&
+      containerRef.current?.contains(document.activeElement)
+    )
       dropBoxRef.current
         ?.querySelector<HTMLElement>("[aria-expanded]")
         ?.focus();
@@ -186,19 +216,31 @@ const Navigation = ({
         e.target as Node,
       );
     };
+    // Escape pressed inside the navigation is spent on the box: the page's
+    // own Escape (closing an aside, clearing the selection) must not act on
+    // the same press. Pressed elsewhere, it closes the box and goes on.
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !e.defaultPrevented) setIsOpen(false);
+      if (e.key !== "Escape" || e.defaultPrevented) return;
+      setIsOpen(false);
+      const target = e.target as Node;
+      if (
+        containerRef.current?.contains(target) ||
+        dropBoxRef.current?.contains(target)
+      ) {
+        e.preventDefault();
+        consumeKey(e);
+      }
     };
 
     focusInDropBoxRef.current = !!dropBoxRef.current?.contains(
       document.activeElement,
     );
     document.addEventListener("focusin", onFocusIn);
-    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("keydown", onKeyDown, true);
 
     return () => {
       document.removeEventListener("focusin", onFocusIn);
-      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("keydown", onKeyDown, true);
     };
   }, [isOpen]);
 
@@ -323,6 +365,7 @@ const Navigation = ({
           ) : null}
           <div
             {...pickAriaProps(rest)}
+            role={groupRoleWhenNamed(rest)}
             ref={setContainerRef}
             className={styles.container}
             data-is-root-folder={isRootFolder ? "true" : "false"}

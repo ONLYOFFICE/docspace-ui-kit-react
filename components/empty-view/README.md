@@ -224,8 +224,7 @@ items have no override either.
   activates too.
 - The icon you pass is rendered as given; mark it `aria-hidden` unless it carries meaning the
   title does not.
-- **A passed `aria-*` lands on the wrapper and is kept.** The wrapper has no role, so a name
-  there is not read.
+- **A passed `aria-*` lands on the wrapper and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
 
 ## Test ids
 

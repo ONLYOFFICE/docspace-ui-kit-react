@@ -404,8 +404,8 @@ negative margin never sees it.
 - The panels' resize handles take a mouse, a finger or a pen. They carry `role="presentation"`
   and no tab stop, so the keyboard cannot reach them and screen readers skip them.
 - Nothing announces the operations progress; the button that shows it is visual only.
-- **A passed `aria-*` lands on the section container and is kept.** The container has no role,
-  so label a `<main>` of your own for a landmark.
+- **A passed `aria-*` lands on the section container and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
+  For a landmark, label a `<main>` of your own.
 
 ## Test ids
 

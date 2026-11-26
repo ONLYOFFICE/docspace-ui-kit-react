@@ -61,7 +61,7 @@ const Modal = ({
   "aria-describedby": ariaDescribedBy,
   ...rest
 }: ModalSubComponentsProps) => {
-  // A passed ria-* describes the dialog; everything else is the header's.
+  // A passed aria-* describes the dialog; everything else is the header's.
   const aria = pickAriaProps(rest);
   const headerRest = omitAriaProps(rest);
 

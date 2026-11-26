@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { HelpButton } from ".";
 
 describe("<HelpButton />", () => {
@@ -144,6 +144,51 @@ describe("<HelpButton />", () => {
     );
 
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
+  });
+
+  it("makes the element around children a group when it is named", () => {
+    render(
+      <HelpButton tooltipContent={tooltipContent} aria-label="About storage">
+        <span>Storage</span>
+      </HelpButton>,
+    );
+
+    expect(screen.getByRole("group", { name: "About storage" })).toBe(
+      screen.getByText("Storage").parentElement,
+    );
+  });
+
+  // A tooltip opened from the keyboard was neither read out nor closed when
+  // the focus moved on.
+  it("announces a tooltip the keyboard opens, and closes it on Tab", async () => {
+    render(
+      <>
+        <HelpButton tooltipContent={<b>Rich content</b>} />
+        <button type="button">Next</button>
+      </>,
+    );
+    const icon = screen.getByRole("button", { name: "Info" });
+    const region = screen.getByRole("status");
+    expect(region).toBeEmptyDOMElement();
+
+    icon.focus();
+    fireEvent.keyDown(icon, { key: "Enter" });
+
+    await waitFor(() => expect(region).toHaveTextContent("Rich content"));
+    const tooltipId = icon.getAttribute("aria-describedby") as string;
+    expect(document.getElementById(tooltipId)).toHaveTextContent(
+      "Rich content",
+    );
+
+    fireEvent.blur(icon, {
+      relatedTarget: screen.getByRole("button", { name: "Next" }),
+    });
+
+    await waitFor(() =>
+      expect(document.getElementById(tooltipId)).not.toBeInTheDocument(),
+    );
+    expect(region).toBeEmptyDOMElement();
+    expect(icon).not.toHaveAttribute("aria-describedby");
   });
 
   it("lets a passed aria-label name the button", () => {

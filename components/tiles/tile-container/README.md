@@ -231,8 +231,7 @@ inherit, so setting them once on the container restyles every tile in the listin
   container.
 - Nothing here manages focus or announces that the listing changed. Announce the result count
   yourself when the content is replaced by a filter.
-- **A passed `aria-*` lands on the container and is kept.** It has no role, so a name there is not
-  read.
+- **A passed `aria-*` lands on the container and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
 
 ## Test ids
 

@@ -301,8 +301,7 @@ name when the content is a link, and that underline has no variable.
 - The generated tag is the only place the room type is stated. It is a label, not an accessible
   description of the tile.
 - `inProgress` sets `aria-busy="true"` on the tile.
-- **A passed `aria-*` lands on the base tile's outer element and is kept.** It has no role, so a name there is not
-  read.
+- **A passed `aria-*` lands on the base tile's outer element and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
 
 ## Test ids
 

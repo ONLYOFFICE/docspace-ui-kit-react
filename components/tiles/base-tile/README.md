@@ -271,8 +271,7 @@ declares only private fallbacks of its own, so an inherited value reaches it.
   the keyboard, so a blocked tile's ticked checkbox can still be toggled.
 - The right-click menu is pointer-only. The three-dot button is the keyboard path to the same
   actions, so keep it available.
-- **A passed `aria-*` lands on the tile and is kept.** It has no role, so a name there is not
-  read. `inProgress` sets `aria-busy` over a passed value.
+- **A passed `aria-*` lands on the tile and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read. `inProgress` sets `aria-busy` over a passed value.
 
 ## Test ids
 

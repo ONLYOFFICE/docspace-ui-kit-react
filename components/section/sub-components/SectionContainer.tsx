@@ -2,6 +2,7 @@ import classNames from "classnames";
 
 import { Scrollbar } from "../../scrollbar";
 import { DeviceType } from "../../../enums";
+import { groupRoleWhenNamed } from "../../../utils/aria-props";
 
 import { SectionContainerProps } from "../Section.types";
 import styles from "../Section.module.scss";
@@ -22,6 +23,7 @@ const SectionContainer = ({
   return (
     <div
       {...aria}
+      role={aria ? groupRoleWhenNamed(aria) : undefined}
       ref={forwardRef}
       id="section"
       inert={inert}

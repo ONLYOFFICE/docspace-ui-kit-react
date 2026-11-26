@@ -1,4 +1,4 @@
-import { pickAriaProps } from "../../utils/aria-props";
+import { groupRoleWhenNamed, pickAriaProps } from "../../utils/aria-props";
 import type { LoaderWrapperProps } from "./LoaderWrapper.types";
 
 export const LoaderWrapper = ({
@@ -10,6 +10,7 @@ export const LoaderWrapper = ({
   return (
     <div
       {...pickAriaProps(rest)}
+      role={groupRoleWhenNamed(rest)}
       style={{
         opacity: isLoading
           ? "var(--loader-wrapper-loading-opacity, 0.5)"

@@ -12,7 +12,7 @@
   "state": { "visibility": "isOpen", "close": "afterHide", "loading": null, "disabled": null },
   "related": ["tooltip", "icon-button", "field-container"],
   "subComponents": [],
-  "testIds": ["help-button"],
+  "testIds": ["help-button", "help-button-announcement"],
   "storiesAudit": "2026-09-28"
 } -->
 
@@ -206,21 +206,22 @@ element itself, so use the `color` prop.
   takes Tab focus, and Enter or Space opens the tooltip. It is named "Info", translated.
 - **With `openOnClick={false}` the icon is not a button.** A hover tooltip has no keyboard route, so
   the icon stays a `<div>` with no role and no tab stop.
-- The tooltip's text is not announced: nothing links it to the icon. When the content matters, put
-  the same text in the page, where it needs no opening.
+- **A tooltip the keyboard opens is read out.** Its text goes into a hidden live region, and the
+  icon carries `aria-describedby` pointing at it while it is open. A hover or mouse opening is
+  not announced.
+- **It closes when the focus leaves the icon**, unless the focus moves into the tooltip itself.
 - **A passed `aria-*` is kept on the anchor**: the info icon, or the element around `children`. A
   passed `aria-label` replaces "Info". `role` and `ariaLabel` are left out of its props.
-- **The element around `children` has no role.** Pass a `<button>` as `children` to give the
-  explanation a named, focusable trigger.
+- **The element around `children` has no role** unless it is named, which makes it a
+  `role="group"`. Pass a `<button>` as `children` for a focusable trigger.
 - Once open, the tooltip closes on Escape.
-- The tooltip is not linked to anything by `aria-describedby`; nothing here reaches the
-  accessibility tree.
 
 ## Test ids
 
-| Element     | `data-testid`                                |
-| ----------- | -------------------------------------------- |
-| The wrapper | `help-button`, overridable with `dataTestId` |
+| Element                                     | `data-testid`                                |
+| ------------------------------------------- | -------------------------------------------- |
+| The wrapper                                 | `help-button`, overridable with `dataTestId` |
+| The live region, while the icon is a button | `help-button-announcement`                   |
 
 The icon inside carries `icon-button` from [`IconButton`](../icon-button/README.md).
 

@@ -170,9 +170,11 @@ export const Default: Story = {
     editorBorderRadius: 8,
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
-    await expect(
-      canvas.getByRole("region", { name: "Image editor" }),
-    ).toBeVisible();
+    // No English fallback: the region is named only by a passed aria-label.
+    const editor = canvas.getByTestId("image-editor");
+    await expect(editor).toBeVisible();
+    await expect(editor).toHaveAttribute("role", "region");
+    await expect(editor).not.toHaveAttribute("aria-label");
     await expect(canvas.getByTestId("change_image_button")).toHaveTextContent(
       "choose another image",
     );

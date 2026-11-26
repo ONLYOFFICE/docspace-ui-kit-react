@@ -164,6 +164,15 @@ const icon = (canvas: Canvas) =>
 const tooltipShows = (text: string) =>
   waitFor(() => expect(screen.getByText(text)).toBeVisible());
 
+// Opened from the keyboard, the text is also in the hidden live region.
+const keyboardTooltipShows = (canvas: Canvas, text: string) =>
+  waitFor(() => {
+    expect(screen.getByRole("tooltip")).toHaveTextContent(text);
+    expect(canvas.getByTestId("help-button-announcement")).toHaveTextContent(
+      text,
+    );
+  });
+
 const icons = (canvas: { getAllByTestId: (id: string) => HTMLElement[] }) =>
   canvas
     .getAllByTestId("help-button")
@@ -186,7 +195,7 @@ export const Default: Story = {
     );
     canvas.getByRole("button", { name: "Info" }).focus();
     await userEvent.keyboard("{Enter}");
-    await tooltipShows("This is a help tooltip");
+    await keyboardTooltipShows(canvas, "This is a help tooltip");
   },
   render: (args) => (
     <div style={{ padding: "40px 20px" }}>
@@ -444,7 +453,10 @@ export const WithTextContent: Story = {
     );
     anchor.focus();
     await userEvent.keyboard("{Enter}");
-    await tooltipShows("Plain text opens in the shared tooltip");
+    await keyboardTooltipShows(
+      canvas,
+      "Plain text opens in the shared tooltip",
+    );
   },
   parameters: {
     docs: {

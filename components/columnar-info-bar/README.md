@@ -230,8 +230,7 @@ themes, so a value set on an ancestor never reaches it. `neutral` and `page` dec
   is usually not announced. The bar is announced on appearing and again when its content changes.
 - A virtual cursor meets the text twice. The `page` variant is static and announces nothing.
 - Nothing here traps focus or moves it.
-- **A passed `aria-*` lands on the bar's outer element and is kept.** That element has no role,
-  so a name there is not read.
+- **A passed `aria-*` lands on the bar's outer element and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
 
 ## Test ids
 

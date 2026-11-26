@@ -17,7 +17,7 @@ import { ContextMenu, ContextMenuRefType } from "../../context-menu";
 import { Loader, LoaderTypes } from "../../loader";
 import { IndexIconButtons } from "./sub-components/index-icon-buttons";
 
-import { pickAriaProps } from "../../../utils/aria-props";
+import { groupRoleWhenNamed, pickAriaProps } from "../../../utils/aria-props";
 import { RowProps } from "./Row.types";
 import { hasOwnProperty } from "../../../utils";
 import styles from "./Row.module.scss";
@@ -139,6 +139,7 @@ const Row = React.memo((props: RowProps) => {
   return (
     <div
       {...pickAriaProps(props)}
+      role={groupRoleWhenNamed(props)}
       ref={row}
       id={id}
       style={style}
@@ -155,7 +156,7 @@ const Row = React.memo((props: RowProps) => {
         className,
       )}
       data-testid={dataTestId ?? "row"}
-      aria-busy={inProgress || undefined}
+      aria-busy={inProgress || props["aria-busy"]}
     >
       {inProgress ? (
         <Loader

@@ -213,8 +213,7 @@ Set them on the component's `style`, on an ancestor, or on the theme provider.
   mounted, such as the search field's.
 - The actions are whatever you pass; their roles and labels are yours to get right. A link
   styled as an action still needs an `href` to be reachable by keyboard.
-- **A passed `aria-*` lands on the container and is kept.** The container has no role, so a
-  name there is not read.
+- **A passed `aria-*` lands on the container and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
 
 ## Test ids
 

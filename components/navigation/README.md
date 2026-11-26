@@ -316,8 +316,11 @@ show only while it is open. The header's other colours come from the theme and a
   `role="button"`, take Tab focus and answer Enter and Space.
 - **The folder name carries `aria-expanded`** while it can open the drop box. In the root folder or
   with an empty trail it is a plain heading.
-- **Focus follows the drop box.** Opened from the folder name, it moves to the box's copy of that
-  name. Closed with the focus inside, it returns to the header's folder name.
+- **Focus follows the drop box from the keyboard.** Opened from the folder name, it moves to the
+  box's copy of that name. Closed with the focus inside, it returns to the header's folder name. A
+  mouse click leaves the focus where the click put it.
+- A held Enter or Space opens or closes the box once. With Ctrl, Alt or Meta the key does nothing
+  here.
 - **The logo is pointer-only.** It is a `<div>` with an `onClick`, and no role, `tabindex` or key
   handler.
 - **The icon buttons are keyboard buttons.** The back arrow, the plus, the folder and the info
@@ -330,11 +333,10 @@ show only while it is open. The header's other colours come from the theme and a
   button sits inside its heading, so the heading keeps its role.
 - The header is not a landmark: there is no `<nav>`, no `aria-label` and no breadcrumb semantics.
 - The drop box is an ordinary positioned `<div>`, not a dialog. Escape closes it, and Tab can leave
-  it.
+  it. Pressed inside the header or the box, Escape stops there and does not reach the page.
 - The logo's `alt` is the product name as the portal brands it; the burger image has an empty
   `alt`.
-- **A passed `aria-*` lands on the header's container and is kept.** The container has no role,
-  so a name there is not read.
+- **A passed `aria-*` lands on the header's container and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
 
 ## Test ids
 

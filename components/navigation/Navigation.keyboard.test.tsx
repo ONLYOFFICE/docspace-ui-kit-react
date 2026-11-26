@@ -84,6 +84,57 @@ describe("Navigation from the keyboard", () => {
     expect(document.activeElement).toBe(title);
   });
 
+  it("keeps Escape pressed in the box from the page", () => {
+    render(<Navigation {...props} onClickFolder={vi.fn()} />);
+    const onPageKeyDown = vi.fn();
+    document.addEventListener("keydown", onPageKeyDown);
+
+    const title = screen.getByRole("button", { name: "Contracts" });
+    title.focus();
+    fireEvent.keyDown(title, { key: "Enter" });
+    fireEvent.keyUp(title, { key: "Enter" });
+    fireEvent.keyDown(document.activeElement as HTMLElement, {
+      key: "Escape",
+    });
+
+    document.removeEventListener("keydown", onPageKeyDown);
+    expect(title).toHaveAttribute("aria-expanded", "false");
+    expect(onPageKeyDown).not.toHaveBeenCalled();
+  });
+
+  it("opens the box once while Enter is held", () => {
+    render(<Navigation {...props} onClickFolder={vi.fn()} />);
+
+    const title = screen.getByRole("button", { name: "Contracts" });
+    title.focus();
+    fireEvent.keyDown(title, { key: "Enter" });
+    fireEvent.keyDown(document.activeElement as HTMLElement, {
+      key: "Enter",
+      repeat: true,
+    });
+
+    expect(title).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("leaves the focus alone when the mouse opens and closes the box", () => {
+    const onClickFolder = vi.fn();
+    render(<Navigation {...props} onClickFolder={onClickFolder} />);
+
+    const title = screen.getByRole("button", { name: "Contracts" });
+    fireEvent.pointerDown(title);
+    title.focus();
+    fireEvent.click(title);
+    expect(document.activeElement).toBe(title);
+
+    const row = screen.getByRole("button", { name: "2026" });
+    fireEvent.pointerDown(row);
+    row.focus();
+    fireEvent.click(row);
+
+    expect(onClickFolder).toHaveBeenCalledWith("2", false, undefined);
+    expect(document.activeElement).not.toBe(title);
+  });
+
   it("keeps the title of the root folder a plain heading", () => {
     render(<Navigation {...props} isRootFolder onClickFolder={vi.fn()} />);
 

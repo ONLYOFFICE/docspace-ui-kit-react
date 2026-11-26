@@ -240,8 +240,7 @@ component's stylesheet fixes both at `12px`, and the tile is capped at 128px hig
 - `inProgress` sets `aria-busy="true"` on the tile. Nothing sets `aria-disabled`.
 - `isBlockingOperation` turns off the pointer but not the keyboard, so a blocked template's
   checkbox can still be toggled.
-- **A passed `aria-*` lands on the base tile's outer element and is kept.** It has no role, so a name there is not
-  read.
+- **A passed `aria-*` lands on the base tile's outer element and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
 
 ## Test ids
 

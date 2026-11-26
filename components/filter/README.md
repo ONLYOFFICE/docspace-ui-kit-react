@@ -340,7 +340,7 @@ export function FilterWithChips() {
 - **The sort menu marks the current field with an arrow** in the current direction. Picking that
   field again reverses the direction; picking another keeps it.
 - `onSortButtonClick` reports each change of the sort menu: `true` as it opens, `false` as it
-  closes. The first render reports nothing.
+  closes. The first render reports nothing, and unmounting with the menu open reports `false`.
 - **The sort button disappears** with `isIndexing`, `isFlowsPage` or `isRecentFolder`. The filter
   button disappears with `isIndexEditingMode` or `isFlowsPage`.
 - **The view selector is in two places.** On a desktop it is one button beside the sort button,
@@ -448,8 +448,7 @@ The search box, the chips and the buttons read their own components' variables:
   whenever the value getter returns a new non-empty value.
 - Nothing announces that the listing has been filtered or sorted. The chips are the only report,
   and they are not a live region.
-- **A passed `aria-*` lands on the bar's outer element and is kept.** It has no role, so a name there is not
-  read.
+- **A passed `aria-*` lands on the bar's outer element and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
 
 ## Test ids
 

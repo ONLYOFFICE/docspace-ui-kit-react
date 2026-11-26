@@ -250,14 +250,13 @@ fallback for both.
 - The three-dot button is named by its tooltip, "Show File Actions". Without a translation
   provider the tooltip is empty and the button is named "More options".
 - Ctrl-click and Shift-click have no keyboard equivalent.
-- `inProgress` sets `aria-busy="true"` on the tile, and its loader is decorative, so the tile
-  announces the busy state once.
+- `inProgress` sets `aria-busy="true"` on the tile, over a passed value. Its loader is decorative, so
+  the tile announces the busy state once.
 - The right-click menu is pointer-only. The three-dot button is the keyboard path to the same
   actions, so keep it available.
 - Make the name a real link. The tile's own click selects rather than opens, and the keyboard
   cannot reach it.
-- **A passed `aria-*` lands on the tile and is kept.** It has no role, so a name there is not
-  read.
+- **A passed `aria-*` lands on the tile and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
 
 ## Test ids
 

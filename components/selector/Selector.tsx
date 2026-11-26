@@ -7,7 +7,7 @@ import classNames from "classnames";
 
 import { ButtonKeys } from "../../enums";
 import { consumeKey } from "../../utils/consume-key";
-import { pickAriaProps } from "../../utils/aria-props";
+import { groupRoleWhenNamed, pickAriaProps } from "../../utils/aria-props";
 
 import { Aside } from "../aside";
 import { Backdrop } from "../backdrop";
@@ -726,6 +726,7 @@ const Selector = ({
   const selectorComponent = (
     <div
       {...pickAriaProps(rest)}
+      role={groupRoleWhenNamed(rest)}
       ref={selectorRef}
       id={id}
       className={classNames(styles.selector, className)}

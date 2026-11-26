@@ -23,7 +23,7 @@ import VirtualDataTemplateSvg from "../../assets/icons/32/template/virtual-data.
 import { RoomsType } from "../../enums";
 
 import { Checkbox } from "../checkbox";
-import { pickAriaProps } from "../../utils/aria-props";
+import { groupRoleWhenNamed, pickAriaProps } from "../../utils/aria-props";
 
 import type { RoomLogoProps } from "./RoomLogo.types";
 import styles from "./RoomLogo.module.scss";
@@ -112,6 +112,7 @@ const RoomLogoPure = ({
   return (
     <div
       {...pickAriaProps(rest)}
+      role={groupRoleWhenNamed(rest)}
       id={id}
       className={classNames(className, styles.container)}
       style={style}

@@ -240,8 +240,8 @@ Space.
 
 ## Accessibility
 
-- The outer element is a `region` labelled `"Image editor"`, in English. Pass a translated
-  `aria-label` to replace it.
+- The outer element is a `region` with no name of its own. Pass a translated `aria-label` to make
+  it a named landmark; without one it is not announced as a region.
 - **A passed `aria-*` lands on the region and is kept.**
 - **The replace control and `ButtonDelete` are keyboard buttons.** Each is a `<div>` with
   `role="button"`, reached with Tab and pressed with Enter or Space, and named by its text. The

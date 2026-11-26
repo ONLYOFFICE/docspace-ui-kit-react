@@ -8,6 +8,20 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **A named element with no role of its own becomes a `group`.** A passed `aria-label` or
+  `aria-labelledby` on a plain `<div>` was kept and never read. Now it adds `role="group"`, so
+  the name is announced. This covers `Article`, `AsideHeader`, `Calendar`, `ColumnarInfoBar`,
+  `ContextMenu`'s panel, `EmptyScreenContainer`, `EmptyView`, `Filter`, `LoaderWrapper`,
+  `Navigation`, `Paging`, `RoomIcon`, `RoomLogo`, `Section`, `Selector`, the rows, the table's
+  parts and the tiles. It also covers `HelpButton`'s element around `children`, and an `Avatar`
+  or `Tag` that is not a button. Without a name nothing changes
+- **Enter and Space on the kit's own keyboard buttons act once per press, and never with
+  Ctrl, Alt or Meta.** A held key used to repeat the action, and a modified one ran it too. A
+  held key is now kept from the page and does nothing; a modified one is left to the browser
+  and the page. This covers every `<div>` the kit makes a button, such as `Navigation`'s title
+  and drop box rows, `Article`'s collapse handle and a clickable `Tag`
+- **`ImageEditor`'s region has no English name of its own.** It was labelled "Image editor"
+  whatever the language. Pass a translated `aria-label` to name it
 - **Style rules and custom properties that nothing reads are gone.** `Section` kept a copy of
   `OperationsProgressButton`'s styles under a class it never sets, `MainButtonMobile` the styles
   of a progress bar it no longer draws, and `DropDown` a `withColumns` rule. Several components
@@ -431,6 +445,17 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`HelpButton`'s tooltip is read out when the keyboard opens it, and closes when the focus
+  moves on.** Its text goes into a live region, and the icon points at it with
+  `aria-describedby` while it is open. It used to appear silently and stay open after Tab
+- **`Navigation` moves the focus for the keyboard only, and keeps Escape to itself.** A mouse
+  click on a drop box row no longer puts the focus on the header's title. Escape pressed in the
+  header or the box closes the box and no longer reaches the page's own Escape handlers
+- **`Row`, `FileTile` and `FolderTile` keep a passed `aria-busy`.** It was dropped whenever
+  `inProgress` was not set
+- **`Filter` reports `onSortButtonClick(false)` when it unmounts with the sort menu open.** A
+  host that hid something while the menu was open, such as the mobile main button, kept it
+  hidden
 - **`Dropzone`'s full format list is opaque.** Its stylesheet set the list's background and
   border from `--background-content` and `--border-color`, which nothing defines, so the list was
   see-through over the area. The list now takes `DropDown`'s own background and border

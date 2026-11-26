@@ -9,7 +9,7 @@ import PencilReactSvgUrl from "../../assets/pencil.react.svg";
 import PlusSvgUrl from "../../assets/icons/16/button.plus.react.svg";
 
 import { IconSizeType, useClickOutside } from "../../utils";
-import { pickAriaProps } from "../../utils/aria-props";
+import { groupRoleWhenNamed, pickAriaProps } from "../../utils/aria-props";
 import { useCommonTranslation } from "../../utils/i18n";
 
 import { useInterfaceDirection, useTheme } from "../../context";
@@ -233,7 +233,7 @@ const AvatarPure = ({
         onKeyDown={isInteractive ? onKeyDown : undefined}
         ref={iconRef}
         data-testid={dataTestId ?? "avatar"}
-        role={isInteractive ? "button" : undefined}
+        role={isInteractive ? "button" : groupRoleWhenNamed(rest)}
         tabIndex={isInteractive ? 0 : undefined}
         aria-label={
           rest["aria-label"] ??

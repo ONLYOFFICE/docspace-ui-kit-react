@@ -17,7 +17,7 @@ import { Text } from "../text";
 import { Avatar, AvatarRole, AvatarSize } from "../avatar";
 import { IconButton } from "../icon-button";
 import { Portal } from "../portal";
-import { pickAriaProps } from "../../utils/aria-props";
+import { groupRoleWhenNamed, pickAriaProps } from "../../utils/aria-props";
 import { useCommonTranslation } from "../../utils/i18n";
 import { RoomIcon } from "../room-icon";
 
@@ -664,6 +664,7 @@ const ContextMenu = (props: ContextMenuProps) => {
         >
           <div
             {...pickAriaProps(props)}
+            role={groupRoleWhenNamed(props)}
             ref={menuRef}
             id={id}
             className={currentClassName}

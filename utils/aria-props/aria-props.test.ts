@@ -1,6 +1,21 @@
 import { describe, expect, it } from "vitest";
 
-import { omitAriaProps, pickAriaProps } from ".";
+import { groupRoleWhenNamed, omitAriaProps, pickAriaProps } from ".";
+
+describe("groupRoleWhenNamed", () => {
+  it("is a group when a label or a labelledby names the element", () => {
+    expect(groupRoleWhenNamed({ "aria-label": "Files" })).toBe("group");
+    expect(groupRoleWhenNamed({ "aria-labelledby": "title" })).toBe("group");
+  });
+
+  it("gives no role without a name", () => {
+    expect(groupRoleWhenNamed({})).toBeUndefined();
+    expect(groupRoleWhenNamed({ "aria-label": "" })).toBeUndefined();
+    expect(
+      groupRoleWhenNamed({ "aria-describedby": "hint", ariaLabel: "Files" }),
+    ).toBeUndefined();
+  });
+});
 
 describe("omitAriaProps", () => {
   it("keeps everything but the aria-* attributes", () => {

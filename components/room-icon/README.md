@@ -270,8 +270,7 @@ A stylesheet cannot override them.
   named by the translated "Edit".
 - The badge is a focusable button only with `onBadgeClick`, named by `badgeLabel`. Without it the
   button is unnamed. The menu is a `DropDown` that closes on an outside click.
-- **A passed `aria-*` lands on the outer `<div>`.** It has no role, so a name there is not
-  announced. `aria-hidden` works: use it on a tile without editing buttons, beside the room's name.
+- **A passed `aria-*` lands on the outer `<div>`.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read. `aria-hidden` works: use it on a tile without editing buttons, beside the room's name.
 
 ## Test ids
 

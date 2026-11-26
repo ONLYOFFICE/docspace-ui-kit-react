@@ -27,7 +27,7 @@ import { isDesktop, isMobile } from "../../utils";
 import useSearch from "./hooks/useSearch";
 import { useCommonTranslation } from "../../utils/i18n";
 import { activateOnButtonKey } from "../../utils/keyboard-activation";
-import { pickAriaProps } from "../../utils/aria-props";
+import { groupRoleWhenNamed, pickAriaProps } from "../../utils/aria-props";
 import styles from "./Filter.module.scss";
 import { FilterProps, TItem, TRoomGroup } from "./Filter.types";
 import {
@@ -604,6 +604,7 @@ const FilterInput = React.memo(
     return (
       <div
         {...pickAriaProps(rest)}
+        role={groupRoleWhenNamed(rest)}
         className={classNames(styles.filterInput, {
           [styles.tileView]: viewAs === "tile",
         })}

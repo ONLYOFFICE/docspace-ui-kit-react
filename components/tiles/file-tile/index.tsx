@@ -14,6 +14,7 @@ import { Loader, LoaderTypes } from "../../loader";
 
 import { useCommonTranslation, isMobile, isTablet } from "../../../utils";
 import { hasOwnProperty } from "../../../utils/hasOwnProperty";
+import { groupRoleWhenNamed } from "../../../utils/aria-props";
 
 import { FileChildProps, FileTileProps } from "./FileTile.types";
 
@@ -259,13 +260,14 @@ const FileTile = ({
 
   return (
     <div
+      role={groupRoleWhenNamed(rest)}
       {...rest}
       ref={forwardRef}
       className={fileTileClassNames}
       onContextMenu={onContextMenu}
       onClick={onFileClick}
       data-testid={dataTestId ?? "tile"}
-      aria-busy={inProgress || undefined}
+      aria-busy={inProgress || rest["aria-busy"]}
     >
       <div className={fileTileTopClassNames} onClick={thumbnailClick}>
         {icon}

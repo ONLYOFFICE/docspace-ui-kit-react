@@ -741,8 +741,7 @@ The two empty-screen variables show only while the list is empty.
   Enter or Space.
 - Give the panel a name yourself: `headerProps.headerLabel` renders as text, not as a label for
   the region.
-- **A passed `aria-*` lands on the outer element and is kept.** It has no role, so a name there is not
-  read.
+- **A passed `aria-*` lands on the outer element and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
 
 ## Test ids
 

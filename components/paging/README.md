@@ -255,8 +255,7 @@ Set them on an ancestor or through the `style` prop; the strip reads them from e
   `disabled` attribute, so the button leaves the tab order at that end of the range.
 - The strip itself is a plain `<div>`: it has no `role="navigation"` and no label. Wrap it in a
   `<nav aria-label="Pagination">` of your own when the page has more than one set of controls.
-- **A passed `aria-*` lands on the strip and is kept.** It has no role, so a name there is not
-  read.
+- **A passed `aria-*` lands on the strip and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
 - Changing a page replaces the list above without announcing anything. Put the result range in a
   live region, or move focus to the top of the list after the fetch.
 - The two selectors are the kit's combo box; its keyboard behaviour and ARIA are documented in

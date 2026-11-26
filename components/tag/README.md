@@ -239,7 +239,7 @@ are declared by the theme on the tag itself. A wrapper cannot override them.
   and pressed by Enter and Space. It is named by the translated "Remove", which does not say
   which tag it removes.
 - **A passed `aria-*` lands on the tag and is kept.** A passed `aria-label` wins over `label`,
-  which is the name otherwise. `isDisabled` sets `aria-disabled` over a passed value.
+  which is the name otherwise. `isDisabled` sets `aria-disabled` over a passed value. On a tag that is not a button, a passed name makes it a `role="group"`.
 - A tag with `withLabel={false}` announces only its `aria-label`, so keep `label` filled in
   even when it is not drawn.
 

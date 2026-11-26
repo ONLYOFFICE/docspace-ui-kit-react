@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from "react";
 import CrossReactSvg from "../../assets/icons/12/cross.react.svg";
 import { useLiveRegionTextOf } from "../../hooks/useLiveRegionText";
 import { useCommonTranslation } from "../../utils/i18n";
-import { pickAriaProps } from "../../utils/aria-props";
+import { groupRoleWhenNamed, pickAriaProps } from "../../utils/aria-props";
 
 import type { ColumnarInfoBarProps } from "./ColumnarInfoBar.types";
 import styles from "./ColumnarInfoBar.module.scss";
@@ -61,7 +61,12 @@ const ColumnarInfoBar = ({
 
   if (variant === "page") {
     return (
-      <div {...pickAriaProps(rest)} className={className} style={style}>
+      <div
+        {...pickAriaProps(rest)}
+        role={groupRoleWhenNamed(rest)}
+        className={className}
+        style={style}
+      >
         <div className={styles.pageHeader}>
           {header}
           {onAction ? (
@@ -81,7 +86,12 @@ const ColumnarInfoBar = ({
   }
 
   return (
-    <div {...pickAriaProps(rest)} className={className} style={style}>
+    <div
+      {...pickAriaProps(rest)}
+      role={groupRoleWhenNamed(rest)}
+      className={className}
+      style={style}
+    >
       <div className={styles.content} ref={contentRef}>
         {header}
         {list}

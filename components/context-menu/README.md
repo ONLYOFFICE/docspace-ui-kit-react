@@ -322,8 +322,8 @@ list and `maxHeightLowerSubmenu` for a second-level submenu.
   reader does not announce which item it is on.
 - Nothing links the opener to the menu by `aria-controls` or `aria-expanded`; add those on your
   own control.
-- **A passed `aria-*` lands on the menu panel and is kept**, the element that takes `id`. The
-  panel has no `menu` role, so a name there is not read; point `aria-controls` at its `id`.
+- **A passed `aria-*` lands on the menu panel and is kept**, the element that takes `id`. A
+  passed name makes the panel a `role="group"`, not a `menu`; point `aria-controls` at its `id`.
 - A right-click is the usual way in, which no keyboard user has. Give the same actions a button
   as well, as [`Row`](../rows/row/README.md) does.
 

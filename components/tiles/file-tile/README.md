@@ -289,14 +289,14 @@ or an ancestor, and the fade plays once, for two seconds, when the tile mounts.
   tile.
 - Ctrl-click and Shift-click have no keyboard equivalent, so range and additive selection are
   pointer-only.
-- `inProgress` sets `aria-busy="true"` on the tile, and its loader is decorative, so the tile
-  announces the busy state once.
+- `inProgress` sets `aria-busy="true"` on the tile, over a passed value. Its loader is decorative, so
+  the tile announces the busy state once.
 - The badges and quick actions are your own elements. Label them, or they are not announced as
   belonging to the file.
 - Make the name a real link, so the file can be opened from the keyboard. The tile's own click
   selects rather than opens.
 - **A passed `aria-*` lands on the outer `<div>` and is kept**, like every prop the tile does not
-  name.
+  name. A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
 
 ## Test ids
 

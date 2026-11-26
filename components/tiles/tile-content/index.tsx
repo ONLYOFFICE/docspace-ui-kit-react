@@ -1,5 +1,5 @@
 import React from "react";
-import { pickAriaProps } from "../../../utils/aria-props";
+import { groupRoleWhenNamed, pickAriaProps } from "../../../utils/aria-props";
 import styles from "./TileContent.module.scss";
 import { TileContentProps } from "./TileContent.types";
 
@@ -14,6 +14,7 @@ export const TileContent = ({
   return (
     <div
       {...pickAriaProps(rest)}
+      role={groupRoleWhenNamed(rest)}
       id={id}
       className={`${styles.tileContent} ${className || ""}`}
       style={style}

@@ -84,6 +84,18 @@ const SortButton = ({
     onSortButtonClick?.(isOpen);
   }, [isOpen, onSortButtonClick]);
 
+  // A list open when the button goes away is closed with it, and says so:
+  // whoever hid something while it was open must get to show it again.
+  const onSortButtonClickRef = React.useRef(onSortButtonClick);
+  onSortButtonClickRef.current = onSortButtonClick;
+
+  React.useEffect(
+    () => () => {
+      if (reportedOpen.current) onSortButtonClickRef.current?.(false);
+    },
+    [],
+  );
+
   const onOptionClick = React.useCallback(
     (e: React.MouseEvent | React.ChangeEvent<HTMLInputElement>) => {
       const target = e.target as HTMLDivElement;

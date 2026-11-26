@@ -196,7 +196,7 @@ instance. A wrapper that mounts already loading starts dimmed, with no fade.
 - **The dimmed content is still operable from the keyboard**, and still read in full by a screen
   reader. Disable the controls inside for the state to be true for everyone.
 - **A passed `aria-*` lands on the wrapper and is kept.** Pass `aria-busy={isLoading}` to say
-  that the content is loading.
+  that the content is loading. A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
 - At the default 0.5 the text contrast is halved, which will fail WCAG for body text. Raise
   `--loader-wrapper-loading-opacity` where the dimmed text still has to be read.
 

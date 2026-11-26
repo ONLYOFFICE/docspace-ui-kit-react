@@ -2,7 +2,7 @@ import React from "react";
 import classNames from "classnames";
 
 import { InfiniteLoaderComponent } from "../../infinite-loader";
-import { pickAriaProps } from "../../../utils/aria-props";
+import { groupRoleWhenNamed, pickAriaProps } from "../../../utils/aria-props";
 import { RowContainerProps } from "./RowContainer.types";
 import styles from "./RowContainer.module.scss";
 
@@ -30,6 +30,7 @@ const RowContainer = (props: RowContainerProps) => {
   return (
     <div
       {...pickAriaProps(props)}
+      role={groupRoleWhenNamed(props)}
       id={id}
       className={classNames(styles.container, className, {
         [styles.useReactWindow]: useReactWindow,

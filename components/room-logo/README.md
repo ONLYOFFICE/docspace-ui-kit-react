@@ -193,8 +193,7 @@ space around the glyph, and a smaller one leaves it overflowing.
 - The glyph is an inline SVG inside two plain `<div>`s, with no role, no title and no
   `aria-hidden`. A screen reader skips it. Where the glyph alone states the room's kind, put an
   `aria-label` on your row.
-- **A passed `aria-*` lands on the outer `<div>`.** It has no role, so a name there is not
-  announced; label your row instead.
+- **A passed `aria-*` lands on the outer `<div>`.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
 - The wrapper's click handler is not exposed to the keyboard: there is no `tabIndex` and no key
   handler, and it only fires on mobile anyway. The checkbox inside is a real one and is
   focusable — once your stylesheet has made it visible.

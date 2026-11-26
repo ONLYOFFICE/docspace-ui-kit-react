@@ -8,7 +8,7 @@ import CrossIconReactSvgUrl from "../../assets/icons/12/cross.react.svg";
 import { Text } from "../text";
 import { IconButton } from "../icon-button";
 import { TooltipContainer } from "../tooltip";
-import { pickAriaProps } from "../../utils/aria-props";
+import { groupRoleWhenNamed, pickAriaProps } from "../../utils/aria-props";
 import { useCommonTranslation } from "../../utils/i18n";
 import { activateOnButtonKey } from "../../utils/keyboard-activation";
 
@@ -64,7 +64,7 @@ const TagPure: FC<TagProps> = ({
       ref={ref}
       title={label}
       onClick={onClickAction}
-      role={isInteractive ? "button" : undefined}
+      role={isInteractive ? "button" : groupRoleWhenNamed(rest)}
       tabIndex={isInteractive ? 0 : undefined}
       onKeyDown={
         isInteractive

@@ -15,7 +15,7 @@ import { useInterfaceDirection } from "../../../context/InterfaceDirectionContex
 import { HeaderType } from "../../context-menu/ContextMenu.types";
 import { Loader, LoaderTypes } from "../../loader";
 
-import { pickAriaProps } from "../../../utils/aria-props";
+import { groupRoleWhenNamed, pickAriaProps } from "../../../utils/aria-props";
 import styles from "./FolderTile.module.scss";
 
 const svgLoader = () => <div style={{ width: "96px" }} />;
@@ -221,12 +221,13 @@ export const FolderTile = ({
   return (
     <div
       {...pickAriaProps(rest)}
+      role={groupRoleWhenNamed(rest)}
       className={folderTileClassNames}
       onClick={onFolderClick}
       ref={forwardRef}
       onContextMenu={onContextMenu}
       data-testid={dataTestId ?? "tile"}
-      aria-busy={inProgress || undefined}
+      aria-busy={inProgress || rest["aria-busy"]}
     >
       {isBigFolder ? (
         <>

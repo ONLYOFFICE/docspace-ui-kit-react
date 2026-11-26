@@ -166,8 +166,7 @@ export function PagedList({
 - There is no keyboard navigation between rows, and the container is not focusable.
 - A list users must work through from the keyboard needs [`Table`](../../table/README.md) or
   markup of your own.
-- **A passed `aria-*` lands on the container and is kept.** It has no role, so a name there is not
-  read.
+- **A passed `aria-*` lands on the container and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
 
 ## Test ids
 

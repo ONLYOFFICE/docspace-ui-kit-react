@@ -339,6 +339,55 @@ describe("Filter Component", () => {
       expect(onSortButtonClick).toHaveBeenLastCalledWith(false);
       expect(onSortButtonClick).toHaveBeenCalledTimes(2);
     });
+
+    // A host that hides something while the list is open (the mobile main
+    // button) must hear that it closed, even when the filter goes first.
+    it("reports nothing when it unmounts with the sort list closed", async () => {
+      const onSortButtonClick = vi.fn();
+      let unmount = () => {};
+      await act(async () => {
+        ({ unmount } = renderComponent({
+          onSortButtonClick,
+          getSortData: () => [
+            { id: "sort-title", key: "title", label: "Name", default: true },
+          ],
+          getSelectedSortData: () => ({
+            sortId: "title",
+            sortDirection: "asc",
+          }),
+        }));
+      });
+
+      unmount();
+      expect(onSortButtonClick).not.toHaveBeenCalled();
+    });
+
+    it("reports false when it unmounts after the list was opened", async () => {
+      const user = userEvent.setup();
+      const onSortButtonClick = vi.fn();
+      let unmount = () => {};
+      await act(async () => {
+        ({ unmount } = renderComponent({
+          onSortButtonClick,
+          getSortData: () => [
+            { id: "sort-title", key: "title", label: "Name", default: true },
+          ],
+          getSelectedSortData: () => ({
+            sortId: "title",
+            sortDirection: "asc",
+          }),
+        }));
+      });
+
+      await user.click(
+        within(screen.getByTestId("filter_sort_combobox")).getByRole("button"),
+      );
+      expect(onSortButtonClick).toHaveBeenLastCalledWith(true);
+
+      unmount();
+      expect(onSortButtonClick).toHaveBeenLastCalledWith(false);
+      expect(onSortButtonClick).toHaveBeenCalledTimes(2);
+    });
   });
 
   // The panel's tags were divs only the pointer could press: the keyboard

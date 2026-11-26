@@ -2,7 +2,7 @@ import classNames from "classnames";
 
 import { isTablet } from "../../utils";
 import { Text } from "../text";
-import { pickAriaProps } from "../../utils/aria-props";
+import { groupRoleWhenNamed, pickAriaProps } from "../../utils/aria-props";
 
 import styles from "./EmptyScreenContainer.module.scss";
 
@@ -28,6 +28,7 @@ const EmptyScreenContainer = (props: EmptyScreenContainerProps) => {
   return (
     <div
       {...pickAriaProps(props)}
+      role={groupRoleWhenNamed(props)}
       id={id}
       style={style}
       className={classNames(
