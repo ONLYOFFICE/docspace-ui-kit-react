@@ -146,6 +146,12 @@ const getTransactionType = (key: string) => ({
   isDebit: key !== "credit",
 });
 
+// The billing pages live under the portal settings, which only admins and the
+// owner can open, so everyone who reaches this store is an admin. A reading
+// such as "an ordinary user sees the payer's data here" or "a guest triggers
+// a billing request from this page" does not apply: there is no such user on
+// these pages. The flags that matter here are `isOwner` and `isPayer`, which
+// tell admins apart from each other.
 class PaymentStore {
   private paymentApi: PaymentApi;
 
