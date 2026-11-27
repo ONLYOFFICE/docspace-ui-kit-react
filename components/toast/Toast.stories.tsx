@@ -1,4 +1,4 @@
-import type { CSSProperties, ComponentProps } from "react";
+import type { CSSProperties } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, screen, waitFor, within } from "storybook/test";
@@ -25,64 +25,28 @@ const meta = {
     toastr.clear();
   },
   argTypes: {
-    type: {
-      control: "select",
-      options: Object.values(ToastType),
-      description:
-        "Which `toastr` method the story calls, and so the colour and icon of the toast: `success`, `error`, `warning` or `info`. The `Toast` container itself ignores this prop",
-    },
-    title: {
-      control: "text",
-      description:
-        "Bold first line of the toast, the second argument of `toastr`. Left out, a translated default for the type is shown; `null` shows no title",
-    },
-    data: {
-      control: "text",
-      description:
-        "Message under the title, the first argument of `toastr`: a string or any React node",
-    },
-    withCross: {
-      control: "boolean",
-      description:
-        "Fourth argument of `toastr`: shows a cross that closes the toast, and stops a click on the toast from closing it",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
-    timeout: {
-      control: "number",
-      description:
-        "Third argument of `toastr`: milliseconds before the toast closes, or 0 to keep it open until it is closed by hand. A value under 750 falls back to 5000",
-      table: {
-        defaultValue: { summary: "5000" },
-      },
-    },
-    id: {
-      control: "text",
-      description:
-        "Ignored: nothing reads it, and the container carries no `id`",
-    },
     className: {
       control: "text",
-      description: "Class added to the container the toasts are stacked in",
+      description: "Applied to the container the toasts are stacked in.",
     },
     style: {
       control: "object",
-      description:
-        "Inline style of the container the toasts are stacked in; the place to set the CSS variables, since the container is not rendered inside your markup",
+      description: "Applied to that container as inline style.",
     },
     isSSR: {
       control: "boolean",
       description:
-        "Renders nothing until the page has mounted in the browser, so a server-rendered tree and its first client render match",
+        "Whether the container renders nothing until the first client-side effect, for a server-rendered tree.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
   },
-} satisfies Meta<typeof Toast>;
+} satisfies Meta<ToastTemplateProps>;
 
-type Story = StoryObj<ComponentProps<typeof Toast>>;
+// The story's own controls: the container's props, and the arguments of the
+// `toastr` call its button makes.
+type Story = StoryObj<ToastTemplateProps>;
 
 export default meta;
 
@@ -213,7 +177,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The call most screens make: a short message after an action, with the title left to the type. Click **Show Toast** to open it, and pick another type or change the message, title or timeout live in the Controls panel below.",
+          "The call most screens make: a short message after an action, with the title left to the type. **Show Toast** opens it.",
       },
       source: {
         code: `toastr.success("Your changes were saved");`,
@@ -250,7 +214,7 @@ export const Success: Story = {
     docs: {
       description: {
         story:
-          "Confirms that an action the user started has finished, such as a save or a move. Click **Show Toast** to open it, and change the message, title or timeout live in the Controls panel below.",
+          "A success toast: an action the user started has finished, such as a save or a move. **Show Toast** opens it.",
       },
       source: {
         code: `toastr.success("Operation completed successfully", "Success", 5000);`,
@@ -260,6 +224,7 @@ export const Success: Story = {
 };
 
 export const ErrorToast: Story = {
+  name: "Error",
   render: (args) => (
     <ToastTemplate
       type={args.type ?? ToastType.error}
@@ -287,7 +252,7 @@ export const ErrorToast: Story = {
     docs: {
       description: {
         story:
-          "Tells the user that an action failed. Click **Show Toast** to open it; in code, pass the caught error itself and the message is read from it.",
+          "An error toast: an action failed. **Show Toast** opens it. In code, pass the caught error itself, and the message is read from it.",
       },
       source: {
         code: `toastr.error("An error occurred while processing your request", "Error", 5000);`,
@@ -324,7 +289,7 @@ export const Warning: Story = {
     docs: {
       description: {
         story:
-          "Asks the user to look at something before going on, without reporting a failure. Click **Show Toast** to open it.",
+          "A warning toast: something to look at before going on, without a failure. **Show Toast** opens it.",
       },
       source: {
         code: `toastr.warning("Please review the changes before proceeding", "Warning", 5000);`,
@@ -357,7 +322,7 @@ export const Info: Story = {
     docs: {
       description: {
         story:
-          "Reports something neutral the user may want to know, such as a finished background task. Click **Show Toast** to open it.",
+          "An info toast: something neutral, such as a finished background task. **Show Toast** opens it.",
       },
       source: {
         code: `toastr.info("New updates are available", "Information", 5000);`,
@@ -367,6 +332,7 @@ export const Info: Story = {
 };
 
 export const WithCloseButton: Story = {
+  name: "With a cross",
   render: (args) => (
     <ToastTemplate
       type={args.type ?? ToastType.success}
@@ -408,7 +374,7 @@ export const WithCloseButton: Story = {
     docs: {
       description: {
         story:
-          "For a message the user must read before it goes: the toast stays until its cross is clicked or pressed (`timeout` 0, `withCross`), and a click on the toast itself no longer closes it.",
+          "A toast that stays until its cross is used (`timeout` 0, `withCross`), for a message the user must read. A click on the toast itself does not close it.",
       },
       source: {
         code: `toastr.success("Click the close button to dismiss", "Dismissible Toast", 0, true);`,
@@ -418,6 +384,7 @@ export const WithCloseButton: Story = {
 };
 
 export const KeyboardDismiss: Story = {
+  name: "Closed from the keyboard",
   render: () => (
     <TriggerTemplate
       label="Show Toast"
@@ -444,7 +411,7 @@ export const KeyboardDismiss: Story = {
     docs: {
       description: {
         story:
-          "A toast with no cross and no timeout (`timeout` 0) still closes from the keyboard: Tab reaches its close button, which appears as the cross while it has focus, and Enter closes the toast. A mouse closes it by clicking anywhere on it.",
+          "A toast with no cross and no timeout (`timeout` 0) still closes from the keyboard. Tab reaches its close button, shown as the cross while focused, and Enter closes it.",
       },
       source: {
         code: `toastr.info("Closes from the keyboard too", "Info", 0);`,
@@ -454,6 +421,7 @@ export const KeyboardDismiss: Story = {
 };
 
 export const AllTypes: Story = {
+  name: "All types",
   render: () => <AllTypesTemplate />,
   play: async (context) => {
     await openToast(context, "Info message", "Show All Toast Types");
@@ -498,6 +466,7 @@ const TriggerTemplate = ({
 );
 
 export const CustomContent: Story = {
+  name: "Custom content",
   render: () => (
     <TriggerTemplate
       label="Show Toast"
@@ -526,7 +495,7 @@ export const CustomContent: Story = {
     docs: {
       description: {
         story:
-          "A message that needs more than a line of text, such as a link to what the action produced: any React node passed as the first argument is rendered as it is, under the title.",
+          "A message with more than a line of text, such as a link to what the action produced. Any React node passed first is rendered as it is, under the title.",
       },
       source: {
         code: `toastr.success(
@@ -546,6 +515,7 @@ export const CustomContent: Story = {
 };
 
 export const DefaultTitles: Story = {
+  name: "Default titles",
   render: () => (
     <TriggerTemplate
       label="Show Toasts"
@@ -588,6 +558,7 @@ toastr.info("No title at all", null, 0, true);`,
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <ToastTemplate
       type={args.type ?? ToastType.success}
@@ -622,7 +593,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "112px" },
       description: {
         story:
-          "Toasts in a right-to-left layout: they open in the top-left corner and slide in from the left, the icon moves to the right of the text and the cross to the left. The toasts are portalled outside the story, so the direction comes from the document, set here by the Direction toolbar, and a `dir` on a wrapper of yours would not reach them.",
+          "Toasts in a right-to-left layout open in the top-left corner and slide in from the left. The icon sits right of the text, the cross on the left. The direction comes from the theme; a `dir` on your wrapper does not reach them.",
       },
       source: {
         code: `// The page runs right to left, e.g. <ThemeProvider locale="ar">
@@ -660,6 +631,7 @@ const CssCustomizationTemplate = () => {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => <CssCustomizationTemplate />,
   play: async (context) => {
     const toast = await openToast(
@@ -678,7 +650,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The variables are listed under CSS variables on this page; here they are set through the \`style\` prop of \`Toast\`, because the toasts are portalled outside any wrapper of yours. The example sets every one a string toast can show, all but \`--toast-text-size\`: open a toast to see the rounder corners, the wider padding and the wider container further from the edge.`,
+        story: `Rounder corners, wider padding and a wider container further from the edge. The variables go on \`Toast\`'s \`style\`, since the toasts are portalled outside any wrapper. All but \`--toast-text-size\` are set.`,
       },
       source: {
         code: `<Toast

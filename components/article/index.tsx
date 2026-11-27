@@ -1,5 +1,5 @@
 import React from "react";
-import { isMobile, isMobileOnly, isIOS } from "react-device-detect";
+import { isMobile } from "react-device-detect";
 
 import { Portal } from "../portal";
 
@@ -18,6 +18,7 @@ import ArticleDevToolsBar from "./sub-components/DevToolsBar";
 import HideArticleMenuButton from "./sub-components/HideMenuButton";
 import BackButton from "./sub-components/BackButton";
 
+import { groupRoleWhenNamed, pickAriaProps } from "../../utils/aria-props";
 import styles from "./Article.module.scss";
 import { HEADER_NAME, MAIN_BUTTON_NAME, BODY_NAME } from "./Article.constants";
 import { ArticleProps } from "./Article.types";
@@ -57,8 +58,6 @@ const Article = ({
   hideAppsBlock,
 
   setArticleOpen,
-  withSendAgain,
-  mainBarVisible,
 
   isLiveChatAvailable,
   isShowLiveChat,
@@ -71,16 +70,6 @@ const Article = ({
   withCustomArticleHeader,
 
   isBurgerLoading,
-
-  isNonProfit,
-  isFreeTariff,
-  isGracePeriod,
-  isLicenseDateExpired,
-  isPaymentPageAvailable,
-  isTrial,
-  standalone,
-  currentTariffPlanTitle,
-  trialDaysLeft,
 
   languageBaseName,
   isMobileArticle,
@@ -100,6 +89,7 @@ const Article = ({
   navigate,
   onBack,
   customSlot,
+  ...rest
 }: ArticleProps) => {
   const [articleHeaderContent, setArticleHeaderContent] =
     React.useState<null | React.JSX.Element>(null);
@@ -107,12 +97,6 @@ const Article = ({
     React.useState<null | React.JSX.Element>(null);
   const [articleBodyContent, setArticleBodyContent] =
     React.useState<null | React.JSX.Element>(null);
-  const [_correctTabletHeight, setCorrectTabletHeight] = React.useState<
-    null | number
-  >(null);
-  const updateSizeRef = React.useRef<null | ReturnType<typeof setTimeout>>(
-    null,
-  );
 
   const onMobileBack = React.useCallback(() => {
     // close article
@@ -127,9 +111,16 @@ const Article = ({
   }, [onMobileBack]);
 
   React.useEffect(() => {
-    const item = localStorage.getItem("showArticle") || "{}";
-
-    const showArticle = JSON.parse(item);
+    // A value that is not JSON counts as its raw text; blocked storage, as an
+    // absent key.
+    let showArticle: unknown = true;
+    try {
+      const item = localStorage.getItem("showArticle") || "{}";
+      showArticle = item;
+      showArticle = JSON.parse(item);
+    } catch {
+      // keep the fallback above
+    }
 
     if (currentDeviceType === DeviceType.mobile) {
       setShowText(true);
@@ -173,42 +164,6 @@ const Article = ({
     });
   }, [children]);
 
-  // TODO: make some better
-  const onResize = React.useCallback(
-    (e?: Event) => {
-      let tableHeight = window.innerHeight;
-
-      if (mainBarVisible) {
-        const mainBar = document.getElementById("main-bar");
-
-        if (mainBar) {
-          if (!mainBar.offsetHeight) {
-            updateSizeRef.current = setTimeout(() => onResize(), 0);
-            return;
-          }
-
-          tableHeight -= mainBar.offsetHeight;
-        }
-      }
-
-      setCorrectTabletHeight(tableHeight);
-    },
-    [mainBarVisible],
-  );
-
-  React.useEffect(() => {
-    onResize();
-    window.addEventListener("resize", onResize);
-    if (isMobile && !isMobileOnly && isIOS) {
-      window?.visualViewport?.addEventListener("resize", onResize);
-    }
-    return () => {
-      window.removeEventListener("resize", onResize);
-      window?.visualViewport?.removeEventListener("resize", onResize);
-      if (updateSizeRef.current) clearTimeout(updateSizeRef.current);
-    };
-  }, [onResize]);
-
   const hideDevTools =
     user?.isVisitor ||
     (!isAdmin && limitedAccessDevToolsForUsers) ||
@@ -222,6 +177,8 @@ const Article = ({
   const articleComponent = (
     <>
       <div
+        {...pickAriaProps(rest)}
+        role={groupRoleWhenNamed(rest)}
         id="article-container"
         data-show-text={showText ? "true" : "false"}
         data-open={articleOpen ? "true" : "false"}

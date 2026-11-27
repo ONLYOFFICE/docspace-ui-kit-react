@@ -5,6 +5,23 @@ import { AsideHeader } from ".";
 import styles from "./AsideHeader.module.scss";
 
 describe("AsideHeader", () => {
+  it("names a header icon by its label", () => {
+    render(
+      <AsideHeader
+        headerIcons={[
+          {
+            key: "share",
+            iconNode: <svg />,
+            label: "Share",
+            onClick: vi.fn(),
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "Share" })).toBeInTheDocument();
+  });
+
   it("renders header text correctly", () => {
     const headerText = "Test Header";
     render(<AsideHeader header={headerText} />);

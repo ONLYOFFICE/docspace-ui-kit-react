@@ -12,6 +12,14 @@ describe("AppLoader", () => {
     expect(loader).toBeInTheDocument();
   });
 
+  it("puts a passed aria-* on the status region", () => {
+    render(<AppLoader aria-label="Opening the portal" />);
+
+    expect(
+      screen.getByRole("status", { name: "Opening the portal" }),
+    ).toBeInTheDocument();
+  });
+
   it("announces the wait through a status region", async () => {
     render(<AppLoader />);
 

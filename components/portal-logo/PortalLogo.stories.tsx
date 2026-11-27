@@ -61,12 +61,12 @@ const meta = {
     className: {
       control: "text",
       description:
-        "Added to the logo image, or to the fallback logo, next to its own `logo-wrapper` class; never to the wrapper around it",
+        "Added to the `<img>`, or to the fallback logo, next to the component's own `logo-wrapper` class. It never reaches the wrapper around it.",
     },
     isResizable: {
       control: "boolean",
       description:
-        "Follows the window width and, at 600px and narrower, shows the small logo in a bar fixed across the top of the window. Without it the logo is hidden at those widths",
+        "Watches the window width and swaps to the small logo in a fixed bar at 600px and narrower. Without it the logo is hidden at those widths.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -74,9 +74,14 @@ const meta = {
     alt: {
       control: "text",
       description:
-        "Accessible name of the logo, on the image and on the fallback logo alike. An empty string makes the logo decorative",
+        "Accessible name of the logo, on the image and on the mark shown when it fails to load. Without it, the product name as the portal brands it; an empty string makes the logo decorative.",
+    },
+    dataTestId: {
+      control: "text",
+      description:
+        "Value of `data-testid` on the wrapper, or on the fallback logo that replaces it.",
       table: {
-        defaultValue: { summary: '"portal logo"' },
+        defaultValue: { summary: '"portal-logo"' },
       },
     },
   },
@@ -101,13 +106,26 @@ const findLogo = async (canvasElement: HTMLElement) => {
 };
 
 export const Default: Story = {
+  name: "Default",
   render: (args) => <PortalLogo {...args} />,
   args: {
     isResizable: false,
   },
   play: async ({ canvasElement }) => {
     const img = await findLogo(canvasElement);
-    await expect(img).toHaveAttribute("alt", "portal logo");
+    await expect(img).toHaveAttribute("alt", "ONLYOFFICE Apps");
+    // The phone bar's colour has a default of its own and yields to the
+    // portal's --header-background-color set above it.
+    const wrapper = img.parentElement as HTMLElement;
+    const holder = wrapper.parentElement as HTMLElement;
+    const barColor = () =>
+      getComputedStyle(wrapper)
+        .getPropertyValue("--portal-logo-mobile-bg-value")
+        .trim();
+    await expect(barColor()).not.toBe("");
+    holder.style.setProperty("--header-background-color", "rgb(1, 2, 3)");
+    await expect(barColor()).toBe("rgb(1, 2, 3)");
+    holder.style.removeProperty("--header-background-color");
     // Without isResizable the logo is hidden, not shrunk, on a phone.
     if (isPhoneWidth()) {
       await expect(img).not.toBeVisible();
@@ -119,7 +137,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The logo as a wide screen shows it, at its full size. No portal serves the image here, so a placeholder stands in for it; change any other prop live in the Controls panel below.",
+          "The logo at its full desktop size. No portal serves the image here, so a grey placeholder stands in for it.",
       },
       source: {
         code: `<PortalLogo />`,
@@ -129,6 +147,7 @@ export const Default: Story = {
 };
 
 export const Resizable: Story = {
+  name: "Resizable",
   render: (args) => <PortalLogo {...args} />,
   args: {
     isResizable: true,
@@ -148,7 +167,7 @@ export const Resizable: Story = {
     docs: {
       description: {
         story:
-          "The same logo, now following the window width: narrow the window to 600px or less and it moves into a bar fixed across the top (`isResizable`). The OnPhone story shows that layout.",
+          "The same logo, following the window width (`isResizable`). At 600px and narrower it moves into a bar fixed across the top, as the phone story shows.",
       },
       source: {
         code: `<PortalLogo isResizable />`,
@@ -158,6 +177,7 @@ export const Resizable: Story = {
 };
 
 export const WithClassName: Story = {
+  name: "With class name",
   render: (args) => <PortalLogo {...args} />,
   args: {
     className: "custom-logo-class",
@@ -183,6 +203,7 @@ export const WithClassName: Story = {
 };
 
 export const OnPhone: Story = {
+  name: "On a phone",
   render: (args) => <PortalLogo {...args} />,
   decorators: [withFrame(414, 120)],
   globals: { viewport: { value: "mobile2", isRotated: false } },
@@ -215,6 +236,7 @@ export const OnPhone: Story = {
 };
 
 export const FallbackLogo: Story = {
+  name: "Fallback logo",
   render: (args) => <PortalLogo {...args} />,
   args: {
     isResizable: false,
@@ -237,7 +259,7 @@ export const FallbackLogo: Story = {
     docs: {
       description: {
         story:
-          "What a page shows when the portal's logo cannot be loaded: the bundled logo takes the image's place, at its own size, so the page never has an empty gap or a broken-image icon. It keeps the name passed in `alt`, so a screen reader still hears which portal this is.",
+          "The bundled logo in place of a portal logo that failed to load, at its own size. It keeps the name passed in `alt`, so a screen reader still hears which portal this is.",
       },
       source: {
         code: `// /logo.ashx fails to load
@@ -248,6 +270,7 @@ export const FallbackLogo: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={
@@ -276,7 +299,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `One resizable logo with every variable set on its wrapper -- the variables are listed under CSS variables on this page. On a wide screen it shows the two desktop variables; narrow the window to 600px or less to see the three bar variables, with the desktop width still applied to the logo inside the bar.`,
+        story: `One resizable logo with all five variables set on an ancestor. A wide screen shows the two desktop ones: a 320×36 logo. At 600px and narrower the three bar variables set the bar and the height of the logo in it.`,
       },
     },
   },

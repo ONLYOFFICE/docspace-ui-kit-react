@@ -8,6 +8,128 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Changed
 
+- **A named element with no role of its own becomes a `group`.** A passed `aria-label` or
+  `aria-labelledby` on a plain `<div>` was kept and never read. Now it adds `role="group"`, so
+  the name is announced. This covers `Article`, `AsideHeader`, `Calendar`, `ColumnarInfoBar`,
+  `ContextMenu`'s panel, `EmptyScreenContainer`, `EmptyView`, `Filter`, `LoaderWrapper`,
+  `Navigation`, `Paging`, `RoomIcon`, `RoomLogo`, `Section`, `Selector`, the rows, the table's
+  parts and the tiles. It also covers `HelpButton`'s element around `children`, and an `Avatar`
+  or `Tag` that is not a button. Without a name nothing changes
+- **Enter and Space on the kit's own keyboard buttons act once per press, and never with
+  Ctrl, Alt or Meta.** A held key used to repeat the action, and a modified one ran it too. A
+  held key is now kept from the page and does nothing; a modified one is left to the browser
+  and the page. This covers every `<div>` the kit makes a button, such as `Navigation`'s title
+  and drop box rows, `Article`'s collapse handle and a clickable `Tag`
+- **A `Tag` that draws only its icon is an image named by its label.** With `withLabel={false}`
+  and no `onClick`, its name sat on a `<div>` with no role, and a screen reader read nothing.
+  It is now `role="img"`, or a named `role="group"` while it shows its delete cross
+- **`ImageEditor`'s region has no English name of its own.** It was labelled "Image editor"
+  whatever the language. Pass a translated `aria-label` to name it
+- **Style rules and custom properties that nothing reads are gone.** `Section` kept a copy of
+  `OperationsProgressButton`'s styles under a class it never sets, `MainButtonMobile` the styles
+  of a progress bar it no longer draws, and `DropDown` a `withColumns` rule. Several components
+  declared properties no rule reads, and a few rules read properties nothing defines.
+  Nothing on screen changes. `ErrorContainer`'s `--error-container-link`, `CategoryItem`'s
+  `--category-item-subheader-size` and `RoomType`'s `--room-type-dropdown-item-background` and
+  `--room-type-display-item-*`, which did nothing, are removed with them
+- **`RoomType` renders the `listItem` card for a `type` it does not know.** It rendered a fourth,
+  static layout no typed value could select, with no click, keys or test id. Only untyped code
+  passing another string sees the change
+- **Props that nothing reads are removed from the types.** Each was documented as ignored. Drop
+  them from your calls; a TypeScript caller gets an error where it still passes one, and in plain
+  JavaScript a component that spreads the rest onto its element puts the value there as an
+  attribute:
+  - `Article`: `withSendAgain`, `mainBarVisible`, `isNonProfit`, `isGracePeriod`, `isFreeTariff`,
+    `isPaymentPageAvailable`, `isLicenseDateExpired`, `isTrial`, `standalone`,
+    `currentTariffPlanTitle`, `trialDaysLeft`, and its own `withCustomSlot` and `path`
+  - `Navigation`: `showText`, `isRoom`, `isCurrentFolderInfo`, `showFolderInfo`, `clearTrash`,
+    `isEmptyFilesList`, `isEmptyPage`, and the values it supplies itself: `id`, `forwardedRef`,
+    `onCloseDropBox`, `toggleDropBox`, `isMobileOnly`, `ignoreChangeView`
+  - `Section`: `user`, `getIcon`, `displayFileExtension`, `showText`, `isEmptyPage`,
+    `isTrashFolder`, `isTabletView`, `isHeaderVisible`, `mainBarVisible`, `maintenanceExist`,
+    `snackbarExist`, `progressBarDropDownContent`, `onCancelOperation`, `onOpenUploadPanel`,
+    `uploadFiles`, `withTabs`, `asideInfoPanel`, `chatFiles`, `vectorizedFiles`, every `ai*` prop,
+    and the values it supplies itself: `bannerContent`, `withoutScroll`, `topInfoPanel`,
+    `onClose`, `isDesktop`
+  - `HelpButton` keeps only `color` of `IconButton`'s props, and drops `tooltipId`,
+    `tooltipProps` and the four `offset*` sides. `onClick`, `title`, `iconName`, the hover and
+    press props and the mouse handlers were never passed to the icon
+  - `MainButtonMobile`: `title`, `percent`, `sectionWidth`, `withButton`, `onUploadClick`,
+    `isOpenButton`, `mainButtonRef`. `MainButton`: `opened`
+  - `ComboBox`: `withSearch`, `searchPlaceholder`, `showDisabledItems`, `withBlur`, `role`, and
+    the same two in `AccessRightSelect`. `DropDown`: `columnCount`, `withBlur`,
+    `disableOnClickOutside`. `ContextMenuButton`: `columnCount`, `asideHeader`
+  - `Selector`: `withBlur` (and in the `Groups`, `MCPServers`, `People` and `Room` selectors)
+    and `bodyIsLoading`
+  - `PasswordInput`: `emailInputName`, `clipActionResource`, `clipCopiedResource`. `Textarea`:
+    `fullHeight`, `minHeight`, `paddingLeftProp`. `Text` and `Label`: `display`. `Link`: `label`.
+    `LinkWithDropdown`: `isHovered`. `FieldContainer` and `Label`: `tooltipMaxWidth`
+  - `Toast`: `id`, `title`, `type`, `data`, `withCross`, `timeout`, which are `toastr`'s arguments
+  - `Snackbar`: `isMaintenance`, `onClose`. `ModalDialog`: `blur`. `Tag`: `isDefault`.
+    `OperationsProgressButton`: `percent`, `onOpenPanel`, `onCancelOperation`
+  - `Avatar`: `editAction`. `AvatarEditorDialog` and `ImageEditor`: `maxImageSize`. `RoomLogo`:
+    `isPrivacy`. `ColorPicker`: `forwardedRef`. `DragAndDrop`: `targetFile`,
+    `forwardedRef`. Its `value` stays: it is written to the outer element, where
+    `SelectionArea` and the portal's drop handler read it
+  - `Row`: `item`, `contextButtonSpacerWidth`. `RowContent`: `sectionWidth`. `TableHeader`:
+    `sectionWidth`, `onClick`. `TableBody`: `isIndexEditingMode`. `TableRow`: `hideColumns`
+  - `BaseTile`, `FolderTile` and `TemplateTile`: `thumbnailClick`. `FolderTile`: `dragging`,
+    `contextMenuHeader`. `FileTile`: `thumbSize`, `contextButtonSpacerWidth`, `sideColor`.
+    `TemplateTile`: `columnCount`. `TileContainer`: `isDesc`
+  - `InfiniteLoader`: `showSkeleton`, `smallPreview`, `isOneTile`. `SelectionArea`: `itemHeight`
+    in `arrayTypes`
+- **`SearchInput`'s `id` is on the `<input>` alone.** It was set on the outer `<div>` too, so the
+  page held the id twice and a `<label htmlFor>` or a `FieldContainer`'s `labelFor` found the
+  `<div>` first and named nothing. The label now names the field. A selector or a test that
+  found the outer element by `#id` finds the field instead; use `dataTestId` for the block
+- **`Button` keeps a passed `aria-label`, `aria-disabled` and `aria-busy`.** All three were
+  overwritten: the name always came from `label`, so an icon-only button could not be named. A
+  passed `aria-label` now wins over `label`, which stays the fallback. `isDisabled` and
+  `isLoading` still set the other two to `true`. Drop an `aria-label` that only repeats `label`
+  in another language, or the button is named in that language
+- **`ProgressBar` keeps a passed `aria-label` and `aria-busy`.** Both were overwritten: the name
+  always came from `label`, and `aria-busy` was dropped unless `isInfiniteProgress` was set. A
+  passed `aria-label` now wins over `label`, which stays the fallback
+- **`AddButton` puts a passed `aria-*` on the wrapper that has the role.** It landed on the inner
+  square, a `<div>` with no role, so it could not name or describe the button. A passed
+  `aria-disabled` and `aria-busy` are kept unless `isDisabled` or `isLoading` sets them. Read them
+  from `selector-add-button-container`, not from the square
+- **`Tabs` puts a passed `aria-*` on the tab list.** It landed on the outer `<div>`, so the tab
+  list could not be named. Name it with `aria-label` or `aria-labelledby`; read the attributes
+  from the `tablist`, not from the wrapper
+- **`TabItem` keeps its own `aria-selected` over a passed one.** The rest of the props were spread
+  after it, so a passed `aria-selected` won over the pill's state
+- **`ThemeProviderComponent` hands the page back when it unmounts.** It left `data-theme`,
+  `data-dir`, the body classes and every custom property behind. Now the provider mounted last
+  writes the page, and when it goes the one around it writes again, or the page returns to what it
+  was before any provider. A colour scheme without `main`, or none, takes the previous accent off
+  instead of keeping it. A theme without `isBase` is light in the React context too, as it already
+  was in the body class
+- **`ImageEditor`'s test ids are `data-testid`, and its file input has an id of its own.** The
+  outer element and the cropper wrapper carried `image-editor` and `image-cropper-wrapper` under
+  the misspelt `data-test-id`; select them with `getByTestId` now. The hidden input's fixed id
+  `customFileInput`, which a page's own upload input often carries too, is now generated per
+  editor: reach the input as the `input[type="file"]` inside the replace control
+- **`Filter`'s `onSortButtonClick` gets `true` when the sort menu opens and `false` when it
+  closes.** It got the opposite, and `true` once on mount. The first render now reports nothing.
+  A handler that relied on the old values, such as one that hides a button while the menu is open
+  with `setVisible(value)`, needs `setVisible(!value)`
+- **`Navigation`'s `hideInfoPanel` is a `boolean`.** It was typed as a callback but never called:
+  any truthy value hid the info panel toggle, so passing the handler the type asked for hid the
+  button. Pass `true` to hide it; a function no longer type-checks, and passing one still hides it
+- **`EmptyView`'s title and description sit in a `<div>`, not a `<header>`.** Outside a `main`,
+  `section` or `article` the `<header>` was a `banner` landmark, a second one beside the page's
+  own. The view now adds no landmark; a selector for `header` inside it finds nothing, while the
+  class stays
+- **Every component's README, prop JSDoc and story texts follow the documentation rules, and what
+  they said wrong is corrected.** The text changed, not the components: the defects the rewrite
+  found are under _Fixed_. A corrected statement may be one your code relied on. `Button`'s
+  `accent` has no accent border, its `ref` is always the `<button>`, and a passed `aria-label` is
+  overwritten even without `label`. `ContextMenu` reads `global` and `autoZIndex`.
+  `SelectionArea`'s examples put an item's key in `data-value`, where it reads `value`.
+  `DragAndDrop` has `role="presentation"` and no keyboard, not `role="button"`. The controls of
+  `Filter`, `Row` and `Table` that were called mouse-only take the keyboard. `ThemeProvider` writes
+  the React context too
 - **`FileTile`'s `--tile-option-button-padding-end` is now `--tile-option-button-margin-end`,
   default `8px`.** The actions button pads its icon alike on every side, so its keyboard focus
   ring sits around the icon, and the room to the tile's edge is a margin after it. The space to
@@ -100,6 +222,27 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `ContextRoomSync` connects each offered room that holds skills and `ContextRoomWatcher`
   follows every connected room on its own (one losing its skills is disconnected alone)
 - `@onlyoffice/ai-chat` peer requirement raised to `^1.0.2`
+- **The AI chat's settings rows and clarifying questions are opt-in on `AiAgentProviders`.**
+  `@onlyoffice/ai-chat` 1.0.2-progress.75 adds "Set up Web search..." to the composer's "+"
+  menu, "Add model..." to the model picker, and an `ask_user_question` tool that pauses a round
+  on a question panel. A host that passes nothing gets none of them: the rows are hidden and
+  the tool is not sent. `canManageAiSettings` shows both rows to a user who may open the
+  portal's AI settings and sends each to its page there
+  (`/portal-settings/ai-settings/web-search`, `.../ai-models`) through `window.DocSpace.navigate`,
+  not to the library's own settings page or dialog; `askUserQuestions` lets the model ask, and
+  is off in the analyze mode whatever the host says. `@onlyoffice/ai-chat` peer requirement
+  raised to `>=1.0.2-progress.75`
+- **A picture of the AI chat opens in `MediaViewer`, not in the chat library's own viewer.** An
+  attachment's chip, a sent message's thumbnail, a generated image and an image a tool returned
+  open the kit's media viewer with zoom, rotation and the chat's download, and none of the
+  actions of a file. The viewer is loaded with the first picture opened. It needs the host's
+  `Common` translations the media viewer reads, and `Common:Image` for a picture with no name
+- **The AI chat no longer passes `Common:EnableWebSearchInBilling` to the chat library.** The
+  library dropped the switched-off web search toggle the string labelled, and with it the
+  `EnableWebSearch` key; a host may delete the string
+- **The reasoning depth after the model's name in the AI chat composer is muted.** It is drawn
+  in regular weight and the colour of a placeholder (`--text-tertiary`); in the light theme it
+  had the colour and the weight of the name
 - **`AiAgentProviders`' `entityId` is the AI project the chat is open in, `contextEntityId` the
   location.** With the AI agents gone, threads are global per user and nothing but a project
   scopes the chat; the folder or room the user is in goes in `contextEntityId`, which the AI
@@ -168,8 +311,8 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `aria-label` set to `title`, with or without a picture; the `<img>` inside has `alt=""`
   instead of the fixed `"mcp icon"`, and the letter is hidden, so a screen reader no longer
   reads a bare letter. With an empty `title` the icon is `aria-hidden`
-- **`MainButton.model` is optional with `isDropdown={false}`, and `opened` no longer reaches the DOM.** `opened` was never read and is now deprecated.
-- **`MainButtonMobile` is operable from the keyboard and reports every open and close.** The floating button carries `aria-haspopup="menu"` and `aria-expanded`; the sheet is a `menu` of `menuitem`s that the arrow keys, Home, End, Enter and Escape operate; the alert badge is a button named "Alert" with `withAlertClick`. `onClose` now fires whenever the sheet closes (button, backdrop, item, Escape, Back) and never on opening, regardless of `isOpenButton`; the new `onOpen` reports opening. `isOpenButton` and five other ignored props are deprecated.
+- **`MainButton.model` is optional with `isDropdown={false}`.** `opened` was never read and is removed, as listed above.
+- **`MainButtonMobile` is operable from the keyboard and reports every open and close.** The floating button carries `aria-haspopup="menu"` and `aria-expanded`; the sheet is a `menu` of `menuitem`s that the arrow keys, Home, End, Enter and Escape operate; the alert badge is a button named "Alert" with `withAlertClick`. `onClose` now fires whenever the sheet closes (button, backdrop, item, Escape, Back) and never on opening; the new `onOpen` reports opening. `isOpenButton` and the other props it ignored are removed, as listed above.
 - **The `QuickActions` strip is a horizontal toolbar.** The arrow keys (mirrored in RTL), Home and End move focus between tiles and scroll the focused tile into view; Tab still visits every tile.
 - **`TimePicker`'s fields are `type="text"` and take translated names.** They were
   `type="search"` and were announced as search fields. New `ariaLabel`, `hoursLabel` and
@@ -247,6 +390,19 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Added
 
+- **`AsideHeader`'s `headerIcons` take a `label`**, the icon button's accessible name. `Aside` and
+  `ModalDialog` pass it on
+- **`RoomIcon` takes `badgeLabel`**, the accessible name of a badge that `onBadgeClick` makes a
+  button
+- **`CategoryItem` takes `className` and `style`**, both on its outer element. It took neither,
+  so its variables could only be set on an ancestor
+- **`PortalLogo` takes `dataTestId`**, `portal-logo` by default, on the wrapper or on the
+  fallback logo that replaces it. It carried no test id at all
+- **`SocketEvents.ModifyThreadFiles` (`s:modify-thread-files`) and `TModifyThreadFilesData`**
+  (`utils/socket`). The event a server sends to the author of a conversation with an AI agent
+  when a file is saved to it: `{ cmd: "create", id, threadId, kind }`, `kind` being `"artifacts"`
+  or `"attachments"`. It is in `TListenEventCallbackMap`, so a listener takes the payload
+  without a cast
 - **`media-viewer`: the media viewer of the DocSpace client, and `MediaGallery`.** Both are
   imported from `@onlyoffice/apps-ui-kit/media-viewer`.
   - `MediaViewer` shows the images and plays the video and audio of a playlist the host passes
@@ -314,6 +470,329 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 ### Fixed
 
+- **`HelpButton`'s tooltip is read out when the keyboard opens it, and closes when the focus
+  moves on.** Its text goes into a live region, and the icon points at it with
+  `aria-describedby` while it is open. It used to appear silently and stay open after Tab.
+  A second press that closes it is not read out again, and a passed `aria-describedby` is kept
+  beside the tooltip's id
+- **`Navigation`'s room title is a button only when there is a folder to go back to.** With
+  `rootRoomTitle` and a single crumb it was a Tab stop on which Enter did nothing
+- **`Dropzone`'s and `DateTimePicker`'s ARIA labels are translated.** The drop area, its inputs,
+  the format line and the time display were named in English in every language
+- **`Navigation` moves the focus for the keyboard only, and keeps Escape to itself.** A mouse
+  click on a drop box row no longer puts the focus on the header's title. Escape pressed in the
+  header or the box closes the box and no longer reaches the page's own Escape handlers
+- **`Row`, `FileTile` and `FolderTile` keep a passed `aria-busy`.** It was dropped whenever
+  `inProgress` was not set
+- **`Filter` reports `onSortButtonClick(false)` when it unmounts with the sort menu open.** A
+  host that hid something while the menu was open, such as the mobile main button, kept it
+  hidden
+- **`Dropzone`'s full format list is opaque.** Its stylesheet set the list's background and
+  border from `--background-content` and `--border-color`, which nothing defines, so the list was
+  see-through over the area. The list now takes `DropDown`'s own background and border
+- **`FileTile` shows the pointer cursor**, as the other tiles do. It read `--cursor-pointer`,
+  which nothing defines, and fell back to the arrow
+- **Standard props that were declared and dropped now reach the element.** `Avatar` and `Row`
+  put `id` and `style` on their outer element, `TableHeader` puts `style` on the header, and
+  `Navigation` and `Section` hand a passed `ref` their header row and container. `FileInput` puts
+  `name` on its hidden file field instead of the outer `<div>`
+- **`TilesSkeleton`'s `isRooms` widens the columns** to the room tiles' 275px floor. Its rule
+  matched only a descendant of the grid, so it changed nothing
+- **`MainButton`, `Filter` and `TabItem` drop the grey tap flash on touch screens.** `MainButton`
+  read an undefined `--tap-highlight-color`; `Filter` and `TabItem` declared a custom property
+  named `--webkit-tap-highlight-color` instead of setting `-webkit-tap-highlight-color`
+- **A clickable `Tag`, `ImageEditor`'s replace control and `ButtonDelete` take the keyboard.**
+  Each was a `<div>` with a click handler and no tab stop. Each is now `role="button"` in the tab
+  order, pressed with Enter or Space; a disabled or deleted tag stays out of it
+- **`Calendar`'s title opens the month and year views from the keyboard.** It was an `<h2>` that
+  answered the mouse only. When the view changes, the focus moves to the new view's title instead
+  of falling back to the page
+- **`Navigation`'s trail takes the keyboard.** The folder name, the room title and the drop box
+  rows were `<div>`s that answered the mouse only. Each is now `role="button"` in the tab order,
+  pressed with Enter or Space, inside its heading where it has one. The folder name carries
+  `aria-expanded`, the focus moves into the drop box and back, and Escape closes the box
+- **`RoomLogoCoverDialog`'s swatches, glyphs and "without icon" control take the keyboard.** Each
+  was a `<div>` that answered the mouse only, and nothing said which was chosen. Each is now a
+  `role="button"` with `aria-pressed`. A swatch is named by its hex value, a glyph by "Icon" and
+  its place in the row
+- **`HelpButton`'s tooltip opens from the keyboard.** The info icon was a `<div>` that answered the
+  mouse only. While the tooltip opens on click, the icon is a `role="button"` named "Info", and Enter
+  or Space opens it. A passed `aria-label` replaces the name
+- **`Article`'s collapse handle and logo take the keyboard.** Both answered the mouse only. The
+  handle is now a `role="button"`, named "Show menu" while collapsed. The logo, which navigates
+  home, is a `role="link"` named by the product name, followed with Enter
+- **`AvatarEditorDialog`, `RoomLogoCoverDialog` and the filter panel are named by their
+  heading**: `title`, `t("Common:RoomCover")` and `filterHeader`. Each was announced as an
+  unnamed dialog. A passed `aria-label` or `aria-labelledby` still wins
+- **Images beside their own label have an empty `alt`**: the plugin icons of `ContextMenu` and
+  `DropDownItem`, `Dropzone`'s icon, `Selector`'s empty-screen picture, `FileTile`'s thumbnail,
+  `RoomIcon`'s hover image and the burger images of `Navigation` and `Article`. Each was
+  announced by English filler such as "plugin-logo" or "Thumbnail-img"
+- **Logos are named by what they show.** A `RoomIcon` logo is named by `title`, like the
+  initials it replaces, and the logos of `Navigation` and `Article` by the product name as the
+  portal brands it. They read "room icon", "logo" and "burger-logo"
+- **`PortalLogo`'s `alt` defaults to the product name** as the portal brands it, instead of the
+  English "portal logo"
+- **`Calendar`'s month arrows are named in the kit's translations**, "Previous" and "Next"
+- **The kit's own icon-only buttons are named**, in its translations. Each was a focusable button
+  announced only as "button": the crosses of `Tag`, `SelectedItem` and the filter chips
+  ("Remove"), `Textarea`'s copy button ("Copy to clipboard"), the table group menu's cross and
+  info panel toggle ("Close", "Info panel"), the back arrows of `Navigation` and of
+  `ContextMenu`'s mobile submenu ("Back"), the filter panel's clear icon ("Clear filter"), and the
+  pencils and pluses of `Avatar` and `RoomIcon` ("Edit", or "Upload picture" for `Avatar`'s plus)
+- **`RoomLogoCoverDialog`'s custom colour plus and pencil are named** by `t("Common:Color")`, the
+  text already shown above the swatches
+- **Some icon buttons take their name from a prop that was only a tooltip.** `Filter`'s sort
+  button is named by `sortByTitle`, and the table's cog by `TableHeader`'s `settingsTitle`, or
+  "Settings". `Navigation`'s plus is named by `titles.actions`, or "Actions", and its folder
+  button by `titles.contextMenu`, which nothing read, or "More options"
+- **`Avatar`, `RoomType`, `SelectedItem` and `CategoryItem` forward a passed `aria-*` to the
+  element with the role**: the avatar's button, the row, the chip and the title link. Each
+  dropped every one. A passed `aria-label` wins over `userName`, the row's text, the chip's label
+  and the title; `aria-expanded`, `aria-pressed` and a disabled row's `aria-disabled` stay the
+  component's
+- **`AvatarEditorDialog` and `RoomLogoCoverDialog` forward a passed `aria-*` to the dialog**, so
+  `aria-label` or `aria-labelledby` can name it. Neither dialog had a name, nor a way to give one
+- **`ImageEditor` forwards a passed `aria-*` to its region.** A passed `aria-label` replaces the
+  English "Image editor"
+- **`PortalLogo` and `MCPIcon` forward a passed `aria-*` to their image.** A passed `aria-label`
+  wins over `alt` and `title`, and a passed `aria-hidden` lets `MCPIcon` stay silent beside the
+  server's name in text
+- **`RoomIcon` and `RoomLogo` forward a passed `aria-*` to their outer element.** Each dropped
+  every one. Neither element has a role, so a name there is not read; `aria-hidden` works
+- **`Row`, `RowContainer`, `RowContent` and every part of the table forward a passed `aria-*` to
+  their outer element.** Each dropped every one. None of those elements has a role, so a name
+  there is not read
+- **Every tile forwards a passed `aria-*` to its outer element.** `BaseTile`, `FolderTile`,
+  `RoomTile`, `TemplateTile`, `TileContainer` and `TileContent` dropped them; `FileTile` already
+  passed them on and now declares them. `inProgress` still sets `aria-busy` over a passed value
+- **`Filter`, `Paging` and `Selector` forward a passed `aria-*` to their outer element.** Each
+  dropped every one
+- **`Dropzone` forwards a passed `aria-*` to its drop area**, the library's `role="button"`. A
+  passed `aria-label` wins over the English "File upload area" or "Folder upload area"
+- **`InfiniteLoader` names its virtual grid with a passed `aria-label`.** react-virtualized named
+  it `grid` and forwards no other `aria-*`
+- **`ModalDialog` puts every passed `aria-*` on the dialog.** Beyond `aria-label`,
+  `aria-labelledby` and `aria-describedby` they went to the header, which dropped them. The
+  header gets none now; `aria-modal` stays the component's
+- **`DropDown` and `ContextMenu` forward a passed `aria-*` to the menu.** Both dropped every one;
+  `DropDown` lets a passed `aria-label` win over `ariaLabel`. `ContextMenu` puts it on the panel
+  that takes `id`. `LinkWithDropdown` keeps the attributes on its link and off its list
+- **`NavMenu` and `QuickActions` forward a passed `aria-*` to their landmark and toolbar.** Both
+  dropped every one, so neither the `<nav>` nor the `toolbar` could be named
+- **`Card` and `CollapsibleCard` forward a passed `aria-*`.** `Card` puts it on its `<section>`,
+  which a name makes a `region` landmark, and `CollapsibleCard` on its toggle button
+- **`Article`, `Section`, `Navigation`, `AsideHeader`, `ColumnarInfoBar`, `EmptyView` and
+  `EmptyScreenContainer` forward a passed `aria-*` to their outer element.** Each dropped every
+  one. None of those elements has a role, so a name there is not read
+- **`ComboBox` and `AccessRightSelect` forward a passed `aria-*` to the button.** Both dropped
+  every one but `ariaLabel`. A passed `aria-label` wins over `ariaLabel`; the open state and
+  `aria-disabled` while `isDisabled` stay the component's
+- **`ColorPicker`, `TimePicker` and `Tags` forward a passed `aria-*` to their group.** Each took
+  only `ariaLabel`, which a passed `aria-label` now wins over
+- **`RadioButton` and `RadioButtonGroup` forward a passed `aria-*`.** The button puts it on its
+  input, and the group on its `radiogroup`, which can be named at last
+- **`DateTimePicker` is a named group, and forwards a passed `aria-*` to it.** Its
+  `selectDateText` name sat on a `<div>` with no role, where screen readers ignore it
+- **`DatePicker` forwards a passed `aria-*` to the select-date control, and `Calendar` to its
+  outer element.** Both dropped every one. A passed `aria-label` wins over `selectDateText`
+- **`Loader`, `AppLoader`, `LoaderWrapper`, `StatusMessage` and `Tag` forward a passed
+  `aria-*`.** Each dropped every one. The loaders put it on their status region, and `Tag` lets
+  a passed `aria-label` win over `label`
+- **`FloatingButton`, `OperationsProgressButton` and `MainButtonMobile` forward a passed `aria-*`
+  to the circle.** All three dropped it, so the badge could only be named after its icon in
+  English. A passed `aria-label` wins over `label`, and names the progress bar too
+- **`FloatingButton` without a `label` is named by its operation, translated.** It was named
+  after its icon in English (`"upload button"`), even in a translated portal, where the
+  dashboard's and the AI agents' upload circles and the webhook history's refresh circle pass
+  none. Now `upload` is `Common:Upload`, `refresh` `Common:Update`, `other` `Common:InProgress`,
+  and so on for every icon.
+  `MainButtonMobile` is named `Common:Actions`, open or closed, where it was `"plus button"` and
+  `"minus button"`
+- **`RoomLogoCoverDialog` asks for `Common:Icon`, not `CreateEditRoomDialog:Icon`.** The glyph
+  row's label and the name of every glyph came from a namespace the package does not ship, so
+  outside the portal a `t` of your own had to supply it. `Icon` is now in the shipped `Common`.
+  A portal needs `Common:Icon` in its locales: the ONLYOFFICE Apps client moved it there from
+  `CreateEditRoomDialog`, along with `MarkRead` from `Files`
+- **`ContextMenuButton` forwards a passed `aria-*` to its button.** It was dropped. A passed
+  `aria-label` wins over `title`. In `toggle` mode a passed `aria-haspopup`, `aria-expanded` and
+  `aria-controls` are kept, to describe the menu `onClick` opens
+- **`LoadingButton` forwards a passed `aria-*` to its progress bar.** It was dropped. A passed
+  `aria-label` wins over `progressLabel`, and the component keeps its own value attributes
+- **`ToggleButton` and `TwoStateToggle` forward a passed `aria-*` to the control.** Both dropped
+  it. `ToggleButton` puts it on its checkbox and `TwoStateToggle` on its switch, where a passed
+  `aria-label` wins over `label` and `ariaLabel`. The checked state stays the component's
+- **`HelpButton` forwards a passed `aria-*` to its anchor.** It was dropped. It lands on the info
+  icon, or on the element around `children`
+- **`QuantityPicker` forwards a passed `aria-*` to the number field.** It was dropped, so the
+  field could not be named. Pass `aria-label` or `aria-labelledby` to name it
+- **`PasswordInput` and `SearchInput` forward a passed `aria-*` to the `<input>`.** Both dropped
+  it. `PasswordInput`'s type took every input attribute but handed the field none, and
+  `SearchInput`'s type took no `aria-*` at all. Name either field with `aria-label` or
+  `aria-labelledby`
+- **`Textarea` and `Slider` forward every passed `aria-*`.** `Textarea` kept only `aria-label`,
+  `aria-labelledby` and `aria-describedby`, and `Slider` those and `aria-valuetext`; the rest were
+  dropped. `Slider` leaves out `aria-valuenow`, `aria-valuemin` and `aria-valuemax`, which the
+  native range reports from `value`, `min` and `max`
+- **`ColorInput` forwards a passed `aria-*` to its hex field.** It dropped every one, so the field
+  could be named only through `inputLabel`. A passed `aria-label` wins over `inputLabel`, and
+  `hasError` still sets `aria-invalid` to `true` over a passed value
+- **`Label` forwards a passed `aria-*` to the `<label>`.** It dropped every one
+- **`FileInput` takes every `aria-*` in its type and keeps `aria-disabled` while inert.** The type
+  took only `aria-label` and `aria-description`, though the wrapper received any `aria-*`. A
+  passed `aria-disabled` also overwrote the `true` that `isDisabled` and `isLoading` set
+- **Arabic gets the system font in any region.** `getFontFamilyDependingOnLanguage`, and with it
+  `ThemeProvider`, matched only `ar-SA`; `ar` and `ar-EG` got Open Sans, which has no Arabic
+  glyphs
+- **`RoomType` works the same for the pointer and the keys, and needs no portal for its accent.**
+  A `dropdownButton` ignored the disabled props for a click but not for Enter and Space; now it
+  ignores them for both. The pressed and open borders fall back to the theme's accent, not the
+  text colour. Leaving out `roomType` leaves the row blank, as an unknown value does, instead of
+  borrowing the form room's texts
+- **`RoomIcon`'s empty state draws one button.** With `withEditing` the pencil sat over the plus
+  in the same corner, each with a menu of its own; the plus is left. Its circle takes the theme's
+  accent without the portal too, where it had no background and the white plus was invisible
+- **`Avatar`'s badge colours can be set on an ancestor.** The avatar declared
+  `--avatar-owner-fill`, `--avatar-administrator-fill` and their strokes on itself, so a value from
+  above never reached the badge
+- **`ImageEditor` keeps the file dialog shut while `isDisabled`.** The replace control still opened
+  it, and the file chosen there was dropped
+- **`AvatarEditorDialog` cannot be closed while `isLoading`.** The header cross, Escape and the
+  backdrop still closed it, and the close reset the image the save was sending
+- **`RoomLogoCoverDialog`'s "without icon" stays chosen while no glyph is.** The first click turned
+  it off, and nothing turned it back on. Its label asks for `Common:WithoutIcon`, so a `t` whose
+  default namespace is not `Common` finds it
+- **`PortalLogo`'s phone bar takes the portal's `--header-background-color`.** The logo declared
+  that token on itself, hiding the portal's value, and left the bar with no colour outside a
+  `.light` or `.dark` ancestor
+- **`MCPIcon` draws the first letter after leading spaces, and a leading emoji whole.** It drew the
+  space, a blank tile, or half of the emoji's surrogate pair
+- **`SelectedItem` applies `style`, and its cross carries no `undefined` class.** `style` was
+  declared and never read; without `classNameCloseButton` the cross got the literal class
+- **`isManagement()` is true only under the management app's `/management`.** It matched the word
+  anywhere in the path, so `CategoryItem` hid its paid badge on a page such as
+  `/portal-settings/management/...`
+- **`FormWrapper`'s width variables hold on a tablet, and a class can restyle it on a phone.** A
+  tablet fixed the width at 416px whatever the variables said; on a phone the shadow and background
+  were removed with `!important`
+- **`InfiniteLoader`'s row skeletons line up with the right edge in a right-to-left layout.** The
+  rule that moves them named `.row-loade`, a class nothing carries
+- **`SelectionArea` reports at most once per animation frame, and a release cancels the report
+  still scheduled.** Each move and scroll built a scheduler of its own, so several moves within one
+  frame gave several reports, and the release cancelled a new, empty one
+- **`Dropzone`'s format line opens nothing while `isDisabled`.** It had left the tab order, but a
+  click still opened the full list. The line now carries `aria-disabled` as well
+- **Clearing `Scrollbar`'s `paddingInlineEnd` brings the default space back.** The value was
+  written only while the prop was set, so the last one stayed
+- **A click on a tile's three-dot button calls `tileContextClick` once.** `BaseTile`, `FileTile`
+  and `FolderTile` called it as the button read its options, with no argument, and again with
+  `false` as it reported the click. Only the second call is left
+- **`FileTile`'s `isBlockingOperation` turns the pointer off.** Its rule matched only a descendant
+  of the tile, so hover, clicks and right-clicks still reached a blocked file.
+- **A `RowContainer` with any `id` gets rows of its own width.** The virtual list measured
+  `document.getElementById("rowContainer")`, so another id laid the rows out zero wide and a
+  second container took the first one's width. A `row` list of `InfiniteLoaderComponent` now
+  measures the element it sits in and follows it as it resizes, or measures it once where there is
+  no `ResizeObserver`, as in jsdom; `table` and `tile` still look up their ids
+- **`TableHeader` gives the free width to the wide column on a window resize.** When the columns
+  stopped fitting, a resize handed it only to a `default` column that also set `minWidth`, and to
+  any column with `minWidth` and `default: false`. The wide column could end at `0px` with the
+  rest. A layout reset was not affected
+- **`TableRow` and `TableBody` add no class named `undefined`.** `hideColumns` and the body's
+  `infoPanelVisible` each looked up a class their stylesheet does not define. The props change
+  nothing else
+- **`RowContent` adds no class named `undefined`.** `sectionWidth` looked up a class its
+  stylesheet does not define; the prop changes nothing else
+- **`Article` survives a `showArticle` value in local storage that is not JSON.** The parse ran
+  unguarded in an effect, so such a value threw on mount and on every device change. It now
+  counts as its raw text, and storage that cannot be read counts as an absent key
+- **`Navigation`'s header holds up in four corner cases.** The room title with `rootRoomTitle` and
+  a single crumb threw on click; it now only closes the drop box. Each title icon's tooltip has
+  its own id, where every header shared `iconTooltip`. `withLogo={true}` no longer draws an
+  `<img>` with an empty `src`. The extra button's place in the row follows `currentDeviceType`, as
+  the rest of the layout does, instead of the window's width at render
+- **`Tabs` passes each bar only its own props.** A prop of the other type, such as `scaled` on
+  the primary bar, reached the wrapper `<div>` and React warned about an unknown attribute
+- **A click on a `Toast` spreads out its own deck only, and the deck closes again.** The click
+  set `position: static` on every `.Toastify__toast` in the document and never undid it, so a
+  later toast stacked over the spread ones. The container now carries a class until its last
+  toast is gone. The `visualViewport` listener that wrote `--toast-top-offset` on `<html>`, where
+  nothing read it, is removed
+- **`ColumnarInfoBar`'s close cross follows `--cib-color`.** Its `fill: var(--gray)` named a
+  variable the kit does not define, so the cross kept the asset's fixed grey in both themes
+- **A swipe down no longer closes a `ModalDialog` that cannot close.** The swipe called
+  `onClose` directly, past the guard the cross and Escape go through, so `isCloseable={false}`
+  and `embedded` did not stop it on a phone. It goes through that guard now, and such a dialog
+  is not dragged at all
+- **`ContextMenu`'s mobile sheet shows a `badgeLabel` without `isPaidBadge`.** The sheet drew a
+  badge only for a paid item, while the desktop list drew a plain one in blue; both draw it now
+- **`DropDownItem` draws an `icon` passed as an element or a memoised component.** An element
+  such as `<Icon />`, or a component wrapped in `memo` or `forwardRef`, fell through to
+  `react-svg` with an empty address and drew nothing, though the type allows both. The mobile
+  submenu of `ContextMenu` shows an item's `iconNode` as well
+- **`DropDown`'s virtual list keeps the markup of a child of its own.** With `maxHeight` every
+  child was rendered again as a `DropDownItem` built from its props, so a component of your own
+  lost its markup. A `DropDownItem` is still drawn that way, and a component marked with
+  `markAsDropDownItem` keeps its own markup and still takes the keyboard highlight; any other
+  child is placed in its row as it is
+- **An open `DropDown` takes only the arrows and Enter from the page.** Its virtual list, with
+  `maxHeight` and keyboard navigation on, prevented the default of every key press on the page
+  before looking at the key, so a text field elsewhere took no characters and Tab did not move.
+  Only the three keys it acts on are prevented now
+- **`Calendar` leaves the day of `minDate` selectable, and keeps the seconds.** A day was
+  compared at midnight with `minDate` and its time, so a `minDate` of now disabled today; it is
+  compared with the day `minDate` falls on now. A picked day kept the old hours and minutes but
+  dropped the seconds; it keeps them too. `DatePicker` and `DateTimePicker` show the calendar
+  and gain both
+- **`DatePicker` writes the chip's date in `locale`.** The month name followed the date's own
+  Luxon locale, so a German picker showed "15 Mar 2024"; it shows "15 März 2024". `DateTimePicker`
+  gains the same
+- **`TimePicker` reports a change of `meridiem`, and keeps the zone of `initialTime`.** A new
+  AM or PM reported nothing until the next keystroke; it now reports the typed time in the new
+  half. Every value is `initialTime` with the typed hour and minute set on it, so it keeps that
+  date's seconds and time zone; it used to be parsed again in the local zone with the seconds
+  at zero. `DateTimePicker` reports a value equal to its current one only once
+- **`Badge` merges a passed `style` over its own.** The style was spread after the badge's own,
+  so it replaced `height`, `border`, `borderRadius` and the background colour as a whole; now
+  only the keys it names change
+- **`LinkWithDropdown` renders on a server and finds entries with a numeric `key`.** It read
+  `window.orientation` while it was created, which threw where there is no `window`. An entry's
+  `onClick` was looked up by comparing its `key` with a DOM attribute, so a numeric key never
+  matched and the click only closed the menu
+- **`Tag` styles its label.** The label never got the stylesheet's label class, so a deleted tag
+  was not struck through, a disabled one not greyed, and `--tag-text-color`, `--tag-size` and
+  `--tag-lh` changed nothing. All of them reach the label now. Its size comes from `--tag-size`,
+  13px by default, instead of an inline style
+- **`Heading` no longer carries a class named `undefined`.** It asked for a `not-selectable`
+  class its stylesheet never defined. Headings stay selectable, as they were
+- **`RadioButton`s sharing a `name` clear each other.** Without `onChange` each button held its
+  own dot, and React restored the group from those stale dots: a click on a second button left
+  its input unchecked and the first one's dot drawn. A button checked that way now clears the
+  others of its name in the same form
+- **`RadioButtonGroup` takes several captions.** Every `type: "text"` entry had the key
+  `radio-text`, so a second caption collided with the first; each is keyed by its position now
+- **A loading `Button` no longer repeats its `id` on the spinner.** The button passed its own
+  `id` to the `track` loader, so while it loaded the page held two elements with that id. A
+  loader without an `id` now gets a unique one, so its gradients stay apart from every other
+  track's; before, tracks without an `id` shared one set and a secondary button's spinner drew
+  in the primary's white
+- **`TextInput`'s `keepCharPositions` works.** The prop reached only a `data-` attribute and
+  never the mask, so typing or deleting in the middle shifted the rest. With a `mask` every
+  character now keeps its slot: typing into a filled slot is refused, and a deletion leaves the
+  slot empty. The attribute is still set
+- **`EmailInput` keeps a passed `className`.** Its own class was set after the rest of the props
+  and replaced it; the two are now joined
+- **A failure to load the AI chat's image viewer stays in the viewer.** The viewer is loaded with
+  the first picture opened, and with no error boundary of its own a chunk that failed to load -
+  a tab opened before a deployment - reached the host's boundary, above the whole app:
+  `AiAgentProviders` wraps it. The picture now stays closed and the chat goes on
+- **A picture of the AI chat can be downloaded on a phone and a tablet.** They have no toolbar,
+  and the viewer's menu was hidden, so there was no way to the download the changelog promised.
+  The menu is shown for a picture the chat can download and has Download as its only row.
+  `MediaViewer`'s mobile menu no longer lists Info for a host that passes no `onShowInfoPanel`
+- AI chat: the composer's "+" menu does not end on a separator when web search is hidden - the
+  line stayed under the last row when web search was off and its settings could not be opened
+  (ai-chat 1.0.2-progress.76)
 - **`DropDownItem` renders an icon passed as an element.** Such an icon used to go to
   `ReactSVG` with an empty `src` and show nothing. The mobile submenu of `ContextMenu` now shows
   an item's `iconNode` as well.

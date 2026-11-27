@@ -10,6 +10,8 @@ import { useInterfaceDirection } from "../../context/InterfaceDirectionContext";
 import { IconButton } from "../icon-button";
 import { Scrollbar } from "../scrollbar";
 import { toastr } from "../toast";
+import { pickAriaProps } from "../../utils/aria-props";
+import { useCommonTranslation } from "../../utils/i18n";
 import { jsonify, isJSON } from "./Textarea.utils";
 import type { TextareaProps } from "./Textarea.types";
 import styles from "./Textarea.module.scss";
@@ -51,15 +53,15 @@ const Textarea = ({
   onKeyDown,
   onCopy,
   copyInfoText,
-  "aria-label": ariaLabel,
-  "aria-labelledby": ariaLabelledBy,
-  "aria-describedby": ariaDescribedBy,
   spellCheck,
   autoCorrect,
   autoCapitalize,
   autoComplete,
+  ...rest
 }: TextareaProps) => {
+  const t = useCommonTranslation();
   const { isRTL } = useInterfaceDirection();
+  const aria = pickAriaProps(rest);
 
   const areaRef = useRef<HTMLTextAreaElement>(null);
   const [isError, setIsError] = useState(hasError);
@@ -158,6 +160,7 @@ const Textarea = ({
         <IconButton
           className={`${styles.copyIconWrapper} ${classNameCopyIcon || ""}`}
           onClick={handleCopy}
+          ariaLabel={t("CopyToClipboard")}
           iconNode={<CopyIconUrl />}
           size={16}
         />
@@ -193,6 +196,7 @@ const Textarea = ({
         ) : null}
         {/*  @ts-expect-error: Passing pointer events causes a React warning - "Unknown event handler". TextareaAutosize types are outdated */}
         <TextareaAutosize
+          {...aria}
           id={id}
           className={classNames(styles.textarea, {
             [styles.isJSONField]: isJSONField,
@@ -203,9 +207,6 @@ const Textarea = ({
           maxLength={maxLength}
           name={name}
           tabIndex={tabIndex}
-          aria-label={ariaLabel}
-          aria-labelledby={ariaLabelledBy}
-          aria-describedby={ariaDescribedBy}
           spellCheck={spellCheck}
           autoCorrect={autoCorrect}
           autoCapitalize={autoCapitalize}

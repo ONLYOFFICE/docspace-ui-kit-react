@@ -1,4 +1,4 @@
-export type AppLoaderProps = {
+export type AppLoaderProps = React.AriaAttributes & {
   /** What a screen reader announces while the sheet is shown: the text of its `role="status"` region. Defaults to `Loader`'s translated `Common:LoadingProcessing` ("Loading..."). */
   label?: string;
 };

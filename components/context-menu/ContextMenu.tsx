@@ -17,6 +17,8 @@ import { Text } from "../text";
 import { Avatar, AvatarRole, AvatarSize } from "../avatar";
 import { IconButton } from "../icon-button";
 import { Portal } from "../portal";
+import { groupRoleWhenNamed, pickAriaProps } from "../../utils/aria-props";
+import { useCommonTranslation } from "../../utils/i18n";
 import { RoomIcon } from "../room-icon";
 
 import { SubMenu } from "./sub-components/SubMenu";
@@ -60,6 +62,7 @@ const ContextMenu = (props: ContextMenuProps) => {
   const [root, setRoot] = React.useState<null | HTMLDivElement>(null);
 
   const { isRTL } = useInterfaceDirection();
+  const t = useCommonTranslation();
 
   const {
     ref,
@@ -660,6 +663,8 @@ const ContextMenu = (props: ContextMenuProps) => {
           onExited={onExited}
         >
           <div
+            {...pickAriaProps(props)}
+            role={groupRoleWhenNamed(props)}
             ref={menuRef}
             id={id}
             className={currentClassName}
@@ -678,6 +683,7 @@ const ContextMenu = (props: ContextMenuProps) => {
                       className="edit_icon"
                       iconNode={<ArrowLeftReactUrl />}
                       onClick={onBackClick}
+                      ariaLabel={t("Back")}
                       size={16}
                     />
                   ) : (

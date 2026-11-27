@@ -12,6 +12,7 @@ import classNames from "classnames";
 import ButtonAlertReactSvg from "../../assets/button.alert.react.svg";
 import { consumeKey } from "../../utils/consume-key";
 import { useCommonTranslation } from "../../utils/i18n";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import { Scrollbar } from "../scrollbar";
 import { Backdrop } from "../backdrop";
@@ -39,7 +40,6 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
     buttonOptions,
     withoutButton,
     manualWidth,
-    isOpenButton,
     onClose,
     onOpen,
     alert,
@@ -50,6 +50,7 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
     dropdownStyle,
   } = props;
 
+  const aria = pickAriaProps(props);
   const t = useCommonTranslation();
   // The English fallback when no translations are loaded.
   const alertLabel = t("Alert") || "Alert";
@@ -184,7 +185,7 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
 
   useLayoutEffect(() => {
     recalculateHeight();
-  }, [isOpen, isOpenButton, recalculateHeight]);
+  }, [isOpen, recalculateHeight]);
 
   useEffect(() => {
     window.addEventListener("resize", recalculateHeight);
@@ -201,23 +202,6 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
 
     setIsOpen(value);
   };
-
-  // The trigger is FloatingButton's circle, which takes no ARIA props of its
-  // own; the popup state is stamped on its element.
-  useEffect(() => {
-    const el = floatingButtonRef.current;
-    if (!el) return;
-    if (withMenu) {
-      el.setAttribute("aria-haspopup", "menu");
-      el.setAttribute("aria-expanded", String(Boolean(isOpen)));
-      if (isOpen) el.setAttribute("aria-controls", sheetId);
-      else el.removeAttribute("aria-controls");
-    } else {
-      el.removeAttribute("aria-haspopup");
-      el.removeAttribute("aria-expanded");
-      el.removeAttribute("aria-controls");
-    }
-  }, [withMenu, isOpen, sheetId]);
 
   // Escape closes the sheet and gives focus back to the button. It listens in
   // the capture phase and consumes the key, so the portal's document hotkeys
@@ -454,9 +438,20 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
         data-testid="main-button-mobile"
       >
         <FloatingButton
+          {...aria}
+          // With a menu, its state wins over a passed value; without one the
+          // button opens nothing, so a passed value is kept.
+          aria-haspopup={withMenu ? "menu" : aria["aria-haspopup"]}
+          aria-expanded={withMenu ? Boolean(isOpen) : aria["aria-expanded"]}
+          aria-controls={
+            withMenu ? (isOpen ? sheetId : undefined) : aria["aria-controls"]
+          }
           ref={floatingButtonRef}
           className={classNames(styles.floatingButton)}
           icon={isOpen ? FloatingButtonIcons.minus : FloatingButtonIcons.plus}
+          // One name for both icons: the open sheet is told by aria-expanded,
+          // not by a second name. A passed aria-label wins over it.
+          label={t("Actions")}
           onClick={onMainButtonClick}
           withoutProgress
         />

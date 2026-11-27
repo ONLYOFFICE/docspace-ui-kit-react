@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { HeaderButtons } from "../header-buttons/HeaderButtons";
 import { MonthsHeaderProps } from "../../Calendar.types";
 import styles from "../../Calendar.module.scss";
+import { activateOnButtonKey } from "../../../../utils/keyboard-activation";
 import {
   subtractFromDate,
   addToDate,
@@ -44,6 +45,10 @@ export const MonthsHeader = ({
       <h2
         className={classNames(styles.title, "months-header")}
         onClick={onTitleClick}
+        // The title opens the year view, so it is a button to the keyboard.
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => activateOnButtonKey(e, onTitleClick)}
       >
         {formatDate(observedDate, "yyyy")}
         <span className={styles.headerActionIcon} />

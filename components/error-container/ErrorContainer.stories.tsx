@@ -14,26 +14,26 @@ const meta = {
   argTypes: {
     headerText: {
       control: "text",
-      description: "The heading, rendered as an `h1` at 23px",
+      description: "The heading, rendered as an `h1` at 23px.",
     },
     bodyText: {
       control: "text",
-      description: "The line under the heading, 14px and no wider than 560px",
+      description: "The line under the heading, 14px and no wider than 560px.",
     },
     buttonText: {
       control: "text",
       description:
-        "Label of the action button. The button appears only when `onClickButton` is set as well",
+        "Label of the action button. The button appears only when `onClickButton` is set as well.",
     },
     customizedBodyText: {
       control: "text",
       description:
-        "A third line under `bodyText`, 13px and 600-weight, in the muted colour. It takes plain text: markup in the string is shown as typed",
+        "A third line under `bodyText`, 13px and 600-weight, in the muted colour. It takes plain text, not markup.",
     },
     isPrimaryButton: {
       control: "boolean",
       description:
-        "Whether the action button is the filled accent one rather than the outlined one",
+        "Whether the action button is the filled accent one rather than the outlined one.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -41,14 +41,15 @@ const meta = {
     isEditor: {
       control: "boolean",
       description:
-        "Takes the container out of the page flow and lays it over the whole width of its positioned parent, for a host that mounts it over a layout of its own",
+        "Lays the page over its positioned parent at full width instead of in the flow, for a host such as the document editor.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     hideLogo: {
       control: "boolean",
-      description: "Hides the portal logo above the illustration",
+      description:
+        "Hides the portal logo above the illustration. Set it outside an ONLYOFFICE Apps portal, where the logo endpoint does not resolve.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -56,26 +57,26 @@ const meta = {
     onClickButton: {
       action: "clicked",
       description:
-        "Called when the action button is clicked. The button appears only when `buttonText` is set as well",
+        "Called when the action button is clicked. The button appears only when `buttonText` is set as well.",
     },
     children: {
       control: false,
       description:
-        "Rendered last, below the button: the place for a support link or a details block",
+        "Rendered last, below the button: the place for a support link or a details block.",
     },
     id: {
       control: "text",
       description:
-        "Value of `id` on the outer element. It does not rename the fixed ids of the parts inside",
+        "Value of `id` on the outer element. It does not rename the four fixed ids inside (`container-inner`, `header`, `text`, `customized-text`).",
     },
     className: {
       control: "text",
       description:
-        "Added after the component's own classes on the outer element",
+        "Added after the component's own classes on the outer element.",
     },
     style: {
       control: "object",
-      description: "Inline style of the outer element",
+      description: "Inline style of the outer element.",
     },
   },
   args: {
@@ -103,7 +104,7 @@ export const Default: Story = {
     ).toBeVisible();
     await expect(canvas.getByText("Try again later")).toBeVisible();
     await expect(canvas.getByText("Customized body")).toBeVisible();
-    await expect(canvas.getByAltText("portal logo")).toBeInTheDocument();
+    await expect(canvas.getByAltText("ONLYOFFICE Apps")).toBeInTheDocument();
     // No buttonText, so no button even though onClickButton is set.
     await expect(canvas.queryByRole("button")).toBeNull();
     // The illustration is decorative: every SVG sits under aria-hidden.
@@ -125,7 +126,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The plain error page: the heading says what happened (`headerText`), the line under it says what to do (`bodyText`), and the muted third line carries a detail such as an error code (`customizedBodyText`). Change any other prop live in the Controls panel below.",
+          "The plain error page. The heading says what happened (`headerText`), and the line under it what to do (`bodyText`). The muted third line carries a detail such as an error code (`customizedBodyText`).",
       },
       source: {
         code: `<ErrorContainer
@@ -139,6 +140,7 @@ export const Default: Story = {
 };
 
 export const WithPrimaryButton: Story = {
+  name: "With an action",
   render: (args) => <ErrorContainer {...args} />,
   args: {
     bodyText: "An error occurred while processing your request",
@@ -170,6 +172,7 @@ export const WithPrimaryButton: Story = {
 };
 
 export const InEditorMode: Story = {
+  name: "Over the editor",
   render: (args) => <ErrorContainer {...args} />,
   args: {
     isEditor: true,
@@ -188,7 +191,7 @@ export const InEditorMode: Story = {
     docs: {
       description: {
         story:
-          "The same page laid over its host instead of pushing it down (`isEditor`), for a screen such as a document editor that mounts the error on top of a layout of its own.",
+          "The same page laid over its host instead of pushing it down (`isEditor`). It suits a screen such as a document editor, which mounts the error over its own layout.",
       },
       source: {
         code: `<ErrorContainer
@@ -203,6 +206,7 @@ export const InEditorMode: Story = {
 };
 
 export const WithChildren: Story = {
+  name: "With your own content",
   render: (args) => <ErrorContainer {...args} />,
   args: {
     headerText: "Connection Error",
@@ -235,7 +239,7 @@ export const WithChildren: Story = {
           style={{
             fontSize: "13px",
             marginTop: "16px",
-            color: "var(--gray)",
+            opacity: 0.7,
             fontStyle: "italic",
           }}
         >
@@ -277,6 +281,7 @@ export const WithChildren: Story = {
 };
 
 export const WithSecondaryButton: Story = {
+  name: "Outlined button",
   render: (args) => <ErrorContainer {...args} />,
   args: {
     headerText: "Some error has happened",
@@ -292,7 +297,7 @@ export const WithSecondaryButton: Story = {
     docs: {
       description: {
         story:
-          "**Go back** — the same button, outlined (`isPrimaryButton` off), for a page where leaving is the way out rather than an action the user is expected to take.",
+          "**Go back** — the same button, outlined (`isPrimaryButton` off). It suits a page where leaving is the way out, not an action the user is expected to take.",
       },
       source: {
         code: `<ErrorContainer
@@ -308,6 +313,7 @@ export const WithSecondaryButton: Story = {
 };
 
 export const WithoutLogo: Story = {
+  name: "Without the logo",
   render: (args) => <ErrorContainer {...args} />,
   args: {
     headerText: "Some error has happened",
@@ -315,13 +321,13 @@ export const WithoutLogo: Story = {
     hideLogo: true,
   },
   play: async ({ canvas }) => {
-    await expect(canvas.queryByAltText("portal logo")).toBeNull();
+    await expect(canvas.queryByAltText("ONLYOFFICE Apps")).toBeNull();
   },
   parameters: {
     docs: {
       description: {
         story:
-          "The page starts with the illustration, with no logo above it (`hideLogo`), for a host that already shows its own brand or has no portal to take the logo from.",
+          "The page starts with the illustration, with no logo above it (`hideLogo`). It suits a host that shows its own brand or has no portal to take the logo from.",
       },
       source: {
         code: `<ErrorContainer
@@ -335,6 +341,7 @@ export const WithoutLogo: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   play: async ({ canvas }) => {
     const header = canvas.getByText("Connection error");
     // The text variable colours customizedBodyText only.

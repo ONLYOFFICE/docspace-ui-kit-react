@@ -70,17 +70,17 @@ const meta = {
     emailSettings: {
       control: false,
       description:
-        "Options for the built-in parser: which forms of address to accept, such as a display name, punycode or an IP-address domain",
+        "Options for the built-in parser: which forms of address to accept.",
     },
     customValidate: {
       control: false,
       description:
-        "Function that replaces the built-in parser and `emailSettings` outright; it returns `{ value, isValid, errors }` and `isValid` decides the error border",
+        "Replaces the built-in parser outright. Return the same shape; the component uses `isValid` to decide whether to colour the field.",
     },
     onValidateInput: {
       action: "onValidateInput",
       description:
-        "Called after every keystroke with the result of the check, whichever parser ran",
+        "Called after every keystroke with the result of the check, whichever parser ran.",
     },
     onChange: {
       action: "onChange",
@@ -93,7 +93,7 @@ const meta = {
     handleAnimationStart: {
       action: "handleAnimationStart",
       description:
-        "Called on the field's native animationstart, which is how a page notices the browser autofilling it, since autofill fires no change event",
+        "Native `animationstart` on the field. It exists to catch the browser's autofill animation, which fires no change event.",
     },
     autoComplete: {
       control: "text",
@@ -121,7 +121,7 @@ const meta = {
     },
     dataTestId: {
       control: "text",
-      description: "`data-testid` of the field",
+      description: "`data-testid` of the field.",
       table: {
         defaultValue: { summary: "email-input" },
       },
@@ -243,7 +243,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "An empty field that checks the address as you type: an incomplete one turns the border red, a complete one clears it (`hasError` left out). Change any other prop live in the Controls panel below.",
+          "An empty field that checks the address while it is typed. An incomplete address turns the border red, and a complete one clears it.",
       },
       source: {
         code: `<EmailInput
@@ -299,7 +299,7 @@ export const Sizes: Story = {
     docs: {
       description: {
         story:
-          "Pick the height that matches the rest of the form: base and middle share 13px text, large grows to 16px (`size`). Type into any of them to see the result of the check under the field.",
+          "The three sizes (`size`): base and middle share 13px text, large grows to 16px. The result of the check shows under each field.",
       },
       source: {
         code: `<EmailInput size={InputSize.base} placeholder="Base size" />
@@ -352,7 +352,7 @@ export const States: Story = {
     docs: {
       description: {
         story:
-          "The field in each state a form puts it in: **user@example.com** is valid and plain; **disabled@example.com** is greyed out and cannot be focused (`isDisabled`); **readonly@example.com** can be focused and selected but not edited (`isReadOnly`); **invalid-email** has its red border forced on (`hasError`), which the check would also have done on its own.",
+          "The field in each state a form puts it in:\n\n- **user@example.com** — valid and plain\n- **disabled@example.com** — greyed out, cannot be focused (`isDisabled`)\n- **readonly@example.com** — focusable and selectable, not editable (`isReadOnly`)\n- **invalid-email** — the red border forced on (`hasError`)",
       },
       source: {
         code: `<EmailInput value="user@example.com" />
@@ -385,6 +385,7 @@ const CustomValidationTemplate = () => {
 };
 
 export const WithCustomValidation: Story = {
+  name: "Custom check",
   render: () => <CustomValidationTemplate />,
   play: async ({ canvas, userEvent }) => {
     const field = canvas.getByPlaceholderText("Enter @custom-domain.com email");
@@ -404,7 +405,7 @@ export const WithCustomValidation: Story = {
     docs: {
       description: {
         story:
-          "Enforce a rule the parser does not know, such as a single allowed domain: the function replaces the parser outright and its `isValid` decides the red border (`customValidate`). Type an address that does not end with @custom-domain.com to see the field turn red and the returned error key appear under it.",
+          "A rule the parser does not know: one allowed domain (`customValidate`). The function replaces the parser, and its `isValid` decides the red border. Any other domain turns the field red, and the returned error key shows under it.",
       },
       source: {
         code: `<EmailInput
@@ -431,6 +432,7 @@ const AutomaticErrorTemplate = () => {
 };
 
 export const AutomaticErrorState: Story = {
+  name: "Automatic error state",
   render: () => <AutomaticErrorTemplate />,
   play: async ({ canvas }) => {
     // With hasError left out, the check alone draws the border.
@@ -445,7 +447,7 @@ export const AutomaticErrorState: Story = {
     docs: {
       description: {
         story:
-          "Without `hasError` the field decides for itself: **name@example.com** parses and stays plain, **name@example** has no top-level domain and is red from the start. Edit either one to watch the border follow the check.",
+          "Without `hasError` the field decides for itself: **name@example.com** parses and stays plain, **name@example** has no top-level domain and is red from the start. The border follows the check as the value is edited.",
       },
       source: {
         code: `<EmailInput value="name@example.com" onChange={handleChange} />
@@ -488,6 +490,7 @@ const AcceptedAddressFormsTemplate = () => {
 };
 
 export const AcceptedAddressForms: Story = {
+  name: "Accepted address forms",
   render: () => <AcceptedAddressFormsTemplate />,
   play: async ({ canvas }) => {
     // The same "Name <address>" form: rejected by default, accepted with
@@ -502,7 +505,7 @@ export const AcceptedAddressForms: Story = {
     docs: {
       description: {
         story:
-          "Decide which forms of address count as valid: the same address with a display name is refused by the first field and accepted by the second, which allows names (`emailSettings` with `allowName`). Punycode, IP-address domains, spaces and local domain names are switched the same way.",
+          "The same address with a display name in two fields (`emailSettings`). The first refuses it; the second, with `allowName`, accepts it. Punycode, IP-address domains, spaces and local domain names are switched the same way.",
       },
       source: {
         code: `const settings = EmailSettings.parse({ allowName: true });
@@ -528,6 +531,7 @@ const RightToLeftTemplate = () => {
 
 // Framed on Docs: the theme provider stamps data-dir on <html>, which would flip the whole page.
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
   play: async ({ canvas }) => {
@@ -545,7 +549,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "106px" },
       description: {
         story:
-          'Under a right-to-left interface both fields align to the right edge: the placeholder of the empty field and the address in the second one, which still reads left to right because an address is Latin text (`dir="auto"`). The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+          'Two fields in a right-to-left interface, aligned to the right edge. The address still reads left to right, as Latin text (`dir="auto"`). The direction comes from the theme\'s `interfaceDirection` and the wrapper\'s `dir="rtl"`.',
       },
       source: {
         code: `<div dir="rtl">
@@ -558,6 +562,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   play: async ({ canvas }) => {
     const empty = canvas.getByPlaceholderText("Custom styled email");
     await expect(empty).toHaveStyle({
@@ -611,7 +616,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The first field shows them all; hover and focus it to see the two border variables. The second holds an address with its error border forced on (\`hasError\`), where the theme's error colour replaces the border variables and the rest still apply.`,
+        story: `Every overridable variable, set on one wrapper. The first field shows them all. The second is in the error state (\`hasError\`): the theme's error colour replaces the border variables, and the rest still apply.`,
       },
       source: {
         code: `<div

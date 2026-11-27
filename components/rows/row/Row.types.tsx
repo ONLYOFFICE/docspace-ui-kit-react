@@ -21,7 +21,7 @@ export type TData = {
 
 export type TMode = "modern" | "default";
 
-export type RowProps = {
+export type RowProps = React.AriaAttributes & {
   /**
    * Whether the row's checkbox is ticked. Its **presence** is what renders the
    * checkbox at all — passing `checked={false}` gives an unticked box, omitting
@@ -37,9 +37,6 @@ export type RowProps = {
   className?: string;
   /** Element placed before the context button, after the badges. */
   contentElement?: React.ReactNode;
-  /** Width reserved for the context button, as a CSS length.
-   * @default "26px" */
-  contextButtonSpacerWidth?: string;
   /**
    * Items of the context menu. They may be given here or as
    * `data.contextOptions`, which wins; an empty list renders no button.
@@ -55,17 +52,23 @@ export type RowProps = {
    * its presence is what reserves the space.
    */
   element?: React.ReactElement;
-  /** Ignored. Nothing reads this prop and no `id` reaches the DOM. */
+  /** Id of the row element. */
   id?: string;
   /** Draws the checkbox as partly ticked, for a group that is half-selected. */
   indeterminate?: boolean;
-  /** Called with the new checked state and whatever `data` holds. */
+  /**
+   * Called with the new checked state and whatever `data` holds. In the modern
+   * mode on a touch device, a tap on the start element calls it with `true`.
+   */
   onSelect?: (checked: boolean, data?: unknown) => void;
-  /** Called by a click on the start element and on the content, but not on the checkbox or the context button. */
+  /**
+   * Called by a click on the content, and in the default mode on the start
+   * element. The checkbox and the context button do not call it.
+   */
   onRowClick?: (e: React.MouseEvent) => void;
   /** Called when the context menu is asked for, with `true` for a right-click. */
   onContextClick?: (value?: boolean) => void;
-  /** Ignored. Nothing reads this prop and no inline style reaches the DOM. */
+  /** Inline style of the row element. */
   style?: React.CSSProperties;
   /** Replaces the checkbox and the start element with a spinner. */
   inProgress?: boolean;
@@ -83,7 +86,7 @@ export type RowProps = {
   isIndexEditingMode?: boolean;
   /** Tells the context menu that this row is a room, which changes its header. */
   isRoom?: boolean;
-  /** Hover tooltip of the context button. */
+  /** Hover tooltip and accessible name of the context button. */
   contextTitle?: string;
   /** Element placed before `contentElement`, for badges of your own. */
   badgesComponent?: React.ReactNode;
@@ -97,8 +100,6 @@ export type RowProps = {
   isDisabled?: boolean;
   /** Called with the direction when an index arrow is clicked. */
   onChangeIndex?: (action: VDRIndexingAction) => void;
-  /** Ignored. The context menu's header is read from the child's own `item` prop. */
-  item?: RowItemType;
   /** Value of `data-testid` on the row.
    * @default "row" */
   dataTestId?: string;

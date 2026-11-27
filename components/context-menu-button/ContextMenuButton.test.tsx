@@ -83,6 +83,45 @@ describe("<ContextMenuButton />", () => {
     expect(button).toHaveAttribute("aria-expanded", "false");
   });
 
+  it("keeps a passed aria-* on the button, its aria-label over title", () => {
+    render(
+      <ContextMenuButton
+        {...baseProps}
+        usePortal={false}
+        aria-label="Actions for report.docx"
+        aria-describedby="file-hint"
+        aria-expanded
+        aria-disabled
+      />,
+    );
+    const button = screen.getByRole("button", {
+      name: "Actions for report.docx",
+    });
+    expect(button).toHaveAttribute("aria-describedby", "file-hint");
+    expect(button).toHaveAttribute("aria-disabled", "true");
+    // The dropdown's own state wins over a passed one.
+    expect(button).toHaveAttribute("aria-expanded", "false");
+    expect(screen.getByTestId("context-menu-button")).not.toHaveAttribute(
+      "aria-describedby",
+    );
+  });
+
+  it("keeps the caller's menu state in toggle mode", () => {
+    render(
+      <ContextMenuButton
+        {...baseProps}
+        displayType={ContextMenuButtonDisplayType.toggle}
+        aria-haspopup="menu"
+        aria-expanded
+        aria-controls="caller-menu"
+      />,
+    );
+    const button = screen.getByRole("button", { name: "Actions" });
+    expect(button).toHaveAttribute("aria-haspopup", "menu");
+    expect(button).toHaveAttribute("aria-expanded", "true");
+    expect(button).toHaveAttribute("aria-controls", "caller-menu");
+  });
+
   it("calls onClick on the click that opens the menu, not the one closing it", () => {
     const onClick = vi.fn();
     render(<ContextMenuButton {...baseProps} onClick={onClick} />);

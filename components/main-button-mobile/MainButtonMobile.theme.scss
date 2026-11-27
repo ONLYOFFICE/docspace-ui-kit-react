@@ -2,15 +2,12 @@
 
 .light {
   --status-warning: #{colors.$light-status-warning};
-  --main-button-mobile-text-color: #{colors.$light-gray-dark};
   --main-button-mobile-button-color: var(
     --color-scheme-main-accent,
     #{colors.$light-blue-main}
   );
   --main-button-mobile-icon-fill: #{colors.$white};
   --main-button-mobile-circle-background: #{colors.$white};
-  --main-button-mobile-mobile-progress-bar-background: #{colors.$gray-strong};
-  --main-button-mobile-bar-icon: #{colors.$gray};
   --main-button-mobile-button-wrapper-background: #{colors.$gray-light-mid};
   --main-button-mobile-button-options-background-color: color-mix(
     in srgb,
@@ -35,23 +32,16 @@
     black
   );
   --main-button-mobile-dropdown-background-action-mobile: #{colors.$blue-light-mid};
-  --main-button-mobile-progress-bar-color: var(
-    --color-scheme-main-accent,
-    #{colors.$light-blue-main}
-  );
 }
 
 .dark {
   --status-warning: #{colors.$dark-status-warning};
-  --main-button-mobile-text-color: #{colors.$dark-gray-dark};
   --main-button-mobile-button-color: var(
     --color-scheme-main-accent,
     #{colors.$light-blue-main}
   );
   --main-button-mobile-icon-fill: #{colors.$black};
   --main-button-mobile-circle-background: #{colors.$black};
-  --main-button-mobile-mobile-progress-bar-background: #{colors.$gray-dark-strong};
-  --main-button-mobile-bar-icon: #{colors.$gray-dark};
   --main-button-mobile-button-wrapper-background: #{colors.$gray-dark-mid};
   --main-button-mobile-button-options-background-color: #{colors.$gray-dark-mid};
   --main-button-mobile-button-options-color: #{colors.$white};
@@ -60,8 +50,4 @@
   --main-button-mobile-dropdown-button-color: #{colors.$white};
   --main-button-mobile-dropdown-hover-button-color: #{colors.$black};
   --main-button-mobile-dropdown-background-action-mobile: #{colors.$blue-light-mid};
-  --main-button-mobile-progress-bar-color: var(
-    --color-scheme-main-accent,
-    #{colors.$light-blue-main}
-  );
 }

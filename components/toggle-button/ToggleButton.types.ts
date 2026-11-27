@@ -42,13 +42,13 @@ export type ToggleIconProps = Pick<
 /** Props for the main ToggleButton component */
 export type ToggleButtonProps = PickedTextProps &
   ElementProps &
+  Omit<React.AriaAttributes, "aria-checked"> &
   InputProps & {
     /** Text rendered beside the switch, in a `Text` span. Omit it and the
      * component is the 28×16 switch alone. */
     label?: string;
-    /** Whether the switch is on. The control is fully controlled: this is the
-     * `checked` of a real checkbox input, so pass `onChange` with it or React
-     * warns and the switch never moves. */
+    /** Whether the switch is on. It is fully controlled: without `onChange` the
+     * switch shows `isChecked` and never moves on its own. */
     isChecked?: boolean;
     /** Disables the underlying input and stops pointer events on the whole
      * control, and dims the switch and the label. */

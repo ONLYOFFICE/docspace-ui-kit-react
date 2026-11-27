@@ -37,7 +37,7 @@ const meta = {
       control: "select",
       options: Object.values(ComboBoxDisplayType),
       description:
-        "`toggle` renders the button alone and no list at all, for a control that only looks like a combo box",
+        "`toggle` renders the button alone and no list at all, for a control that only looks like a combo box.",
       table: {
         defaultValue: { summary: "default" },
       },
@@ -46,7 +46,7 @@ const meta = {
       control: "select",
       options: Object.values(ComboBoxSize),
       description:
-        "Width of the button: 173px for `base`, 300px for `middle`, 350px for `big`, 500px for `huge`, or the width of its content for `content`. Applies only when `scaled` is off",
+        "One of the fixed widths — 173, 300, 350 or 500px, or the content's own. It only applies when `scaled` is false.",
       table: {
         defaultValue: { summary: "base" },
       },
@@ -54,30 +54,21 @@ const meta = {
     scaled: {
       control: "boolean",
       description:
-        "Stretches the button to the full width of its parent, in place of the width `size` gives it",
+        "Makes the button take the full width of its parent, which overrides `size`.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     isDisabled: {
       control: "boolean",
-      description: "Greys the button out and stops the list opening",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
-    withSearch: {
-      control: false,
-      description:
-        "Ignored: nothing reads this prop and there is no search field",
+      description: "Greys the button out and stops it opening.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     noBorder: {
       control: "boolean",
-      description:
-        "Removes the button's border and background and lowers it to 18px, for a combo box set inside a line of text",
+      description: "Removes the button's border.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -85,13 +76,13 @@ const meta = {
     dropDownMaxHeight: {
       control: "number",
       description:
-        "Height of the list in pixels; a longer list scrolls inside it. Without it the list shows every option in full and the arrow keys do not move through it",
+        "Height of the list in pixels. It is also what gives the list a scrollbar: without it a long list is rendered in full.",
     },
     directionY: {
       control: "select",
       options: ["top", "bottom", "both"],
       description:
-        "Side of the button the list opens on: `bottom`, `top`, or `both` to open it below and move it above when it does not fit there",
+        "Preferred vertical side of the list; it flips to fit the viewport.",
       table: {
         defaultValue: { summary: "bottom" },
       },
@@ -100,7 +91,7 @@ const meta = {
       control: "select",
       options: ["left", "right"],
       description:
-        "Edge of the button the list aligns to. The list moves to the other edge when it does not fit, unless `fixedDirection` is on",
+        "Preferred horizontal side of the list; it flips to fit the viewport.",
       table: {
         defaultValue: { summary: "right" },
       },
@@ -108,7 +99,7 @@ const meta = {
     fixedDirection: {
       control: "boolean",
       description:
-        "Keeps the list on the sides `directionX` and `directionY` give, even when it does not fit there",
+        "Keeps `directionX` and `directionY` as given instead of flipping them.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -116,38 +107,29 @@ const meta = {
     isDefaultMode: {
       control: "boolean",
       description:
-        "Renders the list in a portal at the end of the page instead of inside the combo box",
+        "Whether the list is rendered in a portal on `document.body`.",
       table: {
         defaultValue: { summary: "true" },
-      },
-    },
-    showDisabledItems: {
-      control: false,
-      description: "Ignored: disabled options are always listed, greyed out",
-      table: {
-        defaultValue: { summary: "false" },
       },
     },
     displaySelectedOption: {
       control: "boolean",
       description:
-        "Keeps the selected option clickable in the list and highlights it. Without it that option is greyed out and cannot be picked again",
+        "Keeps the option that is currently selected usable and highlights it. Without it that option is rendered disabled, so the value cannot be picked again.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     displayArrow: {
       control: "boolean",
-      description:
-        "Draws the arrow even when there are no options to open. With options the arrow is always drawn",
+      description: "Draws the arrow even when there are no options to open.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     modernView: {
       control: "boolean",
-      description:
-        "Draws the button 28px high with no border and no background, and gives it a grey background on hover and while the list is open",
+      description: "Compact button with no background until it is open.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -155,20 +137,15 @@ const meta = {
     isLoading: {
       control: "boolean",
       description:
-        "Hides the button's label, icon and arrow behind a spinner and stops the list opening",
+        "Replaces the arrow with a spinner and stops the button opening.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
-    searchPlaceholder: {
-      control: false,
-      description:
-        "Ignored: nothing reads this prop and there is no search field",
-    },
     manualWidth: {
       control: "text",
       description:
-        "Width of the list as a CSS length. It does not change the button's width",
+        "Width of the list as a CSS length. It has nothing to do with the button's width — use `scaledOptions` for that.",
       table: {
         defaultValue: { summary: "200px" },
       },
@@ -176,15 +153,14 @@ const meta = {
     textOverflow: {
       control: "boolean",
       description:
-        "Cuts a long option label short with an ellipsis instead of wrapping it onto a second line",
+        "Truncates an option's label with an ellipsis instead of wrapping it.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     fillIcon: {
       control: "boolean",
-      description:
-        "Paints the option icons, in the list and in the button, in the text colour. An option's own `fillIcon` wins over it",
+      description: "Recolours the selected option's icon to the text colour.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -192,59 +168,60 @@ const meta = {
     options: {
       control: "object",
       description:
-        "The options of the list. Each needs a unique `key` and, unless it is a separator, a `label`; it may also carry an `icon`, a `description` shown under the label, `disabled` and a `tooltip`",
+        "The options. Each needs a unique `key`, and a `label` unless it is a separator; `disabled`, `icon`, `description`, `isBeta` and `tooltip` are passed to the row.",
     },
     selectedOption: {
       control: "object",
       description:
-        "The option shown in the button. The combo box does not change it on its own: keep it in your own state and set it from `onSelect`",
+        "The option to show in the button. The component does not choose it: keep it in your own state and set it from `onSelect`.",
     },
     onSelect: {
       action: "onSelect",
       description:
-        "Called with the option that was clicked, before the list closes",
+        "Called with the option that was clicked. Nothing changes on its own — `selectedOption` is yours to update.",
     },
     onToggle: {
       control: false,
       description:
-        "Called when the button is clicked, with the open state being asked for. Passing it without `onBackdropClick` also stops a click outside closing the list",
+        "Called with the open state asked for, by a click on the button or a key; the event is a mouse or a keyboard one. Without `onBackdropClick`, a click outside no longer closes the list.",
     },
     onBackdropClick: {
       control: false,
       description:
-        "Called when a click outside closes the list, while `withBackdrop` is on",
+        "Called when a click outside closes the list, if `withBackdrop` is on.",
     },
     onClickSelectedItem: {
       control: false,
-      description: "Called when the option already selected is clicked again",
+      description: "Called when the option already selected is clicked again.",
     },
     setIsOpenItemAccess: {
       control: false,
       description:
-        "Called with the open state whenever the list opens or closes",
+        "Called with the open state whenever it changes, alongside `onToggle`.",
     },
     type: {
       control: "select",
       options: [null, "badge", "onlyIcon", "descriptive"],
       description:
-        "Shape of the button: `badge` draws the label as a badge in the option's own colours, `onlyIcon` shows the option's icon without the label, `descriptive` adds the option's `description` under the label",
+        "Shape of the button: `badge` draws the label as a coloured badge, `onlyIcon` drops the label, `descriptive` adds the option's `description` under it.",
     },
     plusBadgeValue: {
       control: "number",
       description:
-        "Number shown as `+N` after the label, for a summary of several chosen values",
+        "Number shown as `+N` after the label, for a multi-select summary.",
     },
     opened: {
       control: "boolean",
       description:
-        "Opens or closes the list from outside whenever it changes; a click on the button still toggles it in between",
+        "Opens or closes the list from outside. It seeds the internal state rather than controlling it: the next click on the button wins until this changes.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withoutArrow: {
       control: "boolean",
-      description: "Hides the arrow, even when there are options to open",
+      description:
+        "Hides the arrow, whatever `displayArrow` and the options say.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -252,16 +229,17 @@ const meta = {
     comboIcon: {
       control: false,
       description:
-        "Icon drawn in place of the arrow: a component, an element or an SVG URL",
+        "Icon to draw instead of the arrow: a component, an element, or a URL.",
     },
     children: {
       control: false,
       description:
-        "Content drawn inside the button before the label. A click on it does not open the list unless `disableIconClick` is off",
+        "Content rendered inside the button, before the label. A click on it is ignored unless `disableIconClick` is false.",
     },
     disableIconClick: {
       control: "boolean",
-      description: "Ignores a click on `children` instead of opening the list",
+      description:
+        "Whether a click on `children` is swallowed instead of opening the list.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -269,7 +247,7 @@ const meta = {
     disableItemClick: {
       control: "boolean",
       description:
-        "Stops the list opening at all, while the button keeps its normal look",
+        "Stops the list opening at all, without the disabled styling.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -277,7 +255,7 @@ const meta = {
     disableItemClickFirstLevel: {
       control: "boolean",
       description:
-        "Stops the list opening from a first-level item, on phones and tablets only",
+        "The same, but only for first-level items on a touch device.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -285,17 +263,17 @@ const meta = {
     advancedOptions: {
       control: false,
       description:
-        "Element whose children replace the list of options, for a menu that is not a list; `options` then only decide whether the button shows an arrow",
+        "Element whose children replace the list entirely, for a menu that is not a list of options. `options` is then used only for the button.",
     },
     advancedOptionsCount: {
       control: "number",
       description:
-        "How many items `advancedOptions` holds, for deciding whether the list becomes a bottom sheet on a phone",
+        "How many advanced options there are, for deciding the mobile layout.",
     },
     scaledOptions: {
       control: "boolean",
       description:
-        "Makes the list as wide as the button, in place of `manualWidth`",
+        "Matches the list's width to the button's instead of `manualWidth`.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -303,30 +281,30 @@ const meta = {
     manualX: {
       control: "text",
       description:
-        "Exact horizontal offset of the list from the button, as a CSS length, when the list is not in a portal",
+        "(Non-portal mode) Exact horizontal offset of the list from the button.",
     },
     manualY: {
       control: "text",
       description:
-        "Exact vertical offset of the list from the button, when the list is not in a portal",
+        "(Non-portal mode) Exact vertical offset of the list from the button.",
     },
     offsetX: {
       control: "number",
-      description: "Moves the list sideways by this many pixels",
+      description: "Horizontal offset of the list, in pixels.",
     },
     topSpace: {
       control: "number",
       description:
-        "Space in pixels to keep free above the list when it opens upwards",
+        "Space to leave above the list when it opens upwards, in pixels.",
     },
     optionStyle: {
       control: "object",
-      description: "Inline style applied to every option of the list",
+      description: "Inline style applied to every option.",
     },
     isMobileView: {
       control: "boolean",
       description:
-        "Pins the list to the bottom of the screen, full width, while the window is in portrait",
+        "Pins the list to the bottom of the screen, full width, in portrait.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -334,7 +312,7 @@ const meta = {
     hideMobileView: {
       control: "boolean",
       description:
-        "Keeps the list under the button on a phone instead of turning it into a bottom sheet. A list of fewer than four options never becomes one",
+        "Keeps the list anchored to the button on a phone instead of turning it into a bottom sheet.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -342,14 +320,14 @@ const meta = {
     isNoFixedHeightOptions: {
       control: "boolean",
       description:
-        "Lets options of different heights scroll in a plain scrollbar instead of the list that renders only the visible rows",
+        "Renders the options in a plain scrollbar instead of the virtualised list.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isAside: {
       control: "boolean",
-      description: "Marks the list's backdrop as belonging to a side panel",
+      description: "Marks the list's backdrop as belonging to a side panel.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -357,28 +335,28 @@ const meta = {
     withBackdrop: {
       control: "boolean",
       description:
-        "Lays a backdrop over the page while the list is open, so the next click outside only closes the list",
+        "Whether the list renders a backdrop to catch the next click.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     withBackground: {
       control: "boolean",
-      description: "Dims the page behind that backdrop",
+      description: "Gives that backdrop its dimming background.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withoutBackground: {
       control: "boolean",
-      description: "Keeps that backdrop fully transparent",
+      description: "Makes that backdrop transparent.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     usePortalBackdrop: {
       control: "boolean",
-      description: "Renders that backdrop in the portal, above the page",
+      description: "Moves the list's backdrop into the portal, above the page.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -386,41 +364,36 @@ const meta = {
     shouldShowBackdrop: {
       control: "boolean",
       description:
-        "Renders the backdrop even when another one is already on screen",
+        "Renders the backdrop even when another one is already on screen.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     forceCloseClickOutside: {
       control: "boolean",
-      description: "Stops the combo box listening for a click outside the list",
+      description: "Stops the outside-click listener being registered.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
-    withBlur: {
-      control: false,
-      description: "Ignored: the list does not read it",
-    },
     withLabel: {
       control: "boolean",
       description:
-        "Finds the selected option in the list by its label; off, by its `key`",
+        "Whether the selected option is matched by label rather than by key.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     withoutPadding: {
       control: "boolean",
-      description: "Removes the 4px of space above and below the button",
+      description: "Removes the vertical padding around the button.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     noSelect: {
       control: "boolean",
-      description:
-        "Stops the button's text from being selected with the pointer",
+      description: "Whether the button's text cannot be selected.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -428,7 +401,7 @@ const meta = {
     useImageIcon: {
       control: "boolean",
       description:
-        "Draws the kit's placeholder image over the selected option's icon",
+        "Draws the kit's placeholder image next to the selected option's icon.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -436,7 +409,7 @@ const meta = {
     tabIndex: {
       control: "number",
       description:
-        "Position of the button in the tab order; `-1` takes it out of the tab order",
+        "Position of the button in the tab order; `-1` takes it out. A disabled button is out of the tab order whatever this says.",
       table: {
         defaultValue: { summary: "0" },
       },
@@ -444,41 +417,35 @@ const meta = {
     title: {
       control: "text",
       description:
-        "Tooltip for the whole control, shown on hover when a `RootTooltip` is mounted",
-    },
-    role: {
-      control: false,
-      description: "Ignored: nothing reads this prop",
+        "Hover tooltip for the whole control. It needs `RootTooltip` mounted.",
     },
     id: {
       control: "text",
-      description: "`id` of the element that wraps the button and the list",
+      description: "Applied to the element that wraps the button and the list.",
     },
     className: {
       control: "text",
-      description: "Class of the element that wraps the button and the list",
+      description: "Applied to the element that wraps the button and the list.",
     },
     style: {
       control: "object",
-      description:
-        "Inline style of the element that wraps the button and the list, applied to the list as well",
+      description: "Applied to the wrapper and, again, to the list.",
     },
     dropDownId: {
       control: "text",
-      description: "`id` of the list",
+      description: "Applied to the list element.",
     },
     dropDownClassName: {
       control: "text",
-      description: "Class of the list",
+      description: "Applied to the list element.",
     },
     dropDownTestId: {
       control: "text",
-      description: "`data-testid` of the list",
+      description: "Value of `data-testid` on the list.",
     },
     dataTestId: {
       control: "text",
-      description:
-        "`data-testid` of the element that wraps the button and the list",
+      description: "Value of `data-testid` on the wrapper.",
       table: {
         defaultValue: { summary: "combobox" },
       },
@@ -618,7 +585,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A fixed-width combo box with a placeholder in the button, as a form shows it before anything is chosen. Pick an option to see it replace the placeholder, and change any other prop live in the Controls panel below.",
+          "A fixed-width combo box with a placeholder in the button, as a form shows it before anything is chosen. A picked option replaces the placeholder.",
       },
       source: {
         code: `const [status, setStatus] = useState<TOption>({ key: 0, label: "Select Status" });
@@ -655,6 +622,7 @@ const DifferentSizesTemplate = () => {
 };
 
 export const DifferentSizes: Story = {
+  name: "Sizes",
   render: () => <DifferentSizesTemplate />,
   play: async ({ canvas }) => {
     // Fixed widths per size; content fits the label.
@@ -668,7 +636,7 @@ export const DifferentSizes: Story = {
     docs: {
       description: {
         story:
-          "The fixed widths side by side, to pick the one that fits the longest label a form expects: `base` 173px, `middle` 300px, `big` 350px, `huge` 500px, and `content`, as wide as the label (`size`, with `scaled` off).",
+          "The fixed widths, one above the other (`size`, with `scaled` off). `base` is 173px, `middle` 300px, `big` 350px and `huge` 500px; `content` is as wide as the label.",
       },
       source: {
         code: `<ComboBox size={ComboBoxSize.base} options={options} selectedOption={selected} />
@@ -701,6 +669,7 @@ const WithIconsTemplate = () => {
 };
 
 export const WithIcons: Story = {
+  name: "With icons",
   render: () => <WithIconsTemplate />,
   play: async ({ canvas, userEvent }) => {
     const button = comboButton(canvas);
@@ -733,7 +702,7 @@ export const WithIcons: Story = {
     docs: {
       description: {
         story:
-          "Options with an icon each, so an action is recognised before its label is read; pick one and its icon moves into the button next to the label (`icon` on each option).",
+          "Options with an icon each (`icon` on each option). The picked option's icon moves into the button next to its label.",
       },
       source: {
         code: `<ComboBox
@@ -792,6 +761,7 @@ const WithOptionDescriptionsTemplate = () => {
 };
 
 export const WithOptionDescriptions: Story = {
+  name: "With option descriptions",
   render: () => <WithOptionDescriptionsTemplate />,
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(comboButton(canvas));
@@ -804,7 +774,7 @@ export const WithOptionDescriptions: Story = {
     docs: {
       description: {
         story:
-          "Options whose label alone does not explain the choice: open the list and each row shows the label with a line of explanation under it (`description` on each option). The selected row is highlighted and stays clickable (`displaySelectedOption`).",
+          "Options with a line of explanation under each label (`description` on each option). The selected row is highlighted and stays clickable (`displaySelectedOption`).",
       },
       source: {
         code: `<ComboBox
@@ -859,7 +829,7 @@ export const Disabled: Story = {
     docs: {
       description: {
         story:
-          "A choice that cannot be changed right now, kept on screen so the reader still sees the value: the button is greyed out and a click does not open the list (`isDisabled`).",
+          "A disabled combo box that still shows its value (`isDisabled`). The button is greyed out, and a click does not open the list.",
       },
       source: {
         code: `<ComboBox options={options} selectedOption={selected} isDisabled />`,
@@ -885,6 +855,7 @@ const WithSelectedOptionTemplate = () => {
 };
 
 export const WithSelectedOption: Story = {
+  name: "With a value chosen",
   render: () => <WithSelectedOptionTemplate />,
   play: async ({ canvas, userEvent }) => {
     const button = comboButton(canvas);
@@ -927,7 +898,7 @@ export const WithSelectedOption: Story = {
     docs: {
       description: {
         story:
-          "A form that opens with a value already chosen. Open the list: the chosen option is greyed out and cannot be picked again, because `displaySelectedOption` is off; turn it on to keep it clickable and highlighted instead.",
+          "A combo box that opens with a value already chosen. In its list the chosen option is greyed out and cannot be picked again; `displaySelectedOption` keeps it clickable.",
       },
       source: {
         code: `<ComboBox options={options} selectedOption={options[0]} />`,
@@ -981,6 +952,7 @@ const CustomStylingTemplate = () => {
 };
 
 export const CustomStyling: Story = {
+  name: "Badge",
   render: () => <CustomStylingTemplate />,
   play: async ({ canvas, userEvent }) => {
     // The selection shows as a badge in the option's own colours.
@@ -1000,7 +972,7 @@ export const CustomStyling: Story = {
     docs: {
       description: {
         story:
-          'Colour-coded values, such as priorities, where the colour says more than the word: the button draws the chosen option as a badge in its own text and background colours (`type="badge"`, with `color` and `backgroundColor` on each option). Pick another priority to see the badge change; the rows of the list stay plain.',
+          'Priorities drawn as a coloured badge in the button (`type="badge"`). Each option brings its own `color` and `backgroundColor`, and the rows of the list stay plain.',
       },
       source: {
         code: `<ComboBox
@@ -1021,6 +993,7 @@ export const CustomStyling: Story = {
 };
 
 export const LoadingState: Story = {
+  name: "Loading",
   render: () => (
     <Wrapper>
       <ComboBox
@@ -1040,7 +1013,7 @@ export const LoadingState: Story = {
     docs: {
       description: {
         story:
-          "A value that is still being fetched or saved: the label and the arrow give way to a spinner and a click does not open the list until loading ends (`isLoading`).",
+          "A combo box whose value is still loading (`isLoading`). A spinner takes the place of the label and the arrow, and a click does not open the list.",
       },
       source: {
         code: `<ComboBox options={options} selectedOption={selected} scaled={false} isLoading />`,
@@ -1062,6 +1035,7 @@ const rtlOptions = [
 
 // Framed on Docs: the theme provider stamps the direction on the page, which would flip the whole Docs page.
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: () => (
     <div dir="rtl">
       <SelectableComboBox
@@ -1099,7 +1073,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "190px" },
       description: {
         story:
-          'The combo box under a right-to-left interface: the icon and the label start at the right edge, the icon is mirrored, and the arrow sits at the left end. Open the list to see its rows aligned to the right as well. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+          "A right-to-left combo box. The icon and the label start at the right edge, the icon is mirrored, and the arrow sits at the left end.",
       },
       source: {
         code: `<div dir="rtl">
@@ -1123,6 +1097,7 @@ const baseOptions = [
 ];
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   play: async ({ canvas }) => {
     await expect(comboButton(canvas)).toHaveStyle({
       borderTopColor: "rgb(0, 130, 201)",
@@ -1145,14 +1120,13 @@ export const CssCustomization: Story = {
         options={baseOptions}
         selectedOption={{ key: 0, label: "Select option" }}
         size={ComboBoxSize.base}
-        onSelect={() => {}}
       />
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: `The border colours, the radius and the padding set on one wrapper -- the variables are listed under CSS variables on this page. Hover the button to see the hover colour and click it to see the open one.`,
+        story: `A combo box under a wrapper that sets the border colours, the radius and the padding. The picture shows the resting blue border and the 12px radius.`,
       },
       source: {
         code: `<div style={{

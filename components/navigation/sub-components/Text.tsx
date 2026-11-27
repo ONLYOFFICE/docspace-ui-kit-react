@@ -1,5 +1,6 @@
 import React from "react";
 import { Badge } from "../../badge";
+import { activateOnButtonKey } from "../../../utils/keyboard-activation";
 
 import styles from "../Navigation.module.scss";
 import { TTextProps } from "../Navigation.types";
@@ -14,6 +15,8 @@ const Text = ({
   isRootFolder,
   isRootFolderTitle,
   onClick,
+  isButton,
+  isExpanded,
   badgeLabel,
   className,
   titleTooltip,
@@ -32,7 +35,25 @@ const Text = ({
         truncate
         isRootFolderTitle={isRootFolderTitle}
       >
-        {title}
+        {/* The button sits inside the heading, so the heading keeps its role.
+            Its click bubbles to the container's handler. */}
+        {isButton ? (
+          <span
+            className={styles.titleButton}
+            role="button"
+            tabIndex={0}
+            aria-expanded={isExpanded}
+            onKeyDown={(e) =>
+              activateOnButtonKey(e, ({ currentTarget }) =>
+                currentTarget.click(),
+              )
+            }
+          >
+            {title}
+          </span>
+        ) : (
+          title
+        )}
       </Heading>
       {badgeLabel ? (
         <Badge

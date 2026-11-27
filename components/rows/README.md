@@ -25,12 +25,10 @@ below before choosing it.
 
 ## Use this when / not when
 
-- Use when you are rebuilding something that has to look and behave like the portal's file
-  list: a selectable row with an icon, a title, badges and a context menu, virtualised over
-  thousands of items.
+- Use for a list that looks and behaves like the portal's file list: selectable rows with an
+  icon, a title, badges and a context menu.
 - Not for a generic list of your own. The parts read each other's children by position and by
-  prop name, and the virtual list measures itself through a literal element id — see
-  [`RowContainer`](./row-container/README.md).
+  prop name.
 - Not for tabular data with columns the user sorts or resizes: that is
   [`Table`](../table/README.md).
 - Not for a handful of items. Three names and an avatar are a flex column of your own, and cost
@@ -129,13 +127,10 @@ export function SelectableList({ names }: { names: string[] }) {
 ## Behaviour the types don't state
 
 - **The parts are coupled by position and by name, not by types.**
-  [`RowContent`](./row-content/README.md) addresses its children by index,
-  [`Row`](./row/README.md) reads `item` off its child's props, and
-  [`RowContainer`](./row-container/README.md) is found by the virtual list through the literal
-  id `rowContainer`. None of that is visible in the props.
-- **Only one row list can work on a page**, because of that literal id, and the container has
-  to be under the portal's scroll element for virtualisation to measure anything. Pass
-  `useReactWindow={false}` outside the portal.
+  [`RowContent`](./row-content/README.md) addresses its children by index, and
+  [`Row`](./row/README.md) reads `item` off its child's props.
+- Virtualisation follows the portal's scroll element. Pass `useReactWindow={false}` outside the
+  portal.
 - The folder also exports `RowSkeleton` and `RowsSkeleton` for the loading state, and
   `IndexIconButtons` for the arrows the row shows while indexes are being edited.
 - Each part has its own page; the traps are listed there rather than here.
@@ -151,30 +146,34 @@ export function SelectableList({ names }: { names: string[] }) {
 | `IndexIconButtons`                          | The up and down arrows of the row's index-editing mode   |
 
 `RowsSkeleton` draws `count` placeholder rows, 25 when it is not given, while the real rows
-load. Each row is a 32px square for the start element, a bar for the title and a 16px square
-for the context button; below the desktop breakpoint a shorter second bar appears under the
-title, where a real row shows its line of details. The shapes take the colour, opacity, corner
-radius, `speed` and `animate` props of
-[`RectangleSkeleton`](../rectangle/README.md), and `className` and `style` go to every row;
-`x`, `y`, `width`, `height` and `uniqueKey` are ignored, because the rows place and size their
-shapes themselves. `RowsSkeleton` has no way to round the start element: for a list of
-avatars, render `RowSkeleton isRectangle={false}` once per row, which draws a circle in the
-square's place. Neither checks the system's reduced-motion setting; `animate={false}` keeps
-the shapes still.
+load.
+
+- Each row is a 32px square for the start element, a bar for the title and a 16px square for
+  the context button.
+- Below the desktop breakpoint a shorter second bar appears under the title, where a real row
+  shows its details.
+- The shapes take the colour, opacity, corner radius, `speed` and `animate` props of
+  [`RectangleSkeleton`](../rectangle/README.md). `className` and `style` go to every row.
+- `x`, `y`, `width`, `height` and `uniqueKey` are ignored, because the rows place and size
+  their shapes themselves.
+- `RowsSkeleton` cannot round the start element. For a list of avatars, render
+  `RowSkeleton isRectangle={false}` once per row, which draws a circle instead.
+- Neither checks the system's reduced-motion setting; `animate={false}` keeps the shapes still.
 
 ## Accessibility
 
-- Nothing here is a list, a grid or an option as far as assistive technology is concerned: the
-  parts are `<div>`s. There is no `role="list"`, no `aria-selected` on a row, and the context
-  menu opens on right-click or from a `<div>` that is not focusable.
-- Selection is a [`Checkbox`](../checkbox/README.md) inside the row, which is a real input and
-  is reachable — it is the only part of a row that is.
+- Nothing here is a list, a grid or an option to assistive technology: the parts are `<div>`s.
+  There is no `role="list"` and no `aria-selected` on a row.
+- A keyboard reaches two parts of a row: its [`Checkbox`](../checkbox/README.md) and its context
+  button, which opens the menu on Enter or Space.
+- A click on the content and the index-editing arrows work by pointer only.
 - A list a keyboard user must be able to work through needs [`Table`](../table/README.md) or
   markup of your own.
-- Each skeleton shape is an SVG with `role="img"`, so a screen reader meets three images per
-  placeholder row. `title` names every one of them through an SVG `<title>`; without it they
-  have no name and nothing is announced. The skeletons set no `aria-busy` — mark the loading
-  region with it yourself.
+- **A passed `aria-*` lands on the outer element of each part and is kept.** A passed
+  `aria-label` or `aria-labelledby` makes that part a `role="group"`, so the name is read.
+- Each skeleton shape is an SVG with `role="img"`: three per row on desktop, four below it.
+  `title` names each through an SVG `<title>`; without it they have no name.
+- The skeletons set no `aria-busy`. Mark the loading region with it yourself.
 
 ## Test ids
 

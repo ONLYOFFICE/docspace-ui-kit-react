@@ -142,6 +142,20 @@ describe("ImageCropper", () => {
     expect(screen.getByTestId("slider")).toBeInTheDocument();
   });
 
+  it("opens the file dialog from the keyboard", () => {
+    const props = createProps();
+    render(<ImageCropper {...props} />);
+
+    const button = screen.getByRole("button", {
+      name: "Common:ChooseAnother",
+    });
+    const input = button.querySelector("input") as HTMLInputElement;
+    const openDialog = vi.spyOn(input, "click");
+    fireEvent.keyDown(button, { key: "Enter" });
+
+    expect(openDialog).toHaveBeenCalled();
+  });
+
   it("updates zoom through slider changes", () => {
     const props = createProps();
     render(<ImageCropper {...props} />);
@@ -230,6 +244,32 @@ describe("ImageCropper", () => {
     expect(props.onChangeFile).toHaveBeenCalled();
 
     clickSpy.mockRestore();
+  });
+
+  // A file chosen while disabled was dropped, so the dialog does not open.
+  it("keeps the file dialog shut while disabled", () => {
+    render(<ImageCropper {...createProps({ isDisabled: true })} />);
+    const clickSpy = vi
+      .spyOn(HTMLInputElement.prototype, "click")
+      .mockImplementation(() => {});
+
+    fireEvent.click(screen.getByTestId("change_image_button"));
+
+    expect(clickSpy).not.toHaveBeenCalled();
+    clickSpy.mockRestore();
+  });
+
+  it("gives every file input an id of its own", () => {
+    render(
+      <>
+        <ImageCropper {...createProps()} />
+        <ImageCropper {...createProps()} />
+      </>,
+    );
+    const [first, second] = document.querySelectorAll('input[type="file"]');
+
+    expect(first.id).not.toBe("customFileInput");
+    expect(first.id).not.toBe(second.id);
   });
 
   it("updates preview image when avatar editor is ready", async () => {

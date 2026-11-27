@@ -21,31 +21,32 @@ const meta = {
     title: {
       control: "text",
       description:
-        "Name the initials are taken from: the first letter of its first word and of its last",
+        "Room name. Only its initials are drawn — the first letter of the first word and of the last.",
     },
     color: {
       control: "text",
       description:
-        "Colour of the tile, as six hex digits without a leading `#`; the initials turn white or black to stay readable on it",
+        "Background of the tile and the source of the initials' colour, as six hex digits **without** a leading `#`. Unset, the initials sit on no background.",
     },
     size: {
       control: "text",
       description:
-        "Side of the square, as a px string such as `48px`; at `96px` the corner badge grows to match",
+        "Side of the square, as a px string. It is also divided to scale the cover glyph, so a value in any other unit gives `NaN`.",
       table: {
         defaultValue: { summary: "32px" },
       },
     },
     radius: {
       control: "text",
-      description: "Corner radius of the tile and of the image inside it",
+      description: "Corner radius of the tile and of the image inside it.",
       table: {
         defaultValue: { summary: "6px" },
       },
     },
     showDefault: {
       control: "boolean",
-      description: "Draws the initials even when a logo is set",
+      description:
+        "Draws the initials instead of the logo, whatever `logo` holds.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -53,20 +54,22 @@ const meta = {
     logo: {
       control: "text",
       description:
-        "Logo drawn instead of the initials: an image URL, or an object whose `cover` SVG is inlined and painted in the initials' colour, or whose `medium` URL is shown as it is",
+        "The room's logo: a URL, or the portal's logo object. An object with a `cover` is inlined as a base64 SVG and recoloured; otherwise `medium` is used as a URL.",
     },
     imgClassName: {
       control: "text",
-      description: "Class added to the `<img>` the logo is drawn in",
+      description:
+        "Added to the `<img>` the logo renders into, and to the template's 24px image.",
     },
     className: {
       control: "text",
-      description: "Class added to the outer element",
+      description:
+        "Added to the outer element, before the component's own classes.",
     },
     isArchive: {
       control: "boolean",
       description:
-        "Greys the tile out whatever `color` holds, and switches the hover image off",
+        "Paints the tile in the archive grey instead of `color`, and turns off the hover overlay.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -74,7 +77,7 @@ const meta = {
     isTemplate: {
       control: "boolean",
       description:
-        "Draws the tile as an outline in its colour, with the initials or a 24px logo inside",
+        "Draws the template outline instead of the round tile, with the logo shrunk to 24px inside it.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -82,7 +85,7 @@ const meta = {
     withEditing: {
       control: "boolean",
       description:
-        "Adds a pencil button in the corner that opens the logo menu; the tile becomes at least 64px wide and the badge is not drawn",
+        "Adds the pencil button and the menu it opens; the empty state keeps its plus instead. It also makes the tile 64px wide at the least.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -90,7 +93,7 @@ const meta = {
     isEmptyIcon: {
       control: "boolean",
       description:
-        "Replaces the whole tile with a dashed frame, a camera glyph and a plus button that opens the logo menu",
+        "Draws a dashed empty frame with a camera glyph and a plus button, for a room that has no logo yet. It replaces the logo and the initials, and `isTemplate` wins over it.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -99,11 +102,11 @@ const meta = {
       // The icons are data URIs too long to edit, and they stretch the table.
       control: false,
       description:
-        "Entries of the logo menu, each with a label, an icon and a click handler; the upload entry is handed the hidden file input. With none, no menu opens",
+        "Entries of the logo menu. Without any, clicking the tile, the pencil or the plus opens nothing.",
     },
     dropDownManualX: {
       control: "text",
-      description: "Horizontal offset of the logo menu from its button",
+      description: "Horizontal offset of the logo menu.",
       table: {
         defaultValue: { summary: "-10px" },
       },
@@ -111,44 +114,50 @@ const meta = {
     onChangeFile: {
       action: "onChangeFile",
       description:
-        "Called when a file is picked in the hidden file input; the input is rendered only when this is set",
+        "Called with the change event of the hidden file input. Passing it is what renders that input at all; its id is generated per instance.",
     },
     hoverSrc: {
       control: "text",
       description:
-        "Image that slides in over the tile while the pointer is on it, replacing the initials",
+        "Image faded in over the tile while the pointer is on it. Ignored while `isArchive` is set.",
     },
     badgeUrl: {
       control: "text",
-      description: "URL of the glyph drawn in the bottom corner of the tile",
+      description:
+        "URL of the badge glyph, drawn in the corner. Either this or `badgeIconNode` renders the badge; `withEditing` suppresses it.",
     },
     badgeIconNode: {
       control: false,
-      description:
-        "Glyph drawn in the bottom corner, as a node instead of a URL",
+      description: "Badge glyph as a node, used instead of `badgeUrl`.",
     },
     badgeIconColor: {
       control: "text",
       description:
-        "When set, the badge glyph keeps its own colours instead of being filled white (black in the dark theme)",
+        "Any value keeps the badge glyph's own colours; the value itself is not read. Unset, the glyph is filled white, or black in the dark theme.",
     },
     onBadgeClick: {
       action: "onBadgeClick",
       description:
-        "Called when the badge is clicked; the click also reaches the tile and toggles the logo menu, when the tile has one",
+        "Called when the badge is clicked. The click also reaches the tile, which toggles the logo menu when the tile has one.",
+    },
+    badgeLabel: {
+      control: "text",
+      description:
+        "Accessible name of the badge, which is a button only with `onBadgeClick`. Without it that button is unnamed.",
     },
     tooltipContent: {
       control: "text",
       description:
-        "Text shown under the badge while the pointer is on it; needs `tooltipId`",
+        "Text of the badge's tooltip. It also needs `tooltipId`, and it is what makes the badge show a pointer cursor.",
     },
     tooltipId: {
       control: "text",
-      description: "Id that ties the badge to its tooltip",
+      description:
+        "Id the badge's tooltip is registered under. Without it the tooltip has nothing to attach to.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the outer element",
+      description: "Value of `data-testid` on the outer element.",
       table: {
         defaultValue: { summary: "room-icon" },
       },
@@ -202,6 +211,7 @@ const mockModel = [
 ];
 
 export const Default: Story = {
+  name: "Default",
   render: (args: RoomIconProps) => (
     <RoomIcon {...args} className={styles.roomTitle} />
   ),
@@ -221,8 +231,7 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "A room with no logo is shown by its initials on its colour. Change the name, the colour or the size live in the Controls panel below.",
+        story: "A room with no logo, shown by its initials on its colour.",
       },
       source: {
         code: `<RoomIcon title="Test Room" color="4781D1" size="96px" />`,
@@ -242,6 +251,7 @@ const SizesTemplate = () => {
 };
 
 export const Sizes: Story = {
+  name: "Sizes",
   render: () => <SizesTemplate />,
   play: async ({ canvas }: PlayContext) => {
     const widths = canvas
@@ -277,6 +287,7 @@ const ColorsTemplate = () => {
 };
 
 export const Colors: Story = {
+  name: "Colours",
   render: () => <ColorsTemplate />,
   play: async ({ canvas }: PlayContext) => {
     // Each tile carries its colour as a custom property.
@@ -309,6 +320,7 @@ export const Colors: Story = {
 };
 
 export const WithEditing: Story = {
+  name: "With editing",
   render: (args: RoomIconProps) => (
     <div style={{ height: "200px" }}>
       <RoomIcon {...args} className={styles.roomTitle} />
@@ -346,7 +358,7 @@ export const WithEditing: Story = {
     docs: {
       description: {
         story:
-          "Lets the reader change the logo: click the pencil in the corner, or anywhere on the tile, to open the logo menu (`withEditing`, `model`); picking an entry shows up in the Actions panel.",
+          "A tile with a pencil button in the corner (`withEditing`). The pencil, or a click anywhere on the tile, opens the logo menu (`model`).",
       },
       source: {
         code: `<RoomIcon
@@ -363,6 +375,7 @@ export const WithEditing: Story = {
 };
 
 export const EmptyState: Story = {
+  name: "Empty",
   render: (args: RoomIconProps) => (
     <div style={{ height: "200px" }}>
       <RoomIcon {...args} />
@@ -377,17 +390,20 @@ export const EmptyState: Story = {
   play: async ({ canvas, userEvent }: PlayContext) => {
     const icon = canvas.getByTestId("room-icon");
     await expect(canvas.getByTestId("empty-icon")).toBeInTheDocument();
+    const plus = icon.querySelector(".open-plus-logo-icon") as HTMLElement;
+    // The plus circle is the accent colour without the portal too.
+    await expect(
+      getComputedStyle(plus.parentElement as HTMLElement).backgroundColor,
+    ).not.toBe("rgba(0, 0, 0, 0)");
     // The plus button opens the same logo menu.
-    await userEvent.click(
-      icon.querySelector(".open-plus-logo-icon") as HTMLElement,
-    );
+    await userEvent.click(plus);
     await waitFor(() => expect(isMenuOpen()).toBe(true));
   },
   parameters: {
     docs: {
       description: {
         story:
-          "For a room that has no logo yet: a dashed frame with a camera glyph, and a plus button in the bottom-right corner that opens the logo menu (`isEmptyIcon`, `model`). The button takes its background from the host's accent colour, which Storybook does not define, so here only a click on that corner finds it.",
+          "A dashed frame with a camera glyph, for a room with no logo yet (`isEmptyIcon`). Its corner plus button opens the logo menu (`model`) and sits on a circle in the accent colour.",
       },
       source: {
         code: `<RoomIcon title="" size="96px" isEmptyIcon model={menuModel} />`,
@@ -397,6 +413,7 @@ export const EmptyState: Story = {
 };
 
 export const Archive: Story = {
+  name: "Archived",
   render: (args: RoomIconProps) => (
     <RoomIcon {...args} className={styles.roomTitle} />
   ),
@@ -427,6 +444,7 @@ export const Archive: Story = {
 };
 
 export const WithBadge: Story = {
+  name: "With badge",
   render: (args: RoomIconProps) => (
     <div style={{ position: "relative", width: "120px", height: "120px" }}>
       <RoomIcon {...args} className={styles.roomTitle} />
@@ -452,7 +470,7 @@ export const WithBadge: Story = {
     docs: {
       description: {
         story:
-          "Marks something about the room with a glyph in the bottom corner (`badgeUrl`); clicking it calls `onBadgeClick`, shown in the Actions panel.",
+          "A glyph in the bottom corner marks something about the room (`badgeUrl`). A click on it calls `onBadgeClick`.",
       },
       source: {
         code: `<RoomIcon
@@ -469,6 +487,7 @@ export const WithBadge: Story = {
 };
 
 export const WithTooltip: Story = {
+  name: "Badge with tooltip",
   render: (args: RoomIconProps) => (
     <div style={{ position: "relative", width: "120px", height: "120px" }}>
       <RoomIcon {...args} className={styles.roomTitle} />
@@ -498,7 +517,7 @@ export const WithTooltip: Story = {
     docs: {
       description: {
         story:
-          "Explains the badge in words: hover it to read the text (`tooltipContent`), which the badge finds through `tooltipId`.",
+          "A badge with a tooltip that explains it in words (`tooltipContent`). The tooltip is tied to the badge through `tooltipId`.",
       },
       source: {
         code: `<RoomIcon
@@ -516,6 +535,7 @@ export const WithTooltip: Story = {
 };
 
 export const Template: Story = {
+  name: "Template",
   render: (args: RoomIconProps) => (
     <RoomIcon {...args} className={styles.roomTitle} />
   ),
@@ -547,6 +567,7 @@ export const Template: Story = {
 };
 
 export const WithHover: Story = {
+  name: "Hover image",
   render: (args: RoomIconProps) => (
     <div style={{ height: "200px" }}>
       <RoomIcon {...args} className={styles.roomTitle} />
@@ -571,7 +592,7 @@ export const WithHover: Story = {
     docs: {
       description: {
         story:
-          "Hints that the tile can be clicked: hover it, and the initials slide away while a second image fades in (`hoverSrc`); a click opens the logo menu (`model`).",
+          "A tile that hints it can be clicked (`hoverSrc`). On hover the initials slide away and a second image fades in. A click opens the logo menu.",
       },
       source: {
         code: `<RoomIcon
@@ -588,6 +609,7 @@ export const WithHover: Story = {
 };
 
 export const LongTitle: Story = {
+  name: "Long name",
   render: (args: RoomIconProps) => (
     <RoomIcon {...args} className={styles.roomTitle} />
   ),
@@ -645,6 +667,7 @@ const WithLogoTemplate = (args: RoomIconProps) => (
 );
 
 export const WithLogo: Story = {
+  name: "With logo",
   render: (args: RoomIconProps) => <WithLogoTemplate {...args} />,
   args: {
     title: "Project files",
@@ -667,11 +690,11 @@ export const WithLogo: Story = {
   parameters: {
     docs: {
       description: {
-        story: `A room with a logo of its own shows it instead of the initials (\`logo\`):
+        story: `Three rooms with a logo of their own, shown instead of the initials (\`logo\`):
 
 - **Image** — a URL, drawn as it is
-- **Cover** — an object with a \`cover\` SVG, inlined and painted in the initials' colour on the tile
-- **Broken URL** — the image fails to load, so the tile falls back to the initials`,
+- **Cover** — an object with a \`cover\` SVG, inlined and painted in the initials' colour
+- **Broken URL** — the image fails to load, and the tile falls back to the initials`,
       },
       source: {
         code: `<RoomIcon title="Project files" color="2DB482" size="48px" logo={logoUrl} />
@@ -693,6 +716,7 @@ const RightToLeftTemplate = (args: RoomIconProps) => (
 
 // Framed on Docs: the theme provider stamps the direction on the page, which would flip the whole Docs page.
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args: RoomIconProps) => <RightToLeftTemplate {...args} />,
   globals: { direction: "rtl" },
   args: {
@@ -716,7 +740,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "90px" },
       description: {
         story:
-          'The tile under a right-to-left interface: the pencil button and the badge move to the bottom-left corner. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+          'The tile under a right-to-left interface: the pencil button and the badge move to the bottom-left corner. The pencil follows the theme\'s `interfaceDirection`; the wrapper also carries `dir="rtl"`.',
       },
       source: {
         code: `<div dir="rtl">
@@ -729,6 +753,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   render: () => (
     <div
       style={
@@ -768,7 +793,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. It covers two instances:
+        story: `Two tiles restyled by every overridable variable, set on a wrapper:
 
 - **Design review** — an editable tile, for \`--room-icon-bg-opacity\` on the tile and \`--room-icon-edit-bg\` on the pencil
 - **Empty frame** — for \`--room-icon-bg\` on the plus glyph, \`--room-icon-button-icon-color\` on the camera, and the frame's \`--room-icon-dashed-border\` and \`--room-icon-empty-radius\``,

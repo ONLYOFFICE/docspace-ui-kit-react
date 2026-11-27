@@ -64,7 +64,10 @@ export type CreatedDocumentsContextValue = {
    * `null` for the default agent, whose cards have no such line.
    */
   agentName: string | null;
-  /** "Save to room...": the folder selector, then a copy of the file. */
+  /**
+   * "Save to room...": the folder selector, then a copy of the file. Left
+   * out in a chat with no agent, whose cards have no such button.
+   */
   onSaveToRoom?: (file: CopyToRoomFile) => void;
 };
 

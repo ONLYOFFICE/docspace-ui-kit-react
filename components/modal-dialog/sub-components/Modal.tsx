@@ -11,6 +11,7 @@ import { AsideHeader } from "../../aside";
 import styles from "../ModalDialog.module.scss";
 import { ModalBackdrop } from "./ModalBackdrop";
 import { FormWrapper } from "./FormWrapper";
+import { omitAriaProps, pickAriaProps } from "../../../utils/aria-props";
 import { ModalSubComponentsProps } from "../ModalDialog.types";
 
 const ASIDE_PADDING_AFTER_LAST_ITEM = "12px";
@@ -60,6 +61,10 @@ const Modal = ({
   "aria-describedby": ariaDescribedBy,
   ...rest
 }: ModalSubComponentsProps) => {
+  // A passed aria-* describes the dialog; everything else is the header's.
+  const aria = pickAriaProps(rest);
+  const headerRest = omitAriaProps(rest);
+
   const internalContentRef = React.useRef<null | HTMLDivElement>(null);
   const contentRef = sheetRef ?? internalContentRef;
 
@@ -220,6 +225,7 @@ const Modal = ({
         >
           {!hideContent ? (
             <div
+              {...aria}
               id="modal-dialog"
               ref={contentRef}
               role="dialog"
@@ -259,7 +265,7 @@ const Modal = ({
                       header={headerComponent}
                       onCloseClick={onClose}
                       onBackClick={onBackClick}
-                      {...rest}
+                      {...headerRest}
                     />
                   ) : null}
 

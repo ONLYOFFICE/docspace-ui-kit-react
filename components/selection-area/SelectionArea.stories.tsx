@@ -21,7 +21,7 @@ const meta = {
       control: "select",
       options: ["tile", "row"],
       description:
-        "`tile` works out each item's place on a grid of columns and rows; any other value treats the items as one column of equal-height rows",
+        '`"tile"` places items on a grid of columns and rows; any other value treats them as one column.',
       table: {
         defaultValue: { summary: "undefined" },
       },
@@ -29,7 +29,7 @@ const meta = {
     folderHeaderHeight: {
       control: "number",
       description:
-        "Height in pixels of a header above the tiles, added to the top of the grid in tile view unless `isRooms` is set; tile view expects it to be set",
+        "Height in pixels of a header above the tiles, added to the grid's top edge unless `isRooms` is set. Without it no tile is ever covered.",
       table: {
         defaultValue: { summary: "undefined" },
       },
@@ -37,7 +37,7 @@ const meta = {
     defaultHeaderHeight: {
       control: "number",
       description:
-        "Height in pixels of one group heading in tile view, counted once for every group above an item's group",
+        "Height in pixels of one group heading in tile view, counted once for every group above an item's group.",
       table: {
         defaultValue: { summary: "undefined" },
       },
@@ -45,7 +45,7 @@ const meta = {
     countTilesInRow: {
       control: "number",
       description:
-        "How many tiles fit in one row in tile view; without it no tile is ever covered",
+        "How many tiles fit in one row in tile view. Without it no tile is ever covered.",
       table: {
         defaultValue: { summary: "undefined" },
       },
@@ -53,7 +53,7 @@ const meta = {
     isRooms: {
       control: "boolean",
       description:
-        "In tile view, leaves `folderHeaderHeight` out of the grid's top edge",
+        "In tile view, leaves `folderHeaderHeight` out of the grid's top edge.",
       table: {
         defaultValue: { summary: "undefined" },
       },
@@ -61,7 +61,7 @@ const meta = {
     arrayTypes: {
       control: "object",
       description:
-        "One entry per group of items, in display order: the group name matched against the first part of an item's `value`, the gap between its rows, how many rows it takes and how many tile slots it leaves empty at the end",
+        "One entry per group of items, in display order. Tile view reads each group's row gap, row count and empty slots from it; a missing entry counts as zero.",
       table: {
         defaultValue: { summary: "undefined" },
       },
@@ -69,37 +69,37 @@ const meta = {
     containerClass: {
       control: false,
       description:
-        "Class of the element the rectangle stays inside; the whole page when nothing carries it. Fixed by the story",
+        "Class of the element the rectangle stays inside. When nothing carries it, the whole page is used.",
     },
     selectableClass: {
       control: false,
       description:
-        "Class every selectable item carries, together with a `value` attribute shaped `group_…_index`. Fixed by the story",
+        "Class every selectable item carries, together with a `value` attribute shaped `group_…_index`.",
     },
     scrollClass: {
       control: false,
       description:
-        "Class of the scrolling element; when it scrolls, the rectangle's starting corner moves with the content. Fixed by the story",
+        "Class of the scrolling element. When it scrolls, the rectangle's starting corner moves with the content. Without a match the page's scroller is used.",
     },
     itemsContainerClass: {
       control: false,
       description:
-        "Class of the element the items sit in; its top-left corner, read when a drag starts, is where the first item is taken to be. Fixed by the story",
+        "Class of the element the items sit in. Its corner, read when a drag starts, is where the first item is taken to be.",
     },
     itemClass: {
       control: false,
       description:
-        "In row view, the class of the child inside each item that carries the `value` attribute. Fixed by the story",
+        "In row view, the class of the child inside each item that carries the `value` attribute.",
     },
     onMove: {
       control: false,
       description:
-        "Called once with `clear: true` when a drag passes 10px, then on every animation frame with every covered item (`added`) and every uncovered one (`removed`). The story uses it to highlight the covered items",
+        "Called once with `clear: true` when a drag passes 10px. Then it is called after each pointer move or scroll, with the full covered and uncovered sets.",
     },
     startAreaSelector: {
       control: false,
       description:
-        "CSS selector of the region a drag may start in; the default is the portal's `#sectionScroll`, which the story's wrapper carries",
+        "CSS selector of the region a drag may start in. A mouse-down outside it is ignored.",
       table: {
         defaultValue: { summary: '"#sectionScroll"' },
       },
@@ -107,7 +107,7 @@ const meta = {
     onMouseDown: {
       action: "onMouseDown",
       description:
-        "Called on every mouse-down anywhere in the document, before the component checks the button and where the press landed",
+        "Called on every mouse-down anywhere in the document. It fires before the button and the target are checked, so also for presses that start no selection.",
     },
   },
   decorators: [
@@ -235,6 +235,7 @@ const SelectionTemplate = ({
 };
 
 export const Default: Story = {
+  name: "Tile grid",
   render: (args) => <SelectionTemplate {...args} />,
   args: {
     onMove: fn(),
@@ -245,7 +246,6 @@ export const Default: Story = {
     arrayTypes: [
       {
         type: "item",
-        itemHeight: 150,
         rowGap: 16,
       },
     ],
@@ -285,7 +285,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A grid of tiles, the layout the rectangle's column and row arithmetic is built for. Click and drag across the items to select them; a covered tile turns blue. Change any other prop live in the Controls panel below.",
+          "A grid of twelve tiles, the layout the rectangle's column and row arithmetic is built for. A tile the dragged rectangle covers turns blue.",
       },
       source: {
         code: `<SelectionArea
@@ -297,7 +297,7 @@ export const Default: Story = {
   itemClass="item-name"
   onMove={handleMove}
   countTilesInRow={4}
-  arrayTypes={[{ type: "item", itemHeight: 150, rowGap: 16 }]}
+  arrayTypes={[{ type: "item", rowGap: 16 }]}
 />`,
       },
     },
@@ -305,6 +305,7 @@ export const Default: Story = {
 };
 
 export const RowView: Story = {
+  name: "Rows",
   render: (args) => <SelectionTemplate {...args} />,
   args: {
     viewAs: "row",
@@ -324,7 +325,7 @@ export const RowView: Story = {
     docs: {
       description: {
         story:
-          "A list of equal-height rows, where only the rectangle's vertical extent decides what is covered: drag down from any row and every row it crosses turns blue, however far to the side the pointer goes (`viewAs`). Each row keeps its `value` on a child, found by `itemClass`.",
+          'A list of equal-height rows (`viewAs="row"`). Only the rectangle\'s height decides what is covered, however far to the side it reaches. Each row keeps its `value` on a child, found by `itemClass`.',
       },
       source: {
         code: `<SelectionArea
@@ -342,6 +343,7 @@ export const RowView: Story = {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <SelectionTemplate {...args} gridClassName={styles.exactGrid} />
@@ -369,7 +371,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "640px" },
       description: {
         story:
-          'The tile grid in a right-to-left layout: the first tile sits in the top right corner, and a drag across the right-hand column selects the first tile of each row. The wrapper carries `dir="rtl"` for the grid; the component mirrors its column order from the theme\'s `interfaceDirection` (the Direction toolbar).',
+          "The tile grid in a right-to-left layout, with the first tile in the top right corner. The component mirrors its column order from the theme's direction; the wrapper's `dir=\"rtl\"` lays out the grid.",
       },
       source: {
         code: `<div dir="rtl">
@@ -382,7 +384,7 @@ export const RightToLeft: Story = {
     itemClass="item-name"
     onMove={handleMove}
     countTilesInRow={4}
-    arrayTypes={[{ type: "item", itemHeight: 150, rowGap: 16 }]}
+    arrayTypes={[{ type: "item", rowGap: 16 }]}
   />
 </div>`,
       },
@@ -391,6 +393,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: (args) => (
     <div
       style={
@@ -409,7 +412,7 @@ export const CssCustomization: Story = {
     folderHeaderHeight: 0,
     defaultHeaderHeight: 0,
     countTilesInRow: 4,
-    arrayTypes: [{ type: "item", itemHeight: 150, rowGap: 16 }],
+    arrayTypes: [{ type: "item", rowGap: 16 }],
     isRooms: false,
   },
   play: async () => {
@@ -430,7 +433,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `All three variables set on one wrapper -- the variables are listed under CSS variables on this page. Drag across the tiles to see the fill and the border.`,
+        story: `The tile grid under a wrapper that sets all three variables. The rectangle drawn during a drag gets a paler fill, a blue border and a lower stacking order.`,
       },
       source: {
         code: `<div
@@ -449,7 +452,7 @@ export const CssCustomization: Story = {
     itemClass="item-name"
     onMove={handleMove}
     countTilesInRow={4}
-    arrayTypes={[{ type: "item", itemHeight: 150, rowGap: 16 }]}
+    arrayTypes={[{ type: "item", rowGap: 16 }]}
   />
 </div>`,
       },

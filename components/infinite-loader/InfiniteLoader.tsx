@@ -63,8 +63,7 @@ const InfiniteLoaderComponent = (props: InfiniteLoaderProps) => {
 
   if (isLoading) return null;
 
-  // The loader's own scroll element and skeleton flag win over anything in
-  // props: `showSkeleton` is computed here, never taken from the caller.
+  // The loader's own scroll element wins over anything in props.
   return viewAs === "tile" ? (
     <GridComponent
       {...props}

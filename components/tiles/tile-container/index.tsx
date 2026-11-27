@@ -2,6 +2,7 @@ import React from "react";
 import classNames from "classnames";
 import { TileContainerProps, TileItemProps } from "./TileContainer.types";
 
+import { groupRoleWhenNamed, pickAriaProps } from "../../../utils/aria-props";
 import styles from "./TileContainer.module.scss";
 import { Heading, HeadingSize } from "../../heading";
 
@@ -13,9 +14,9 @@ export const TileContainer = ({
   infiniteGrid: InfiniteGrid,
   headingFolders,
   headingFiles,
-  isDesc,
   style,
   noSelect,
+  ...rest
 }: TileContainerProps) => {
   const Rooms: React.ReactElement[] = [];
   const Folders: React.ReactElement[] = [];
@@ -97,9 +98,7 @@ export const TileContainer = ({
     }
   });
 
-  const headingClassNames = classNames(styles.header, {
-    [styles.isDesc]: isDesc,
-  });
+  const headingClassNames = styles.header;
 
   const renderTile = (
     <>
@@ -169,6 +168,8 @@ export const TileContainer = ({
 
   return (
     <div
+      {...pickAriaProps(rest)}
+      role={groupRoleWhenNamed(rest)}
       className={classNames(className, styles.tileContainer, {
         [styles.noSelect]: noSelect,
       })}

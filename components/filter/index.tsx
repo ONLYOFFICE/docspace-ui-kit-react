@@ -27,6 +27,7 @@ import { isDesktop, isMobile } from "../../utils";
 import useSearch from "./hooks/useSearch";
 import { useCommonTranslation } from "../../utils/i18n";
 import { activateOnButtonKey } from "../../utils/keyboard-activation";
+import { groupRoleWhenNamed, pickAriaProps } from "../../utils/aria-props";
 import styles from "./Filter.module.scss";
 import { FilterProps, TItem, TRoomGroup } from "./Filter.types";
 import {
@@ -116,6 +117,7 @@ const FilterInput = React.memo(
     mainButtonProps,
     mainButtonIcon,
     hideSearch,
+    ...rest
   }: FilterProps) => {
     const t = useCommonTranslation();
 
@@ -601,6 +603,8 @@ const FilterInput = React.memo(
 
     return (
       <div
+        {...pickAriaProps(rest)}
+        role={groupRoleWhenNamed(rest)}
         className={classNames(styles.filterInput, {
           [styles.tileView]: viewAs === "tile",
         })}
@@ -771,7 +775,6 @@ const FilterInput = React.memo(
                           isDefaultMode={false}
                           advancedOptionsCount={overflowGroups.length}
                           onSelect={() => {}}
-                          withBlur={false}
                           withBackdrop={!isMobileView}
                           onBackdropClick={toggleOverflow}
                           type="onlyIcon"

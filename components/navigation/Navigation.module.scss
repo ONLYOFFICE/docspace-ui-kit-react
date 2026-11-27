@@ -256,6 +256,12 @@
   }
 }
 
+// Inset, because the truncating heading clips anything outside it.
+.titleButton:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}
+
 .titleBlockBadge {
   --navigation-badge-fill-v: var(
     --navigation-badge-fill,
@@ -406,6 +412,12 @@
 
   &[data-root="true"] {
     align-items: baseline;
+  }
+
+  // Inset, because the scrolling list clips anything outside a row.
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: -2px;
   }
 
   @include mixins.tablet-and-below {

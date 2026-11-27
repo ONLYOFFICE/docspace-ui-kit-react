@@ -72,7 +72,6 @@ const TableContainerWrapper = (props: TableContainerProps) => {
         columns={mockColumns}
         columnStorageName={COLUMN_STORAGE_NAME}
         columnInfoPanelStorageName={COLUMN_INFO_PANEL_STORAGE_NAME}
-        sectionWidth={800}
         useReactWindow={useReactWindow}
         showSettings
         sortingVisible
@@ -111,27 +110,27 @@ The Table README describes it in full.`,
     useReactWindow: {
       control: "boolean",
       description:
-        "Makes the container a full-height block instead of a grid; set it together with the same prop on the header and the body when the rows are virtualised",
+        "Whether the body inside is virtualised. The container then becomes a full-height block instead of the grid.",
     },
     noSelect: {
       control: "boolean",
-      description: "Stops the user selecting text anywhere inside the table",
+      description: "Stops the user selecting text anywhere inside the table.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     className: {
       control: "text",
-      description: "Class applied to the container after the component's own",
+      description: "Applied to the container.",
     },
     forwardedRef: {
       control: false,
       description:
-        "Ref of the container element; pass the same ref to the header as `containerRef`",
+        "Ref of the container element; pass the same ref to the header as `containerRef`.",
     },
     children: {
       control: false,
-      description: "The header, the group menu and the body",
+      description: "The header, the group menu and the body.",
     },
   },
   decorators: [
@@ -160,6 +159,7 @@ type Story = StoryObj<ComponentProps<typeof TableContainer>>;
 export default meta;
 
 export const Default: Story = {
+  name: "Complete table",
   render: (args) => <TableContainerWrapper {...args} />,
   args: {
     useReactWindow: false,
@@ -189,7 +189,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A complete table of ten rows under a sortable header, the usual way the parts are put together: the container holds the grid, the header sizes its columns. Turn on `useReactWindow` in the Controls panel below to render the same rows through the virtualised body.",
+          "A complete table of ten rows under a sortable header, the usual way the parts are put together. The container holds the grid, and the header sizes its columns.",
       },
       source: {
         code: `const ref = useRef<HTMLDivElement>(null);
@@ -200,7 +200,6 @@ export const Default: Story = {
     columns={columns}
     columnStorageName="my-columns"
     columnInfoPanelStorageName="my-info-panel"
-    sectionWidth={800}
     useReactWindow={false}
     showSettings
     sortingVisible

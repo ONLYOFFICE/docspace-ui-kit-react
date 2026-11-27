@@ -2,13 +2,14 @@
 
 import React from "react";
 import { Loader, LoaderTypes } from "../loader";
+import { pickAriaProps } from "../../utils/aria-props";
 import styles from "./AppLoader.module.scss";
 
 import type { AppLoaderProps } from "./AppLoader.types";
 
 export type { AppLoaderProps };
 
-const AppLoader = ({ label }: AppLoaderProps) => {
+const AppLoader = ({ label, ...rest }: AppLoaderProps) => {
   // The inner Loader is the role="status" region, and the label is its text
   // (the Loader's own translated default when none is passed); the sheet
   // itself is busy for as long as it is mounted.
@@ -19,6 +20,7 @@ const AppLoader = ({ label }: AppLoaderProps) => {
       aria-busy="true"
     >
       <Loader
+        {...pickAriaProps(rest)}
         className={styles.pageLoader}
         type={LoaderTypes.rombs}
         size="40px"

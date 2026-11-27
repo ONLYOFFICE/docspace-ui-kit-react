@@ -153,7 +153,8 @@ export const getMobileMediaContextModel = (
       onClick: () => {
         return onShowInfoPanel?.(targetFile);
       },
-      disabled: isPublicFile,
+      // A host that shows no Info panel is not offered a row that does nothing.
+      disabled: isPublicFile || !onShowInfoPanel,
     },
     {
       key: "download",

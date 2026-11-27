@@ -16,17 +16,21 @@ const meta = {
     percent: {
       control: { type: "number", min: 0, max: 100 },
       description:
-        "How far along the operation is, 0 to 100; anything above 100 fills the whole bar",
+        "How far along the operation is, 0 to 100. The value is clamped to that range, and a non-number (`NaN`, `Infinity`) counts as 0.",
     },
     label: {
       control: "text",
       description:
-        "Line of text above the bar; it is also the bar's tooltip and its accessible name",
+        "Line of text above the bar, and the bar's accessible name unless `aria-label` is passed. A truncated label shows in full in the kit's tooltip.",
+    },
+    "aria-label": {
+      control: false,
+      description: "Accessible name of the bar, in place of `label`.",
     },
     isInfiniteProgress: {
       control: "boolean",
       description:
-        "Display infinite loading animation instead of percentage-based progress",
+        "Replaces the fill with a strip that slides across the track for ever. The bar is then indeterminate: no `aria-valuenow`, and `aria-busy` set.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -34,22 +38,22 @@ const meta = {
     status: {
       control: "text",
       description:
-        "Line of text under the bar; hidden while `error` is set, which takes the same place",
+        'Line of text under the bar — "3 of 4 files processed". It sits in a polite live region, so a change is announced. It is hidden while `error` is set, which takes the same slot.',
     },
     error: {
       control: "text",
       description:
-        "Line of text under the bar in the error colour; shown instead of `status` when both are given",
+        'Line of text under the bar in the error colour, rendered with `role="alert"` so it is announced. It replaces `status` whenever both are given; nothing else about the bar changes.',
     },
     className: {
       control: "text",
       description:
-        "Extra class added to the bar element itself, not to the block around the label and status line",
+        "Added after the component's own class on the bar element, not on the outer container.",
     },
     style: {
       control: "object",
       description:
-        "Inline style of the whole block — the label, the bar and the status line together",
+        "Inline style of the outer container — the label, the bar and the status line together. The bar itself is styled through the `--progress-bar-*` custom properties.",
     },
   },
 } satisfies Meta<typeof ProgressBar>;
@@ -76,7 +80,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Use it for an operation whose progress you can measure: the label names the operation and the fill shows how far it has got (`percent`, `label`). Change any other prop live in the Controls panel below.",
+          "A bar for an operation whose progress can be measured: the label names it, and the fill shows how far it has got (`percent`, `label`).",
       },
       source: {
         code: `<ProgressBar percent={50} label="Uploading file..." />`,
@@ -86,6 +90,7 @@ export const Default: Story = {
 };
 
 export const WithStatus: Story = {
+  name: "With status",
   render: (args) => <ProgressBar {...args} />,
   args: {
     percent: 75,
@@ -113,6 +118,7 @@ export const WithStatus: Story = {
 };
 
 export const WithError: Story = {
+  name: "With error",
   render: (args) => <ProgressBar {...args} />,
   args: {
     percent: 30,
@@ -145,6 +151,7 @@ export const WithError: Story = {
 };
 
 export const InfiniteProgress: Story = {
+  name: "Indeterminate",
   render: (args) => <ProgressBar {...args} />,
   args: {
     percent: 0,
@@ -164,7 +171,7 @@ export const InfiniteProgress: Story = {
     docs: {
       description: {
         story:
-          "Use it when the operation cannot report how far it has got: a short strip slides across the track until the bar is removed, and the bar is announced as busy with no value (`isInfiniteProgress`).",
+          "A bar for an operation that cannot report how far it has got (`isInfiniteProgress`). A short strip slides across the track, and the bar is announced as busy.",
       },
       source: {
         code: `<ProgressBar percent={0} label="Please wait..." isInfiniteProgress />`,
@@ -204,6 +211,7 @@ export const Complete: Story = {
 };
 
 export const OutOfRange: Story = {
+  name: "Out of range",
   render: (args) => (
     <>
       <ProgressBar {...args} percent={-20} label="Below the range" />
@@ -228,7 +236,7 @@ export const OutOfRange: Story = {
     docs: {
       description: {
         story:
-          "`percent` is clamped to 0..100 at both ends: a negative value draws an empty bar and reports 0, a value over 100 fills it and reports 100.",
+          "Two bars fed values outside 0..100 (`percent`). The negative one is empty and reports 0, and the one over 100 is full and reports 100.",
       },
       source: {
         code: `<ProgressBar percent={-20} label="Below the range" />
@@ -243,6 +251,7 @@ type PreparationStory = StoryObj<
 >;
 
 export const PreparationPortal: PreparationStory = {
+  name: "Preparation portal",
   render: (args) => <PreparationPortalProgress {...args} />,
   args: {
     percent: 75,
@@ -262,7 +271,7 @@ export const PreparationPortal: PreparationStory = {
     docs: {
       description: {
         story:
-          "Use `PreparationPortalProgress` for a full-page wait where the number itself matters: a taller bar with the percentage printed in its middle and a centred caption below (`percent`, `text`). The percentage turns from dark to light once the fill passes 50%; move `percent` in the Controls panel below to see it.",
+          "`PreparationPortalProgress`, for a full-page wait where the number matters: a taller bar with the percentage in its middle and a caption below (`percent`, `text`). The number turns light past 50%.",
       },
       source: {
         code: `<PreparationPortalProgress percent={75} text="Setting things up..." />`,
@@ -285,6 +294,7 @@ const RightToLeftTemplate = (args: ProgressBarProps) => (
 
 // Framed on Docs: the theme provider stamps the direction on the page, which would flip the whole Docs page.
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => <RightToLeftTemplate {...args} />,
   globals: { direction: "rtl" },
   args: {
@@ -307,7 +317,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "100px" },
       description: {
         story:
-          'The bar under a right-to-left interface: the label and status line align to the right, the fill grows from the right edge, and the infinite strip in the second bar slides from right to left. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+          "Two right-to-left bars. The label and status line align right, the fill grows from the right edge, and the second bar's strip slides from right to left.",
       },
       source: {
         code: `<div dir="rtl">
@@ -320,6 +330,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: (args) => (
     <div
       style={
@@ -357,9 +368,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The variables are listed under CSS variables on this page; the example sets every one of them on one wrapper.
-
-The first bar shows the track, fill, size, radius, margin and status colour; the second sets \`error\` to show \`--progress-bar-error-text\`, since an error takes the place of the status line.`,
+        story: `Two bars under a wrapper that sets every variable. The second sets \`error\`, the only state that shows \`--progress-bar-error-text\`.`,
       },
       source: {
         code: `<div style={{

@@ -42,190 +42,190 @@ const meta = {
     showText: {
       control: "boolean",
       description:
-        "Shows text labels alongside icons; off, the panel narrows to a 60px column of icons on tablet. The component also writes its own choice back through `setShowText` on mount and on every device change",
+        "Whether the panel is expanded. It is the width switch — 243px when set, 60px when not — and it is written back through `setShowText` on mount and on every device change.",
       table: { type: { summary: "boolean" } },
     },
     setShowText: {
       control: false,
       description:
-        "Called on mount and on every device change with the width the component has decided on: `true` on desktop and on a phone; on tablet `false`, and only when the `showArticle` entry in local storage holds `false`",
+        "Called on mount and on every device change: `true` on a desktop or a phone. On a tablet it gets `false`, and only while `showArticle` in local storage is falsy.",
     },
     toggleShowText: {
       control: false,
       description:
-        "Called by the collapse handle at the foot of the panel on tablet; the host is expected to flip `showText`",
+        "Called by the collapse handle at the foot of the panel. It is expected to flip `showText`; the panel does not collapse on its own.",
     },
     articleOpen: {
       control: "boolean",
       description:
-        "Whether the panel is shown on a phone, where it covers the page over a backdrop. On desktop and tablet the panel is always shown",
+        "Whether the panel is open over the page. It only matters on a phone, where the panel is a portal with a backdrop.",
       table: { type: { summary: "boolean" } },
     },
     toggleArticleOpen: {
       control: false,
       description:
-        "Called on a phone by the close button of the header, the backdrop, the back button and the developer tools entry; the host is expected to flip `articleOpen`",
+        "Called on a phone by the header's close button, the backdrop, the back button and the developer tools entry. It is expected to flip `articleOpen`.",
     },
     setArticleOpen: {
       control: false,
       description:
-        "Called with `false` when the browser goes back on a phone, to close the panel",
+        "Called with `false` when the browser goes back on a phone, to close the panel.",
     },
     isMobileArticle: {
       control: "boolean",
       description:
-        "Removes the padding around the main action. The component writes its own value back through `setIsMobileArticle` on mount and on every device change",
+        "Removes the padding and margin around the main button, and moves the live chat launcher clear of it. The component writes it back through `setIsMobileArticle`.",
       table: { type: { summary: "boolean" } },
     },
     setIsMobileArticle: {
       control: false,
       description:
-        "Called on mount and on every device change: `true` on tablet and phone, `false` on desktop",
+        "Called on mount and on every device change: `true` on a tablet or a phone, `false` on a desktop. Wire it to the state behind `isMobileArticle`.",
     },
     currentDeviceType: {
       control: "select",
       options: Object.values(DeviceType),
       description:
-        "Which layout to render: a fixed column on `desktop`, a collapsible sidebar on `tablet`, a full-width overlay on `mobile`. The breakpoints of the stylesheet still follow the window width",
+        "Which layout to render. The panel is a portal into `#root` on `mobile`, a collapsible sidebar on `tablet` and a fixed column on `desktop`; nothing here measures the viewport.",
       table: { type: { summary: "DeviceType" } },
     },
     children: {
       control: false,
       description:
-        "The slots, as an array of `Article.Header`, `Article.MainButton` and `Article.Body`; any other element is dropped",
+        "The three slots, as an array. Each is `Article.Header`, `Article.MainButton` or `Article.Body`; anything else is dropped, and the slots are matched by display name, so a wrapper around one hides it.",
     },
     withCustomArticleHeader: {
       control: "boolean",
       description:
-        "Shows the contents of `Article.Header` in the header row instead of the logo",
+        "Shows the `Article.Header` slot in the header row in place of the logo. Without it the slot is not rendered; a phone never shows it.",
       table: { type: { summary: "boolean" } },
     },
     withMainButton: {
       control: "boolean",
       description:
-        "Shows the contents of `Article.MainButton` above the body on desktop and tablet; on a phone the slot is shown below the panel without it",
+        "Whether a main button belongs above the body. Without it the `Article.MainButton` slot is not rendered on anything but a phone.",
       table: { defaultValue: { summary: "false" } },
     },
     onLogoClickAction: {
       control: false,
       description:
-        "Called when the logo or the back button is clicked, before the panel navigates home",
+        "Called when the logo, or the back button above the body, is clicked, before the panel navigates.",
     },
     showBackButton: {
       control: "boolean",
       description:
-        "Shows a back button at the top of the body on desktop and tablet, and in the header on a phone",
+        "Shows the back button in the header, and a second one above the body on anything wider than a phone.",
       table: { type: { summary: "boolean" } },
     },
     onBack: {
       control: false,
-      description: "Called by the back button instead of navigating home",
+      description: "Called by the back button instead of navigating.",
     },
     navigate: {
       control: false,
       description:
-        "Router push used by the logo, the back button and the developer tools entry; without it they reload the page at the new address",
+        "Router push used by the logo, the back button and the developer tools entry. Without it they set `window.location`, which reloads the page.",
     },
     isBurgerLoading: {
       control: "boolean",
-      description: "Shows skeletons in place of the logo and the back button",
+      description:
+        "Renders the logo and the back button as skeletons. A custom header outranks it.",
       table: { type: { summary: "boolean" } },
     },
     showArticleLoader: {
       control: "boolean",
       description:
-        "Replaces the profile block with a skeleton and removes the custom slot, the developer tools entry, the apps block, the live chat and the collapse handle; the header and the slots stay",
+        "Replaces the profile block with a skeleton. It also removes the custom slot, the developer tools entry, the apps block, the live chat and the collapse handle.",
       table: { defaultValue: { summary: "false" } },
     },
     user: {
       control: false,
       description:
-        "The signed-in person, whose avatar and name the profile block shows; a guest (`isVisitor`) never sees the developer tools entry",
+        "The signed-in person, shown in the block at the foot of the panel. Its `isVisitor` also hides the developer tools entry.",
     },
     getActions: {
       control: false,
       description:
-        "Returns the items of the menu opened by the profile block's dots button, and by its avatar on a collapsed tablet panel",
+        "Returns the model of the profile block's context menu. It is handed a translate function, which this package does not supply.",
     },
     onProfileClick: {
       control: false,
       description:
-        "Called when the person's name or avatar in the profile block is clicked, with the original event wrapped in an object",
+        "Called when the profile block is clicked, with the original event wrapped in an object.",
     },
     hideProfileBlock: {
       control: "boolean",
       description:
-        "Removes the profile block at the foot of the panel, and moves the collapse handle down in its place",
+        "Removes the profile block at the foot of the panel, and moves the collapse handle down to take its place.",
       table: { type: { summary: "boolean" } },
     },
     hideAppsBlock: {
       control: "boolean",
-      description: "Removes the block of application download links",
+      description:
+        'Removes the "download the apps" block at the foot of the panel.',
       table: { type: { summary: "boolean" } },
     },
     logoText: {
       control: "text",
       description:
-        "Organization name used in the tooltips of the application download links",
+        'Organization name in the tooltips of the "download the apps" links.',
       table: { type: { summary: "string" } },
     },
     downloaddesktopUrl: {
       control: "text",
-      description: "Address behind the Windows, macOS and Linux download links",
+      description:
+        "Address behind the Windows, macOS and Linux links. Empty, those three links are not drawn.",
       table: { type: { summary: "string" } },
     },
     officeforandroidUrl: {
       control: "text",
-      description: "Address behind the Android download link",
+      description:
+        "Address behind the Android link. Empty, the link is not drawn.",
       table: { type: { summary: "string" } },
     },
     officeforiosUrl: {
       control: "text",
-      description: "Address behind the iOS download link",
+      description: "Address behind the iOS link. Empty, the link is not drawn.",
       table: { type: { summary: "string" } },
     },
     isAdmin: {
       control: "boolean",
       description:
-        "Whether the person is an administrator; together with `limitedAccessDevToolsForUsers` it decides whether the developer tools entry is shown",
+        "Whether the person is an administrator. With `limitedAccessDevToolsForUsers` it decides whether the developer tools entry is shown.",
       table: { type: { summary: "boolean" } },
     },
     limitedAccessDevToolsForUsers: {
       control: "boolean",
       description:
-        "Hides the developer tools entry from anyone who is not an administrator",
+        "Hides the developer tools entry from anyone who is not an administrator.",
       table: { type: { summary: "boolean" } },
     },
     customSlot: {
       control: false,
       description:
-        "Extra content between the body and the developer tools entry",
-    },
-    mainBarVisible: {
-      control: "boolean",
-      description:
-        "Whether a top bar with the id `main-bar` is on screen. The component measures it on every resize and then does not use the result, so nothing on screen changes",
-      table: { type: { summary: "boolean" } },
+        "Extra content under the body, above the developer tools entry. Its presence also shifts the collapse handle and the developer tools entry.",
     },
     isLiveChatAvailable: {
       control: false,
       description:
-        "Allows the live chat bubble, which loads a third-party Zendesk script; it is never shown in a mobile browser",
+        "Whether the live chat is mounted at all. It is also suppressed on a mobile user agent.",
       table: { type: { summary: "boolean" } },
     },
     isShowLiveChat: {
       control: false,
-      description: "Whether the live chat bubble is expanded",
+      description:
+        'Whether the Zendesk widget is on the page. The script loads the first time this is true; from then on the "Live chat" switch shows and hides the widget through its API.',
       table: { type: { summary: "boolean" } },
     },
     zendeskKey: {
       control: false,
-      description: "Key of the Zendesk account the live chat connects to",
+      description:
+        "Key of the Zendesk account. The live chat block loads a third-party script with it.",
       table: { type: { summary: "string" } },
     },
     languageBaseName: {
       control: false,
-      description: "Locale handed to the live chat",
+      description: "Locale handed to the Zendesk widget.",
       table: { type: { summary: "string" } },
     },
   },
@@ -281,13 +281,10 @@ const defaultProps: ArticleProps = {
   toggleArticleOpen: fn(),
   setIsMobileArticle: fn(),
   setArticleOpen: fn(),
-  withSendAgain: false,
-  mainBarVisible: true,
   hideProfileBlock: false,
   logoText: "",
   isShowLiveChat: false,
   hideAppsBlock: false,
-  withCustomSlot: false,
   isLiveChatAvailable: false,
   isAdmin: false,
   currentDeviceType: DeviceType.desktop,
@@ -486,7 +483,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The panel as a desktop page shows it: the logo, the body, the developer tools entry, the download links and the profile block. Click the dots beside the name to open the actions menu (`getActions`), and change any other prop live in the Controls panel below.",
+          "The panel as a desktop page shows it: the logo, the body, the developer tools entry, the download links and the profile block. The dots beside the name open the actions menu (`getActions`).",
       },
       source: {
         code: `<Article
@@ -506,6 +503,7 @@ export const Default: Story = {
 };
 
 export const WithMainButton: Story = {
+  name: "With main button",
   render: (args) => <Template {...args} />,
   args: {
     ...defaultProps,
@@ -544,6 +542,7 @@ export const WithMainButton: Story = {
 };
 
 export const CustomHeader: Story = {
+  name: "Custom header",
   render: (args) => <Template {...args} />,
   args: {
     ...defaultProps,
@@ -583,6 +582,7 @@ export const CustomHeader: Story = {
 };
 
 export const WithBackButton: Story = {
+  name: "With back button",
   render: (args) => <Template {...args} />,
   args: {
     ...defaultProps,
@@ -614,6 +614,7 @@ export const WithBackButton: Story = {
 };
 
 export const LoadingState: Story = {
+  name: "Loading",
   render: (args) => <Template {...args} />,
   args: {
     ...defaultProps,
@@ -637,7 +638,7 @@ export const LoadingState: Story = {
     docs: {
       description: {
         story:
-          "Skeletons in place of the logo and the profile block while the page's data is still arriving, so the panel keeps its shape; the body slot is still rendered (`isBurgerLoading`, `showArticleLoader`).",
+          "Skeletons in place of the logo and the profile block while the page's data arrives, so the panel keeps its shape (`isBurgerLoading`, `showArticleLoader`). The body slot is still rendered.",
       },
       source: {
         code: `<Article {...panelProps} isBurgerLoading showArticleLoader>
@@ -651,6 +652,7 @@ export const LoadingState: Story = {
 };
 
 export const WithCustomSlot: Story = {
+  name: "With custom slot",
   render: (args) => <Template {...args} />,
   args: {
     ...defaultProps,
@@ -677,7 +679,7 @@ export const WithCustomSlot: Story = {
     docs: {
       description: {
         story:
-          "**Storage: 2 GB of 10 GB** — a notice that belongs to the panel rather than to the navigation, placed between the body and the developer tools entry (`customSlot`).",
+          "**Storage: 2 GB of 10 GB** — a notice that belongs to the panel rather than to the navigation (`customSlot`). It sits between the body and the developer tools entry.",
       },
       source: {
         code: `<Article {...panelProps} customSlot={<div>Storage: 2 GB of 10 GB</div>}>
@@ -691,6 +693,7 @@ export const WithCustomSlot: Story = {
 };
 
 export const WithoutFooterBlocks: Story = {
+  name: "Without footer blocks",
   render: (args) => <Template {...args} />,
   args: {
     ...defaultProps,
@@ -710,7 +713,7 @@ export const WithoutFooterBlocks: Story = {
     docs: {
       description: {
         story:
-          "The body with nothing below it, for a page that shows the person and the download links elsewhere: no profile block (`hideProfileBlock`), no download links (`hideAppsBlock`) and no developer tools entry for a person who is not an administrator (`limitedAccessDevToolsForUsers`).",
+          "The body with nothing below it, for a page that shows the person and the download links elsewhere. It drops the profile block (`hideProfileBlock`), the download links (`hideAppsBlock`) and, for a non-administrator, the developer tools entry (`limitedAccessDevToolsForUsers`).",
       },
       source: {
         code: `<Article
@@ -730,6 +733,7 @@ export const WithoutFooterBlocks: Story = {
 };
 
 export const CollapsedOnTablet: Story = {
+  name: "Collapsed on a tablet",
   // The catalog follows the column: icons only while it is collapsed.
   render: function Render(args) {
     const [, updateArgs] = useArgs<ArticleProps>();
@@ -784,13 +788,13 @@ export const CollapsedOnTablet: Story = {
     await expect(
       within(article(canvasElement)).getAllByTestId("icon-button")[0],
     ).toBeVisible();
-    await expect(canvas.queryByAltText("ONLYOFFICE")).toBeNull();
+    await expect(canvas.queryByAltText("ONLYOFFICE Apps")).toBeNull();
   },
   parameters: {
     docs: {
       description: {
         story:
-          "A 60px column of icons in a tablet-width window, which leaves the page most of the screen (`showText` off). The header is the page's own, as in the ONLYOFFICE Apps client: a toggle that expands the column, and the logo beside it once expanded (`withCustomArticleHeader`, `toggleShowText`).",
+          "A 60px column of icons in a tablet-width window, which leaves the page most of the screen (`showText` off). The header is the page's own, as in the ONLYOFFICE Apps client (`withCustomArticleHeader`). Its toggle expands the column and shows the logo beside it (`toggleShowText`).",
       },
       source: {
         code: `const [showText, setShowText] = useState(false);
@@ -823,6 +827,7 @@ const toggleShowText = () => setShowText((value) => !value);
 };
 
 export const OnPhone: Story = {
+  name: "On a phone",
   render: renderInteractive,
   decorators: [withFrame(414, 640)],
   globals: { viewport: { value: "mobile2", isRotated: false } },
@@ -853,7 +858,7 @@ export const OnPhone: Story = {
     docs: {
       description: {
         story:
-          "The panel on a phone: it covers the page below a 64px top strip, over a backdrop, and drops the profile block. Close it with the cross in its header or a tap on the backdrop (`toggleArticleOpen`); switch `articleOpen` in the Controls panel of the story canvas to open it again.",
+          "The panel on a phone: it covers the page below a 64px top strip, over a backdrop, and drops the profile block. The cross in its header and a tap on the backdrop both call `toggleArticleOpen`.",
       },
       source: {
         code: `const [articleOpen, setArticleOpen] = useState(true);
@@ -885,6 +890,7 @@ const rtlLabels = [
 ];
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <Template {...args} />
@@ -920,7 +926,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "626px" },
       description: {
         story:
-          "The panel in a right-to-left interface: its border moves to the left edge, the back arrow points right and the dots button sits on the left of the profile block.",
+          "The panel in a right-to-left interface. Its border moves to the left edge, the back arrow points right, and the dots button sits on the left of the profile block.",
       },
       source: {
         code: `<div dir="rtl">
@@ -990,6 +996,7 @@ const CssCustomizationTemplate = () => {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => <CssCustomizationTemplate />,
   play: async ({ canvasElement }) => {
     const [first] = within(canvasElement).getAllByTestId("article");
@@ -1003,7 +1010,7 @@ export const CssCustomization: Story = {
     docs: {
       description: {
         story:
-          "Five of the panel's variables set on one wrapper -- the variables are listed under CSS variables on this page. The first panel shows the background, the borders and the profile block; the second adds the back button (`showBackButton`) for `--article-back-color`. In a phone-width window the story shows one panel as the mobile sheet, with the back button; the phone layout has no profile block.",
+          "Five of the panel's variables set on one wrapper. The first panel shows the background, the borders and the profile block; the second adds the back button for `--article-back-color`. A phone-width window shows one panel as the mobile sheet, which has no profile block.",
       },
       source: {
         code: `<div style={{ "--article-bg": "light-dark(#e6f3fb, #16303e)", "--article-border": "1px solid #0082c9", "--article-back-color": "#0082c9" }}>

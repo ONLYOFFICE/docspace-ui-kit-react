@@ -10,6 +10,25 @@ describe("<MCPIcon />", () => {
     return render(<MCPIcon title="Test" {...props} />);
   };
 
+  it("takes a passed name over title and keeps the other aria-*", () => {
+    renderComponent({
+      "aria-label": "Hugging Face server",
+      "aria-describedby": "server-hint",
+    });
+
+    const icon = screen.getByRole("img", { name: "Hugging Face server" });
+    expect(icon).toHaveAttribute("aria-describedby", "server-hint");
+  });
+
+  it("is hidden by a passed aria-hidden though it has a title", () => {
+    renderComponent({ "aria-hidden": true });
+
+    expect(screen.getByTestId("mcp-icon")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+  });
+
   it("renders MCPIcon component without errors", () => {
     renderComponent();
     const iconElement = screen.getByTestId("mcp-icon");
@@ -38,6 +57,16 @@ describe("<MCPIcon />", () => {
   it("displays first character of title in uppercase", () => {
     renderComponent({ title: "hugging face" });
     expect(screen.getByText("H")).toBeInTheDocument();
+  });
+
+  it("draws the first letter after leading spaces", () => {
+    renderComponent({ title: "  hugging face" });
+    expect(screen.getByText("H")).toBeInTheDocument();
+  });
+
+  it("draws a leading emoji whole", () => {
+    renderComponent({ title: "\u{1F916} Robot" });
+    expect(screen.getByText("\u{1F916}")).toBeInTheDocument();
   });
 
   it("renders image when imgSrc is provided", () => {

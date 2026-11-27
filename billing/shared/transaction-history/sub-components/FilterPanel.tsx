@@ -92,7 +92,6 @@ const FilterPanel = ({
                   directionY="both"
                   noBorder={false}
                   dropDownMaxHeight={300}
-                  showDisabledItems
                   size={ComboBoxSize.content}
                   scaled
                   dataTestId={typeComboboxTestId}

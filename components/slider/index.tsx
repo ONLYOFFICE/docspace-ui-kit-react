@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import classNames from "classnames";
+import { pickAriaProps } from "../../utils/aria-props";
 import { SliderProps } from "./Slider.types";
 import styles from "./Slider.module.scss";
 
@@ -20,11 +21,16 @@ const Slider = (props: SliderProps) => {
     thumbWidth,
     runnableTrackHeight,
     dataTestId,
-    "aria-label": ariaLabel,
-    "aria-labelledby": ariaLabelledBy,
-    "aria-describedby": ariaDescribedBy,
-    "aria-valuetext": ariaValueText,
+    ...rest
   } = props;
+  // The native range reports the value and its bounds from `value`, `min`
+  // and `max`; a passed copy could only fall out of step with them.
+  const {
+    "aria-valuenow": _valueNow,
+    "aria-valuemin": _valueMin,
+    "aria-valuemax": _valueMax,
+    ...aria
+  } = pickAriaProps(rest);
 
   const [sizeProp, setSizeProp] = useState("0%");
   const sliderRef = useRef<HTMLInputElement>(null);
@@ -75,6 +81,7 @@ const Slider = (props: SliderProps) => {
 
   return (
     <input
+      {...aria}
       id={id}
       ref={sliderRef}
       type="range"
@@ -86,10 +93,6 @@ const Slider = (props: SliderProps) => {
       step={step}
       value={value}
       disabled={isDisabled}
-      aria-label={ariaLabel}
-      aria-labelledby={ariaLabelledBy}
-      aria-describedby={ariaDescribedBy}
-      aria-valuetext={ariaValueText}
       data-testid={dataTestId ?? "slider"}
     />
   );

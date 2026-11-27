@@ -267,8 +267,6 @@ class SnackBar extends React.Component<SnackbarProps, { isLoaded: boolean }> {
       backgroundImg,
       onAction: _onAction, // Excluded from rest to prevent DOM warning
       onLoad: _onLoad, // Excluded from rest to prevent DOM warning
-      isMaintenance: _isMaintenance, // Not a DOM attribute
-      onClose: _onClose, // Not a DOM attribute
       skipBlur: _skipBlur, // Not a DOM attribute
       closeButtonLabel: closeButtonLabelProp,
       id = "snackbar-container",

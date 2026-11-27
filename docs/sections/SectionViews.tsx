@@ -180,7 +180,6 @@ export const SectionTable = ({
             columns={columns}
             columnStorageName={storage}
             columnInfoPanelStorageName={`${storage}-info-panel`}
-            sectionWidth={width}
             useReactWindow={false}
             showSettings={false}
             sortBy={sortBy}
@@ -335,7 +334,6 @@ export const SectionTiles = ({
             element={iconOf(item)}
             contextOptions={contextOptions(item)}
             getContextModel={() => contextOptions(item)}
-            thumbnailClick={() => open(item)}
           >
             {name(item)}
           </FolderTile>

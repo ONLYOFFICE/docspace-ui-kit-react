@@ -180,6 +180,31 @@ describe("FileTile", () => {
     vi.clearAllMocks();
   });
 
+  it("treats the thumbnail as decorative", () => {
+    render(
+      <FileTile {...defaultProps} thumbnail="test.png">
+        <FileContent />
+      </FileTile>,
+    );
+
+    expect(screen.getByTestId("file-thumbnail")).toHaveAttribute("alt", "");
+  });
+
+  it("puts a passed aria-* on the tile", () => {
+    render(<FileTile {...defaultProps} aria-describedby="file-hint" />);
+    expect(screen.getByTestId("tile")).toHaveAttribute(
+      "aria-describedby",
+      "file-hint",
+    );
+  });
+
+  it("makes a named tile a group and keeps a passed aria-busy", () => {
+    render(<FileTile {...defaultProps} aria-label="Report.docx" aria-busy />);
+    const tile = screen.getByRole("group", { name: "Report.docx" });
+    expect(tile).toBe(screen.getByTestId("tile"));
+    expect(tile).toHaveAttribute("aria-busy", "true");
+  });
+
   it("renders file title correctly", () => {
     render(
       <FileTile {...defaultProps}>
@@ -233,7 +258,6 @@ describe("FileTile", () => {
         {...defaultProps}
         thumbnailClick={thumbnailClick}
         thumbnail="test.png"
-        thumbSize={96}
       >
         <FileContent />
       </FileTile>,
@@ -275,7 +299,9 @@ describe("FileTile", () => {
     const button = screen.getByTestId("context-menu-button");
     fireEvent.click(button);
 
-    expect(tileContextClick).toHaveBeenCalled();
+    // Once, as a click rather than a right-click.
+    expect(tileContextClick).toHaveBeenCalledTimes(1);
+    expect(tileContextClick).toHaveBeenCalledWith(false);
   });
 
   it("calls withCtrlSelect when Ctrl+Click", () => {
@@ -358,7 +384,6 @@ describe("FileTile", () => {
       <FileTile
         {...defaultProps}
         thumbnail="invalid.png"
-        thumbSize={96}
         temporaryIcon={<div data-testid="temp-icon" />}
       >
         <FileContent />
@@ -371,9 +396,9 @@ describe("FileTile", () => {
     expect(screen.getByTestId("temp-icon")).toBeTruthy();
   });
 
-  it("renders ReactSVG for thumbnail when thumbSize is undefined", () => {
+  it("renders the thumbnail as an image", () => {
     render(
-      <FileTile {...defaultProps} thumbnail="test.svg" thumbSize={undefined}>
+      <FileTile {...defaultProps} thumbnail="test.svg">
         <FileContent />
       </FileTile>,
     );
@@ -463,7 +488,6 @@ describe("FileTile", () => {
         {...defaultProps}
         setSelection={setSelection}
         thumbnail="test.png"
-        thumbSize={96}
       >
         <FileContent />
       </FileTile>,

@@ -32,15 +32,13 @@ Path-scoped detail that does not belong here, loaded when the matching files are
 | `source-checks.md`       | the client-side checks that used to cover this source (hex, ASCII, indentation, assets, deps, licence headers), why none of them run here now, and AGPL-3.0-only without per-file headers                                        |
 | `cross-platform.md`      | why every command has to run on Windows too, what `package.json` scripts may not contain, and why `path.sep` does not make an id POSIX                                                                                           |
 | `vscode-tasks.md`        | the three layers behind the status-bar buttons in `ui-kit.code-workspace`                                                                                                                                                        |
+| `doc-writing.md`         | how long a README's lead and bullets, a prop's JSDoc and a story's text run, what order they say things in, what they leave to the generated tables; the `W_*` style warnings `check:readme` prints                              |
 | `product-naming.md`      | DocSpace is now ONLYOFFICE Apps: what to rename in user-facing text, which names stay, and the grep that finds leftovers                                                                                                         |
 
 ## Tech Stack
 
-- **React 19** (peer dependency)
-- **TypeScript 5** (strict mode, `tsconfig.json`)
 - **Rollup** — library build (`rollup.config.mjs`), **ESM only** (`dist/esm`, `dist/types`);
   there is no CJS output
-- **Storybook 10** — component documentation and visual development
 - **Vitest** — unit and component tests in jsdom (`unit` project), plus every story
   rendered in Chromium through `@storybook/addon-vitest` (`storybook` project)
 - **Biome** — linting only. Its **formatter is disabled**
@@ -65,7 +63,6 @@ Path-scoped detail that does not belong here, loaded when the matching files are
   (`scripts/build-untouched.mjs`). CI runs everything in full. Prettier and `tsc`
   cache in `node_modules/.cache`. `format:gate` fixes the files it finds and still fails
   the push, because a pre-push hook cannot rewrite the commits being pushed
-- **pnpm** — package manager
 
 ## Repository Structure
 
@@ -78,15 +75,8 @@ components/          — 98 UI components, each in its own folder:
                           <Name>.module.scss (optional)
                           <Name>.stories.tsx
                           <Name>.test.tsx (optional)
-constants/           — Shared constants
-context/             — React contexts (ThemeContext, InterfaceDirectionContext)
-enums/               — Shared enumerations
 errors/              — Error page components (401, 403, 404, etc.)
-hooks/               — 11 custom React hooks (barrelled in hooks/index.ts)
 providers/           — theme, translation, error-boundary (public) and api (portal-only)
-styles/              — Global SCSS styles, mixins, variables
-types/               — Shared TypeScript types
-utils/               — Utility functions (cookie, date, device, email, i18n, etc.)
 assets/              — SVG icons as React components (*.react.svg); assets/icons/ is
                        committed and refreshed from public/images/icons by copy-images.js
 
@@ -127,9 +117,6 @@ Playwright output (playwright-report/, test-results/), and the API-site output: 
 ## Common Commands
 
 ```bash
-# Install dependencies
-pnpm install
-
 # Library build: rollup -> tsc declarations -> normalize types -> per-directory
 # package.json markers -> assemble dist/styles.css -> assert no bundled
 # dependencies, no non-index chunks, no lost "use client"
@@ -139,15 +126,6 @@ pnpm build
 # Must be pnpm: publishConfig field overrides are a pnpm feature, and an
 # npm-packed tarball has no exports/main at all.
 pnpm verify:package
-
-# Watch mode build
-pnpm build:watch
-
-# Storybook development server (port 6006)
-pnpm storybook
-
-# Build Storybook static
-pnpm storybook-build
 
 # Run tests (the jsdom `unit` project; what CI runs)
 pnpm test
@@ -161,23 +139,6 @@ pnpm gate
 # Render every story in Chromium and run its play function (the `storybook`
 # project; CI's "Story tests" job runs it)
 pnpm test:stories
-
-# Tests with UI
-pnpm test:ui
-
-# Tests with coverage
-pnpm test:coverage
-
-# Lint
-pnpm lint
-pnpm lint:fix
-
-# Format
-pnpm format
-pnpm format:fix
-
-# TypeScript check
-pnpm tsc
 
 # Refresh non-English locales, css/fonts.css and fonts/ from a DocSpace client
 # checkout. Run by hand, never part of build/test. Needs DOCSPACE_CLIENT_ROOT
@@ -216,7 +177,6 @@ applies. Three levels, fastest first:
 ## Coding Conventions
 
 - **TypeScript**: strict mode; no `any`; explicit types on all exported symbols
-- **Component file**: `ComponentName.tsx` + `ComponentName.types.ts` + `index.ts`
 - **Theming**: SCSS Modules with CSS custom properties (`var(--token)`); the
   provider stamps `data-theme`/`data-dir` on `<html>`; no hardcoded colors or
   sizes; use CSS logical properties + mixins from `styles/mixins/_direction.scss`
@@ -227,8 +187,6 @@ applies. Three levels, fastest first:
 - **`ref` as a prop**: React 19, so `ref?: React.Ref<HTMLElement>` in the props type. Do not
   add `forwardRef` to new components; the 20 that still use it are legacy
 - **Accessibility**: WCAG 2.1 AA — `aria-*` attributes, keyboard navigation, focus management
-- **Formatting**: Prettier (`.prettierrc.yaml`) — 80-char line width, double quotes,
-  trailing commas, 2-space indent, LF. Biome's formatter is off and configures none of this
 - **Tests**: Vitest + React Testing Library, setup in `test/setup.ts`
 - **Stories**: every component must have a story. It may live in a subdirectory rather
   than beside `index.ts` — `table`, `rows` and `tiles` all do — so check recursively

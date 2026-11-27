@@ -512,7 +512,6 @@ export const FilesApp = () => {
             element={iconOf(entry)}
             temporaryIcon={iconOf(entry, 96)}
             contextOptions={contextOptions(entry)}
-            thumbnailClick={() => open(entry)}
           >
             <TileContent>
               <Link
@@ -617,11 +616,8 @@ export const FilesApp = () => {
         hideProfileBlock
         hideAppsBlock
         limitedAccessDevToolsForUsers
-        withCustomSlot={false}
         isBurgerLoading={false}
         showBackButton={false}
-        withSendAgain={false}
-        mainBarVisible={false}
         isAdmin={false}
         isLiveChatAvailable={false}
         isShowLiveChat={false}
@@ -681,7 +677,6 @@ export const FilesApp = () => {
         <Section
           currentDeviceType={currentDeviceType}
           withBodyScroll
-          isHeaderVisible
           viewAs={viewAs}
           settingsStudio={false}
         >
@@ -718,15 +713,12 @@ export const FilesApp = () => {
                 title={current.title}
                 isRootFolder={atRoot}
                 canCreate={canCreate}
-                showText
                 isDesktop={isDesktop}
-                isRoom={current.isRoom}
                 withMenu
                 showTitle
                 showRootFolderTitle
                 showNavigationButton={false}
                 isInfoPanelVisible={false}
-                isCurrentFolderInfo={false}
                 currentDeviceType={currentDeviceType}
                 // The ancestors, nearest first, the place's root last: the
                 // portal's `pathParts` without the current folder, reversed.
@@ -745,14 +737,12 @@ export const FilesApp = () => {
                   const parent = crumbs[0];
                   go(parent && !parent.isRoot ? parent.id : null);
                 }}
-                clearTrash={noop}
                 getContextOptionsFolder={() => [
                   { key: "refresh", label: "Refresh", onClick: reload },
                 ]}
                 getContextOptionsPlus={() => createOptions}
                 toggleInfoPanel={noop}
-                hideInfoPanel={noop}
-                showFolderInfo={noop}
+                hideInfoPanel
                 onPlusClick={noop}
                 withLogo={false}
                 burgerLogo=""

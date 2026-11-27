@@ -39,6 +39,19 @@ describe("ImageEditor", () => {
     vi.clearAllMocks();
   });
 
+  it("puts a passed aria-* on the region, whose passed name wins", () => {
+    render(
+      <ImageEditor
+        {...defaultProps}
+        aria-label="Logo editor"
+        aria-describedby="logo-hint"
+      />,
+    );
+
+    const region = screen.getByRole("region", { name: "Logo editor" });
+    expect(region).toHaveAttribute("aria-describedby", "logo-hint");
+  });
+
   it("renders without crashing", () => {
     render(<ImageEditor {...defaultProps} />);
   });
@@ -60,6 +73,19 @@ describe("ImageEditor", () => {
     const className = "custom-class";
     render(<ImageEditor {...defaultProps} className={className} />);
     expect(screen.getByRole("region")).toHaveClass(className);
+  });
+
+  it("is found by its test ids", () => {
+    render(
+      <ImageEditor
+        {...defaultProps}
+        image={{ ...defaultProps.image, uploadedFile: "photo.png" }}
+      />,
+    );
+    expect(screen.getByTestId("image-editor")).toBe(screen.getByRole("region"));
+    expect(screen.getByTestId("image-cropper-wrapper")).toContainElement(
+      screen.getByTestId("image-cropper"),
+    );
   });
 
   it("handles image rescaling when enabled", () => {

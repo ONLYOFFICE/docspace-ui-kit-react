@@ -27,7 +27,6 @@ const BenefitsContainer = observer(({ t }: { t: TTranslation }) => {
     return (
       <HelpButton
         className="payment-tooltip"
-        offsetRight={0}
         iconNode={<HelpReactSvg />}
         tooltipContent={
           <CommonTrans

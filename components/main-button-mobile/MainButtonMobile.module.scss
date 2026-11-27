@@ -68,10 +68,6 @@
   text-overflow: ellipsis;
   padding: 0;
 
-  @include mixins.tablet {
-    height: var(--height-prop);
-  }
-
   @include mixins.mobile {
     width: var(--main-button-mobile-dropdown-mobile-width) !important;
     inset-inline-end: var(
@@ -247,86 +243,4 @@
   block-size: 100%;
   overflow: hidden;
   vertical-align: top;
-}
-
-// ProgressBar styles
-.progressBarContainer {
-  display: none;
-  align-items: center;
-  flex-wrap: wrap;
-  width: 100%;
-  box-sizing: border-box;
-  height: 60px;
-  padding-top: 26px;
-
-  &.isUploading {
-    display: flex;
-  }
-}
-
-.progressWrapper {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  .progressHeader {
-    width: 40%;
-    line-height: 16px;
-    color: var(--main-button-mobile-text-color);
-    &:hover {
-      cursor: pointer;
-    }
-  }
-
-  .progressInfoWrapper {
-    width: 60%;
-    display: flex;
-    align-items: center;
-
-    .progressCount {
-      width: calc(100% - 26px);
-      line-height: 16px;
-      color: var(--main-button-mobile-text-color);
-      text-align: right;
-      margin-inline-end: 12px;
-      &:hover {
-        cursor: pointer;
-      }
-    }
-
-    .progressIcon {
-      svg {
-        path {
-          fill: var(--main-button-mobile-bar-icon);
-        }
-      }
-
-      &.error {
-        svg {
-          path {
-            fill: var(--status-warning);
-          }
-        }
-      }
-    }
-  }
-}
-
-.mobileProgressBar {
-  width: 100%;
-  height: var(--main-button-mobile-progress-height, 4px);
-  background-color: var(--main-button-mobile-mobile-progress-bar-background);
-  border-radius: var(--main-button-mobile-progress-radius, 2px);
-  margin-top: 14px;
-}
-
-.progressBar {
-  width: var(--upload-percent);
-  height: var(--main-button-mobile-progress-height, 4px);
-  opacity: 1;
-  background: var(--main-button-mobile-progress-bar-color);
-  &.error {
-    background: var(--status-warning);
-  }
 }

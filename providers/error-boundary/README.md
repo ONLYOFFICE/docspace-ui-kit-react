@@ -16,9 +16,8 @@
 # ErrorBoundary
 
 Catches what the subtree throws while rendering and shows something in its place. It is a plain
-React class boundary with the kit's own [`ErrorContainer`](../../components/error-container/README.md)
-as its default fallback, offered here so an application does not have to write the one class
-component React still requires for this.
+React class boundary, so an application does not have to write that class itself. The kit's
+[`ErrorContainer`](../../components/error-container/README.md) is its default fallback.
 
 ## Use this when / not when
 
@@ -28,9 +27,8 @@ component React still requires for this.
   blank application.
 - Not for errors you expect. A failed request that returns a status is a value, not a throw, and
   belongs in your own state.
-- Not for anything React does not route through rendering: event handlers, `setTimeout`,
-  `requestAnimationFrame` and rejected promises are never caught by a boundary, in this kit or
-  any other.
+- Not for anything React does not route through rendering. No boundary catches event handlers,
+  `setTimeout`, `requestAnimationFrame` or rejected promises.
 
 ## Import
 
@@ -139,8 +137,7 @@ export function Reported({ children }: { children: React.ReactNode }) {
   boundary renders its fallback for as long as it is mounted. Remount it — a changing `key` is
   the usual way — to try the subtree again.
 - **The default fallback is untranslated English.** "Something went wrong" is written into the
-  component and is not a prop, so an interface in any other language shows one English heading at
-  the worst possible moment. Pass `fallback` if that matters.
+  component and is not a prop. Pass `fallback` for an interface in another language.
 - **The error's `message` is shown to the reader** by that default fallback, verbatim. For a
   failure carrying anything internal, replace it rather than letting it through.
 - **A throw with no error object still renders the fallback**, as
@@ -152,13 +149,13 @@ export function Reported({ children }: { children: React.ReactNode }) {
 
 ## Accessibility
 
-- The fallback replaces the subtree without moving focus. If focus was inside what threw, it
-  falls back to the document body and the reader is left without a position — move it deliberately
-  when the region was interactive.
+- The fallback replaces the subtree without moving focus. Focus inside what threw falls back to
+  the document body, so move it deliberately when the region was interactive.
 - Nothing announces the swap. A fallback that matters should say what happened in text, in a
   region the reader will reach, rather than relying on the visual change alone.
 - The default fallback renders [`ErrorContainer`](../../components/error-container/README.md) and
   inherits its semantics.
+- The boundary renders no element and takes no `aria-*`. Put them in the fallback you pass.
 
 ## Related
 

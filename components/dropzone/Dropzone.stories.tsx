@@ -18,17 +18,17 @@ const meta = {
     isLoading: {
       control: "boolean",
       description:
-        "Replaces the whole drop area with a loader; while it is set there is nothing to click or drop on. Required",
+        "Replaces the whole drop area with a loader. While it is set there is nothing to drop on and no file input in the DOM.",
     },
     uploadPercent: {
       control: "number",
       description:
-        "Percentage for the progress bar shown instead of the spinner while `isLoading` is set. Leave it out for a spinner",
+        "Percentage for the progress bar shown in place of the plain loader while `isLoading`. Leave it out and the loader is an indeterminate spinner.",
     },
     isDisabled: {
       control: "boolean",
       description:
-        "Blocks clicks, the keyboard and dropping. The area looks the same as when enabled",
+        "Blocks clicking, the keyboard and dropping on the area and its format line, and sets `aria-disabled`.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -36,7 +36,7 @@ const meta = {
     isFolderUpload: {
       control: "boolean",
       description:
-        "Picks a whole directory instead of files: a click anywhere in the area opens a folder dialog, the format line is hidden and `accept` is ignored",
+        "Switches to picking a directory, through a `webkitdirectory` input that any click in the area opens. `accept` is then ignored.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -44,7 +44,7 @@ const meta = {
     isMultipleUpload: {
       control: "boolean",
       description:
-        "Whether more than one file, or in folder mode more than one root folder, may be dropped at once. When false a larger drop is refused whole",
+        "Whether more than one file, or in folder mode more than one root folder, may be dropped at once. When it is `false` an over-large drop is refused whole.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -52,37 +52,37 @@ const meta = {
     linkMainText: {
       control: "text",
       description:
-        "The first, bold line; clicking it opens the file or folder dialog. Required",
+        "The first line, a bold accent link that opens the file or folder dialog. Not translated for you.",
     },
     linkSecondaryText: {
       control: "text",
       description:
-        "The line after it, in the body colour; hidden on mobile screens. Required",
+        "The line after it, in the body colour, hidden at 600px wide or narrower. Not translated for you.",
     },
     exstsText: {
       control: "text",
       description:
-        "The short list of supported formats under the two lines, not shown in folder mode. Required",
+        "The short list of supported formats under the two lines. Not translated for you.",
     },
     fullExstsText: {
       control: "text",
       description:
-        "The full list of formats, shown in a drop-down when the short line is clicked. Without it that line is not clickable",
+        "The full list, shown in a drop-down when the short line is clicked. Without it that line is not clickable.",
     },
     formatsPlusBadgeValue: {
       control: "number",
       description:
-        "Drawn as a `+N` pill beside the short format list; 0 and no value both leave it out",
+        "Drawn as a `+N` pill beside the short format list. `0` and no value both leave it out.",
     },
     accept: {
       control: "object",
       description:
-        "Accepted types: a MIME type, an extension such as `.docx`, a comma-separated list of either, or an array of them. Ignored in folder mode. Required",
+        "Accepted types, in react-dropzone 11's form: MIME types or extensions such as `.docx`, comma-separated or in an array. Ignored in folder mode.",
     },
     maxFiles: {
       control: "number",
       description:
-        "Largest number of files one drop may carry; a drop with more is refused whole. 0 means no limit",
+        "Largest number of files the drop library accepts; `0` means no limit.",
       table: {
         defaultValue: { summary: "0" },
       },
@@ -90,24 +90,25 @@ const meta = {
     icon: {
       control: "text",
       description:
-        "Picture above the text, 50 by 50 pixels: an image URL, or an SVG component the dropzone renders itself",
+        "Picture above the text, 50 by 50 pixels: a URL, or an SVG component the dropzone renders itself.",
     },
     iconClassName: {
       control: "text",
-      description: "Added after the component's own class on the icon",
+      description: "Added after the component's own class on the icon.",
     },
     className: {
       control: "text",
-      description: "Added after the component's own class on the outer element",
+      description:
+        "Added after the component's own class on the outer element.",
     },
     loaderClassName: {
       control: "text",
       description:
-        "Added after the component's own classes on the spinner or the progress bar",
+        "Added after the component's own classes on the loader or the progress bar.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the outer element",
+      description: "Value of `data-testid` on the outer element.",
       table: {
         defaultValue: { summary: '"dropzone"' },
       },
@@ -115,22 +116,22 @@ const meta = {
     onDrop: {
       action: "dropped",
       description:
-        "Called with the accepted files after a drop or a pick in the dialog. An empty result and a drop refused by the single-upload rule never reach it",
+        "Called with the accepted files. An empty result never reaches it, and neither does a drop refused by the single-upload rule.",
     },
     onDropRejected: {
       action: "dropRejected",
       description:
-        "Called with the files that were refused: a wrong type, or more than `maxFiles`",
+        "Called with the files the drop library refused — wrong type, or more than `maxFiles`.",
     },
     onSingleUploadError: {
       action: "singleUploadError",
       description:
-        "Called instead of `onDrop` when `isMultipleUpload` is false and the drop holds more than one file, or more than one root folder. The component shows the user nothing itself",
+        "Called instead of `onDrop` when a single-upload rule refuses the drop. Nothing is uploaded and nothing is said to the user by the component.",
     },
     getFilesFromEvent: {
       control: false,
       description:
-        "Replaces the component's own reader of a drop, which walks a dropped directory and gives each file its path",
+        "Replaces the reader that walks a dropped directory and attaches each file's path. The directory and single-upload checks still run before it.",
     },
   },
 } satisfies Meta<typeof Dropzone>;
@@ -186,6 +187,7 @@ const hitAtCentre = (element: HTMLElement) => {
 };
 
 export const Default: Story = {
+  name: "Files",
   args: defaultArgs,
   play: async (context) => {
     const { args, canvas, userEvent } = context;
@@ -214,7 +216,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The everyday setup: click the area to pick files or drop them onto it, and the accepted files appear in the Actions panel (`onDrop`). Change any other prop live in the Controls panel below.",
+          "The everyday setup: a dashed area with a prompt and the accepted formats. A click opens the file dialog, a drop works too, and the accepted files reach `onDrop`.",
       },
       source: {
         code: `<Dropzone
@@ -231,6 +233,7 @@ export const Default: Story = {
 };
 
 export const Loading: Story = {
+  name: "Loading",
   args: {
     ...defaultArgs,
     isLoading: true,
@@ -247,7 +250,7 @@ export const Loading: Story = {
     docs: {
       description: {
         story:
-          "Use while the picked files are being prepared or sent: a spinner replaces the text lines and the drop target, so nothing more can be clicked or dropped (`isLoading`).",
+          "A spinner in place of the text lines and the drop target, while the picked files are prepared or sent (`isLoading`). Nothing more can be clicked or dropped.",
       },
       source: {
         code: `<Dropzone
@@ -263,6 +266,7 @@ export const Loading: Story = {
 };
 
 export const Disabled: Story = {
+  name: "Disabled",
   args: {
     ...defaultArgs,
     isDisabled: true,
@@ -284,7 +288,7 @@ export const Disabled: Story = {
     docs: {
       description: {
         story:
-          "Use when uploading is not allowed right now: the area looks the same as the default, but clicks, keys and drops do nothing (`isDisabled`).",
+          "An area that looks like the default, but where clicks, keys and drops do nothing (`isDisabled`). It suits a moment when uploading is not allowed.",
       },
       source: {
         code: `<Dropzone
@@ -301,6 +305,7 @@ export const Disabled: Story = {
 };
 
 export const SingleFileUpload: Story = {
+  name: "At most one file",
   args: {
     ...defaultArgs,
     maxFiles: 1,
@@ -318,7 +323,7 @@ export const SingleFileUpload: Story = {
     docs: {
       description: {
         story:
-          "Use when the next step takes one file: a drop of two or more is refused whole and reported as rejected files instead of uploaded (`maxFiles`).",
+          "An area for one file at a time (`maxFiles={1}`). A drop of two or more is refused whole and reported as rejected files.",
       },
       source: {
         code: `<Dropzone
@@ -337,6 +342,7 @@ export const SingleFileUpload: Story = {
 };
 
 export const ImageUpload: Story = {
+  name: "Images only",
   args: {
     ...defaultArgs,
     accept: [".png", ".jpg", ".jpeg", ".gif"],
@@ -359,7 +365,7 @@ export const ImageUpload: Story = {
     docs: {
       description: {
         story:
-          "Use when only some types make sense: the file dialog offers only these types, and a dropped file of any other type is refused and reported as rejected (`accept`).",
+          "An area for images only (`accept`). The file dialog offers only these types, and a dropped file of another type is reported as rejected.",
       },
       source: {
         code: `<Dropzone
@@ -377,6 +383,7 @@ export const ImageUpload: Story = {
 };
 
 export const FolderUpload: Story = {
+  name: "Folder",
   args: {
     ...defaultArgs,
     isFolderUpload: true,
@@ -398,7 +405,7 @@ export const FolderUpload: Story = {
     docs: {
       description: {
         story:
-          "Use to upload a directory tree: a click anywhere, or Enter or Space on the focused area, opens a folder dialog, each file arrives with its path inside the folder, and the format line is not shown (`isFolderUpload`).",
+          "An area for a directory tree, with no format line (`isFolderUpload`). A click, or Enter or Space, opens a folder dialog, and each file arrives with its path.",
       },
       source: {
         code: `<Dropzone
@@ -416,6 +423,7 @@ export const FolderUpload: Story = {
 };
 
 export const SingleFolderUpload: Story = {
+  name: "One folder at a time",
   args: {
     ...defaultArgs,
     isFolderUpload: true,
@@ -450,7 +458,7 @@ export const SingleFolderUpload: Story = {
     docs: {
       description: {
         story:
-          "Use when one folder is expected: a drop holding two or more root folders is refused whole, and `onSingleUploadError` is called instead of `onDrop` (`isMultipleUpload` off in folder mode).",
+          "A folder area that takes one folder at a time (`isMultipleUpload={false}`). Two or more root folders are refused whole, and `onSingleUploadError` is called instead of `onDrop`.",
       },
       source: {
         code: `<Dropzone
@@ -470,6 +478,7 @@ export const SingleFolderUpload: Story = {
 };
 
 export const SingleFileOnly: Story = {
+  name: "One file at a time",
   args: {
     ...defaultArgs,
     isMultipleUpload: false,
@@ -493,7 +502,7 @@ export const SingleFileOnly: Story = {
     docs: {
       description: {
         story:
-          "Use when one file is expected and you explain a larger drop yourself: two or more files are refused whole, and `onSingleUploadError` is called instead of `onDrop` (`isMultipleUpload`).",
+          "An area that takes one file at a time (`isMultipleUpload={false}`). Two or more files are refused whole, and `onSingleUploadError` lets the host explain why.",
       },
       source: {
         code: `<Dropzone
@@ -512,6 +521,7 @@ export const SingleFileOnly: Story = {
 };
 
 export const UploadProgress: Story = {
+  name: "Upload progress",
   args: {
     ...defaultArgs,
     isLoading: true,
@@ -525,7 +535,7 @@ export const UploadProgress: Story = {
     docs: {
       description: {
         story:
-          "Use when the upload can report how far it has got: a progress bar with the percentage replaces the spinner and fills to the given share (`uploadPercent`).",
+          "A progress bar at 45% in place of the spinner, for an upload that reports how far it has got (`uploadPercent`).",
       },
       source: {
         code: `<Dropzone
@@ -542,6 +552,7 @@ export const UploadProgress: Story = {
 };
 
 export const WithFormatsList: Story = {
+  name: "Full format list",
   args: {
     ...defaultArgs,
     exstsText: "PDF, DOC, DOCX",
@@ -571,6 +582,12 @@ export const WithFormatsList: Story = {
     await expect(line).toHaveAttribute("aria-expanded", "true");
     await expect(args.onDrop).not.toHaveBeenCalled();
 
+    // The list is painted over the area, not see-through.
+    const list = full.closest('[class*="dropzoneFormatsDropdown"]');
+    await expect(getComputedStyle(list as Element).backgroundColor).not.toBe(
+      "rgba(0, 0, 0, 0)",
+    );
+
     // Clicking the line again closes it.
     await userEvent.click(line);
     await waitFor(() => expect(full).not.toBeVisible());
@@ -594,7 +611,7 @@ export const WithFormatsList: Story = {
     docs: {
       description: {
         story:
-          "Use when the accepted formats do not fit on one line: the short line carries a `+4` pill for the rest (`formatsPlusBadgeValue`); click it, or focus it and press Enter, to open the full list in a drop-down, and click outside or press Escape to close it (`fullExstsText`).",
+          "A short format line with a `+4` pill and a chevron, for formats that do not fit on one line (`formatsPlusBadgeValue`, `fullExstsText`). A click or Enter opens the full list; Escape closes it.",
       },
       source: {
         code: `<Dropzone
@@ -613,6 +630,7 @@ export const WithFormatsList: Story = {
 };
 
 export const WithIcon: Story = {
+  name: "With icon",
   args: {
     ...defaultArgs,
     icon: CatalogFolderIcon,
@@ -625,7 +643,7 @@ export const WithIcon: Story = {
     docs: {
       description: {
         story:
-          "Use to make the area recognisable at a glance: the picture sits above the two lines at 50 by 50 pixels, given as an SVG component or an image URL (`icon`).",
+          "A 50-pixel folder picture above the two lines, to make the area recognisable at a glance (`icon`). It takes an SVG component or an image URL.",
       },
       source: {
         code: `import FolderIcon from "./folder.react.svg";
@@ -686,6 +704,7 @@ const CssCustomizationTemplate = () => {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => <CssCustomizationTemplate />,
   play: async ({ canvas }) => {
     // The border and radius belong to the outer wrapper.
@@ -697,7 +716,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one instance -- the variables are listed under CSS variables on this page. Hover the format line, press it, and click it to open the full list for the hover, pressed and open variables; drag a file over the page, then over the area, for the two drag backgrounds.`,
+        story: `A blue dashed area with rounder corners, under a wrapper that sets every variable. The format line's hover, pressed and open colours, and both drag backgrounds, are set too.`,
       },
       source: {
         code: `<div

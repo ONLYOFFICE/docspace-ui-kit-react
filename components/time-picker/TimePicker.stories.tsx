@@ -20,7 +20,7 @@ const meta = {
     initialTime: {
       control: false,
       description:
-        "Time shown when the picker mounts, as an ISO string, a `Date` or a Luxon `DateTime`; read once, later changes are ignored; defaults to 00:00 of the current day",
+        "Time the fields start on, read once on mount; midnight today without it. Its day, seconds and time zone are carried into every value `onChange` reports.",
       table: {
         defaultValue: { summary: "00:00 of the current day" },
       },
@@ -28,7 +28,7 @@ const meta = {
     hasError: {
       control: "boolean",
       description:
-        "Whether the border is drawn in the error colour; it stays while a field is focused",
+        "Whether the group is drawn in its error colours; they stay while a field is focused.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -36,12 +36,11 @@ const meta = {
     tabIndex: {
       control: "number",
       description:
-        "Position of both fields in the Tab order; left out, they take their natural place in it",
+        "Position of both fields in the tab order. Left out, both take their natural place in it.",
     },
     focusOnRender: {
       control: "boolean",
-      description:
-        "Whether the hours field is focused, with its text selected, when the picker mounts",
+      description: "Whether the hours field is selected on mount.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -49,52 +48,54 @@ const meta = {
     isTwelveHourFormat: {
       control: "boolean",
       description:
-        "Caps the hours field at 12 instead of 23; `meridiem` is required with it and decides the half of the day",
+        "Whether hours run 1 to 12 rather than 0 to 23; requires `meridiem`.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     meridiem: {
       control: "text",
-      description:
-        '"AM" or "PM", required with `isTwelveHourFormat`: combined with the typed hours to compute the time passed to `onChange`; never displayed',
+      description: "Ignored in the 24-hour mode.",
     },
     className: {
       control: "text",
-      description: "Additional CSS class for the time picker container",
+      description: "Applied to the outermost element.",
     },
     classNameInput: {
       control: "text",
       description:
-        "Prefix for the two inner fields' class names: they become `<prefix>-hours-input` and `<prefix>-minutes-input`",
+        "Prefix for the two fields' class names: they become `<classNameInput>-hours-input` and `-minutes-input`. Left out, the fields get no extra class.",
     },
     onChange: {
       action: "onChange",
       description:
-        "Called on every accepted keystroke with a full `DateTime`: the date from `initialTime` combined with the typed time",
+        "Called on every accepted keystroke, and on a change of `meridiem`, with `initialTime` carrying the typed time.",
     },
     onBlur: {
       action: "onBlur",
       description:
-        "Called when typing completes the minutes field: after two digits, a single digit above 5, a third digit or a value above 59; leaving the field with the mouse or Tab does not call it",
+        "Called when typing completes the minutes field, not when it loses focus. Two digits, one digit above 5, a third digit or a value above 59 complete it.",
     },
     ariaLabel: {
       control: "text",
-      description: "Accessible name of the group; pass a translated string",
+      description:
+        "Accessible name of the group that holds the two fields. Pass a translated string.",
       table: {
         defaultValue: { summary: '"Time picker"' },
       },
     },
     hoursLabel: {
       control: "text",
-      description: "Accessible name of the hours field",
+      description:
+        "Accessible name of the hours field. Pass a translated string.",
       table: {
         defaultValue: { summary: '"Hours"' },
       },
     },
     minutesLabel: {
       control: "text",
-      description: "Accessible name of the minutes field",
+      description:
+        "Accessible name of the minutes field. Pass a translated string.",
       table: {
         defaultValue: { summary: '"Minutes"' },
       },
@@ -102,18 +103,18 @@ const meta = {
     autoAdvance: {
       control: "boolean",
       description:
-        "Whether typing moves the focus: a complete hour jumps to minutes and a complete minute blurs the field and calls `onBlur`; off, the focus stays put and `onBlur` is never called",
+        "Whether typing moves the focus for you: a complete hour jumps to minutes, and a complete minute blurs the field and calls `onBlur`. Turn it off to keep the focus where the user put it; `onBlur` is then never called.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     forwardedRef: {
       control: false,
-      description: "Ref to the outer box, a <div>",
+      description: "Ref to the outermost element.",
     },
     testId: {
       control: false,
-      description: "data-testid on the outer box",
+      description: "`data-testid` of the outermost element.",
       table: {
         defaultValue: { summary: "time-picker" },
       },
@@ -198,7 +199,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A 24-hour picker preset to 10:30 (`initialTime`); type `9` in the hours field and watch it become `09` and jump to minutes; change any other prop live in the Controls panel below.",
+          "A 24-hour picker preset to 10:30 (`initialTime`). A typed `9` in the hours becomes `09`, and the caret moves on to minutes.",
       },
       source: {
         code: `<TimePicker
@@ -217,6 +218,7 @@ const WrappedTemplate = (args: Story["args"]) => (
 );
 
 export const WithError: Story = {
+  name: "Error",
   render: (args) => <WrappedTemplate {...args} />,
   args: {
     initialTime: createDateTime(2025, 1, 27, 10, 30, 0),
@@ -241,7 +243,7 @@ export const WithError: Story = {
     docs: {
       description: {
         story:
-          "The border turns red to flag a time the form rejected (`hasError`), and both fields are marked `aria-invalid`; the fields stay editable so it can be corrected in place.",
+          "A red border that flags a time the form rejected (`hasError`). Both fields are marked `aria-invalid` and stay editable.",
       },
       source: {
         code: `<TimePicker initialTime={createDateTime(2025, 1, 27, 10, 30, 0)} hasError onChange={(time) => console.log(time)} />`,
@@ -272,6 +274,7 @@ const TwelveHourFormatTemplate = ({
 };
 
 export const TwelveHourFormat: Story = {
+  name: "12-hour format",
   render: (args) => <TwelveHourFormatTemplate onChange={args.onChange} />,
   play: async ({ args, canvas, userEvent }) => {
     const [am, pm] = canvas.getAllByRole("group", { name: "Time picker" });
@@ -289,7 +292,7 @@ export const TwelveHourFormat: Story = {
     docs: {
       description: {
         story:
-          "Hours stop at 12 (`isTwelveHourFormat`); nothing on screen tells AM from PM, only the `meridiem` behind each box decides what `onChange` receives: the first reports 10:30, the second, showing 02:30, reports 14:30.",
+          "Two 12-hour pickers (`isTwelveHourFormat`); nothing on screen tells AM from PM. The `meridiem` behind each decides the value: the second, showing 02:30, reports 14:30.",
       },
       source: {
         code: `<TimePicker initialTime={time} isTwelveHourFormat meridiem="AM" onChange={(time) => console.log(time)} />
@@ -300,6 +303,7 @@ export const TwelveHourFormat: Story = {
 };
 
 export const FocusOnRender: Story = {
+  name: "Focused on mount",
   // Mounted once on screen: a hidden field cannot take the focus.
   render: (args) => (
     <WhenVisible>
@@ -322,7 +326,7 @@ export const FocusOnRender: Story = {
     docs: {
       description: {
         story:
-          "The picker opens with the hours field selected (`focusOnRender`), so a form that asks for a time first takes the digits without a click; type `14` and the caret moves on to minutes.",
+          "A picker that opens with the hours field selected (`focusOnRender`), so it takes digits without a click.",
       },
       source: {
         code: `<TimePicker initialTime={time} focusOnRender onChange={(time) => console.log(time)} />`,
@@ -367,6 +371,7 @@ const CssCustomizationTemplate = () => {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => <CssCustomizationTemplate />,
   play: async ({ canvas }) => {
     const [plain, error] = canvas.getAllByTestId("time-picker");
@@ -381,7 +386,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The TimePicker and inner TextInput variables set on one wrapper -- the variables are listed under CSS variables on this page. The first box shows the border, background, size and radius variables and the inner fields' text colour; click into it to see \`--time-input-focus-border\`. The second adds \`hasError\`, the only state in which \`--time-input-error-border\` has anything to colour. \`--text-input-bg\` is set to the same value as \`--time-input-bg\` so the fields blend into the box.`,
+        story: `Two pickers under a wrapper that sets the TimePicker and inner TextInput variables. The second adds \`hasError\`, the only state that shows \`--time-input-error-border\`.`,
       },
       source: {
         code: `<div

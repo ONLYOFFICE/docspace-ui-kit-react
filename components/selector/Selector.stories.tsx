@@ -235,92 +235,90 @@ const meta = {
   argTypes: {
     id: {
       control: "text",
-      description: "`id` attribute of the outermost element",
+      description: "Applied to the outermost element.",
     },
     className: {
       control: "text",
-      description: "Class added to the outermost element",
+      description: "Applied to the outermost element.",
     },
     style: {
       control: "object",
-      description: "Inline styles of the outermost element",
+      description: "Applied to the outermost element.",
     },
     dataTestId: {
       control: "text",
-      description: "`data-testid` of the outermost element",
+      description: "`data-testid` of the outermost element.",
       table: { defaultValue: { summary: "selector" } },
     },
     withHeader: {
       control: "boolean",
       description:
-        "Draws a header bar with a title and a closing cross at the top of the panel; it only accepts `true`",
+        "Whether the panel has a header bar. It only accepts `true` — leave it out for a selector with no header of its own.",
     },
     headerProps: {
       control: "object",
-      description:
-        "What the header shows: `headerLabel` as the title, `onCloseClick` for the cross, and a back arrow when `withoutBackButton` is literally `false` with `onBackClick`",
+      description: "The header's own props. Required once `withHeader` is set.",
     },
     items: {
       control: false,
       description:
-        "The rows loaded so far, in the order they are shown. A row marked `isCreateNewItem` must come first and one marked `isInputItem` second",
+        "The page of items loaded so far, in the order they are shown.",
     },
     onSelect: {
       action: "onSelect",
       description:
-        "Called with the clicked row and whether it was a double click, before Selector updates its own selection; the third argument submits that one row",
+        "Called when a row is clicked, before Selector updates its own selection. The third argument submits with that one item, which is how a double click confirms a choice.",
     },
     isMultiSelect: {
       control: "boolean",
       description:
-        "Puts a checkbox on every row and lets more than one be ticked; the submit button then shows the count",
+        "Whether rows carry checkboxes and more than one can be ticked.",
       table: { defaultValue: { summary: "false" } },
     },
     forceIsMultiSelect: {
       control: "boolean",
-      description:
-        "Gives a checkbox to the rows that ask for single selection with their own `disableMultiSelect`",
+      description: "Overrules this row's own `disableMultiSelect`.",
       table: { defaultValue: { summary: "false" } },
     },
     selectedItems: {
       control: false,
       description:
-        "Rows to start out ticked in multi-select, matched by `id`. Selector copies them once; later ticks come back through `onSubmit`",
+        "Items to start out ticked, matched by `id`. Selector copies them into its own state; it is a starting point, not a controlled value.",
     },
     selectedItem: {
       control: false,
-      description:
-        "The one row to start out highlighted outside multi-select, matched by `id`",
+      description: "The one ticked item outside multi-select, matched by `id`.",
     },
     maxSelectedItems: {
       control: "number",
       description:
-        "Largest number of rows that may be ticked at once; past it the unticked rows go grey and stop responding",
+        "Largest number of items that may be ticked at once. Beyond it the unticked rows go grey and stop responding, with no message of their own.",
     },
     renderCustomItem: {
       control: false,
       description:
-        "Replaces the text of every row with what it returns, keeping the row's avatar, checkbox and height",
+        "Replaces the text of a row, keeping its avatar, checkbox and layout.",
     },
     displayFileExtension: {
       control: "boolean",
-      description: "Draws a file's extension after its name in a dimmer colour",
+      description:
+        "Whether a file's extension is drawn after its name, in a dimmer colour.",
       table: { defaultValue: { summary: "false" } },
     },
     loadNextPage: {
       control: false,
       description:
-        "Called with the index to continue from as the list nears its end, and once with 0 on mount; append the next page to `items`",
+        "Called with the index to start from when the list nears its end, and once with 0 on mount unless `disableFirstFetch` is set. Append to `items`.",
     },
     disableFirstFetch: {
       control: "boolean",
       description:
-        "Skips the `loadNextPage(0)` call on mount, for a list whose first page is already in `items`",
+        "Whether to skip the `loadNextPage(0)` call Selector makes on mount.",
       table: { defaultValue: { summary: "false" } },
     },
     hasNextPage: {
       control: "boolean",
-      description: "Indicates more items are available for infinite scrolling",
+      description: "Whether another page can be fetched.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -328,18 +326,17 @@ const meta = {
     isNextPageLoading: {
       control: "boolean",
       description:
-        "Marks a page request as in flight, so scrolling further asks for no other page",
+        "Whether a page request is in flight, which suppresses another one.",
       table: { defaultValue: { summary: "false" } },
     },
     totalItems: {
       control: "number",
       description:
-        "How many items exist in total, which sets how far the list can be scrolled",
+        "How many items exist in total, which is what the scrollbar is sized from.",
     },
     isLoading: {
       control: "boolean",
-      description:
-        "Replaces the list with `rowLoader` for the initial load, and hides the tinted note meanwhile",
+      description: "Initial load: the body is replaced with a skeleton loader",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -347,96 +344,96 @@ const meta = {
     isContentLoading: {
       control: "boolean",
       description:
-        "Keeps the current list on screen, dimmed and not clickable, while new content loads; wins over `isLoading`",
+        "Content refresh: the current body stays on screen dimmed; wins over isLoading",
       table: { defaultValue: { summary: "false" } },
     },
     rowLoader: {
       control: false,
       description:
-        "Skeleton shown for a row that has not arrived yet and for the whole list during `isLoading`",
+        "Skeleton for a row that has not arrived yet, and for the whole body during the initial load. `RowLoader` from this folder fits.",
     },
     isSSR: {
       control: "boolean",
       description:
-        "Renders every row as plain markup until the panel has a measured height, for server rendering",
+        "Whether to render every item as plain markup instead of virtualising. The list needs a measured height, which server rendering cannot give it.",
       table: { defaultValue: { summary: "false" } },
     },
     withPadding: {
       control: "boolean",
-      description: "Keeps 16px of space above the first part of the body",
+      description: "Whether the body keeps its 16px of padding at the top.",
       table: { defaultValue: { summary: "true" } },
     },
     descriptionText: {
       control: "text",
-      description: "A line of bold text above the list",
+      description:
+        "A line of bold text above the list. It costs the list 32px of height.",
     },
     injectedElement: {
       control: false,
       description:
-        "An element of your own, drawn between the breadcrumbs and the search box; the list is shortened by its height",
+        "Rendered between the breadcrumbs and the search box. Selector clones it to attach a ref and subtracts its measured height from the list.",
     },
     withSearch: {
       control: "boolean",
       description:
-        "Shows a search box above the list; it hides itself while the list is empty and no search is running",
+        "Whether the list can be searched. It only accepts `true`. The box hides while the list is empty and no search runs, so an empty folder shows the empty screen.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     searchPlaceholder: {
       control: "text",
-      description: "Placeholder text for the search input",
+      description: "Grey text in the empty search box.",
     },
     searchValue: {
       control: "text",
       description:
-        "Text shown in the search box; searching itself is yours to do in `onSearch`",
+        "Text in the box. Searching is yours to do; this is what is displayed.",
     },
     isSearchLoading: {
       control: "boolean",
-      description: "Replaces the search box with `searchLoader`",
+      description: "Whether to replace the box with `searchLoader`.",
       table: { defaultValue: { summary: "false" } },
     },
     searchLoader: {
       control: false,
-      description: "Skeleton shown in place of the search box while it loads",
+      description: "Shown in place of the box while `isSearchLoading` is set.",
     },
     onSearch: {
       action: "onSearch",
       description:
-        "Called with the trimmed query once typing stops; call its callback to show the search empty screen when nothing matches. An empty query calls `onClearSearch` instead",
+        "Called with the trimmed query once typing stops. Call the callback to put the selector into its searching state, which is what swaps the empty screen for the search one. An empty query calls `onClearSearch` instead.",
     },
     onClearSearch: {
       action: "onClearSearch",
       description:
-        "Called by the search box's cross and the empty screen's \"Clear filter\" link; call its callback to leave the searching state",
+        "Called by the box's cross and by the empty screen's \"clear filter\" link. Call the callback to take the selector out of its searching state.",
     },
     withSelectAll: {
       control: "boolean",
       description:
-        'Shows a "select all" row above the list that ticks or unticks every enabled loaded row, in multi-select while no search is running',
+        'Whether the "select all" row sits above the list. It only accepts `true`, and the row appears only with `isMultiSelect` and only while no search is running.',
       table: {
         defaultValue: { summary: "false" },
       },
     },
     selectAllLabel: {
       control: "text",
-      description: 'Text of the "select all" row',
+      description: "Text of that row.",
     },
     selectAllIcon: {
       control: "text",
-      description:
-        'URL of the avatar beside the "select all" text; an empty string draws the default one',
+      description: "URL of the icon beside it.",
     },
     onSelectAll: {
       action: "onSelectAll",
       description:
-        'Called when the "select all" row is clicked; Selector ticks and unticks the rows itself',
+        "Called when the row is clicked. Selector ticks and unticks the loaded items itself; this is a notification, not the implementation.",
     },
     withBreadCrumbs: {
       control: "boolean",
       description:
-        "Shows the folder trail above the list, outermost folder first",
+        "Whether the folder trail is shown above the list. It only accepts `true`.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -444,97 +441,97 @@ const meta = {
     breadCrumbs: {
       control: "object",
       description:
-        "The trail, outermost first; the last entry is the current folder and is not clickable",
+        "The trail, outermost first. The last entry is the current folder.",
     },
     onSelectBreadCrumb: {
       action: "onSelectBreadCrumb",
       description:
-        'Called with the clicked crumb, and by the empty screen\'s "Back" link with the one before the last; load that folder yourself',
+        "Called with the crumb that was clicked. Navigating is your job: fetch that folder and hand back new `items` and `breadCrumbs`.",
     },
     isBreadCrumbsLoading: {
       control: "boolean",
-      description: "Replaces the trail with `breadCrumbsLoader`",
+      description: "Whether to replace the trail with `breadCrumbsLoader`.",
       table: { defaultValue: { summary: "false" } },
     },
     breadCrumbsLoader: {
       control: false,
-      description: "Skeleton shown in place of the trail while it loads",
+      description:
+        "Shown in place of the trail while it loads; `BreadCrumbsLoader` fits.",
     },
     withTabs: {
       control: false,
       description:
-        "Shows a tab strip above the list; Selector keeps a separate selection for each tab and adds them up",
+        "Whether a tab strip is shown above the list. It only accepts `true`.",
     },
     tabsData: {
       control: false,
       description:
-        "The tabs, in order; switch `activeTabId` from each tab's `onClick`",
+        "One entry per tab in the strip above the list, left to right.",
     },
     activeTabId: {
       control: "text",
-      description: "`id` of the open tab",
+      description:
+        "Id of the open tab. Selector keeps one selection per tab id and adds them all up, so switching tabs does not drop what was ticked on the other.",
     },
     withInfo: {
       control: "boolean",
       description:
-        "Shows a tinted note between the search box and the list, hidden during the initial load",
+        "Whether a tinted note sits between the search box and the list. It only accepts `true`, and the note is hidden during the initial load.",
       table: { defaultValue: { summary: "false" } },
     },
     infoText: {
       control: "text",
-      description: "Text of the tinted note",
+      description:
+        "Text of the tinted note between the search box and the list.",
     },
     withInfoBadge: {
       control: "boolean",
-      description: "Draws an info icon before the note's text",
+      description: "Whether an icon is drawn beside the text.",
       table: { defaultValue: { summary: "false" } },
     },
     withInfoBar: {
       control: "boolean",
-      description:
-        "Shows a bar with a bold title and a description above the list",
+      description: "Whether a dismissable bar is shown above the list.",
       table: { defaultValue: { summary: "false" } },
     },
     infoBarData: {
       control: "object",
-      description:
-        "What that bar says: a `title`, a `description`, an optional icon, and an `onClose` that adds a closing cross",
+      description: "What that bar says. Nothing is drawn without it.",
     },
     emptyScreenImage: {
       control: false,
       description:
-        "Picture shown when the folder is empty: an image URL, or an element drawn as it is",
+        "Picture for the empty folder. A string is used as an `<img>` source, an element is rendered as it is.",
     },
     emptyScreenHeader: {
       control: "text",
-      description: "Heading shown when the folder is empty",
+      description: "Heading for the empty folder.",
     },
     emptyScreenDescription: {
       control: "text",
-      description: "Paragraph under that heading",
+      description: "Paragraph under that heading.",
     },
     searchEmptyScreenImage: {
       control: false,
-      description: "Picture shown when a search finds nothing",
+      description: "The same picture, for a search that found nothing.",
     },
     searchEmptyScreenHeader: {
       control: "text",
-      description: "Heading shown when a search finds nothing",
+      description: "Heading for a search that found nothing.",
     },
     searchEmptyScreenDescription: {
       control: "text",
-      description: "Paragraph under that heading",
+      description: "Paragraph under that heading.",
     },
     hideBackButton: {
       control: "boolean",
-      description:
-        'Hides the "Back" link on the empty screen of an empty folder',
+      description: 'Whether the empty screen\'s "back" link is hidden.',
       table: { defaultValue: { summary: "false" } },
     },
     alwaysShowFooter: {
       control: "boolean",
       description:
-        "Shows the footer from the start instead of only once the selection has changed",
+        "Whether the footer stays put instead of appearing with the first tick.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -542,16 +539,16 @@ const meta = {
     submitButtonLabel: {
       control: "text",
       description:
-        'Text of the primary button; in multi-select the count is added in brackets, so pass "Add", not "Add (3)"',
+        'Text of the primary button. In multi-select the count is appended in brackets, so pass "Add", not "Add (3)".',
     },
     submitButtonId: {
       control: "text",
-      description: "`id` attribute of the primary button",
+      description: "`id` attribute of the primary button.",
     },
     disableSubmitButton: {
       control: "boolean",
       description:
-        "Disables the primary button and Enter; with a footer input an empty name disables it too",
+        "Whether the primary button is dead. With `withFooterInput` an empty input disables it too, whatever this says.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -559,109 +556,109 @@ const meta = {
     onSubmit: {
       action: "onSubmit",
       description:
-        "Called by the primary button and by Enter with the ticked rows, the chosen access, the file name and the checkbox state; a returned promise shows a spinner on the button until it settles",
+        "Called with everything the footer holds. Return a promise and the button shows its spinner until it settles. Enter fires it as well.",
     },
     withCancelButton: {
       control: "boolean",
-      description: "Shows a second, non-primary button in the footer",
+      description:
+        "Whether a second, non-primary button sits in the footer. It only accepts `true`.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     cancelButtonLabel: {
       control: "text",
-      description: "Text of the cancel button",
+      description:
+        "Text on the footer's second button, the one that calls `onCancel`.",
     },
     cancelButtonId: {
       control: "text",
-      description: "`id` attribute of the cancel button",
+      description:
+        "Placed as the `id` attribute on the footer's second button.",
     },
     onCancel: {
       action: "onCancel",
       description:
-        "Called by the cancel button, and by Escape anywhere on the page whether or not the button is shown",
+        "Called by that button — and by Escape, which Selector listens for on the window whether or not the button is there.",
     },
     withAccessRights: {
       control: "boolean",
       description:
-        "Adds a drop-down of access levels beside the primary button",
+        "Whether the footer carries an access drop-down. It only accepts `true`.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     accessRights: {
       control: "object",
-      description: "The access levels in that drop-down",
+      description: "The choices in that drop-down.",
     },
     selectedAccessRight: {
       control: "object",
       description:
-        "The access level chosen at the start, and whenever this changes",
+        "The chosen access. Selector copies it into its own state on mount and whenever this changes, and hands that copy to `onSubmit`.",
     },
     onAccessRightsChange: {
       action: "onAccessRightsChange",
-      description: "Called with the access level picked in the drop-down",
+      description: "Called when the choice changes.",
     },
     accessRightsMode: {
       control: "select",
       options: Object.values(SelectorAccessRightsMode),
       description:
-        "`compact` opens a menu sized to its entries; `detailed` opens one as wide as the footer. Both show each level's description under its label",
+        "How the access list opens: `compact` fits its entries, `detailed` spans the footer, or the screen as a panel on a phone.",
       table: { defaultValue: { summary: "compact" } },
     },
     withFooterInput: {
       control: "boolean",
       description:
-        "Adds a text field above the footer buttons, for the name to save under",
+        'Whether the footer carries a text field — the "save as" name. It only accepts `true`, and it makes the footer 145px instead of 73px.',
       table: { defaultValue: { summary: "false" } },
     },
     footerInputHeader: {
       control: "text",
-      description: "Label above the footer text field",
+      description: "Label above that field.",
     },
     currentFooterInputValue: {
       control: "text",
       description:
-        "Text the footer field starts with; Selector keeps the edited value and hands it to `onSubmit`",
+        "Initial text of the field. Selector owns the value from then on and hands the edited one to `onSubmit`; changing this prop later does nothing.",
     },
     folderFormValidation: {
       control: false,
       description:
-        "A pattern of forbidden characters; a name that matches it marks the field red and shows a warning under it",
+        'Matched against the footer input on every keystroke. A match marks the field as in error under a "contains special characters" line, so the pattern describes what is *forbidden*.',
     },
     withFooterCheckbox: {
       control: "boolean",
-      description: "Adds a checkbox above the footer buttons",
+      description:
+        "Whether the footer carries a checkbox. It only accepts `true`, and it makes the footer 110px, or 181px alongside `withFooterInput`.",
       table: { defaultValue: { summary: "false" } },
     },
     footerCheckboxLabel: {
       control: "text",
-      description: "Label beside the footer checkbox",
+      description: "Text shown beside the footer checkbox.",
     },
     isChecked: {
       control: "boolean",
       description:
-        "Whether the footer checkbox starts out ticked; Selector keeps its state and hands it to `onSubmit`",
+        "Initial state of the checkbox. Selector owns it from then on and hands the current value to `onSubmit`; changing this prop later does nothing.",
       table: { defaultValue: { summary: "false" } },
     },
     useAside: {
       control: false,
       description:
-        "Wraps the panel in a backdrop and a side panel sliding in from the edge of the window",
+        "Whether Selector wraps itself in a backdrop and an `Aside`. It is the only way the component becomes a panel; on its own it is a plain box that fills its parent.",
     },
     onClose: {
       action: "onClose",
       description:
-        "Called by a click on the backdrop and by the side panel's own close; required with `useAside`",
+        "Called by the backdrop and by the aside. Required once `useAside` is set.",
     },
     withoutBackground: {
       control: "boolean",
-      description: "Makes the backdrop behind the side panel transparent",
+      description: "Whether the backdrop behind the aside is transparent.",
       table: { defaultValue: { summary: "false" } },
-    },
-    withBlur: {
-      control: false,
-      description: "Ignored; nothing reads this prop",
     },
   },
 } satisfies Meta<typeof Selector>;
@@ -671,6 +668,7 @@ type Story = StoryObj<ComponentProps<typeof Selector>>;
 export default meta;
 
 export const Default: Story = {
+  name: "Paged list",
   render: (args) => <Template {...args} />,
   args: {
     searchPlaceholder: "Search",
@@ -743,7 +741,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          'A long list that loads 100 rows at a time as you scroll, with one row picked at a time. The first row opens a "New folder" entry and the second is the inline name field for it (`isCreateNewItem`, `isInputItem`); change any other prop live in the Controls panel below.',
+          'A long list that loads 100 rows at a time, with one row picked at a time. The first row is a "New folder" entry and the second its inline name field (`isCreateNewItem`, `isInputItem`).',
       },
       source: {
         code: `<Selector
@@ -762,6 +760,7 @@ export const Default: Story = {
 };
 
 export const ContentLoading: Story = {
+  name: "Dimmed while loading",
   render: (args) => <Template {...args} />,
   args: {
     ...Default.args,
@@ -783,7 +782,7 @@ export const ContentLoading: Story = {
     docs: {
       description: {
         story:
-          "Content refresh state: while new data is loading (search, tab change or folder navigation), the current list stays on screen dimmed and non-interactive instead of being replaced with a skeleton.",
+          "The list dimmed while new data loads, for a search, a tab change or a folder change (`isContentLoading`). The rows stay on screen and the pointer cannot reach them.",
       },
       source: {
         code: `<Selector
@@ -801,6 +800,7 @@ export const ContentLoading: Story = {
 };
 
 export const BreadCrumbs: Story = {
+  name: "Folder trail",
   render: (args) => <Template {...args} />,
   args: {
     ...Default.args,
@@ -827,7 +827,7 @@ export const BreadCrumbs: Story = {
     docs: {
       description: {
         story:
-          "Use a folder trail when the list is one level of a folder tree. With more than three folders, the ones between the first and the last two collapse into a menu behind the dots; click an earlier folder and `onSelectBreadCrumb` reports it, so you can load that folder and pass new `items` and `breadCrumbs`.",
+          "A folder trail above the list, for one level of a folder tree. With more than three folders, the middle ones collapse into a menu behind the dots. `onSelectBreadCrumb` reports an earlier folder; loading it is yours.",
       },
       source: {
         code: `<Selector
@@ -849,6 +849,7 @@ export const BreadCrumbs: Story = {
 };
 
 export const NewName: Story = {
+  name: "Save as",
   render: (args) => <Template {...args} />,
   args: {
     ...Default.args,
@@ -882,7 +883,7 @@ export const NewName: Story = {
     docs: {
       description: {
         story:
-          'Use a name field in the footer for a "save as" or copy flow, where the reader picks the destination folder and names the file in one step. The checkbox under the field is a second choice handed to `onSubmit` with the name (`withFooterCheckbox`); clear the field and the Add button goes dead.',
+          'A name field in the footer, for a "save as" or copy flow that picks a folder and names the file. The checkbox under it is a second choice for `onSubmit` (`withFooterCheckbox`). An empty field disables the Add button.',
       },
       source: {
         code: `<Selector
@@ -904,6 +905,7 @@ export const NewName: Story = {
 };
 
 export const WithHeader: Story = {
+  name: "With header",
   render: (args) => <Template {...args} source={people} />,
   args: {
     ...Default.args,
@@ -936,7 +938,7 @@ export const WithHeader: Story = {
     docs: {
       description: {
         story:
-          "Give the panel a header when it stands on its own, in a dialog or a side panel. The title comes with a closing cross and, here, a back arrow for a step-by-step flow (`headerProps.withoutBackButton: false`); the footer gets a second button that calls `onCancel`, as Escape does.",
+          "A header with a title, a closing cross and a back arrow (`headerProps.withoutBackButton: false`), for a panel standing on its own. The footer's second button calls `onCancel`, as Escape does.",
       },
       source: {
         code: `<Selector
@@ -994,6 +996,7 @@ const SearchTemplate = (args: SelectorProps) => {
 };
 
 export const WithSearch: Story = {
+  name: "With search",
   render: (args) => <SearchTemplate {...args} />,
   args: {
     ...Default.args,
@@ -1026,7 +1029,7 @@ export const WithSearch: Story = {
     docs: {
       description: {
         story:
-          "Add a search box when the reader knows the name they are looking for. Type part of a label to narrow the list; type something no label contains, such as `zzz`, to see the search empty screen (`searchEmptyScreenHeader`), and clear the box with its cross to get the whole list back. The filtering is the story's own: Selector hands over the query in `onSearch` and shows what `items` you give back.",
+          "A search box above the list, for a reader who knows the name. The story filters the rows itself: Selector hands over the query in `onSearch` and shows the `items` you give back. A query with no match shows the search empty screen.",
       },
       source: {
         code: `const [query, setQuery] = useState("");
@@ -1055,6 +1058,7 @@ export const WithSearch: Story = {
 };
 
 export const MultiSelect: Story = {
+  name: "Several at once",
   render: (args) => <Template {...args} source={people} />,
   args: {
     ...Default.args,
@@ -1083,7 +1087,7 @@ export const MultiSelect: Story = {
     docs: {
       description: {
         story:
-          'Use multi-select when the reader adds several items in one go, such as people to a share. Every row gets a checkbox, the footer appears with the first tick and its Add button shows how many are ticked, and the "All items" row above the list ticks or unticks every loaded row (`withSelectAll`). Two rows start out ticked (`selectedItems`).',
+          'Checkboxes on every row, for adding several items in one go. Two rows start out ticked (`selectedItems`), and the Add button counts them. The "All items" row ticks or unticks every loaded row (`withSelectAll`).',
       },
       source: {
         code: `<Selector
@@ -1107,6 +1111,7 @@ export const MultiSelect: Story = {
 const limitItems = people.slice(0, 8);
 
 export const SelectionLimit: Story = {
+  name: "Selection limit",
   render: (args) => <StaticTemplate {...args} />,
   args: {
     ...Default.args,
@@ -1152,7 +1157,7 @@ export const SelectionLimit: Story = {
     docs: {
       description: {
         story:
-          "Cap the selection when the target can take only so many items. Two rows are ticked and the limit is two, so every other row is greyed out and ignores clicks (`maxSelectedItems`); untick one and the rest come back. Selector shows no message of its own, so say what the limit is somewhere near the panel.",
+          "A selection capped at two with two rows ticked, so every other row is greyed out and ignores clicks (`maxSelectedItems`). Selector shows no message of its own; say what the limit is near the panel.",
       },
       source: {
         code: `<Selector
@@ -1179,6 +1184,7 @@ const disabledItems = people
   );
 
 export const DisabledItems: Story = {
+  name: "Disabled rows",
   render: (args) => <StaticTemplate {...args} />,
   args: {
     ...Default.args,
@@ -1217,6 +1223,7 @@ export const DisabledItems: Story = {
 const accessItems = people.slice(0, 20);
 
 export const WithAccessRights: Story = {
+  name: "With access drop-down",
   render: (args) => <StaticTemplate {...args} />,
   args: {
     ...Default.args,
@@ -1254,7 +1261,7 @@ export const WithAccessRights: Story = {
     docs: {
       description: {
         story:
-          "Add an access drop-down to the footer when the items being added need a permission as well. Open it beside the Add button to pick one; the choice is handed to `onSubmit` with the ticked items. Switch `accessRightsMode` to `detailed` in the Controls panel below to open the menu as wide as the footer instead.",
+          "An access drop-down beside the Add button, for items that need a permission as well. The choice goes to `onSubmit` with the ticked items. With `accessRightsMode` set to `detailed` the list spans the footer.",
       },
       source: {
         code: `<Selector
@@ -1278,6 +1285,7 @@ export const WithAccessRights: Story = {
 };
 
 export const EmptyFolder: Story = {
+  name: "Empty folder",
   render: (args) => <StaticTemplate {...args} />,
   args: {
     ...Default.args,
@@ -1301,7 +1309,7 @@ export const EmptyFolder: Story = {
     docs: {
       description: {
         story:
-          'What the reader sees in a folder with nothing in it: the picture, heading and paragraph you pass (`emptyScreenImage`, `emptyScreenHeader`, `emptyScreenDescription`). The "New folder" link is the list\'s `isCreateNewItem` row turned into a link, and "Back" goes to the previous folder of the trail; `hideBackButton` removes it.',
+          'An empty folder: the picture, heading and paragraph you pass (`emptyScreenImage`, `emptyScreenHeader`, `emptyScreenDescription`). The "New folder" link is the `isCreateNewItem` row. "Back" goes to the previous folder of the trail, and `hideBackButton` removes it.',
       },
       source: {
         code: `<Selector
@@ -1319,6 +1327,7 @@ export const EmptyFolder: Story = {
 };
 
 export const LoadingState: Story = {
+  name: "Skeletons",
   render: (args) => <StaticTemplate {...args} />,
   args: {
     ...Default.args,
@@ -1347,7 +1356,7 @@ export const LoadingState: Story = {
     docs: {
       description: {
         story:
-          "Show skeletons while the first page is on its way, so the panel keeps its shape instead of flashing an empty screen. The trail, the search box and the list each have a skeleton of their own, and each is switched on separately (`isBreadCrumbsLoading`, `isSearchLoading`, `isLoading`); the folder exports all three loaders.",
+          "Skeletons while the first page is on its way, so the panel keeps its shape. The trail, the search box and the list each have their own, switched on separately (`isBreadCrumbsLoading`, `isSearchLoading`, `isLoading`).",
       },
       source: {
         code: `import {
@@ -1409,6 +1418,7 @@ const TabsTemplate = (args: SelectorProps) => {
 };
 
 export const WithTabs: Story = {
+  name: "With tabs",
   render: (args) => <TabsTemplate {...args} />,
   args: {
     ...Default.args,
@@ -1436,7 +1446,7 @@ export const WithTabs: Story = {
     docs: {
       description: {
         story:
-          "Split the list into tabs when the items come from separate sources. Tick a row, switch to the other tab and tick another: the Add button counts both, because Selector keeps a selection per tab (`withTabs`, `tabsData`, `activeTabId`). Switching tabs is yours to do from each tab's `onClick`.",
+          "A list split into tabs, for items from separate sources. Selector keeps a selection per tab and the Add button counts them all (`withTabs`, `tabsData`, `activeTabId`). Switching tabs is yours, from each tab's `onClick`.",
       },
       source: {
         code: `const [activeTabId, setActiveTabId] = useState("files");
@@ -1458,6 +1468,7 @@ export const WithTabs: Story = {
 };
 
 export const WithInfo: Story = {
+  name: "Note and heading",
   render: (args) => <Template {...args} source={people} />,
   args: {
     ...Default.args,
@@ -1477,7 +1488,7 @@ export const WithInfo: Story = {
     docs: {
       description: {
         story:
-          "Two ways to say something about the list before the reader picks from it:\n\n- **Only items you can edit are listed here.** — a tinted note with an info icon, for a condition that explains what the list holds (`withInfo`, `infoText`, `withInfoBadge`)\n- **Recent items** — a bold line right above the rows, for a short heading (`descriptionText`)",
+          "Two ways to say something about the list:\n\n- **Only items you can edit are listed here** — a tinted note with an icon, for what the list holds (`withInfo`, `infoText`, `withInfoBadge`)\n- **Recent items** — a bold line above the rows, for a short heading (`descriptionText`)",
       },
       source: {
         code: `<Selector
@@ -1506,6 +1517,7 @@ const InfoBarTemplate = (args: SelectorProps) => {
 };
 
 export const WithInfoBar: Story = {
+  name: "With info bar",
   render: (args) => <InfoBarTemplate {...args} />,
   args: {
     ...Default.args,
@@ -1555,6 +1567,7 @@ export const WithInfoBar: Story = {
 const panelItems = people.slice(0, 30);
 
 export const InSidePanel: Story = {
+  name: "Side panel",
   render: (args) => <Selector {...args} />,
   args: {
     ...Default.args,
@@ -1589,7 +1602,7 @@ export const InSidePanel: Story = {
       story: { inline: false, height: "600px" },
       description: {
         story:
-          "Open Selector as a side panel over the page when picking is a step on its own. The panel slides in from the edge of the window over a dimmed backdrop, and a click on the backdrop calls `onClose` (`useAside`); without it, Selector is a plain box that fills its parent.",
+          "Selector as a side panel over a dimmed backdrop, for picking as a step of its own (`useAside`). A click on the backdrop calls `onClose`. Without `useAside`, Selector is a plain box that fills its parent.",
       },
       source: {
         code: `<Selector
@@ -1608,6 +1621,7 @@ export const InSidePanel: Story = {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <Template {...args} source={people} />
@@ -1637,7 +1651,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "511px" },
       description: {
         story:
-          "The panel in a right-to-left layout: the folder trail starts at the right edge with its arrows pointing left, and the row labels and the footer button line up from the right.",
+          "The panel in a right-to-left layout. The folder trail starts at the right edge with its arrows pointing left, and the rows and footer line up from the right.",
       },
       source: {
         code: `<div dir="rtl">
@@ -1692,6 +1706,7 @@ const CustomizationTemplate = (args: SelectorProps) => (
 );
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: (args) => <CustomizationTemplate {...args} />,
   args: {
     ...Default.args,
@@ -1734,7 +1749,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. Hover a row to see the hover background and hover the tick beside the name field to see its hover colour. The two empty-screen variables are set too but show only when the list is empty.`,
+        story: `Every overridable variable set on one wrapper, as listed under CSS variables. The row hover background and the name field's tick hover colour show on hover. The two empty-screen variables show only while the list is empty.`,
       },
       source: {
         code: `<div

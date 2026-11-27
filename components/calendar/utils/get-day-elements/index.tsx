@@ -9,6 +9,7 @@ import {
   formatDate,
   formatDateLocalized,
   now,
+  startOf,
 } from "../../../../utils/date";
 
 const parseDay = (key: string): DateTime | null => {
@@ -24,6 +25,9 @@ export const getDayElements = (
   locale?: string,
 ) => {
   const calendarDays = getCalendarDays(observedDate);
+  // A day is parsed at midnight, so it is compared with the day `minDate`
+  // falls on: a `minDate` of now leaves today selectable.
+  const firstDay = startOf(minDate, "day")!;
 
   const currentNow = now();
   const currentDate = `${formatDate(currentNow, "yyyy-MM-")}${currentNow.day}`;
@@ -36,7 +40,7 @@ export const getDayElements = (
     isSecondary: boolean,
   ) => {
     const dt = parseDay(day.key);
-    const isDisabled = !dt || dt < minDate || dt > maxDate;
+    const isDisabled = !dt || dt < firstDay || dt > maxDate;
     const isCurrent = day.key === currentDate;
     const isSelected = day.key === selectedDateFormatted;
 

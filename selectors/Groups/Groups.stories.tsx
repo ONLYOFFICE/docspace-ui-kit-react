@@ -95,13 +95,6 @@ import GroupsSelector from "@onlyoffice/apps-ui-kit/selectors/Groups";
         defaultValue: { summary: "false" },
       },
     },
-    withBlur: {
-      control: "boolean",
-      description: "Apply a blur effect to the Aside backdrop",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
 
     // Callbacks
     onSubmit: {
@@ -212,7 +205,6 @@ export const AsideMode: Story = {
   args: {
     useAside: true,
     withoutBackground: false,
-    withBlur: false,
     withHeader: true,
     headerProps: {
       headerLabel: "Select Group",
@@ -231,13 +223,12 @@ export const AsideMode: Story = {
       description: {
         story:
           "Renders the selector inside an Aside panel with a backdrop overlay. " +
-          "Use `withBlur` to apply a blur effect and `withoutBackground` to remove the overlay.",
+          "`withoutBackground` removes the overlay.",
       },
       source: {
         code: `<GroupsSelector
   useAside
   withoutBackground={false}
-  withBlur={false}
   withHeader
   headerProps={{
     headerLabel: "Select Group",

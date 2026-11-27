@@ -21,13 +21,13 @@ const meta = {
     theme: {
       control: "object",
       description:
-        "The theme object. `isBase` picks the light (`true`) or dark (`false`) theme, `interfaceDirection` sets the writing direction (`ltr` or `rtl`), and `fontFamily` sets the font of every element on the page. Other keys are ignored.",
+        "The theme object. `isBase` picks light or dark, `interfaceDirection` the writing direction, and `fontFamily` the font of every element. Other keys are ignored, and the type checks none of them.",
       table: { defaultValue: { summary: "required" } },
     },
     currentColorScheme: {
       control: "object",
       description:
-        "The accent colours: `main.accent` and `main.buttons` are the colours, `text.accent` and `text.buttons` the text drawn on them. Written onto the page only when `main` is present; leaving it out or removing it later keeps the colours already there.",
+        "The accent colours and the text drawn on them. They reach the page only when `main` is present; leaving the scheme out later takes them off.",
       table: { defaultValue: { summary: "undefined" } },
     },
     children: {
@@ -136,6 +136,7 @@ const readsBack = ({ canvas }: PlayContext, line: string | RegExp) =>
 const framed = { inline: false, height: "250px" };
 
 export const Default: Story = {
+  name: "Default",
   render: (args) => <ToolbarTheme {...args} />,
   args: {
     theme: defaultTheme,
@@ -156,7 +157,7 @@ export const Default: Story = {
       story: framed,
       description: {
         story:
-          "The theme the toolbar's switch picks, in the left-to-right direction: the panel reads back what the component wrote onto the page, and its background and text take the theme's colours. `isBase` follows the toolbar here; change the rest of the theme object live in the Controls panel below.",
+          "A panel in the theme the toolbar picks, left to right, reading back what the component wrote onto the page. Its background and text take the theme's colours, and `isBase` follows the toolbar.",
       },
       source: {
         code: `<ThemeProviderComponent
@@ -170,6 +171,7 @@ export const Default: Story = {
 };
 
 export const DarkTheme: Story = {
+  name: "Dark theme",
   render: (args) => <Template {...args} />,
   args: {
     theme: { ...defaultTheme, isBase: false },
@@ -185,7 +187,7 @@ export const DarkTheme: Story = {
       story: framed,
       description: {
         story:
-          "Use it to switch the page to the dark theme: the panel turns dark with light text, the body class reads `dark`, and the slider switches to its dark look (`isBase: false`).",
+          "The page in the dark theme (`isBase: false`). The panel turns dark with light text, the body class reads `dark`, and the slider takes its dark look.",
       },
       source: {
         code: `<ThemeProviderComponent theme={{ isBase: false, interfaceDirection: "ltr" }}>
@@ -197,6 +199,7 @@ export const DarkTheme: Story = {
 };
 
 export const WithAccentColors: Story = {
+  name: "Accent colours",
   render: (args) => <Template {...args} />,
   args: {
     theme: defaultTheme,
@@ -212,7 +215,7 @@ export const WithAccentColors: Story = {
       story: framed,
       description: {
         story:
-          "Use it to give accented components your own colour: the slider's thumb and filled track turn green, and the panel reads the new accent back (`currentColorScheme`).",
+          "A green accent passed in `currentColorScheme`. The slider's thumb and filled track turn green, and the panel reads the accent back.",
       },
       source: {
         code: `<ThemeProviderComponent
@@ -232,6 +235,7 @@ export const WithAccentColors: Story = {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <Template {...args} />
@@ -252,7 +256,7 @@ export const RightToLeft: Story = {
       story: framed,
       description: {
         story:
-          'Use it for a right-to-left interface: the panel moves to the right edge, its lines align right, the slider fills from the right, and `data-dir` reads `rtl` (`interfaceDirection: "rtl"`).',
+          'The page in a right-to-left interface (`interfaceDirection: "rtl"`). The panel sits at the right edge, its lines align right, the slider fills from the right, and `data-dir` reads `rtl`.',
       },
       source: {
         code: `<ThemeProviderComponent theme={{ isBase: true, interfaceDirection: "rtl" }}>

@@ -15,30 +15,28 @@ const meta = {
     title: {
       control: "text",
       description:
-        "Text label shown at the inline start of the toggle; an empty string hides it",
+        'Text to the left of the pill. An empty string removes it. The default names the product through `getBrandName("ProductName")`, so a portal that rebrands the product renames it here too.',
       table: { defaultValue: { summary: "ONLYOFFICE Apps design" } },
     },
     labelOld: {
       control: "text",
-      description:
-        "Label on the inline-start half of the pill, the position of the classic view",
+      description: "Label on the left half of the pill, the classic view.",
       table: { defaultValue: { summary: "OLD" } },
     },
     labelNew: {
       control: "text",
-      description:
-        "Label on the inline-end half of the pill, the position of the new dashboard",
+      description: "Label on the right half, the new dashboard.",
       table: { defaultValue: { summary: "NEW" } },
     },
     confirmTitle: {
       control: "text",
-      description:
-        "Heading of the confirmation dialog shown when switching from NEW to OLD",
+      description: "Heading of the dialog shown when leaving the new view.",
       table: { defaultValue: { summary: "Switch to Old Design" } },
     },
     confirmBody: {
       control: "text",
-      description: "First paragraph of the confirmation dialog",
+      description:
+        'First paragraph of that dialog. The default names the product through `getBrandName("ProductName")`.',
       table: {
         defaultValue: {
           summary:
@@ -49,7 +47,7 @@ const meta = {
     confirmHint: {
       control: "text",
       description:
-        "Second, smaller paragraph under the first one in the confirmation dialog; an empty string hides it",
+        "Second paragraph of that dialog. An empty string removes it.",
       table: {
         defaultValue: {
           summary:
@@ -59,31 +57,28 @@ const meta = {
     },
     confirmOk: {
       control: "text",
-      description:
-        "Label of the confirmation dialog's primary button, which switches to OLD",
+      description: "Label of that dialog's primary button.",
       table: { defaultValue: { summary: "Switch" } },
     },
     confirmCancel: {
       control: "text",
-      description:
-        "Label of the confirmation dialog's second button, which closes it and keeps NEW",
+      description: "Label of its cancel button.",
       table: { defaultValue: { summary: "Cancel" } },
     },
     ariaLabel: {
       control: "text",
       description:
-        "Accessible name a screen reader announces for the switch; the English default is not translated",
+        'Accessible name of the switch button. The English default, which names the product through `getBrandName("ProductName")`, is not translated for you.',
       table: { defaultValue: { summary: "Switch ONLYOFFICE Apps design" } },
     },
     onNavigate: {
       action: "onNavigate",
       description:
-        'Called with `"/dashboard"` when switching to NEW and with `"/"` after confirming the switch to OLD; replaces `window.location.href`. Pass React Router `navigate` here.',
+        "Called with the URL to go to — `/dashboard` or `/`, both hard-coded. Pass your router's navigate here; without it the component assigns `window.location.href` and the page reloads.",
     },
     className: {
       control: "text",
-      description:
-        "Additional CSS class applied to the wrapper around the title and the pill",
+      description: "Applied to the wrapper around the title and the pill.",
     },
   },
   // Without onNavigate a switch sets window.location.href and takes the
@@ -138,7 +133,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The toggle in the NEW position, as a first visit finds it. Click it to open the confirmation dialog that guards the way back to the classic view; change any other prop live in the Controls panel below.",
+          "The toggle in the NEW position, as a first visit finds it. A click opens the confirmation dialog that guards the way back to the classic view.",
       },
       source: {
         code: `<TwoStateToggle onNavigate={(url) => navigate(url)} />`,
@@ -148,6 +143,7 @@ export const Default: Story = {
 };
 
 export const ShowingOldState: Story = {
+  name: "Classic view",
   decorators: [
     (Story) => {
       localStorage.setItem("useDocSpace", "old");
@@ -180,6 +176,7 @@ export const ShowingOldState: Story = {
 };
 
 export const WithoutTitle: Story = {
+  name: "Without the title",
   args: {
     title: "",
   },
@@ -204,6 +201,7 @@ export const WithoutTitle: Story = {
 };
 
 export const CustomLabels: Story = {
+  name: "Custom texts",
   args: {
     title: "Interface",
     labelOld: "v1",
@@ -240,7 +238,7 @@ export const CustomLabels: Story = {
     docs: {
       description: {
         story:
-          "All text strings are customizable — useful when the toggle is reused in other contexts. Click the toggle to see the dialog texts.",
+          "A toggle with every text of its own, the dialog's included, for reuse in another context.",
       },
       source: {
         code: `<TwoStateToggle
@@ -260,6 +258,7 @@ export const CustomLabels: Story = {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <TwoStateToggle {...args} />
@@ -282,7 +281,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "62px" },
       description: {
         story:
-          "The toggle in a right-to-left layout: the title moves to the right of the pill, OLD takes the right half and NEW the left, and the thumb sits on the left over NEW. The wrapper carries `dir=\"rtl\"` for the layout; the thumb's leftward slide comes from the theme's `interfaceDirection` (the Direction toolbar).",
+          "The toggle in a right-to-left layout, with the title to the right of the pill and the thumb on the left over NEW. The wrapper's `dir=\"rtl\"` lays it out; the theme's `interfaceDirection` slides the thumb.",
       },
       source: {
         code: `<div dir="rtl">
@@ -294,6 +293,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   play: async ({ canvas, userEvent }) => {
     const toggle = canvas.getByRole("switch");
     await expect(toggle).toHaveStyle({
@@ -326,7 +326,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `All three overridable variables set on one wrapper -- the variables are listed under CSS variables on this page. Press Tab to focus the switch and see the ring take the custom accent.`,
+        story: `All three overridable variables, set on one wrapper. The keyboard focus ring takes the custom accent too.`,
       },
       source: {
         code: `<div style={{

@@ -22,7 +22,7 @@ const meta = {
     open: {
       control: "boolean",
       description:
-        "Whether the menu is shown; while it is off the menu stays in the page, hidden",
+        "Whether the menu is shown. The element stays in the DOM either way — it is `display: none` until this is true.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -31,7 +31,7 @@ const meta = {
       control: "select",
       options: ["left", "right"],
       description:
-        "Which edge of the anchor the menu lines up with: `right` opens it towards the right from the anchor's left edge, `left` towards the left from its right edge",
+        "Side the menu extends to: `right` lines it up with the anchor's start edge, `left` with its end edge.",
       table: {
         defaultValue: { summary: "right" },
       },
@@ -40,7 +40,7 @@ const meta = {
       control: "select",
       options: ["top", "bottom", "both"],
       description:
-        "Whether the menu opens below the anchor, above it, or (`both`) below unless there is no room left under it",
+        "Whether the menu opens below the anchor, above it, or below unless there is no room (`both`).",
       table: {
         defaultValue: { summary: "bottom" },
       },
@@ -48,24 +48,24 @@ const meta = {
     maxHeight: {
       control: "number",
       description:
-        "Height of the list in pixels; it also turns on the scrollbar, the virtualised list and the arrow keys, none of which happen without it",
+        "Height of the list in pixels. It also turns on virtualisation, the scrollbar and the arrow keys; without it every child renders as given.",
     },
     manualWidth: {
       control: "text",
       description:
-        "Exact width of the menu as a CSS length, for example `300px` or `100%`",
+        "Width of the menu as a CSS length, such as `200px` or `100%`.",
     },
     offsetX: {
       control: "number",
       description:
-        "Shifts the menu inwards from the anchor's edge by this many pixels; portal mode only",
+        "Horizontal shift from the anchor's edge, in pixels. Read only in the default portal mode.",
       table: {
         defaultValue: { summary: "0" },
       },
     },
     zIndex: {
       control: "number",
-      description: "Stacking order of the menu",
+      description: "Stacking order of the menu. The default is 400.",
       table: {
         defaultValue: { summary: "400" },
       },
@@ -73,7 +73,7 @@ const meta = {
     showDisabledItems: {
       control: "boolean",
       description:
-        "Keeps items whose `disabled` prop is true in the list, greyed out; by default they are dropped",
+        "Keeps children whose `disabled` prop is true in the list. They are dropped by default, together with a separator that ends up first or last.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -81,7 +81,7 @@ const meta = {
     isDefaultMode: {
       control: "boolean",
       description:
-        "Renders the menu in a portal on the page body, positioned against `forwardedRef`; off, it renders in place inside the nearest positioned ancestor",
+        "Whether the menu is rendered in a portal on `document.body`, positioned by measuring `forwardedRef`. Turn it off to render it in place, absolutely positioned inside the nearest positioned ancestor.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -89,7 +89,7 @@ const meta = {
     fixedDirection: {
       control: "boolean",
       description:
-        "Keeps `directionX` and `directionY` as given instead of flipping them when the menu would not fit the window",
+        "Keeps `directionX` and `directionY` exactly as given instead of flipping them to fit the viewport.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -97,7 +97,7 @@ const meta = {
     enableKeyboardEvents: {
       control: "boolean",
       description:
-        "Whether the Up and Down arrows move the highlight and Enter clicks the highlighted item; read only with `maxHeight`, and while it is on every key press on the page has its default action prevented",
+        "Whether the arrow keys move through the items and Enter clicks one. Read only with `maxHeight`; while on, those three keys lose their default.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -105,24 +105,23 @@ const meta = {
     withBackdrop: {
       control: "boolean",
       description:
-        "Puts a transparent layer behind the open menu that catches the next click and calls `clickOutsideAction`",
+        "Whether a `Backdrop` is rendered behind the menu to catch the next click.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     withBackground: {
       control: "boolean",
-      description: "Dims the page behind the open menu",
+      description: "Passed to the backdrop: gives it the dimming background.",
     },
     withoutBackground: {
       control: "boolean",
-      description:
-        "Keeps the layer behind the menu transparent, even with `withBackground` or `isAside` and on a phone, where it is dimmed otherwise",
+      description: "Passed to the backdrop: makes it transparent.",
     },
     usePortalBackdrop: {
       control: "boolean",
       description:
-        "Renders the backdrop inside the portal, above the rest of the page, instead of beneath the menu",
+        "Moves the backdrop inside the portal, above the page at z-index 400 rather than below the menu at 199.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -130,7 +129,7 @@ const meta = {
     shouldShowBackdrop: {
       control: "boolean",
       description:
-        "Renders the backdrop even when another one is already open on the page, which it otherwise leaves to catch the click",
+        "Passed to the backdrop: makes it render even when it would stay invisible.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -138,120 +137,111 @@ const meta = {
     isAside: {
       control: "boolean",
       description:
-        "Dims the page behind the menu and opens its backdrop over up to two others, for a menu inside a side panel",
+        "Passed to the backdrop, which then keeps an aside panel above itself.",
     },
     backDrop: {
       control: false,
       description:
-        "An element rendered in place of the backdrop that `withBackdrop` builds",
+        "The backdrop element itself. It is built from `withBackdrop`; passing your own replaces it.",
     },
     isMobileView: {
       control: "boolean",
       description:
-        "Pins the menu to the bottom edge of the screen at full width when the window is taller than it is wide",
+        "Pins the menu to the bottom edge of the screen, full width, in portrait.",
     },
     isNoFixedHeightOptions: {
       control: "boolean",
       description:
-        "With `maxHeight`, scrolls the items as they are instead of in the virtualised list, for items taller or shorter than 32px",
+        "Renders the children in a plain scrollbar instead of the virtualised list, for items whose height is not the 32px the list assumes.",
     },
     useFlexibleHeight: {
       control: "boolean",
       description:
-        "With `isNoFixedHeightOptions`, lets the list shrink below `maxHeight` when its items take less room",
+        "Sizes the menu to its content's width. With `isNoFixedHeightOptions` the list is also capped at `maxHeight` instead of fixed there.",
     },
     disableScrollbarPadding: {
       control: "boolean",
       description:
-        "With `isNoFixedHeightOptions`, removes the space kept for the scrollbar, so an item's hover fill reaches the menu's edge",
+        "Removes the scrollbar's side padding, so an item's hover background reaches the edge. Read only with `isNoFixedHeightOptions`.",
     },
     withDynamicScrollbar: {
       control: "boolean",
       description:
-        "Caps the menu at the room left between the anchor and the window edge on every open, and scrolls the rest",
+        "Measures the room around the anchor on every open and caps the menu at what is left, scrolling the rest. It replaces the virtualised list with a plain scrollbar.",
     },
     topSpace: {
       control: "number",
       description:
-        "With `withDynamicScrollbar`, pixels to keep free between the menu and the top of the window",
+        "(`withDynamicScrollbar` only) Space to leave above the menu, in pixels.",
     },
     bottomSpace: {
       control: "number",
       description:
-        "With `withDynamicScrollbar`, pixels to keep free between the menu and the bottom of the window",
+        "(`withDynamicScrollbar` only) Space to leave below the menu, in pixels.",
     },
     manualX: {
       control: "text",
       description:
-        "Distance from the anchor's edge as a CSS length; inline mode only",
+        "Horizontal distance from the anchor's edge, as a CSS length. Read only with `isDefaultMode` off.",
     },
     manualY: {
       control: "text",
       description:
-        "Distance from the anchor's top or bottom as a CSS length, instead of the anchor's full height; inline mode only",
+        "Vertical distance from the anchor, as a CSS length; the default of 100% opens the menu flush with it. Read only with `isDefaultMode` off.",
     },
     forwardedRef: {
       control: false,
       description:
-        "Ref of the element the menu belongs to; in portal mode the menu is positioned against it, and without it the menu goes to the corner of the window",
+        "Ref of the element the menu belongs to. The default portal mode positions the menu against it; without it the menu is not placed next to anything.",
     },
     appendTo: {
       control: false,
       description:
-        "Element the portal renders the menu into instead of the page body",
+        "Element the portal renders into, instead of `document.body`.",
     },
     clickOutsideAction: {
       action: "clickOutsideAction",
       description:
-        "Called when the backdrop or a listed outside event is clicked, with the event and the state being asked for: the opposite of `open`",
+        "Called when a click lands outside the dropdown, and by the backdrop. The second argument is the state being asked for — the negation of `open`, not the current value.",
     },
     enableOnClickOutside: {
       action: "enableOnClickOutside",
-      description: "Called once each time the menu opens",
+      description: "Called once each time the dropdown opens.",
     },
     eventTypes: {
       control: "object",
       description:
-        "DOM event names listened for on the window while the menu is open; one outside the menu calls `clickOutsideAction`",
+        "DOM event names listened for on `window` to detect a click outside. Nothing is listened for when it is absent; the backdrop is the usual mechanism.",
     },
     forceCloseClickOutside: {
       control: "boolean",
-      description: "Stops the outside-event listeners from being added at all",
+      description:
+        "Drops the mobile default outside-click listeners. An `eventTypes` you pass is still listened for.",
     },
     children: {
       control: false,
-      description: "Items of the menu, normally `DropDownItem`s",
+      description:
+        "Items of the menu, normally `DropDownItem`s. With `maxHeight` set they are virtualised, so each child's height is read from its `height` prop rather than measured.",
     },
     className: {
       control: "text",
-      description: "Class added to the menu element",
+      description: "Applied to the dropdown element.",
     },
     style: {
       control: "object",
-      description: "Inline style merged into the menu element's own",
+      description: "Merged into the dropdown element's inline style.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of the menu element's `data-testid`",
+      description: "Value of `data-testid` on the dropdown.",
       table: {
         defaultValue: { summary: "dropdown" },
       },
     },
     id: {
       control: false,
-      description: "Ignored; no `id` reaches the page",
-    },
-    columnCount: {
-      control: false,
-      description: "Ignored; nothing reads it",
-    },
-    disableOnClickOutside: {
-      control: false,
-      description: "Ignored; nothing reads it",
-    },
-    withBlur: {
-      control: false,
-      description: "Ignored; nothing reads it",
+      description:
+        "`id` of the menu element, for `aria-controls` on the control that opens it.",
     },
   },
 } satisfies Meta<typeof DropDown>;
@@ -340,7 +330,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The everyday case: a short menu opened from a button and closed by the next click anywhere else. Press **Open Dropdown**, then change any other prop live in the Controls panel below and open it again.",
+          "The everyday case: a short menu that **Open Dropdown** opens and the next click anywhere else closes.",
       },
       source: {
         code: `const [isOpen, setIsOpen] = useState(false);
@@ -392,6 +382,7 @@ const WithHeadersTemplate = () => {
 };
 
 export const WithHeadersAndSeparators: Story = {
+  name: "With headers and separators",
   render: () => <WithHeadersTemplate />,
   play: async (context) => {
     const { menu } = await openMenu(context, "File Actions");
@@ -463,6 +454,7 @@ const WithDisabledItemsTemplate = () => {
 };
 
 export const WithDisabledItems: Story = {
+  name: "With disabled items",
   render: () => <WithDisabledItemsTemplate />,
   beforeEach: () => {
     onDisabledMove.mockClear();
@@ -534,6 +526,7 @@ const ScrollableTemplate = () => {
 };
 
 export const ScrollableList: Story = {
+  name: "Long scrolling list",
   render: () => <ScrollableTemplate />,
   play: async (context) => {
     const { userEvent } = context;
@@ -663,6 +656,7 @@ const DirectionsTemplate = () => {
 };
 
 export const DirectionVariants: Story = {
+  name: "Opening directions",
   render: () => <DirectionsTemplate />,
   play: async (context) => {
     const { userEvent } = context;
@@ -742,6 +736,7 @@ const CustomWidthTemplate = () => {
 };
 
 export const CustomWidth: Story = {
+  name: "Custom width",
   render: () => <CustomWidthTemplate />,
   play: async (context) => {
     const { menu } = await openMenu(context, "Wide Dropdown");
@@ -793,6 +788,7 @@ const SeparatorsTemplate = () => {
 };
 
 export const WithSeparators: Story = {
+  name: "With separators",
   render: () => <SeparatorsTemplate />,
   play: async (context) => {
     const { menu } = await openMenu(context, "Edit Menu");
@@ -847,6 +843,7 @@ const RightToLeftTemplate = () => {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: () => <RightToLeftTemplate />,
   play: async ({ canvas }) => {
     // Open from the start, lined up with the button's right edge.
@@ -865,7 +862,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "220px" },
       description: {
         story:
-          "The menu in a right-to-left interface, open from the start: the button sits at the right, the menu lines up with the button's right edge and extends towards the left, and the labels are aligned to the right. The menu renders into the right-to-left container (`appendTo`), because on its own it goes to the end of the page body, outside any `dir` wrapper.",
+          "The menu in a right-to-left interface, open from the start. It lines up with the button's right edge and extends left, with right-aligned labels. It renders into the right-to-left container (`appendTo`), since the page body is outside any `dir` wrapper.",
       },
       source: {
         code: `<div dir="rtl" ref={setContainer}>
@@ -924,6 +921,7 @@ const CssCustomizationTemplate = () => {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => <CssCustomizationTemplate />,
   play: async (context) => {
     const { menu } = await openMenu(context, "Dropdown trigger");
@@ -936,7 +934,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The variables are listed under CSS variables on this page. Press **Dropdown trigger** to open the menu. It renders inline here (\`isDefaultMode={false}\`), inside the wrapper that sets the variables; in the default portal mode the menu is on the page body, outside any wrapper, so set them through the DropDown's own \`style\` prop instead.`,
+        story: `The menu restyled by the variables on its wrapper, opened from **Dropdown trigger**. It renders in place here (\`isDefaultMode={false}\`). In the default portal mode it sits on the page body, so set them through its own \`style\`.`,
       },
       source: {
         code: `<div style={{

@@ -25,47 +25,59 @@ export type SpaceQuotaProps = {
   className?: string;
 };
 
-export type TemplateTileProps = {
-  /** Whether the tile is selected. */
+export type TemplateTileProps = React.AriaAttributes & {
+  /** Ticks the checkbox and keeps it in place of the icon, and tints the
+   * tile. */
   checked?: boolean;
-  /** Whether the tile is the one being acted on, which keeps its hover background. */
+  /** Keeps the hover background on the tile being acted on. */
   isActive?: boolean;
-  /** Turns the pointer off while an operation is running over the tile: hover, clicks and right-clicks stop reaching it. It does not change how the tile looks. */
+  /** Stops the tile answering hover, clicks and right-clicks while an
+   * operation runs over it. The tile looks the same as an idle one. */
   isBlockingOperation?: boolean;
-  /** The template this tile stands for. Its `createdBy` fills the owner line and its `security.EditRoom` decides whether the quota control is read-only. */
+  /** The template the tile stands for. Its `createdBy` fills the owner line,
+   * and `security.EditRoom` decides whether the storage figure is editable. */
   item: TemplateItem;
-  /** Called with the new checked state and the `item`. A checked item that has no string `title` is dropped before it reaches you. */
+  /** Called with the new checked state and the `item` when the checkbox
+   * changes, or when the icon is tapped at 600px or narrower. */
   onSelect?: (checked: boolean, item: TemplateItem) => void;
-  /** Ignored. It reaches the base tile, which does not read it either. */
-  thumbnailClick?: (e: React.MouseEvent) => void;
-  /** Builds the menu shown on right-click. Without it the right-click menu never opens. */
+  /** Returns the menu's entries. Without it neither the three-dot button nor a
+   * right-click opens anything. */
   getContextModel?: () => ContextMenuModel[];
-  /** The tile's content. Only the first element is rendered, above the badges. */
+  /** The name beside the icon, usually a `TileContent`. Only the first element
+   * is rendered. */
   children?: React.ReactNode;
-  /** Draws the checkbox in its indeterminate state. */
+  /** Draws the checkbox half-filled. It shows while the checkbox does: on
+   * hover, or when the tile is checked. */
   indeterminate?: boolean;
-  /** The icon beside the checkbox. Without it neither the icon nor the checkbox is rendered at all. */
+  /** The template icon beside the name. Without it the tile has neither the
+   * icon nor the checkbox. */
   element?: React.ReactNode;
-  /** The menu's entries. Required — but the three-dot button appears only when `item` also carries a `contextOptions` key of its own. */
+  /** Draws the three-dot button when non-empty and `item` has a
+   * `contextOptions` key. The menu lists `getContextModel`'s entries, not
+   * these. */
   contextOptions: ContextMenuModel[];
-  /** Called before the menu opens. */
+  /** Called before the menu opens, from the three-dot button or a
+   * right-click. */
   tileContextClick?: () => void;
   /** Called when the menu closes. */
   hideContextMenu?: () => void;
-  /** Ignored. It is required by the type and read by nothing — the lower half is a two-column list, not a grid. */
-  columnCount: number;
-  /** Badges beside the content, in the upper half. */
+  /** Action buttons after the name. */
   badges?: React.ReactNode;
-  /** Replaces the icon and the checkbox with the kit's track loader. */
+  /** Replaces the icon and the checkbox with a small loader, and sets
+   * `aria-busy` on the tile. */
   inProgress?: boolean;
-  /** Draws the accent outline that marks the tile the keyboard is on. */
+  /** Draws the accent border that marks the tile the keyboard is on. */
   showHotkeyBorder?: boolean;
-  /** Renaming state: it removes the icon and the checkbox. */
+  /** Renaming state: removes the icon and the checkbox, and stops hover from
+   * tinting the tile. */
   isEdit?: boolean;
-  /** Adds the storage line to the lower half. The value beside it appears only when `SpaceQuotaComponent` is given as well. */
+  /** Adds a storage line under the owner. Its figure appears only when
+   * `SpaceQuotaComponent` is given too. */
   showStorageInfo?: boolean;
-  /** Called when the owner's name is clicked. Required, even when the template has no `createdBy` and the name is never rendered. */
+  /** Called when the owner's name is clicked, or activated with Enter.
+   * Required even for a template without `createdBy`, which shows no name. */
   openUser: () => void;
-  /** Renders the storage figure. It is handed the `item`, the literal type `"room"` and whether editing is allowed. */
+  /** Draws the storage figure. It receives the `item`, the type `"room"` and
+   * whether the figure is read-only. */
   SpaceQuotaComponent?: React.ComponentType<SpaceQuotaProps>;
 };

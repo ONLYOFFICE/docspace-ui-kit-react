@@ -11,6 +11,8 @@ import { parseToDateTime, formatDate } from "../../utils/date";
 import { TimePicker } from "../time-picker";
 import { DatePicker } from "../date-picker";
 import { ComboBox, TOption } from "../combobox";
+import { pickAriaProps } from "../../utils/aria-props";
+import { useCommonTranslation } from "../../utils/i18n";
 
 import type {
   DateTimePickerProps,
@@ -37,6 +39,8 @@ const DateTimePicker = (props: DateTimePickerProps) => {
     useMaxTime,
     translations,
   } = props;
+
+  const t = useCommonTranslation();
 
   const options = [
     { key: "AM", label: translations.AM },
@@ -68,6 +72,11 @@ const DateTimePicker = (props: DateTimePickerProps) => {
     if (isTwelveHourFormat && d) {
       setSelectedFormat(d.hour >= 12 ? options[1] : options[0]);
     }
+
+    // The time editor reports again when AM/PM changes, after this component
+    // has already reported the new half; a value equal to the current one is
+    // not reported twice.
+    if (d && date && d.equals(date)) return;
 
     onChange?.(d);
     setDate(d);
@@ -165,8 +174,10 @@ const DateTimePicker = (props: DateTimePickerProps) => {
         [styles.hasError]: hasError,
       })}
       id={id}
+      {...pickAriaProps(props)}
       data-testid={dataTestId ?? "date-time-picker"}
-      aria-label={selectDateText}
+      role="group"
+      aria-label={props["aria-label"] ?? selectDateText}
       aria-invalid={hasError}
     >
       <DatePicker
@@ -215,7 +226,7 @@ const DateTimePicker = (props: DateTimePickerProps) => {
               onKeyDown={onTimeCellKeyDown}
               data-testid="date-time-picker-time-display"
               role="button"
-              aria-label={`Current time: ${shownTime}`}
+              aria-label={t("CurrentTimeLabel", { time: shownTime })}
               tabIndex={0}
             >
               <ClockIcon

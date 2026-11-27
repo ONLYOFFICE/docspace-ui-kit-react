@@ -26,7 +26,7 @@ const meta = {
       control: "select",
       options: Object.values(InputSize),
       description:
-        "Width of the field: 173px, 300px or 550px; large also uses a 16px font, middle a semibold weight",
+        "Width and type size of the field, from 173px to 550px wide.",
       table: {
         defaultValue: { summary: "base" },
       },
@@ -34,47 +34,53 @@ const meta = {
     type: {
       control: "select",
       options: Object.values(InputType),
-      description: "HTML input type",
+      description:
+        "Kind of value the field takes. It sets the input's `type`, and with it the mobile keyboard and the browser's own validation.",
       table: {
         defaultValue: { summary: "text" },
       },
     },
     value: {
       control: "text",
-      description: "Input value",
+      description:
+        "Text the field shows. The field is controlled: it shows only what you pass, so update it from `onChange`.",
     },
     placeholder: {
       control: "text",
       description:
-        "Placeholder text; defaults to a single space so `:placeholder-shown` matches even when none was asked for",
+        "Placeholder text. The default is a single space, not an empty string, so `:placeholder-shown` matches even when no placeholder was asked for.",
       table: {
         defaultValue: { summary: '" "' },
       },
     },
     isDisabled: {
       control: "boolean",
-      description: "Disable the input field",
+      description:
+        "Greys the field and stops editing. A disabled field is skipped by the tab order and left out of a submitted form.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isReadOnly: {
       control: "boolean",
-      description: "Make the input read-only",
+      description:
+        "Keeps the value legible and selectable but stops editing. The field stays in the tab order.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     hasError: {
       control: "boolean",
-      description: "Colors the border red, also while hovered and focused",
+      description:
+        "Draws the border in the error colour. It sets no `aria-invalid`.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     hasWarning: {
       control: "boolean",
-      description: "Colors the border orange, also while hovered and focused",
+      description:
+        "Draws the border in the warning colour, which wins over `hasError`.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -82,28 +88,30 @@ const meta = {
     scale: {
       control: "boolean",
       description:
-        "Makes the field fill the width of its container instead of its size's fixed width",
+        "Stretches the field to the width of its container instead of the fixed `size` width.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withBorder: {
       control: "boolean",
-      description: "Show border around the input",
+      description:
+        "Draws the border. Without it the field shows no hover, focus, error or warning colour, since all of them are border colours.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     isBold: {
       control: "boolean",
-      description: "Set font weight to 600",
+      description: "Sets the typed text's weight to 600, over `fontWeight`.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     maxLength: {
       control: "number",
-      description: "Maximum character length",
+      description:
+        "Most characters the field accepts; typing past it is dropped silently.",
       table: {
         defaultValue: { summary: "255" },
       },
@@ -111,16 +119,16 @@ const meta = {
     fontWeight: {
       control: "number",
       description:
-        "CSS font weight of the text; `isBold` overrides it with 600",
+        "Weight of the typed text, as a CSS `font-weight`. `isBold` wins over it.",
     },
     tabIndex: {
       control: "number",
       description:
-        "Position in the Tab order; left out, the field takes its natural place, pass -1 to skip it from the keyboard",
+        "Place of the field in the tab order. Left out, the field takes its natural place; pass `-1` only for a field the keyboard should skip.",
     },
     isAutoFocussed: {
       control: "boolean",
-      description: "Focuses the field when it mounts",
+      description: "Puts the caret in the field on its first render.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -129,7 +137,7 @@ const meta = {
       control: "select",
       options: ["auto", "ltr", "rtl"],
       description:
-        "Text direction of the value; `auto` lets each value pick its own from its first strong character",
+        "Text direction of the field. `auto` lets each value pick its own, so mixed-script text reads correctly.",
       table: {
         defaultValue: { summary: '"auto"' },
       },
@@ -146,17 +154,18 @@ const meta = {
         "email",
         "url",
       ],
-      description: "Virtual keyboard layout on touch devices",
+      description:
+        "Which virtual keyboard a touch device shows, independent of `type`.",
     },
     mask: {
       control: false,
       description:
-        "An array of literal characters and RegExps, or a function of the current value returning one; the value is formatted to it as the user types",
+        "Pattern the typed text is fitted to: an array of literal characters and RegExps, or a function of the value that returns one.",
     },
     guide: {
       control: "boolean",
       description:
-        "Shows the whole mask up front, with underscores where characters are still missing; without it the mask grows as the user types",
+        "Shows the mask's placeholder and literal characters before they are typed. Without it they appear as the text reaches them.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -164,72 +173,75 @@ const meta = {
     keepCharPositions: {
       control: "boolean",
       description:
-        "Typing or deleting a character leaves the others in place instead of shifting them along the mask",
+        "Keeps every character in its slot: typing into a filled slot is refused, and a deletion leaves the slot empty instead of shifting the rest. Read only with `mask`.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     onChange: {
       description:
-        "Called with the native change event on every edit; the stories wire it themselves to keep the field controlled",
+        "Called with the change event on every edit. Pass it unless the field is read-only, since the field shows `value` and nothing else.",
     },
     onBlur: {
       action: "onBlur",
-      description:
-        "Called with the native focus event when the field loses focus",
+      description: "Called when the field loses focus.",
     },
     onFocus: {
       action: "onFocus",
-      description:
-        "Called with the native focus event when the field gains focus",
+      description: "Called when the field receives focus.",
     },
     onKeyDown: {
       action: "onKeyDown",
-      description: "Called with the native keyboard event on every key press",
+      description: "Called on every key press while the field has focus.",
     },
     onClick: {
       action: "onClick",
-      description: "Called with the native mouse event on click",
+      description:
+        "Called with the mouse event when the pointer clicks the field.",
     },
     onContextMenu: {
       action: "onContextMenu",
-      description: "Called with the native mouse event on right click",
+      description:
+        "Called when the browser's context menu is opened on the field.",
     },
     id: {
       control: "text",
-      description:
-        "HTML id of the input element, the target for `<label htmlFor>`",
+      description: "Id of the `<input>`.",
     },
     name: {
       control: "text",
-      description: "HTML name of the input element for form submission",
+      description: "Name under which the value is submitted with a form.",
     },
     autoComplete: {
       control: "text",
-      description: "HTML autocomplete of the input element",
+      description:
+        "What the browser may autofill here, as an HTML `autocomplete` token such as `email` or `new-password`.",
       table: {
         defaultValue: { summary: '"off"' },
       },
     },
     spellCheck: {
       control: "boolean",
-      description: "HTML spellcheck of the input element",
+      description:
+        "Turns the browser's spelling check on or off; unset, the browser decides.",
     },
     className: {
       control: "text",
-      description: "Extra class on the input element",
+      description: "Class added to the `<input>`.",
     },
     style: {
       control: "object",
-      description: "Inline styles on the input element",
+      description:
+        "Inline style of the `<input>`, the only place its own CSS variables can be overridden.",
     },
     forwardedRef: {
       control: false,
-      description: "Ref to the input element; not passed on when `mask` is set",
+      description:
+        "Ref to the `<input>`. Dropped when `mask` is set, which renders the masked input instead.",
     },
     testId: {
       control: "text",
-      description: "Value of data-testid on the input element",
+      description: "Value of `data-testid` on the `<input>`.",
       table: {
         defaultValue: { summary: '"text-input"' },
       },
@@ -301,7 +313,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "An empty field with a placeholder, the shape most forms start from (`placeholder`); change any other prop live in the Controls panel below.",
+          "An empty field with a placeholder, the shape most forms start from (`placeholder`).",
       },
       source: {
         code: `<TextInput
@@ -358,7 +370,7 @@ export const Sizes: Story = {
     docs: {
       description: {
         story:
-          "Pick the width by the room the form gives the field: 173px for a short value, 300px for most text, 550px for a long one (`size`); the middle size is also semibold, the large one uses a 16px font.",
+          "The three widths (`size`): 173px for a short value, 300px for most text, 550px for a long one. The middle size is also semibold; the large one uses a 16px font.",
       },
       source: {
         code: `<TextInput size={InputSize.base} value="Base size" />
@@ -399,7 +411,7 @@ export const Types: Story = {
     docs: {
       description: {
         story:
-          "Match `type` to the value so the browser supplies the right keyboard and value rules: password hides the characters, number rejects letters, email and tel bring up their own touch keyboards.",
+          "One field per `type`, so the browser supplies the right keyboard and value rules. Password hides the characters, number rejects letters, email and tel bring their own touch keyboards.",
       },
       source: {
         code: `<TextInput type={InputType.text} placeholder="Text" />
@@ -459,7 +471,7 @@ export const States: Story = {
     docs: {
       description: {
         story:
-          "Every state the field can be in, side by side: a red border on `hasError`, an orange one on `hasWarning`, a grey box that ignores input on `isDisabled`, a field that blocks typing without changing its look on `isReadOnly`, and the bare text of `withBorder={false}` for inline use.",
+          "Every state of the field, side by side:\n\n- `hasError` — a red border\n- `hasWarning` — an orange border\n- `isDisabled` — a grey box that ignores input\n- `isReadOnly` — blocks typing without changing the look\n- `withBorder={false}` — the bare text, for inline use",
       },
       source: {
         code: `<TextInput value="Normal" />
@@ -537,12 +549,26 @@ const WithMaskTemplate = () => {
 };
 
 export const WithMask: Story = {
+  name: "Masks",
   render: () => <WithMaskTemplate />,
   play: async ({ canvas, userEvent }) => {
     // The mask inserts the separators itself.
     const date = canvas.getByPlaceholderText("DD/MM/YYYY");
     await userEvent.type(date, "25122024");
     await expect(date).toHaveValue("25/12/2024");
+
+    // keepCharPositions: a digit typed into a filled slot is refused rather
+    // than shifting the rest, and a deleted one leaves its slot empty.
+    await userEvent.type(date, "1", {
+      initialSelectionStart: 0,
+      initialSelectionEnd: 0,
+    });
+    await expect(date).toHaveValue("25/12/2024");
+    await userEvent.type(date, "{Backspace}", {
+      initialSelectionStart: 1,
+      initialSelectionEnd: 1,
+    });
+    await expect(date).toHaveValue("_5/12/2024");
 
     const phone = canvas.getByPlaceholderText("+1 (___) ___-____");
     await userEvent.type(phone, "15551234567");
@@ -562,7 +588,7 @@ export const WithMask: Story = {
     docs: {
       description: {
         story:
-          "Use a mask when the value has one fixed shape, such as a date or a phone number: the field inserts the separators as the user types and refuses characters that do not fit (`mask`). The date and phone fields show the whole pattern up front with underscores for the missing digits (`guide`); only the date field keeps the other digits in place when one is deleted (`keepCharPositions`). The third field passes a function instead of an array, so the pattern is chosen from the value as it is typed: a plain digit starts a four-digit extension, a leading `+` switches to the full number; without `guide` the mask grows with the value.",
+          "Fields for values of one fixed shape (`mask`), which insert the separators and refuse what does not fit.\n\n- **Date** and **phone** show the whole pattern up front (`guide`)\n- **Extension or number** picks its pattern from the value: a digit starts an extension, a `+` the full number",
       },
       source: {
         code: `// Date mask
@@ -611,6 +637,7 @@ const ScaledTemplate = () => {
 };
 
 export const ScaledInputs: Story = {
+  name: "Full width",
   render: () => <ScaledTemplate />,
   play: async ({ canvas }) => {
     for (const value of ["Scaled base", "Scaled middle", "Scaled large"]) {
@@ -625,7 +652,7 @@ export const ScaledInputs: Story = {
     docs: {
       description: {
         story:
-          "Let the field fill its column instead of its size's fixed width, for form grids and side panels (`scale`); font size and padding still follow `size`.",
+          "Fields that fill their column instead of a fixed width, for form grids and side panels (`scale`). Font size and padding still follow `size`.",
       },
       source: {
         code: `<TextInput scale size={InputSize.base} value="Scaled base" />
@@ -647,6 +674,7 @@ const BoldTemplate = () => {
 };
 
 export const BoldText: Story = {
+  name: "Bold text",
   render: () => <BoldTemplate />,
   play: async ({ canvas }) => {
     const weight = (value: string) =>
@@ -672,6 +700,7 @@ export const BoldText: Story = {
 };
 
 export const AutoFocused: Story = {
+  name: "Focused on mount",
   render: () => (
     <WhenVisible>
       <ControlledInput
@@ -694,7 +723,7 @@ export const AutoFocused: Story = {
       story: { inline: false, height: "58px" },
       description: {
         story:
-          "Put the caret in the field the moment it appears, for a dialog or a panel whose first action is typing (`isAutoFocussed`); the field is focused when the story loads, so start typing without clicking.",
+          "A field with the caret in it from the moment it appears (`isAutoFocussed`), for a dialog or a panel whose first action is typing.",
       },
       source: {
         code: `<TextInput
@@ -720,6 +749,7 @@ const RightToLeftTemplate = () => {
 
 // Framed on Docs: the theme provider stamps data-dir on <html>, which would flip the whole page.
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
   play: async ({ canvas }) => {
@@ -737,7 +767,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "106px" },
       description: {
         story:
-          'The same fields under a right-to-left interface: the placeholder sits at the right edge and the caret of an empty field starts on the right; text typed in a right-to-left script runs right to left, Latin text still runs left to right (`dir="auto"`); the tel field keeps its placeholder left-to-right, so a phone number reads the same as in a left-to-right interface. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+          'Two fields in a right-to-left interface, with the placeholder at the right edge. Text in a right-to-left script runs right to left, Latin text left to right (`dir="auto"`). The tel field keeps its placeholder left-to-right, so a phone number reads as usual.',
       },
       source: {
         code: `<div dir="rtl">
@@ -750,6 +780,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   play: async ({ canvas }) => {
     await expect(canvas.getByDisplayValue("Custom styled input")).toHaveStyle({
       backgroundColor: "rgb(245, 243, 255)",
@@ -811,7 +842,11 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The first field sets the shared \`--text-input-*\` tokens on a wrapper -- the variables are listed under CSS variables on this page; hover and focus it to see the two border variables. The second carries \`--text-input-placeholder-color\` in its own \`style\`, the only place it works. The third is disabled: the theme takes over its text and border, and only the radius, the font size and \`--text-input-disabled-bg\` still apply.`,
+        story: `Three fields restyled through CSS variables:
+
+- **First** — the shared \`--text-input-*\` variables, set on a wrapper
+- **Second** — \`--text-input-placeholder-color\` in its own \`style\`, the only place it works
+- **Third** — disabled: only the radius, the font size and \`--text-input-disabled-bg\` still apply`,
       },
       source: {
         code: `<div

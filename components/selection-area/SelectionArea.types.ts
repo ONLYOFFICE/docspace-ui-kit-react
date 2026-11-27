@@ -1,11 +1,14 @@
 import type { TViewAs } from "../../types";
 
 export type TOnMove = {
-  /** Every element the rectangle currently covers — the whole set, recomputed each frame, not a delta. */
+  /** Every element the rectangle covers now: the whole set, not a delta. */
   added: Element[];
-  /** Every element it currently does not cover. */
+  /** Every element it does not cover now. */
   removed: Element[];
-  /** Set on the one call made when a drag passes the 10px threshold, with empty `added` and `removed`: drop whatever an earlier drag selected. */
+  /**
+   * Set on the one call made when a drag passes 10px, with both lists empty.
+   * It is the cue to drop whatever an earlier drag selected.
+   */
   clear?: boolean;
 };
 
@@ -14,8 +17,6 @@ export type TArrayTypes = {
   type: string;
   /** Vertical gap between rows of this group, in pixels. */
   rowGap?: number;
-  /** Height of one item of this group, in pixels. */
-  itemHeight: number;
   /** How many tile slots this group leaves empty at the end of its last row. */
   countOfMissingTiles?: number;
   /** How many rows this group occupies. */
@@ -23,32 +24,47 @@ export type TArrayTypes = {
 };
 
 export type SelectionAreaProps = {
-  /** Class of the element the rectangle is clamped to. When nothing matches it, the `<html>` element is used. Required. */
+  /** Class of the element the rectangle stays inside. When nothing carries it, the whole page is used. */
   containerClass: string;
-  /** Class every selectable element carries. Each one must also have a `value` attribute shaped `type_…_index`, which is how the component works out where it sits. Required. */
+  /** Class every selectable item carries, together with a `value` attribute shaped `group_…_index`. */
   selectableClass: string;
-  /** Called once with `clear: true` when a drag passes the 10px threshold, then on every animation frame of the drag with the full covered and uncovered sets. */
+  /**
+   * Called once with `clear: true` when a drag passes 10px. Then it is called
+   * after each pointer move or scroll, with the full covered and uncovered sets.
+   */
   onMove?: ({ added, removed, clear }: TOnMove) => void;
-  /** Class of the scrolling element. The component listens to its `scroll` and shifts the rectangle to match; without a match it uses the page's own scroller. Required. */
+  /**
+   * Class of the scrolling element. When it scrolls, the rectangle's starting
+   * corner moves with the content. Without a match the page's scroller is used.
+   */
   scrollClass: string;
-  /** `"tile"` switches to the grid arithmetic — columns, row gaps and missing tiles; anything else is treated as a single column. Required. */
+  /** `"tile"` places items on a grid of columns and rows; any other value treats them as one column. */
   viewAs: TViewAs;
-  /** Class of the element the items sit in. It is measured once, at the start of each drag, to place the grid's origin. Required. */
+  /** Class of the element the items sit in. Its corner, read when a drag starts, is where the first item is taken to be. */
   itemsContainerClass: string;
-  /** In tile view, skips adding `folderHeaderHeight` to the grid's origin. */
+  /** In tile view, leaves `folderHeaderHeight` out of the grid's top edge. */
   isRooms?: boolean;
-  /** Height in pixels of the header above the tiles, added to the grid's origin unless `isRooms` is set. It is asserted to exist in tile view. */
+  /**
+   * Height in pixels of a header above the tiles, added to the grid's top edge
+   * unless `isRooms` is set. Without it no tile is ever covered.
+   */
   folderHeaderHeight?: number;
-  /** One entry per group of items, in the order they appear. Tile arithmetic needs it; without it every gap and row count is taken as zero. */
+  /**
+   * One entry per group of items, in display order. Tile view reads each
+   * group's row gap, row count and empty slots from it; a missing entry counts as zero.
+   */
   arrayTypes?: TArrayTypes[];
-  /** In row view, the class of the descendant that carries the `value` attribute. Required. */
+  /** In row view, the class of the child inside each item that carries the `value` attribute. */
   itemClass: string;
-  /** How many tiles fit in a row. It is asserted to exist in tile view, where a missing value makes every position `NaN`. */
+  /** How many tiles fit in one row in tile view. Without it no tile is ever covered. */
   countTilesInRow?: number;
-  /** Height in pixels of one group heading, multiplied by the number of headings above a group. */
+  /** Height in pixels of one group heading in tile view, counted once for every group above an item's group. */
   defaultHeaderHeight?: number;
-  /** Called on every mouse-down on the document, before the button and the target are checked — so it fires for the right button and for clicks that start no selection. */
+  /**
+   * Called on every mouse-down anywhere in the document. It fires before the
+   * button and the target are checked, so also for presses that start no selection.
+   */
   onMouseDown?: (event: MouseEvent) => void;
-  /** CSS selector of the region a drag may start in: a mouse-down outside every element matching it is ignored. The default is the portal's section scroller. */
+  /** CSS selector of the region a drag may start in. A mouse-down outside it is ignored. */
   startAreaSelector?: string;
 };

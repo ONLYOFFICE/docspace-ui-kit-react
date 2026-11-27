@@ -1,9 +1,8 @@
-export type RowContentProps = {
+export type RowContentProps = React.AriaAttributes & {
   /**
-   * The row's parts, addressed by position: the first is the title, the second
-   * the icons beside it, and everything after that is a side element that is
-   * **not displayed** — only its text is, joined into the one line under the
-   * title. It has to be an array.
+   * The row's parts by position: the title, then the icons beside it. Later
+   * children are side elements, hidden, with their text joined into the line
+   * under the title. It has to be an array.
    */
   children: React.ReactElement<{
     containerWidth?: string;
@@ -22,13 +21,8 @@ export type RowContentProps = {
   /** Applied to the content element, and again to the title's wrapper. */
   style?: React.CSSProperties;
   /**
-   * Read as a flag, not as a width: any non-zero value switches the content to
-   * its section layout.
-   */
-  sectionWidth?: number;
-  /**
-   * Whether the last side element is flattened into the joined line like the
-   * others. Turn it off to render it as the element it is.
+   * Whether the last side element is joined into the line as text like the
+   * others. Turn it off to show it at the end of the line as the element it is.
    * @default true
    */
   convertSideInfo?: boolean;

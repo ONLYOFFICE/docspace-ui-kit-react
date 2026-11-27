@@ -183,14 +183,14 @@ const meta = {
     checked: {
       control: "boolean",
       description:
-        "Ticks the checkbox and keeps it in place of the icon, and tints the tile",
+        "Ticks the checkbox and keeps it in place of the icon, and tints the tile.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isActive: {
       control: "boolean",
-      description: "Keeps the hover background on the tile being acted on",
+      description: "Keeps the hover background on the tile being acted on.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -198,7 +198,7 @@ const meta = {
     isBlockingOperation: {
       control: "boolean",
       description:
-        "Stops the tile answering hover, clicks and right-clicks; it looks the same as an idle tile",
+        "Stops the tile answering hover, clicks and right-clicks while an operation runs over it. The tile looks the same as an idle one.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -206,14 +206,15 @@ const meta = {
     indeterminate: {
       control: "boolean",
       description:
-        "Draws the checkbox half-filled; it shows while the checkbox does, that is on hover or when the tile is checked",
+        "Draws the checkbox half-filled. It shows while the checkbox does: on hover, or when the tile is checked.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     inProgress: {
       control: "boolean",
-      description: "Replaces the icon and the checkbox with a small loader",
+      description:
+        "Replaces the icon and the checkbox with a small loader, and sets `aria-busy` on the tile.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -221,7 +222,7 @@ const meta = {
     showHotkeyBorder: {
       control: "boolean",
       description:
-        "Turns the tile's border the accent colour, to mark the one the keyboard is on",
+        "Draws the accent border that marks the tile the keyboard is on.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -229,7 +230,7 @@ const meta = {
     isEdit: {
       control: "boolean",
       description:
-        "Removes the icon and the checkbox while the template is renamed, and stops hovering from tinting the tile",
+        "Renaming state: removes the icon and the checkbox, and stops hover from tinting the tile.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -237,7 +238,7 @@ const meta = {
     showStorageInfo: {
       control: "boolean",
       description:
-        "Adds a storage line under the owner; its figure appears only when `SpaceQuotaComponent` is given too",
+        "Adds a storage line under the owner. Its figure appears only when `SpaceQuotaComponent` is given too.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -245,57 +246,51 @@ const meta = {
     item: {
       control: "object",
       description:
-        "The template the tile stands for, passed back through `onSelect`. Its `createdBy` fills the owner line, `security.EditRoom` decides whether the storage figure can be changed, and a `contextOptions` key on it is what draws the three-dot button",
+        "The template the tile stands for. Its `createdBy` fills the owner line, and `security.EditRoom` decides whether the storage figure is editable.",
     },
     children: {
       control: false,
       description:
-        "The name beside the icon, usually a `TileContent`; only the first element is shown",
+        "The name beside the icon, usually a `TileContent`. Only the first element is rendered.",
     },
     element: {
       control: false,
       description:
-        "The template icon beside the name; without it the tile has neither the icon nor the checkbox",
+        "The template icon beside the name. Without it the tile has neither the icon nor the checkbox.",
     },
     badges: {
       control: false,
-      description: "Action buttons after the name",
+      description: "Action buttons after the name.",
     },
     SpaceQuotaComponent: {
       control: false,
       description:
-        'Draws the storage figure; it is handed the item, the type `"room"` and whether the figure is read-only',
+        'Draws the storage figure. It receives the `item`, the type `"room"` and whether the figure is read-only.',
     },
     contextOptions: {
       control: "object",
-      description: "Entries of the menu opened by the three-dot button",
+      description:
+        "Draws the three-dot button when non-empty and `item` has a `contextOptions` key. The menu lists `getContextModel`'s entries, not these.",
     },
     getContextModel: {
       control: false,
       description:
-        "Returns the entries of the menu opened by a right-click; without it a right-click opens nothing",
+        "Returns the menu's entries. Without it neither the three-dot button nor a right-click opens anything.",
     },
     onSelect: {
       description:
-        "Called with the new checked state and the item from the checkbox, and when the icon is tapped on a phone",
+        "Called with the new checked state and the `item` when the checkbox changes, or when the icon is tapped at 600px or narrower.",
     },
     openUser: {
-      description: "Called when the owner's name is clicked",
+      description:
+        "Called when the owner's name is clicked, or activated with Enter. Required even for a template without `createdBy`, which shows no name.",
     },
     tileContextClick: {
-      description: "Called just before the menu opens",
+      description:
+        "Called before the menu opens, from the three-dot button or a right-click.",
     },
     hideContextMenu: {
-      description: "Called when the menu closes",
-    },
-    columnCount: {
-      control: false,
-      description:
-        "Ignored: the type requires it, and nothing in the tile reads it",
-    },
-    thumbnailClick: {
-      control: false,
-      description: "Ignored: nothing in the tile calls it",
+      description: "Called when the menu closes.",
     },
   },
   args: {
@@ -356,6 +351,7 @@ const Template = ({
 };
 
 export const Default: Story = {
+  name: "Owner and storage",
   render: Template,
   args: {
     item: defaultItem,
@@ -364,7 +360,6 @@ export const Default: Story = {
     badges,
     showStorageInfo: true,
     getContextModel: () => contextOptions,
-    columnCount: 1,
     SpaceQuotaComponent: MockSpaceQuota,
   },
   beforeEach: () => {
@@ -405,7 +400,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A template with its owner and the storage it uses: the icon, the name with a create-room button, the menu, and the two lines below. Hover the icon and tick the checkbox to select it, click the owner to see `openUser` in the Actions panel, and change any other prop live in the Controls panel below.",
+          "A template with its owner and storage: the icon, the name with a create-room button, the three-dot button, and two lines below. A click on the owner calls `openUser`.",
       },
       source: {
         code: `<TemplateTile
@@ -416,7 +411,6 @@ export const Default: Story = {
   showStorageInfo={true}
   SpaceQuotaComponent={SpaceQuota}
   getContextModel={() => contextOptions}
-  columnCount={1}
   openUser={openOwnerProfile}
 >
   <TileContent>
@@ -430,6 +424,7 @@ export const Default: Story = {
 };
 
 export const Checked: Story = {
+  name: "Selected",
   render: Template,
   args: {
     ...Default.args,
@@ -446,7 +441,7 @@ export const Checked: Story = {
     docs: {
       description: {
         story:
-          "A selected template, as it looks among others the reader has picked: the checkbox stays ticked in place of the icon and the tile is tinted (`checked`).",
+          "A selected template (`checked`). The ticked checkbox stays in place of the icon, and the tile is tinted.",
       },
       source: {
         code: `<TemplateTile
@@ -467,6 +462,7 @@ export const Checked: Story = {
 };
 
 export const WithSpaceQuota: Story = {
+  name: "Editable storage limit",
   render: Template,
   args: {
     ...Default.args,
@@ -488,7 +484,7 @@ export const WithSpaceQuota: Story = {
     docs: {
       description: {
         story:
-          "A template with a storage limit the reader may change: the storage line shows the space used and a drop-down with the limit, both drawn by the host's quota component (`showStorageInfo`, `SpaceQuotaComponent`, `security.EditRoom`).",
+          "A template whose storage limit the reader may change (`showStorageInfo`, `SpaceQuotaComponent`, `security.EditRoom`). The host's quota component draws the space used and a drop-down with the limit.",
       },
       source: {
         code: `<TemplateTile
@@ -509,6 +505,7 @@ export const WithSpaceQuota: Story = {
 };
 
 export const WithReadOnlyQuota: Story = {
+  name: "Read-only storage limit",
   render: Template,
   args: {
     ...Default.args,
@@ -532,7 +529,7 @@ export const WithReadOnlyQuota: Story = {
     docs: {
       description: {
         story:
-          "The same template for a reader who may not edit it: the tile tells the quota component the figure is read-only, so it shows the used space and the limit as plain text (`security.EditRoom: false`).",
+          "The same template for a reader who may not edit it (`security.EditRoom: false`). The tile tells the quota component the figure is read-only, so it shows plain text.",
       },
       source: {
         code: `<TemplateTile
@@ -553,6 +550,7 @@ export const WithReadOnlyQuota: Story = {
 };
 
 export const BlockingOperation: Story = {
+  name: "Blocked by an operation",
   render: Template,
   args: {
     ...Default.args,
@@ -567,7 +565,7 @@ export const BlockingOperation: Story = {
     docs: {
       description: {
         story:
-          "A template an operation is running over, which must not be picked or opened until it ends: hover it, click it or right-click it and nothing happens (`isBlockingOperation`). It looks the same as an idle template, so show the operation somewhere else.",
+          "A template an operation is running over (`isBlockingOperation`). The tile ignores the pointer until it ends, and it looks the same as an idle template, so show the operation somewhere else.",
       },
       source: {
         code: `<TemplateTile
@@ -587,6 +585,7 @@ export const BlockingOperation: Story = {
 };
 
 export const InProgress: Story = {
+  name: "Busy",
   render: Template,
   args: {
     ...Default.args,
@@ -623,6 +622,7 @@ export const InProgress: Story = {
 };
 
 export const WithHotkeyBorder: Story = {
+  name: "Keyboard border",
   render: Template,
   args: {
     ...Default.args,
@@ -657,6 +657,7 @@ export const WithHotkeyBorder: Story = {
 };
 
 export const RenamingState: Story = {
+  name: "Renaming",
   render: Template,
   args: {
     ...Default.args,
@@ -673,7 +674,7 @@ export const RenamingState: Story = {
     docs: {
       description: {
         story:
-          "A template whose name is being edited: the icon and the checkbox go, so the name can become a text field, and hovering no longer tints the tile (`isEdit`).",
+          "A template whose name is being edited (`isEdit`). The icon and the checkbox go, so the name can become a text field. The tile keeps its idle background under the pointer.",
       },
       source: {
         code: `<TemplateTile
@@ -696,6 +697,7 @@ export const RenamingState: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={
@@ -724,7 +726,6 @@ export const CssCustomization: Story = {
             showHotkeyBorder={showHotkeyBorder}
             openUser={fn()}
             getContextModel={() => contextOptions}
-            columnCount={1}
             SpaceQuotaComponent={MockSpaceQuota}
           >
             <TileContent>
@@ -759,7 +760,7 @@ export const CssCustomization: Story = {
         story: `The variables are listed under CSS variables on this page.
 
 Two instances:
-- **Sample Template** — for every variable but the hotkey colour; hover it for \`--tile-hover-bg\`.
+- **Sample Template** — every variable but the hotkey colour; \`--tile-hover-bg\` shows on hover.
 - **Team Template** — \`showHotkeyBorder\`, for \`--tile-hotkey-color\`.`,
       },
       source: {
@@ -772,10 +773,10 @@ Two instances:
   "--tile-sub-color": "light-dark(#006fa6, #4fb0e6)",
   "--tile-hotkey-color": "#e0662e",
 }}>
-  <TemplateTile item={template} element={<TemplateIcon />} contextOptions={options} badges={badges} columnCount={1} openUser={openOwnerProfile} showStorageInfo SpaceQuotaComponent={SpaceQuota}>
+  <TemplateTile item={template} element={<TemplateIcon />} contextOptions={options} badges={badges} openUser={openOwnerProfile} showStorageInfo SpaceQuotaComponent={SpaceQuota}>
     <TileContent><Link>Sample Template</Link></TileContent>
   </TemplateTile>
-  <TemplateTile item={template} element={<TemplateIcon />} contextOptions={options} badges={badges} columnCount={1} openUser={openOwnerProfile} showStorageInfo SpaceQuotaComponent={SpaceQuota} showHotkeyBorder>
+  <TemplateTile item={template} element={<TemplateIcon />} contextOptions={options} badges={badges} openUser={openOwnerProfile} showStorageInfo SpaceQuotaComponent={SpaceQuota} showHotkeyBorder>
     <TileContent><Link>Team Template</Link></TileContent>
   </TemplateTile>
 </div>`,

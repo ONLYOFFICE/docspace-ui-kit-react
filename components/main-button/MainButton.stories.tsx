@@ -68,7 +68,7 @@ const meta = {
     text: {
       control: "text",
       description:
-        "Text drawn in the button. It is the whole label: the component takes no children",
+        "Text drawn in the button. It is the whole label: the component takes no children.",
       table: {
         defaultValue: { summary: '"Button"' },
       },
@@ -76,7 +76,7 @@ const meta = {
     isDisabled: {
       control: "boolean",
       description:
-        "Whether the button is inert: it dims to 60% opacity, a click or a key neither opens the menu nor calls `onAction`, and `aria-disabled` is set. It stays in the tab order",
+        "Whether the button is inert: it dims to 60% opacity, the click and the keys are dropped, and `aria-disabled` is set. It stays focusable.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -84,57 +84,51 @@ const meta = {
     isDropdown: {
       control: "boolean",
       description:
-        "Whether a click opens the menu built from `model`, with an arrow beside the text. When off, the click calls `onAction` instead",
+        "Whether clicking opens the menu built from `model`. When `false`, the click calls `onAction` instead.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
-    opened: {
-      control: false,
-      description:
-        "Deprecated and ignored. Nothing reads this prop, and it is not passed to the button's element",
-    },
     onAction: {
       action: "onAction",
       description:
-        "Called with the click event when the button is clicked or activated with Enter or Space. Only reached while `isDropdown` is off",
+        "Called with the event when the button is clicked or activated with Enter or Space. Only reached while `isDropdown` is `false`.",
     },
     model: {
       // The icons are data URIs too long to edit, and they stretch the table.
       control: false,
       description:
-        "Items of the menu: a label with an optional icon and description, a separator, or a nested list under `items`. Only read while `isDropdown` is on, and may be left out otherwise",
+        "Items of the menu. Only read while `isDropdown` is `true`; may be left out otherwise.",
     },
     hideArrow: {
       control: "boolean",
       description:
-        "Whether the arrow beside the text is left out. A click still opens the menu",
+        "Whether the arrow beside the text is left out. The menu still opens.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     className: {
       control: "text",
-      description:
-        "Class added to the button, after the component's own classes",
+      description: "Applied to the button, after the component's own classes.",
     },
     id: {
       control: "text",
-      description: "Id of the button, not of the wrapper around it",
+      description: "Applied to the button, not to the wrapper around it.",
     },
     style: {
       control: "object",
-      description: "Inline style of the button",
+      description: "Applied to the button as inline style.",
     },
     setRefMap: {
       control: false,
       description:
-        "Called on mount and on every window resize with a key and the button's element, so a host can find the button, for example to point a guided tour at it",
+        "Registers the button's element (a `<button>`) in the portal's guidance map, for the onboarding tour.",
     },
     anchorRef: {
       control: false,
       description:
-        "Element the menu opens under and takes its width from. Without it the button's own box is used; pass an outer wrapper when the button sits inside a larger clickable area",
+        "Element the menu is anchored to and sized from. Without it the button's own box is used; pass an outer wrapper when the button sits inside a larger clickable area.",
     },
   },
 } satisfies Meta<typeof MainButton>;
@@ -181,6 +175,10 @@ export const Default: Story = {
   play: async (context) => {
     const button = await clickButton(context, "Main Button");
     const item = await findVisibleItem("New document");
+    // A tap draws no grey flash over the button.
+    await expect(
+      getComputedStyle(button).getPropertyValue("-webkit-tap-highlight-color"),
+    ).toBe("rgba(0, 0, 0, 0)");
     await expect(button).toHaveAttribute("aria-haspopup", "menu");
     await expect(button).toHaveAttribute("aria-expanded", "true");
 
@@ -200,7 +198,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The button with its menu: click it to open the list of things to create, then change any other prop live in the Controls panel below.",
+          "The button with its menu, which opens on click with the list of things to create.",
       },
       source: {
         code: `<MainButton text="Main Button" model={itemsModel} />`,
@@ -236,7 +234,7 @@ export const Disabled: Story = {
     docs: {
       description: {
         story:
-          "MainButton in a disabled state: it appears with reduced opacity, and a click or a key does nothing. It stays in the tab order and is announced as disabled (`isDisabled`).",
+          "A disabled button at reduced opacity; a click or a key does nothing (`isDisabled`). It stays in the tab order and is announced as disabled.",
       },
       source: {
         code: `<MainButton text="Disabled Button" isDisabled isDropdown={false} model={[]} />`,
@@ -259,6 +257,7 @@ const DisabledWithDropdownTemplate = () => {
 };
 
 export const DisabledWithDropdown: Story = {
+  name: "Disabled with a menu",
   render: () => <DisabledWithDropdownTemplate />,
   play: async (context) => {
     const button = await clickButton(context, "Disabled with Dropdown");
@@ -273,8 +272,7 @@ export const DisabledWithDropdown: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "MainButton with a dropdown menu in a disabled state. Both the button and dropdown are non-interactive.",
+        story: "A disabled button with a menu: the menu does not open either.",
       },
       source: {
         code: `<MainButton text="Disabled with Dropdown" isDropdown isDisabled model={itemsModel} />`,
@@ -284,6 +282,7 @@ export const DisabledWithDropdown: Story = {
 };
 
 export const WithAction: Story = {
+  name: "Single action",
   render: (args) => (
     <Wrapper>
       <MainButton {...args} />
@@ -310,7 +309,7 @@ export const WithAction: Story = {
     docs: {
       description: {
         story:
-          "For a single action that needs no menu: the button has no arrow, and a click is reported in the Actions panel instead of opening a list (`isDropdown={false}`, `onAction`).",
+          "A button for a single action, with no arrow (`isDropdown={false}`). A click calls `onAction` instead of opening a list.",
       },
       source: {
         code: `<MainButton text="Click Me" isDropdown={false} model={[]} onAction={handleClick} />`,
@@ -350,6 +349,7 @@ const WithItemDescriptionsTemplate = () => {
 };
 
 export const WithItemDescriptions: Story = {
+  name: "Items with descriptions",
   render: () => <WithItemDescriptionsTemplate />,
   play: async (context) => {
     const button = await clickButton(context, "Create");
@@ -367,7 +367,7 @@ export const WithItemDescriptions: Story = {
     docs: {
       description: {
         story:
-          "For choices that need a word of explanation: click the button and each item shows its label with a description under it, while the menu grows wider than the button to fit the text (`description` on the items of `model`).",
+          "A menu whose items each show a description under the label (`description` on the items of `model`). The menu grows wider than the button to fit the text.",
       },
       source: {
         code: `<MainButton
@@ -401,6 +401,7 @@ const WithDropdownTemplate = () => {
 };
 
 export const WithDropdown: Story = {
+  name: "Full menu",
   render: () => <WithDropdownTemplate />,
   play: async (context) => {
     await clickButton(context, "Create new");
@@ -433,7 +434,7 @@ export const WithDropdown: Story = {
     docs: {
       description: {
         story:
-          "MainButton with a full dropdown menu including icons, nested sub-menus, and separators. Click the button, or Tab to it and press Enter, to see the dropdown; the arrow keys move through it and Escape closes it.",
+          "A full menu with icons, nested sub-menus and separators. A click or Enter opens it; the arrow keys move through it and Escape closes it.",
       },
       source: {
         code: `<MainButton
@@ -457,6 +458,7 @@ export const WithDropdown: Story = {
 };
 
 export const WithoutArrow: Story = {
+  name: "Without the arrow",
   render: (args) => (
     <Wrapper>
       <MainButton {...args} />
@@ -477,7 +479,7 @@ export const WithoutArrow: Story = {
     docs: {
       description: {
         story:
-          "For a button whose label alone says it opens a list: the arrow beside the text is gone, yet a click still opens the same menu (`hideArrow`).",
+          "A button with no arrow beside the text, for a label that alone says it opens a list (`hideArrow`). A click still opens the menu.",
       },
       source: {
         code: `<MainButton text="Create new" model={itemsModel} hideArrow />`,
@@ -488,6 +490,7 @@ export const WithoutArrow: Story = {
 
 // Framed on Docs, tall enough for the open menu: the theme provider stamps data-dir on <html>, which would flip the whole page.
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <Wrapper>
@@ -515,7 +518,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "304px" },
       description: {
         story:
-          'The button in a right-to-left layout: the text moves to the right edge and the arrow to the left; click it and the menu opens with its icons on the right and the sub-menu chevron on the left. The wrapper carries `dir="rtl"`; the direction also comes from the theme\'s `interfaceDirection` (the Direction toolbar).',
+          'The button in a right-to-left layout, with the text at the right edge and the arrow at the left. Its menu has the icons on the right and the sub-menu chevron on the left. The wrapper carries `dir="rtl"`; the direction can also come from the theme\'s `interfaceDirection`.',
       },
       source: {
         code: `<div dir="rtl">
@@ -527,6 +530,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   play: async ({ canvas }) => {
     // The styled button sits inside the group element.
     await expect(
@@ -564,7 +568,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on a wrapper around one button -- the variables are listed under CSS variables on this page. Click it to see the menu keep the button's new width.`,
+        story: `Every overridable variable, set on a wrapper around one button. The menu it opens keeps the button's new width.`,
       },
       source: {
         code: `<div

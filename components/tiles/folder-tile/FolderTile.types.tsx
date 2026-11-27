@@ -11,20 +11,18 @@ export interface FolderItem extends TileItem {
   };
 }
 
-export type FolderTileProps = {
+export type FolderTileProps = React.AriaAttributes & {
   /** The folder this tile stands for. Its `contextOptions` key — present or absent — is what decides whether the three-dot button appears. */
   item: FolderItem;
-  /** Whether the tile is selected. */
+  /** Ticks the checkbox, shows it in place of the icon and tints the whole tile. The tile holds no state; pass back what `onSelect` reports. */
   checked?: boolean;
   /** Draws the accent outline that marks the tile the keyboard is on. */
   showHotkeyBorder?: boolean;
   /** Replaces the icon and the checkbox with the kit's track loader. */
   inProgress?: boolean;
-  /** Called with the new checked state and the `item` — from the checkbox, from a plain click on the tile, and from a tap on the icon below 600px. */
+  /** Called with the new checked state and the `item`, from the checkbox or a plain click. A tap on the icon calls it too, in a window 600px wide or narrower. */
   onSelect?: (checked: boolean, item: FolderItem) => void;
-  /** Ignored. Nothing reads it, and the component forwards no unknown props, so it never reaches the DOM either. */
-  thumbnailClick?: (e: React.MouseEvent) => void;
-  /** Builds the menu shown on right-click. Without it the right-click menu never opens. */
+  /** Builds the menu that the three-dot button and a right-click open. Without it neither opens a menu, whatever `contextOptions` holds. */
   getContextModel?: () => ContextMenuModel[];
   /** Called with an empty array before a plain click selects the tile, unless the click landed on an image, an input or an SVG shape. */
   setSelection?: (items: FolderItem[]) => void;
@@ -38,29 +36,25 @@ export type FolderTileProps = {
   children?: React.ReactNode;
   /** Called when the menu closes. */
   hideContextMenu?: () => void;
-  /** Ignored. The header is built from the first child's `item`; nothing reads this prop. */
-  contextMenuHeader?: React.ReactNode;
   /** Called before the menu opens, with `true` when the trigger was a right-click. */
   tileContextClick?: (isRightClick?: boolean) => void;
-  /** Badges for the folder. In the tall layout they sit over the thumbnail; in the short one they follow the content. */
+  /** Badges after the name, or in the picture's top end corner in the tall card. Give their wrapper the class `badges`, so a click on them does not select. */
   badges?: React.ReactNode;
-  /** The menu's entries. Required — but see `item`. */
+  /** Draws the three-dot button when non-empty and `item` carries a `contextOptions` key. The menu lists `getContextModel`'s entries, not these. */
   contextOptions: ContextMenuModel[];
   /** Draws the checkbox in its indeterminate state. */
   indeterminate?: boolean;
-  /** Marks the tile as being dragged: hovering it no longer tints it, underlines the name or swaps the icon for the checkbox. It does not dim the tile. */
+  /** Marks the tile as being dragged: hovering it does not tint it, underline the name or swap the icon for the checkbox. It does not dim the tile. */
   isDragging?: boolean;
-  /** Ignored. `isDragging` is the one that is read. */
-  dragging?: boolean;
-  /** Whether the tile is the one being acted on, which keeps its hover state. */
+  /** Keeps the hover tint and the underlined name on the tile being acted on, after the pointer leaves it. */
   isActive?: boolean;
-  /** Renaming state: it removes the icon and the checkbox. */
+  /** Renaming state: removes the icon, the checkbox and the hover tint, so the content gets the name row. */
   isEdit?: boolean;
   /** Attached to the outer element, and clicked by the component itself on a right-click before the menu is mounted. */
   forwardRef?: React.RefObject<HTMLDivElement | null>;
-  /** The folder's picture, drawn only in the tall layout: a URL is fetched as an SVG, an element is rendered as given. */
+  /** The folder's picture, drawn only in the tall card: a URL is fetched as an SVG, an element is rendered as given. */
   temporaryIcon?: string | React.ReactElement;
-  /** Switches to the tall layout — a picture on top and the row below it — instead of the single row. */
+  /** Switches from the single row to a tall card, with a picture on top and the name row below it. */
   isBigFolder?: boolean;
   /** Value of `data-testid` on the outer element.
    * @default "tile" */

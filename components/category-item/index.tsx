@@ -11,6 +11,7 @@ import { useTheme } from "../../context/ThemeContext";
 
 import { isManagement } from "../../utils/common";
 import { globalColors } from "../../providers/theme";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import { ICategoryItemProps } from "./CategoryItem.types";
 
@@ -27,6 +28,9 @@ export const CategoryItem = ({
   withPaidBadge,
   badgeLabel,
   dataTestId,
+  className,
+  style,
+  ...rest
 }: ICategoryItemProps) => {
   const { isBase } = useTheme();
 
@@ -39,13 +43,18 @@ export const CategoryItem = ({
     : {};
 
   return (
-    <div className={styles.categoryItemWrapper} data-testid={dataTestId}>
+    <div
+      className={classNames(styles.categoryItemWrapper, className)}
+      style={style}
+      data-testid={dataTestId}
+    >
       <div className={styles.categoryItemHeading}>
         <Link
           className={classNames(styles.inheritTitleLink, "header", {
             [styles.disabled]: isDisabled,
           })}
           noHover={isDisabled}
+          {...pickAriaProps(rest)}
           {...onClickProp}
           {...onHrefProp}
           {...disabledProps}

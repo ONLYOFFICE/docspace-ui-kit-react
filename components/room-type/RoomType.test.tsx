@@ -14,6 +14,58 @@ const getArrow = (root: HTMLElement) =>
   root.querySelector(".choose_room-forward_btn") as HTMLElement;
 
 describe("<RoomType />", () => {
+  it("renders the list card for a type it does not know", () => {
+    const onClick = vi.fn();
+    render(
+      <RoomType
+        {...baseProps}
+        // Untyped code can pass any string.
+        type={"displayItem" as "listItem"}
+        roomType={RoomsType.EditingRoom}
+        onClick={onClick}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId("room-type-list-item"));
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("puts a passed aria-* on the row and keeps its own aria-disabled", () => {
+    render(
+      <RoomType
+        {...baseProps}
+        roomType={RoomsType.EditingRoom}
+        onClick={vi.fn()}
+        isDisabled
+        aria-label="Create a collaboration room"
+        aria-disabled={false}
+      />,
+    );
+
+    const row = screen.getByRole("button", {
+      name: "Create a collaboration room",
+    });
+    expect(row).toHaveAttribute("aria-disabled", "true");
+  });
+
+  it("keeps its own aria-expanded on the dropdown button", () => {
+    render(
+      <RoomType
+        {...baseProps}
+        type="dropdownButton"
+        roomType={RoomsType.EditingRoom}
+        onClick={vi.fn()}
+        isOpen
+        aria-expanded={false}
+        aria-describedby="type-hint"
+      />,
+    );
+
+    const button = screen.getByTestId("room-type-dropdown-button");
+    expect(button).toHaveAttribute("aria-expanded", "true");
+    expect(button).toHaveAttribute("aria-describedby", "type-hint");
+  });
+
   it("renders the list item by default with the room's title", () => {
     render(
       <RoomType
@@ -230,5 +282,34 @@ describe("<RoomType />", () => {
       expect(onClick).toHaveBeenCalledTimes(1);
       expect(root).not.toHaveAttribute("aria-disabled");
     });
+
+    it("lets the keys open a dropdown button the pointer opens", () => {
+      const onClick = vi.fn();
+      render(
+        <RoomType
+          {...baseProps}
+          type="dropdownButton"
+          roomType={RoomsType.FormRoom}
+          disabledFormRoom
+          isDisabled
+          onClick={onClick}
+        />,
+      );
+
+      const root = screen.getByTestId("room-type-dropdown-button");
+      fireEvent.click(root);
+      fireEvent.keyDown(root, { key: "Enter" });
+      fireEvent.keyDown(root, { key: " " });
+
+      expect(onClick).toHaveBeenCalledTimes(3);
+    });
+  });
+
+  it("leaves the texts empty without roomType", () => {
+    render(<RoomType {...baseProps} onClick={vi.fn()} />);
+
+    const root = screen.getByTestId("room-type-list-item");
+    expect(root).toHaveTextContent(/^$/);
+    expect(root).not.toHaveAttribute("title");
   });
 });

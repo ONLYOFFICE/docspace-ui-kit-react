@@ -22,7 +22,7 @@ The Table README describes it in full.`,
     checked: {
       control: "boolean",
       description:
-        "Adds a `checked` class to the row for the consumer's highlight and reveals children marked `create-share-link`",
+        "Adds a `checked` class for your own highlight, and keeps children marked `create-share-link` shown.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -30,7 +30,7 @@ The Table README describes it in full.`,
     isActive: {
       control: "boolean",
       description:
-        "Marks the row whose context menu is open: reveals children marked `create-share-link` and turns off the drop highlight",
+        "Marks the row whose context menu is open: children marked `create-share-link` stay shown and the drop fill is off.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -38,7 +38,7 @@ The Table README describes it in full.`,
     dragging: {
       control: "boolean",
       description:
-        "Fills children marked `droppable-hover` with the drop colour while something is dragged over the table",
+        "Fills children marked `droppable-hover` with the drop colour while something is dragged over the table.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -46,15 +46,7 @@ The Table README describes it in full.`,
     isIndexEditingMode: {
       control: "boolean",
       description:
-        "Leaves out the last cell with the context menu button, for rows being reordered",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
-    hideColumns: {
-      control: "boolean",
-      description:
-        "Adds a class for the narrow layout the header asks for when it runs out of room; the kit styles nothing with it",
+        "Leaves out the last cell with the context button, for rows being reordered.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -62,82 +54,81 @@ The Table README describes it in full.`,
     contextOptions: {
       control: false,
       description:
-        "Items of the context menu; a non-empty list renders the three-dot button, an empty one leaves a blank space instead",
+        "Items of the context menu. The context button is drawn only while the list has an item; otherwise a blank space takes its place.",
     },
     getContextModel: {
       control: false,
-      description: "Builds the context menu items at the moment the menu opens",
+      description: "Builds the context menu's items at the moment it opens.",
     },
     title: {
       control: "text",
-      description: "Hover tooltip of the three-dot button",
+      description: "Hover tooltip and accessible name of the context button.",
     },
     badgeUrl: {
       control: "text",
-      description: "URL of a badge image shown in the context menu's header",
+      description: "URL of the badge image shown in the context menu's header.",
     },
     selectionProp: {
       control: "object",
       description:
-        "Class and `value` spread onto the last cell, which holds the context menu button",
+        "Class and `value` spread onto the last cell, which holds the context button.",
     },
     contextMenuCellStyle: {
       control: "object",
-      description: "Inline styles of the last cell",
+      description: "Applied to the last cell, which holds the context button.",
     },
     className: {
       control: "text",
-      description: "Class applied to the row after the component's own",
+      description: "Applied to the row.",
     },
     style: {
       control: "object",
-      description:
-        "Inline styles of the row; inside a table the header overwrites its grid columns",
+      description: "Applied to the row element.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of the row's `data-testid` attribute",
+      description: "Value of `data-testid` on the row.",
       table: {
         defaultValue: { summary: "table-row" },
       },
     },
     contextMenuTestId: {
       control: "text",
-      description: "Value of the context menu's `data-testid` attribute",
+      description:
+        "Test id of the row's context menu, which opens outside the row in a portal.",
     },
     fileContextClick: {
       action: "fileContextClick",
       description:
-        "Called when the context menu is asked for, with `true` for a right-click",
+        "Called when the context menu is asked for, with `true` for a right-click.",
     },
     onHideContextMenu: {
       action: "onHideContextMenu",
-      description: "Called when the context menu closes",
+      description: "Called when the context menu closes.",
     },
     onClick: {
       action: "onClick",
-      description: "Called with the mouse event on a click anywhere in the row",
+      description: "Called on a click anywhere in the row.",
     },
     onDoubleClick: {
       action: "onDoubleClick",
-      description:
-        "Called with the mouse event on a double click anywhere in the row",
+      description: "Called on a double click anywhere in the row.",
     },
     onMouseEnter: {
       action: "onMouseEnter",
-      description: "Called when the pointer enters the row",
+      description: "Called when the pointer enters the row.",
     },
     onMouseLeave: {
       action: "onMouseLeave",
-      description: "Called when the pointer leaves the row",
+      description: "Called when the pointer leaves the row.",
     },
     forwardedRef: {
       control: false,
-      description: "Ref of the row element",
+      description: "Ref of the row element.",
     },
     children: {
       control: false,
-      description: "The row's cells, normally one `TableCell` per column",
+      description: "The row's cells, normally one `TableCell` per column.",
     },
   },
   args: {
@@ -184,6 +175,7 @@ const menuItem = async (name: string) => {
 const RowContent = <FileCells file={storyFiles[0]} />;
 
 export const Default: Story = {
+  name: "With context menu",
   render: (args) => <TableRow {...args} />,
   args: {
     children: RowContent,
@@ -198,6 +190,8 @@ export const Default: Story = {
   play: async ({ args, canvas, userEvent }) => {
     const row = canvas.getByTestId("table-row");
     await expect(row).toHaveClass("custom-row-class", "table-container_row");
+    // No class named "undefined" lands on the row.
+    await expect(row).not.toHaveClass("undefined");
 
     await userEvent.click(canvas.getByText("Annual Report 2025"));
     await expect(args.onClick).toHaveBeenCalled();
@@ -215,7 +209,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A row with a context menu, the way rows in a file list offer their actions: right-click anywhere in the row, or click the three-dot button at its end.",
+          "A file row with its context menu. A right-click anywhere in the row opens the menu, and so does the three-dot button at its end.",
       },
       source: {
         code: `<TableRow
@@ -232,6 +226,7 @@ export const Default: Story = {
 };
 
 export const IndexEditingMode: Story = {
+  name: "Reordering rows",
   render: (args) => <TableRow {...args} />,
   args: {
     children: RowContent,
@@ -250,7 +245,7 @@ export const IndexEditingMode: Story = {
     docs: {
       description: {
         story:
-          "While rows are being reordered the last cell with the context menu button is left out, so a drag cannot open a menu by accident (`isIndexEditingMode`).",
+          "A row being reordered, without the last cell and its context button (`isIndexEditingMode`). A drag cannot open a menu by accident.",
       },
       source: {
         code: `<TableRow

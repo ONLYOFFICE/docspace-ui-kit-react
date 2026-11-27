@@ -14,13 +14,13 @@ export type TRadioButtonOption = {
   /** Whether this one option is disabled while the rest stay live. */
   disabled?: boolean;
   /**
-   * `"text"` renders a caption inside the group instead of a button — a
-   * sub-heading between two runs of options. Anything else renders a button.
+   * `"text"` renders a caption inside the group instead of a button, as a
+   * heading above the options or between two runs of them.
    */
   type?: "text" | "radio";
   /** Whether this option's input takes focus on mount. */
   autoFocus?: boolean;
-  /** `data-testid` of this option; it doubles as the button's test id. */
+  /** `data-testid` of this option's button, or of the caption. */
   dataTestId?: string;
   /** Applied to this option's label element. */
   id?: PicketRadioButtonPropsForOption["id"];
@@ -38,11 +38,10 @@ type PicketRadioButtonProps = Pick<
   "isDisabled" | "fontWeight" | "fontSize" | "name" | "spacing" | "orientation"
 >;
 
-export type RadioButtonGroupProps = {
+export type RadioButtonGroupProps = React.AriaAttributes & {
   /**
-   * Called when the choice changes. Despite the name it receives the input's
-   * change event, so the new value is `event.target.value` — always a string,
-   * even where the option's `value` was a number.
+   * Called when the choice changes, with the input's change event despite the
+   * name. The new value is `event.target.value`, always a string.
    */
   onClick: (e: React.ChangeEvent<HTMLInputElement>) => void;
   /** The options, in order. An entry with `type: "text"` is a caption, not a button. */
@@ -60,9 +59,8 @@ export type RadioButtonGroupProps = {
    */
   dataTestId?: string;
   /**
-   * Which way the options run. Horizontal makes the group a flex row; vertical
-   * makes it `inline-block`, so it shrinks to its content. Note the default
-   * differs from a lone `RadioButton`, which is vertical.
+   * Which way the options run: a row, or a column only as wide as its longest
+   * label. A lone `RadioButton` defaults to vertical instead.
    */
   orientation?: PicketRadioButtonProps["orientation"];
 

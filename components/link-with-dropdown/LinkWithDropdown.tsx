@@ -9,6 +9,7 @@ import { DropDownItem } from "../drop-down-item";
 import { Scrollbar } from "../scrollbar";
 import { Text } from "../text";
 import { consumeKey } from "../../utils/consume-key";
+import { omitAriaProps } from "../../utils/aria-props";
 
 import styles from "./LinkWithDropdown.module.scss";
 import { LinkWithDropDownProps } from "./LinkWithDropdown.types";
@@ -46,10 +47,11 @@ const LinkWithDropdown = ({
 }: LinkWithDropDownProps) => {
   const ref = useRef<HTMLDivElement | null>(null);
 
-  const [state, setState] = useState({
+  // Read only in a browser, so the component also renders on a server.
+  const [state, setState] = useState(() => ({
     isOpen,
-    orientation: window.orientation,
-  });
+    orientation: typeof window === "undefined" ? undefined : window.orientation,
+  }));
 
   const setIsOpen = (value: boolean) =>
     setState((s) => ({ ...s, isOpen: value }));
@@ -225,7 +227,8 @@ const LinkWithDropdown = ({
   ) => {
     const currentTarget = e.currentTarget as HTMLElement;
     const { key } = currentTarget.dataset;
-    const item = data?.find((x) => x.key === key);
+    // The DOM attribute is text, so a numeric key is compared as text too.
+    const item = data?.find((x) => String(x.key) === key);
     setIsOpen(!state.isOpen);
     if (item && "onClick" in item) item.onClick?.(e);
   };
@@ -359,7 +362,8 @@ const LinkWithDropdown = ({
         topSpace={topSpace}
         bottomSpace={bottomSpace}
         withDynamicScrollbar={withDynamicScrollbar}
-        {...rest}
+        // The aria-* passed describe the link; the list is named by its role.
+        {...omitAriaProps(rest)}
       >
         {showScroll ? (
           <Scrollbar

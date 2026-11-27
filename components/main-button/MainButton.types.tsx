@@ -11,11 +11,6 @@ export type MainButtonProps = {
   isDropdown?: boolean;
   /** Called with the event when the button is clicked or activated with Enter or Space. Only reached while `isDropdown` is `false`. */
   onAction?: (e: React.MouseEvent) => void;
-  /**
-   * Ignored. Nothing reads this prop, and it is not passed to the DOM.
-   * @deprecated The menu's open state lives inside the component.
-   */
-  opened?: boolean;
   /** Applied to the button, after the component's own classes. */
   className?: string;
   /** Applied to the button, not to the wrapper around it. */

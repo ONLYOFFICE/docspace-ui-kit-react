@@ -454,9 +454,6 @@
   flex-wrap: wrap;
 
   padding: var(--ops-progress-bar-padding, 8px 16px);
-  background: var(--background-primary);
-  border-top: 1px solid var(--progress-bar-border);
-  border-bottom: 1px solid var(--progress-bar-border);
 
   transition:
     opacity 0.3s ease-out,

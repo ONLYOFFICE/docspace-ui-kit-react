@@ -37,7 +37,6 @@ const meta = {
     setInfoPanelWidth: fn(),
     setIsChatPanelVisible: fn(),
     setChatPanelWidth: fn(),
-    onOpenUploadPanel: fn(),
     cancelUpload: fn(),
     clearSecondaryProgressData: fn(),
     clearPrimaryProgressData: fn(),
@@ -49,7 +48,7 @@ const meta = {
       control: "select",
       options: Object.values(DeviceType),
       description:
-        "Which layout to render: where the header and the filter go, whether the body scrolls itself and whether the info panel sits beside the body or covers the page. Nothing measures the window, so the host passes the value that fits it",
+        "Which layout to render. It places the header and the filter, decides whether the body scrolls, and puts the info panel inline or over the page. Nothing here measures the viewport.",
       table: {
         defaultValue: { summary: "undefined" },
       },
@@ -57,14 +56,14 @@ const meta = {
     withBodyScroll: {
       control: "boolean",
       description:
-        "Gives the body a scroller of its own under the pinned header; off, the page scrolls instead and the section takes a 20px inline-start padding. On a phone the page always scrolls",
+        "Whether the section scrolls its own body. With `false` the page scrolls instead and the section takes a 20px inline-start padding. On a phone the page always scrolls.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     settingsStudio: {
       control: "boolean",
-      description: "Applies the settings pages' narrower body padding",
+      description: "Applies the settings pages' narrower body padding.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -80,12 +79,12 @@ const meta = {
         "profile",
       ],
       description:
-        "Which listing the body holds. `settings` and `profile` drop the body's top padding",
+        "Which listing the body holds. It changes the body's padding, and in `row` view it lets a click beside the info panel close it.",
     },
     isInfoPanelAvailable: {
       control: "boolean",
       description:
-        "Whether the info panel region exists at all; off, it is never rendered whatever `isInfoPanelVisible` says",
+        "Whether the info panel region exists at all. It defaults to `true`, so the panel's markup is mounted unless you turn it off.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -93,56 +92,57 @@ const meta = {
     isInfoPanelVisible: {
       control: "boolean",
       description:
-        "Whether the info panel is open. It shows only while `canDisplay` is set as well",
+        "Whether the info panel is open. It narrows the section and is one of the two conditions for the panel being rendered at all — `canDisplay` is the other.",
     },
     canDisplay: {
       control: "boolean",
       description:
-        "Allows the info panel to be shown. Without it the panel stays hidden even while `isInfoPanelVisible` is set",
+        "**The info panel is not rendered without this.** `isInfoPanelVisible` alone is not enough: both must be true.",
     },
     setIsInfoPanelVisible: {
       control: false,
       description:
-        "Called with `false` when the info panel closes itself on a device below desktop: a click on the dimmed page around it, or the browser going back",
+        "Called with `false` when the info panel closes itself — a click beside it, or the browser going back below the desktop breakpoint.",
     },
     isMobileHidden: {
       control: "boolean",
-      description: "Hides the info panel on any device below desktop",
+      description:
+        "Hides the info panel on anything narrower than a desktop, where it would otherwise cover the page.",
     },
     anotherDialogOpen: {
       control: "boolean",
       description:
-        "Hides the info panel below desktop while another dialog is open, so the two do not stack",
+        "Suppresses the info panel below the desktop breakpoint while a dialog of yours is open, so the two do not stack.",
     },
     infoPanelWithoutScroll: {
       control: "boolean",
       description:
-        "Removes the info panel body's own scroller, for panel content that scrolls its own regions",
+        "Removes the info panel body's scroller and the aside's, for a body that scrolls its own regions.",
     },
     isInfoPanelScrollLocked: {
       control: "boolean",
       description:
-        "Freezes the info panel's scroller, for a drag or a menu that must not scroll the panel under it",
+        "Freezes the info panel's own scroller, for a drag or a menu that must not scroll the panel under it.",
     },
     isInfoPanelResizable: {
       control: "boolean",
       description:
-        "Adds a drag handle on the info panel's inner edge that changes its width from 400px to 800px, by mouse or touch, on desktop only. A double click on the handle restores 400px",
+        "Opt-in edge resizer for the info panel (desktop only), from `INFO_PANEL_WIDTH` to `INFO_PANEL_MAX_WIDTH`. Pass the width the host stores plus a setter; leave unset for a fixed-width panel.",
     },
     infoPanelWidth: {
       control: "number",
       description:
-        "Width of the info panel in pixels while the handle is on; without it the panel is 400px wide",
+        "Width of the info panel in px while `isInfoPanelResizable` is on. Without the resizer it is ignored and the panel keeps its stylesheet width.",
     },
     setInfoPanelWidth: {
       control: false,
       description:
-        "Called once per handle drag, when the pointer is released, and on the double click that restores the default, with the new width in pixels",
+        "Called with the committed width: once per drag, on release, and on the double click that restores the default. A width narrowed to fit the window is never committed.",
     },
     isChatPanelAvailable: {
       control: "boolean",
       description:
-        "Whether the chat panel region exists at all; off, it is never rendered",
+        "Whether the AI chat region exists at all. It defaults to `false`.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -150,52 +150,51 @@ const meta = {
     isChatPanelVisible: {
       control: "boolean",
       description:
-        "Whether the chat panel is open. On tablet and phone it covers the whole page",
+        "Opens the AI chat panel, docked on a desktop and covering the page below it. It needs `isChatPanelAvailable`.",
     },
     setIsChatPanelVisible: {
       control: false,
       description:
-        "Called with `false` when the browser goes back while the chat panel is open on a device below desktop",
+        "Called with `false` when the browser goes back while the chat panel is open below the desktop breakpoint.",
     },
     chatPanelDropTargetLabel: {
       control: "text",
       description:
-        'Text of a dashed "drop here" frame drawn over the chat panel; set it while the host drags its own items over the panel and clear it afterwards',
+        'Text of a dashed "drop here" frame over the chat panel. Set it while the host drags its own items over the panel, and clear it afterwards.',
     },
     isChatPanelResizable: {
       control: "boolean",
       description:
-        "Adds a drag handle on the chat panel's inner edge that changes its width, on desktop only",
+        "Opt-in edge resizer for the docked chat panel (desktop only). Pass the width the host stores plus a setter; leave unset for a fixed-width panel.",
     },
     chatPanelWidth: {
       control: "number",
-      description:
-        "Width of the docked chat panel in pixels while the handle is on; without it the panel is 400px wide",
+      description: "Current width of the docked chat panel in pixels.",
     },
     setChatPanelWidth: {
       control: false,
       description:
-        "Called once per handle drag, when the mouse is released, with the new width in pixels",
+        "Called once per resize drag, when the pointer is released, with the committed width.",
     },
     setChatPanelFullscreen: {
       control: false,
       description:
-        "Called when the handle is dragged past the widest width the page allows; the host is expected to turn fullscreen on. Without it the drag stops at that width",
+        "Turns the chat panel fullscreen on. Called when the edge resizer is dragged past the widest docked width; leave unset to keep that drag clamped at the limit.",
     },
     unsetChatPanelFullscreen: {
       control: false,
       description:
-        "Called when the handle is dragged back inwards in fullscreen; the host turns fullscreen off and the same drag goes on resizing the panel",
+        "Turns the chat panel fullscreen off. Called when the resizer is dragged back inwards in fullscreen, which then continues as a normal resize.",
     },
     isChatPanelFullscreen: {
       control: "boolean",
       description:
-        "Whether the host renders the chat panel fullscreen right now; the handle then only listens for the drag back inwards",
+        "Whether the host renders the chat panel fullscreen right now.",
     },
     scrollableBanner: {
       control: "boolean",
       description:
-        "Puts the banner at the top of the scrolling body, so it scrolls away under the header, instead of pinning it above the scroller",
+        "Puts the banner at the top of the scrolling body, so it scrolls away under the header. Off, the banner stays pinned above the scroller.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -203,7 +202,7 @@ const meta = {
     stickyTableHeader: {
       control: "boolean",
       description:
-        "Moves the desktop filter into the scrolling body, where it sticks under the header, and lets a table header stick under the filter instead of being fixed. The host gives the resting offsets in CSS variables",
+        "Moves the desktop filter into the scrolling body, where it sticks under the header. A table header then sticks under the filter instead of being fixed.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -211,16 +210,11 @@ const meta = {
     inert: {
       control: "boolean",
       description:
-        "Makes the whole section unfocusable and unclickable and hides it from assistive technology, for a section kept mounted behind a fullscreen panel",
-    },
-    withTabs: {
-      control: "boolean",
-      description:
-        "Marks the filter below desktop as sitting under tabs. No style reads the mark any more, so it changes nothing on screen",
+        "Makes the whole section unfocusable and unclickable, and hides it from assistive technology. It suits a section kept mounted behind a fullscreen panel.",
     },
     withoutFooter: {
       control: "boolean",
-      description: "Drops the footer slot and the empty space under the body",
+      description: "Drops both the footer slot and the spacer under the body.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -228,41 +222,41 @@ const meta = {
     fullHeightBody: {
       control: "boolean",
       description:
-        "Makes the body fill the height below the header rather than its content's, for a page whose inner regions scroll instead",
+        "Makes the body fill the section's height rather than its content's, for a chat-like page whose inner regions scroll instead.",
     },
     getContextModel: {
       control: false,
       description:
-        "Returns the items of the menu that opens on a right click anywhere in the body. Without it no menu is mounted",
+        "Returns the model for the body's own right-click menu. Without it no menu is mounted; it is also suppressed while `isIndexEditingMode` is set.",
     },
     isIndexEditingMode: {
       control: "boolean",
       description:
-        "Turns the body's right-click menu off while the listing is being reordered",
+        "Suppresses the body's right-click menu while the listing is being reordered.",
     },
     pathname: {
       control: "text",
       description:
-        "The current route; changing it asks the body to take the focus again on desktop",
+        "The current route. Changing it re-focuses the body on a desktop, which is how the portal restores keyboard scrolling after a navigation.",
     },
     onDrop: {
       control: false,
       description:
-        "Called with the files dropped anywhere on the body. Nothing is filtered and nothing is highlighted",
+        "Called with the files dropped anywhere on the body, which is itself a drop target. Nothing is filtered and nothing is highlighted — see `DragAndDrop`.",
     },
     onDragOverEmpty: {
       control: false,
       description:
-        "Called on every drag over the body, with a flag saying whether a drag was already active",
+        "Called on every drag-over of the body, with a drag-active flag that is one render behind.",
     },
     onDragLeaveEmpty: {
       control: false,
-      description: "Called when a drag leaves the body",
+      description: "Called when a drag leaves the body.",
     },
     secondaryActiveOperations: {
       control: "object",
       description:
-        "Background operations (copy, move, delete…) shown in the floating progress button. Any non-empty list makes the button appear",
+        "Background operations shown in the progress button. Its length is one of the three that decide whether the button appears.",
       table: {
         defaultValue: { summary: "[]" },
       },
@@ -270,7 +264,7 @@ const meta = {
     primaryOperationsArray: {
       control: "object",
       description:
-        "Upload operations shown in the progress button's own panel. Any non-empty list makes the button appear",
+        "Upload operations shown in the progress button's own panel.",
       table: {
         defaultValue: { summary: "[]" },
       },
@@ -278,7 +272,7 @@ const meta = {
     pluginOperations: {
       control: "object",
       description:
-        "Operations contributed by plugins, listed with the background ones. Any non-empty list makes the button appear",
+        "Operations contributed by plugins, merged into the background operations of the progress button.",
       table: {
         defaultValue: { summary: "[]" },
       },
@@ -286,96 +280,92 @@ const meta = {
     secondaryOperationsCompleted: {
       control: "boolean",
       description:
-        "Whether the background operations have finished, for the button's completed look",
+        "Whether the background operations have finished, for the progress button's completed state.",
     },
     primaryOperationsCompleted: {
       control: "boolean",
-      description: "Whether the uploads have finished",
+      description: "Whether the panel operations — uploads — have finished.",
     },
     pluginOperationsCompleted: {
       control: "boolean",
-      description: "Whether the plugin operations have finished",
+      description:
+        "Whether the plugin operations have finished, for the progress button's completed state.",
     },
     secondaryOperationsStopped: {
       control: "boolean",
       description:
-        "Whether the background operations were stopped rather than finished",
+        "Whether the background operations were stopped rather than finished.",
     },
     secondaryOperationsAlert: {
       control: "boolean",
       description:
-        "Puts the progress button in its alert look for a failed background operation",
+        "Puts the progress button in its alert state for a failed background operation.",
     },
     primaryOperationsAlert: {
       control: "boolean",
       description:
-        "Puts the progress button in its alert look for a failed upload",
+        "Puts the progress button in its alert state for a failed upload.",
     },
     pluginOperationsAlert: {
       control: "boolean",
       description:
-        "Puts the progress button in its alert look for a failed plugin operation",
+        "Puts the progress button in its alert state for a failed plugin operation.",
     },
     primaryOperationsCanceled: {
       control: "boolean",
-      description: "Whether the uploads were cancelled",
+      description: "Whether the uploads were cancelled.",
     },
     needErrorChecking: {
       control: "boolean",
       description:
-        "Makes the progress button check its operations for errors before showing them as complete",
+        "Makes the progress button check its operations for errors before reporting them complete.",
     },
     pluginShowCancelButton: {
       control: "boolean",
       description:
-        "Shows the progress button's cancel control whatever the operations say",
+        "Forces the progress button's cancel control on, whatever the operations say.",
     },
     mainButtonVisible: {
       control: "boolean",
       description:
-        "Whether a main action button is on screen, which moves the progress button clear of it",
-    },
-    onOpenUploadPanel: {
-      control: false,
-      description:
-        "Called when the progress button asks to open the upload panel",
+        "Whether the main button is on screen, which moves the progress button clear of it.",
     },
     cancelUpload: {
       control: false,
       description:
-        "Called by the progress button's cancel control while an upload is running",
+        "Called by the progress button's cancel control while an upload is running.",
     },
     clearSecondaryProgressData: {
       control: false,
-      description: "Called to clear a finished background operation",
+      description: "Clears a finished background operation.",
     },
     clearPrimaryProgressData: {
       control: false,
-      description: "Called to clear a finished upload",
+      description: "Clears a finished upload operation.",
     },
     cancelSecondaryOperationById: {
       control: false,
-      description:
-        "Called with an operation type and id to cancel one background operation",
+      description: "Cancels one background operation by id.",
     },
     dragging: {
       control: "boolean",
       description:
-        "Whether the host is dragging its own items, which switches the progress button to a drop preview",
+        "Whether a drag of the host's own items is in progress, which the progress button uses for its drop-preview state.",
     },
     dropTargetPreview: {
       control: "text",
       description:
-        "Name of the folder a dragged item would land in, shown by the progress button's drop preview",
+        "Name of the folder a dragged item would land in, shown by the progress button.",
     },
     clearDropPreviewLocation: {
       control: false,
-      description: "Called to clear that drop preview",
+      description:
+        "Called by the progress button when its drop preview ends, so the host can forget the target folder.",
     },
     startDropPreview: {
       control: false,
       description:
-        "Passing it at all makes the progress button appear even with no operations, so a drag can show its drop preview",
+        "Its mere presence makes the progress button appear, even with no operations, so that a drag can show its drop preview.",
     },
   },
 } satisfies Meta<typeof Section>;
@@ -480,20 +470,16 @@ const NavigationHeader = ({
     title="My Documents"
     isRootFolder={false}
     canCreate
-    showText
     isDesktop={device === DeviceType.desktop}
-    isRoom={false}
     withMenu
     showTitle
     showRootFolderTitle
     showNavigationButton={false}
     isInfoPanelVisible={false}
-    isCurrentFolderInfo={false}
     currentDeviceType={device}
     navigationItems={mockNavigationItems}
     onClickFolder={noop}
     onBackToParentFolder={noop}
-    clearTrash={noop}
     getContextOptionsFolder={() => [
       { key: "rename", label: "Rename" },
       { key: "delete", label: "Delete" },
@@ -503,8 +489,7 @@ const NavigationHeader = ({
       { key: "create", label: "Create folder" },
     ]}
     toggleInfoPanel={noop}
-    hideInfoPanel={noop}
-    showFolderInfo={noop}
+    hideInfoPanel
     onPlusClick={noop}
     withLogo={false}
     burgerLogo=""
@@ -595,7 +580,6 @@ const TableContent = () => {
         columns={mockColumns}
         columnStorageName={COLUMN_STORAGE_NAME}
         columnInfoPanelStorageName={COLUMN_INFO_PANEL_STORAGE_NAME}
-        sectionWidth={800}
         useReactWindow={false}
         showSettings
         sortingVisible
@@ -751,7 +735,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A whole page: breadcrumbs in the header, a search and filter bar under it and a table in the body, each outlined and labelled so you can see where the section puts its slots. Scroll the table to see the header and the filter stay pinned; change any other prop live in the Controls panel below.",
+          "A whole page with each slot outlined and labelled: breadcrumbs in the header, a filter bar under it, a table in the body. The header and the filter stay pinned while the table scrolls.",
       },
       source: {
         code: `<Section currentDeviceType={DeviceType.desktop} withBodyScroll settingsStudio={false}>
@@ -858,6 +842,7 @@ const renderInfoPanel = (args: ComponentProps<typeof Section>) => {
 };
 
 export const WithInfoPanel: Story = {
+  name: "With info panel",
   render: renderInfoPanel,
   args: {
     currentDeviceType: DeviceType.desktop,
@@ -883,7 +868,7 @@ export const WithInfoPanel: Story = {
     docs: {
       description: {
         story:
-          "A details panel beside the listing, for the properties of the selected item without leaving the page. It shows only while both `canDisplay` and `isInfoPanelVisible` are on; switch either off in the Controls panel below to close it. Drag its inner edge to make it wider or narrower (`isInfoPanelResizable`); the new width arrives when you release the pointer (`setInfoPanelWidth`), and a double click on the edge restores 400px.",
+          "A details panel beside the listing, for the properties of the selected item without leaving the page. It shows only while both `canDisplay` and `isInfoPanelVisible` are on. Its inner edge drags it wider or narrower (`isInfoPanelResizable`), and a double click restores 400px.",
       },
       source: {
         code: `const [width, setWidth] = useState(400);
@@ -957,6 +942,7 @@ const ChatPanelStory = (args: ComponentProps<typeof Section>) => {
 };
 
 export const WithChatPanel: Story = {
+  name: "With chat panel",
   render: (args) => <ChatPanelStory {...args} />,
   args: {
     currentDeviceType: DeviceType.desktop,
@@ -995,7 +981,7 @@ export const WithChatPanel: Story = {
     docs: {
       description: {
         story:
-          "A chat docked beside the listing, so a conversation about the files stays open while you work with them. Drag its inner edge to make it wider or narrower (`isChatPanelResizable`); the new width arrives when you release the mouse (`setChatPanelWidth`).",
+          "A chat docked beside the listing, so a conversation about the files stays open beside them. Its inner edge drags it wider or narrower (`isChatPanelResizable`), and `setChatPanelWidth` gets the width on release.",
       },
       source: {
         code: `const [width, setWidth] = useState(400);
@@ -1028,6 +1014,7 @@ export const WithChatPanel: Story = {
 };
 
 export const WithBanner: Story = {
+  name: "With banner",
   render: (args) => (
     <PageFrame>
       <Section {...args}>
@@ -1076,7 +1063,7 @@ export const WithBanner: Story = {
     docs: {
       description: {
         story:
-          "A notice above the header that stays in view while the table scrolls (`Section.SectionBanner`). Switch `scrollableBanner` on in the Controls panel below to put it at the top of the listing instead, where it scrolls away under the header.",
+          "A notice above the header that stays in view while the table scrolls (`Section.SectionBanner`). With `scrollableBanner` it sits at the top of the listing instead and scrolls away under the header.",
       },
       source: {
         code: `<Section
@@ -1106,6 +1093,7 @@ const submenuItems = [
 ];
 
 export const WithSubmenu: Story = {
+  name: "With submenu",
   render: (args) => (
     <PageFrame>
       <Section {...args}>
@@ -1166,6 +1154,7 @@ export const WithSubmenu: Story = {
 };
 
 export const WithOperationsProgress: Story = {
+  name: "With operations progress",
   render: (args) => (
     <PageFrame>
       <Section {...args}>
@@ -1198,7 +1187,7 @@ export const WithOperationsProgress: Story = {
     docs: {
       description: {
         story:
-          "A round progress button in the bottom corner, so a long copy or upload stays visible while the user goes on working (`secondaryActiveOperations`). Hover it to read what is running; an empty list hides it again.",
+          "A round progress button in the bottom corner, so a long copy or upload stays visible while the user works on (`secondaryActiveOperations`). On hover it says what is running; an empty list hides it.",
       },
       source: {
         code: `<Section
@@ -1231,6 +1220,7 @@ const getBodyContextModel = () => [
 ];
 
 export const WithContextMenu: Story = {
+  name: "With context menu",
   render: (args) => (
     <PageFrame>
       <Section {...args}>
@@ -1283,7 +1273,7 @@ export const WithContextMenu: Story = {
       story: { inline: false, height: "626px" },
       description: {
         story:
-          "A menu of page-wide actions on a right click anywhere in the body, for what applies to the folder rather than to one file (`getContextModel`). Right click the list to open it.",
+          "A menu of page-wide actions on a right click anywhere in the body, for what applies to the folder rather than to one file (`getContextModel`).",
       },
       source: {
         code: `<Section
@@ -1308,6 +1298,7 @@ export const WithContextMenu: Story = {
 };
 
 export const OnTablet: Story = {
+  name: "On a tablet",
   render: (args) => (
     <PageFrame height={640}>
       <Section {...args}>
@@ -1348,7 +1339,7 @@ export const OnTablet: Story = {
     docs: {
       description: {
         story:
-          "The page in a tablet-width window: the header stays pinned, while the filter bar moves into the listing and scrolls with it, leaving more room for the rows (`currentDeviceType`).",
+          "The page in a tablet-width window (`currentDeviceType`). The header stays pinned, and the filter bar moves into the listing and scrolls with it.",
       },
       source: {
         code: `<Section
@@ -1372,6 +1363,7 @@ export const OnTablet: Story = {
 };
 
 export const OnPhone: Story = {
+  name: "On a phone",
   render: (args) => (
     <PageFrame height={640}>
       <Section {...args}>
@@ -1407,7 +1399,7 @@ export const OnPhone: Story = {
     docs: {
       description: {
         story:
-          "The page on a phone: the header and the filter bar both move into the listing and the whole page scrolls, so the rows get the full height of the screen (`currentDeviceType`).",
+          "The page on a phone (`currentDeviceType`). The header and the filter bar move into the listing, and the whole page scrolls, so the rows get the full height.",
       },
       source: {
         code: `<Section
@@ -1431,6 +1423,7 @@ export const OnPhone: Story = {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <PageFrame>
@@ -1479,7 +1472,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "626px" },
       description: {
         story:
-          "The page in a right-to-left interface: the info panel opens on the left, its border moves to its right edge, and the table's columns run from the right.",
+          "The page in a right-to-left interface. The info panel opens on the left with its border on its right edge, and the table's columns run from the right.",
       },
       source: {
         code: `<div dir="rtl">
@@ -1512,6 +1505,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: (args) => (
     <div
       style={
@@ -1589,7 +1583,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The variables are listed under CSS variables on this page. The example sets every desktop one on a wrapper around one section with both panels open: the blue strip is the pinned header, the pale blue column is the info panel and the yellow one is the chat panel, with its drop frame on. Navigation, Filter and the table have variables of their own, documented in their stories and set on the same wrapper.`,
+        story: `Both panels styled from a wrapper: a blue header strip, a pale blue info panel, and a yellow chat panel with its drop frame. Both panels are 300px wide. Navigation, Filter and the table have variables of their own, documented on their pages.`,
       },
       source: {
         code: `<div

@@ -4,7 +4,8 @@ import classNames from "classnames";
 import { Button, ButtonSize } from "../button";
 import { ModalDialog } from "../modal-dialog";
 import { Text } from "../text";
-import { getBrandName } from "../../constants/brands";
+import { getProductName } from "../../utils/product-name";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import type { TwoStateToggleProps } from "./TwoStateToggle.types";
 import styles from "./TwoStateToggle.module.scss";
@@ -30,15 +31,6 @@ const writeStoredDesign = (value: "new" | "old") => {
   }
 };
 
-// The product's name as the portal brands it. The library's own lookup is the
-// identity until an application registers one, so an unwired lookup -- which
-// answers with the key itself -- falls back to the product's current name.
-const PRODUCT_NAME_KEY = "ProductName";
-const getProductName = (): string => {
-  const name = getBrandName(PRODUCT_NAME_KEY).trim();
-  return name && name !== PRODUCT_NAME_KEY ? name : "ONLYOFFICE Apps";
-};
-
 const TwoStateToggle = ({
   title: titleProp,
   labelOld = "OLD",
@@ -51,13 +43,16 @@ const TwoStateToggle = ({
   ariaLabel: ariaLabelProp,
   onNavigate,
   className,
+  ...rest
 }: TwoStateToggleProps) => {
+  const aria = pickAriaProps(rest);
   const productName = getProductName();
   const title = titleProp ?? `${productName} design`;
   const confirmBody =
     confirmBodyProp ??
     `You are about to leave the new Dashboard and return to the classic ${productName} view.`;
-  const ariaLabel = ariaLabelProp ?? `Switch ${productName} design`;
+  const ariaLabel =
+    aria["aria-label"] ?? ariaLabelProp ?? `Switch ${productName} design`;
 
   // isNew === true  → new Dashboard  (useDocSpace = "new")
   // isNew === false → classic view (useDocSpace = "old")
@@ -101,6 +96,7 @@ const TwoStateToggle = ({
         {title ? <span className={styles.title}>{title}</span> : null}
         <button
           type="button"
+          {...aria}
           role="switch"
           aria-checked={isNew}
           aria-label={ariaLabel}

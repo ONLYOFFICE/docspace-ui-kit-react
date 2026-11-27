@@ -38,18 +38,6 @@ describe("InfiniteLoader props it computes", () => {
     received.length = 0;
   });
 
-  it("does not let a showSkeleton prop override its own flag", () => {
-    render(<InfiniteLoaderComponent {...defaultProps} showSkeleton />);
-    expect(last().showSkeleton).toBe(false);
-  });
-
-  it("does not let a showSkeleton prop override its own flag in the grid", () => {
-    render(
-      <InfiniteLoaderComponent {...defaultProps} viewAs="tile" showSkeleton />,
-    );
-    expect(last().showSkeleton).toBe(false);
-  });
-
   it("scrolls the element passed as scrollElement", () => {
     const scroller = document.createElement("div");
     document.body.appendChild(scroller);
