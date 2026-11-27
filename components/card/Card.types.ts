@@ -1,7 +1,9 @@
 import type React from "react";
 
-export interface CardProps {
-  /** Left side of the header row. A string renders as the card's heading, an `<h3>` unless `titleLevel` says otherwise; any other node is rendered as given inside a `<div>`. The row is dropped entirely when both this and `extra` are unset. */
+export interface CardProps extends React.AriaAttributes {
+  /** Left side of the header row. A string renders as the card's heading;
+   * any other node is rendered as given inside a `<div>`. Without this and
+   * `extra` there is no header row. */
   title?: React.ReactNode;
   /** Level of the heading a string `title` renders as. Ignored when `title` is not a string. */
   titleLevel?: 1 | 2 | 3 | 4 | 5 | 6;

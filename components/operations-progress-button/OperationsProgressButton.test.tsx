@@ -35,4 +35,17 @@ describe("<OperationsProgressButton /> accessible name", () => {
     expect(screen.queryByLabelText("move button")).toBeNull();
     expect(screen.getAllByLabelText("Moving folder").length).toBeGreaterThan(0);
   });
+
+  it("keeps a passed aria-* on the badge, its aria-label over the operation", () => {
+    render(
+      <OperationsProgressButton
+        operations={[operation("Moving folder", "move", 10)]}
+        aria-label="Moving folder Reports"
+        aria-describedby="operations-hint"
+      />,
+    );
+
+    const badge = screen.getByRole("button", { name: "Moving folder Reports" });
+    expect(badge).toHaveAttribute("aria-describedby", "operations-hint");
+  });
 });

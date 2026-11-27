@@ -17,6 +17,36 @@ describe("<Slider />", () => {
     expect(screen.getByTestId("slider")).toBeInTheDocument();
   });
 
+  it("forwards a passed aria-* to the range input", () => {
+    render(
+      <Slider
+        {...defaultProps}
+        aria-label="Volume"
+        aria-controls="player"
+        aria-keyshortcuts="Alt+V"
+      />,
+    );
+
+    const slider = screen.getByRole("slider", { name: "Volume" });
+    expect(slider).toHaveAttribute("aria-controls", "player");
+    expect(slider).toHaveAttribute("aria-keyshortcuts", "Alt+V");
+  });
+
+  it("leaves the value and its bounds to the native range", () => {
+    const untyped = {
+      "aria-valuenow": 99,
+      "aria-valuemin": 10,
+      "aria-valuemax": 20,
+    } as object;
+    render(<Slider {...defaultProps} {...untyped} />);
+
+    const slider = screen.getByRole("slider");
+    expect(slider).not.toHaveAttribute("aria-valuenow");
+    expect(slider).not.toHaveAttribute("aria-valuemin");
+    expect(slider).not.toHaveAttribute("aria-valuemax");
+    expect(slider).toHaveValue("50");
+  });
+
   it("accepts and applies custom props", () => {
     const props = {
       id: "testId",

@@ -102,7 +102,7 @@ const meta = {
     checked: {
       control: "boolean",
       description:
-        "Ticks the checkbox and keeps it in place of the icon, and tints the whole tile",
+        "Ticks the checkbox, shows it in place of the icon and tints the whole tile. The tile holds no state; pass back what `onSelect` reports.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -110,14 +110,15 @@ const meta = {
     isDragging: {
       control: "boolean",
       description:
-        "Marks the tile as being dragged; the checkbox then no longer replaces the icon on hover, and nothing else changes",
+        "Marks the tile as being dragged: hovering the icon does not swap it for the checkbox. It does not dim the tile.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     inProgress: {
       control: "boolean",
-      description: "Replaces the icon and the checkbox with a small loader",
+      description:
+        "Replaces the icon and the checkbox with the kit's track loader.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -125,7 +126,7 @@ const meta = {
     isActive: {
       control: "boolean",
       description:
-        "Keeps the hover tint and the underlined name on the tile being acted on",
+        "Keeps the hover tint and the underlined name on the tile being acted on, after the pointer leaves it.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -133,7 +134,7 @@ const meta = {
     showHotkeyBorder: {
       control: "boolean",
       description:
-        "Turns the tile's border the accent colour, to mark the one the keyboard is on",
+        "Draws the accent outline that marks the tile the keyboard is on.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -141,7 +142,7 @@ const meta = {
     isEdit: {
       control: "boolean",
       description:
-        "Removes the icon and the checkbox while the file is renamed",
+        "Renaming state: removes the icon and the checkbox, so the content gets the name row.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -149,7 +150,7 @@ const meta = {
     isBlockingOperation: {
       control: "boolean",
       description:
-        "Meant to stop the tile reacting to the pointer during an operation; it currently changes nothing",
+        "Stops hover, clicks and right-clicks reaching the tile while an operation runs over it. The tile looks the same.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -157,7 +158,7 @@ const meta = {
     isHighlight: {
       control: "boolean",
       description:
-        "Fades a colour out of the lower part once, over two seconds, to point at a file that was just matched; the kit defines no colour for it (see CSS Customization)",
+        "Fades `--highlightColor` out of the name row once, on mount, to point at a matched file. The kit sets no such colour, so nothing shows until you set one.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -165,99 +166,86 @@ const meta = {
     item: {
       control: "object",
       description:
-        "The file the tile stands for, passed back through the callbacks. A `contextOptions` key on it is what draws the three-dot button; `isPlugin` with `fileTileIcon` puts that icon in place of the preview",
+        "The file the tile stands for, passed back through the callbacks. A `contextOptions` key on it is what draws the three-dot button.",
     },
     children: {
       control: false,
       description:
-        "The name row beside the icon, usually a `TileContent`; only the first element is shown",
+        "The tile's content. Only the first element is rendered, in the row beside the icon; the rest are dropped.",
     },
     element: {
       control: false,
       description:
-        "The file-type icon beside the name; without it the tile has neither the icon nor the checkbox",
+        "The icon beside the checkbox. Without it neither the icon nor the checkbox is rendered at all.",
     },
     thumbnail: {
       control: "text",
       description:
-        "Address of the preview image, drawn across the upper part; the tile falls back to `temporaryIcon` when it fails to load",
+        "Address of the preview image. When it fails to load, the tile draws a plugin's `fileTileIcon` or `temporaryIcon` instead.",
     },
     temporaryIcon: {
       control: false,
       description:
-        "Placeholder drawn at the bottom of the upper part when there is no preview: an element as given, or the address of an SVG",
+        "Drawn when there is no `thumbnail`: a URL is fetched as an SVG, an element is rendered as given.",
     },
     badges: {
       control: false,
       description:
-        "Badges in the top end corner of the preview; give their wrapper the class `badges` so clicking them does not select the tile",
+        "Badges drawn in a row in the thumbnail's top end corner. Give them the class `badges` so a click on them does not select the tile.",
     },
     contentElement: {
       control: false,
       description:
-        "A column of quick-action buttons in the top start corner of the preview",
+        "Quick-action buttons, stacked in a column in the thumbnail's top start corner.",
     },
     contextOptions: {
       control: "object",
-      description: "Entries of the menu opened by the three-dot button",
+      description:
+        "Draws the three-dot button when non-empty and `item` carries a `contextOptions` key. The menu lists `getContextModel`'s entries, not these.",
     },
     getContextModel: {
       control: false,
       description:
-        "Returns the entries of the menu opened by a right-click; without it a right-click opens nothing",
+        "Builds the menu that the three-dot button and a right-click open. Without it neither opens a menu, whatever `contextOptions` holds.",
     },
     onSelect: {
       description:
-        "Called with the new checked state and the item on a plain click on the tile, from the checkbox, and when the icon is tapped on a phone",
+        "Called with the new checked state and the `item`, from the checkbox or a plain click. A tap on the icon calls it too, in a window 600px wide or narrower.",
     },
     setSelection: {
       description:
-        "Called with an empty list just before a plain click selects the tile, unless the click landed on an image, an input or an icon",
+        "Called with an empty array before a plain click selects the tile, unless the click landed on an image, an input or an SVG shape.",
     },
     withCtrlSelect: {
       description:
-        "Called with the item on a Ctrl- or Cmd-click, which then does not select the tile",
+        "Called with the `item` on a Ctrl- or Cmd-click, instead of selecting.",
     },
     withShiftSelect: {
       description:
-        "Called with the item on a Shift-click, which then does not select the tile",
+        "Called with the `item` on a Shift-click, instead of selecting.",
     },
     thumbnailClick: {
       description:
-        "Called with the event when the preview is clicked; the tile's own click handling runs as well",
+        "Called with the event when the thumbnail area is clicked. The tile's own click handler runs as well.",
     },
     tileContextClick: {
       description:
-        "Called just before the menu opens, with `true` when a right-click opened it",
+        "Called before the menu opens, with `true` when the trigger was a right-click.",
     },
     hideContextMenu: {
-      description: "Called when the menu closes",
+      description: "Called when the menu closes.",
     },
     forwardRef: {
       control: false,
       description:
-        "Ref to the outer element, which the tile also clicks on a right-click when its menu is not mounted yet",
+        "Attached to the outer element, and clicked by the component itself on a right-click before the menu is mounted.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the outer element",
+      description: "Value of `data-testid` on the outer element.",
       table: {
         defaultValue: { summary: '"tile"' },
       },
-    },
-    thumbSize: {
-      control: false,
-      description: "Ignored: no value of it changes the tile",
-    },
-    contextButtonSpacerWidth: {
-      control: false,
-      description:
-        "Ignored: it lands on the outer element as an unknown attribute",
-    },
-    sideColor: {
-      control: false,
-      description:
-        "Ignored: it lands on the outer element as an unknown attribute",
     },
   },
   args: {
@@ -313,6 +301,7 @@ const Template = ({
 };
 
 export const Default: Story = {
+  name: "Placeholder picture",
   render: Template,
   args: {
     item: {
@@ -336,6 +325,7 @@ export const Default: Story = {
   play: async ({ args, canvas, userEvent }) => {
     const tile = canvas.getByTestId("tile");
     const content = within(tile).getByText("Document");
+    await expect(getComputedStyle(tile).cursor).toBe("pointer");
 
     // A click on the tile selects it, alone.
     await userEvent.click(content);
@@ -372,7 +362,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A document with no preview yet: a placeholder picture, a badge and a quick action over it, and the name row with the menu. Click the tile to select it, Ctrl- or Shift-click it to see the other callbacks in the Actions panel, and change any other prop live in the Controls panel below.",
+          "A document with no preview: a placeholder picture, a badge and a quick action over it, and the name row with the menu. A plain click selects the tile; a Ctrl-, Cmd- or Shift-click goes to `withCtrlSelect` or `withShiftSelect`.",
       },
       source: {
         code: `<FileTile
@@ -396,6 +386,7 @@ export const Default: Story = {
 };
 
 export const Checked: Story = {
+  name: "Selected",
   render: Template,
   args: {
     ...Default.args,
@@ -412,7 +403,7 @@ export const Checked: Story = {
     docs: {
       description: {
         story:
-          "A selected file, as it looks among others the reader has picked: the checkbox stays ticked in place of the icon and the whole tile is tinted (`checked`).",
+          "A selected file: the checkbox stays ticked in place of the icon, and the whole tile is tinted (`checked`).",
       },
       source: {
         code: `<FileTile
@@ -434,10 +425,12 @@ export const Checked: Story = {
 };
 
 export const InProgress: Story = {
+  name: "Busy",
   render: Template,
   args: {
     ...Default.args,
     inProgress: true,
+    isBlockingOperation: true,
   },
   play: async ({ canvas }) => {
     const tile = canvas.getByTestId("tile");
@@ -445,12 +438,14 @@ export const InProgress: Story = {
       within(tile).queryByRole("checkbox", { hidden: true }),
     ).toBeNull();
     await expect(tile.querySelector('[class*="loader"]')).not.toBeNull();
+    // The pointer does not reach a blocked tile.
+    await expect(getComputedStyle(tile).pointerEvents).toBe("none");
   },
   parameters: {
     docs: {
       description: {
         story:
-          "A file that is busy, being uploaded or converted: a small loader stands where the icon and the checkbox were (`inProgress`).",
+          "A file that is busy, being uploaded or converted: a small loader stands where the icon and the checkbox were (`inProgress`). The pointer does not reach it (`isBlockingOperation`).",
       },
       source: {
         code: `<FileTile
@@ -458,6 +453,7 @@ export const InProgress: Story = {
   element={<WordSvgUrl />}
   contextOptions={contextOptions}
   inProgress={true}
+  isBlockingOperation={true}
 >
   <TileContent>
     <Link type="page" title="Document.docx" fontWeight={600} isTextOverflow>
@@ -471,6 +467,7 @@ export const InProgress: Story = {
 };
 
 export const WithThumbnail: Story = {
+  name: "With a preview",
   render: Template,
   args: {
     ...Default.args,
@@ -487,7 +484,7 @@ export const WithThumbnail: Story = {
     docs: {
       description: {
         story:
-          "A document with a preview: the image fills the upper part, cropped from the top, and the badges sit over it (`thumbnail`). If the image fails to load, the placeholder from `temporaryIcon` takes its place.",
+          "A document with a preview: the image fills the upper part, cropped from the top, and the badges sit over it (`thumbnail`). An image that fails to load gives way to `temporaryIcon`.",
       },
       source: {
         code: `<FileTile
@@ -510,6 +507,7 @@ export const WithThumbnail: Story = {
 };
 
 export const WithHotkeyBorder: Story = {
+  name: "Keyboard outline",
   render: Template,
   args: {
     ...Default.args,
@@ -546,6 +544,7 @@ export const WithHotkeyBorder: Story = {
 };
 
 export const RenamingState: Story = {
+  name: "Renaming",
   render: Template,
   args: {
     ...Default.args,
@@ -586,6 +585,7 @@ export const RenamingState: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={
@@ -683,13 +683,11 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The variables are listed under CSS variables on this page.
+        story: `Two tiles under wrappers that set the variables.
+- **Document.docx** — a preview, a badge and a quick action, for the rest of the variables.
+- **Report.docx** — \`showHotkeyBorder\` for \`--tile-hotkey-color\`. Its own wrapper sets a thicker \`--file-tile-border-style\` and hides the icon with \`--tile-icon-display\`.
 
-Two instances:
-- **Document.docx** — a preview, a badge and a quick action, for every variable except \`--file-tile-border-style\`, \`--tile-icon-display\`, \`--tile-hotkey-color\` and \`--highlightColor\`; hover it for the hover variables.
-- **Report.docx** — \`showHotkeyBorder\`, for \`--tile-hotkey-color\`, in a wrapper of its own that sets \`--file-tile-border-style\` to a thicker border and \`--tile-icon-display\` to \`none\`.
-
-\`--highlightColor\` is not set here: the highlight plays once, on mount, and is gone before a reader looks.`,
+\`--highlightColor\` is left out: the highlight plays once, on mount.`,
       },
       source: {
         code: `<div style={{

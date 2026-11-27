@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import classNames from "classnames";
 
 import { useCommonTranslation } from "../../utils/i18n";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import type { LoadingButtonProps } from "./LoadingButton.types";
 import styles from "./LoadingButton.module.scss";
@@ -40,6 +41,7 @@ const LoadingButton: React.FC<LoadingButtonProps> = ({
   isDefaultMode,
   cancelLabel,
   progressLabel = "Progress",
+  ...rest
 }) => {
   const t = useCommonTranslation();
   const [isAnimation, setIsAnimation] = useState<boolean>(true);
@@ -56,6 +58,7 @@ const LoadingButton: React.FC<LoadingButtonProps> = ({
     };
   }, [isAnimation]);
 
+  const aria = pickAriaProps(rest);
   const value = clampPercent(percent);
   const cancelName = cancelLabel ?? (t("Common:CancelButton") || "Cancel");
 
@@ -89,8 +92,9 @@ const LoadingButton: React.FC<LoadingButtonProps> = ({
           [styles.inConversion]: inConversion,
         })}
         style={{ "--loading-button-percent": value } as React.CSSProperties}
+        {...aria}
         role="progressbar"
-        aria-label={progressLabel}
+        aria-label={aria["aria-label"] ?? progressLabel}
         aria-valuemin={0}
         aria-valuemax={100}
         // At 0 the ring spins: the progress is not known yet.

@@ -9,6 +9,8 @@ import PencilReactSvgUrl from "../../assets/pencil.react.svg";
 import PlusSvgUrl from "../../assets/icons/16/button.plus.react.svg";
 
 import { IconSizeType, useClickOutside } from "../../utils";
+import { groupRoleWhenNamed, pickAriaProps } from "../../utils/aria-props";
+import { useCommonTranslation } from "../../utils/i18n";
 
 import { useInterfaceDirection, useTheme } from "../../context";
 
@@ -54,8 +56,12 @@ const AvatarPure = ({
   isNotIcon = false,
   imgClassName = "",
   dataTestId,
+  id,
+  style,
+  ...rest
 }: AvatarProps) => {
   const { isRTL } = useInterfaceDirection();
+  const t = useCommonTranslation();
   const { isBase } = useTheme();
 
   const iconRef = React.useRef<HTMLDivElement>(null);
@@ -216,6 +222,9 @@ const AvatarPure = ({
   return (
     <>
       <div
+        {...pickAriaProps(rest)}
+        id={id}
+        style={style}
         className={classNames(styles.avatar, className)}
         data-size={size}
         data-no-click={noClick ? "true" : "false"}
@@ -224,9 +233,12 @@ const AvatarPure = ({
         onKeyDown={isInteractive ? onKeyDown : undefined}
         ref={iconRef}
         data-testid={dataTestId ?? "avatar"}
-        role={isInteractive ? "button" : undefined}
+        role={isInteractive ? "button" : groupRoleWhenNamed(rest)}
         tabIndex={isInteractive ? 0 : undefined}
-        aria-label={isInteractive && userName ? userName : undefined}
+        aria-label={
+          rest["aria-label"] ??
+          (isInteractive && userName ? userName : undefined)
+        }
       >
         <div
           className={classNames(styles.avatarWrapper, className)}
@@ -244,6 +256,7 @@ const AvatarPure = ({
                   className="edit_icon"
                   iconNode={<PencilReactSvgUrl />}
                   onClick={onEditButtonClick}
+                  ariaLabel={t("EditButton")}
                   size={16}
                   dataTestId="edit_avatar_icon_button"
                 />
@@ -254,6 +267,7 @@ const AvatarPure = ({
                 className="edit_icon"
                 iconNode={<PlusSvgUrl />}
                 onClick={onUploadClick}
+                ariaLabel={t("UploadPicture")}
                 size={16}
                 dataTestId="edit_avatar_icon_button"
               />

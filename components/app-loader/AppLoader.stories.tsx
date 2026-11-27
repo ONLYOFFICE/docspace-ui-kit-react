@@ -51,6 +51,7 @@ export const Default: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={
@@ -71,7 +72,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Both variables set on one wrapper -- the variables are listed under CSS variables on this page. The sheet takes a light blue background and drops its stacking order to 100.`,
+        story: `The sheet under a wrapper that sets both variables: a light blue background, and a stacking order of 100.`,
       },
       source: {
         code: `<div

@@ -68,17 +68,9 @@ export type SnackbarProps = {
    */
   onLoad?: () => void;
   /**
-   * Ignored. Nothing reads this prop; it is kept off the DOM.
-   */
-  isMaintenance?: boolean;
-  /**
    * Opacity of the bar. Without it the bar renders fully transparent — the stylesheet falls back to `0`.
    */
   opacity?: number;
-  /**
-   * Ignored. Nothing reads this prop; the close cross calls `onAction`.
-   */
-  onClose?: () => void;
   /**
    * Whether the window `blur` listener is skipped. It is on by default and turns a click inside an iframe into an `onAction` half a second later.
    */

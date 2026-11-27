@@ -2,6 +2,7 @@ import { Text } from "../text";
 
 import EmptyViewOption from "./sub-components/EmptyViewOption";
 
+import { groupRoleWhenNamed, pickAriaProps } from "../../utils/aria-props";
 import styles from "./EmptyView.module.scss";
 import type { EmptyViewProps } from "./EmptyView.types";
 
@@ -14,13 +15,16 @@ const EmptyView = ({
   className,
   bodyClassName,
   extraContent,
+  ...rest
 }: EmptyViewProps) => {
   return (
     <div
+      {...pickAriaProps(rest)}
+      role={groupRoleWhenNamed(rest)}
       className={`${styles.wrapper}${className ? ` ${className}` : ""}`}
       data-testid="empty-view"
     >
-      <header className={styles.header}>
+      <div className={styles.header}>
         {icon}
         <Text
           as="h3"
@@ -33,7 +37,7 @@ const EmptyView = ({
         <Text as="p" fontSize="12px" className={styles.subheading}>
           {description}
         </Text>
-      </header>
+      </div>
       {extraContent ? extraContent : null}
       {options ? (
         <div

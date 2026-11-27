@@ -151,6 +151,14 @@ describe("RoomTile", () => {
     return render(<RoomTile {...defaultProps} />);
   };
 
+  it("puts a passed aria-* on the tile", () => {
+    renderRoomTile({ "aria-describedby": "room-hint" });
+    expect(screen.getByTestId("tile")).toHaveAttribute(
+      "aria-describedby",
+      "room-hint",
+    );
+  });
+
   it("renders room title correctly", () => {
     renderRoomTile();
     expect(screen.getByTestId("room-content")).toBeTruthy();

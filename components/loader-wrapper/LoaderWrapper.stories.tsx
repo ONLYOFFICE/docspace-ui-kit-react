@@ -17,16 +17,16 @@ const meta = {
     children: {
       control: false,
       description:
-        "The content that is dimmed and made unclickable while loading. It is laid out in a flex column",
+        "The tree that is dimmed and made unclickable. Nothing is added around it beyond the wrapper's own flex column.",
     },
     isLoading: {
       control: "boolean",
       description:
-        "Whether the content is busy: fades the content to half opacity and stops the mouse reaching it. Shows no spinner and does not block the keyboard",
+        "Whether the content is busy. It fades the wrapper and sets `pointer-events: none`; it renders no spinner of its own and does not stop the keyboard.",
     },
     testId: {
       control: "text",
-      description: "Replaces the wrapper's `data-testid`",
+      description: "Replaces the wrapper's `data-testid`.",
       table: {
         defaultValue: { summary: "loader-wrapper" },
       },
@@ -88,7 +88,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The content as it looks when nothing is loading: fully opaque and clickable. Switch `isLoading` in the Controls panel below to watch it fade and back.",
+          "The content as it looks when nothing is loading: fully opaque and clickable.",
       },
       source: {
         code: `<LoaderWrapper isLoading={false}>
@@ -100,6 +100,7 @@ export const Default: Story = {
 };
 
 export const LoadingContent: Story = {
+  name: "Loading",
   render: (args) => <LoaderWrapper {...args} />,
   args: {
     isLoading: true,
@@ -115,7 +116,7 @@ export const LoadingContent: Story = {
     docs: {
       description: {
         story:
-          "The same card while loading: it stays on screen at half opacity so the reader keeps their place, and the button no longer answers the mouse (`isLoading`). Place a loader beside it to say why.",
+          "The same card while loading (`isLoading`): on screen at half opacity, and the button no longer answers the mouse. A loader beside it would say why.",
       },
       source: {
         code: `<LoaderWrapper isLoading>
@@ -127,6 +128,7 @@ export const LoadingContent: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={
@@ -151,7 +153,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Both opacities and the transition set on one wrapper -- the variables are listed under CSS variables on this page. The first card is loading and shows \`--loader-wrapper-loading-opacity\`; the second is idle and shows \`--loader-wrapper-idle-opacity\`. \`--loader-wrapper-transition\` takes effect only when \`isLoading\` changes on an instance, which these two cards never do.`,
+        story: `Two cards under a wrapper that sets both opacities and the transition. The first is loading and shows \`--loader-wrapper-loading-opacity\`; the second is idle.`,
       },
       source: {
         code: `<div

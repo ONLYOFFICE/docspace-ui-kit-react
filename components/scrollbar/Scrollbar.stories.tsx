@@ -16,7 +16,7 @@ const meta = {
     autoHide: {
       control: "boolean",
       description:
-        "Hides the tracks until the content is scrolled or the pointer moves over it, and fades them out again three seconds later",
+        "Hides the tracks until a scroll or a pointer move over the content, and fades them out three seconds later. `false` keeps them on screen.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -24,31 +24,30 @@ const meta = {
     fixedSize: {
       control: "boolean",
       description:
-        "Keeps the thumb at its wider 8px thickness on desktop instead of widening it only while the pointer is over the track",
+        "Keeps the thumb 8px thick on desktop. Without it the thumb is 4px and thickens only under the pointer.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     paddingAfterLastItem: {
       control: "text",
-      description:
-        "Space below the last item inside the scrolling area, as a CSS length",
+      description: "Space below the last item, as a CSS length.",
     },
     paddingInlineEnd: {
       control: "text",
       description:
-        "Space between the content and the side the vertical track is on, as a CSS length; replaces the default 17px (8px on screens up to 600px wide)",
+        "Space between the content and the side the vertical track is on, as a CSS length. It replaces the default at every screen width.",
     },
     noScrollY: {
       control: "boolean",
-      description: "Disables vertical scrolling",
+      description: "Stops the content scrolling vertically.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     noScrollX: {
       control: "boolean",
-      description: "Disables horizontal scrolling",
+      description: "Stops the content scrolling horizontally.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -56,19 +55,20 @@ const meta = {
     rtl: {
       control: "boolean",
       description:
-        "Puts the vertical track on the left edge when true and on the right when false; follows the interface direction when not set",
+        "Which side the vertical track is on. It follows the interface direction unless set.",
     },
     tabIndex: {
       control: "number",
       description:
-        "Position of the scrolling area in the tab order; -1 keeps it out of the tab order, `null` removes the attribute",
+        "Tab order of the content element. The default keeps it out of the tab order, so the keyboard cannot reach the region; `null` drops the attribute.",
       table: {
         defaultValue: { summary: "-1" },
       },
     },
     autoFocus: {
       control: "boolean",
-      description: "Moves focus to the scrolling area after the first render",
+      description:
+        "Focuses the content element after mount, so the arrow keys scroll it straight away.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -76,22 +76,22 @@ const meta = {
     translateContentSizeYToHolder: {
       control: "boolean",
       description:
-        "Gives the box the height of its content, so it grows with the content instead of filling its parent",
+        "Gives the outer element the content's own height, so the scrollbar grows with its content instead of filling its parent.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     translateContentSizeXToHolder: {
       control: "boolean",
-      description:
-        "Gives the box the width of its content, so it grows with the content instead of filling its parent",
+      description: "The same on the horizontal axis.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     translateContentSizesToHolder: {
       control: "boolean",
-      description: "Gives the box both the height and the width of its content",
+      description:
+        "Gives the outer element both the content's height and its width.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -99,48 +99,50 @@ const meta = {
     createContext: {
       control: "boolean",
       description:
-        "Publishes the scrollbar instance on a React context for the components rendered inside it",
+        "Publishes the scrollbar on a React context for the components inside it.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     onScroll: {
       action: "onScroll",
-      description: "Called with the native scroll event as the content scrolls",
+      description: "Called as the content scrolls, with the native event.",
     },
     id: {
       control: "text",
-      description: "Id of the outer element",
+      description: "Applied to the outermost element.",
     },
     className: {
       control: "text",
-      description: "Class added to the outer element",
+      description: "Applied to the outermost element.",
     },
     style: {
       control: "object",
-      description:
-        "Inline styles of the outer element, usually its width and height",
+      description: "Applied to the outermost element.",
     },
     scrollClass: {
       control: "text",
-      description: "Class added to the element that scrolls",
+      description:
+        "Extra class on the inner element that scrolls, the `.scroller`.",
     },
     scrollBodyClassName: {
       control: "text",
-      description: "Class added to the element that holds the content",
+      description:
+        "Extra class on the element that holds the content, the `.scroll-body`.",
     },
     ref: {
       control: false,
       description:
-        "Receives the scrollbar instance, with its scroll methods and elements",
+        "Receives the scrollbar instance, with its scroll methods and elements.",
     },
     contentRef: {
       control: false,
-      description: "Receives the element that holds the content",
+      description:
+        "Receives the element that holds the content, once it is mounted.",
     },
     children: {
       control: false,
-      description: "The content to scroll",
+      description: "The content to scroll.",
     },
   },
 } satisfies Meta<typeof Scrollbar>;
@@ -188,6 +190,7 @@ const LongContent = () => (
 );
 
 export const Default: Story = {
+  name: "Track always shown",
   render: (args) => (
     <Scrollbar {...args}>
       <LongContent />
@@ -234,7 +237,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Tall content in a fixed-size box, with auto-hide turned off so the vertical track stays on screen (`autoHide={false}`); change any other prop live in the Controls panel below.",
+          "Tall content in a fixed-size box, with the vertical track always on screen (`autoHide={false}`).",
       },
       source: {
         code: `<Scrollbar autoHide={false} style={{ width: 300, height: 200 }}>
@@ -246,6 +249,7 @@ export const Default: Story = {
 };
 
 export const WithAutoHide: Story = {
+  name: "Auto-hiding track",
   render: (args) => (
     <Scrollbar {...args}>
       <LongContent />
@@ -269,7 +273,7 @@ export const WithAutoHide: Story = {
     docs: {
       description: {
         story:
-          "The default behaviour, for content where a permanent track would distract: the track stays hidden until you scroll or move the pointer over the content, then fades out three seconds later (`autoHide`).",
+          "The default, with the track hidden until a scroll or a pointer move over the content (`autoHide`). It fades out three seconds later, for content where a permanent track would distract.",
       },
       source: {
         code: `<Scrollbar autoHide style={{ width: 300, height: 200 }}>
@@ -281,6 +285,7 @@ export const WithAutoHide: Story = {
 };
 
 export const WithFixedSize: Story = {
+  name: "Fixed thumb size",
   render: (args) => (
     <Scrollbar {...args}>
       <LongContent />
@@ -300,7 +305,7 @@ export const WithFixedSize: Story = {
     docs: {
       description: {
         story:
-          "The thumb stays at its wider 8px thickness on desktop instead of widening only while the pointer is over the track, so it is easier to find and grab (`fixedSize`).",
+          "A thumb that stays 8px thick on desktop, so it is easier to find and grab (`fixedSize`). Without the prop it thickens only under the pointer.",
       },
       source: {
         code: `<Scrollbar fixedSize autoHide={false} style={{ width: 300, height: 200 }}>
@@ -312,6 +317,7 @@ export const WithFixedSize: Story = {
 };
 
 export const WithHorizontalScroll: Story = {
+  name: "Horizontal scroll",
   render: (args) => (
     <Scrollbar {...args}>
       <div
@@ -357,6 +363,7 @@ export const WithHorizontalScroll: Story = {
 };
 
 export const WithBothScrollbars: Story = {
+  name: "Both tracks",
   render: (args) => (
     <Scrollbar {...args}>
       <div style={{ width: "500px" }}>
@@ -393,6 +400,7 @@ export const WithBothScrollbars: Story = {
 };
 
 export const WithPaddingAfterLastItem: Story = {
+  name: "Space after the last item",
   render: (args) => (
     <Scrollbar {...args}>
       <LongContent />
@@ -412,7 +420,7 @@ export const WithPaddingAfterLastItem: Story = {
     docs: {
       description: {
         story:
-          "Scrollbar with additional padding after the last item, providing extra space at the bottom of scrollable content.",
+          "Extra space below the last paragraph, inside the scrolling content (`paddingAfterLastItem`).",
       },
       source: {
         code: `<Scrollbar paddingAfterLastItem="50px" autoHide={false} style={{ width: 300, height: 200 }}>
@@ -424,6 +432,7 @@ export const WithPaddingAfterLastItem: Story = {
 };
 
 export const WithPaddingInlineEnd: Story = {
+  name: "Space before the track",
   render: (args) => (
     <Scrollbar {...args}>
       <LongContent />
@@ -443,7 +452,7 @@ export const WithPaddingInlineEnd: Story = {
     docs: {
       description: {
         story:
-          "Scrollbar with inline-end padding, adding space on the right (or left in RTL) side of the scroll body.",
+          "A wide gap between the text and the track's side, on the right here and on the left in a right-to-left interface (`paddingInlineEnd`).",
       },
       source: {
         code: `<Scrollbar paddingInlineEnd="100px" autoHide={false} style={{ width: 300, height: 200 }}>
@@ -455,6 +464,7 @@ export const WithPaddingInlineEnd: Story = {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <Scrollbar {...args}>
@@ -486,7 +496,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "226px" },
       description: {
         story:
-          "The same box under a right-to-left interface: the vertical track moves to the left edge, the text aligns to the right and the content's inline-end padding moves to the left with the track. The direction comes from the theme's `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir=\"rtl\"` for the text itself.",
+          "The same box in a right-to-left interface: the vertical track and the content's end padding move to the left edge. The bar takes the direction from the theme; the wrapper's `dir=\"rtl\"` aligns the text.",
       },
       source: {
         code: `<div dir="rtl">
@@ -500,6 +510,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={
@@ -533,7 +544,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The variables are listed under CSS variables on this page. The example sets the thumb colours (hover and drag the thumb to see the other two), a 6px thumb, a 2px track padding and 32px of space before the track.`,
+        story: `A violet 6px thumb on a track with 2px of padding, and 32px of space before the track. A wrapper sets the variables; the hover and drag colours are set too.`,
       },
     },
   },

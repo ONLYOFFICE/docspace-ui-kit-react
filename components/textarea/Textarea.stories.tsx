@@ -19,7 +19,8 @@ const meta = {
   argTypes: {
     value: {
       control: "text",
-      description: "Textarea value",
+      description:
+        "The text. The field is controlled, so pair it with `onChange`.",
       table: {
         defaultValue: { summary: '""' },
       },
@@ -27,61 +28,67 @@ const meta = {
     placeholder: {
       control: "text",
       description:
-        "Placeholder text. Defaults to a single space so an empty field still counts as showing a placeholder, which the Firefox minimum-height rules rely on",
+        "Text shown while the field is empty. The default is a single space, so `:placeholder-shown` matches even when no placeholder was asked for.",
       table: {
         defaultValue: { summary: '" "' },
       },
     },
     isDisabled: {
       control: "boolean",
-      description: "Disable the textarea",
+      description:
+        "Greys the field and stops editing. A disabled field leaves the tab order and the submitted form.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isReadOnly: {
       control: "boolean",
-      description: "Make the textarea read-only",
+      description: "Keeps the text legible and selectable but stops editing.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     hasError: {
       control: "boolean",
-      description: "Show error state",
+      description:
+        "Draws the field in the error colour. Under `isJSONField` it adds to that mode's own error state rather than being replaced by it.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     maxLength: {
       control: "number",
-      description: "Maximum character length",
+      description:
+        "Maximum number of characters the field accepts. Unlike `TextInput`, which caps at 255, there is no limit unless you set one.",
     },
     heightTextArea: {
       control: "text",
-      description: "Custom height of the textarea",
+      description:
+        "Fixed height, as a number of pixels or a CSS length. It wins over the default height but not over `heightScale` or `isFullHeight`.",
     },
     fontSize: {
       control: "number",
-      description: "Font size in pixels",
+      description:
+        "Font size in pixels, applied inline to the textarea and to the line numbers.",
       table: {
         defaultValue: { summary: "13" },
       },
     },
     color: {
       control: "color",
-      description: "Text color",
+      description: "Colour of the text, applied inline.",
     },
     enableCopy: {
       control: "boolean",
-      description: "Show copy icon",
+      description: "Shows a copy button in the corner of the field.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     hasNumeration: {
       control: "boolean",
-      description: "Show line numbers",
+      description:
+        "Renders line numbers down the left edge and indents the text to make room for them.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -89,15 +96,14 @@ const meta = {
     isJSONField: {
       control: "boolean",
       description:
-        "Pretty-prints the value as JSON and shows the error border while it is empty or not valid JSON; pair with hasNumeration for line numbers",
+        "Treats the value as JSON and pretty-prints it. The field shows its error state whenever the value is empty or not a JSON object or array.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     heightScale: {
       control: "boolean",
-      description:
-        "Makes the field 65% of the browser window height instead of a fixed height, so it stretches and shrinks with the window",
+      description: "Makes the field 65vh tall instead of the default 89px.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -105,7 +111,7 @@ const meta = {
     isFullHeight: {
       control: "boolean",
       description:
-        "Makes the field exactly as tall as its text: every new line makes it taller and every removed line shorter, down to the 89px default height",
+        "Sizes the field to its content instead of scrolling inside a fixed height.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -113,91 +119,91 @@ const meta = {
     copyInfoText: {
       control: "text",
       description:
-        "Text of the success toast shown after the copy button is clicked; without it no toast appears",
+        "Text of the toast shown after a successful copy. Without it the copy is silent.",
     },
     onCopy: {
       action: "onCopy",
-      description:
-        "Called with the copied text after the copy button is clicked",
+      description: "Called with the copied text after the copy button is used.",
     },
     tabIndex: {
       control: "number",
       description:
-        "Tab order of the field; left out, the field takes its natural place in the Tab sequence, and -1 makes the keyboard skip it",
+        "Place of the field in the tab order. Left out, the field takes its natural place; pass `-1` only for a field the keyboard should skip.",
     },
     autoFocus: {
       control: "boolean",
-      description: "Focuses the field when it mounts",
+      description: "Puts the caret in the field on its first render.",
     },
     areaSelect: {
       control: "boolean",
       description:
-        "Selects the whole text whenever it turns on, for a field the reader is expected to copy from",
+        "Selects the whole text whenever this flips to true — for a field the user is expected to copy from.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     onChange: {
       description:
-        "Called with the native change event on every edit; the stories wire it themselves to keep the field controlled",
+        "Called with the change event on every edit. The field shows `value` only, so update it from here.",
     },
     onKeyDown: {
       action: "onKeyDown",
-      description: "Called with the native keyboard event on every key press",
+      description: "Called on every key press while the field has focus.",
     },
     isChatMode: {
       control: "boolean",
       description:
-        "Moves the border, background and state colors from the scroll container to the outer frame",
+        "Moves the scrollbar styling from the inner scroller to the outer wrapper, which is what a chat composer needs.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     id: {
       control: "text",
-      description:
-        "HTML id of the textarea element, the target for `<label htmlFor>`",
+      description: "Id of the `<textarea>`, for a `<label for>` to point at.",
     },
     name: {
       control: "text",
-      description: "HTML name of the textarea element for form submission",
+      description: "Name under which the text is submitted with a form.",
     },
     className: {
       control: "text",
       description:
-        "Class added to the scroll container that carries the border",
+        "Applied to the scrollbar around the textarea, not to the textarea itself.",
     },
     wrapperClassName: {
       control: "text",
-      description: "Class added to the outer frame",
+      description:
+        "Applied to the outer wrapper that carries the height and the copy icon.",
     },
     classNameCopyIcon: {
       control: "text",
-      description: "Class added to the copy button",
+      description:
+        "Applied to the copy button, alongside the component's own class.",
     },
     style: {
       control: "object",
       description:
-        "Inline styles applied to the scroll container that carries the border",
+        "Inline style of the scrollbar around the textarea, not of the textarea itself.",
     },
     "aria-label": {
       control: "text",
       description:
-        "Accessible name of the field, for when no `<label>` points at it",
+        "Accessible name of the field, for when no `<label>` points at it. `id` with a `<label for>` names the field just as well.",
     },
     "aria-labelledby": {
       control: "text",
       description:
-        "id of the element on screen that names the field, such as a visible caption",
+        "`id` of the element that names this field, the usual choice when the caption is already on screen.",
     },
     "aria-describedby": {
       control: "text",
       description:
-        "id of the element describing the field, such as a hint or an error line below it; announced after the name",
+        "`id` of the element describing the field, such as a hint or an error line below it. Announced after the name.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of data-testid on the textarea element",
+      description: "Value of `data-testid` on the textarea.",
       table: {
         defaultValue: { summary: '"textarea"' },
       },
@@ -272,7 +278,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "An empty field with a placeholder and a fixed height, the shape most forms start from (`placeholder`, `heightTextArea`); change any other prop live in the Controls panel below.",
+          "An empty field with a placeholder and a fixed height, the shape most forms start from (`placeholder`, `heightTextArea`).",
       },
       source: {
         code: `<Textarea
@@ -364,6 +370,7 @@ const WithCopyTemplate = () => {
 };
 
 export const WithCopy: Story = {
+  name: "With copy button",
   render: () => <WithCopyTemplate />,
   play: async ({ canvas, userEvent }) => {
     const text = "This text can be copied using the copy button.";
@@ -382,7 +389,7 @@ export const WithCopy: Story = {
     docs: {
       description: {
         story:
-          "The copy button in the corner puts the whole text on the clipboard and confirms it with a toast (`enableCopy`, `copyInfoText`); clicking the frame or the button also selects all the text. The toast renders only where a `Toast` container is mounted, so the story mounts one.",
+          "A copy button in the corner that puts the whole text on the clipboard and confirms with a toast (`enableCopy`, `copyInfoText`). A click on the frame or the button also selects the text.",
       },
       source: {
         code: `<Textarea
@@ -409,6 +416,7 @@ const WithNumerationTemplate = () => {
 };
 
 export const WithNumeration: Story = {
+  name: "Line numbers",
   render: () => <WithNumerationTemplate />,
   play: async ({ canvas, userEvent }) => {
     const field = canvas.getByRole("textbox");
@@ -467,6 +475,7 @@ const JSONFieldTemplate = () => {
 };
 
 export const JSONField: Story = {
+  name: "JSON",
   render: () => <JSONFieldTemplate />,
   play: async ({ canvas }) => {
     // The field re-formats the JSON it shows, so take them in order.
@@ -517,6 +526,7 @@ const CustomHeightTemplate = () => {
 };
 
 export const CustomHeights: Story = {
+  name: "Fixed heights",
   render: () => <CustomHeightTemplate />,
   play: async ({ canvas }) => {
     const heights = ["80px height", "150px height", "250px height"].map(
@@ -557,6 +567,7 @@ const GrowsWithContentTemplate = () => {
 };
 
 export const GrowsWithContent: Story = {
+  name: "Grows with content",
   render: () => <GrowsWithContentTemplate />,
   play: async ({ canvas, userEvent }) => {
     // The frame is as tall as its lines, and grows with each new one.
@@ -597,6 +608,7 @@ const RightToLeftTemplate = () => {
 
 // Framed on Docs: the theme provider stamps data-dir on <html>, which would flip the whole page.
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
   play: async ({ canvas }) => {
@@ -615,7 +627,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "146px" },
       description: {
         story:
-          'The same field under a right-to-left interface, mirroring the left-to-right layout: the line numbers move to the right edge, the copy button to the left one, and the text starts from the right. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+          "A field in a right-to-left interface: line numbers at the right edge, the copy button at the left, the text from the right. The direction comes from the theme's `interfaceDirection` and the wrapper's `dir=\"rtl\"`.",
       },
       source: {
         code: `<div dir="rtl">
@@ -627,6 +639,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   play: async ({ canvas }) => {
     const [plain, numbered] = canvas.getAllByRole("textbox");
     await expect(plain).toHaveStyle({ color: "rgb(76, 29, 149)" });
@@ -669,7 +682,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Nine of the variables set on one wrapper -- every one is listed under CSS variables on this page. The first field shows the shared \`--text-input-*\` tokens, the padding and the custom height; hover and focus it to see the two border variables. The second adds \`hasNumeration\`, the only state in which \`--textarea-numeration-text-color\` has anything to color.`,
+        story: `Nine of the variables, set on one wrapper. The first field shows the shared \`--text-input-*\` variables, the padding and the custom height. The second adds \`hasNumeration\`, the only state \`--textarea-numeration-text-color\` colours.`,
       },
       source: {
         code: `<div

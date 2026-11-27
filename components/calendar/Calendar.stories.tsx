@@ -54,8 +54,7 @@ const meta = {
     locale: {
       control: "select",
       options: locales,
-      description:
-        "Locale tag the month and weekday names are written in; any tag the browser knows works, the list holds common ones",
+      description: "BCP 47 tag the month and weekday names are written in.",
       table: {
         defaultValue: { summary: "en" },
       },
@@ -63,7 +62,7 @@ const meta = {
     minDate: {
       control: "date",
       description:
-        "Earliest selectable day; earlier days are greyed out and the arrows stop at its month",
+        "Earliest selectable day; its own day stays selectable, whatever its time. Days before it are greyed, and the header arrows stop at its month.",
       table: {
         defaultValue: { summary: "1970-01-01" },
       },
@@ -71,7 +70,7 @@ const meta = {
     maxDate: {
       control: "date",
       description:
-        "Latest selectable day; later days are greyed out and the arrows stop at its month",
+        "Latest selectable day, with the same effect at the other end.",
       table: {
         defaultValue: { summary: "ten years from today" },
       },
@@ -79,49 +78,48 @@ const meta = {
     initialDate: {
       control: "date",
       description:
-        "First shown date when the calendar opens; a date outside the range opens the nearer boundary instead",
+        "Month the calendar opens on. Out-of-range values are moved to the nearer of `minDate` and `maxDate`, with a warning on the console.",
       table: {
         defaultValue: { summary: "today" },
       },
     },
     isMobile: {
       control: "boolean",
-      description:
-        "Widens the gap between the two arrow buttons from 8px to 12px; the larger touch layout itself switches on by window width",
+      description: "Whether the larger touch layout is used.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     className: {
       control: "text",
-      description: "Additional CSS class for the calendar container",
+      description: "Applied to the outermost element.",
     },
     id: {
       control: "text",
-      description: "Id of the calendar container",
+      description: "Applied to the outermost element.",
     },
     style: {
       control: "object",
-      description: "Inline styles of the calendar container",
+      description: "Applied to the outermost element.",
     },
     selectedDate: {
       control: false,
       description:
-        "The highlighted day, as a Luxon DateTime; its time is kept when another day is picked",
+        "The highlighted day, as a Luxon `DateTime`. Its hours and minutes are kept when another day is picked; only the date part is replaced.",
     },
     setSelectedDate: {
       action: "setSelectedDate",
-      description: "Called with the newly picked day, before onChange",
+      description: "Called with the newly picked day, before `onChange`.",
     },
     onChange: {
       action: "onChange",
       description:
-        "Called with the newly picked day, right after setSelectedDate and with the same value",
+        'Called with the newly picked day, after `setSelectedDate`. Both receive the same value; there is no separate "confirm" step.',
     },
     useMaxTime: {
       control: "boolean",
       description:
-        "Reports a picked day at 23:59:59.999 instead of keeping the time of the previous selection",
+        "Whether a picked day is reported at 23:59:59.999 rather than keeping the old time.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -129,21 +127,21 @@ const meta = {
     isScroll: {
       control: "boolean",
       description:
-        "Wraps the grid in a scroll area and drops the calendar's top, right and bottom padding",
+        "Whether the grid is wrapped in a `Scrollbar` instead of sizing to its content.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     dataTestId: {
       control: "text",
-      description: "data-testid of the calendar container",
+      description: "`data-testid` of the outermost element.",
       table: {
         defaultValue: { summary: "calendar" },
       },
     },
     forwardedRef: {
       control: false,
-      description: "Ref to the calendar container",
+      description: "Ref to the outermost element.",
     },
   },
 } satisfies Meta<typeof Calendar>;
@@ -315,7 +313,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          'The calendar as it opens: today is filled with the accent colour and, being the selected day too, ringed as well. Each day is named by its full date, the selected one is `aria-pressed` and today is `aria-current="date"`. Click a day to select it and watch the Actions panel, click the title to switch to months and then years, and change any other prop live in the Controls panel below.',
+          "The calendar as it opens: today is filled with the accent colour and, being the selected day too, ringed as well. The title opens the months view, and then the years.",
       },
       source: {
         code: `const [selectedDate, setSelectedDate] = useState(now());
@@ -346,6 +344,7 @@ const WithDateConstraintsTemplate = () => {
 };
 
 export const WithDateConstraints: Story = {
+  name: "Limited to this year",
   render: () => <WithDateConstraintsTemplate />,
   play: async ({ canvas, userEvent }) => {
     const calendar = canvas.getByTestId("calendar");
@@ -380,7 +379,7 @@ export const WithDateConstraints: Story = {
     docs: {
       description: {
         story:
-          "Calendar with min and max date constraints. Only dates within the current year are selectable.",
+          "A calendar limited to this year (`minDate`, `maxDate`). Days outside it are greyed, and the arrows stop at January and December.",
       },
       source: {
         code: `<Calendar
@@ -435,6 +434,7 @@ const LocaleExamplesTemplate = () => {
 };
 
 export const LocaleExamples: Story = {
+  name: "Locales",
   render: () => <LocaleExamplesTemplate />,
   play: async ({ canvas }) => {
     const calendars = canvas.getAllByTestId("calendar");
@@ -452,7 +452,7 @@ export const LocaleExamples: Story = {
     docs: {
       description: {
         story:
-          "Calendar rendered in different locales. Shows how month names, weekday headers, and date formatting adapt to each locale.",
+          "Four calendars in English, Russian, German and Japanese (`locale`). The month names and the weekday headers follow each locale.",
       },
       source: {
         code: `<Calendar locale="en" selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
@@ -479,6 +479,7 @@ const RightToLeftTemplate = () => {
 
 // Framed on Docs: the theme provider stamps data-dir on <html>, which would flip the whole page.
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
   play: async ({ canvas }) => {
@@ -497,7 +498,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "402px" },
       description: {
         story:
-          'The calendar in a right-to-left layout with Arabic names: the weeks run from right to left, the title moves to the right edge and the arrows to the left, while the chevron after the title stays on its right, before the text. The wrapper carries `dir="rtl"`; the direction also comes from the theme\'s `interfaceDirection` (the Direction toolbar).',
+          "A right-to-left calendar with Arabic names. The weeks run from right to left, the title sits at the right edge and the arrows at the left.",
       },
       source: {
         code: `<div dir="rtl">
@@ -513,6 +514,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => {
     const today = now();
     const [selectedDate, setSelectedDate] = useState<DateTime>(
@@ -580,7 +582,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The calendar opens with a selected day other than today, so the today and selected-day variables both show, and with \`minDate\` at the start of this month, so the days of the previous month and the left arrow show their disabled colours. Hover a day and an arrow to see the hover variables.`,
+        story: `A calendar under a wrapper that sets every overridable variable. The selected day is not today, so both looks show. \`minDate\` at the start of this month shows the disabled colours on last month's days and the left arrow.`,
       },
       source: {
         code: `<div

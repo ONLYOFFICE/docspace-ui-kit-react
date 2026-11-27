@@ -9,6 +9,10 @@ import { consumeKey } from "../consume-key";
  * `<button>`: Enter and Space on the element itself (not on a control inside
  * it) call `activate`, are kept from the page-wide hotkeys (Enter opens the
  * selected file), and Space does not scroll the page.
+ *
+ * A held key activates once: its autorepeat is kept from the page as well,
+ * and does nothing. With Ctrl, Alt or Meta the key is left to the browser and
+ * the page, since those are someone else's shortcuts.
  */
 export const activateOnButtonKey = <T extends HTMLElement>(
   e: React.KeyboardEvent<T>,
@@ -16,7 +20,12 @@ export const activateOnButtonKey = <T extends HTMLElement>(
 ) => {
   if (e.target !== e.currentTarget) return;
   if (e.key !== "Enter" && e.key !== " ") return;
+  if (e.ctrlKey || e.altKey || e.metaKey) return;
   e.preventDefault();
+  if (e.repeat) {
+    e.stopPropagation();
+    return;
+  }
   consumeKey(e);
   activate(e);
 };

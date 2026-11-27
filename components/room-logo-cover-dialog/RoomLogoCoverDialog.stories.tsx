@@ -13,18 +13,11 @@ import enCommon from "../../locales/en/Common.json";
 import { RoomLogoCoverDialog } from ".";
 
 // The dialog takes its translator as a prop rather than using the hook, so
-// the stories hand it the kit's own English bundle. `Common:` keys and the
-// bare `WithoutIcon` come from there; `CreateEditRoomDialog:Icon` lives in a
-// namespace the kit does not ship, which is what an application outside the
-// portal has to supply too.
-const EXTRA_LABELS: Record<string, string> = {
-  "CreateEditRoomDialog:Icon": "Icon",
-};
+// the stories hand it the kit's own English bundle: every key it asks for is
+// in `Common`.
 const common = enCommon as Record<string, string>;
 const t = ((key: string) =>
-  EXTRA_LABELS[key] ??
-  common[key.replace(/^Common:/, "")] ??
-  key) as TTranslation;
+  common[key.replace(/^Common:/, "")] ?? key) as TTranslation;
 
 // The 56 covers the portal serves from `files/rooms/covers`, copied from the
 // server (products/ASC.Files/Core/Covers/default). `data` is the inline SVG
@@ -79,56 +72,56 @@ const meta = {
     t: {
       control: false,
       description:
-        "Translation function. The dialog asks it for the heading, the button labels and the picker labels, some of them outside the `Common` namespace the kit ships",
+        "Translation function for the heading, the buttons and the picker labels, all `Common` keys the kit ships.",
     },
     visible: {
       control: "boolean",
       description:
-        "Whether the dialog is on screen. Opening it again discards whatever was chosen the last time",
+        "Whether the dialog is on screen. Opening it remounts the picker, which discards whatever was chosen last time.",
     },
     covers: {
       control: false,
       description:
-        "The icons to offer, each as raw SVG markup that is written into the page as it is. An empty array leaves the icon picker out",
+        "The cover icons to offer. Each carries raw SVG markup that is injected into the page, so take them only from a source you trust. An empty array leaves the icon picker out.",
     },
     title: {
       control: "text",
       description:
-        "Room title, whose first and last initials are drawn on the preview while no icon is chosen",
+        "Room title, used for the initials drawn on the preview when no icon is chosen.",
       table: { defaultValue: { summary: '""' } },
     },
     initialColor: {
       control: "text",
       description:
-        "Colour selected when the dialog opens, as `#rrggbb`. A colour outside the presets appears as an extra swatch after them",
+        "Colour selected when the dialog opens, as `#rrggbb`. Defaults to the first of the kit's logo colours.",
       table: { defaultValue: { summary: "#FF6680" } },
     },
     initialCover: {
       control: false,
       description:
-        "Icon selected when the dialog opens, or `null` for the initials",
+        "Cover selected when the dialog opens, or `null` for the initials.",
       table: { defaultValue: { summary: "null" } },
     },
     isBaseTheme: {
       control: "boolean",
       description:
-        "Whether the preview tile is drawn for the light theme. Taken from the theme when it is not passed",
+        "Whether the preview is drawn for the light theme. Taken from the theme context when it is not passed.",
       table: { defaultValue: { summary: "from the theme" } },
     },
     currentColorScheme: {
       control: "object",
       description:
-        "The portal's accent colours; the hovered and the chosen icon are drawn in `main.accent`. Without it neither is highlighted",
+        "The portal's accent colours, used to tint the hovered and selected icon. Without it those states have no accent.",
     },
     onClose: {
       action: "onClose",
       description:
-        "Called by the cancel button, the header cross, Escape and a click outside the dialog, but not while the colour picker is open",
+        "Called by the cancel button, the header cross, Escape and the backdrop — but not while the colour picker is open, which swallows all four.",
     },
     onApply: {
       action: "onApply",
       description:
-        "Called with the chosen colour and icon, or `null` for the initials, when apply is clicked. The dialog does not close itself",
+        "Called with the chosen colour and cover when apply is clicked. The dialog does not close itself.",
     },
   },
 } satisfies Meta<typeof RoomLogoCoverDialog>;
@@ -205,6 +198,7 @@ const RoomLogoCoverDialogDemo = ({
 };
 
 export const Default: Story = {
+  name: "Default",
   render: (args) => <RoomLogoCoverDialogDemo {...args} />,
   args: {
     visible: true,
@@ -230,7 +224,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The dialog as it opens for a room with no logo yet: the first preset colour, no icon and no title. Pick a colour and an icon to watch the preview change, and apply or cancel to see the callbacks in the Actions panel; the button reopens it.",
+          "The dialog as it opens for a room with no logo yet: the first preset colour, no icon and no title. Apply and cancel close it, and the button behind reopens it.",
       },
       source: {
         code: `<RoomLogoCoverDialog
@@ -246,6 +240,7 @@ export const Default: Story = {
 };
 
 export const WithPreselectedCover: Story = {
+  name: "Room with a logo",
   render: (args) => <RoomLogoCoverDialogDemo {...args} />,
   args: {
     ...Default.args,
@@ -270,7 +265,7 @@ export const WithPreselectedCover: Story = {
     docs: {
       description: {
         story:
-          "Reopening the dialog for a room that already has a logo: its icon is on the tile and its colour, which is not one of the presets, sits as an extra swatch after them with a pencil to change it (`initialCover`, `initialColor`).",
+          "The dialog for a room that already has a logo: its icon is on the tile (`initialCover`). Its colour is not a preset, so it sits after them as a swatch with a pencil (`initialColor`).",
       },
       source: {
         code: `<RoomLogoCoverDialog
@@ -284,6 +279,7 @@ export const WithPreselectedCover: Story = {
 };
 
 export const InitialsFromTitle: Story = {
+  name: "Initials from the title",
   render: (args) => <RoomLogoCoverDialogDemo {...args} />,
   args: {
     ...Default.args,
@@ -305,7 +301,7 @@ export const InitialsFromTitle: Story = {
     docs: {
       description: {
         story:
-          "With no icon chosen the tile carries the room's initials, here QR for a room called Quarterly reports (`title`). Pick an icon and it replaces them; the without-icon chip brings them back.",
+          "With no icon chosen the tile carries the room's initials, here QR for a room called Quarterly reports (`title`). A chosen icon replaces them; the without-icon chip brings them back.",
       },
       source: {
         code: `<RoomLogoCoverDialog {...dialogProps} title="Quarterly reports" />`,
@@ -315,6 +311,7 @@ export const InitialsFromTitle: Story = {
 };
 
 export const WithAccentColors: Story = {
+  name: "Accent colours",
   render: (args) => <RoomLogoCoverDialogDemo {...args} />,
   args: {
     ...Default.args,
@@ -333,7 +330,7 @@ export const WithAccentColors: Story = {
     docs: {
       description: {
         story:
-          "Pass the portal's colour scheme so the chosen icon sits on a tint of its accent colour; without it the chosen icon looks like the rest (`currentColorScheme`).",
+          "The chosen icon on a tint of the portal's accent colour (`currentColorScheme`). Without a colour scheme the chosen icon looks like the rest.",
       },
       source: {
         code: `<RoomLogoCoverDialog
@@ -347,6 +344,7 @@ export const WithAccentColors: Story = {
 };
 
 export const WithoutIconPicker: Story = {
+  name: "Colour only",
   render: (args) => <RoomLogoCoverDialogDemo {...args} covers={[]} />,
   args: {
     ...Default.args,
@@ -376,6 +374,7 @@ export const WithoutIconPicker: Story = {
 };
 
 export const OnPhone: Story = {
+  name: "On a phone",
   render: (args) => <RoomLogoCoverDialogDemo {...args} />,
   decorators: [withPhoneFrame],
   globals: { viewport: { value: "mobile2", isRotated: false } },
@@ -393,7 +392,7 @@ export const OnPhone: Story = {
     docs: {
       description: {
         story:
-          "On a phone the dialog becomes a full-screen panel, with the preview and the icons centred, and the plus button opens the colour picker in a modal of its own.",
+          "At a phone width the dialog opens as a side panel. Its plus button opens the colour picker in a modal of its own.",
       },
       source: {
         code: `<RoomLogoCoverDialog {...dialogProps} title="Quarterly reports" />`,

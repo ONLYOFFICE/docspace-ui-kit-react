@@ -5,6 +5,14 @@ import { render, screen } from "@testing-library/react";
 import { TableCell } from "./TableCell";
 
 describe("<TableCell />", () => {
+  it("puts a passed aria-* on the cell", () => {
+    render(<TableCell aria-describedby="cell-hint">Cell</TableCell>);
+    expect(screen.getByTestId("table-cell")).toHaveAttribute(
+      "aria-describedby",
+      "cell-hint",
+    );
+  });
+
   it("renders without errors", () => {
     render(<TableCell>Cell</TableCell>);
 

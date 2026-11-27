@@ -26,6 +26,42 @@ describe("<AddButton />", () => {
     );
   });
 
+  it("puts a passed aria-* on the wrapper with the role, not on the square", () => {
+    render(
+      <AddButton
+        {...baseProps}
+        aria-label="Add a member"
+        aria-describedby="members-hint"
+        data-hint="kept"
+      />,
+    );
+    const button = screen.getByRole("button", { name: "Add a member" });
+    expect(button).toHaveAttribute("aria-describedby", "members-hint");
+    const square = screen.getByTestId("selector-add-button");
+    expect(square).not.toHaveAttribute("aria-label");
+    expect(square).toHaveAttribute("data-hint", "kept");
+  });
+
+  it("keeps a passed aria-disabled and aria-busy unless the flags are set", () => {
+    const { rerender } = render(
+      <AddButton {...baseProps} aria-disabled="true" aria-busy="true" />,
+    );
+    const button = screen.getByRole("button");
+    expect(button).toHaveAttribute("aria-disabled", "true");
+    expect(button).toHaveAttribute("aria-busy", "true");
+
+    rerender(
+      <AddButton
+        {...baseProps}
+        isLoading
+        aria-disabled="false"
+        aria-busy="false"
+      />,
+    );
+    expect(button).toHaveAttribute("aria-disabled", "true");
+    expect(button).toHaveAttribute("aria-busy", "true");
+  });
+
   it("accepts id", () => {
     render(<AddButton {...baseProps} id="testId" />);
 

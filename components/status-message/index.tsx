@@ -6,6 +6,7 @@ import DangerToastReactSvg from "../../assets/danger.toast.react.svg";
 import { IconSizeType } from "../../utils/common-icons-style";
 import styles from "./StatusMessage.module.scss";
 import { Text } from "../text";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import type { StatusMessageProps } from "./StatusMessage.types";
 
@@ -35,6 +36,7 @@ const textOf = (node: React.ReactNode): string => {
 const StatusMessage: React.FC<StatusMessageProps> = ({
   message,
   isWarning,
+  ...rest
 }) => {
   const initial: Shown | null = message
     ? { message, isWarning: !!isWarning }
@@ -138,6 +140,7 @@ const StatusMessage: React.FC<StatusMessageProps> = ({
 
   return (
     <div
+      {...pickAriaProps(rest)}
       ref={messageRef}
       // An error interrupts; a warning waits for a pause.
       role={shown.isWarning ? "status" : "alert"}

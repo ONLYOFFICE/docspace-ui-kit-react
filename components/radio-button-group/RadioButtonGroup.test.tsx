@@ -20,6 +20,21 @@ describe("<RadioButtonGroup />", () => {
     vi.clearAllMocks();
   });
 
+  it("puts a passed aria-* on the radio group", () => {
+    render(
+      <RadioButtonGroup
+        {...baseProps}
+        aria-label="Fruit"
+        aria-describedby="fruit-hint"
+      />,
+    );
+
+    expect(screen.getByRole("radiogroup", { name: "Fruit" })).toHaveAttribute(
+      "aria-describedby",
+      "fruit-hint",
+    );
+  });
+
   it("renders without error", () => {
     render(<RadioButtonGroup {...baseProps} />);
     expect(screen.getByTestId("radio-button-group")).toBeInTheDocument();
@@ -41,6 +56,27 @@ describe("<RadioButtonGroup />", () => {
     baseProps.options.forEach((option) => {
       expect(screen.getByLabelText(option.label as string)).toBeInTheDocument();
     });
+  });
+
+  it("renders several captions without a key collision", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    render(
+      <RadioButtonGroup
+        {...baseProps}
+        options={[
+          { value: "fruit", type: "text", label: "Fruit" },
+          { value: "apple", label: "Sweet apple" },
+          { value: "vegetable", type: "text", label: "Vegetables" },
+          { value: "carrot", label: "Carrot" },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Fruit")).toBeInTheDocument();
+    expect(screen.getByText("Vegetables")).toBeInTheDocument();
+    expect(error.mock.calls.flat().join(" ")).not.toMatch(/same key/);
+    error.mockRestore();
   });
 
   it("accepts and applies custom id", () => {

@@ -17,6 +17,7 @@ import { ContextMenu, ContextMenuRefType } from "../../context-menu";
 import { Loader, LoaderTypes } from "../../loader";
 import { IndexIconButtons } from "./sub-components/index-icon-buttons";
 
+import { groupRoleWhenNamed, pickAriaProps } from "../../../utils/aria-props";
 import { RowProps } from "./Row.types";
 import { hasOwnProperty } from "../../../utils";
 import styles from "./Row.module.scss";
@@ -26,7 +27,6 @@ const Row = React.memo((props: RowProps) => {
     checked,
     children,
     contentElement,
-    contextButtonSpacerWidth = "26px",
     data,
     element,
     indeterminate,
@@ -49,6 +49,8 @@ const Row = React.memo((props: RowProps) => {
     isDisabled,
     isIndexEditingMode,
     dataTestId,
+    id,
+    style,
   } = props;
 
   const cm = useRef<ContextMenuRefType>(null);
@@ -136,7 +138,11 @@ const Row = React.memo((props: RowProps) => {
 
   return (
     <div
+      {...pickAriaProps(props)}
+      role={groupRoleWhenNamed(props)}
       ref={row}
+      id={id}
+      style={style}
       onContextMenu={onContextMenu}
       className={classNames(
         styles.row,
@@ -150,7 +156,7 @@ const Row = React.memo((props: RowProps) => {
         className,
       )}
       data-testid={dataTestId ?? "row"}
-      aria-busy={inProgress || undefined}
+      aria-busy={inProgress || props["aria-busy"]}
     >
       {inProgress ? (
         <Loader
@@ -229,7 +235,6 @@ const Row = React.memo((props: RowProps) => {
       </div>
       <div
         className={classNames(styles.optionButton, "row_context-menu-wrapper")}
-        style={{ ["--manual-width" as string]: contextButtonSpacerWidth }}
       >
         {badgesComponent || null}
         {renderContentElement ? (

@@ -52,6 +52,24 @@ const baseProps = {
 };
 
 describe("<PasswordInput />", () => {
+  it("forwards a passed aria-* to the <input>, not the wrapper", () => {
+    render(
+      <PasswordInput
+        {...baseProps}
+        aria-label="New password"
+        aria-describedby="password-rules"
+      />,
+    );
+
+    const input = screen.getByLabelText("New password");
+    expect(input.tagName).toBe("INPUT");
+    expect(input).toHaveAttribute("name", baseProps.inputName);
+    expect(input).toHaveAttribute("aria-describedby", "password-rules");
+    expect(screen.getByTestId("password-input")).not.toHaveAttribute(
+      "aria-label",
+    );
+  });
+
   it("renders without error", () => {
     render(
       <PasswordInput inputType={InputType.password} size={InputSize.base} />,

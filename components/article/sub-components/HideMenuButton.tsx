@@ -5,6 +5,7 @@ import ArticleShowMenuReactSvg from "../../../assets/article-show-menu.react.svg
 
 import { Text } from "../../text";
 import { useCommonTranslation } from "../../../utils/i18n";
+import { activateOnButtonKey } from "../../../utils/keyboard-activation";
 
 import styles from "../Article.module.scss";
 import { ArticleHideMenuButtonProps } from "../Article.types";
@@ -20,7 +21,12 @@ const HideArticleMenuButton = ({
   return (
     <div
       className={styles.hideArticleMenuButton}
+      role="button"
+      tabIndex={0}
+      // Collapsed, the handle is an icon alone; expanded, its text names it.
+      aria-label={showText ? undefined : t("ShowArticleMenu")}
       onClick={toggleShowText}
+      onKeyDown={(e) => activateOnButtonKey(e, () => toggleShowText())}
       data-show-text={showText ? "true" : "false"}
       data-with-custom-slot={withCustomSlot ? "true" : "false"}
       data-hide-profile-block={hideProfileBlock ? "true" : "false"}

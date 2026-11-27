@@ -155,43 +155,44 @@ const meta = {
       control: "select",
       options: ["row", "tile", "table"],
       description:
-        "Which layout to render: `tile` lays the children out as rows of a grid, `row` and `table` as a list; it also picks the placeholder shown for rows not loaded yet",
+        "Which layout to render: `tile` is a grid of tile rows, every other value a list. It also picks the skeleton: `row` and `table` have one, the rest none.",
     },
     hasMoreFiles: {
       control: "boolean",
       description:
-        "Whether there is another page to ask for; while false, every row counts as loaded and no placeholder is shown",
+        "Whether there is another page to ask for. While false, every row counts as loaded.",
     },
     filesLength: {
       control: "number",
-      description: "How many items are loaded so far",
+      description: "How many items are loaded so far.",
     },
     itemCount: {
       control: "number",
-      description: "How many items there are in total, loaded or not",
+      description: "How many items there are in total, loaded or not.",
     },
     loadMoreItems: {
       control: false,
       description:
-        "Called with the start and stop index of the items to load when the user scrolls near the end of the loaded ones; it returns a promise",
+        "Called with the start and stop index to load when the user scrolls near the end.",
     },
     itemSize: {
       control: "number",
       description:
-        "Height of every row in pixels in the `row` and `table` layouts; the `tile` layout ignores it and sizes each row from the tile it holds",
+        "Height of every row in pixels, in the list layouts. The `tile` layout ignores it and sizes each row from the tile it holds.",
     },
     children: {
       control: false,
       description:
-        "The items, as an array with one entry per list row, table row or row of tiles",
+        "The items, as an array: one entry per list row, table row or row of tiles.",
     },
     onScroll: {
       control: false,
-      description: "Called as the list scrolls",
+      description: "Called as the list scrolls.",
     },
     isLoading: {
       control: "boolean",
-      description: "Renders nothing at all while true",
+      description:
+        "Renders nothing at all while it is true, so the region collapses.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -199,7 +200,7 @@ const meta = {
     countTilesInRow: {
       control: "number",
       description:
-        "How many tiles one row of the `tile` layout holds; it decides which rows count as loaded and how many skeleton tiles a row shows during a long scroll jump",
+        "How many tiles one row of the `tile` layout holds. It decides which rows count as loaded, and how many skeleton tiles a row shows.",
       table: {
         defaultValue: { summary: "1" },
       },
@@ -207,47 +208,34 @@ const meta = {
     columnStorageName: {
       control: "text",
       description:
-        "`localStorage` key holding the table's column widths; required in the `table` layout, which throws without it",
+        "`localStorage` key of the table's column widths. The `table` layout throws without it.",
     },
     columnInfoPanelStorageName: {
       control: "text",
       description:
-        "`localStorage` key holding the table's column widths while the info panel is open; required in the `table` layout",
+        "The key read instead while `infoPanelVisible` is set. The `table` layout throws without it.",
     },
     infoPanelVisible: {
       control: "boolean",
       description:
-        "Reads the table's column widths from the info-panel key instead of the regular one",
+        "Reads the table's column widths from `columnInfoPanelStorageName` instead.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     className: {
       control: "text",
-      description: "Class added to the list element",
+      description: "Applied to the list element.",
     },
     currentFolderId: {
       control: "text",
       description:
-        "Identifier of the folder being shown; when it changes, the `tile` layout measures its row heights again",
-    },
-    showSkeleton: {
-      control: false,
-      description:
-        "Ignored; the loader sets it itself after a scroll jump of more than 800px, and a value passed here never reaches the list",
+        "Identifier of the folder shown. When it changes, the `tile` layout measures its rows again.",
     },
     scrollElement: {
       control: false,
       description:
-        "The element that scrolls the list; without it the loader looks for the portal's `#sectionScroll` scroller (`#customScrollBar` on mobile) and falls back to the window",
-    },
-    smallPreview: {
-      control: false,
-      description: "Declared, but no layout reads it",
-    },
-    isOneTile: {
-      control: false,
-      description: "Declared, but no layout reads it",
+        "The element that scrolls the list. Without it the loader looks for the portal's scroller, then falls back to the window.",
     },
   },
 } satisfies Meta<typeof InfiniteLoaderComponent>;
@@ -279,6 +267,7 @@ const expectLoadsMore = async (
 };
 
 export const Default: Story = {
+  name: "Loads the next page",
   args: {
     viewAs: "tile" as TViewAs,
     itemCount: 100,
@@ -304,7 +293,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Scroll the box: when the end of the loaded items comes near, the loader asks for the next range, and the new items arrive half a second later (`loadMoreItems`, logged in the Actions panel). In the `tile` layout each child is one row of the grid; here a plain box stands in for a row of tiles. Change any other prop live in the Controls panel below.",
+          "A scrolling box with the first page of a 100-item list. Near the end of the loaded items the loader asks for the next range (`loadMoreItems`), which arrives half a second later. Each plain box stands in for a row of tiles.",
       },
       source: {
         code: `<InfiniteLoaderComponent
@@ -343,6 +332,7 @@ const saveTableColumns = () => {
 };
 
 export const RowLayout: Story = {
+  name: "Rows",
   args: {
     viewAs: "row" as TViewAs,
     itemCount: 100,
@@ -367,7 +357,7 @@ export const RowLayout: Story = {
     docs: {
       description: {
         story:
-          'A list of rows of one height (`viewAs="row"`, `itemSize`). Scroll to the end: the rows after the last loaded item are skeleton rows until the next page arrives, and a jump of more than 800px, such as dragging the scrollbar, turns every row in view into a skeleton while the scrolling lasts.',
+          'A list of rows of one height (`viewAs="row"`, `itemSize`). Past the last loaded item the rows are skeletons until the next page arrives. A jump of more than 800px turns the rows in view into skeletons briefly.',
       },
       source: {
         code: `<InfiniteLoaderComponent
@@ -386,6 +376,7 @@ export const RowLayout: Story = {
 };
 
 export const TableLayout: Story = {
+  name: "Table rows",
   args: {
     viewAs: "table" as TViewAs,
     itemCount: 100,
@@ -411,7 +402,7 @@ export const TableLayout: Story = {
     docs: {
       description: {
         story:
-          'A table whose rows share one column layout (`viewAs="table"`). The layout is not passed as a prop: the loader reads it from `localStorage` under the key it is given (`columnStorageName`, or `columnInfoPanelStorageName` while `infoPanelVisible` is set), which lets the table header that saves the widths and the rows below stay in step. The rows not loaded yet show the table skeleton.',
+          'A table whose rows share one three-column layout (`viewAs="table"`). The loader reads that layout from `localStorage` under `columnStorageName`, where the table header saves its widths. Rows not loaded yet show the table skeleton.',
       },
       source: {
         code: `localStorage.setItem("filesColumns", "2fr 1fr 1fr");
@@ -453,6 +444,7 @@ const renderRtlItem = (index: number) => (
 );
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   args: {
     viewAs: "row" as TViewAs,
     itemCount: 100,
@@ -466,9 +458,23 @@ export const RightToLeft: Story = {
       <InfiniteLoaderDemo {...args} renderItem={renderRtlItem} />
     </div>
   ),
-  play: async ({ canvas }) => {
+  play: async ({ canvas, canvasElement }) => {
     const item = await canvas.findByText("ملف 1");
     await expect(getComputedStyle(item).direction).toBe("rtl");
+
+    // The skeletons of the next page line up with the right edge too.
+    const scroller = getScroller();
+    scroller.scrollTop = scroller.scrollHeight;
+    scroller.dispatchEvent(new Event("scroll"));
+    const skeleton = await waitFor(() => {
+      const found = canvasElement.querySelector<HTMLElement>(".row-loader");
+      if (!found) throw new Error("No row skeleton yet");
+      return found;
+    });
+    const list = skeleton.parentElement as HTMLElement;
+    await expect(Math.round(skeleton.getBoundingClientRect().right)).toBe(
+      Math.round(list.getBoundingClientRect().right),
+    );
   },
   parameters: {
     noPadding: true,
@@ -491,6 +497,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={
@@ -510,7 +517,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The three tile variables set on one wrapper -- the variables are listed under CSS variables on this page. They size only the skeleton tiles, which appear for a moment when the box is scrolled by more than 800px at once — drag the scrollbar quickly to see them.`,
+        story: `The tile layout under a wrapper that sets the three tile variables. They size only the skeleton tiles, which appear for a moment after a scroll jump of more than 800px.`,
       },
       source: {
         code: `<div

@@ -26,6 +26,16 @@ const defaultProps = {
 };
 
 describe("InfiniteLoader Component", () => {
+  it("names the virtual grid with a passed aria-label", () => {
+    const { container } = render(
+      <InfiniteLoaderComponent {...defaultProps} aria-label="Files" />,
+    );
+    expect(container.querySelector(".ReactVirtualized__List")).toHaveAttribute(
+      "aria-label",
+      "Files",
+    );
+  });
+
   it("renders without crashing", () => {
     const { container } = render(<InfiniteLoaderComponent {...defaultProps} />);
     expect(container).toBeInTheDocument();
@@ -148,7 +158,7 @@ describe("InfiniteLoader Component", () => {
   it("shows skeleton when scroll shift is large", async () => {
     vi.mocked(isMobile).mockReturnValue(false);
 
-    // Create a container that ListComponent expects for width calculation
+    // The element the list sits in gives it its width.
     const rowContainer = document.createElement("div");
     rowContainer.id = "rowContainer";
     document.body.appendChild(rowContainer);
@@ -172,7 +182,9 @@ describe("InfiniteLoader Component", () => {
       width: 1000,
     } as DOMRect);
 
-    render(<InfiniteLoaderComponent {...defaultProps} />);
+    render(<InfiniteLoaderComponent {...defaultProps} />, {
+      container: rowContainer,
+    });
 
     // Simulate initial scroll
     fireEvent.scroll(scroller, { target: { scrollTop: 0 } });

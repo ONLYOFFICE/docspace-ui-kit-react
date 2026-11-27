@@ -27,7 +27,7 @@ const meta = {
       control: "select",
       options: [ModalDialogType.modal, ModalDialogType.aside],
       description:
-        "Whether the dialog is a centered modal or a panel attached to the side of the window",
+        "Shows the dialog as a centred modal or a side panel at every width. `displayTypeDetailed` wins over it.",
       table: {
         defaultValue: { summary: "modal" },
       },
@@ -35,7 +35,7 @@ const meta = {
     visible: {
       control: "boolean",
       description:
-        "Whether the dialog is shown; its markup stays in the document either way",
+        "Shows the dialog. It stays mounted either way, so render it conditionally to remove it.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -43,7 +43,7 @@ const meta = {
     isCloseable: {
       control: "boolean",
       description:
-        "Whether the user can close the dialog at all: false removes the close cross and stops Escape and the backdrop click",
+        "Whether the user may close the dialog at all. The cross, Escape and a backdrop click share one guard, so `false` stops all three.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -51,23 +51,21 @@ const meta = {
     isLoading: {
       control: "boolean",
       description:
-        "Replaces the header, body and footer with a skeleton of the current display type",
+        "Replaces the header, body and footer with a skeleton of the current display type.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isLarge: {
       control: "boolean",
-      description:
-        "Makes the modal 520px wide and up to 400px tall instead of 400px and 280px (modal only)",
+      description: "**`MODAL-ONLY`** Sets width: 520px and max-height: 400px",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isHuge: {
       control: "boolean",
-      description:
-        "Caps the width at 730px; takes effect only together with autoMaxWidth, which lets the modal grow with its content (modal only)",
+      description: "**`MODAL-ONLY`** Sets predefined huge size",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -75,7 +73,7 @@ const meta = {
     autoMaxHeight: {
       control: "boolean",
       description:
-        "Removes the 280px height cap, so the modal grows with its content (modal only)",
+        "**`MODAL-ONLY`** Lifts the height cap, so the modal grows with its content.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -83,14 +81,14 @@ const meta = {
     autoMaxWidth: {
       control: "boolean",
       description:
-        "Sizes the modal to its content instead of a fixed 400px width (modal only)",
+        "**`MODAL-ONLY`** Lets the width follow the content instead of the fixed 400px.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withFooterBorder: {
       control: "boolean",
-      description: "Draws a line between the body and the footer",
+      description: "**`MODAL-ONLY`** Displays border between body and footer",
       table: {
         defaultValue: { summary: "true for aside, false for modal" },
       },
@@ -98,44 +96,42 @@ const meta = {
     withBodyScroll: {
       control: "boolean",
       description:
-        "Wraps the body in the kit's scrollbar, so long content scrolls inside the panel (aside only)",
+        "**`ASIDE-ONLY`** Wraps the side panel's body in the kit's scrollbar.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isScrollLocked: {
       control: "boolean",
-      description:
-        "Stops the scrollable body from scrolling, together with withBodyScroll (aside only)",
+      description: "**`ASIDE-ONLY`** Locks the scroll in body section",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     zIndex: {
       control: "number",
-      description: "Stacking order of the backdrop and the dialog on it",
+      description: "Stacking order of the backdrop, which holds the dialog.",
       table: {
         defaultValue: { summary: "310" },
       },
     },
     displayTypeDetailed: {
       control: "object",
-      description:
-        "A display type for each of mobile, tablet and desktop widths, re-read when the window is resized; overrides displayType",
+      description: "Detailed display type for each dimension",
     },
     onClose: {
       action: "onClose",
       description:
-        "Called by the close cross, Escape, a backdrop click and a downward swipe of the header on a phone",
+        "Called by the cross, Escape, a backdrop click or a swipe down.",
     },
     onBackClick: {
       action: "onBackClick",
-      description:
-        "Called by the back arrow and by Backspace pressed outside a text field",
+      description: "Called by the back arrow.",
     },
     isBackButton: {
       control: "boolean",
-      description: "Shows a back arrow before the title",
+      description:
+        "Whether a back arrow is rendered before the title. It is mirrored in RTL.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -143,43 +139,39 @@ const meta = {
     closeOnBackdropClick: {
       control: "boolean",
       description:
-        "Whether a click on the backdrop closes the dialog; the close cross and Escape keep working",
+        "Whether a click on the backdrop closes the dialog. Unlike `isCloseable`, this stops only that one route; the cross and Escape keep working.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     backdropVisible: {
       control: "boolean",
-      description:
-        "Whether the backdrop dims the page; a hidden backdrop still catches clicks",
+      description: "Controls the visibility of the backdrop overlay",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     withForm: {
       control: "boolean",
-      description:
-        "Wraps the header, body and footer in a form, so a submit button in the footer submits it",
+      description: "Wraps content in form element",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     onSubmit: {
       action: "onSubmit",
-      description:
-        "Called with the submit event of the form added by withForm; the page does not reload",
+      description: "Form submit handler",
     },
     withoutPadding: {
       control: "boolean",
-      description: "Removes the padding around the body",
+      description: "Removes default padding from body",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withoutHeaderMargin: {
       control: "boolean",
-      description:
-        "Removes the 16px gap between the header and the body (modal only)",
+      description: "Removes default margin from header",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -187,14 +179,15 @@ const meta = {
     isDoubleFooterLine: {
       control: "boolean",
       description:
-        "Stacks the footer's children in a column, each child a row of its own",
+        "Stacks the footer in a column, so each `<div>` in it becomes a row of buttons.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     hideContent: {
       control: "boolean",
-      description: "Shows the backdrop with no dialog on it",
+      description:
+        "Renders the backdrop without the dialog surface, so none of the content mounts.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -202,7 +195,7 @@ const meta = {
     embedded: {
       control: "boolean",
       description:
-        "Removes the close cross and makes Escape and the backdrop click do nothing, whatever isCloseable says",
+        "Turns closing off: no cross, and neither Escape nor the backdrop calls `onClose`.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -210,7 +203,7 @@ const meta = {
     containerVisible: {
       control: "boolean",
       description:
-        "Shows the ModalDialog.Container slot in place of the header, body and footer (aside only)",
+        "**`ASIDE-ONLY`** Allows embedding modal as aside dialog inside parent container",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -218,15 +211,14 @@ const meta = {
     withBorder: {
       control: "boolean",
       description:
-        "Draws a one-pixel border on the edge where the side panel meets the page",
+        "Draws a one-pixel border on the dialog's inline-start edge, where an aside meets the page. Set `--modal-dialog-aside-border` to recolour it.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withBodyScrollForcibly: {
       control: "boolean",
-      description:
-        "Wraps the body in the kit's scrollbar in either display type",
+      description: "Forces body scroll regardless of display type",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -234,12 +226,12 @@ const meta = {
     scrollbarCreateContext: {
       control: "boolean",
       description:
-        "Lets content inside the scrollable body reach its scrollbar, to scroll it from code",
+        "Makes the body's scrollbar publish itself through `ScrollbarContext`, so a descendant can scroll it. Off unless something inside needs that.",
     },
     isInvitePanelLoader: {
       control: "boolean",
       description:
-        "Shapes the side panel's loading skeleton as a list of people to invite (aside only, with isLoading)",
+        "Draws the invite panel's skeleton while the side panel is loading.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -247,76 +239,77 @@ const meta = {
     headerIcons: {
       control: false,
       description:
-        "Extra icon buttons between the title and the close cross, each with a key, an onClick and an icon",
+        "Extra icon buttons between the title and the close cross. Each needs a `key`, an `onClick`, and an `iconNode` or a `url` fetched at runtime; its optional `label` is the button's accessible name.",
     },
     headerComponent: {
       control: false,
       description:
-        "Any node rendered after the header icons and before the close cross",
+        "Arbitrary node rendered after the icons and before the close cross, for a control that is not an icon.",
     },
     withoutBorder: {
       control: "boolean",
-      description: "Hides the line under the header",
+      description:
+        "Hides the bottom border, which otherwise spans the full width of the panel regardless of the header's own side margins.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     headerHeight: {
       control: "text",
-      description: "Height of the header as a CSS length",
+      description:
+        "Height of the header as a CSS length, such as `70px`. Without it the header is 53px tall.",
       table: {
         defaultValue: { summary: "53px" },
       },
     },
-    blur: {
-      control: false,
-      description: "Accepted but not read: it changes nothing on screen",
-    },
     "aria-label": {
       control: "text",
       description:
-        "Accessible name of the dialog, for a dialog with no visible title",
+        'Accessible name of the dialog, landing on the element that carries `role="dialog"`. Prefer `aria-labelledby` when the heading is already on screen; a dialog with neither is announced as an unnamed dialog.',
     },
     "aria-labelledby": {
       control: "text",
-      description: "id of the element naming the dialog, usually its title",
+      description:
+        "`id` of the element naming the dialog — usually the heading passed to `ModalDialog.Header`, given an `id` of its own.",
     },
     "aria-describedby": {
       control: "text",
       description:
-        "id of the element describing the dialog, announced after its name",
+        "`id` of the element describing the dialog, announced after the name.",
     },
     id: {
       control: "text",
-      description: "id of the outer element rendered into the page",
+      description: "Applied to the dialog's outer element.",
     },
     className: {
       control: "text",
-      description: "Class added to the layer the dialog is centered on",
+      description:
+        "Added to the click-to-close layer around the dialog surface.",
     },
     style: {
       control: "object",
-      description: "Inline style of the layer the dialog is centered on",
+      description:
+        "Applied to the click-to-close layer around the dialog surface.",
     },
     dataTestId: {
       control: "text",
-      description: "data-testid of the outer element",
+      description: "Test id",
       table: {
         defaultValue: { summary: "modal" },
       },
     },
     ref: {
       control: false,
-      description: "Ref to the outer element",
+      description: "Reference to the modal element",
     },
     sheetRef: {
       control: false,
-      description: "Ref to the dialog surface itself",
+      description:
+        'Reference to the inner sheet/content element (`<div id="modal-dialog">`)',
     },
     children: {
       control: false,
-      description:
-        "The ModalDialog.Header, Body, Footer and Container slots; any other child is dropped",
+      description: "Displays the child elements",
     },
   },
   args: {
@@ -469,7 +462,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The centered modal, for a short task that needs an answer before the page is used again. Click Show to open it and close it with the cross, Escape or a click on the dimmed page; change any other prop live in the Controls panel below.",
+          "The centred modal, for a short task that needs an answer before the page is used again. **Show** opens it; the cross, Escape or a click on the dimmed page closes it.",
       },
       source: {
         code: `<ModalDialog visible={isVisible} onClose={closeModal}>
@@ -554,6 +547,7 @@ const AsideTemplate = ({ ...args }: ModalDialogProps) => {
 };
 
 export const AsideDisplay: Story = {
+  name: "Side panel",
   render: (args) => <AsideTemplate {...args} />,
   args: {
     displayType: ModalDialogType.aside,
@@ -594,6 +588,7 @@ export const AsideDisplay: Story = {
 };
 
 export const LoadingState: Story = {
+  name: "Loading",
   render: (args) => <Template {...args} />,
   args: {
     displayType: ModalDialogType.modal,
@@ -612,7 +607,7 @@ export const LoadingState: Story = {
     docs: {
       description: {
         story:
-          "While the content is being fetched, the header, body and footer give way to a skeleton of the same size (`isLoading`), so the dialog does not jump when the data arrives.",
+          "A skeleton of the same size in place of the header, body and footer while the content loads (`isLoading`). The dialog does not jump when the data arrives.",
       },
       source: {
         code: `<ModalDialog visible={isVisible} isLoading onClose={closeModal}>
@@ -625,6 +620,7 @@ export const LoadingState: Story = {
 };
 
 export const AsideLoadingState: Story = {
+  name: "Side panel loading",
   render: (args) => <AsideTemplate {...args} />,
   args: {
     displayType: ModalDialogType.aside,
@@ -655,6 +651,7 @@ export const AsideLoadingState: Story = {
 };
 
 export const LargeModal: Story = {
+  name: "Large",
   render: (args) => <Template {...args} />,
   args: {
     displayType: ModalDialogType.modal,
@@ -685,6 +682,7 @@ export const LargeModal: Story = {
 };
 
 export const HugeModal: Story = {
+  name: "Huge",
   render: (args) => <Template {...args} />,
   args: {
     displayType: ModalDialogType.modal,
@@ -720,6 +718,7 @@ export const HugeModal: Story = {
 };
 
 export const AutoSizeModal: Story = {
+  name: "Sized to content",
   render: (args) => <Template {...args} />,
   args: {
     displayType: ModalDialogType.modal,
@@ -749,6 +748,7 @@ export const AutoSizeModal: Story = {
 };
 
 export const WithFooterBorder: Story = {
+  name: "With a footer border",
   render: (args) => <Template {...args} />,
   args: {
     displayType: ModalDialogType.modal,
@@ -780,6 +780,7 @@ export const WithFooterBorder: Story = {
 };
 
 export const NonCloseable: Story = {
+  name: "Not closable",
   render: (args) => <Template {...args} />,
   args: {
     displayType: ModalDialogType.modal,
@@ -821,6 +822,7 @@ export const NonCloseable: Story = {
 };
 
 export const AsideScrollLocked: Story = {
+  name: "Side panel, scroll locked",
   render: (args) => <AsideTemplate {...args} />,
   args: {
     displayType: ModalDialogType.aside,
@@ -838,7 +840,7 @@ export const AsideScrollLocked: Story = {
     docs: {
       description: {
         story:
-          "The same long panel with its scrolling switched off (`isScrollLocked`), for a moment when the content must stay where it is, such as while a menu inside it is open.",
+          "The same long panel with its scrolling switched off (`isScrollLocked`). It suits a moment when the content must stay put, such as while a menu inside is open.",
       },
       source: {
         code: `<ModalDialog displayType={ModalDialogType.aside} withBodyScroll isScrollLocked visible={isVisible} onClose={closeModal}>
@@ -851,6 +853,7 @@ export const AsideScrollLocked: Story = {
 };
 
 export const AsideWithBodyScroll: Story = {
+  name: "Side panel, scrolling body",
   render: (args) => <AsideTemplate {...args} />,
   args: {
     displayType: ModalDialogType.aside,
@@ -885,6 +888,7 @@ export const AsideWithBodyScroll: Story = {
 };
 
 export const AsideNonCloseable: Story = {
+  name: "Side panel, not closable",
   render: (args) => <AsideTemplate {...args} />,
   args: {
     displayType: ModalDialogType.aside,
@@ -920,6 +924,7 @@ export const AsideNonCloseable: Story = {
 };
 
 export const WithBackButton: Story = {
+  name: "With a back arrow",
   render: (args) => <AsideTemplate {...args} />,
   args: {
     displayType: ModalDialogType.aside,
@@ -943,7 +948,7 @@ export const WithBackButton: Story = {
     docs: {
       description: {
         story:
-          "A panel reached from another one gets a back arrow before its title (`isBackButton`). The arrow and Backspace pressed outside a text field both call `onBackClick`; watch the Actions panel.",
+          "A panel reached from another one gets a back arrow before its title (`isBackButton`). The arrow and Backspace outside a text field both call `onBackClick`.",
       },
       source: {
         code: `<ModalDialog
@@ -962,6 +967,7 @@ export const WithBackButton: Story = {
 };
 
 export const BackdropClickDisabled: Story = {
+  name: "Backdrop click ignored",
   render: (args) => <Template {...args} />,
   args: {
     displayType: ModalDialogType.modal,
@@ -1053,6 +1059,7 @@ const FormTemplate = ({ ...args }: ModalDialogProps) => {
 };
 
 export const FormDialog: Story = {
+  name: "Form",
   render: (args) => <FormTemplate {...args} />,
   args: {
     displayType: ModalDialogType.modal,
@@ -1079,7 +1086,7 @@ export const FormDialog: Story = {
     docs: {
       description: {
         story:
-          "A dialog that collects a value: Enter in the field or the Save button submits it (`withForm`), and `onSubmit` receives the event with the page reload already prevented; watch the Actions panel.",
+          "A dialog that collects a value (`withForm`). Enter in the field or the Save button submits it, and `onSubmit` gets the event with the page reload already prevented.",
       },
       source: {
         code: `<ModalDialog visible={isVisible} withForm onSubmit={handleSubmit} onClose={closeModal}>
@@ -1153,6 +1160,7 @@ const DoubleFooterTemplate = ({ ...args }: ModalDialogProps) => {
 };
 
 export const TwoFooterRows: Story = {
+  name: "Two footer rows",
   render: (args) => <DoubleFooterTemplate {...args} />,
   args: {
     displayType: ModalDialogType.modal,
@@ -1178,7 +1186,7 @@ export const TwoFooterRows: Story = {
     docs: {
       description: {
         story:
-          "Three actions do not fit one row of a 400px dialog, so the footer stacks its children (`isDoubleFooterLine`): each `<div>` inside it becomes a row of its own, here the main action above the other two.",
+          "A footer of two rows: the main action above the other two (`isDoubleFooterLine`). Three actions do not fit one row of a 400px dialog, so each `<div>` becomes a row.",
       },
       source: {
         code: `<ModalDialog visible={isVisible} isDoubleFooterLine onClose={closeModal}>
@@ -1254,6 +1262,7 @@ const ContainerTemplate = ({ ...args }: ModalDialogProps) => {
 };
 
 export const AsideWithContainer: Story = {
+  name: "Side panel with a second view",
   render: (args) => <ContainerTemplate {...args} />,
   args: {
     displayType: ModalDialogType.aside,
@@ -1277,7 +1286,7 @@ export const AsideWithContainer: Story = {
     docs: {
       description: {
         story:
-          "A side panel that swaps in a second view without closing: Open details shows the `ModalDialog.Container` slot in place of the header, body and footer (`containerVisible`), and Back returns. The slot is ignored in the centered modal.",
+          "A side panel that swaps in a second view without closing (`containerVisible`). Open details shows the `ModalDialog.Container` slot in place of the rest, and Back returns. The centred modal ignores the slot.",
       },
       source: {
         code: `<ModalDialog
@@ -1302,6 +1311,7 @@ export const AsideWithContainer: Story = {
 
 // Framed on Docs: the theme provider stamps the direction on the page, which would flip the whole Docs page.
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <AsideTemplate {...args} />
@@ -1334,7 +1344,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "420px" },
       description: {
         story:
-          "The side panel under a right-to-left interface: it is attached to the left edge and slides in from there, the back arrow points the other way and the close cross sits on the left of the header. The dialog renders outside the story's `<div dir=\"rtl\">`, so it takes the direction from the theme's `interfaceDirection` (the Direction toolbar).",
+          "The side panel under a right-to-left interface, attached to the left edge and sliding in from there. The back arrow points the other way, and the cross sits on the left. The direction comes from the theme's `interfaceDirection`.",
       },
       source: {
         code: `<ModalDialog
@@ -1466,6 +1476,7 @@ const CssCustomizationTemplate = () => {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => <CssCustomizationTemplate />,
   play: async ({ canvas, userEvent }) => {
     const [modal, aside] = screen.getAllByTestId("modal-dialog");
@@ -1491,10 +1502,10 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable in use -- the variables are listed under CSS variables on this page, which also says which ones must be set on \`body\` or \`:root\` rather than on the dialog. This example puts the colours on each dialog's \`style\` prop and sets the page-level ones on \`body\` while a dialog is open.
+        story: `The modal and side panel restyled. The colours sit on each dialog's \`style\`; the page-level variables go on \`body\`.
 
-- **Show** — the modal with \`withFooterBorder\`: colors from its \`style\` prop, and radius, width, height cap, paddings, gaps, backdrop and a centered title with no line under it from the page
-- **Show Aside** — the side panel with \`withBorder\`, for \`--modal-dialog-aside-border\` and \`--modal-dialog-aside-default-width\``,
+- **Show** — the modal (\`withFooterBorder\`): radius, size, paddings, gaps, backdrop and a centred title without its line.
+- **Show Aside** — the side panel (\`withBorder\`): its border and width.`,
       },
       source: {
         code: `/* Page-level variables */

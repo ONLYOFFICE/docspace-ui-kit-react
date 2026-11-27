@@ -52,7 +52,6 @@ const LimitPeriodComboBox = ({
       noBorder={false}
       scaled={false}
       size={ComboBoxSize.content}
-      showDisabledItems
       isDisabled={isDisabled}
       title={t("LimitPeriod")}
       dataTestId={testId}

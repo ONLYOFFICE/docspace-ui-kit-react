@@ -10,8 +10,7 @@ const meta = {
   argTypes: {
     radius: {
       control: "text",
-      description:
-        "Radius of the circle, in user units. It sizes the circle only, not the element around it",
+      description: "Radius of the circle, in user units.",
       table: {
         defaultValue: { summary: "12" },
       },
@@ -19,7 +18,7 @@ const meta = {
     x: {
       control: "text",
       description:
-        "Horizontal position of the circle's centre, in user units. A value smaller than `radius` cuts off the circle's left side; the default equals the default radius",
+        "Centre of the circle on the horizontal axis, in user units: the SVG's `cx`. A value below `radius` cuts the circle off at the left edge.",
       table: {
         defaultValue: { summary: "12" },
       },
@@ -27,7 +26,7 @@ const meta = {
     y: {
       control: "text",
       description:
-        "Vertical position of the circle's centre, in user units. A value smaller than `radius` cuts off the circle's top",
+        "Centre of the circle on the vertical axis, in user units — the SVG's `cy`.",
       table: {
         defaultValue: { summary: "12" },
       },
@@ -35,7 +34,7 @@ const meta = {
     width: {
       control: "text",
       description:
-        "Width of the SVG element. The default fills the parent's width",
+        "Width of the `<svg>` element. The circle's own size comes from `radius`.",
       table: {
         defaultValue: { summary: "100%" },
       },
@@ -43,7 +42,7 @@ const meta = {
     height: {
       control: "text",
       description:
-        "Height of the SVG element. The default fills the parent's height, and shrinks to nothing in a parent without one",
+        "Height of the `<svg>` element. The circle's own size comes from `radius`.",
       table: {
         defaultValue: { summary: "100%" },
       },
@@ -51,7 +50,7 @@ const meta = {
     title: {
       control: "text",
       description:
-        "Accessible name of the placeholder, read by screen readers and shown as the browser's tooltip on hover. Empty by default, and an untitled placeholder is hidden from screen readers",
+        "Accessible name of the skeleton, rendered as the SVG's `<title>`. It is empty by default, and an untitled skeleton is `aria-hidden` as decoration.",
       table: {
         defaultValue: { summary: '""' },
       },
@@ -59,36 +58,35 @@ const meta = {
     backgroundColor: {
       control: "color",
       description:
-        "Colour of the circle at rest. Black by default in every theme",
+        "Colour of the skeleton at rest. Fixed black, not a theme colour.",
       table: {
         defaultValue: { summary: "#000" },
       },
     },
     foregroundColor: {
       control: "color",
-      description: "Colour of the lighter band that sweeps across the circle",
+      description: "Colour of the band that sweeps across the skeleton.",
       table: {
         defaultValue: { summary: "#000" },
       },
     },
     backgroundOpacity: {
       control: { type: "range", min: 0, max: 1, step: 0.1 },
-      description: "Opacity of the resting colour",
+      description: "How strongly the resting colour shows, from 0 to 1.",
       table: {
         defaultValue: { summary: "0.1" },
       },
     },
     foregroundOpacity: {
       control: { type: "range", min: 0, max: 1, step: 0.1 },
-      description: "Opacity of the sweeping band's colour",
+      description: "How strongly the sweeping band shows, from 0 to 1.",
       table: {
         defaultValue: { summary: "0.15" },
       },
     },
     speed: {
       control: { type: "range", min: 0.5, max: 3, step: 0.1 },
-      description:
-        "Duration of one sweep, in seconds: a larger value moves the band more slowly",
+      description: "Duration of one sweep, in seconds.",
       table: {
         defaultValue: { summary: "2" },
       },
@@ -96,18 +94,18 @@ const meta = {
     animate: {
       control: "boolean",
       description:
-        "Whether the band sweeps at all. Off, the circle is a still shape",
+        "Whether the band sweeps at all. Turn it off for a static placeholder.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     className: {
       control: "text",
-      description: "Class name added to the SVG element",
+      description: "Applied to the `<svg>` element.",
     },
     style: {
       control: "object",
-      description: "Inline style applied to the SVG element",
+      description: "Applied to the `<svg>` element.",
     },
   },
   parameters: {
@@ -156,7 +154,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A circle of radius 20 centred in a 50 by 50 box — the radius, the centre and the box size are set together, because a centre closer to an edge than the radius cuts the circle off. Change any prop live in the Controls panel below.",
+          "A circle of radius 20 centred in a 50 by 50 box. The radius, the centre and the box are set together, since an edge closer than the radius cuts the circle.",
       },
       source: {
         code: `<CircleSkeleton width="50" height="50" radius="20" x="25" y="25" />`,
@@ -166,6 +164,7 @@ export const Default: Story = {
 };
 
 export const SmallAvatar: Story = {
+  name: "Small avatar",
   render: (args) => <CircleSkeleton {...args} />,
   args: {
     width: "32",
@@ -180,8 +179,7 @@ export const SmallAvatar: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Small avatar-sized circle skeleton, suitable for compact user avatars.",
+        story: "A small circle standing in for a compact avatar.",
       },
       source: {
         code: `<CircleSkeleton width="32" height="32" radius="16" x="16" y="16" />`,
@@ -191,6 +189,7 @@ export const SmallAvatar: Story = {
 };
 
 export const LargeAvatar: Story = {
+  name: "Large avatar",
   render: (args) => <CircleSkeleton {...args} />,
   args: {
     width: "80",
@@ -205,8 +204,7 @@ export const LargeAvatar: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Large avatar-sized circle skeleton, suitable for profile images.",
+        story: "A large circle standing in for a profile image.",
       },
       source: {
         code: `<CircleSkeleton width="80" height="80" radius="40" x="40" y="40" />`,
@@ -216,6 +214,7 @@ export const LargeAvatar: Story = {
 };
 
 export const CustomColors: Story = {
+  name: "Custom colours",
   render: (args) => <CircleSkeleton {...args} />,
   args: {
     width: "50",
@@ -240,7 +239,7 @@ export const CustomColors: Story = {
     docs: {
       description: {
         story:
-          "A light grey circle for a surface where the default black at low opacity is too faint or the wrong tone, such as a dark one (`backgroundColor`, `foregroundColor` and their opacities).",
+          "A light grey circle for a dark surface, where the default black is too faint (`backgroundColor`, `foregroundColor`, their opacities).",
       },
       source: {
         code: `<CircleSkeleton
@@ -260,6 +259,7 @@ export const CustomColors: Story = {
 };
 
 export const NoAnimation: Story = {
+  name: "Still",
   render: (args) => <CircleSkeleton {...args} />,
   args: {
     width: "50",
@@ -287,6 +287,7 @@ export const NoAnimation: Story = {
 };
 
 export const SlowAnimation: Story = {
+  name: "Slow sweep",
   render: (args) => <CircleSkeleton {...args} />,
   args: {
     width: "50",
@@ -316,6 +317,7 @@ export const SlowAnimation: Story = {
 };
 
 export const AvatarGroup: Story = {
+  name: "Avatar group",
   render: () => (
     <div style={{ display: "flex", gap: "8px" }}>
       <CircleSkeleton width="40" height="40" radius="20" x="20" y="20" />
@@ -336,8 +338,7 @@ export const AvatarGroup: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Multiple circle skeletons arranged in a row, simulating an avatar group placeholder.",
+        story: "Circles in a row, standing in for a group of avatars.",
       },
       source: {
         code: `<div style={{ display: "flex", gap: "8px" }}>
@@ -352,6 +353,7 @@ export const AvatarGroup: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "Styled with props",
   render: () => (
     <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
       <CircleSkeleton
@@ -398,7 +400,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The component reads no CSS custom property -- see the behaviour notes on this page; its colours come from props. All three circles here set the same four props, at three sizes.`,
+        story: `The component reads no CSS variables; its colours come from props. All three circles set the same four props, at three sizes.`,
       },
       source: {
         code: `<CircleSkeleton

@@ -22,24 +22,34 @@ const meta = {
     children: {
       control: false,
       description:
-        "The form content; every child is centred horizontally in the card",
+        "The form. Every child is centred horizontally by the wrapper's own flex column.",
     },
     className: {
       control: "text",
-      description: "Additional class names applied to the card",
+      description: "Applied to the card.",
     },
     id: {
       control: "text",
-      description: "HTML id applied to the card",
+      description: "Applied to the card.",
     },
     style: {
       control: "object",
-      description: "Inline styles applied to the card",
+      description: "Applied to the card.",
     },
     onSubmit: {
       control: false,
       description:
-        "Makes the card a form; called on submit with the navigation prevented",
+        'Makes the card itself the `<form>` and calls this on submit, with the browser\'s navigation already prevented. Give the main button `type="submit"` so that it, and Enter in a field, submit. Without it the card is a `<div>`.',
+    },
+    "aria-label": {
+      control: "text",
+      description:
+        "Names the card. With `onSubmit` set this turns the `<form>` into a form landmark.",
+    },
+    "aria-labelledby": {
+      control: "text",
+      description:
+        "Names the card by the id of an element inside it, usually the heading. With `onSubmit` set this turns the `<form>` into a form landmark.",
     },
   },
 } satisfies Meta<typeof FormWrapper>;
@@ -49,6 +59,7 @@ type Story = StoryObj<ComponentProps<typeof FormWrapper>>;
 export default meta;
 
 export const Default: Story = {
+  name: "Default",
   render: (args) => <FormWrapper {...args} />,
   args: {
     children: (
@@ -68,7 +79,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The card on its own around a heading and a line of text, to judge its width, padding, corners and shadow before a form goes in. Change the class, id or inline styles live in the Controls panel below.",
+          "The card on its own around a heading and a line of text, showing its width, padding, corners and shadow.",
       },
       source: {
         code: `<FormWrapper>
@@ -133,6 +144,7 @@ const SignInFormTemplate = (args: ComponentProps<typeof FormWrapper>) => {
 };
 
 export const WithLoginForm: Story = {
+  name: "Sign-in form",
   render: (args) => <SignInFormTemplate {...args} />,
   args: {
     children: null,
@@ -173,7 +185,7 @@ export const WithLoginForm: Story = {
     docs: {
       description: {
         story:
-          "A sign-in form as the card is meant to hold it: an email field, a password field and a primary submit button. With `onSubmit` the card is the `<form>`, so Enter in either field submits it. Each caption is tied to its field through `labelFor` and the control's `id`; each field row is given a width of 100% and each control `scale`, so they span the card instead of shrinking to their content.",
+          "A sign-in form: an email field, a password field and a primary submit button. With `onSubmit` the card is the `<form>`, so Enter in either field submits it. Each field row has a 100% width and each control `scale`, so they span the card.",
       },
       source: {
         code: `<FormWrapper onSubmit={onSignIn} aria-label="Sign in">
@@ -233,6 +245,7 @@ const RegistrationFormTemplate = (args: ComponentProps<typeof FormWrapper>) => {
 };
 
 export const WithRegistrationForm: Story = {
+  name: "Registration form",
   render: (args) => <RegistrationFormTemplate {...args} />,
   args: {
     children: null,
@@ -254,7 +267,7 @@ export const WithRegistrationForm: Story = {
     docs: {
       description: {
         story:
-          "A longer form with four fields, to show that the card keeps its fixed width and only grows taller as fields are added.",
+          "A registration form with four fields. The card keeps its fixed width and only grows taller as fields are added.",
       },
       source: {
         code: `<FormWrapper>
@@ -278,6 +291,7 @@ export const WithRegistrationForm: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   render: () => (
     <div
       style={
@@ -310,11 +324,41 @@ export const CssCustomization: Story = {
     await expect(style.paddingLeft).toBe("40px");
     // So the card itself is the width plus the padding on both sides.
     await expect(Math.round(card.getBoundingClientRect().width)).toBe(480);
+
+    // The canvas is desktop-wide, so read the card's own rules inside its
+    // media queries: the width variables hold on a tablet too, and nothing
+    // on a phone is !important.
+    const mediaRules = [...document.styleSheets]
+      .flatMap((sheet) => {
+        try {
+          return [...sheet.cssRules];
+        } catch {
+          return [];
+        }
+      })
+      .filter((rule): rule is CSSMediaRule => rule instanceof CSSMediaRule)
+      .flatMap((media) => [...media.cssRules])
+      .filter(
+        (rule): rule is CSSStyleRule =>
+          rule instanceof CSSStyleRule &&
+          [...card.classList].some((name) => rule.selectorText === `.${name}`),
+      );
+    await expect(mediaRules.length).toBeGreaterThan(0);
+    for (const rule of mediaRules) {
+      for (const name of [...rule.style]) {
+        await expect(rule.style.getPropertyPriority(name)).toBe("");
+      }
+    }
+    await expect(
+      mediaRules.some((rule) =>
+        rule.style.maxWidth.includes("--form-wrapper-max-width"),
+      ),
+    ).toBe(true);
   },
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on a wrapper around one card -- the variables are listed under CSS variables on this page. Set the minimum and the maximum width together: either one alone is clamped by the other.`,
+        story: `Every overridable variable set on a wrapper around one card. The minimum and maximum width are set together, since either one alone is clamped by the other.`,
       },
       source: {
         code: `<div

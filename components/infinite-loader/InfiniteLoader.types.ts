@@ -1,52 +1,60 @@
 import { IndexRange } from "react-virtualized";
 import { TViewAs } from "../../types";
 
-export type InfiniteLoaderProps = {
+/** The one `aria-*` attribute react-virtualized forwards to its grid. */
+export type InfiniteLoaderAriaProps = Pick<React.AriaAttributes, "aria-label">;
+
+export type InfiniteLoaderProps = InfiniteLoaderAriaProps & {
   /**
-   * Which layout to render: `tile` lays the children out in a grid, anything
-   * else in a list. It also picks the skeleton shown while a page loads —
-   * `table` and `row` have one, the rest show nothing.
+   * Which layout to render: `tile` is a grid of tile rows, every other value a
+   * list. It also picks the skeleton: `row` and `table` have one, the rest none.
    */
   viewAs: TViewAs;
-  /** Whether there is another page to ask for. */
+  /** Whether there is another page to ask for. While false, every row counts as loaded. */
   hasMoreFiles: boolean;
   /** How many items are loaded so far. */
   filesLength: number;
   /** How many items there are in total, loaded or not. */
   itemCount: number;
-  /** Called with the range to load when the user scrolls near the end. */
+  /** Called with the start and stop index to load when the user scrolls near the end. */
   loadMoreItems: (params: IndexRange) => Promise<void>;
-  /** Height of one row, or of one tile, in pixels. It is the same for all of them. */
+  /**
+   * Height of every row in pixels, in the list layouts. The `tile` layout
+   * ignores it and sizes each row from the tile it holds.
+   */
   itemSize: number;
-  /** The items. It must be an array, one entry per row or tile. */
+  /** The items, as an array: one entry per list row, table row or row of tiles. */
   children: React.ReactNode[];
   /** Called as the list scrolls. */
   onScroll?: () => void;
-  /** Renders nothing at all while it is true. */
+  /** Renders nothing at all while it is true, so the region collapses. */
   isLoading?: boolean;
-  /** `localStorage` key of the table's column widths, for the table skeleton. */
+  /** `localStorage` key of the table's column widths. The `table` layout throws without it. */
   columnStorageName?: string;
-  /** The info-panel variant of that key. */
+  /** The key read instead while `infoPanelVisible` is set. The `table` layout throws without it. */
   columnInfoPanelStorageName?: string;
   /** Applied to the list element. */
   className?: string;
-  /** Narrows the layout for an open info panel. */
+  /** Reads the table's column widths from `columnInfoPanelStorageName` instead. */
   infoPanelVisible?: boolean;
-  /** How many tiles fit on a row, in the `tile` layout. */
+  /**
+   * How many tiles one row of the `tile` layout holds. It decides which rows
+   * count as loaded, and how many skeleton tiles a row shows.
+   * @default 1
+   */
   countTilesInRow?: number;
-  /** Ignored: the loader sets it itself after a scroll jump of more than 800px, and a value passed here never reaches the list. */
-  showSkeleton?: boolean;
-  /** The element that scrolls the list. Without it the loader looks for the portal's `#sectionScroll` scroller (`#customScrollBar` on mobile) and falls back to the window. */
+  /**
+   * The element that scrolls the list. Without it the loader looks for the
+   * portal's scroller, then falls back to the window.
+   */
   scrollElement?: Element | null;
-  /** Identifier of the folder being shown, which resets the grid when it changes. */
+  /** Identifier of the folder shown. When it changes, the `tile` layout measures its rows again. */
   currentFolderId?: string | number;
-  /** Renders the tiles in their small form. */
-  smallPreview?: boolean;
-  /** Lays a single tile out on its own row. */
-  isOneTile?: boolean;
 };
 
 export type ListComponentProps = InfiniteLoaderProps & {
   /** The element the list watches for scrolling, resolved by the loader. */
   scroll: Element | (Window & typeof globalThis);
+  /** Draws the rows still scrolling as skeletons; the loader sets it after a jump of more than 800px. */
+  showSkeleton?: boolean;
 };

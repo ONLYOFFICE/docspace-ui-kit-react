@@ -31,6 +31,23 @@ describe("TwoStateToggle", () => {
     ).toBeInTheDocument();
   });
 
+  it("keeps a passed aria-* on the switch, with its own aria-checked", () => {
+    render(
+      <TwoStateToggle
+        ariaLabel="Design"
+        aria-label="Use the new dashboard"
+        aria-describedby="design-hint"
+        aria-checked={false}
+      />,
+    );
+
+    const toggle = screen.getByRole("switch", {
+      name: "Use the new dashboard",
+    });
+    expect(toggle).toHaveAttribute("aria-describedby", "design-hint");
+    expect(toggle).toHaveAttribute("aria-checked", "true");
+  });
+
   it("names the product through the brand lookup, not a literal", () => {
     const saved = (globalThis as Record<symbol, unknown>)[
       Symbol.for("@onlyoffice/apps-ui-kit#brandLookup")

@@ -3,7 +3,7 @@ import type { MouseEvent, ReactNode } from "react";
 export type QuickActionItem = {
   /** Identity of the tile: its React key, and what tells one section's tiles from another's. */
   id: string;
-  /** Element drawn above the label, fitted into an 81×75 box (48×45 at tablet and below). */
+  /** Picture above the label, in an 81×75 box (48×45 at tablet and below). An `<svg>` fills the box. */
   icon: ReactNode;
   /** Text under the icon, and the tile's accessible name. Clamped to two lines. */
   label: string;
@@ -29,10 +29,8 @@ export type QuickActionItem = {
 type QuickActionsCloseProps =
   | {
       /**
-       * Hides the whole banner. When omitted no close control is rendered, so
-       * a consumer that has nowhere to persist the choice keeps a carousel
-       * without an affordance that would appear to do nothing on the next
-       * load.
+       * Called when the close control is clicked; the banner stays until you
+       * remove it. Without it no close control is drawn.
        */
       onClose: () => void;
       /** Tooltip and accessible name for the close control. */
@@ -52,7 +50,7 @@ type QuickActionsCloseProps =
  */
 type QuickActionsControlProps =
   | {
-      /** Whether skeleton tiles are drawn instead of the real ones. */
+      /** Draws skeleton tiles instead of the real ones, and no arrows or cross. */
       isLoading: true;
       /** Accessible name of the arrow that scrolls back. Required, and localized by you, unless `isLoading` is pinned to `true`. */
       prevLabel?: never;
@@ -60,7 +58,7 @@ type QuickActionsControlProps =
       nextLabel?: never;
     }
   | {
-      /** Whether skeleton tiles are drawn instead of the real ones. */
+      /** Draws skeleton tiles instead of the real ones, and no arrows or cross. */
       isLoading?: boolean;
       /** Accessible name of the arrow that scrolls back. Required, and localized by you, unless `isLoading` is pinned to `true`. */
       prevLabel: string;
@@ -68,7 +66,8 @@ type QuickActionsControlProps =
       nextLabel: string;
     };
 
-export type QuickActionsProps = QuickActionsCloseProps &
+export type QuickActionsProps = React.AriaAttributes &
+  QuickActionsCloseProps &
   QuickActionsControlProps & {
     /** The tiles, in the order they are drawn. An empty array renders nothing at all. */
     items: QuickActionItem[];

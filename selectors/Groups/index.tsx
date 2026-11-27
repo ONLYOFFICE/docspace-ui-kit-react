@@ -29,7 +29,6 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
     useAside,
     onClose,
     withoutBackground,
-    withBlur,
 
     onSubmit,
   } = props;
@@ -156,7 +155,7 @@ const GroupsSelector = (props: GroupsSelectorProps) => {
   );
 
   const withAside: TSelectorWithAside = useAside
-    ? { useAside, onClose, withBlur, withoutBackground }
+    ? { useAside, onClose, withoutBackground }
     : {};
 
   return (

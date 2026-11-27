@@ -9,8 +9,11 @@ export type DateTimePickerTranslations = {
   PM: string;
 };
 
-export type DateTimePickerProps = {
-  /** Date and time the component starts on. */
+export type DateTimePickerProps = React.AriaAttributes & {
+  /**
+   * Moment shown from the first render, as the day chip and the time beside it.
+   * Its hour also picks AM or PM.
+   */
   initialDate?: Nullable<DateTime | Date | string>;
   /** Text of the button shown while no date is chosen. */
   selectDateText: string;
@@ -23,7 +26,10 @@ export type DateTimePickerProps = {
    * `null` when the date is cleared.
    */
   onChange: (d: null | DateTime) => void;
-  /** Earliest selectable day in the calendar. */
+  /**
+   * Earliest selectable day in the calendar; its own day stays selectable,
+   * whatever its time.
+   */
   minDate?: DateTime | Date;
   /** Latest selectable day in the calendar. */
   maxDate?: DateTime | Date;

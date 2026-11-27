@@ -9,7 +9,13 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { touchesBuild } from "./build-inputs.mjs";
-import { changesSince, findPushBase } from "./push-base.mjs";
+import {
+  baseAgainst,
+  changesSince,
+  findBranchBase,
+  findPushBase,
+  isCommit,
+} from "./push-base.mjs";
 
 let dir;
 
@@ -94,6 +100,64 @@ describe("findPushBase", () => {
   });
 });
 
+// check-readme's `--base origin/<target>` in CI.
+describe("baseAgainst", () => {
+  it("starts after the target branch merged into the feature", () => {
+    commit("a");
+    git("switch", "-q", "-c", "feature");
+    commit("components/mine.ts");
+    git("switch", "-q", "master");
+    const target = commit("components/theirs.ts");
+    remoteRef("origin/release/v1", target);
+    git("switch", "-q", "feature");
+    git("merge", "-q", "--no-edit", "master");
+
+    const base = baseAgainst(dir, "origin/release/v1");
+
+    expect(base?.sha).toBe(target);
+    expect(changesSince(dir, base?.sha ?? "")).toEqual(["components/mine.ts"]);
+  });
+
+  it("returns null when the history at hand has no common commit", () => {
+    commit("a");
+    git("switch", "-q", "--orphan", "other");
+    remoteRef("origin/other", commit("b"));
+    git("switch", "-q", "master");
+
+    expect(baseAgainst(dir, "origin/other")).toBeNull();
+  });
+});
+
+describe("isCommit", () => {
+  it("tells a branch from a typo", () => {
+    remoteRef("origin/release/v1", commit("a"));
+
+    expect(isCommit(dir, "origin/release/v1")).toBe(true);
+    expect(isCommit(dir, "origin/relase/v1")).toBe(false);
+  });
+});
+
+describe("findBranchBase", () => {
+  it("ignores the upstream and returns the branch's parent", () => {
+    const root = commit("a");
+    remoteRef("origin/master", root);
+    git("switch", "-q", "-c", "feature");
+    const pushed = commit("b");
+    remoteRef("origin/feature", pushed);
+    git("config", "remote.origin.url", dir);
+    git("config", "remote.origin.fetch", "+refs/heads/*:refs/remotes/origin/*");
+    git("config", "branch.feature.remote", "origin");
+    git("config", "branch.feature.merge", "refs/heads/feature");
+    commit("c");
+
+    expect(findBranchBase(dir)).toEqual({
+      sha: root,
+      ref: "origin/master",
+      ahead: 2,
+    });
+  });
+});
+
 describe("changesSince", () => {
   it("lists committed, unstaged and untracked files once each", () => {
     const base = commit("a");
@@ -106,6 +170,15 @@ describe("changesSince", () => {
       "components/x.ts",
       "rollup.config.mjs",
     ]);
+  });
+
+  // check-readme's `--base HEAD^1`: in CI, the first parent of a pull
+  // request's merge commit.
+  it("takes a revision as well as a sha", () => {
+    commit("a");
+    commit("components/x.ts");
+
+    expect(changesSince(dir, "HEAD^1")).toEqual(["components/x.ts"]);
   });
 
   it("returns null for a commit git does not know", () => {

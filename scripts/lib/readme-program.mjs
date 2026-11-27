@@ -679,6 +679,14 @@ export function createReadmeProgram(folders = documentedFolders()) {
               : "external",
       ownerFolder: owner,
       declaredFile: relative(declaration.getSourceFile().fileName),
+      // Where the JSDoc begins, so a style finding opens on the text it is
+      // about; getStart() alone skips the comment and lands on the property.
+      declaredLine:
+        declaration
+          .getSourceFile()
+          .getLineAndCharacterOfPosition(
+            (declaration.jsDoc?.[0] ?? declaration).getStart(),
+          ).line + 1,
       // The type that declares the prop, which is what a group heading and the
       // closing React line name: `AsideHeaderProps`, `InputHTMLAttributes`.
       declaredIn: declaringTypeName(declaration),

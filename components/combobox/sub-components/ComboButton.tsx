@@ -43,6 +43,7 @@ export const ComboButton: React.FC<TComboButtonProps> = ({
   // keyboard unless the caller passed a tab index of its own.
   tabIndex = 0,
   ariaLabel,
+  aria,
   isLoading = false,
   displayArrow: displayArrowProp,
   noSelect,
@@ -109,13 +110,14 @@ export const ComboButton: React.FC<TComboButtonProps> = ({
 
   return (
     <div
+      {...aria}
       className={comboButtonClasses}
       onClick={onClick}
       // `aria-disabled` alone leaves a div in the tab order; a disabled
       // control is no tab stop.
       tabIndex={isDisabled ? -1 : tabIndex}
-      aria-disabled={isDisabled}
-      aria-label={ariaLabel}
+      aria-disabled={isDisabled || (aria?.["aria-disabled"] ?? false)}
+      aria-label={aria?.["aria-label"] ?? ariaLabel}
       aria-expanded={isOpen}
       aria-pressed={isOpen}
       aria-haspopup="listbox"

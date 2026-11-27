@@ -18,6 +18,17 @@ describe("<Scrollbar />", () => {
     expect(screen.getByTestId("scrollbar")).toBeInTheDocument();
   });
 
+  it("drops a cleared paddingInlineEnd", () => {
+    const { container, rerender } = render(
+      <Scrollbar paddingInlineEnd="40px">Some content</Scrollbar>,
+    );
+    const written = '[style*="--scrollbar-padding-inline-end"]';
+    expect(container.querySelector(written)).not.toBeNull();
+
+    rerender(<Scrollbar>Some content</Scrollbar>);
+    expect(container.querySelector(written)).toBeNull();
+  });
+
   it("accepts and applies className", () => {
     render(<Scrollbar className="test-class">Content</Scrollbar>);
     expect(screen.getByTestId("scrollbar")).toHaveClass("test-class");

@@ -53,210 +53,202 @@ const meta = {
       // The icon is a data URI too long to edit, and it stretches the table.
       control: false,
       description:
-        "The access levels to choose from, each drawn as a row with its icon, label, description and paid badge; an entry marked as a separator becomes a divider",
+        "The access levels to choose from. Each is rendered as a row with its icon, label, description and quota badge; an entry with `isSeparator` becomes a divider. Ignored when `advancedOptions` is given.",
     },
     selectedOption: {
       // The icon is a data URI too long to edit, and it stretches the table.
       control: false,
       description:
-        "The level shown in the button; keep it in your own state and set it from `onSelect`",
+        "The option to show in the button. The component does not choose it: keep it in your own state and set it from `onSelect`.",
     },
     scaledOptions: {
       control: "boolean",
       description:
-        "Makes the list as wide as the button instead of `manualWidth`",
+        "Matches the list's width to the button's instead of `manualWidth`.",
       table: { defaultValue: { summary: "false" } },
     },
     scaled: {
       control: "boolean",
       description:
-        "Makes the button take the full width of its parent, which overrides `size`",
+        "Makes the button take the full width of its parent, which overrides `size`.",
       table: { defaultValue: { summary: "true" } },
     },
     directionX: {
       control: { type: "select" },
       options: ["right", "left"],
-      description: "Horizontal direction in which the dropdown opens",
+      description: "Which side of the button the drop-down opens towards.",
       table: { defaultValue: { summary: "right" } },
     },
     size: {
       control: { type: "select" },
       options: Object.values(ComboBoxSize),
       description:
-        "One of the fixed button widths — 173, 300, 350 or 500px, or the content's own; applies only when `scaled` is off",
+        "One of the fixed widths — 173, 300, 350 or 500px, or the content's own. It only applies when `scaled` is false.",
       table: { defaultValue: { summary: "base" } },
     },
     manualWidth: {
       control: "text",
       description:
-        "Width of the list as a CSS length; the button's width is set by `size` and `scaled`",
+        "Width of the list as a CSS length. It has nothing to do with the button's width — use `scaledOptions` for that.",
       table: { defaultValue: { summary: "200px" } },
     },
     isDisabled: {
       control: "boolean",
-      description: "Greys the button out and stops it opening",
+      description: "Greys the button out and stops it opening.",
       table: { defaultValue: { summary: "false" } },
     },
     isLoading: {
       control: "boolean",
       description:
-        "Shows a spinner in place of the button's label and icon, and stops the button opening",
+        "Replaces the arrow with a spinner and stops the button opening.",
       table: { defaultValue: { summary: "false" } },
     },
     withoutBackground: {
       control: "boolean",
-      description: "Makes the backdrop behind the open list transparent",
-      table: { defaultValue: { summary: "false" } },
-    },
-    withBlur: {
-      control: "boolean",
-      description: "Accepted but ignored: nothing blurs",
+      description: "Makes that backdrop transparent.",
       table: { defaultValue: { summary: "false" } },
     },
     directionY: {
       control: { type: "select" },
       options: ["top", "bottom", "both"],
-      description: "Vertical direction in which the dropdown opens",
+      description: "Whether the drop-down opens above or below the button.",
       table: { defaultValue: { summary: "bottom" } },
     },
     isAside: {
       control: "boolean",
-      description:
-        "Marks the backdrop behind the open list as belonging to a side panel",
+      description: "Marks the list's backdrop as belonging to a side panel.",
       table: { defaultValue: { summary: "false" } },
     },
     isMobileView: {
       control: "boolean",
       description:
-        "Pins the open list to the bottom of the screen, full width, on a phone in portrait",
+        "Pins the list to the bottom of the screen, full width, in portrait.",
       table: { defaultValue: { summary: "false" } },
     },
     manualY: {
       control: "text",
       description:
-        "Exact vertical offset of the list from the button, when the list renders in place",
+        "(Non-portal mode) Exact vertical offset of the list from the button.",
     },
     fixedDirection: {
       control: "boolean",
       description:
-        "Prevents the dropdown from flipping direction when near viewport edges",
+        "Keeps `directionX` and `directionY` as given instead of flipping them.",
       table: { defaultValue: { summary: "false" } },
     },
     withBackground: {
       control: "boolean",
-      description: "Dims the page behind the open list",
+      description: "Gives that backdrop its dimming background.",
       table: { defaultValue: { summary: "false" } },
     },
     shouldShowBackdrop: {
       control: "boolean",
       description:
-        "Renders the backdrop behind the open list even when another one is already on screen",
+        "Renders the backdrop even when another one is already on screen.",
       table: { defaultValue: { summary: "false" } },
     },
     withBackdrop: {
       control: "boolean",
       description:
-        "Whether the open list puts a backdrop behind itself to catch the next click",
+        "Whether the list renders a backdrop to catch the next click.",
       table: { defaultValue: { summary: "true" } },
     },
     noBorder: {
       control: "boolean",
-      description: "Removes the border from the select element",
+      description: "Removes the button's border.",
       table: { defaultValue: { summary: "false" } },
     },
     noSelect: {
       control: "boolean",
-      description:
-        "Whether the button's text cannot be selected with the mouse",
+      description: "Whether the button's text cannot be selected.",
       table: { defaultValue: { summary: "true" } },
     },
     isSelectionDisabled: {
       control: "boolean",
       description:
-        "Refuses every level other than the current one and those in `availableAccess`; a refused pick shows `selectionErrorText` in a toast and the selection stays",
+        "Whether picking a level other than the current one is refused. What is still allowed is `availableAccess`; everything else raises a toast.",
       table: { defaultValue: { summary: "false" } },
     },
     availableAccess: {
       control: "object",
       description:
-        "The `access` values that may still be picked while `isSelectionDisabled` is on",
+        "The `access` values that may still be chosen while `isSelectionDisabled` is set. Without it only the current level is allowed.",
     },
     selectionErrorText: {
       control: "text",
-      description: "The toast text shown when a refused level is picked",
+      description: "The toast shown when a refused level is picked.",
     },
     displaySelectedOption: {
       control: "boolean",
-      description: "Keeps the current level highlighted in the list",
-      table: { defaultValue: { summary: "false" } },
-    },
-    showDisabledItems: {
-      control: "boolean",
       description:
-        "Accepted but ignored: disabled options are always kept in the list",
+        "Keeps the option that is currently selected usable and highlights it. Without it that option is rendered disabled, so the value cannot be picked again.",
+      table: { defaultValue: { summary: "false" } },
     },
     title: {
       control: "text",
       description:
-        "Hover tooltip for the whole control; it needs `RootTooltip` mounted",
+        "Hover tooltip for the whole control. It needs `RootTooltip` mounted.",
     },
     topSpace: {
       control: "number",
-      description: "Additional top spacing in pixels for the dropdown",
+      description:
+        "Passed straight to `ComboBox`: space above the drop-down, in pixels.",
     },
     modernView: {
       control: "boolean",
-      description: "Switches the button to its compact presentation",
+      description: "Passed straight to `ComboBox`: its compact presentation.",
       table: { defaultValue: { summary: "false" } },
     },
     fillIcon: {
       control: "boolean",
       description:
-        "Recolours the icon in the button to the theme's icon colour",
+        "Passed straight to `ComboBox`: whether the arrow icon is recoloured.",
       table: { defaultValue: { summary: "false" } },
     },
     isDefaultMode: {
       control: "boolean",
       description:
-        "Renders the open list in a portal at the end of the page, positioned against the button; turn it off to render the list in place, next to the button",
+        "Passed straight to `ComboBox`: renders the open list in a portal at the end of the page. `false` renders it in place, where a wrapper's CSS variables reach it.",
       table: { defaultValue: { summary: "true" } },
     },
     comboIcon: {
       control: "text",
-      description: "URL of an icon shown in place of the arrow in the button",
+      description:
+        "Passed straight to `ComboBox`: URL of an icon to show instead of the arrow.",
     },
     usePortalBackdrop: {
       control: "boolean",
-      description: "Whether to render the backdrop using a React portal",
+      description:
+        "Passed straight to `ComboBox`: whether the backdrop is rendered in a portal.",
       table: { defaultValue: { summary: "false" } },
     },
     type: {
       control: { type: "select" },
       options: [undefined, "badge", "onlyIcon", "descriptive"],
       description:
-        "How the button shows the chosen level: `descriptive` adds its description under the label, `onlyIcon` shows the icon alone, `badge` draws the label as a badge",
+        "Shape of the button: `badge` draws the label as a coloured badge, `onlyIcon` drops the label, `descriptive` adds the option's `description` under it.",
     },
     dataTestId: {
       control: "text",
-      description: "`data-testid` of the button",
+      description: "`data-testid` of the combo button.",
     },
     onSelect: {
       description:
-        "Called with the level that was picked; not called for a refused one",
+        "Called with the option that was clicked. Nothing changes on its own — `selectedOption` is yours to update.",
     },
     setIsOpenItemAccess: {
       control: false,
-      description: "Told `true` when the list opens and `false` when it closes",
+      description:
+        "Passed straight to `ComboBox`: told when the drop-down opens and closes.",
     },
     className: {
       control: "text",
-      description:
-        "Class added to the element that wraps the button and the list",
+      description: "Applied to the element that wraps the button and the list.",
     },
     advancedOptions: {
       control: false,
       description:
-        "An element whose children replace the rows built from `accessOptions`",
+        "Element whose children replace the list entirely, for a menu that is not a list of options. `options` is then used only for the button.",
     },
   },
   args: {
@@ -317,12 +309,26 @@ export const Default: Story = {
     );
     await listHidden();
     await expect(combobox).toHaveTextContent("Viewer");
+
+    // The rows are DropDownItems, so the keyboard walks them as ComboBox's own
+    // options: an arrow opens the list on the chosen row.
+    const button = canvas.getByRole("button", { expanded: false });
+    button.focus();
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(button).toHaveAttribute("aria-expanded", "true");
+    await expect(
+      document.getElementById(
+        button.getAttribute("aria-activedescendant") ?? "",
+      ),
+    ).toHaveTextContent("Viewer");
+    await userEvent.keyboard("{Escape}");
+    await expect(button).toHaveAttribute("aria-expanded", "false");
   },
   parameters: {
     docs: {
       description: {
         story:
-          "The drop-down as it is placed next to a person or a link: open it to see each level's icon, description and paid badge, and pick one to see the button follow (`onSelect`, logged in the Actions panel). Change any other prop live in the Controls panel below.",
+          "The drop-down as it is placed next to a person or a link. Each level in its list has an icon, a description and, where it is paid, a badge.",
       },
       source: {
         code: `<AccessRightSelect
@@ -374,6 +380,7 @@ const DisplayTypesTemplate = () => (
 );
 
 export const DisplayTypes: Story = {
+  name: "Display types",
   render: () => <DisplayTypesTemplate />,
   play: async ({ canvas }) => {
     const [plain, descriptive, onlyIcon] = canvas.getAllByTestId("combobox");
@@ -387,11 +394,11 @@ export const DisplayTypes: Story = {
   parameters: {
     docs: {
       description: {
-        story: `How much of the chosen level the button shows, from the most room to the least:
+        story: `How much of the chosen level the button shows:
 
-- **Editor** — the label alone, the usual form (no \`type\`)
-- **Editor, Can edit and share files** — the label with the description underneath, for a form where the choice needs explaining (\`type="descriptive"\`)
-- **The folder icon** — the icon alone, for a row with no room for text; the list still shows every label (\`type="onlyIcon"\`)`,
+- **Editor** — the label alone (no \`type\`)
+- **Editor, Can edit and share files** — the label with the description underneath (\`type="descriptive"\`)
+- **The folder icon** — the icon alone; the list still shows every label (\`type="onlyIcon"\`)`,
       },
       source: {
         code: `<AccessRightSelect accessOptions={options} selectedOption={access} />
@@ -420,6 +427,7 @@ const RestrictedChoicesTemplate = () => (
 );
 
 export const RestrictedChoices: Story = {
+  name: "Refused levels",
   render: () => <RestrictedChoicesTemplate />,
   beforeEach: () => {
     toastr.clear();
@@ -445,7 +453,7 @@ export const RestrictedChoices: Story = {
     docs: {
       description: {
         story:
-          "For a level the viewer may see but not grant. Open the list and pick **Full access**: a toast explains why, and the button keeps **Viewer**; **Commenter** and **Viewer** can still be picked (`isSelectionDisabled`, `availableAccess`, `selectionErrorText`). The toast needs `Toast` mounted once in the app.",
+          "Levels the viewer may see but not grant (`isSelectionDisabled`, `availableAccess`). Picking **Full access** shows a toast and keeps **Viewer**; **Commenter** and **Viewer** can still be picked. The toast needs `Toast` mounted once.",
       },
       source: {
         code: `<AccessRightSelect
@@ -463,6 +471,7 @@ export const RestrictedChoices: Story = {
 };
 
 export const DisabledState: Story = {
+  name: "Disabled",
   args: {
     ...Default.args,
     isDisabled: true,
@@ -483,7 +492,7 @@ export const DisabledState: Story = {
     docs: {
       description: {
         story:
-          "For an access level that cannot be changed right now, such as while the person is being removed: the button is greyed out and clicking it does not open the list (`isDisabled`).",
+          "A disabled drop-down (`isDisabled`), for a level that cannot change right now. The button is greyed out, and a click does not open the list.",
       },
       source: {
         code: `<AccessRightSelect
@@ -497,6 +506,7 @@ export const DisabledState: Story = {
 };
 
 export const LoadingState: Story = {
+  name: "Loading",
   args: {
     ...Default.args,
     isLoading: true,
@@ -519,7 +529,7 @@ export const LoadingState: Story = {
     docs: {
       description: {
         story:
-          "For the moment a new level is being saved: a spinner takes the place of the label and icon, and the list cannot be opened until the save finishes (`isLoading`).",
+          "A drop-down while a new level is saved (`isLoading`). A spinner takes the place of the label and icon, and the list does not open.",
       },
       source: {
         code: `<AccessRightSelect
@@ -594,6 +604,7 @@ const CssCustomizationTemplate = () => {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => <CssCustomizationTemplate />,
   play: async ({ canvas, userEvent }) => {
     // Each instance renders its list in place.
@@ -615,9 +626,9 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. Open any of the instances to see the row and panel variables; they render the list in place (\`isDefaultMode={false}\`), because a portalled list is out of reach of a wrapper's variables. The three instances share one wrapper:
+        story: `Three drop-downs under a wrapper that sets every overridable variable. Each renders its list in place (\`isDefaultMode={false}\`), where the wrapper's variables reach it.
 
-- **Full access** — the usual button, for the button radius and everything in the list
+- **Full access** — the button radius, and everything in the list
 - **The first icon** — \`type="onlyIcon"\`, for \`--access-right-select-text\`
 - **The second icon** — \`type="onlyIcon"\` and \`isDisabled\`, for \`--access-right-select-disabled-icon\``,
       },

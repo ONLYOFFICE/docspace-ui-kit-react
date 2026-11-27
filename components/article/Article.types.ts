@@ -10,17 +10,17 @@ export type ArticleHeaderProps = {
   showText: boolean;
   children: React.ReactNode;
   onIconClick: () => void;
-  /** Called when the logo in the panel's header is clicked. */
+  /** Called when the logo, or the back button above the body, is clicked, before the panel navigates. */
   onLogoClickAction?: () => void;
-  /** Renders the burger and logo as skeletons instead of images. */
+  /** Renders the logo and the back button as skeletons. A custom header outranks it. */
   isBurgerLoading: boolean;
-  /** Tells the header that the `Article.Header` slot carries its own markup, which changes the header's own padding. */
+  /** Shows the `Article.Header` slot in the header row in place of the logo. Without it the slot is not rendered; a phone never shows it. */
   withCustomArticleHeader: boolean;
   /** Which layout to render. The panel is a portal into `#root` on `mobile`, a collapsible sidebar on `tablet` and a fixed column on `desktop`; nothing here measures the viewport. */
   currentDeviceType: DeviceType;
   /** Shows the back button in the header, and a second one above the body on anything wider than a phone. */
   showBackButton: boolean;
-  /** Router push used by the back button and the dev tools entry. Without it those elements navigate nowhere. */
+  /** Router push used by the logo, the back button and the developer tools entry. Without it they set `window.location`, which reloads the page. */
   navigate?: (path: string) => void;
   /** Called by the back button instead of navigating. */
   onBack?: () => void;
@@ -30,13 +30,13 @@ export type ArticleAppsProps = {
   showText: boolean;
   withDevTools: boolean;
   withCustomSlot: boolean;
-  /** Name shown in the "download the apps" block at the foot of the panel. */
+  /** Organization name in the tooltips of the "download the apps" links. */
   logoText: string;
-  /** Address behind the desktop application link. */
+  /** Address behind the Windows, macOS and Linux links. Empty, those three links are not drawn. */
   downloaddesktopUrl: string;
-  /** Address behind the Android link. */
+  /** Address behind the Android link. Empty, the link is not drawn. */
   officeforandroidUrl: string;
-  /** Address behind the iOS link. */
+  /** Address behind the iOS link. Empty, the link is not drawn. */
   officeforiosUrl: string;
 };
 
@@ -46,7 +46,7 @@ export type ArticleHideMenuButtonProps = {
   toggleShowText: VoidFunction;
   /** Removes the profile block at the foot of the panel, and moves the collapse handle down to take its place. */
   hideProfileBlock: boolean;
-  /** Not read. The component works out whether there is a custom slot from `customSlot` itself. */
+  /** Whether a custom slot sits above the handle, which then moves down to make room. */
   withCustomSlot: boolean;
 };
 
@@ -56,9 +56,9 @@ export type ArticleDevToolsBarProps = {
   articleOpen: boolean;
   withCustomSlot: boolean;
   currentDeviceType: DeviceType;
-  /** Called by the burger in the header, and by the backdrop on a phone. It is expected to flip `articleOpen`. */
+  /** Called on a phone by the header's close button, the backdrop, the back button and the developer tools entry. It is expected to flip `articleOpen`. */
   toggleArticleOpen: TToggleArticleOpen;
-  /** Not read at this level. The component passes its own `/developer-tools` path to the bar. */
+  /** Route of the developer tools page. */
   path?: string;
   navigate?: (path: string) => void;
 };
@@ -82,7 +82,7 @@ export type ArticleLiveChatProps = ArticleZendeskProps & {
   withFloatingButton?: boolean;
   /** The info panel is docked at the inline end, so the launcher moves clear of it. */
   isInfoPanelVisible?: boolean;
-  /** Width in px of the open info panel, or of the AI chat open in its place, which the launcher moves clear of; `0` when neither is. Set, it wins over `isInfoPanelVisible`, which assumes `INFO_PANEL_WIDTH`. */
+  /** Width in px of the open info or chat panel, or `0`, for the launcher to move clear of. Set, it wins over `isInfoPanelVisible`, which assumes `INFO_PANEL_WIDTH`. */
   infoPanelWidth?: number;
 };
 
@@ -99,28 +99,29 @@ export type ArticleProfileProps = {
   currentDeviceType: DeviceType;
 };
 
-export type ArticleProps = ArticleProfileProps &
+export type ArticleProps = React.AriaAttributes &
+  ArticleProfileProps &
   ArticleZendeskProps &
-  ArticleHideMenuButtonProps &
-  Omit<ArticleDevToolsBarProps, "withCustomSlot"> &
+  Omit<ArticleHideMenuButtonProps, "withCustomSlot"> &
+  Omit<ArticleDevToolsBarProps, "withCustomSlot" | "path"> &
   Omit<ArticleHeaderProps, "children" | "onClick" | "onIconClick"> &
   Omit<ArticleAppsProps, "withDevTools" | "withCustomSlot"> & {
-    /** Called on mount and on every device change with the width the component has decided on. Wire it to the state behind `showText` or the panel never changes width. */
+    /** Called on mount and on every device change: `true` on a desktop or a phone. On a tablet it gets `false`, and only while `showArticle` in local storage is falsy. */
     setShowText: (value: boolean) => void;
     /** Whether a main button belongs above the body. Without it the `Article.MainButton` slot is not rendered on anything but a phone. */
     withMainButton?: boolean;
-    /** Whether the panel is in its narrow, overlay-capable mode. It is written back through `setIsMobileArticle` on mount and on every device change. */
+    /** Removes the padding and margin around the main button, and moves the live chat launcher clear of it. The component writes it back through `setIsMobileArticle`. */
     isMobileArticle: boolean;
     /**
      * Whether an upload or other progress indicator is on screen.
-     * @deprecated Not read: the live chat launcher no longer moves for a progress indicator. Kept so existing callers compile; it goes in the next major.
+     * @deprecated It goes in the next major. While it is set, the live chat launcher steps one button aside, as for a main button.
      */
     showProgress?: boolean;
     /** Whether the info panel is open. Above mobile the live chat launcher moves clear of it. */
     isInfoPanelVisible?: boolean;
-    /** Width in px of the open info panel, or of the AI chat open in its place, for the live chat launcher to move clear of; `0` when neither is. Set, it wins over `isInfoPanelVisible`, which assumes `INFO_PANEL_WIDTH`. Pass it when the panels are resizable. */
+    /** Width in px of the open info or chat panel, or `0`, for the live chat launcher to move clear of. Set, it wins over `isInfoPanelVisible`; pass it when the panels are resizable. */
     infoPanelWidth?: number;
-    /** Called on mount and on every device change. Wire it to the state behind `isMobileArticle`. */
+    /** Called on mount and on every device change: `true` on a tablet or a phone, `false` on a desktop. Wire it to the state behind `isMobileArticle`. */
     setIsMobileArticle: (value: boolean) => void;
     /** The three slots, as an array. Each is `Article.Header`, `Article.MainButton` or `Article.Body`; anything else is dropped, and the slots are matched by display name, so a wrapper around one hides it. */
     children: React.JSX.Element[];
@@ -130,40 +131,17 @@ export type ArticleProps = ArticleProfileProps &
 
     /** Called with `false` when the browser goes back on a phone, to close the panel. */
     setArticleOpen: (value: boolean) => void;
-    /** Not read. Nothing in the component uses it. */
-    withSendAgain: boolean;
-    /** Whether the portal's top bar is on screen. Its height is measured out of the window height on every resize — a measurement the component then does not use. */
-    mainBarVisible: boolean;
 
     /** Whether the live chat is mounted at all. It is also suppressed on a mobile user agent. */
     isLiveChatAvailable: boolean;
 
-    /** Replaces the profile block with a skeleton and removes the custom slot, the developer tools entry, the apps block, the live chat and the collapse handle. The header and the slots are still rendered. */
+    /** Replaces the profile block with a skeleton. It also removes the custom slot, the developer tools entry, the apps block, the live chat and the collapse handle. */
     showArticleLoader?: boolean;
     /** Whether the person is an administrator. With `limitedAccessDevToolsForUsers` it decides whether the developer tools entry is shown. */
     isAdmin: boolean;
 
-    /** Not read. Nothing in the component uses it. */
-    isNonProfit?: boolean;
-    /** Not read. Nothing in the component uses it. */
-    isGracePeriod?: boolean;
-    /** Not read. Nothing in the component uses it. */
-    isFreeTariff?: boolean;
-    /** Not read. Nothing in the component uses it. */
-    isPaymentPageAvailable?: boolean;
-    /** Not read. Nothing in the component uses it. */
-    isLicenseDateExpired?: boolean;
-    /** Not read. Nothing in the component uses it. */
-    isTrial?: boolean;
-    /** Not read. Nothing in the component uses it. */
-    standalone?: boolean;
-    /** Not read. Nothing in the component uses it. */
-    currentTariffPlanTitle?: string;
-    /** Not read. Nothing in the component uses it. */
-    trialDaysLeft?: number;
-
     /** Hides the developer tools entry from anyone who is not an administrator. */
     limitedAccessDevToolsForUsers: boolean;
-    /** Extra content between the body and the apps block. Its presence also shifts the collapse handle and the developer tools entry. */
+    /** Extra content under the body, above the developer tools entry. Its presence also shifts the collapse handle and the developer tools entry. */
     customSlot?: React.ReactNode;
   };

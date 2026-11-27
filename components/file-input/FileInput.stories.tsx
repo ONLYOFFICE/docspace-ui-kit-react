@@ -20,23 +20,24 @@ const meta = {
       control: "select",
       options: Object.values(InputSize),
       description:
-        "Height and width of the field, which also pick the icon box and button sizes",
+        "Height of the field, which also picks the icon and button sizes: base and middle take a 15px icon, large a 16px one.",
       table: {
         defaultValue: { summary: "base" },
       },
     },
     placeholder: {
       control: "text",
-      description: "Text shown in the field until a file is chosen",
+      description:
+        "Placeholder of the read-only field, shown until a file is chosen.",
     },
     buttonLabel: {
       control: "text",
-      description: "Renders a button with this label in place of the icon",
+      description: "Renders a button with this label in place of the icon.",
     },
     isDisabled: {
       control: "boolean",
       description:
-        "Greys the field out and makes it inert: no click, drop or key opens or fills it, and it leaves the tab order",
+        "Whether the field is greyed and inert: a click, a drop, Enter and Space all do nothing, and the control leaves the tab order.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -44,42 +45,42 @@ const meta = {
     isLoading: {
       control: "boolean",
       description:
-        "Replaces the icon with a spinner and makes the field inert, as `isDisabled` does; with a button label the button stays in place of the spinner",
+        "Whether a spinner replaces the icon. It also makes the control inert, as `isDisabled` does; the spinner is not shown when `buttonLabel` is set, since the button has no loading form.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     hasError: {
       control: "boolean",
-      description: "Draws the field and its icon box with an error border",
+      description: "Whether the field is drawn in its error colours.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     hasWarning: {
       control: "boolean",
-      description: "Draws the field and its icon box with a warning border",
+      description: "Whether the field is drawn in its warning colours.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     scale: {
       control: "boolean",
-      description: "Stretches the field to the full width of its container",
+      description: "Whether the field stretches to fill its container.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isMultiple: {
       control: "boolean",
-      description: "Whether several files may be chosen or dropped at once",
+      description: "Whether several files may be chosen at once.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     isDocumentIcon: {
       control: "boolean",
-      description: "Shows a document icon instead of the folder icon",
+      description: "Whether the icon is a document rather than a folder.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -87,63 +88,72 @@ const meta = {
     accept: {
       control: "object",
       description:
-        'File extensions or MIME types the picker offers and a drop accepts, such as `[".pdf", "image/*"]`; a file of any other type is refused. Left out, any file is accepted',
+        'Extensions and MIME types the dialog offers and a drop accepts, such as `[".pdf", "image/*"]`. Left out, empty, or `[""]`, any file is accepted.',
     },
     onReject: {
       description:
-        "Called with the files `accept` refused; while it is set the field shows no error toast of its own",
+        "Called with the files `accept` turned away. While it is set the component shows no toast of its own for a refused pick or drop.",
     },
     onInput: {
       description:
-        "Called with the chosen files: a single `File` when one was chosen, an array when several were",
+        "Called with the chosen files: a single `File` when one was picked, an array when several were. Check for an array before reading `.name`.",
     },
     fromStorage: {
       control: "boolean",
       description:
-        "Stops the field from opening the file picker: it shows `path` instead and passes clicks to `onClick`",
+        "Turns the control into a button that picks from somewhere else. The hidden file input is left out, `path` is shown, and clicks go to `onClick`.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     path: {
       control: "text",
-      description: "Text shown in the field while `fromStorage` is set",
+      description:
+        "Text shown in the field instead of the chosen file names, with `fromStorage`.",
     },
     onClick: {
       description:
-        "Called when the field or its icon is clicked, only while `fromStorage` is set",
+        "Called when the field or the icon is clicked — but only while `fromStorage` is set. Without it the click opens the file dialog and this never fires.",
     },
     id: {
       control: "text",
-      description: "Id of the hidden file input, not of the visible field",
+      description:
+        'Applied to the hidden `<input type="file">`, not to the wrapper.',
     },
     idButton: {
       control: "text",
-      description: "Id of the outermost element",
+      description:
+        "Id of the outer element, the one a `<label for>` should point at.",
     },
     name: {
       control: false,
-      description: "Accepted but not used",
+      description: "Name of the hidden file field.",
     },
     className: {
       control: false,
-      description: "Class added to the outermost element",
+      description: "Applied to the outermost element.",
     },
     style: {
       control: false,
-      description: "Inline style of the outermost element",
+      description: "Applied to the outermost element.",
     },
     "aria-label": {
       control: "text",
-      description: "Accessible name of the control, which has none without it",
+      description: "Accessible name of the control. There is none without it.",
     },
     "aria-description": {
       control: "text",
-      description: "Accessible description of the control",
+      description: "Accessible description of the control.",
+    },
+    "aria-disabled": {
+      control: false,
+      description:
+        "Marks the control disabled to assistive technology while it still takes clicks and drops. `isDisabled` and `isLoading` set it to `true` over this value.",
     },
     "data-test-id": {
       control: "text",
-      description: "Test id of the outermost element",
+      description:
+        "Sets the outer element's `data-testid`, despite the hyphenated name.",
       table: {
         defaultValue: { summary: "file-input" },
       },
@@ -209,8 +219,7 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "The field as a form shows it before anything is chosen; change any prop live in the Controls panel below.",
+        story: "The field as a form shows it before anything is chosen.",
       },
       source: {
         code: `<FileInput
@@ -290,7 +299,7 @@ export const Sizes: Story = {
     docs: {
       description: {
         story:
-          "Pick the size that matches the other fields of the form: each one also sets the field's width and the size of its icon box (`size`).",
+          "The three sizes (`size`), each of which also sets the field's width and the size of its icon box.",
       },
       source: {
         code: `<FileInput size={InputSize.base} placeholder="Base size" />
@@ -366,7 +375,7 @@ export const States: Story = {
     docs: {
       description: {
         story:
-          "Use these to tell the user about the chosen file: **Error state** and **Warning state** recolour the border (`hasError`, `hasWarning`), **Disabled** greys the field and ignores clicks, drops and keys (`isDisabled`), and **Loading** shows a spinner in place of the icon and is just as inert (`isLoading`).",
+          "The field in each state:\n\n- **Error state**, **Warning state** — the border recoloured (`hasError`, `hasWarning`)\n- **Disabled** — greyed, ignores clicks, drops and keys (`isDisabled`)\n- **Loading** — a spinner in place of the icon, just as inert (`isLoading`)",
       },
       source: {
         code: `<FileInput placeholder="Normal" />
@@ -408,6 +417,7 @@ const chooseUnchecked = (input: HTMLInputElement, file: File) => {
 };
 
 export const WithAcceptFilter: Story = {
+  name: "Accepted types",
   render: () => <WithAcceptFilterTemplate />,
   play: async ({ canvas, userEvent }) => {
     const images = canvas.getByLabelText("Image file input");
@@ -434,7 +444,7 @@ export const WithAcceptFilter: Story = {
     docs: {
       description: {
         story:
-          "Limit the field to the types the host can handle: the picker offers only these extensions, and a dropped file of another type is refused with an error toast (`accept`).",
+          "Fields limited to the types the host can handle (`accept`). The picker offers only these extensions, and a dropped file of another type is refused with a toast.",
       },
       source: {
         code: `<FileInput placeholder="Images only" accept={[".png", ".jpg", ".jpeg", ".gif"]} />
@@ -458,6 +468,7 @@ const ScaledTemplate = () => {
 };
 
 export const ScaledInput: Story = {
+  name: "Full width",
   render: () => <ScaledTemplate />,
   play: async ({ canvas }) => {
     const root = rootOf(field(canvas, "Scaled file input"));
@@ -469,7 +480,7 @@ export const ScaledInput: Story = {
     docs: {
       description: {
         story:
-          "Use it when the field should line up with a full-width form column: it stretches to the width of its container (`scale`).",
+          "A field stretched to the width of its container, for a full-width form column (`scale`).",
       },
       source: {
         code: `<FileInput placeholder="Scaled file input" scale />`,
@@ -507,6 +518,7 @@ const WithButtonTemplate = () => {
 };
 
 export const WithButton: Story = {
+  name: "With a button",
   render: () => <WithButtonTemplate />,
   play: async ({ canvas }) => {
     // A Browse button after the field, sized with it.
@@ -526,7 +538,7 @@ export const WithButton: Story = {
     docs: {
       description: {
         story:
-          "Use a labelled button when an icon alone would not tell the user what the field does: the button takes the place of the icon and grows with the field's size (`buttonLabel`). The field is given the full width of its container here (`scale`), because at a fixed size the button is laid out past the field's own width.",
+          "A labelled button in place of the icon, which grows with the field's size (`buttonLabel`). The fields are full width (`scale`): at a fixed size the button lands past the field's edge.",
       },
       source: {
         code: `<FileInput size={InputSize.base} placeholder="Base size" buttonLabel="Browse" scale />
@@ -556,6 +568,7 @@ const DocumentIconTemplate = () => {
 };
 
 export const DocumentIcon: Story = {
+  name: "Document icon",
   render: () => <DocumentIconTemplate />,
   play: async ({ canvas }) => {
     const icon = (placeholder: string) =>
@@ -567,7 +580,7 @@ export const DocumentIcon: Story = {
     docs: {
       description: {
         story:
-          "Use the document icon when the field takes a single document rather than any file: **Folder icon** is the default, **Document icon** the alternative (`isDocumentIcon`).",
+          "The two icons: **Folder icon** by default, **Document icon** for a field that takes one document (`isDocumentIcon`).",
       },
       source: {
         code: `<FileInput size={InputSize.base} placeholder="Folder icon" />
@@ -578,6 +591,7 @@ export const DocumentIcon: Story = {
 };
 
 export const WithPath: Story = {
+  name: "Path from storage",
   render: (args) => <FileInput {...args} />,
   play: async ({ args, canvas, userEvent }) => {
     // fromStorage shows the path and has no file input to open.
@@ -602,7 +616,7 @@ export const WithPath: Story = {
     docs: {
       description: {
         story:
-          "Use this when the file comes from somewhere other than the device, such as a folder picker of the host's own: the field shows the path it is given (`fromStorage`, `path`), and a click on it or its icon calls the host instead of opening the file picker (`onClick`) — click it and watch the Actions panel.",
+          "A field showing a path from the host's own folder picker (`fromStorage`, `path`). A click on it or its icon calls `onClick` instead of opening the file dialog.",
       },
       source: {
         code: `<FileInput
@@ -674,6 +688,7 @@ const CssCustomizationTemplate = () => {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   render: () => <CssCustomizationTemplate />,
   play: async ({ canvas }) => {
     const choose = field(canvas, "Choose file");
@@ -694,9 +709,9 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
+        story: `Every overridable variable, set on one wrapper.
 
-- **Choose file** — the border, background, text and radius variables; hover it for \`--file-input-hover-border\` and press it for \`--file-input-focus-border\`
+- **Choose file** — the border, background, text and radius variables, and the hover and pressed borders
 - **Warning state** — \`--file-input-warning-border\` (\`hasWarning\`)
 - **Error state** — \`--file-input-error-border\` (\`hasError\`)
 - **Disabled** — \`--file-input-disabled-border\` and \`--file-input-placeholder-color\` (\`isDisabled\`)`,

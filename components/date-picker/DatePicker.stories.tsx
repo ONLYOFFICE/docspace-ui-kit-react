@@ -27,25 +27,26 @@ const meta = {
     locale: {
       control: "text",
       description:
-        "Locale the calendar writes its month names and weekdays in (e.g. 'en', 'de'); the chip always shows the date as '15 Sep 2026'",
+        "BCP 47 tag the calendar and the chip's date are written in.",
     },
     selectDateText: {
       control: "text",
-      description: "Text of the button shown while no date is chosen",
+      description: "Text of the button shown while no date is chosen.",
       table: {
         defaultValue: { summary: '"Select date"' },
       },
     },
     showCalendarIcon: {
       control: "boolean",
-      description: "Show calendar icon in the selected date chip",
+      description:
+        "Whether a calendar glyph is drawn before the date in the chip.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     hideCross: {
       control: "boolean",
-      description: "Hide the close/remove button on the selected date chip",
+      description: "Whether the chip's clearing cross is hidden.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -53,45 +54,42 @@ const meta = {
     autoPosition: {
       control: "boolean",
       description:
-        "Opens the calendar against the right edge of the picker's positioned ancestor when less than 340px of the window is left to the picker's right; measured each time the calendar opens",
+        "Whether the calendar flips to the right edge when there is less than 340px of room to its right. Measured when it opens, not while it is open.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     openDate: {
       control: false,
-      description:
-        "Month the calendar shows each time it opens, even with a date already chosen; a month outside `minDate` to `maxDate` is replaced by the nearest limit",
+      description: "Month the calendar opens on.",
     },
     minDate: {
       control: false,
       description:
-        "Earliest selectable day; the days before it are drawn disabled",
+        "Earliest selectable day in the calendar; its own day stays selectable, whatever its time.",
     },
     maxDate: {
       control: false,
-      description:
-        "Latest selectable day; the days after it are drawn disabled",
+      description: "Latest selectable day in the calendar.",
     },
     initialDate: {
       control: false,
       description:
-        "Date the picker starts with; cleared on the first render unless `outerDate` holds a date too",
+        "Date the component starts with. On its own it does not survive the first effect — pass `outerDate` as well, or instead.",
     },
     outerDate: {
       control: false,
       description:
-        "The chosen date, held by the host: the chip shows it, and the picker shows the button again whenever it is empty",
+        "The chosen date, held by you, and what the chip shows. The component copies it on every render and clears its own date whenever this is empty.",
     },
     onChange: {
       action: "onChange",
       description:
-        "Called with the picked day, and with `null` when the chip's cross clears it",
+        "Called with the chosen date, and with `null` when the cross clears it. Feed the value back through `outerDate` or the chip never appears.",
     },
     isMobile: {
       control: "boolean",
-      description:
-        "Widens the gap between the calendar's previous and next arrows from 8px to 12px; the larger day cells of a phone come from the window width, not from this prop",
+      description: "Whether the calendar uses its larger touch layout.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -99,22 +97,22 @@ const meta = {
     useMaxTime: {
       control: "boolean",
       description:
-        "Reports a day picked while no date is chosen at 23:59:59.999 of that day instead of at the current time of day",
+        "Whether a picked day is reported at the end of that day rather than at midnight.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     className: {
       control: "text",
-      description: "Class name added to the outermost element",
+      description: "Applied to the outermost element.",
     },
     id: {
       control: "text",
-      description: "Id of the outermost element",
+      description: "Applied to the outermost element.",
     },
     testId: {
       control: "text",
-      description: "`data-testid` of the outermost element",
+      description: "`data-testid` of the outermost element.",
       table: {
         defaultValue: { summary: '"date-picker"' },
       },
@@ -236,7 +234,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The picker as a form shows it before a date is chosen: click **Select date**, or focus it and press Enter or Space, to open the calendar, pick a day to turn the button into a chip, and change any other prop live in the Controls panel below.",
+          "The picker as a form shows it before a date is chosen: a **Select date** button. A click, Enter or Space opens the calendar, and a picked day turns the button into a chip.",
       },
       source: {
         code: `const [date, setDate] = useState<DateTime | null>(null);
@@ -269,6 +267,7 @@ const WithInitialDateTemplate = () => {
 };
 
 export const WithInitialDate: Story = {
+  name: "With a date",
   render: () => <WithInitialDateTemplate />,
   play: async ({ canvas }) => {
     const chip = canvas.getByTestId("selected-item");
@@ -281,7 +280,7 @@ export const WithInitialDate: Story = {
     docs: {
       description: {
         story:
-          "DatePicker initialized with the current date. The selected date appears as a chip that can be removed.",
+          "A picker that starts on today's date, shown as a chip with a cross that removes it.",
       },
       source: {
         code: `const [date, setDate] = useState<DateTime | null>(now());
@@ -312,6 +311,7 @@ const FutureDatesOnlyTemplate = () => {
 };
 
 export const FutureDatesOnly: Story = {
+  name: "Today and later",
   render: () => <FutureDatesOnlyTemplate />,
   play: async ({ canvas, userEvent }) => {
     const today = now();
@@ -331,7 +331,7 @@ export const FutureDatesOnly: Story = {
     docs: {
       description: {
         story:
-          "Restricts selection to future dates only by setting minDate to today. Past dates appear disabled in the calendar.",
+          "A picker that allows today and later (`minDate` at the start of today). Past days are disabled in the calendar.",
       },
       source: {
         code: `<DatePicker
@@ -360,6 +360,7 @@ const SpecificYearTemplate = () => {
 };
 
 export const SpecificYearRange: Story = {
+  name: "Limited to one year",
   render: () => <SpecificYearTemplate />,
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByTestId("date-selector"));
@@ -375,7 +376,7 @@ export const SpecificYearRange: Story = {
     docs: {
       description: {
         story:
-          "Constrains the calendar to a specific year (2023). Only dates within January 1 - December 31, 2023 are selectable.",
+          "A picker limited to 2023 (`minDate`, `maxDate`). Only the days from 1 January to 31 December 2023 can be picked.",
       },
       source: {
         code: `<DatePicker
@@ -407,6 +408,7 @@ const WithoutCalendarIconTemplate = () => {
 };
 
 export const WithoutCalendarIcon: Story = {
+  name: "Without the calendar icon",
   render: () => <WithoutCalendarIconTemplate />,
   play: async ({ canvas }) => {
     const chip = canvas.getByTestId("selected-item");
@@ -417,7 +419,7 @@ export const WithoutCalendarIcon: Story = {
     docs: {
       description: {
         story:
-          "The calendar icon in the selected date chip can be hidden with showCalendarIcon={false}.",
+          "A chip without the calendar glyph before its date (`showCalendarIcon={false}`).",
       },
       source: {
         code: `<DatePicker
@@ -449,6 +451,7 @@ const WithoutClearButtonTemplate = () => {
 };
 
 export const WithoutClearButton: Story = {
+  name: "Without the cross",
   render: () => <WithoutClearButtonTemplate />,
   play: async ({ canvas, userEvent }) => {
     const today = now();
@@ -467,7 +470,7 @@ export const WithoutClearButton: Story = {
     docs: {
       description: {
         story:
-          "For a date the form requires: the chip has no cross, so a date can be replaced by clicking the chip and picking another day, but not removed (`hideCross`).",
+          "A chip with no cross, for a date the form requires (`hideCross`). The date can be replaced from the calendar, but not removed.",
       },
       source: {
         code: `const [date, setDate] = useState<DateTime | null>(now());
@@ -501,6 +504,7 @@ const AlignedToRightEdgeTemplate = () => {
 };
 
 export const AlignedToRightEdge: Story = {
+  name: "At the right edge",
   render: () => <AlignedToRightEdgeTemplate />,
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByTestId("date-selector"));
@@ -515,7 +519,7 @@ export const AlignedToRightEdge: Story = {
     docs: {
       description: {
         story:
-          "For a picker near the right edge of the window, such as the last column of a toolbar: click **Select date** and the calendar opens leftwards from the right edge of the nearest positioned container, here the window, instead of running off the screen (`autoPosition`).",
+          "A picker at the right edge of the window (`autoPosition`). Its calendar opens leftwards from the right edge of the nearest positioned container, instead of running off the screen.",
       },
       source: {
         code: `<div style={{ display: "flex", justifyContent: "flex-end" }}>
@@ -554,6 +558,7 @@ const EndOfDayValueTemplate = () => {
 };
 
 export const EndOfDayValue: Story = {
+  name: "End of the day",
   render: () => <EndOfDayValueTemplate />,
   play: async ({ canvas, userEvent }) => {
     await expect(canvas.getByText("Reported value: none")).toBeVisible();
@@ -568,7 +573,7 @@ export const EndOfDayValue: Story = {
     docs: {
       description: {
         story:
-          'For an inclusive end of a period, such as a "valid until" date: pick a day and the value above ends in 23:59:59.999, so the whole day is covered (`useMaxTime`). Without the prop the day is reported at the current time of day.',
+          'A "valid until" date whose picked day ends in 23:59:59.999, so the whole day is covered (`useMaxTime`). Without the prop the day is reported at the current time of day.',
       },
       source: {
         code: `<DatePicker
@@ -585,6 +590,7 @@ export const EndOfDayValue: Story = {
 
 // Framed on Docs: the theme provider stamps the direction on the page, which would flip the whole Docs page.
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: () => (
     <div dir="rtl">
       <ControlledDatePicker
@@ -622,7 +628,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "470px" },
       description: {
         story:
-          'The picker under a right-to-left interface: the chip starts at the right edge, with the calendar icon on its right and the cross on its left, and the calendar opens under the right end of the picker. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+          "A right-to-left picker. The chip starts at the right edge, with the calendar icon on its right and the cross on its left.",
       },
       source: {
         code: `<div dir="rtl">
@@ -671,6 +677,7 @@ const cssVariables = {
 } as React.CSSProperties;
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div style={{ display: "flex", flexWrap: "wrap", ...cssVariables }}>
       <ControlledDatePicker
@@ -709,7 +716,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The variables are listed under CSS variables on this page. They are set on one wrapper around two pickers. The first holds the first day of this month, so it shows the chip; the second has no date, so it shows the **Select date** button. Open either calendar to see the calendar variables: both start at the first of this month (\`minDate\`), so the days of the previous month and the left arrow show their disabled colours, and the first picker's chosen day differs from today. Hover the chip, the button and a day to see the hover variables.`,
+        story: `Two pickers under a wrapper that sets the variables of the parts inside: one with a chip, one with the **Select date** button. Their calendars start at the first of this month (\`minDate\`).`,
       },
       source: {
         code: `<div

@@ -1,6 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 import { HeaderButtonsProps } from "../../Calendar.types";
+import { useCommonTranslation } from "../../../../utils/i18n";
 import styles from "../../Calendar.module.scss";
 
 export const HeaderButtons = ({
@@ -10,6 +11,7 @@ export const HeaderButtons = ({
   isRightDisabled,
   isMobile,
 }: HeaderButtonsProps) => {
+  const t = useCommonTranslation();
   const marginSize = isMobile ? "12px" : "8px";
 
   return (
@@ -22,7 +24,7 @@ export const HeaderButtons = ({
         style={{ marginInlineEnd: marginSize }}
         onClick={onLeftClick}
         disabled={isLeftDisabled}
-        aria-label="Previous"
+        aria-label={t("Previous")}
       >
         <span
           className={classNames(styles.arrowIcon, { [styles.prev]: true })}
@@ -36,7 +38,7 @@ export const HeaderButtons = ({
         })}
         onClick={onRightClick}
         disabled={isRightDisabled}
-        aria-label="Next"
+        aria-label={t("Next")}
       >
         <span
           className={classNames(styles.arrowIcon, { [styles.next]: true })}

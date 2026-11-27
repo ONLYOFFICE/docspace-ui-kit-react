@@ -15,6 +15,19 @@ const baseProps = {
 };
 
 describe("<RowContainer />", () => {
+  it("puts a passed aria-* on the container", () => {
+    render(
+      <RowContainer {...baseProps} aria-label="Files">
+        <span>Demo1</span>
+        <span>Demo2</span>
+      </RowContainer>,
+    );
+    expect(screen.getByTestId("row-container")).toHaveAttribute(
+      "aria-label",
+      "Files",
+    );
+  });
+
   it("renders without error", () => {
     render(
       <RowContainer {...baseProps}>

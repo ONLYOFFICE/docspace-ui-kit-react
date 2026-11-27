@@ -23,12 +23,12 @@ const meta = {
     fallback: {
       control: false,
       description:
-        "Custom fallback UI as a ReactNode or a render function `(error: Error) => ReactNode`",
+        "What to render instead of the subtree after a throw. A function receives the error. Without it the kit's own `ErrorContainer` is shown, with the error's message and an untranslated English heading.",
     },
     onError: {
       control: false,
       description:
-        "Callback fired when an error is caught `(error: Error, errorInfo: ErrorInfo) => void`",
+        "Called once with the error and React's component stack. Report it here; the boundary itself logs nothing.",
     },
   },
   args: {
@@ -95,7 +95,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The panel renders as usual until it throws. Press **Break this panel** and the boundary swaps it for the kit's error page and calls `onError`.",
+          "The panel renders as usual until it throws. A click on **Break this panel** makes it throw, and the boundary swaps it for the kit's error page and calls `onError`.",
       },
       source: {
         code: `const Panel = () => {
@@ -113,6 +113,7 @@ export const Default: Story = {
 };
 
 export const WithoutError: Story = {
+  name: "Nothing thrown",
   args: {
     children: (
       <div style={{ padding: "16px" }}>
@@ -144,6 +145,7 @@ export const WithoutError: Story = {
 };
 
 export const WithError: Story = {
+  name: "Default fallback",
   args: {
     children: <ThrowingComponent />,
   },
@@ -164,7 +166,7 @@ export const WithError: Story = {
     docs: {
       description: {
         story:
-          "When a child component throws, the default ErrorContainer fallback is rendered.",
+          "The kit's error page in place of a child that threw: the default `ErrorContainer` fallback.",
       },
       source: {
         code: `const ThrowingComponent = () => {
@@ -180,6 +182,7 @@ export const WithError: Story = {
 };
 
 export const WithCustomFallback: Story = {
+  name: "Custom fallback",
   args: {
     fallback: (
       <div style={{ padding: "16px", color: "red" }}>
@@ -200,7 +203,7 @@ export const WithCustomFallback: Story = {
     docs: {
       description: {
         story:
-          "A custom ReactNode can be provided as fallback for a fully customized error UI.",
+          "A fallback of your own, any node, in place of the default error page.",
       },
       source: {
         code: `<ErrorBoundary
@@ -219,6 +222,7 @@ export const WithCustomFallback: Story = {
 };
 
 export const WithRenderFunctionFallback: Story = {
+  name: "Fallback from the error",
   args: {
     fallback: (error: Error) => (
       <div style={{ padding: "16px", color: "red" }}>
@@ -239,7 +243,7 @@ export const WithRenderFunctionFallback: Story = {
     docs: {
       description: {
         story:
-          "A render function receives the caught error, enabling dynamic fallback UI based on the error.",
+          "A fallback built by a function from the caught error, which it receives as its argument.",
       },
       source: {
         code: `<ErrorBoundary

@@ -28,12 +28,11 @@ const meta = {
     children: {
       control: false,
       description:
-        "The row's parts, by position: the first is the title, the second sits beside it, and the text of every later child is joined into the line under the title while the child itself is not shown. It has to be an array of at least two",
+        "The row's parts by position: the title, then the icons beside it. Later children are side elements, hidden, with their text joined into the line under the title. It has to be an array.",
     },
     disableSideInfo: {
       control: "boolean",
-      description:
-        "Drops the line of details under the title, leaving the title and what sits beside it",
+      description: "Drops the line of joined side text under the title.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -41,36 +40,31 @@ const meta = {
     convertSideInfo: {
       control: "boolean",
       description:
-        "Whether the last child is joined into the details line as text like the others. Turn it off to show it at the end of that line as the element it is, such as a link",
+        "Whether the last side element is joined into the line as text like the others. Turn it off to show it at the end of the line as the element it is.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     sideColor: {
       control: "color",
-      description: "Any CSS colour for the text of the details line",
-    },
-    sectionWidth: {
-      control: "number",
-      description:
-        "Meant to switch the content to a layout for a given section width; no style reads it at present, so changing it changes nothing on the page",
+      description: "Any CSS colour for the line of side text.",
     },
     onClick: {
       control: false,
-      description: "Called on a click anywhere in the content",
+      description: "Called on a click anywhere in the content.",
     },
     className: {
       control: "text",
-      description: "Class added to the content element",
+      description: "Applied to the row's content element.",
     },
     id: {
       control: "text",
-      description: "Id of the content element",
+      description: "Applied to the row's content element.",
     },
     style: {
       control: "object",
       description:
-        "Inline style applied to the content element, and again to the wrapper around the title and its icons",
+        "Applied to the content element, and again to the title's wrapper.",
     },
   },
 } satisfies Meta<typeof RowContent>;
@@ -101,6 +95,7 @@ const Template = (args: RowContentProps) => (
 );
 
 export const Default: Story = {
+  name: "File row content",
   render: (args) => <Template {...args} />,
   args: {
     disableSideInfo: false,
@@ -109,6 +104,11 @@ export const Default: Story = {
     onClick: fn(),
   },
   play: async ({ args, canvas }) => {
+    // No class named "undefined" lands on the element.
+    await expect(canvas.getByTestId("row-content")).not.toHaveClass(
+      "undefined",
+    );
+
     // The later children are joined into one line; they are not shown.
     await expect(canvas.getByTestId("tablet-side-info")).toHaveTextContent(
       "Modified today | 24 KB | Version 2",
@@ -127,7 +127,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The content of one file row: the title, a status icon beside it, and the details **Modified today**, **24 KB** and **Version 2** joined into one line under them. Click anywhere in it to see `onClick` in the Actions panel, and change any other prop live in the Controls panel below.",
+          "The content of one file row: the title with a folder icon beside it. Under them, **Modified today**, **24 KB** and **Version 2** are joined into one line of text. A click anywhere in it calls `onClick`.",
       },
       source: {
         code: `<RowContent sideColor="#A3A9AE" onClick={handleClick}>
@@ -143,6 +143,7 @@ export const Default: Story = {
 };
 
 export const ElementAtTheEnd: Story = {
+  name: "Link at the end",
   render: (args) => <Template {...args} />,
   args: {
     convertSideInfo: false,
@@ -158,7 +159,7 @@ export const ElementAtTheEnd: Story = {
     docs: {
       description: {
         story:
-          "A details line that ends in something to click: **Version 2** stays a link at the end of the line instead of being joined in as plain text (`convertSideInfo` off). It follows the joined text directly, with no bar or space before it, and only the last child is kept this way.",
+          "A details line that ends in a link: **Version 2** stays a link instead of being joined in as text (`convertSideInfo` off). It follows the joined text with no bar or space. Only the last child is kept this way.",
       },
       source: {
         code: `<RowContent convertSideInfo={false}>
@@ -174,6 +175,7 @@ export const ElementAtTheEnd: Story = {
 };
 
 export const DetailsColour: Story = {
+  name: "Grey details",
   render: (args) => <Template {...args} />,
   args: {
     sideColor: globalColors.gray,
@@ -221,6 +223,7 @@ const TitleOnlyTemplate = () => {
 };
 
 export const TitleOnly: Story = {
+  name: "Title only",
   render: () => <TitleOnlyTemplate />,
   play: async ({ canvas, userEvent }) => {
     await expect(canvas.queryByTestId("tablet-side-info")).toBeNull();
@@ -232,7 +235,7 @@ export const TitleOnly: Story = {
     docs: {
       description: {
         story:
-          "A row that needs only its title and a control of its own: the checkbox takes the place of the title icons, and there is no details line under them (`disableSideInfo`).",
+          "A title with a checkbox of its own in the place of the icons. There is no details line under them (`disableSideInfo`).",
       },
       source: {
         code: `<RowContent disableSideInfo>
@@ -245,6 +248,7 @@ export const TitleOnly: Story = {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: () => (
     <div dir="rtl">
       <RowContent>
@@ -269,7 +273,7 @@ export const RightToLeft: Story = {
     docs: {
       description: {
         story:
-          "The content in a right-to-left interface: the title and its icon start at the right edge, and the details are joined in reverse order, so reading from the right the last of them, **24 KB**, comes first.",
+          "The content in a right-to-left interface: the title and its icon start at the right edge. The details are joined in reverse order, so **24 KB** comes first from the right.",
       },
       source: {
         code: `<div dir="rtl">

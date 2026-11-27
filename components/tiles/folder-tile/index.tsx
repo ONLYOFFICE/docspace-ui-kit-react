@@ -15,6 +15,7 @@ import { useInterfaceDirection } from "../../../context/InterfaceDirectionContex
 import { HeaderType } from "../../context-menu/ContextMenu.types";
 import { Loader, LoaderTypes } from "../../loader";
 
+import { groupRoleWhenNamed, pickAriaProps } from "../../../utils/aria-props";
 import styles from "./FolderTile.module.scss";
 
 const svgLoader = () => <div style={{ width: "96px" }} />;
@@ -43,6 +44,7 @@ export const FolderTile = ({
   dataTestId,
   isBigFolder,
   temporaryIcon,
+  ...rest
 }: FolderTileProps) => {
   const t = useCommonTranslation();
   const childrenArray = React.Children.toArray(children);
@@ -101,12 +103,8 @@ export const FolderTile = ({
     }
   };
 
-  const getOptions = () => {
-    if (tileContextClick) {
-      tileContextClick();
-    }
-    return contextOptions;
-  };
+  // The button's onClick reports the click through onContextMenu.
+  const getOptions = () => contextOptions;
 
   const onFolderClick = (e: React.MouseEvent) => {
     if (e.ctrlKey || e.metaKey) {
@@ -222,12 +220,14 @@ export const FolderTile = ({
 
   return (
     <div
+      {...pickAriaProps(rest)}
+      role={groupRoleWhenNamed(rest)}
       className={folderTileClassNames}
       onClick={onFolderClick}
       ref={forwardRef}
       onContextMenu={onContextMenu}
       data-testid={dataTestId ?? "tile"}
-      aria-busy={inProgress || undefined}
+      aria-busy={inProgress || rest["aria-busy"]}
     >
       {isBigFolder ? (
         <>

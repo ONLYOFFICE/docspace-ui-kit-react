@@ -44,25 +44,27 @@ const meta = {
     t: {
       control: false,
       description:
-        "Translation function; the dialog asks it for the save, cancel and choose-another labels",
+        "Translation function, asked for `Common:SaveButton`, `Common:CancelButton` and `Common:ChooseAnother`.",
     },
     visible: {
       control: "boolean",
-      description: "Whether the dialog is on screen",
+      description:
+        "Puts the dialog on screen; while false it stays mounted but hidden.",
     },
     title: {
       control: "text",
-      description: "Text of the dialog's header, shown as given",
+      description:
+        "Text of the dialog's header, and its accessible name. It is not translated for you.",
     },
     image: {
       control: false,
       description:
-        "The picture and its crop position and zoom, held by the caller; the body stays empty until it carries a file",
+        "The picture and its crop, held in your state. The body is empty until `uploadedFile` is set.",
     },
     isLoading: {
       control: "boolean",
       description:
-        "Shows a spinner on the save button and disables the editor and the cancel button; the header cross, Escape and the backdrop still close the dialog",
+        "Puts the save button in its loading state and blocks the editor and every way to close the dialog.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -70,39 +72,34 @@ const meta = {
     editorBorderRadius: {
       control: "number",
       description:
-        "Corner radius of the crop window in pixels on the editor's 648px canvas: 0 is a square, 324 a circle",
+        "Corner radius of the crop window in pixels, on the editor's 648px canvas.",
       table: {
         defaultValue: { summary: "110" },
       },
     },
-    maxImageSize: {
-      control: "number",
-      description:
-        "Deprecated and ignored; limit or compress the file in onChangeFile",
-    },
     dataTestId: {
       control: "text",
-      description: "Value of data-testid on the dialog",
+      description: "Value of `data-testid` on the dialog.",
     },
     onClose: {
       action: "onClose",
       description:
-        "Called when the dialog is dismissed, after the image has been reset to an empty one",
+        "Called on every way out, after the dialog has reset `image` to an empty, centred, unzoomed one.",
     },
     onSave: {
       action: "onSave",
       description:
-        "Called with the cropped image and its data: URL preview when Save is clicked; the dialog stays open",
+        "Called with the cropped `image` and its `data:` URL preview when save is clicked. The dialog neither closes itself nor sets `isLoading`.",
     },
     onChangeImage: {
       action: "onChangeImage",
       description:
-        "Called with a new image whenever the picture is dragged or zoomed; store it or nothing moves",
+        "Called with a new `image` whenever the crop is dragged or the zoom changes. Apply it to your state or nothing moves.",
     },
     onChangeFile: {
       action: "onChangeFile",
       description:
-        "Called with the change event of the file input when the user chooses another picture",
+        "Called with the change event of the hidden file input when another picture is chosen. Read the file and put it in `image.uploadedFile` yourself.",
     },
   },
   args: {
@@ -184,6 +181,7 @@ const AvatarEditorDialogDemo = ({
 };
 
 export const Default: Story = {
+  name: "Default",
   render: (args) => <AvatarEditorDialogDemo {...args} />,
   args: {
     visible: true,
@@ -227,7 +225,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The dialog as it opens on a chosen picture: drag the picture to frame it, zoom with the slider or the buttons, and press Save or Cancel. The story keeps the picture in its own state and closes the dialog from both handlers, as your code has to; reopen it with the button. Change any other prop live in the Controls panel below.",
+          "The dialog open on a chosen picture: the crop window, the zoom row, and Save and Cancel below. The story keeps the picture in its own state and closes the dialog from both handlers, as your code has to.",
       },
       source: {
         code: `const [visible, setVisible] = useState(true);
@@ -254,14 +252,19 @@ const [image, setImage] = useState<TImage>({
 };
 
 export const Loading: Story = {
+  name: "Saving",
   render: (args) => <AvatarEditorDialogDemo {...args} />,
   args: {
     ...Default.args,
     isLoading: true,
   },
-  play: async () => {
+  play: async ({ args, userEvent }) => {
     await waitFor(() => expect(dialog()).toBeVisible());
     const modal = within(dialog());
+    // Nothing closes the dialog, and so resets the image, mid-upload.
+    await userEvent.keyboard("{Escape}");
+    await expect(args.onClose).not.toHaveBeenCalled();
+    await expect(dialog()).toBeVisible();
     // The editor and Cancel are locked while the upload runs.
     await expect(modal.getByRole("button", { name: "Cancel" })).toBeDisabled();
     await expect(await waitFor(() => modal.getByRole("slider"))).toBeDisabled();
@@ -274,7 +277,7 @@ export const Loading: Story = {
     docs: {
       description: {
         story:
-          "What the user sees while the cropped picture uploads: a spinner on Save and Cancel greyed out, while the picture no longer drags and the zoom row no longer responds (`isLoading`). The header cross, Escape and the backdrop still close the dialog, so guard `onClose` yourself if a close must wait for the upload.",
+          "The dialog while the picture uploads: a spinner on Save, with Cancel and the zoom row disabled and no header cross. Neither Escape nor the backdrop closes it.",
       },
       source: {
         code: `<AvatarEditorDialog
@@ -296,6 +299,7 @@ export const Loading: Story = {
 };
 
 export const SquareCrop: Story = {
+  name: "Square crop",
   render: (args) => <AvatarEditorDialogDemo {...args} />,
   args: {
     ...Default.args,
@@ -313,7 +317,7 @@ export const SquareCrop: Story = {
     docs: {
       description: {
         story:
-          "A crop window with square corners, for a picture that is not shown round, such as a logo or a cover (`editorBorderRadius` of 0). The radius is measured on the editor's 648px canvas: the default 110 gives rounded corners, 324 a circle.",
+          "A crop window with square corners, for a logo or a cover, from `editorBorderRadius` of 0. On the 648px canvas, 110 gives rounded corners and 324 a circle.",
       },
       source: {
         code: `<AvatarEditorDialog

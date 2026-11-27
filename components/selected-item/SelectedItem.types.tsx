@@ -1,4 +1,4 @@
-export interface SelectedItemProps {
+export interface SelectedItemProps extends React.AriaAttributes {
   /** Text of the chip. A falsy label renders nothing at all. */
   label: React.ReactNode;
   /** Whether the chip shrinks to its content. Without it the chip fills the width of its container. */
@@ -23,7 +23,7 @@ export interface SelectedItemProps {
   className?: string;
   /** Applied to the outermost element. */
   id?: string;
-  /** Ignored. Nothing reads this prop; style the chip through `className` or the custom properties. */
+  /** Inline style of the outermost element. */
   style?: React.CSSProperties;
   /** Identifier handed back to `onClose` and `onClick`. It is not used for anything else. */
   propKey: string | number;

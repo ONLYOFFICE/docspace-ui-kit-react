@@ -65,8 +65,10 @@ export const RoomsTypes = RoomsTypeValues.reduce<Record<number, number>>(
   {},
 );
 
+// The management app is served under its own base path. The word elsewhere in
+// a path, as in /portal-settings/management/..., is not that app.
 export const isManagement = () => {
-  return window.location.pathname.includes("management");
+  return /^\/management(\/|$)/.test(window.location.pathname);
 };
 
 export const getUserAvatarRoleByType = (type: EmployeeType) => {

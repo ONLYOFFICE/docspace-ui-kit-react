@@ -23,7 +23,7 @@ const meta = {
     operations: {
       control: "object",
       description:
-        "Secondary operations: copy, move, delete and the rest. In the list each row shows a spinner instead of a progress ring",
+        "Secondary operations: copy, move, delete and the rest. Listed without a ring.",
       table: {
         defaultValue: { summary: "[]" },
       },
@@ -31,7 +31,7 @@ const meta = {
     panelOperations: {
       control: "object",
       description:
-        "Operations that own a panel, such as an upload. In the list each row shows a progress ring with a cancel cross",
+        "Operations that own a panel — the upload. Their progress is the one the ring shows.",
       table: {
         defaultValue: { summary: "[]" },
       },
@@ -39,15 +39,14 @@ const meta = {
     operationsAlert: {
       control: "boolean",
       description:
-        "Whether any operation failed: the button gets a warning badge and the tooltip names the error",
+        "Whether any operation failed: the badge becomes a warning triangle.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     operationsCanceled: {
       control: "boolean",
-      description:
-        "Whether an upload was cancelled: the button gets the stop sign and the tooltip shows the operation's label",
+      description: "Whether an upload was cancelled. Treated as stopped.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -55,7 +54,7 @@ const meta = {
     operationsCompleted: {
       control: "boolean",
       description:
-        "Whether everything is finished: the button shows a tick, slides out of view 4 seconds later (8 with a panel operation) and then calls the clear callbacks",
+        "Whether everything is finished: the button plays its hide animation and then clears.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -63,7 +62,7 @@ const meta = {
     operationsStopped: {
       control: "boolean",
       description:
-        "Whether an operation was aborted: the button gets the stop sign, which wins over alert and completed, and the tooltip says the operation was stopped",
+        "Whether an operation was aborted. Treated as stopped, which wins over alert and completed.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -71,7 +70,7 @@ const meta = {
     mainButtonVisible: {
       control: "boolean",
       description:
-        "Whether the mobile main button is on screen: on tablet widths the button sits 88px from the bottom (80px on phones) instead of 16px, clear of it",
+        "Whether the mobile main button is on screen, which lifts this one clear of it.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -79,7 +78,7 @@ const meta = {
     needErrorChecking: {
       control: "boolean",
       description:
-        "Whether a completed run may still hold errors: the button then stays on screen instead of hiding itself",
+        "Whether a completed run may still hold errors, which stops the button from auto-hiding.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -87,7 +86,7 @@ const meta = {
     showCancelButton: {
       control: "boolean",
       description:
-        "Whether a cancel cross appears beside the button on hover. Only while there is exactly one operation",
+        "Whether the cancel cross is offered. Only while there is exactly one operation.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -95,7 +94,7 @@ const meta = {
     isInfoPanelVisible: {
       control: "boolean",
       description:
-        "Whether the info panel is open, or the AI chat in its place: the button moves `infoPanelWidth` plus 24px in from the trailing edge, clear of it, 424px by default",
+        "Whether the info panel, or the AI chat in its place, is open. The button then moves 24px clear of its edge.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -103,12 +102,12 @@ const meta = {
     infoPanelWidth: {
       control: "number",
       description:
-        "Width in pixels of the open info panel, or of the chat in its place, while `isInfoPanelVisible` is on, for a panel the person can resize; without it the button assumes 400px",
+        "Width in px of that open panel, for a resizable one, so the button stays clear of the width chosen. Without it the button assumes 400px.",
     },
     isDragging: {
       control: "boolean",
       description:
-        "Whether files are being dragged: a preview button rises in the middle of the screen while a drop folder is named",
+        "Whether a drag is in progress, which raises the drag preview button.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -116,47 +115,32 @@ const meta = {
     dropTargetFolderName: {
       control: "text",
       description:
-        "Name of the folder under the pointer, shown in the drag preview button's tooltip",
-    },
-    percent: {
-      control: false,
-      description:
-        "Ignored. Nothing reads this prop; the ring shows the first operation's `percent`",
+        "Name of the folder under the pointer, shown by the drag preview button.",
     },
     clearOperationsData: {
       action: "clearOperationsData",
       description:
-        "Called once the hide animation ends, and when a finished row's clear icon is clicked in the list, to drop the secondary operations",
+        "Called once the hide animation ends, to drop the secondary operations.",
     },
     clearPanelOperationsData: {
       action: "clearPanelOperationsData",
       description:
-        "Called once the hide animation ends, and when a finished panel row's clear icon is clicked in the list, to drop the panel operations",
+        "Called once the hide animation ends, to drop the panel operations.",
     },
     clearDropPreviewLocation: {
       action: "clearDropPreviewLocation",
       description:
-        "Called when the drag preview button goes away, to forget the drop folder",
+        "Called when the drag preview button is done with, to forget the drop target.",
     },
     cancelUpload: {
       action: "cancelUpload",
       description:
-        "Called with the translation function when the cancel cross beside the button, or on a panel row's ring, is clicked",
+        "Called with the translation function when the cancel cross is clicked.",
     },
     cancelSecondaryOperationById: {
       action: "cancelSecondaryOperationById",
       description:
-        "Meant to be called with the operation and the id of its first item from a secondary row's cancel; those rows show a spinner with no cancel, so nothing calls it",
-    },
-    onOpenPanel: {
-      control: false,
-      description:
-        "Ignored. Nothing reads this prop; the panel is opened through `Operation.showPanel`",
-    },
-    onCancelOperation: {
-      control: false,
-      description:
-        "Ignored. Nothing reads this prop; the cancel cross calls `cancelUpload`",
+        "Called with the operation and the id of its first item, from a row's own cancel.",
     },
   },
   args: {
@@ -330,7 +314,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "One running operation: the ring shows how far it has got and the tooltip names it. Change any other prop live in the Controls panel below.",
+          "One running operation: the ring shows how far it has got and the tooltip names it.",
       },
       source: {
         code: `<OperationsProgressButton
@@ -342,6 +326,7 @@ export const Default: Story = {
 };
 
 export const UploadInProgress: Story = {
+  name: "With cancel cross",
   render: Template,
   args: {
     operations: [
@@ -374,7 +359,7 @@ export const UploadInProgress: Story = {
     docs: {
       description: {
         story:
-          "Lets the user stop a running operation: hover the button, or Tab past it, to reveal the cancel cross beside it (`showCancelButton`); clicking or pressing it calls `cancelUpload`.",
+          "A cancel cross beside the button, revealed on hover or keyboard focus (`showCancelButton`). Clicking or pressing it calls `cancelUpload`.",
       },
       source: {
         code: `<OperationsProgressButton
@@ -388,6 +373,7 @@ export const UploadInProgress: Story = {
 };
 
 export const WithAlert: Story = {
+  name: "Failed",
   render: Template,
   args: {
     operations: [
@@ -417,7 +403,7 @@ export const WithAlert: Story = {
     docs: {
       description: {
         story:
-          "Tells the user something went wrong without opening anything: the button gets a warning badge (`operationsAlert`); hover it to read the operation's label and how many files failed (`errorCount`).",
+          "A warning badge that says something went wrong without opening anything (`operationsAlert`). The tooltip gives the operation's label and how many files failed (`errorCount`).",
       },
       source: {
         code: `<OperationsProgressButton
@@ -431,6 +417,7 @@ export const WithAlert: Story = {
 };
 
 export const CompletedOperation: Story = {
+  name: "Completed",
   render: Template,
   args: {
     operations: [
@@ -459,7 +446,7 @@ export const CompletedOperation: Story = {
       story: { inline: false, height: "200px" },
       description: {
         story:
-          "The button clears itself away once the work is done: it shows a tick (`operationsCompleted`) and slides out of view 4 seconds later, then calls `clearOperationsData`. Keep the pointer over it to hold it on screen.",
+          "A tick once the work is done (`operationsCompleted`). The button slides out of view 4 seconds later and calls `clearOperationsData`; the pointer over it holds it on screen.",
       },
       source: {
         code: `<OperationsProgressButton
@@ -473,6 +460,7 @@ export const CompletedOperation: Story = {
 };
 
 export const MultipleOperations: Story = {
+  name: "Several operations",
   render: Template,
   args: {
     operations: [
@@ -536,10 +524,10 @@ export const MultipleOperations: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Keeps several operations behind one button: it shows three dots and the tooltip counts them. Click it to open the list:
+        story: `Several operations behind one button with three dots; the tooltip counts them. A click opens the list:
 
 - **Uploading files**, **Copying documents** — secondary operations, each with a spinner (\`operations\`)
-- **Moving folder** — an operation with its own panel, with a progress ring and a cancel cross; click the row to open its panel (\`panelOperations\`, \`showPanel\`)`,
+- **Moving folder** — a progress ring and a cancel cross; the row opens its panel (\`panelOperations\`, \`showPanel\`)`,
       },
       source: {
         code: `<OperationsProgressButton
@@ -557,6 +545,7 @@ export const MultipleOperations: Story = {
 };
 
 export const StoppedOperation: Story = {
+  name: "Stopped",
   render: Template,
   args: {
     operations: [
@@ -587,7 +576,7 @@ export const StoppedOperation: Story = {
     docs: {
       description: {
         story:
-          "Shows that the user aborted an operation rather than that it failed: the button gets a stop sign even though the operation is also marked as failed (`operationsStopped`), and the tooltip says it was stopped.",
+          "A stop sign for an operation the user aborted (`operationsStopped`). It wins even though the operation is also marked as failed, and the tooltip says it was stopped.",
       },
       source: {
         code: `<OperationsProgressButton
@@ -601,6 +590,7 @@ export const StoppedOperation: Story = {
 };
 
 export const OpensPanelOnClick: Story = {
+  name: "Opens a panel",
   render: HostPanelTemplate,
   args: {
     panelOperations: [
@@ -636,7 +626,7 @@ export const OpensPanelOnClick: Story = {
     docs: {
       description: {
         story:
-          "Leads the user to the details of a single operation: click the button to open the operation's own panel (`showPanel`), and hover it to read a second line under the label (`description`). The panel is the page's, not the button's; the story draws a stand-in for it on the right.",
+          "A button that opens the operation's own panel on click (`showPanel`), with a second tooltip line under the label (`description`). The panel is the page's; the story draws a stand-in on the right.",
       },
       source: {
         code: `<OperationsProgressButton
@@ -656,6 +646,7 @@ export const OpensPanelOnClick: Story = {
 };
 
 export const DragPreview: Story = {
+  name: "Drag preview",
   render: Template,
   args: {
     operations: [],
@@ -672,7 +663,7 @@ export const DragPreview: Story = {
       story: { inline: false, height: "200px" },
       description: {
         story:
-          "Tells the user where dragged files will land: while a drag is in progress (`isDragging`) a preview button rises in the middle, and its tooltip names the folder under the pointer (`dropTargetFolderName`).",
+          "A preview button that rises in the middle during a drag (`isDragging`). Its tooltip names the folder under the pointer, where the files will land (`dropTargetFolderName`).",
       },
       source: {
         code: `<OperationsProgressButton
@@ -686,6 +677,7 @@ export const DragPreview: Story = {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <OperationsProgressButton {...args} />
@@ -734,6 +726,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   render: () => (
     <div
       style={
@@ -813,7 +806,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The button shows the three \`--floating-*\` variables; click it to open the list, which shows the rest: **Moving files** is finished and failed, **Moving to trash** was aborted. Hover **Moving files**' clear icon for \`--ops-progress-icon-hover\`.`,
+        story: `Every overridable variable, set on one wrapper. The button shows the three \`--floating-*\` variables, and its list shows the rest. **Moving files** is finished and failed; **Moving to trash** was aborted.`,
       },
     },
   },

@@ -68,6 +68,44 @@ describe("<MainButtonMobile />", () => {
     expect(button).toHaveAttribute("aria-expanded", "false");
   });
 
+  it("is named Actions, open or closed, without a passed aria-label", () => {
+    render(<MainButtonMobile buttonOptions={buttonOptions} />);
+    const button = screen.getByRole("button", { name: "Actions" });
+
+    fireEvent.click(button);
+    expect(button).toHaveAttribute("aria-expanded", "true");
+    expect(button).toHaveAttribute("aria-label", "Actions");
+  });
+
+  it("keeps a passed aria-* on the button, with its menu state over a passed one", () => {
+    render(
+      <MainButtonMobile
+        buttonOptions={buttonOptions}
+        aria-label="Create"
+        aria-describedby="create-hint"
+        aria-expanded
+      />,
+    );
+    const button = screen.getByRole("button", { name: "Create" });
+    expect(button).toHaveAttribute("aria-describedby", "create-hint");
+    expect(button).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("keeps a passed aria-haspopup without a menu", () => {
+    render(
+      <MainButtonMobile
+        withMenu={false}
+        onClick={mockOnClick}
+        aria-label="Upload"
+        aria-haspopup="dialog"
+      />,
+    );
+    expect(screen.getByRole("button", { name: "Upload" })).toHaveAttribute(
+      "aria-haspopup",
+      "dialog",
+    );
+  });
+
   it("closes on Escape, reporting it", () => {
     const onClose = vi.fn();
     render(

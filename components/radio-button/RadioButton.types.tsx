@@ -12,7 +12,7 @@ type PickedLabelProps = Pick<
   "id" | "className" | "style"
 >;
 
-export type RadioButtonProps = {
+export type RadioButtonProps = React.AriaAttributes & {
   /** `name` of the input. Buttons sharing one behave as a single choice. */
   name?: React.ComponentProps<"input">["name"];
 
@@ -26,9 +26,8 @@ export type RadioButtonProps = {
   autoFocus?: React.ComponentProps<"input">["autoFocus"];
 
   /**
-   * Called on every change of the input. Giving it takes the component's own
-   * state handling out of the loop, so `isChecked` becomes the only thing that
-   * moves the dot — and `onClick` stops firing.
+   * Called on every change of the input. It replaces the internal handler: only
+   * `isChecked` moves the dot, and `onClick` no longer fires.
    */
   onChange?: React.ComponentProps<"input">["onChange"];
 
@@ -41,19 +40,19 @@ export type RadioButtonProps = {
   /** Applied to the label. */
   style?: React.ComponentProps<"label">["style"];
 
-  /** Font size of the text beside the button. */
+  /** Font size of the text beside the circle, as a CSS length. */
   fontSize?: TextProps["fontSize"];
 
-  /** Font weight of that text. */
+  /** Weight of the text beside the circle, such as `600` for semibold. */
   fontWeight?: TextProps["fontWeight"];
 
   /**
-   * Whether the button is filled in. It seeds the component's own state and is
-   * re-applied whenever it changes, so it works as a controlled value.
+   * Whether the circle shows a dot. It seeds the component's own state and is
+   * re-applied whenever it changes.
    */
   isChecked?: boolean;
 
-  /** Whether the input is disabled and the label greyed out. */
+  /** Disables the input and greys the circle and the label. */
   isDisabled?: boolean;
 
   /** What is written beside the button. `value` is used when this is left out. */

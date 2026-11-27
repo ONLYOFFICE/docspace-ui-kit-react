@@ -10,6 +10,8 @@ import { Badge } from "../badge";
 import { DropDown } from "../drop-down";
 import { IconSizeType } from "../../utils";
 import { consumeKey } from "../../utils/consume-key";
+import { pickAriaProps } from "../../utils/aria-props";
+import { useCommonTranslation } from "../../utils/i18n";
 
 import { DropzoneProps } from "./Dropzone.types";
 import styles from "./Dropzone.module.scss";
@@ -42,7 +44,10 @@ const Dropzone = ({
   iconClassName,
   className,
   loaderClassName,
+  ...rest
 }: DropzoneProps) => {
+  const t = useCommonTranslation();
+  const aria = pickAriaProps(rest);
   const handleDrop = (acceptedFiles: File[]) => {
     if (!onDrop || acceptedFiles.length === 0) return;
 
@@ -157,8 +162,11 @@ const Dropzone = ({
   const [isFormatsOpen, setIsFormatsOpen] = React.useState(false);
   const formatsRef = React.useRef<HTMLDivElement>(null);
 
+  // The full list opens from the format line, unless the area is disabled.
+  const canOpenFormats = !!fullExstsText && !isDisabled;
+
   const handleFormatsClick = (e: React.MouseEvent) => {
-    if (fullExstsText) {
+    if (canOpenFormats) {
       e.stopPropagation();
       e.preventDefault();
       setIsFormatsOpen((prev) => !prev);
@@ -166,7 +174,7 @@ const Dropzone = ({
   };
 
   const handleFormatsKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
-    if (!fullExstsText) return;
+    if (!canOpenFormats) return;
 
     if (e.key === "Enter" || e.key === " ") {
       // Keep the page from scrolling on Space, and the key from the page's
@@ -231,10 +239,13 @@ const Dropzone = ({
         <div className={styles.dropzoneBody}>
           <div
             {...getRootProps({
+              ...aria,
               className: styles.dropzone,
-              "aria-label": isFolderUpload
-                ? "Folder upload area"
-                : "File upload area",
+              "aria-label":
+                aria["aria-label"] ??
+                (isFolderUpload
+                  ? t("DropzoneFolderArea")
+                  : t("DropzoneFileArea")),
               "data-testid": "dropzone-input-area",
             })}
             {...(isFolderUpload
@@ -252,14 +263,14 @@ const Dropzone = ({
                   webkitdirectory: "",
                   directory: "",
                 } as React.InputHTMLAttributes<HTMLInputElement>)}
-                aria-label="Folder input"
+                aria-label={t("DropzoneFolderInput")}
                 data-testid="dropzone-input"
               />
             ) : (
               <input
                 disabled={isDisabled}
                 {...getInputProps({
-                  "aria-label": "File input",
+                  "aria-label": t("DropzoneFileInput"),
                   "data-testid": "dropzone-input",
                 })}
               />
@@ -268,7 +279,7 @@ const Dropzone = ({
               (typeof icon === "string" ? (
                 <img
                   src={icon}
-                  alt="Upload"
+                  alt=""
                   className={classNames(styles.dropzoneIcon, iconClassName)}
                   data-testid="dropzone-icon"
                 />
@@ -311,7 +322,7 @@ const Dropzone = ({
             <div
               ref={formatsRef}
               className={classNames(styles.dropzoneExsts, {
-                [styles.clickable]: !!fullExstsText,
+                [styles.clickable]: canOpenFormats,
               })}
               data-testid="dropzone-file-types"
               {...(fullExstsText
@@ -319,15 +330,16 @@ const Dropzone = ({
                     role: "button",
                     tabIndex: isDisabled ? -1 : 0,
                     "aria-expanded": isFormatsOpen,
+                    "aria-disabled": isDisabled || undefined,
                     onKeyDown: handleFormatsKeyDown,
                   }
-                : { "aria-label": "Supported file types" })}
+                : { "aria-label": t("DropzoneFileTypes") })}
               onClick={handleFormatsClick}
             >
               <div
                 className={classNames(styles.dropzoneExstsTextContainer, {
                   [styles.isOpen]: isFormatsOpen,
-                  [styles.clickable]: !!fullExstsText,
+                  [styles.clickable]: canOpenFormats,
                 })}
               >
                 <span className={styles.dropzoneExstsText}>{exstsText}</span>

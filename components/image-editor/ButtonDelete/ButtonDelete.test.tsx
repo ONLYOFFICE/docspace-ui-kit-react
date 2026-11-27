@@ -35,6 +35,15 @@ describe("ButtonDelete", () => {
     expect(button).toHaveClass("custom");
   });
 
+  it("is a keyboard button", () => {
+    const handleClick = vi.fn();
+    render(<ButtonDelete t={mockT} onClick={handleClick} />);
+
+    const button = screen.getByRole("button", { name: "Common:Delete" });
+    fireEvent.keyDown(button, { key: "Enter" });
+    expect(handleClick).toHaveBeenCalledTimes(1);
+  });
+
   it("calls onClick handler", () => {
     const handleClick = vi.fn();
 

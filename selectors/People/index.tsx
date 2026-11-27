@@ -234,7 +234,6 @@ const PeopleSelector = ({
   useAside,
   onClose,
   withoutBackground,
-  withBlur,
   setActiveTab,
   injectedElement,
   alwaysShowFooter = false,
@@ -816,7 +815,7 @@ const PeopleSelector = ({
       : {};
 
   const withAside: TSelectorWithAside = useAside
-    ? { useAside, onClose, withBlur, withoutBackground }
+    ? { useAside, onClose, withoutBackground }
     : {};
 
   return (

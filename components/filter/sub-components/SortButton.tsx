@@ -75,9 +75,26 @@ const SortButton = ({
     setIsOpen((val) => !val);
   }, []);
 
+  // Reports each change of the list's state, not the first render.
+  const reportedOpen = React.useRef(isOpen);
+
   React.useEffect(() => {
-    onSortButtonClick?.(!isOpen);
+    if (reportedOpen.current === isOpen) return;
+    reportedOpen.current = isOpen;
+    onSortButtonClick?.(isOpen);
   }, [isOpen, onSortButtonClick]);
+
+  // A list open when the button goes away is closed with it, and says so:
+  // whoever hid something while it was open must get to show it again.
+  const onSortButtonClickRef = React.useRef(onSortButtonClick);
+  onSortButtonClickRef.current = onSortButtonClick;
+
+  React.useEffect(
+    () => () => {
+      if (reportedOpen.current) onSortButtonClickRef.current?.(false);
+    },
+    [],
+  );
 
   const onOptionClick = React.useCallback(
     (e: React.MouseEvent | React.ChangeEvent<HTMLInputElement>) => {
@@ -191,10 +208,10 @@ const SortButton = ({
         isDefaultMode={false}
         advancedOptionsCount={advancedOptionsCount}
         onSelect={() => {}}
-        withBlur={false}
         withBackdrop
         onBackdropClick={toggleCombobox}
         type="onlyIcon"
+        aria-label={title}
         dataTestId="filter_sort_combobox"
       >
         <IconButton iconNode={<SortReactSvg />} size={16} />

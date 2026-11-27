@@ -41,6 +41,15 @@ describe("<FileInput />", () => {
     expect(screen.getByTestId("icon-button")).toBeInTheDocument();
   });
 
+  it("puts name on the hidden file field", () => {
+    render(<FileInput {...defaultProps} name="attachments" />);
+    expect(screen.getByTestId("upload-click-input")).toHaveAttribute(
+      "name",
+      "attachments",
+    );
+    expect(screen.getByTestId("file-input")).not.toHaveAttribute("name");
+  });
+
   it("handles file input correctly", async () => {
     render(<FileInput {...defaultProps} />);
     const fileInput = screen.getByRole("button");
@@ -144,6 +153,35 @@ describe("<FileInput />", () => {
     expect(root).toHaveAttribute("aria-disabled", "true");
     await drop(root, [pdf()]);
     expect(mockOnInput).not.toHaveBeenCalled();
+  });
+
+  it("forwards a passed aria-* to the button wrapper", () => {
+    render(
+      <FileInput
+        {...defaultProps}
+        aria-label="Attachment"
+        aria-describedby="attachment-hint"
+        aria-required="true"
+      />,
+    );
+
+    const control = screen.getByRole("button", { name: "Attachment" });
+    expect(control).toHaveAttribute("aria-describedby", "attachment-hint");
+    expect(control).toHaveAttribute("aria-required", "true");
+  });
+
+  it("keeps a passed aria-disabled unless isDisabled or isLoading is set", () => {
+    const { rerender } = render(
+      <FileInput {...defaultProps} aria-disabled="true" />,
+    );
+    const root = screen.getByTestId("file-input");
+    expect(root).toHaveAttribute("aria-disabled", "true");
+
+    rerender(<FileInput {...defaultProps} isDisabled aria-disabled="false" />);
+    expect(root).toHaveAttribute("aria-disabled", "true");
+
+    rerender(<FileInput {...defaultProps} isLoading aria-disabled="false" />);
+    expect(root).toHaveAttribute("aria-disabled", "true");
   });
 
   it("keeps the wrapper as the only focus stop", () => {

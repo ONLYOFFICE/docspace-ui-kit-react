@@ -22,67 +22,59 @@ const meta = {
     t: {
       control: false,
       description:
-        "Translation function; the editor asks it for the Choose another label (`Common:ChooseAnother`)",
+        "Translation function, asked for the replace control's label, `Common:ChooseAnother`.",
     },
     image: {
       control: false,
       description:
-        "The picture (a `File` or a URL) with its zoom and crop position, held in your state; the editor renders nothing while the picture is empty",
+        "The picture and its crop, held in your state. The whole editor renders nothing while `uploadedFile` is empty.",
     },
     onChangeImage: {
       control: false,
       description:
-        "Called with a new `image` whenever the picture is dragged or zoomed; apply it to your state or nothing moves",
+        "Called with a new `image` whenever the crop is dragged or the zoom changes. Apply it to your state or nothing moves.",
     },
     onChangeFile: {
       control: false,
       description:
-        "Called with the change event of the hidden file input when another picture is chosen; put the file into `image` yourself",
+        "Called with the change event of the hidden file input when another picture is chosen. Read the file and put it in `image.uploadedFile` yourself.",
     },
     Preview: {
       control: false,
       description:
-        "Content rendered below the cropper, in the same wrapper, such as a preview of the cropped result",
+        "Rendered beside the cropper, inside the wrapper that `classNameWrapperImageCropper` names: the place for a preview of the cropped result.",
     },
     setPreview: {
       control: false,
       description:
-        "Called at most every 300ms with the cropped picture as a `data:` URL",
+        "Called, at most every 300ms, with the cropped picture as a `data:` URL. A canvas tainted by a cross-origin image makes it stop silently.",
     },
     isDisabled: {
       control: "boolean",
       description:
-        "Blocks dragging, zooming and choosing another file, and greys out the zoom row; required, so pass `false` when idle",
+        "Blocks dragging, zooming and the replace control's file dialog. Pass `false` when nothing is in flight.",
     },
     editorBorderRadius: {
       control: "number",
       description:
-        "Corner radius of the crop window in pixels, measured on the 648px canvas shown at 368px; 324 or more makes a circle",
+        "Corner radius of the crop window in pixels, measured on the 648px canvas. Half of it, 324, is a circle.",
     },
     disableImageRescaling: {
       control: "boolean",
       description:
-        "Hides the zoom row and freezes the crop position, leaving the picture framed as it is",
+        "Hides the zoom row and freezes the crop position, leaving the picture as it is.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     className: {
       control: "text",
-      description: "Class added to the outer element",
+      description: "Added to the outer element.",
     },
     classNameWrapperImageCropper: {
       control: "text",
       description:
-        "Class added to the element that wraps the cropper and `Preview`, for laying the two out side by side",
-    },
-    maxImageSize: {
-      control: "number",
-      description:
-        "Deprecated, has no effect. Size limits and compression are the caller's job, in onChangeFile",
-      table: {
-        defaultValue: { summary: "undefined" },
-      },
+        "Added to the element that wraps the cropper and `Preview`. It is the hook for laying those two out side by side.",
     },
   },
 } satisfies Meta<typeof ImageEditor>;
@@ -164,6 +156,7 @@ const ImageEditorDemo = ({
 };
 
 export const Default: Story = {
+  name: "Default",
   render: (args) => (
     <ImageEditorDemo
       editorBorderRadius={args.editorBorderRadius}
@@ -177,9 +170,11 @@ export const Default: Story = {
     editorBorderRadius: 8,
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
-    await expect(
-      canvas.getByRole("region", { name: "Image editor" }),
-    ).toBeVisible();
+    // No English fallback: the region is named only by a passed aria-label.
+    const editor = canvas.getByTestId("image-editor");
+    await expect(editor).toBeVisible();
+    await expect(editor).toHaveAttribute("role", "region");
+    await expect(editor).not.toHaveAttribute("aria-label");
     await expect(canvas.getByTestId("change_image_button")).toHaveTextContent(
       "choose another image",
     );
@@ -191,7 +186,7 @@ export const Default: Story = {
 
     // Choosing another image loads it as a File, which brings the zoom row.
     const input = canvasElement.querySelector(
-      "#customFileInput",
+      'input[type="file"]',
     ) as HTMLInputElement;
     const blob = await (await fetch(DefaultUserPhotoUrl)).blob();
     await userEvent.upload(
@@ -204,7 +199,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A picture framed in a square window with slightly rounded corners, the starting point for a logo or a cover. Drag the picture to reframe it; the zoom row stays hidden because the picture is given as a URL, not a `File`. Change any other prop live in the Controls panel below.",
+          "A picture in a square window with slightly rounded corners, for a logo or a cover. The picture is a URL, not a `File`, so there is no zoom row.",
       },
       source: {
         code: `<ImageEditor
@@ -223,6 +218,7 @@ export const Default: Story = {
 };
 
 export const ProfileAvatar: Story = {
+  name: "Round crop",
   render: (args) => (
     <ImageEditorDemo
       editorBorderRadius={args.editorBorderRadius}
@@ -246,7 +242,7 @@ export const ProfileAvatar: Story = {
     docs: {
       description: {
         story:
-          "A round crop window, the shape a profile picture is usually cut to: any radius of half the 648px canvas or more (`editorBorderRadius`) turns the square into a circle.",
+          "A round crop window, the usual shape for a profile picture. An `editorBorderRadius` of half the 648px canvas or more makes a circle.",
       },
       source: {
         code: `<ImageEditor
@@ -276,6 +272,7 @@ ${extra}
 />`;
 
 export const WithZoomControls: Story = {
+  name: "With zoom controls",
   render: (args) => (
     <ImageEditorDemo
       editorBorderRadius={args.editorBorderRadius}
@@ -303,7 +300,7 @@ export const WithZoomControls: Story = {
     docs: {
       description: {
         story:
-          "A picture given as a `File`, the way it arrives from a file input, gets the zoom row under the Choose another control: the slider zooms from 1x to 5x in fine steps, the minus and plus buttons by half a step each, and the preview below follows the crop (`setPreview`).",
+          "A picture given as a `File` gets a zoom row under the replace control. The slider zooms from 1x to 5x in fine steps, and the buttons by 0.5.",
       },
       source: {
         code: fileSource("  isDisabled={false}"),
@@ -313,6 +310,7 @@ export const WithZoomControls: Story = {
 };
 
 export const DisabledState: Story = {
+  name: "Disabled",
   render: (args) => (
     <ImageEditorDemo
       editorBorderRadius={args.editorBorderRadius}
@@ -344,7 +342,7 @@ export const DisabledState: Story = {
     docs: {
       description: {
         story:
-          "The editor while a save is in flight: the zoom row is greyed out, the picture no longer drags and Choose another opens no picker (`isDisabled`).",
+          "The editor while a save is in flight: the zoom row is greyed out and the picture no longer drags. Choose another opens no file dialog.",
       },
       source: {
         code: fileSource("  isDisabled"),
@@ -354,6 +352,7 @@ export const DisabledState: Story = {
 };
 
 export const FixedFraming: Story = {
+  name: "Fixed framing",
   render: (args) => (
     <ImageEditorDemo
       editorBorderRadius={args.editorBorderRadius}
@@ -378,7 +377,7 @@ export const FixedFraming: Story = {
     docs: {
       description: {
         story:
-          "The same `File` with its framing locked: the zoom row is gone and dragging leaves the picture where it is, while Choose another still replaces it (`disableImageRescaling`).",
+          "The same `File` with its framing locked by `disableImageRescaling`: no zoom row, and dragging leaves the picture where it is.",
       },
       source: {
         code: fileSource("  isDisabled={false}\n  disableImageRescaling"),

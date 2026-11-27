@@ -21,9 +21,6 @@ const MainButton = (props: MainButtonProps) => {
     id,
     setRefMap,
     anchorRef,
-    // Declared for backward compatibility and never read; taken out here so
-    // it no longer reaches the DOM as an unknown attribute.
-    opened: _opened,
     ...rest
   } = props;
 
