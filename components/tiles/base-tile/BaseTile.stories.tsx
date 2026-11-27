@@ -112,7 +112,7 @@ const meta = {
     checked: {
       control: "boolean",
       description:
-        "Ticks the checkbox and keeps it in place of the icon, with the hover background",
+        "Ticks the checkbox, shows it in place of the icon and tints the tile. The tile holds no state; pass back what `onSelect` reports.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -120,14 +120,15 @@ const meta = {
     isActive: {
       control: "boolean",
       description:
-        "Keeps the hover background on the tile being acted on, with no checkbox",
+        "Keeps the hover tint on the tile being acted on, after the pointer leaves it.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     inProgress: {
       control: "boolean",
-      description: "Replaces the icon and the checkbox with a small loader",
+      description:
+        "Replaces the icon and the checkbox with the kit's track loader.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -135,7 +136,7 @@ const meta = {
     showHotkeyBorder: {
       control: "boolean",
       description:
-        "Draws an accent border around the tile, to mark the one the keyboard is on",
+        "Draws the accent outline that marks the tile the keyboard is on.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -143,7 +144,7 @@ const meta = {
     isEdit: {
       control: "boolean",
       description:
-        "Removes the icon and the checkbox and the hover background, leaving the top row to its content while the item is renamed",
+        "Renaming state: removes the icon, the checkbox and the hover tint, so `topContent` gets the whole row.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -151,15 +152,14 @@ const meta = {
     isBlockingOperation: {
       control: "boolean",
       description:
-        "Stops the tile from reacting to hover, clicks and right-clicks; it looks the same",
+        "Stops hover, clicks and right-clicks reaching the tile while an operation runs over it. The tile looks the same.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     indeterminate: {
       control: "boolean",
-      description:
-        "Draws the checkbox with a dash instead of a tick, for a partly selected item",
+      description: "Draws the checkbox in its indeterminate state.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -167,77 +167,80 @@ const meta = {
     item: {
       control: "object",
       description:
-        "The item the tile stands for: passed back through `onSelect`, and its title and logo head the menu. A `contextOptions` key on it is what draws the three-dot button",
+        "The item this tile stands for. It is also what `onSelect` is called with, and the fallback source of the context menu's header.",
     },
     element: {
       control: false,
       description:
-        "The icon in the corner; without it the tile has neither the icon nor the checkbox",
+        "The icon in the corner. Without it neither the icon nor the checkbox is rendered at all.",
     },
     topContent: {
       control: false,
-      description: "The title row beside the icon, usually a `TileContent`",
+      description:
+        "The upper half of the tile. Its first child is read for a nested `item`, which then takes over the context menu's header.",
     },
     bottomContent: {
       control: false,
-      description: "The second row under the title, 24px high",
+      description:
+        "The lower half of the tile — where the room tile puts its tags.",
     },
     contextOptions: {
       control: "object",
-      description: "Entries of the menu opened by the three-dot button",
+      description:
+        "Draws the three-dot button when non-empty and `item` carries a `contextOptions` key. The menu lists `getContextModel`'s entries, not these.",
     },
     getContextModel: {
       control: false,
       description:
-        "Returns the entries of the menu opened by a right-click; without it a right-click opens nothing",
+        "Builds the menu that the three-dot button and a right-click open. Without it neither opens a menu, whatever `contextOptions` holds.",
     },
     onSelect: {
       description:
-        "Called with the new checked state and the item when the checkbox is clicked, or when the icon is tapped on a phone",
+        "Called with the new checked state and the `item`, from the checkbox. A tap on the icon calls it too, in a window 600px wide or narrower.",
     },
     onRoomClick: {
-      description: "Called with the click event on any click on the tile",
+      description:
+        "Called with the event on any click on the tile. It is the tile's `onClick`, not a room-specific one.",
     },
     onHover: {
-      description: "Called when the pointer enters the tile",
+      description: "Called when the pointer enters the tile.",
     },
     onLeave: {
-      description: "Called when the pointer leaves the tile",
+      description: "Called when the pointer leaves the tile.",
     },
     tileContextClick: {
       description:
-        "Called just before the menu opens, with `true` when a right-click opened it",
+        "Called before the menu opens, with `true` when the trigger was a right-click.",
     },
     hideContextMenu: {
-      description: "Called when the menu closes",
+      description: "Called when the menu closes.",
     },
     badgeUrl: {
       control: "text",
-      description: "Image drawn as a badge in the menu's header",
+      description:
+        "Passed to the context menu, for the badge it draws in its header.",
     },
     className: {
       control: "text",
-      description: "Class added after the component's own on the outer element",
+      description:
+        "Added after the component's own classes on the outer element.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the outer element",
+      description: "Value of `data-testid` on the outer element.",
       table: {
         defaultValue: { summary: '"tile"' },
       },
     },
     checkboxContainerRef: {
       control: false,
-      description: "Ref to the element holding the icon and the checkbox",
+      description:
+        "Attached to the element holding the icon and the checkbox, so a wrapper can tell clicks on it apart.",
     },
     forwardRef: {
       control: false,
       description:
-        "Ref to an element of your own that the tile clicks on a right-click when its menu is not mounted yet",
-    },
-    thumbnailClick: {
-      control: false,
-      description: "Ignored: the tile never calls it",
+        "A ref the component clicks on a right-click, before the menu is mounted. It is not attached to anything here.",
     },
   },
   args: {
@@ -274,6 +277,7 @@ const Template = ({
 };
 
 export const Default: Story = {
+  name: "Room tile",
   render: Template,
   args: {
     item: roomItem,
@@ -308,7 +312,8 @@ export const Default: Story = {
     await userEvent.click(within(tile).getByText("Marketing"));
     await expect(args.onRoomClick).toHaveBeenCalled();
 
-    await userEvent.click(within(tile).getByText("Campaigns"));
+    // The label lets the pointer through to the tag, so click the tag.
+    await userEvent.click(within(tile).getByTestId("tag_item_Campaigns"));
     await expect(onSelectTag).toHaveBeenCalledWith(
       expect.objectContaining({ label: "Campaigns" }),
     );
@@ -329,7 +334,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A room as a tile, filled the way `RoomTile` fills it: the logo, the name, the three-dot menu and a row of tags. Hover the logo and tick the checkbox, open the menu from the button or with a right-click, and change any other prop live in the Controls panel below. The button is drawn only when the item carries a `contextOptions` key of its own, whatever the `contextOptions` prop holds.",
+          "A room as a tile, filled the way `RoomTile` fills it: the logo, the name, the three-dot menu and a row of tags. The menu opens from the button or on a right-click. The button needs a `contextOptions` key on the item.",
       },
       source: {
         code: sourceOf(),
@@ -339,6 +344,7 @@ export const Default: Story = {
 };
 
 export const Checked: Story = {
+  name: "Selected",
   render: Template,
   args: {
     ...Default.args,
@@ -355,7 +361,7 @@ export const Checked: Story = {
     docs: {
       description: {
         story:
-          "A selected tile, as it looks among others the reader has picked: the checkbox stays ticked in place of the icon and the background stays tinted (`checked`).",
+          "A selected tile: the checkbox stays ticked in place of the icon, and the tile stays tinted (`checked`).",
       },
       source: {
         code: sourceOf("\n  checked"),
@@ -365,6 +371,7 @@ export const Checked: Story = {
 };
 
 export const Active: Story = {
+  name: "Being acted on",
   render: Template,
   args: {
     ...Default.args,
@@ -377,7 +384,7 @@ export const Active: Story = {
     docs: {
       description: {
         story:
-          "The tile whose menu is open or that an action is running on keeps the hover background after the pointer leaves, so the reader can tell which one it is (`isActive`).",
+          "The tile being acted on, such as the one whose menu is open. It keeps the hover tint after the pointer leaves (`isActive`).",
       },
       source: {
         code: sourceOf("\n  isActive"),
@@ -387,6 +394,7 @@ export const Active: Story = {
 };
 
 export const InProgress: Story = {
+  name: "Busy",
   render: Template,
   args: {
     ...Default.args,
@@ -414,6 +422,7 @@ export const InProgress: Story = {
 };
 
 export const WithHotkeyBorder: Story = {
+  name: "Keyboard outline",
   render: Template,
   args: {
     ...Default.args,
@@ -438,6 +447,7 @@ export const WithHotkeyBorder: Story = {
 };
 
 export const WithCustomBottomContent: Story = {
+  name: "Details in the lower half",
   render: Template,
   args: {
     ...Default.args,
@@ -476,6 +486,7 @@ export const WithCustomBottomContent: Story = {
 };
 
 export const RenamingState: Story = {
+  name: "Renaming",
   render: Template,
   args: {
     ...Default.args,
@@ -497,7 +508,7 @@ export const RenamingState: Story = {
     docs: {
       description: {
         story:
-          "A tile whose name is being edited: the icon and the checkbox go, so the title row can hold a text field across the tile, and hovering no longer tints it (`isEdit`).",
+          "A tile whose name is being edited: the icon and the checkbox go, and hovering does not tint it. The title row holds a text field across the tile (`isEdit`).",
       },
       source: {
         code: sourceOf("\n  isEdit").replace(
@@ -518,6 +529,7 @@ export const RenamingState: Story = {
 };
 
 export const BlockingOperation: Story = {
+  name: "Blocked by an operation",
   render: Template,
   args: {
     ...Default.args,
@@ -533,7 +545,7 @@ export const BlockingOperation: Story = {
     docs: {
       description: {
         story:
-          "A tile an operation is running over, which must not be picked or opened until it ends: hover it, click it or right-click it and nothing happens (`isBlockingOperation`). It looks the same as an idle tile, so show the operation somewhere else.",
+          "A tile an operation is running over: hover, clicks and right-clicks do not reach it (`isBlockingOperation`). It looks like an idle tile, so show the operation somewhere else.",
       },
       source: {
         code: sourceOf("\n  isBlockingOperation"),
@@ -543,6 +555,7 @@ export const BlockingOperation: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={
@@ -597,7 +610,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The first tile shows every variable but the hotkey colour; hover it for the hover background. The second is there for \`--tile-hotkey-color\`, which only a tile with \`showHotkeyBorder\` draws.`,
+        story: `Two tiles under one wrapper that sets every variable. The first shows all of them but the hotkey colour; the hover background shows on hover. The second has \`showHotkeyBorder\`, the only state that draws \`--tile-hotkey-color\`.`,
       },
     },
   },

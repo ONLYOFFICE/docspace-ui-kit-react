@@ -90,11 +90,11 @@ Needs `ThemeProvider` above it in the tree, and say what goes wrong without it.
 
 ## Recipes                                     M
 
-### Open / close (controlled)                  C  metadata.state.visibility
-### Loading                                    C  metadata.state.loading
-### Error                                      C  the component has hasError / errorMessage
-### Disabled / read-only                       C  metadata.state.disabled
-### …component-specific…                       optional
+### Open and close it from state              C  metadata.state.visibility
+### Show a loading state while …               C  metadata.state.loading
+### Show an error when …                       C  the component has hasError / errorMessage
+### Disable it until …                         C  metadata.state.disabled
+### …the task, as a reader would search it…    optional
 
 ## Behaviour the types don't state             M
 
@@ -189,6 +189,10 @@ warning, not an error, because the story is the side that is wrong more often.
 
 ## Section rules
 
+How long the text in each section runs, the order a behaviour bullet says things in, and what
+prose leaves to the generated tables are in [`.claude/rules/doc-writing.md`](.claude/rules/doc-writing.md).
+`pnpm check:readme --only components/<folder>` warns where the text runs past its limits.
+
 **`# Name` + paragraph.** What the component is for. No feature list — features are props,
 and props are in the table.
 
@@ -227,7 +231,13 @@ component that never opens.
 
 **`## Recipes`.** Each recipe is a complete, compiling ```tsx block, one per state a reader
 will need on the first day. Only the recipes whose condition holds; do not invent an
-"Error" recipe for a component with no error state.
+"Error" recipe for a component with no error state. The heading is the task in the words a
+reader types into search or an assistant -- "Show a loading state while an action runs", not
+"Loading". Advice that answers such a task but sits in another section (Button's red button,
+once under CSS variables) gets a recipe of its own, and the section links to it.
+
+**Snippets** -- the minimal example and every recipe -- export a component named for what it is
+(`DeleteButton`, `DialogFooter`), never `Example` or `Demo`, with real labels and handlers.
 
 **`## Behaviour the types don't state`.** The reason this template exists. Collect it by
 reading, not by recalling:
@@ -251,11 +261,13 @@ component gets one `props:start` block per exported prop type.
 
 **`## CSS variables`.** Only custom properties a consumer may set — those read with a
 fallback (`var(--button-height-md, 40px)`). Not the private ones the stylesheet defines for
-itself. Columns: Variable, Default, Effect.
+itself. Columns: Variable, Default, Effect. Say which variants read each variable, and where it
+has to be set: on the component's own `style`, on an ancestor, or on the theme provider.
 
 **`## Accessibility`.** Roles and ARIA the component sets by itself, what keyboard
 interaction it supports, and what the consumer still has to supply. "Renders a plain
-`<div>` and sets no ARIA of its own" is a valid and useful answer.
+`<div>` and sets no ARIA of its own" is a valid and useful answer. For every `aria-*` the props
+accept, say whether the component keeps the value passed or overwrites it.
 
 Whatever you tell the consumer to supply, check that they can. `ModalDialog`'s section used
 to say "add `aria-label` yourself"; the prop type accepts one, but unknown props are spread
@@ -333,8 +345,11 @@ being checked, not how a deadline is met.
 - [ ] The absences a reader will hunt for are stated where they will hunt
 - [ ] Nothing in Accessibility asks the consumer to do something the component prevents
 - [ ] No Default cell claims a default the code does not apply
-- [ ] Recipes cover the states the metadata declares, and only those
+- [ ] Recipes cover the states the metadata declares, and only those; each heading is a task
+- [ ] Every snippet exports a component named for what it is, with real labels and handlers
 - [ ] At least three behaviour bullets, each from the source, stylesheet or tests
+- [ ] A full rewrite leaves no `W_LONG_SENTENCE`, `W_LONG_TEXT` or `W_TAUTOLOGICAL_PROP` for the
+      folder; a smaller edit, none on the lines it touched (`.claude/rules/doc-writing.md`)
 - [ ] CSS variables table lists only consumer-settable properties
 - [ ] Test ids table matches `metadata.testIds`
 - [ ] No `PUBLIC_DIR`, no `dist/` path, no `@docspace/ui-kit`, no styled-components

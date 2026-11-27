@@ -37,7 +37,6 @@ export const HeadingPure = ({
     [styles.header]: type === "header",
     [styles.menu]: type === "menu",
     [styles.content]: type === "content",
-    [styles["not-selectable"]]: true,
   });
 
   return (

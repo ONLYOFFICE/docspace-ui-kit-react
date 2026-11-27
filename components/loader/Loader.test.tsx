@@ -19,6 +19,20 @@ describe("<Loader />", () => {
     expect(screen.getByTestId("loader")).toBeInTheDocument();
   });
 
+  it("puts a passed aria-* on the status region", () => {
+    render(
+      <Loader
+        {...baseProps}
+        aria-label="Loading files"
+        aria-describedby="files-hint"
+      />,
+    );
+
+    expect(
+      screen.getByRole("status", { name: "Loading files" }),
+    ).toHaveAttribute("aria-describedby", "files-hint");
+  });
+
   it("renders base type with text", () => {
     render(<Loader {...baseProps} />);
     expect(screen.getByText("Loading")).toBeInTheDocument();
@@ -46,6 +60,32 @@ describe("<Loader />", () => {
     render(<Loader {...baseProps} type={LoaderTypes.track} />);
     expect(screen.getByTestId("loader")).toBeInTheDocument();
     expect(screen.getByTestId("track-loader")).toBeInTheDocument();
+  });
+
+  // Each track names its gradients after the id; two without one must not
+  // share a set, or the second draws in the first one's colour.
+  it("gives each track without an id its own gradients", () => {
+    const { container } = render(
+      <>
+        <Loader type={LoaderTypes.track} isDecorative />
+        <Loader type={LoaderTypes.track} isDecorative />
+      </>,
+    );
+
+    const ids = [...container.querySelectorAll("linearGradient")].map(
+      (gradient) => gradient.id,
+    );
+    expect(ids).toHaveLength(12);
+    expect(new Set(ids).size).toBe(12);
+    expect(ids.some((id) => id.includes("undefined"))).toBe(false);
+  });
+
+  it("names a track's gradients after its id", () => {
+    const { container } = render(
+      <Loader type={LoaderTypes.track} id="upload" isDecorative />,
+    );
+
+    expect(container.querySelector("#spinner-color-upload-1")).not.toBeNull();
   });
 
   it("accepts custom className", () => {

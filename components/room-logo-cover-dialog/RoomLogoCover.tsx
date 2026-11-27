@@ -17,7 +17,7 @@ import type { ICover } from "./RoomLogoCoverDialog.types";
 import styles from "./RoomLogoCoverDialog.module.scss";
 
 export type RoomLogoCoverProps = {
-  /** Translation function. Besides `Common:Color` the icon picker asks for keys outside the `Common` namespace the kit ships. */
+  /** Translation function, asked for `Common` keys only, all of which the kit ships. */
   t: TTranslation;
 
   /** The cover icons to offer. Each carries raw SVG markup that is injected into the page, so take them only from a source you trust. An empty array leaves the icon picker out. */
@@ -130,7 +130,8 @@ const RoomLogoCover = ({
   };
 
   const handleWithoutIconChange = (value: boolean) => {
-    if (value && selectedCover === null) return;
+    // With no glyph chosen there is nothing to show instead of the initials.
+    if (selectedCover === null) return;
     setWithoutIcon(value);
     onChange?.(selectedColor, value ? null : selectedCover);
   };

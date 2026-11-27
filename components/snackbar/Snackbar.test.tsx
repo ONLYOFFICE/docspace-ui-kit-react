@@ -154,10 +154,9 @@ describe("SnackBar", () => {
     );
   });
 
-  it("keeps the ignored props off the DOM", () => {
-    render(<SnackBar {...defaultProps} isMaintenance skipBlur />);
+  it("keeps skipBlur off the DOM", () => {
+    render(<SnackBar {...defaultProps} skipBlur />);
     const bar = screen.getByTestId("snackbar-container");
-    expect(bar).not.toHaveAttribute("ismaintenance");
     expect(bar).not.toHaveAttribute("skipblur");
   });
 

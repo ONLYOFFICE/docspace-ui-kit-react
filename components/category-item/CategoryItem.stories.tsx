@@ -15,27 +15,28 @@ const meta = {
   argTypes: {
     title: {
       control: "text",
-      description: "Heading of the entry, rendered as the text of a 16px link",
+      description:
+        "Heading of the row, rendered as the text of a link at 16px.",
     },
     subtitle: {
       control: "text",
       description:
-        "Explanatory line under the title, at 12px and no wider than 1024px",
+        "Explanatory line under the title, at 12px and no wider than 1024px.",
     },
     url: {
       control: "text",
       description:
-        "Where the title link points; dropped while the entry is disabled",
+        "Where the link points. It is dropped while `isDisabled` is set, which leaves an `<a>` with no `href`.",
     },
     onClickLink: {
       action: "onClickLink",
       description:
-        "Called with the click event on the title link; the browser still follows `url` unless the handler calls `preventDefault`",
+        "Called with the click event on the title link. Nothing prevents the browser from following `url` — call `preventDefault` yourself when you route in JavaScript.",
     },
     isDisabled: {
       control: "boolean",
       description:
-        "Removes the link's `href` and click handler, marks the title `aria-disabled` while keeping it focusable, and gives the title, subtitle and arrow the disabled colour",
+        "Dims the title, subtitle and arrow, and removes `href` and `onClickLink` from the link. The arrow still renders, so say in the subtitle why the row is unavailable.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -43,17 +44,26 @@ const meta = {
     withPaidBadge: {
       control: "boolean",
       description:
-        "Shows the paid badge beside the title, except on a page whose path contains `management`; required",
+        "Shows the paid badge beside the title — unless the page's path starts with `/management`, where it is suppressed. Required, so pass `false` when there is no badge.",
     },
     badgeLabel: {
       control: "text",
       description:
-        "Text inside the paid badge; required, so pass an empty string when there is no badge",
+        "Text inside the paid badge. Required even when `withPaidBadge` is `false`; pass an empty string then.",
     },
     dataTestId: {
       control: "text",
       description:
-        "Value of `data-testid` on the entry, and the stem of the title link's `<dataTestId>_category_link`",
+        "Value of `data-testid` on the wrapper, and the stem of the title link's own `<dataTestId>_category_link`. Without it the link keeps the shared `link` id.",
+    },
+    className: {
+      control: "text",
+      description:
+        "Added after the component's own class, on the outer element.",
+    },
+    style: {
+      control: "object",
+      description: "Inline style of the outer element.",
     },
   },
 } satisfies Meta<typeof CategoryItem>;
@@ -63,6 +73,7 @@ type Story = StoryObj<ComponentProps<typeof CategoryItem>>;
 export default meta;
 
 export const Default: Story = {
+  name: "Default",
   render: (args) => <CategoryItem {...args} />,
   args: {
     title: "Category Title",
@@ -91,7 +102,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "An entry as it sits in an index of destinations: the title link, the explanation under it and the arrow. Change any prop live in the Controls panel below.",
+          "An entry as it sits in an index of destinations: the title link, the explanation under it and the arrow.",
       },
       source: {
         code: `<CategoryItem
@@ -108,6 +119,7 @@ export const Default: Story = {
 };
 
 export const WithPaidBadge: Story = {
+  name: "With paid badge",
   render: (args) => <CategoryItem {...args} />,
   args: {
     title: "Premium Feature",
@@ -125,7 +137,7 @@ export const WithPaidBadge: Story = {
     docs: {
       description: {
         story:
-          "Marks a destination that needs a paid plan: the badge beside the title carries its own text (`withPaidBadge`, `badgeLabel`). The badge is not shown on a page whose path contains `management`.",
+          "A paid badge beside the title (`withPaidBadge`, `badgeLabel`), for a destination that needs a paid plan. A page whose path contains `management` hides it.",
       },
       source: {
         code: `<CategoryItem
@@ -142,6 +154,7 @@ export const WithPaidBadge: Story = {
 };
 
 export const DisabledState: Story = {
+  name: "Disabled",
   render: (args) => <CategoryItem {...args} />,
   args: {
     title: "Disabled Category",
@@ -173,7 +186,7 @@ export const DisabledState: Story = {
     docs: {
       description: {
         story:
-          "For a destination the reader cannot open right now (`isDisabled`): the title stays focusable but is announced as an unavailable link and does nothing, and the title, subtitle and arrow all dim. Say in the subtitle why the entry is unavailable.",
+          "An unavailable entry with its title, subtitle and arrow dimmed (`isDisabled`). The title stays focusable, is announced as an unavailable link and does nothing.",
       },
       source: {
         code: `<CategoryItem
@@ -234,6 +247,7 @@ const AllVariantsTemplate = () => (
 );
 
 export const AllVariants: Story = {
+  name: "All variants",
   render: () => <AllVariantsTemplate />,
   play: async ({ canvas }) => {
     const links = canvas.getAllByRole("link").map((link) => link.textContent);
@@ -261,6 +275,7 @@ export const AllVariants: Story = {
 
 // Framed on Docs: the theme provider stamps the direction on the page, which would flip the whole Docs page.
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <CategoryItem {...args} />
@@ -293,7 +308,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "80px" },
       description: {
         story:
-          'The same entry under a right-to-left interface: the title and subtitle align to the right, the badge follows the title leftwards and the arrow sits at the left end, mirrored to point left. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+          'The entry in a right-to-left interface. The text aligns right, the badge follows the title leftwards, and the arrow sits at the left end, pointing left. The direction comes from the theme\'s `interfaceDirection`; the wrapper adds `dir="rtl"` for rules that read the DOM.',
       },
       source: {
         code: `<div dir="rtl">
@@ -312,6 +327,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   render: () => (
     <div
       style={
@@ -356,7 +372,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The variables set on one wrapper -- they are listed under CSS variables on this page. **Files** shows the title, subtitle and arrow colours and the margin below it; **Security** is disabled (\`isDisabled\`) to show \`--category-item-disabled-color\` on its subtitle.`,
+        story: `The variables set on one wrapper, shown on two entries:\n\n- **Files** — the title, subtitle and arrow colours and the margin below it\n- **Security** — \`--category-item-disabled-color\` on a disabled entry (\`isDisabled\`)`,
       },
     },
   },

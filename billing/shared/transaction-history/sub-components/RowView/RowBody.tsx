@@ -136,7 +136,7 @@ const TransactionRowView: React.FC<TransactionRowViewProps> = ({
         </BonusSplitAnchor>
       }
     >
-      <RowContent sectionWidth={sectionWidth}>{getRowChildren()}</RowContent>
+      <RowContent>{getRowChildren()}</RowContent>
     </Row>
   );
 };

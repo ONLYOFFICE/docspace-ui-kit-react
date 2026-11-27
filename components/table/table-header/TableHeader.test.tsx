@@ -92,7 +92,6 @@ const defaultProps = {
   columns: mockColumns,
   columnStorageName: COLUMN_STORAGE_NAME,
   columnInfoPanelStorageName: COLUMN_INFO_PANEL_STORAGE_NAME,
-  sectionWidth: 1000,
   useReactWindow: false,
   showSettings: true,
 };
@@ -117,6 +116,21 @@ describe("<TableHeader />", () => {
           toJSON: () => {},
         }) as DOMRect,
     );
+  });
+
+  it("puts a passed aria-* on the header", () => {
+    render(<TableHeader {...defaultProps} aria-describedby="header-hint" />);
+    expect(screen.getByTestId("table-header")).toHaveAttribute(
+      "aria-describedby",
+      "header-hint",
+    );
+  });
+
+  it("puts style on the header", () => {
+    render(<TableHeader {...defaultProps} style={{ marginTop: "4px" }} />);
+    expect(screen.getByTestId("table-header")).toHaveStyle({
+      marginTop: "4px",
+    });
   });
 
   it("renders without errors", () => {
@@ -317,6 +331,32 @@ describe("<TableHeader />", () => {
       const sizes = resetWith(mockColumns, [...mockColumns, extra]);
 
       expect(sizes).toEqual(["376px", "0px", "0px", "0px", "0px", "24px"]);
+    });
+
+    it("gives the free width to the wide column on a window resize", () => {
+      // The wide column without minWidth, a narrow one with default: false.
+      const columns = [
+        { ...name, minWidth: undefined },
+        { ...type, default: false, minWidth: 120 },
+        tags,
+        mockColumns[3],
+      ];
+      render(
+        <TableHeaderWithContainerRef {...defaultProps} columns={columns} />,
+      );
+
+      narrow(400);
+      act(() => {
+        window.dispatchEvent(new Event("resize"));
+      });
+
+      expect(localStorage.getItem(COLUMN_STORAGE_NAME)?.split(" ")).toEqual([
+        "376px",
+        "0px",
+        "0px",
+        "0px",
+        "24px",
+      ]);
     });
 
     it("keeps every column of a table without a wide column", () => {

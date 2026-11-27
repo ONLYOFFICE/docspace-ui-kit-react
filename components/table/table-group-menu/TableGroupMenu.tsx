@@ -16,6 +16,7 @@ import { IconButton } from "../../icon-button";
 import { Scrollbar } from "../../scrollbar";
 
 import { GroupMenuItem } from "../sub-components/group-menu-item";
+import { groupRoleWhenNamed, pickAriaProps } from "../../../utils/aria-props";
 import type { TableGroupMenuProps, TGroupMenuProps } from "../Table.types";
 
 import styles from "./TableGroupMenu.module.scss";
@@ -68,6 +69,8 @@ const TableGroupMenu = memo((props: TableGroupMenuProps) => {
 
   return (
     <div
+      {...pickAriaProps(props)}
+      role={groupRoleWhenNamed(props)}
       className={classNames(
         styles.tableGroupMenu,
         "table-container_group-menu",
@@ -139,6 +142,7 @@ const TableGroupMenu = memo((props: TableGroupMenuProps) => {
             className={styles.tableHeaderIconButton}
             size={16}
             onClick={onCloseClick}
+            ariaLabel={t("CloseButton")}
             iconNode={<CrossIconSvg />}
             isFill
             dataTestId="close-button"
@@ -172,6 +176,7 @@ const TableGroupMenu = memo((props: TableGroupMenuProps) => {
               size={16}
               isFill
               onClick={toggleInfoPanel}
+              ariaLabel={t("InfoPanel")}
               color={toggleIconColor}
               hoverColor={toggleIconColor}
               dataTestId="info-panel-toggle-button"

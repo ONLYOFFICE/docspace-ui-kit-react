@@ -15,39 +15,40 @@ const meta = {
   argTypes: {
     children: {
       control: "text",
-      description: "Text of the link",
+      description: "Label of the link, usually the value the menu changes.",
     },
     data: {
       control: "object",
       description:
-        "Entries of the menu, each with the props of a `DropDownItem`: a required `key`, a `label`, an `onClick` called with the click event, or `isSeparator` for a divider line",
+        "Entries of the menu. Each is a `DropDownItem`'s props; `key` is required, and `onClick` is called with the event.",
     },
     fontSize: {
       control: "text",
-      description: "Font size of the link text",
+      description: "Font size of the text, as a CSS length.",
       table: {
         defaultValue: { summary: "13px" },
       },
     },
     fontWeight: {
       control: "number",
-      description: "Font weight of the text, as a number",
+      description:
+        "Weight of the text, such as `600`; ignored while `isBold` is set.",
     },
     isBold: {
       control: "boolean",
-      description: "Quick way to make text bold",
+      description: "Sets the weight to 700, over `fontWeight`.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     color: {
       control: "color",
-      description: "Text color of the link",
+      description: "CSS colour of the text.",
     },
     isDisabled: {
       control: "boolean",
       description:
-        "Makes the link inert: clicking no longer opens the menu and the cursor stays an arrow",
+        "Whether the link is inert: it greys out and clicking no longer opens the menu.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -55,14 +56,15 @@ const meta = {
     withExpander: {
       control: "boolean",
       description:
-        "Draws a chevron after the text, which turns over while the menu is open",
+        "Whether a chevron is drawn after the text, which turns over while the menu is open.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isSemitransparent: {
       control: "boolean",
-      description: "Draws the link at half opacity",
+      description:
+        'Whether the link is drawn at half opacity, the portal\'s "pending" look.',
       table: {
         defaultValue: { summary: "false" },
       },
@@ -70,7 +72,7 @@ const meta = {
     isTextOverflow: {
       control: "boolean",
       description:
-        "Truncates the text with an ellipsis at 200px instead of wrapping it",
+        "Whether the text is truncated with an ellipsis at 200px instead of wrapping.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -79,7 +81,7 @@ const meta = {
       control: "select",
       options: ["alwaysDashed", "appearDashedAfterHover"],
       description:
-        "Whether the dashed underline is always drawn or appears on hover. Currently neither value draws an underline",
+        "Whether the dashed underline is always drawn or appears on hover.",
       table: {
         defaultValue: { summary: "alwaysDashed" },
       },
@@ -87,13 +89,13 @@ const meta = {
     manualWidth: {
       control: "text",
       description:
-        "Exact width of the menu, as a CSS length. Without it the menu is as wide as its widest entry",
+        "Exact width of the menu, as a CSS length. Without it the menu is as wide as its widest entry, up to 200px.",
     },
     directionY: {
       control: "select",
       options: ["top", "bottom", "both"],
       description:
-        "Whether the menu opens above or below the link; `both` opens it below unless it would run off the bottom of the window",
+        'Whether the menu opens above or below the link. Passed straight to `DropDown`, which defaults to `"bottom"`.',
       table: {
         defaultValue: { summary: "bottom" },
       },
@@ -101,7 +103,7 @@ const meta = {
     fixedDirection: {
       control: "boolean",
       description:
-        "Keeps the menu on the chosen sides even when it does not fit there, instead of flipping it",
+        "Whether the menu keeps `directionX` and `directionY` even when it does not fit there.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -109,7 +111,8 @@ const meta = {
     directionX: {
       control: "select",
       options: ["left", "right"],
-      description: "Which side of the link the menu is aligned to",
+      description:
+        'Which side of the link the menu is aligned to. Passed straight to `DropDown`, which defaults to `"right"`.',
       table: {
         defaultValue: { summary: "right" },
       },
@@ -117,7 +120,7 @@ const meta = {
     isOpen: {
       control: "boolean",
       description:
-        "Whether the menu starts open. The link then keeps that state itself; changing this prop re-syncs it",
+        "Whether the menu starts open. The component then keeps that state itself; changing this prop re-syncs it.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -125,7 +128,7 @@ const meta = {
     isDefaultMode: {
       control: "boolean",
       description:
-        "Whether the menu is rendered in a portal on `document.body`. Turn it off to render it in place",
+        "Whether the menu is rendered in a portal on `document.body`. Turn it off to render it in place.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -133,12 +136,12 @@ const meta = {
     title: {
       control: "text",
       description:
-        "Tooltip text for the label. It opens the kit's shared tooltip, which appears only where the page mounts `RootTooltip`; no native `title` attribute is set",
+        "Text of the kit's shared tooltip on the label, for a truncated one. It shows only while `RootTooltip` is mounted.",
     },
     hasScroll: {
       control: "boolean",
       description:
-        "Wraps the menu in a scrollbar of its own, 250px tall (100px in landscape). It only takes effect on a phone",
+        "Whether the menu is wrapped in a scrollbar of its own. It only takes effect on a phone.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -146,48 +149,43 @@ const meta = {
     withDynamicScrollbar: {
       control: "boolean",
       description:
-        "Measures the room around the link on every open and scrolls the menu inside what is left",
+        "Whether the menu measures the room around the link on every open and scrolls inside what is left.",
     },
     topSpace: {
       control: "number",
       description:
-        "(`withDynamicScrollbar` only) Space to leave above the menu, in pixels",
+        "(`withDynamicScrollbar` only) Space to leave above the menu, in pixels.",
     },
     bottomSpace: {
       control: "number",
       description:
-        "(`withDynamicScrollbar` only) Space to leave below the menu, in pixels",
+        "(`withDynamicScrollbar` only) Space to leave below the menu, in pixels.",
     },
     isAside: {
       control: "boolean",
       description:
-        "Passed to the menu's backdrop, which then keeps an aside panel above itself",
+        "Passed to the menu's backdrop, which then keeps an aside panel above itself.",
     },
     withoutBackground: {
       control: "boolean",
-      description: "Passed to the menu's backdrop: makes it transparent",
+      description: "Passed to the menu's backdrop: makes it transparent.",
     },
     className: {
       control: "text",
       description:
-        "Class added to the outermost element and to the link inside it",
+        "Applied to the outermost element, and to the link inside it.",
     },
     dropDownClassName: {
       control: "text",
-      description: "Class added to the menu",
+      description: "Applied to the menu.",
     },
     id: {
       control: "text",
-      description: "`id` of the outermost element",
+      description: "Applied to the outermost element.",
     },
     style: {
       control: "object",
-      description: "Inline style of the outermost element",
-    },
-    isHovered: {
-      control: false,
-      description:
-        "Ignored. Nothing reads this prop; the hover look comes from CSS",
+      description: "Applied to the outermost element as inline style.",
     },
   },
   decorators: [
@@ -281,7 +279,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The link with a three-item menu; click it to open the menu, pick an entry to see its `onClick` in the Actions panel, and change any other prop live in the Controls panel below.",
+          "A link that opens a three-item menu. Picking an entry calls its `onClick` and closes the menu.",
       },
       source: {
         code: `<LinkWithDropdown
@@ -315,6 +313,7 @@ const WithExpanderTemplate = () => {
 };
 
 export const WithExpander: Story = {
+  name: "With chevron",
   render: () => <WithExpanderTemplate />,
   play: async (context) => {
     const trigger = context.canvas.getByRole("button", {
@@ -327,7 +326,7 @@ export const WithExpander: Story = {
     docs: {
       description: {
         story:
-          "Link with an expander arrow icon that indicates the presence of a dropdown menu.",
+          "A link with a chevron after its label, which turns over while the menu is open (`withExpander`).",
       },
       source: {
         code: `<LinkWithDropdown data={items} withExpander>Link with Expander</LinkWithDropdown>`,
@@ -354,6 +353,7 @@ const CustomStylingTemplate = () => {
 };
 
 export const CustomStyling: Story = {
+  name: "Custom font and colour",
   render: () => <CustomStylingTemplate />,
   play: async ({ canvas }) => {
     const label = canvas.getByText("Custom Styled Link");
@@ -369,7 +369,7 @@ export const CustomStyling: Story = {
     docs: {
       description: {
         story:
-          "Link with custom font size, weight, and color for styled appearance.",
+          "A link with its own font size, weight and colour (`fontSize`, `fontWeight`, `color`).",
       },
       source: {
         code: `<LinkWithDropdown data={items} fontSize="16px" fontWeight={600} isBold color="#4781d1">
@@ -405,7 +405,7 @@ export const Disabled: Story = {
     docs: {
       description: {
         story:
-          "Use it while the options do not apply yet: clicking no longer opens the menu and the cursor stays an arrow (`isDisabled`). In the light theme the text keeps the default grey, so the state is not visible until the link is clicked.",
+          "A disabled link (`isDisabled`): a click no longer opens the menu, and the cursor stays an arrow. In the light theme the text keeps its default grey.",
       },
       source: {
         code: `<LinkWithDropdown data={items} isDisabled>Disabled Link</LinkWithDropdown>`,
@@ -430,6 +430,7 @@ const SemiTransparentTemplate = () => {
 };
 
 export const SemiTransparent: Story = {
+  name: "Semitransparent",
   render: () => <SemiTransparentTemplate />,
   play: async ({ canvas }) => {
     await expect(
@@ -464,6 +465,7 @@ const WithCustomWidthTemplate = () => {
 };
 
 export const WithCustomWidth: Story = {
+  name: "Menu of exact width",
   render: () => <WithCustomWidthTemplate />,
   play: async (context) => {
     await opens(context, "Custom Width Link");
@@ -477,7 +479,7 @@ export const WithCustomWidth: Story = {
     docs: {
       description: {
         story:
-          "Link with a manually set dropdown width for controlling the menu size: `manualWidth` sets the width exactly, past the 200px a self-sizing menu stops at.",
+          "A menu of an exact width (`manualWidth`), wider than the 200px a self-sizing menu stops at.",
       },
       source: {
         code: `<LinkWithDropdown data={items} manualWidth="300px">Custom Width Link</LinkWithDropdown>`,
@@ -503,6 +505,7 @@ const TextOverflowTemplate = () => {
 };
 
 export const TextOverflow: Story = {
+  name: "Truncated label",
   render: () => <TextOverflowTemplate />,
   play: async ({ canvas }) => {
     const label = canvas.getByText(/^A long link label/);
@@ -516,7 +519,7 @@ export const TextOverflow: Story = {
     docs: {
       description: {
         story:
-          "Use it where a label can be longer than its place: the text stops at 200px with an ellipsis and the chevron stays beside it (`isTextOverflow`).",
+          "A long label cut at 200px with an ellipsis, with the chevron beside it (`isTextOverflow`).",
       },
       source: {
         code: `<LinkWithDropdown
@@ -556,6 +559,7 @@ const OpenMenuTemplate = () => {
 };
 
 export const OpenMenu: Story = {
+  name: "Open menu",
   render: () => <OpenMenuTemplate />,
   play: async ({ canvas, userEvent }) => {
     // Open from the first render; a click outside, which lands on the
@@ -578,7 +582,7 @@ export const OpenMenu: Story = {
     docs: {
       description: {
         story:
-          "The menu shown on first render (`isOpen`): the link keeps its highlighted background and the chevron points up while the menu is open. Clicking outside or picking an entry closes it.",
+          "A menu open from the first render (`isOpen`). The link keeps its highlighted background, and the chevron points up.",
       },
       source: {
         code: `<LinkWithDropdown data={items} withExpander isOpen>
@@ -590,6 +594,7 @@ export const OpenMenu: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   play: async ({ canvas }) => {
     const customized = root(
       canvas.getByRole("button", { name: "Customized Link" }),
@@ -638,7 +643,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The variables are listed under CSS variables on this page. The first link shows the text, background, radius and padding variables; hover it or open its menu to see the hover pair. The second, with \`isDisabled\`, is there for \`--link-with-dropdown-disabled-color\`.`,
+        story: `Two links under a wrapper that sets the variables. The first shows the text, background, radius and padding; the second, disabled, shows \`--link-with-dropdown-disabled-color\`.`,
       },
       source: {
         code: `<div

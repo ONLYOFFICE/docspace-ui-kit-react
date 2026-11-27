@@ -20,12 +20,44 @@ const baseProps = {
   editLabel: "Edit",
   userName: "Demo User",
   editing: false,
-  editAction: vi.fn(),
 };
 
 describe("<Avatar />", () => {
   afterEach(() => {
     vi.clearAllMocks();
+  });
+
+  it("puts id and style on the outer element", () => {
+    render(<Avatar {...baseProps} id="owner" style={{ marginTop: "4px" }} />);
+    const avatar = screen.getByTestId("avatar");
+    expect(avatar).toHaveAttribute("id", "owner");
+    expect(avatar).toHaveStyle({ marginTop: "4px" });
+  });
+
+  it("names the edit button: a pencil with a picture, a plus without", () => {
+    const { rerender } = render(
+      <Avatar {...baseProps} editing hasAvatar onChangeFile={vi.fn()} />,
+    );
+    expect(screen.getByRole("button", { name: "Edit" })).toBeInTheDocument();
+
+    rerender(<Avatar {...baseProps} editing onChangeFile={vi.fn()} />);
+    expect(
+      screen.getByRole("button", { name: "Upload picture" }),
+    ).toBeInTheDocument();
+  });
+
+  it("puts a passed aria-* on the avatar, whose passed name wins", () => {
+    render(
+      <Avatar
+        {...baseProps}
+        onClick={vi.fn()}
+        aria-label="Open profile"
+        aria-describedby="profile-hint"
+      />,
+    );
+
+    const avatar = screen.getByRole("button", { name: "Open profile" });
+    expect(avatar).toHaveAttribute("aria-describedby", "profile-hint");
   });
 
   it("renders avatar with default props", () => {

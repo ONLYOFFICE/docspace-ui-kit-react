@@ -525,6 +525,7 @@ const FilterBlock = ({
       onClose={hideFilterBlock}
       withBodyScroll
       containerVisible={showSelector.show || !!customPanel}
+      aria-label={filterHeader}
       data-testid="filter_modal_dialog"
     >
       {showSelector.show && renderSelector ? (
@@ -568,6 +569,7 @@ const FilterBlock = ({
                 className="close-button"
                 iconNode={<ClearReactSvgUrl />}
                 onClick={onClearFilter}
+                ariaLabel={t("ClearFilter")}
                 isClickable
                 isFill
                 dataTestId="filter_clear_button"

@@ -32,4 +32,13 @@ describe("DragAndDrop", () => {
     expect(root).toHaveAttribute("role", "presentation");
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
+
+  // SelectionArea and the portal's drop handler find the item under the pointer
+  // by this attribute, so it is not dead even though the component never reads it.
+  it("writes value to the outer element as an attribute", () => {
+    render(<DragAndDrop {...defaultProps} value="folder_42_draggable_0" />);
+    const root = screen.getByText("Drop files here").parentElement;
+
+    expect(root).toHaveAttribute("value", "folder_42_draggable_0");
+  });
 });

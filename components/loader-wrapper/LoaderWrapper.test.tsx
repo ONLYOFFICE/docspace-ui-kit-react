@@ -20,6 +20,18 @@ describe("LoaderWrapper", () => {
     expect(wrapper).toHaveStyle({ pointerEvents: "auto" });
   });
 
+  it("puts a passed aria-* on the wrapper", () => {
+    render(
+      <LoaderWrapper isLoading aria-busy aria-describedby="list-hint">
+        <span>Content</span>
+      </LoaderWrapper>,
+    );
+
+    const wrapper = screen.getByTestId("loader-wrapper");
+    expect(wrapper).toHaveAttribute("aria-busy", "true");
+    expect(wrapper).toHaveAttribute("aria-describedby", "list-hint");
+  });
+
   it("dims children and disables pointer events when loading", () => {
     render(
       <LoaderWrapper isLoading>

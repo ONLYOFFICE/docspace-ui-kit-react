@@ -18,17 +18,17 @@ const meta = {
     headerText: {
       control: "text",
       description:
-        "Bold first line beside the icon: a string, or any node, which is then wrapped in a div instead of a paragraph",
+        "Bold first line, beside the icon. A string renders in the kit's `Text`; anything else is wrapped in a `div` instead of `Text`'s usual `p`. `hideHeader` removes it.",
     },
     bodyText: {
       control: "text",
       description:
-        "Smaller line under the header, at 12px: a string, or any node, which is then wrapped in a div instead of a paragraph",
+        "The line under the header, at 12px. A string renders in the kit's `Text`; anything else is wrapped in a `div` instead of `Text`'s usual `p`.",
     },
     iconName: {
       control: "text",
       description:
-        "Icon beside the header: a URL of an SVG file, loaded and inlined, or an element rendered as given; only its path fills take the header icon colour",
+        "Icon beside the header, the kit's 16px people glyph when unset. A string is fetched as an SVG through `react-svg`; an element is rendered as given. Only `path` fills are recoloured.",
       table: {
         defaultValue: { summary: "16px people glyph" },
       },
@@ -36,7 +36,7 @@ const meta = {
     hideHeader: {
       control: "boolean",
       description:
-        "Removes the first row, icon and header text together, so only the body line is left",
+        "Drops the whole first row, icon and header text together, leaving the body on its own.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -44,27 +44,29 @@ const meta = {
     onClose: {
       control: false,
       description:
-        "Called when the close cross is clicked; the cross is shown only while this is set, and the bar stays on screen until the host stops rendering it",
+        "Called when the close button is clicked. The button exists only while this is set, and the bar does not hide itself.",
     },
     barIsVisible: {
       control: "boolean",
       description:
-        "Removes the 20px margin above the bar, for a bar that already sits under something; it does not show or hide the bar",
+        "Removes the bar's own 20px top margin, for a bar that already sits under something. It shows and hides nothing, whatever the name suggests.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     className: {
       control: "text",
-      description: "Class added after the component's own on the outer element",
+      description:
+        "Added after the component's own classes on the outer element.",
     },
     style: {
       control: "object",
-      description: "Inline style of the outer element",
+      description:
+        "Inline style of the outer element, and the place for the bar's CSS variables.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of data-testid on the outer element",
+      description: "Value of `data-testid` on the outer element.",
       table: {
         defaultValue: { summary: '"public_room_bar"' },
       },
@@ -97,7 +99,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The bar as most screens use it: the default icon, a header and a body line, with no close cross. Change any prop live in the Controls panel below.",
+          "The bar as most screens use it: the default icon, a header and a body line, with no close cross.",
       },
       source: {
         code: `<PublicRoomBar
@@ -110,6 +112,7 @@ export const Default: Story = {
 };
 
 export const WithCustomIcon: Story = {
+  name: "Custom icon",
   render: (args) => <PublicRoomBar {...args} />,
   args: {
     headerText: "Public Room",
@@ -140,6 +143,7 @@ export const WithCustomIcon: Story = {
 };
 
 export const WithoutCloseButton: Story = {
+  name: "Without a close button",
   render: (args) => <PublicRoomBar {...args} />,
   args: {
     headerText: "Public Room",
@@ -175,6 +179,7 @@ const WithCustomComponentsTemplate = () => (
 );
 
 export const WithCustomComponents: Story = {
+  name: "Nodes as text",
   render: () => <WithCustomComponentsTemplate />,
   play: async ({ canvas }) => {
     // A node is wrapped in a div rather than a paragraph.
@@ -192,7 +197,7 @@ export const WithCustomComponents: Story = {
     docs: {
       description: {
         story:
-          "Pass nodes instead of strings when a line needs markup of its own — a coloured header and an italic body here, each wrapped in a div instead of a paragraph (`headerText`, `bodyText`). The bar also sits without its top margin (`barIsVisible`).",
+          "A coloured header and an italic body passed as nodes, each wrapped in a div instead of a paragraph (`headerText`, `bodyText`). The bar sits without its top margin (`barIsVisible`).",
       },
       source: {
         code: `<PublicRoomBar
@@ -206,6 +211,7 @@ export const WithCustomComponents: Story = {
 };
 
 export const WithCloseButton: Story = {
+  name: "With a close button",
   render: (args) => <PublicRoomBar {...args} />,
   args: {
     headerText: "Public Room",
@@ -233,7 +239,7 @@ export const WithCloseButton: Story = {
     docs: {
       description: {
         story:
-          "Let the reader dismiss a note they have read: a close button appears on the right (`onClose`), named by `closeLabel` and operable from the keyboard. Pressing it only reports the click in the Actions panel; the bar stays until the host stops rendering it.",
+          "A close button on the right, for a note the reader may dismiss (`onClose`). It is named by `closeLabel` and works from the keyboard. Pressing it only reports the click; the bar stays until the host removes it.",
       },
       source: {
         code: `const [isShown, setIsShown] = useState(true);
@@ -251,6 +257,7 @@ export const WithCloseButton: Story = {
 };
 
 export const WithoutHeader: Story = {
+  name: "Body only",
   render: (args) => <PublicRoomBar {...args} />,
   args: {
     headerText: "Public Room",
@@ -286,6 +293,7 @@ export const WithoutHeader: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={

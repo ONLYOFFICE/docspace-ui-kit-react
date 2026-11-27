@@ -4,6 +4,8 @@ import CrossReactSvgUrl from "../../assets/icons/12/cross.react.svg";
 import { IconButton } from "../icon-button";
 import { TooltipContainer } from "../tooltip";
 import { activateOnButtonKey } from "../../utils/keyboard-activation";
+import { pickAriaProps } from "../../utils/aria-props";
+import { useCommonTranslation } from "../../utils/i18n";
 
 import type { SelectedItemProps } from "./SelectedItem.types";
 import styles from "./SelectedItem.module.scss";
@@ -19,6 +21,7 @@ export const SelectedItemPure = (props: SelectedItemProps) => {
     isInline = true,
     className,
     id,
+    style,
     propKey,
     group,
     forwardedRef,
@@ -30,6 +33,7 @@ export const SelectedItemPure = (props: SelectedItemProps) => {
     isActive,
     clickable,
   } = props;
+  const t = useCommonTranslation();
   if (!label) return null;
 
   const onCloseClick = (e: React.MouseEvent) => {
@@ -78,10 +82,12 @@ export const SelectedItemPure = (props: SelectedItemProps) => {
 
   return (
     <TooltipContainer
+      {...pickAriaProps(props)}
       as="div"
       onClick={handleOnClick}
       className={selectedItemClassNames}
       id={id}
+      style={style}
       ref={forwardedRef}
       data-testid={dataTestId ?? "selected-item"}
       title={title}
@@ -97,10 +103,13 @@ export const SelectedItemPure = (props: SelectedItemProps) => {
       <div className={labelClassNames}>{label}</div>
       {!hideCross ? (
         <IconButton
-          className={`selected-tag-removed ${classNameCloseButton}`}
+          className={["selected-tag-removed", classNameCloseButton]
+            .filter(Boolean)
+            .join(" ")}
           iconNode={<CrossReactSvgUrl />}
           size={12}
           onClick={onCloseClick}
+          ariaLabel={t("Remove")}
           isFill
           isDisabled={isDisabled}
         />

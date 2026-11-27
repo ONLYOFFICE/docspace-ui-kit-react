@@ -18,6 +18,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 import { changedModuleDirs } from "./changed.mjs";
+import { printUsage } from "./usage.mjs";
 
 const ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -25,6 +26,16 @@ const ROOT = path.resolve(
 );
 
 const argv = process.argv.slice(2);
+
+// Before anything else: an unknown flag is forwarded to scan.mjs, so --help
+// would otherwise build the image first and only then fail inside it.
+if (argv.includes("--help") || argv.includes("-h")) {
+  printUsage(import.meta.url);
+  console.log("\nscan.mjs's flags, which this script forwards:\n");
+  printUsage(new URL("./scan.mjs", import.meta.url));
+  process.exit(0);
+}
+
 const forward = [];
 let build = true;
 let changed = false;

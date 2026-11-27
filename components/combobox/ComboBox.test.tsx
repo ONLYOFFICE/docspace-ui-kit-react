@@ -699,6 +699,33 @@ describe("ComboBox", () => {
     ).toBeInTheDocument();
   });
 
+  it("puts a passed aria-* on the button, its aria-label over ariaLabel", () => {
+    render(
+      <ComboBox
+        {...baseProps}
+        ariaLabel="Role"
+        aria-label="Role of Carol Jones"
+        aria-describedby="role-hint"
+        aria-expanded
+      />,
+    );
+
+    const button = screen.getByRole("button", { name: "Role of Carol Jones" });
+    expect(button).toHaveAttribute("aria-describedby", "role-hint");
+    // The open state is the component's: a passed value does not open it.
+    expect(button).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("keeps a passed aria-disabled unless isDisabled is set", () => {
+    const { rerender } = render(
+      <ComboBox {...baseProps} aria-disabled="true" />,
+    );
+    expect(screen.getByRole("button")).toHaveAttribute("aria-disabled", "true");
+
+    rerender(<ComboBox {...baseProps} isDisabled aria-disabled="false" />);
+    expect(screen.getByRole("button")).toHaveAttribute("aria-disabled", "true");
+  });
+
   it("sets correct tabIndex", () => {
     render(<ComboBox {...baseProps} />);
     const button = screen.getByRole("button");

@@ -97,7 +97,6 @@ const ComboBoxOverride: React.FC<AiChatComboBoxProps> = (props) => {
       dataTestId={dataTestId}
       scaled
       scaledOptions
-      showDisabledItems
       dropDownMaxHeight={400}
       directionY="both"
     />

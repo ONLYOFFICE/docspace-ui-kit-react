@@ -11,6 +11,7 @@ import { IconButton } from "../icon-button";
 import { Text } from "../text";
 import { TooltipContainer } from "../tooltip";
 import { consumeKey } from "../../utils/consume-key";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import {
   getRoomTypeDescriptionTranslation,
@@ -32,8 +33,10 @@ const RoomType = ({
   isTemplate,
   isTemplateRoom,
   isFormSection,
+  ...rest
 }: RoomTypeProps) => {
   const { t } = useTranslation(["Common"]);
+  const aria = pickAriaProps(rest);
 
   const room = {
     type: roomType,
@@ -71,7 +74,8 @@ const RoomType = ({
     if (e.target !== e.currentTarget) return;
     e.preventDefault();
     // A disabled type does nothing, so it must not take the next keyup either.
-    if (disabled) return;
+    // The dropdown button ignores the disabled props, for the pointer too.
+    if (disabled && type !== "dropdownButton") return;
     consumeKey(e);
     e.currentTarget.click();
   };
@@ -118,26 +122,9 @@ const RoomType = ({
     </>
   );
 
-  return type === "listItem" ? (
+  return type === "dropdownButton" ? (
     <TooltipContainer
-      as="div"
-      className={classNames(styles.roomType, styles.listItem, {
-        [styles.isOpen]: isOpen,
-        [styles.disabled]: disabled,
-      })}
-      id={id}
-      title={disabled ? "" : room.title}
-      onClick={handleClick}
-      {...buttonProps}
-      aria-disabled={disabled || undefined}
-      data-tooltip-id={disabled ? "create-room-tooltip" : undefined}
-      data-testid="room-type-list-item"
-      data-selected-id={selectedId}
-    >
-      {content}
-    </TooltipContainer>
-  ) : type === "dropdownButton" ? (
-    <TooltipContainer
+      {...aria}
       as="div"
       id={id}
       title={room.title}
@@ -154,12 +141,13 @@ const RoomType = ({
     </TooltipContainer>
   ) : type === "dropdownItem" ? (
     <TooltipContainer
+      {...aria}
       as="div"
       id={id}
       title={disabled ? "" : room.title}
       onClick={handleClick}
       {...buttonProps}
-      aria-disabled={disabled || undefined}
+      aria-disabled={disabled || aria["aria-disabled"]}
       data-selected-id={selectedId}
       data-tooltip-id={disabled ? "create-room-tooltip" : undefined}
       className={classNames(styles.roomType, styles.dropDownItem, {
@@ -171,14 +159,23 @@ const RoomType = ({
       {content}
     </TooltipContainer>
   ) : (
+    // Any other value, an unknown string from untyped code included, is
+    // the default list card.
     <TooltipContainer
+      {...aria}
       as="div"
-      id={id}
-      title={room.title}
-      data-selected-id={selectedId}
-      className={classNames(styles.roomType, styles.displayItem, {
+      className={classNames(styles.roomType, styles.listItem, {
         [styles.isOpen]: isOpen,
+        [styles.disabled]: disabled,
       })}
+      id={id}
+      title={disabled ? "" : room.title}
+      onClick={handleClick}
+      {...buttonProps}
+      aria-disabled={disabled || aria["aria-disabled"]}
+      data-tooltip-id={disabled ? "create-room-tooltip" : undefined}
+      data-testid="room-type-list-item"
+      data-selected-id={selectedId}
     >
       {content}
     </TooltipContainer>

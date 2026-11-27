@@ -2,11 +2,13 @@ import { createContext, ReactNode } from "react";
 
 import { TSelectorBreadCrumbs } from "../Selector.types";
 
-export const BreadCrumbsContext = createContext<TSelectorBreadCrumbs>({});
+type TBreadCrumbsContext = TSelectorBreadCrumbs & { bodyIsLoading?: boolean };
+
+export const BreadCrumbsContext = createContext<TBreadCrumbsContext>({});
 
 export const BreadCrumbsProvider = ({
   children,
   ...rest
-}: TSelectorBreadCrumbs & { children: ReactNode }) => {
+}: TBreadCrumbsContext & { children: ReactNode }) => {
   return <BreadCrumbsContext value={rest}>{children}</BreadCrumbsContext>;
 };

@@ -1,6 +1,5 @@
 import React from "react";
 
-import { isTablet } from "../../../utils";
 import { Button, ButtonSize } from "../../button";
 
 import styles from "../Navigation.module.scss";
@@ -71,7 +70,8 @@ const ControlButtons = ({
     toggleDropBox?.();
   };
 
-  const isTabletView = isTablet();
+  // The tablet layout, from currentDeviceType like the rest of the header.
+  const isTabletView = !!isMobile && !isMobileOnly;
   const contextOptionsFolder = getContextOptionsFolder();
   const containVisible = contextOptionsFolder.some((item) => !item.disabled);
 
@@ -132,6 +132,7 @@ const ControlButtons = ({
         getData={getContextOptionsFolder}
         withMenu={withMenu}
         title={title}
+        ariaLabel={titles?.contextMenu}
         isTrashFolder={isTrashFolder}
         isMobile={isMobile || false}
         isMobileOnly={isMobileOnly || false}

@@ -1,3 +1,4 @@
+import React from "react";
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
@@ -223,7 +224,7 @@ describe("<DropDownItem /> icon source", () => {
       "data-src",
       ownSvg,
     );
-    expect(screen.queryByAltText("plugin-logo")).not.toBeInTheDocument();
+    expect(document.querySelector("img")).not.toBeInTheDocument();
   });
 
   it("inlines an SVG data URL", () => {
@@ -237,7 +238,7 @@ describe("<DropDownItem /> icon source", () => {
     );
   });
 
-  it("renders an element as it is, without fetching anything", () => {
+  it("draws an element as it is, without fetching anything", () => {
     render(
       <DropDownItem {...baseProps} icon={<svg data-testid="own-icon" />} />,
     );
@@ -246,22 +247,29 @@ describe("<DropDownItem /> icon source", () => {
     expect(screen.queryByTestId("mocked-react-svg")).not.toBeInTheDocument();
   });
 
+  it("renders a memoised component", () => {
+    const Icon = React.memo(() => <svg data-testid="memo-icon" />);
+
+    render(<DropDownItem {...baseProps} icon={Icon} />);
+
+    expect(screen.getByTestId("memo-icon")).toBeInTheDocument();
+  });
+
   it("draws a cross-origin .svg as an image, without fetching it", () => {
     const foreignSvg = "https://cdn.example.com/icon.svg";
 
     render(<DropDownItem {...baseProps} icon={foreignSvg} />);
 
-    expect(screen.getByAltText("plugin-logo")).toHaveAttribute(
-      "src",
-      foreignSvg,
-    );
+    // The icon sits beside the item's label, so it is decorative.
+    expect(document.querySelector("img")).toHaveAttribute("alt", "");
+    expect(document.querySelector("img")).toHaveAttribute("src", foreignSvg);
     expect(screen.queryByTestId("mocked-react-svg")).not.toBeInTheDocument();
   });
 
   it("draws a bitmap as an image, even under images/", () => {
     render(<DropDownItem {...baseProps} icon="/static/images/logo.png" />);
 
-    expect(screen.getByAltText("plugin-logo")).toHaveAttribute(
+    expect(document.querySelector("img")).toHaveAttribute(
       "src",
       "/static/images/logo.png",
     );

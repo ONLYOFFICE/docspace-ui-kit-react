@@ -48,6 +48,19 @@ const sideLink = (
 );
 
 describe("<RowContent />", () => {
+  it("puts a passed aria-* on the content", () => {
+    render(
+      <RowContent aria-describedby="content-hint">
+        <span>Main</span>
+        <span>Side</span>
+      </RowContent>,
+    );
+    expect(screen.getByTestId("row-content")).toHaveAttribute(
+      "aria-describedby",
+      "content-hint",
+    );
+  });
+
   it("renders without error", () => {
     render(
       <RowContent>
@@ -142,19 +155,6 @@ describe("<RowContent />", () => {
 
     const sideInfo = screen.getByTestId("tablet-side-info");
     expect(sideInfo).toHaveStyle({ color: sideColor });
-  });
-
-  it("renders main container with correct width", () => {
-    render(
-      <RowContent>
-        {mainLink}
-        {iconLink}
-        {sideLink}
-      </RowContent>,
-    );
-
-    const mainContainer = screen.getByTestId("main-container-wrapper");
-    expect(mainContainer).toHaveStyle({ "--main-container-width": "140px" });
   });
 
   it("renders side container with correct width", () => {

@@ -40,7 +40,7 @@ const meta = {
         "left-end",
       ],
       description:
-        "Preferred side of the anchor; the tooltip moves to another side when this one has no room in the viewport",
+        "Preferred side of the anchor. It is only a preference: the tooltip flips and shifts to stay in the viewport.",
       table: {
         defaultValue: { summary: "top" },
       },
@@ -48,27 +48,26 @@ const meta = {
     color: {
       control: "color",
       description:
-        "Background colour of the tooltip, in place of the theme's; removing it later keeps the last colour",
+        "Background colour, in place of the theme's. It is only ever set: clearing the prop leaves the last colour in place.",
     },
     opacity: {
       control: { type: "range", min: 0, max: 1, step: 0.1 },
-      description: "Opacity of the tooltip",
+      description:
+        "How opaque the tooltip is, from 0 to 1. Without it the library would use 0.9.",
       table: {
         defaultValue: { summary: "1" },
       },
     },
     maxWidth: {
       control: "text",
-      description:
-        "Maximum width as a CSS length; longer text wraps onto further lines",
+      description: "Maximum width as a CSS length. The default is 320px.",
       table: {
         defaultValue: { summary: "320px" },
       },
     },
     noArrow: {
       control: "boolean",
-      description:
-        "Hides the arrow that points from the tooltip at its anchor; set it to false to show the arrow",
+      description: "Whether the arrow pointing at the anchor is hidden.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -76,7 +75,7 @@ const meta = {
     openOnClick: {
       control: "boolean",
       description:
-        "Opens the tooltip on a click instead of on hover, and closes it on the next click",
+        "Opens on click instead of on hover, and closes on the next click. It replaces the hover behaviour rather than adding to it.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -84,7 +83,7 @@ const meta = {
     float: {
       control: "boolean",
       description:
-        "Makes the tooltip follow the pointer instead of sitting at a fixed side of the anchor",
+        "Follows the pointer instead of sitting at a fixed side of the anchor.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -92,26 +91,26 @@ const meta = {
     id: {
       control: "text",
       description:
-        "Identifier the anchors point at with data-tooltip-id; without it, or anchorSelect, the tooltip has nothing to attach to",
+        "Identifier the anchors point at with `data-tooltip-id`. Without it the tooltip has nothing to attach to, unless `anchorSelect` names the anchors instead.",
     },
     anchorSelect: {
       control: "text",
       description:
-        "CSS selector for the anchors, used instead of data-tooltip-id; it matches elements anywhere in the document",
+        "CSS selector for the anchors, as an alternative to `data-tooltip-id`. It is matched against the whole document, not a subtree.",
     },
     children: {
       control: "text",
       description:
-        "Fixed content, shown for every anchor that has no data-tooltip-content of its own",
+        "Fixed content, used for every anchor that has no `data-tooltip-content` of its own. `getContent` wins over it.",
     },
     getContent: {
       control: false,
       description:
-        "Function that receives the anchor's text and element and returns the content to show; it replaces both the anchor's text and children",
+        "Builds the content from the active anchor's `data-tooltip-content` and the anchor itself. It wins over `children`.",
     },
     offset: {
       control: "number",
-      description: "Gap between the anchor and the tooltip, in pixels",
+      description: "Distance between the anchor and the tooltip, in pixels.",
       table: {
         defaultValue: { summary: "4" },
       },
@@ -120,68 +119,66 @@ const meta = {
       control: "select",
       options: ["none", "start", "end"],
       description:
-        "Whether the tooltip may move to a side on the other axis when the preferred side and its opposite both have no room, and which one it tries first",
+        'Matters only when no side has room. Then `"start"` or `"end"` picks the best fit among the preferred axis and above or below; `"none"` among all.',
     },
     delayShow: {
       control: "number",
-      description:
-        "Time the pointer has to rest on the anchor before the tooltip appears, in milliseconds",
+      description: "Delay before the tooltip appears, in milliseconds.",
     },
     clickable: {
       control: "boolean",
       description:
-        "Keeps the tooltip open while the pointer is over it, so a link inside it can be clicked",
+        "Keeps the tooltip open while the pointer is over it, so links inside it can be reached.",
     },
     isOpen: {
       control: "boolean",
       description:
-        "Holds the tooltip open or closed; while it is set, hover and click no longer open or close it",
+        "Forces the tooltip open or closed. Passing it makes the tooltip controlled: hover and click do not open or close it on their own.",
     },
     imperativeModeOnly: {
       control: "boolean",
       description:
-        "Stops the anchors opening the tooltip, so it opens only when code calls open() on its ref",
+        "Stops the tooltip reacting to anchors at all, leaving `ref.current.open()` and `close()` as the only way to show it.",
     },
     ref: {
       control: false,
       description:
-        "Handle with open() and close() methods for opening the tooltip from code",
+        "Imperative handle with `open()` and `close()`, from react-tooltip.",
     },
     afterShow: {
       action: "afterShow",
-      description: "Called after the tooltip has appeared",
+      description: "Called after the tooltip has been shown.",
     },
     afterHide: {
       action: "afterHide",
-      description: "Called after the tooltip has disappeared",
+      description: "Called after the tooltip has been hidden.",
     },
     noUserSelect: {
       control: "boolean",
-      description:
-        "Stops the text inside the tooltip being selected with the pointer",
+      description: "Stops the tooltip's text being selected.",
     },
     zIndex: {
       control: "number",
       description:
-        "Stacking order of the wrapper around the tooltip, for placing it above or below other layers",
+        "Stacking order of the wrapper. Setting it also makes the wrapper `position: relative`.",
     },
     className: {
       control: "text",
       description:
-        "Class added to the wrapper around the tooltip, not to the tooltip itself",
+        "Applied to the wrapper around the tooltip, not to the tooltip itself.",
     },
     style: {
       control: "object",
       description:
-        "Inline style of the wrapper around the tooltip; CSS variables set here reach the tooltip",
+        "Applied to that same wrapper. Use `tooltipStyle` for the tooltip.",
     },
     tooltipStyle: {
       control: "object",
-      description: "Inline style of the tooltip itself",
+      description: "Applied to the tooltip itself, unlike `style`.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of data-testid on the wrapper around the tooltip",
+      description: "Value of `data-testid` on the wrapper.",
       table: {
         defaultValue: { summary: "tooltip" },
       },
@@ -253,7 +250,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The basic setup: the anchor names the tooltip with `data-tooltip-id` and carries its text in `data-tooltip-content`. Hover the link to see the tooltip follow the pointer (`float`); change any other prop live in the Controls panel below.",
+          "The basic setup: the anchor names the tooltip with `data-tooltip-id` and carries its text in `data-tooltip-content`. On hover the tooltip follows the pointer (`float`).",
       },
       source: {
         code: `<Link data-tooltip-id="my-tooltip" data-tooltip-content="Simple tooltip">
@@ -287,6 +284,7 @@ const CustomStylingTemplate = () => {
 };
 
 export const CustomStyling: Story = {
+  name: "Custom look",
   render: () => <CustomStylingTemplate />,
   play: async ({ canvas, userEvent }) => {
     await userEvent.hover(canvas.getByText("Hover for styled tooltip"));
@@ -299,7 +297,7 @@ export const CustomStyling: Story = {
     docs: {
       description: {
         story:
-          "For a tooltip that has to stand out from the theme: hover the link to see slight transparency (`opacity`), a narrower width limit (`maxWidth`) and the arrow pointing at the link (`noArrow={false}`).",
+          "A tooltip that stands out from the theme. It is slightly transparent (`opacity`), narrower (`maxWidth`), and has an arrow at the link (`noArrow={false}`).",
       },
       source: {
         code: `<Link data-tooltip-id="styled" data-tooltip-content="Styled tooltip">
@@ -333,6 +331,7 @@ const ClickToShowTemplate = () => {
 };
 
 export const ClickToShow: Story = {
+  name: "Opens on click",
   render: () => <ClickToShowTemplate />,
   play: async ({ canvas, userEvent }) => {
     const anchor = canvas.getByText("Click me");
@@ -359,7 +358,7 @@ export const ClickToShow: Story = {
     docs: {
       description: {
         story:
-          "For touch screens and hints the user asks for: click the link to open the tooltip on its right and click again to close it; hovering does nothing (`openOnClick`).",
+          "A tooltip on the right of the link that a click opens and the next click closes (`openOnClick`). It suits touch screens, since a hover does nothing.",
       },
       source: {
         code: `<Link data-tooltip-id="click" data-tooltip-content="Click-triggered tooltip">
@@ -401,6 +400,7 @@ const RichContentTemplate = () => {
 };
 
 export const RichContent: Story = {
+  name: "Rich content",
   render: () => <RichContentTemplate />,
   play: async ({ canvas, userEvent }) => {
     await userEvent.hover(canvas.getByText("Hover for rich content"));
@@ -414,7 +414,7 @@ export const RichContent: Story = {
     docs: {
       description: {
         story:
-          "For a hint that needs more than one line of plain text: hover the link to see a bold title taken from the anchor's text, with an address and a title below it (`getContent`).",
+          "A hint of more than one line: a bold title from the anchor's text, with an email address and a job title below it (`getContent`).",
       },
       source: {
         code: `<Link data-tooltip-id="rich" data-tooltip-content="Team member">
@@ -480,6 +480,7 @@ const DynamicGroupTemplate = () => {
 };
 
 export const SharedByManyAnchors: Story = {
+  name: "One tooltip, many anchors",
   render: () => <DynamicGroupTemplate />,
   play: async ({ canvas, userEvent }) => {
     // One tooltip, a different member for each anchor.
@@ -497,7 +498,7 @@ export const SharedByManyAnchors: Story = {
     docs: {
       description: {
         story:
-          "For a list where every row needs its own hint: hover each name to see one tooltip show that member's details, looked up from the index the anchor carries (`getContent`).",
+          "A list where every name has its own hint. One tooltip shows each member's details, looked up from the index the anchor carries (`getContent`).",
       },
       source: {
         code: `{users.map((user, index) => (
@@ -533,6 +534,7 @@ const FixedContentTemplate = () => {
 };
 
 export const FixedContent: Story = {
+  name: "Fixed content",
   render: () => <FixedContentTemplate />,
   play: async ({ canvas, userEvent }) => {
     await userEvent.hover(canvas.getByText("Hover me"));
@@ -571,6 +573,7 @@ const AnchoredBySelectorTemplate = () => {
 };
 
 export const AnchoredBySelector: Story = {
+  name: "Anchors by selector",
   render: () => <AnchoredBySelectorTemplate />,
   play: async ({ canvas, userEvent }) => {
     const second = canvas.getByText("Second");
@@ -617,6 +620,7 @@ const ClickableContentTemplate = () => {
 };
 
 export const ClickableContent: Story = {
+  name: "Link inside",
   render: () => <ClickableContentTemplate />,
   play: async ({ canvas, userEvent }) => {
     await userEvent.hover(canvas.getByText("Hover me"));
@@ -631,7 +635,7 @@ export const ClickableContent: Story = {
     docs: {
       description: {
         story:
-          "For a tooltip with a link inside: hover the anchor, then move the pointer into the tooltip; it stays open, so the link can be clicked (`clickable`).",
+          "A tooltip with a link inside. It stays open while the pointer moves into it, so the link can be clicked (`clickable`).",
       },
       source: {
         code: `<Link data-tooltip-id="clickable">Hover me</Link>
@@ -662,6 +666,7 @@ const DelayedAppearanceTemplate = () => {
 };
 
 export const DelayedAppearance: Story = {
+  name: "Delayed",
   render: () => <DelayedAppearanceTemplate />,
   play: async ({ canvas, userEvent }) => {
     await userEvent.hover(canvas.getByText("Rest the pointer here"));
@@ -675,7 +680,7 @@ export const DelayedAppearance: Story = {
     docs: {
       description: {
         story:
-          "For anchors the pointer often crosses on its way elsewhere: rest the pointer on the link for a second before the tooltip appears; passing over it shows nothing (`delayShow`).",
+          "A tooltip that appears after the pointer rests on the link for a second (`delayShow`). Passing over the link shows nothing.",
       },
       source: {
         code: `<Link data-tooltip-id="delayed" data-tooltip-content="Appears after one second">
@@ -710,6 +715,7 @@ const ControlledOpenTemplate = () => {
 };
 
 export const ControlledOpen: Story = {
+  name: "Controlled",
   render: () => <ControlledOpenTemplate />,
   play: async ({ canvas, userEvent }) => {
     const button = canvas.getByRole("button", { name: "Show tooltip" });
@@ -728,7 +734,7 @@ export const ControlledOpen: Story = {
     docs: {
       description: {
         story:
-          "For a tooltip the host decides to show, such as after a failed action: click the button to open the tooltip and again to close it; hovering no longer does either (`isOpen`).",
+          "A tooltip the host decides to show, such as after a failed action (`isOpen`). The button opens and closes it; hover does neither.",
       },
       source: {
         code: `const [open, setOpen] = useState(false);
@@ -789,6 +795,7 @@ const OpenedFromCodeTemplate = () => {
 };
 
 export const OpenedFromCode: Story = {
+  name: "Opened from code",
   render: () => <OpenedFromCodeTemplate />,
   play: async ({ canvas, userEvent }) => {
     const open = canvas.getByRole("button", { name: "Open" });
@@ -808,7 +815,7 @@ export const OpenedFromCode: Story = {
     docs: {
       description: {
         story:
-          "For a tooltip shown at a moment only the code knows: click **Open** to see the tooltip below it and **Close** to hide it; hovering either button shows nothing (`imperativeModeOnly` with `ref`).",
+          "A tooltip that only code shows (`imperativeModeOnly` with `ref`). **Open** shows it below the button, **Close** hides it, and hover shows nothing.",
       },
       source: {
         code: `const tooltipRef = useRef<TooltipRefProps | null>(null);
@@ -831,6 +838,7 @@ export const OpenedFromCode: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div style={{ height: "200px", position: "relative" }}>
       <div style={{ position: "absolute", top: 80, left: 100 }}>
@@ -872,7 +880,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one tooltip -- the variables are listed under CSS variables on this page. The tooltip renders in a portal outside the story's markup, so the variables go on its own \`style\` prop, which lands on the wrapper around it. Hover the link to see all of them at once; the stacking order has no visible effect here.`,
+        story: `Every overridable variable set on one tooltip. It renders in a portal outside the story's markup, so the variables go on its own \`style\` prop. The stacking order has no visible effect here.`,
       },
       source: {
         code: `<Tooltip

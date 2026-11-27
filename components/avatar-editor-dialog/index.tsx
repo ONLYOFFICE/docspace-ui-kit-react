@@ -4,6 +4,7 @@ import { ModalDialog, ModalDialogType } from "../modal-dialog";
 import { Button, ButtonSize } from "../button";
 import { Text } from "../text";
 import { ImageEditor } from "../image-editor";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import type { AvatarEditorDialogProps } from "./AvatarEditorDialog.types";
 
@@ -20,12 +21,12 @@ const AvatarEditorDialog = ({
   image,
   isLoading = false,
   editorBorderRadius = 110,
-  maxImageSize,
   dataTestId,
   onClose,
   onSave,
   onChangeImage,
   onChangeFile,
+  ...rest
 }: AvatarEditorDialogProps) => {
   const [preview, setPreview] = useState("");
   const [scrollBodyHeight, setScrollBodyHeight] = useState<number | null>(null);
@@ -58,11 +59,15 @@ const AvatarEditorDialog = ({
 
   return (
     <ModalDialog
+      {...pickAriaProps(rest)}
+      aria-label={rest["aria-label"] ?? title}
       className={styles.modalDialog}
       displayType={ModalDialogType.modal}
       withBodyScroll
       visible={visible}
       onClose={handleClose}
+      // A close during the save would reset the image the save is sending.
+      isCloseable={!isLoading}
       withFooterBorder
       withBodyScrollForcibly={!!scrollBodyHeight}
       dataTestId={dataTestId}
@@ -92,7 +97,6 @@ const AvatarEditorDialog = ({
           onChangeFile={onChangeFile}
           isDisabled={isLoading}
           editorBorderRadius={editorBorderRadius}
-          maxImageSize={maxImageSize}
         />
       </ModalDialog.Body>
 

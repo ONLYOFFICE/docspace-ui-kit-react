@@ -16,7 +16,6 @@ type MCPServersSelectorProps = {
   initedSelectedServers?: string[];
   useAside?: boolean;
   withoutBackground?: boolean;
-  withBlur?: boolean;
 };
 
 type StoryArgs = MCPServersSelectorProps;
@@ -100,11 +99,6 @@ enum ServerType {
     withoutBackground: {
       control: "boolean",
       description: "Remove the background overlay in Aside mode",
-      table: { defaultValue: { summary: "false" } },
-    },
-    withBlur: {
-      control: "boolean",
-      description: "Apply blur effect to the Aside backdrop",
       table: { defaultValue: { summary: "false" } },
     },
   },
@@ -279,7 +273,6 @@ export const AsideMode: Story = {
   args: {
     useAside: true,
     withoutBackground: false,
-    withBlur: false,
     initedSelectedServers: [],
     onSubmit: fn((servers: TSelectorItem[]) => {
       const names = servers.map((s) => s.label).join(", ");
@@ -297,13 +290,12 @@ export const AsideMode: Story = {
       description: {
         story:
           "Renders the selector inside an Aside panel with a backdrop overlay. " +
-          "Use `withBlur` to apply a blur effect and `withoutBackground` to remove the overlay.",
+          "`withoutBackground` removes the overlay.",
       },
       source: {
         code: `<MCPServersSelector
   useAside
   withoutBackground={false}
-  withBlur={false}
   initedSelectedServers={[]}
   onSubmit={(servers) => saveConnectedServers(servers.map((s) => s.id))}
   onClose={() => setOpen(false)}

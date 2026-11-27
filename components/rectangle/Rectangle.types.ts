@@ -15,7 +15,8 @@ export type RectangleSkeletonProps = {
    * so a percentage of the parent works.
    */
   width?: string;
-  /** Height of the `<svg>` element and of the rectangle inside it. */
+  /** How tall the placeholder stands, as an SVG length; it sizes both the
+   * `<svg>` and the rectangle inside. */
   height?: string;
   /** Corner radius of the rectangle, in user units. */
   borderRadius?: string;
@@ -23,9 +24,9 @@ export type RectangleSkeletonProps = {
   backgroundColor?: string;
   /** Colour of the band that sweeps across the skeleton. */
   foregroundColor?: string;
-  /** Opacity of `backgroundColor`. */
+  /** How strongly the resting colour shows, from 0 to 1. */
   backgroundOpacity?: number;
-  /** Opacity of `foregroundColor`. */
+  /** How strongly the sweeping band shows, from 0 to 1. */
   foregroundOpacity?: number;
   /** Duration of one sweep, in seconds. */
   speed?: number;
@@ -34,9 +35,8 @@ export type RectangleSkeletonProps = {
   /** Applied to the `<svg>` element. */
   style?: React.CSSProperties;
   /**
-   * Optional stable id used as `uniqueKey` for the underlying
-   * react-content-loader. When omitted, a `useId()` value is used so SSR and
-   * client render the same SVG ids and no hydration mismatch is reported.
+   * Stable id for the SVG's gradient and clip path. Without it a `useId()`
+   * value is used, so server and client render the same ids.
    */
   uniqueKey?: string;
 };

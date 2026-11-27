@@ -1,6 +1,7 @@
 import React, { useCallback } from "react";
 
 import { Consumer, DomHelpers } from "../../utils";
+import { consumeKey } from "../../utils/consume-key";
 import { Backdrop } from "../backdrop";
 
 import ArrowButton from "./sub-components/ArrowBtn";
@@ -14,6 +15,11 @@ import NavigationText from "./sub-components/Text";
 
 import { DeviceType } from "../../enums";
 import styles from "./Navigation.module.scss";
+import {
+  groupRoleWhenNamed,
+  omitAriaProps,
+  pickAriaProps,
+} from "../../utils/aria-props";
 import { TNavigationProps } from "./Navigation.types";
 import Badges from "./sub-components/Badges";
 
@@ -33,7 +39,6 @@ const Navigation = ({
   titles,
   withMenu,
   onPlusClick,
-  isEmptyPage,
   isDesktop: isDesktopClient,
   isFrame,
   hideInfoPanel,
@@ -58,6 +63,7 @@ const Navigation = ({
   contextButtonAnimation,
   guidAnimationVisible,
   setGuidAnimationVisible,
+  ref,
   isContextButtonVisible,
   isPlusButtonVisible,
   showBackButton,
@@ -77,6 +83,14 @@ const Navigation = ({
 
   const dropBoxRef = React.useRef<HTMLDivElement | null>(null);
   const containerRef = React.useRef<HTMLDivElement | null>(null);
+  const setContainerRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      containerRef.current = node;
+      if (typeof ref === "function") ref(node);
+      else if (ref) ref.current = node;
+    },
+    [ref],
+  );
 
   const isDesktop = currentDeviceType === DeviceType.desktop;
 
@@ -150,6 +164,88 @@ const Navigation = ({
     }
   }, [navigationItems]);
 
+  // Whether the last input was a key rather than a pointer, the same signal
+  // :focus-visible goes by. Only a keyboard user needs the focus moved for
+  // them; a mouse click leaves it where the click put it.
+  const keyboardInputRef = React.useRef(false);
+
+  React.useEffect(() => {
+    const onKey = () => {
+      keyboardInputRef.current = true;
+    };
+    const onPointer = () => {
+      keyboardInputRef.current = false;
+    };
+    document.addEventListener("keydown", onKey, true);
+    document.addEventListener("pointerdown", onPointer, true);
+    return () => {
+      document.removeEventListener("keydown", onKey, true);
+      document.removeEventListener("pointerdown", onPointer, true);
+    };
+  }, []);
+
+  // Focus follows the box: into its copy of the title when the keyboard
+  // opens it from the header, and back to the header's title when the
+  // keyboard closes it with the focus in it -- unless something else has
+  // taken the focus by then.
+  const focusInDropBoxRef = React.useRef(false);
+
+  React.useEffect(() => {
+    if (!isOpen) {
+      if (!focusInDropBoxRef.current) return;
+      focusInDropBoxRef.current = false;
+      if (!keyboardInputRef.current) return;
+      const active = document.activeElement;
+      if (active && active !== document.body) return;
+      containerRef.current
+        ?.querySelector<HTMLElement>("[aria-expanded]")
+        ?.focus();
+      return;
+    }
+
+    if (
+      keyboardInputRef.current &&
+      containerRef.current?.contains(document.activeElement)
+    )
+      dropBoxRef.current
+        ?.querySelector<HTMLElement>("[aria-expanded]")
+        ?.focus();
+
+    const onFocusIn = (e: FocusEvent) => {
+      focusInDropBoxRef.current = !!dropBoxRef.current?.contains(
+        e.target as Node,
+      );
+    };
+    // Escape pressed inside the navigation is spent on the box: the page's
+    // own Escape (closing an aside, clearing the selection) must not act on
+    // the same press. Pressed elsewhere, it closes the box and goes on.
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || e.defaultPrevented) return;
+      setIsOpen(false);
+      const target = e.target as Node;
+      if (
+        containerRef.current?.contains(target) ||
+        dropBoxRef.current?.contains(target)
+      ) {
+        e.preventDefault();
+        consumeKey(e);
+      }
+    };
+
+    focusInDropBoxRef.current = !!dropBoxRef.current?.contains(
+      document.activeElement,
+    );
+    document.addEventListener("focusin", onFocusIn);
+    document.addEventListener("keydown", onKeyDown, true);
+
+    return () => {
+      document.removeEventListener("focusin", onFocusIn);
+      document.removeEventListener("keydown", onKeyDown, true);
+    };
+  }, [isOpen]);
+
+  const canOpenDropBox = !isRootFolder && !!navigationItems?.length;
+
   const onBackToParentFolderAction = React.useCallback(() => {
     setIsOpen((val) => !val);
     onBackToParentFolder?.();
@@ -173,6 +269,8 @@ const Navigation = ({
         isOpen={false}
         isRootFolder={isRootFolder}
         onClick={toggleDropBox}
+        isButton={canOpenDropBox}
+        isExpanded={canOpenDropBox ? isOpen : undefined}
         isRootFolderTitle={false}
         badgeLabel={!showRootFolderNavigation ? badgeLabel : ""}
         titleTooltip={!showRootFolderNavigation ? titleTooltip : undefined}
@@ -180,10 +278,13 @@ const Navigation = ({
     </div>
   );
 
+  // With rootRoomTitle and a single crumb there is no parent to open.
+  const parentItem = navigationItems?.[navigationItems.length - 2];
+
   const onTextClick = React.useCallback(() => {
-    onClickFolder(navigationItems[navigationItems.length - 2].id, false, false);
+    if (parentItem) onClickFolder(parentItem.id, false, false);
     setIsOpen(false);
-  }, [navigationItems, onClickFolder]);
+  }, [parentItem, onClickFolder]);
 
   const navigationTitleContainerNode = showRootFolderNavigation ? (
     <div className="title-container">
@@ -195,12 +296,11 @@ const Navigation = ({
         />
         <NavigationText
           className="room-title"
-          title={
-            rootRoomTitle || navigationItems[navigationItems.length - 2].title
-          }
+          title={rootRoomTitle || parentItem?.title || ""}
           isOpen={isOpen}
           isRootFolder={isRootFolder}
           isRootFolderTitle
+          isButton={!!parentItem}
           onClick={onTextClick}
           badgeLabel={badgeLabel}
         />
@@ -235,7 +335,7 @@ const Navigation = ({
               />
 
               <DropBox
-                {...rest}
+                {...omitAriaProps(rest)}
                 isDesktop={isDesktop}
                 ref={dropBoxRef}
                 dropBoxWidth={dropBoxWidth}
@@ -264,7 +364,9 @@ const Navigation = ({
             </>
           ) : null}
           <div
-            ref={containerRef}
+            {...pickAriaProps(rest)}
+            role={groupRoleWhenNamed(rest)}
+            ref={setContainerRef}
             className={styles.container}
             data-is-root-folder={isRootFolder ? "true" : "false"}
             data-is-show-back-button={showBackButton ? "true" : "false"}
@@ -318,7 +420,6 @@ const Navigation = ({
               onNavigationButtonClick={onNavigationButtonClick}
               tariffBar={tariffBar}
               title={title}
-              isEmptyPage={isEmptyPage}
               onContextOptionsClick={onContextOptionsClick}
               isMobile={currentDeviceType !== DeviceType.desktop}
               isMobileOnly={currentDeviceType === DeviceType.mobile}

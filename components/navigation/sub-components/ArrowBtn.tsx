@@ -3,6 +3,7 @@ import React from "react";
 import ArrowPathReactSvg from "../../../assets/arrow.path.react.svg";
 
 import { IconButton } from "../../icon-button";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 import { TArrowButtonProps } from "../Navigation.types";
 
@@ -11,6 +12,8 @@ const ArrowButton = ({
   showBackButton,
   onBackToParentFolder,
 }: TArrowButtonProps) => {
+  const t = useCommonTranslation();
+
   if (showBackButton) {
     return (
       <div className="navigation-arrow-container">
@@ -19,6 +22,7 @@ const ArrowButton = ({
           size={17}
           isFill
           onClick={onBackToParentFolder}
+          ariaLabel={t("Back")}
           className="arrow-button"
         />
       </div>
@@ -32,6 +36,7 @@ const ArrowButton = ({
         size={17}
         isFill
         onClick={onBackToParentFolder}
+        ariaLabel={t("Back")}
         className="arrow-button"
       />
       <div className="navigation-header-separator" />

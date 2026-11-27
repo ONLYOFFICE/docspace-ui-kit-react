@@ -22,14 +22,12 @@ const defaultProps = {
     {
       type: "folders",
       rowGap: 16,
-      itemHeight: 40,
       countOfMissingTiles: 0,
       rowCount: 2,
     },
     {
       type: "files",
       rowGap: 16,
-      itemHeight: 40,
       countOfMissingTiles: 0,
       rowCount: 2,
     },
@@ -108,6 +106,29 @@ describe("SelectionArea", () => {
       removed: [],
       clear: true,
     });
+  });
+
+  it("schedules one report per frame and cancels it on release", () => {
+    const scheduled: FrameRequestCallback[] = [];
+    const raf = vi
+      .spyOn(window, "requestAnimationFrame")
+      .mockImplementation((callback) => scheduled.push(callback));
+    const caf = vi
+      .spyOn(window, "cancelAnimationFrame")
+      .mockImplementation(() => {});
+
+    const first = mountRows({ id: "sectionScroll" });
+    renderComponent({ viewAs: "row" });
+
+    dragDown(first, 60);
+    fireEvent.mouseMove(document, { clientX: 10, clientY: 90 });
+    expect(scheduled).toHaveLength(1);
+
+    fireEvent.mouseUp(document);
+    expect(caf).toHaveBeenCalledWith(1);
+
+    raf.mockRestore();
+    caf.mockRestore();
   });
 
   it("ignores a mouse-down outside #sectionScroll by default", () => {

@@ -19,7 +19,7 @@ const meta = {
     visible: {
       control: false,
       description:
-        "Whether the layer is rendered at all; a backdrop that is not visible renders nothing. The stories switch it with their button",
+        "Whether the layer is rendered at all. It is not a CSS switch: a backdrop that is not visible renders nothing.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -27,7 +27,7 @@ const meta = {
     zIndex: {
       control: "number",
       description:
-        "Stacking order of the layer; the component it covers needs a higher one",
+        "Stacking order of the layer. The component it covers needs a higher one.",
       table: {
         defaultValue: { summary: "203" },
       },
@@ -35,7 +35,7 @@ const meta = {
     withBackground: {
       control: "boolean",
       description:
-        "Dims the page. Without it the layer is transparent and only catches clicks, except on a screen 600px wide or narrower, where it dims anyway",
+        "Dims the page. Without it the layer is transparent and only catches clicks — except on a viewport of 600px or less, where it dims anyway.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -43,7 +43,7 @@ const meta = {
     withoutBackground: {
       control: "boolean",
       description:
-        "Keeps the layer transparent on every screen size, even when withBackground or isAside is set",
+        "Keeps the layer transparent on every screen size, even when `withBackground` or `isAside` is set.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -51,7 +51,7 @@ const meta = {
     isAside: {
       control: "boolean",
       description:
-        "Marks the layer as belonging to a side panel: it dims the page and renders even when other backdrops are already on screen",
+        "Marks the layer as a side panel's. It dims the page and renders whatever other backdrops are already on screen.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -59,7 +59,7 @@ const meta = {
     isModalDialog: {
       control: "boolean",
       description:
-        "Lets touch scrolling over the layer go on; without it a touch move over the layer is blocked",
+        "Lets touch scrolling through the backdrop go on as usual. Without it a touch move over the layer has its default action prevented.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -67,7 +67,7 @@ const meta = {
     shouldShowBackdrop: {
       control: "boolean",
       description:
-        "Renders the layer even when another backdrop is already on screen, which would otherwise keep it hidden",
+        "Renders the layer even when another backdrop is already on screen, which would otherwise suppress it.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -75,20 +75,20 @@ const meta = {
     onClick: {
       control: false,
       description:
-        "Called on a click on the layer, and on a touch move or touch end over it. The stories use it to close the backdrop",
+        "Called on a click, and on a touch move or touch end, which pass a touch event cast to a mouse event.",
     },
     className: {
       control: "text",
-      description: "Extra class name, or an array of them, for the layer",
+      description: "Extra class name, or an array of them, for the layer.",
     },
     id: {
       control: "text",
-      description: "HTML id of the layer",
+      description: "HTML id of the layer.",
     },
     style: {
       control: "object",
       description:
-        "Inline styles for the layer, applied over the stacking order set by zIndex",
+        "Inline styles for the layer. A `zIndex` here wins over the prop.",
     },
   },
 } satisfies Meta<typeof Backdrop>;
@@ -294,7 +294,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The common case: a dimmed layer behind a dialog that closes it on a click (`withBackground`). Press the button to open it, then click anywhere to close it; change any other prop live in the Controls panel below.",
+          "The common case: a dimmed layer behind a dialog, which a click on the layer closes (`withBackground`). The button opens it.",
       },
       source: {
         code: `<Backdrop visible={isVisible} withBackground onClick={handleClose} />`,
@@ -304,6 +304,7 @@ export const Default: Story = {
 };
 
 export const WithoutBackground: Story = {
+  name: "Transparent",
   render: (args) => <Template {...args} />,
   args: {
     withoutBackground: true,
@@ -322,7 +323,7 @@ export const WithoutBackground: Story = {
     docs: {
       description: {
         story:
-          "For a menu or dropdown that must close on an outside click without darkening the page: the layer stays transparent and still catches the click (`withoutBackground`).",
+          "A transparent layer for a menu that closes on an outside click. The page stays as bright, and the layer still catches the click (`withoutBackground`).",
       },
       source: {
         code: `<Backdrop visible={isVisible} withoutBackground onClick={handleClose} />`,
@@ -332,6 +333,7 @@ export const WithoutBackground: Story = {
 };
 
 export const MultipleBackdrops: Story = {
+  name: "Stacked side panels",
   render: (args) => <MultipleBackdropsTemplate {...args} />,
   args: {
     withBackground: true,
@@ -357,7 +359,7 @@ export const MultipleBackdrops: Story = {
     docs: {
       description: {
         story:
-          "For a side panel opened over another one: each panel's layer renders even though a backdrop is already on screen, and the second darkens the page further (`isAside`). Open the first backdrop, then the second from the button above it; a click closes the top layer first.",
+          "Two side-panel layers, one over the other (`isAside`). The second renders although a backdrop is already on screen, and darkens the page further. A click closes the top layer first.",
       },
       source: {
         code: `<Backdrop visible={isFirstVisible} isAside withBackground onClick={() => setFirstVisible(false)} />
@@ -368,6 +370,7 @@ export const MultipleBackdrops: Story = {
 };
 
 export const ModalDialogBackdrop: Story = {
+  name: "Behind a modal dialog",
   render: (args) => <ModalTemplate {...args} />,
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("button", { name: "Show Modal" }));
@@ -386,7 +389,7 @@ export const ModalDialogBackdrop: Story = {
     docs: {
       description: {
         story:
-          "For a modal dialog on a touch screen: the layer keeps catching taps that close the dialog, but no longer blocks touch scrolling (`isModalDialog`).",
+          "A layer behind a modal dialog on a touch screen. It catches the taps that close the dialog, but lets touch scrolling through (`isModalDialog`).",
       },
       source: {
         code: `<Backdrop visible={isVisible} isModalDialog withBackground onClick={handleClose} />`,
@@ -396,6 +399,7 @@ export const ModalDialogBackdrop: Story = {
 };
 
 export const WithCustomZIndex: Story = {
+  name: "Custom stacking order",
   render: (args) => {
     const [isVisible, setIsVisible] = useState(false);
     const isDarkTheme = document.body.classList.contains("dark");
@@ -458,7 +462,7 @@ export const WithCustomZIndex: Story = {
     docs: {
       description: {
         story:
-          "When the covered content has to sit above other high layers of the page, raise the backdrop's stacking order and place the content one step above it — here 500 and 501 instead of the default 203 (`zIndex`).",
+          "A backdrop at stacking order 500 with its content at 501, instead of the default 203 (`zIndex`). Raise both when the content must sit above other high layers.",
       },
       source: {
         code: `<Backdrop visible={isVisible} withBackground zIndex={500} onClick={handleClose} />`,
@@ -468,6 +472,7 @@ export const WithCustomZIndex: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={
@@ -505,7 +510,7 @@ export const CssCustomization: Story = {
       // The layer is fixed over the whole window, so inline it would cover the Docs page.
       story: { inline: false, height: "200px" },
       description: {
-        story: `The dimming colour overridden on a wrapper -- the variables are listed under CSS variables on this page. The stacking order is the \`zIndex\` prop.`,
+        story: `The dimming colour overridden on a wrapper (\`--backdrop-bg\`). The stacking order is the \`zIndex\` prop.`,
       },
       source: {
         code: `<div style={{ "--backdrop-bg": "rgba(0, 130, 201, 0.4)" }}>

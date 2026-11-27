@@ -9,6 +9,7 @@ import { Slider } from "../slider";
 import { TextInput } from "../text-input";
 import { InputType } from "../text-input";
 import { TabItem } from "../tab-item";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import styles from "./quantity-picker.module.scss";
 
@@ -19,8 +20,8 @@ interface TabItemObject {
   value: number;
 }
 
-type QuantityPickerProps = {
-  /** Current value; the component is controlled */
+type QuantityPickerProps = React.AriaAttributes & {
+  /** The number shown. The component is controlled: pass back what `onChange` reports */
   value: number;
   /** Lower bound for the controls, typed input and slider */
   minValue: number;
@@ -59,7 +60,7 @@ type QuantityPickerProps = {
   isZeroAllowed?: boolean;
   /** Allows zero as a value below `minValue`; other values below it are flagged */
   enableZero?: boolean;
-  /** Tooltip id set as `data-tooltip-id` on the minus control */
+  /** Id of a `Tooltip` you render, anchored to the minus control through `data-tooltip-id` */
   minusTooltipId?: string;
   /** Disables only the minus control; it stays focusable (`aria-disabled`) so `minusTooltipId` can still explain why */
   minusDisabled?: boolean;
@@ -103,7 +104,9 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
   minusDisabled,
   decreaseLabel,
   increaseLabel,
+  ...rest
 }) => {
+  const aria = pickAriaProps(rest);
   const enableZero = enableZeroProp ?? isZeroAllowed ?? false;
 
   const displayValue = showPlusSign
@@ -314,9 +317,12 @@ const QuantityPicker: React.FC<QuantityPickerProps> = ({
         )}
 
         {isDisabled ? (
-          <Text className={inputClass}>{disableValue ?? displayValue}</Text>
+          <Text {...aria} className={inputClass}>
+            {disableValue ?? displayValue}
+          </Text>
         ) : (
           <TextInput
+            {...aria}
             type={InputType.text}
             isReadOnly={isDisabled}
             withBorder={false}

@@ -6,6 +6,7 @@ import DefaultTabletIcon from "../../../assets/default.tablet.react.svg";
 import RootTabletIcon from "../../../assets/root.tablet.react.svg";
 
 import { DeviceType } from "../../../enums";
+import { activateOnButtonKey } from "../../../utils/keyboard-activation";
 
 import { Text } from "../../text";
 
@@ -31,7 +32,10 @@ const Item = ({
     <div
       id={`${id}`}
       className={styles.item}
+      role="button"
+      tabIndex={0}
       onClick={onClickAvailable}
+      onKeyDown={(e) => activateOnButtonKey(e, onClickAvailable)}
       data-root={isRoot ? "true" : "false"}
       data-with-logo={withLogo ? "true" : "false"}
       {...rest}

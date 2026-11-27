@@ -31,7 +31,7 @@ const meta = {
         "h6",
       ],
       description:
-        "Element to render the text as; wins over `tag` when both are set",
+        "Element to render, replacing the component's own default — `p` for `Text` itself. Wins over `tag` when both are set.",
       table: {
         defaultValue: { summary: "p" },
       },
@@ -39,16 +39,17 @@ const meta = {
     tag: {
       control: "text",
       description:
-        "Tag name of the element to render, used only while `as` is unset",
+        "Element to render, used only while `as` is unset. It is a tag name, not an id.",
     },
     children: {
       control: "text",
-      description: "Text to render",
+      description:
+        "Content of the element: text, or phrasing elements while it is a `<p>`.",
     },
     fontSize: {
       control: "text",
       description:
-        "Font size, set as an inline style; a `fontSize` in `style` wins over it",
+        "Font size, as an inline style. Unset, `Text` is 13px through `--text-size`.",
       table: {
         defaultValue: { summary: "13px" },
       },
@@ -56,7 +57,7 @@ const meta = {
     fontWeight: {
       control: "text",
       description:
-        "Font weight, set as an inline style; ignored while `isBold` is on",
+        "Font weight, as an inline style. Ignored while `isBold` is set. Unset, `Text` is 400 through `--text-weight`.",
       table: {
         defaultValue: { summary: "400" },
       },
@@ -64,44 +65,44 @@ const meta = {
     color: {
       control: "color",
       description:
-        "Text colour, set as an inline style; without it the text takes the colour of its parent",
+        "Text colour, as an inline style. `Text` declares none of its own and inherits without it.",
     },
     backgroundColor: {
       control: "color",
-      description: "Background colour behind the text, set as an inline style",
+      description: "Background colour, as an inline style. Any CSS colour.",
     },
     textAlign: {
       control: "select",
       options: ["left", "center", "right", "justify"],
-      description:
-        "Aligns the lines to the left, the centre or the right, or stretches them to both edges; without it the text follows its parent's alignment",
+      description: "Text alignment, as an inline style.",
     },
     lineHeight: {
       control: "text",
-      description: "Height of each line, set as an inline style",
+      description: "Line height, as an inline style.",
     },
     dir: {
       control: "select",
       options: ["ltr", "rtl", "auto"],
       description:
-        "Writing direction: `ltr` and `rtl` set it on the element; `auto` lets the browser pick it from the text and wraps the text in a span that clicks pass through",
+        'Writing direction. `"ltr"` and `"rtl"` set the `dir` attribute; `"auto"` instead wraps the children in a span that takes the pointer events off them.',
     },
     view: {
       control: "select",
       options: [undefined, "tile"],
       description:
-        "`tile` cuts the text to two lines with an ellipsis, and only while `dir` is `auto`; any other value does nothing",
+        'Only `"tile"` is recognised, and only together with `dir="auto"`: it clamps the text to two lines.',
     },
     isBold: {
       control: "boolean",
-      description: "Sets the weight to 700, overriding `fontWeight`",
+      description: "Sets the weight to 700, overriding `fontWeight`.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isItalic: {
       control: "boolean",
-      description: "Renders the text in italics",
+      description:
+        "Slants the text in italics; without it the text stays upright.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -109,7 +110,7 @@ const meta = {
     isInline: {
       control: "boolean",
       description:
-        "Makes the element an inline block, so it sits on a line beside other text",
+        "Renders the text inline instead of as a block — `inline-block` in `Text`, `inline` in `Heading`.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -117,14 +118,15 @@ const meta = {
     truncate: {
       control: "boolean",
       description:
-        "Keeps the text on one line and ends it with an ellipsis; it needs a parent of bounded width, otherwise the element grows instead",
+        "Holds the text on one line and ends it with an ellipsis. It needs a parent of bounded width; on its own the element grows instead.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     noSelect: {
       control: "boolean",
-      description: "Stops the reader from selecting the text",
+      description:
+        "Stops the text being selected, on every browser the kit supports.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -132,89 +134,84 @@ const meta = {
     title: {
       control: "text",
       description:
-        "Text of the kit's shared tooltip that opens when the pointer rests on the text; it needs `RootTooltip` mounted",
+        "Tooltip text. On a component wrapped in the kit's tooltip HOC it opens the shared tooltip, which needs `RootTooltip` mounted. Elsewhere it is the native `title` attribute.",
     },
     onClick: {
       action: "onClick",
-      description: "Called with the event when the text is clicked",
+      description: "Called with the event when the element is clicked.",
     },
     htmlFor: {
       control: "text",
-      description:
-        'Passed to the element unchanged, for `as="label"`: the `id` of the field the text names',
+      description: 'Passed to the element unchanged, for `as="label"`.',
     },
     href: {
       control: "text",
-      description: 'Passed to the element unchanged, for `as="a"`',
+      description: 'Passed to the element unchanged, for `as="a"`.',
     },
     rel: {
       control: "text",
-      description: 'Passed to the element unchanged, for `as="a"`',
+      description: 'Passed to the element unchanged, for `as="a"`.',
     },
     tabIndex: {
       control: "number",
       description:
-        "Passed to the element unchanged; a focusable text element also needs a `role` from you",
+        "Passed to the element unchanged. The component adds no role, so a focusable text element needs one from you.",
     },
     role: {
       control: "text",
       description:
-        "ARIA role of the element, passed unchanged: `status` or `alert` for a line that reports an outcome, `button` alongside `tabIndex` and `onClick`",
+        "ARIA role of the element, passed unchanged: `status` or `alert` for a line that reports an outcome, `button` alongside `tabIndex` and `onClick`.",
     },
     "aria-label": {
       control: "text",
       description:
-        "Accessible name, passed unchanged, for text whose content is not what should be announced",
+        "Accessible name, passed unchanged, for text whose content is not what should be announced.",
     },
     "aria-live": {
       control: "select",
       options: [undefined, "off", "polite", "assertive"],
       description:
-        "Passed unchanged, so a screen reader reads the text out when it changes",
+        "Live-region politeness, passed unchanged, for a line whose content changes and should be read out.",
     },
     "aria-hidden": {
       control: "boolean",
       description:
-        "Passed unchanged, hiding decorative text that repeats what is already read",
+        "Hides the element from assistive technology, passed unchanged, for decoration that repeats what is already read.",
     },
     id: {
       control: "text",
-      description: "The element's own `id`",
+      description: "`id` of the rendered element.",
     },
     className: {
       control: false,
-      description: "Class name added after the component's own classes",
+      description: "Added after the component's own classes.",
     },
     style: {
       control: false,
       description:
-        "Inline styles of the element, merged over the style props, so its values win",
-    },
-    display: {
-      control: false,
-      description:
-        "Ignored: written onto the element as an unknown attribute and does not change the layout; use `isInline` or `style`",
+        "Inline style of the element. `Text` merges it over the style props above, so a `fontSize` here wins over the `fontSize` prop.",
     },
     containerWidth: {
       control: false,
       description:
-        "Not read by the text itself: `RowContent` and `TileContent` read it off the child as the width of the slot they put it in",
+        "Not read here — it reaches the DOM as an unknown attribute. It is read off this element by `RowContent` and `TileContent`, which use it as the width of the slot they put the child in.",
     },
     containerMinWidth: {
       control: false,
       description:
-        "Not read by the text itself: `RowContent` reads it off the child as the minimum width of a side slot",
+        "Not read here — it reaches the DOM as an unknown attribute. It is read off this element by `RowContent`, which uses it as the minimum width of a side slot.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the element",
+      description: "Value of `data-testid` on the element.",
       table: {
         defaultValue: { summary: "text" },
       },
     },
     ref: {
       control: false,
-      description: "Attached to the rendered element, whatever `as` made it",
+      description:
+        "Attached to the rendered element, whatever `as` made it. Typed for a div whatever that element actually is.",
     },
   },
 } satisfies Meta<typeof Text>;
@@ -259,7 +256,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A paragraph at the kit's body size and regular weight, the starting point for any line of text; change any other prop live in the Controls panel below.",
+          "A paragraph at the kit's body size and regular weight, the starting point for any line of text.",
       },
       source: {
         code: `<Text as="p" fontSize="13px">
@@ -394,6 +391,7 @@ const NoSelectTemplate = () => {
 };
 
 export const FontSizes: Story = {
+  name: "Font sizes",
   render: () => <FontSizesTemplate />,
   play: async ({ canvas }) => {
     await expect(styleOf(canvas.getByText(/^10px/)).fontSize).toBe("10px");
@@ -419,6 +417,7 @@ export const FontSizes: Story = {
 };
 
 export const FontWeights: Story = {
+  name: "Font weights",
   render: () => <FontWeightsTemplate />,
   play: async ({ canvas }) => {
     await expect(styleOf(canvas.getByText("Light (300)")).fontWeight).toBe(
@@ -446,6 +445,7 @@ export const FontWeights: Story = {
 };
 
 export const TextStyles: Story = {
+  name: "Bold and italic",
   render: () => <TextStylesTemplate />,
   play: async ({ canvas }) => {
     await expect(styleOf(canvas.getByText("Bold text")).fontWeight).toBe("700");
@@ -472,6 +472,7 @@ export const TextStyles: Story = {
 };
 
 export const TextAlignment: Story = {
+  name: "Alignment",
   render: () => <TextAlignmentTemplate />,
   play: async ({ canvas }) => {
     await expect(
@@ -498,6 +499,7 @@ export const TextAlignment: Story = {
 };
 
 export const InlineText: Story = {
+  name: "Inline",
   render: () => <InlineTemplate />,
   play: async ({ canvas }) => {
     // All three sit on one line.
@@ -525,6 +527,7 @@ export const InlineText: Story = {
 };
 
 export const TruncatedText: Story = {
+  name: "Truncated",
   render: () => <TruncatedTemplate />,
   play: async ({ canvas }) => {
     const text = canvas.getByText(/This is a very long text/);
@@ -535,7 +538,7 @@ export const TruncatedText: Story = {
     docs: {
       description: {
         story:
-          "A sentence longer than its 200px box stays on one line and ends with an ellipsis (`truncate`); without a box of bounded width it would grow instead.",
+          "A sentence longer than its 200px box, held on one line and cut with an ellipsis (`truncate`). Without a bounded box it would grow instead.",
       },
       source: {
         code: `<div style={{ width: 200 }}>
@@ -547,6 +550,7 @@ export const TruncatedText: Story = {
 };
 
 export const HeadingElements: Story = {
+  name: "As heading elements",
   render: () => <HeadingElementsTemplate />,
   play: async ({ canvas }) => {
     // `as` renders real heading elements.
@@ -575,6 +579,7 @@ export const HeadingElements: Story = {
 };
 
 export const Direction: Story = {
+  name: "Direction",
   render: () => <DirectionTemplate />,
   play: async ({ canvas }) => {
     await expect(canvas.getByText("English text (LTR)")).toHaveAttribute(
@@ -591,7 +596,7 @@ export const Direction: Story = {
     docs: {
       description: {
         story:
-          'For text whose language is not known in advance: the first line is set left to right and the second right to left (`dir`); the last two leave the direction to the browser, which reads it from the text itself (`dir="auto"`).',
+          'Four lines in two scripts (`dir`): the first set left to right, the second right to left. The last two take their direction from their own text (`dir="auto"`).',
       },
       source: {
         code: `<Text dir="ltr">English text (LTR)</Text>
@@ -603,6 +608,7 @@ export const Direction: Story = {
 };
 
 export const NoSelectText: Story = {
+  name: "Not selectable",
   render: () => <NoSelectTemplate />,
   play: async ({ canvas }) => {
     await expect(
@@ -616,7 +622,7 @@ export const NoSelectText: Story = {
     docs: {
       description: {
         story:
-          "For captions that should not be copied by accident: drag across both lines, and only the first one is selected (`noSelect`).",
+          "Two lines, of which only the first can be selected; the second is a caption kept from accidental copying (`noSelect`).",
       },
       source: {
         code: `<Text>This text can be selected</Text>
@@ -627,6 +633,7 @@ export const NoSelectText: Story = {
 };
 
 export const WithTooltip: Story = {
+  name: "With tooltip",
   render: () => (
     <>
       <Text isInline title="Last edited on 12 March">
@@ -645,7 +652,7 @@ export const WithTooltip: Story = {
     docs: {
       description: {
         story:
-          "For text that needs a word of explanation without taking space on the page: rest the pointer on the line to read the tooltip (`title`). It opens the kit's shared tooltip, which needs `RootTooltip` mounted, as this story does.",
+          "A line with a tooltip that opens when the pointer rests on it (`title`). It is the kit's shared tooltip, which needs `RootTooltip` mounted, as this story does.",
       },
       source: {
         code: `<Text isInline title="Last edited on 12 March">
@@ -658,6 +665,7 @@ export const WithTooltip: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={
@@ -680,7 +688,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Both variables set on one wrapper -- the variables are listed under CSS variables on this page. The line of text inside comes out larger and semibold.`,
+        story: `A line of text under a wrapper that sets both variables, so it comes out larger and semibold.`,
       },
       source: {
         code: `<div

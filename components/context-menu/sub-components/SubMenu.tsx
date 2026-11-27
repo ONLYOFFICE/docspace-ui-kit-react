@@ -434,13 +434,7 @@ const SubMenu = (props: SubMenuProps) => {
       }
 
       if (!isInlinedSvgUrl(item.icon)) {
-        return (
-          <img
-            src={item.icon}
-            alt="plugin icon"
-            className={iconClassName || ""}
-          />
-        );
+        return <img src={item.icon} alt="" className={iconClassName || ""} />;
       }
 
       return (

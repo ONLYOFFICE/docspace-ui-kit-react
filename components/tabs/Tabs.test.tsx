@@ -117,6 +117,38 @@ const arrayItems: TTabItem[] = [
 ];
 
 describe("Tabs", () => {
+  it("puts a passed aria-* on the tab list, not on the wrapper", () => {
+    render(
+      <Tabs
+        items={arrayItems}
+        selectedItemId="tab1"
+        aria-label="Room views"
+        aria-describedby="views-hint"
+      />,
+    );
+
+    const tablist = screen.getByRole("tablist", { name: "Room views" });
+    expect(tablist).toHaveAttribute("aria-describedby", "views-hint");
+    expect(tablist.parentElement?.closest("[aria-label]")).toBeNull();
+  });
+
+  it("puts a passed aria-* on the secondary tab list too", () => {
+    render(
+      <Tabs
+        type={TabsTypes.Secondary}
+        items={arrayItems}
+        selectedItemId="tab1"
+        aria-label="Filters"
+      />,
+    );
+
+    expect(
+      screen
+        .getByRole("tablist", { name: "Filters" })
+        .parentElement?.closest("[aria-label]"),
+    ).toBeNull();
+  });
+
   it("renders without errors", () => {
     const { container } = render(
       <Tabs items={arrayItems} selectedItemId="tab1" />,
@@ -135,6 +167,32 @@ describe("Tabs", () => {
     const labels = screen.getAllByText("LABEL");
     expect(labels).toHaveLength(3);
   });
+
+  it.each([TabsTypes.Primary, TabsTypes.Secondary])(
+    "keeps the other type's props off the DOM (%s)",
+    (type) => {
+      const { container } = render(
+        <Tabs
+          items={arrayItems}
+          type={type}
+          selectedItemId="tab1"
+          layoutId="layout"
+          hotkeysId="keys"
+          scaled
+          withAnimation
+          stickyHeader={<span />}
+        />,
+      );
+
+      const outer = container.firstElementChild as HTMLElement;
+      for (const name of ["type", "scaled", "withanimation", "stickyheader"])
+        expect(outer).not.toHaveAttribute(name);
+      if (type === TabsTypes.Primary) {
+        expect(outer).not.toHaveAttribute("layoutid");
+        expect(outer).not.toHaveAttribute("hotkeysid");
+      }
+    },
+  );
 
   it("applies correct styles for primary tabs", () => {
     const { container } = render(
