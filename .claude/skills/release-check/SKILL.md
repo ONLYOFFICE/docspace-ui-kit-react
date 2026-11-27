@@ -1,6 +1,6 @@
 ---
 name: release-check
-description: Full pre-merge sweep -- the CI gate, plus the checks nothing runs: manifest invariants, the plugin API surface diff, drift against the plugin skill, what the tarball would actually ship, and (before a publish) that every vendored peer is already on npm
+description: "Full pre-merge sweep -- the CI gate, plus the checks nothing runs: manifest invariants, the plugin API surface diff, drift against the plugin skill, what the tarball would actually ship, and (before a publish) that every vendored peer is already on npm"
 argument-hint: "[--quick]"
 ---
 
