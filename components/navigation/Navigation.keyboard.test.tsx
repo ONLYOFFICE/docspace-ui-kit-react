@@ -162,4 +162,23 @@ describe("Navigation from the keyboard", () => {
 
     expect(onClickFolder).toHaveBeenCalledWith("2", false, false);
   });
+
+  // With rootRoomTitle and a single crumb there is no parent folder to open,
+  // so the title is not a Tab stop that does nothing.
+  it("leaves the room title plain text when there is no parent to open", () => {
+    render(
+      <Navigation
+        {...props}
+        title="Documents"
+        navigationItems={[trail[0]]}
+        showRootFolderTitle
+        rootRoomTitle="Documents"
+        onClickFolder={vi.fn()}
+      />,
+    );
+
+    const roomTitle = document.querySelector('[data-root-folder-title="true"]');
+    expect(roomTitle).not.toBeNull();
+    expect(roomTitle?.querySelector('[role="button"]')).toBeNull();
+  });
 });

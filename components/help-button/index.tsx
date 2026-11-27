@@ -73,8 +73,15 @@ const HelpButton = (props: HelpButtonProps) => {
   const [shownFromKey, setShownFromKey] = React.useState(false);
   const [announcement, setAnnouncement] = React.useState("");
   const anchorRef = React.useRef<Element | null>(null);
+  // Whether the key press toggled the tooltip open. A closing tooltip stays in
+  // the DOM until its fade ends, so its presence alone does not say which way
+  // the press went.
+  const openFromKeyRef = React.useRef(false);
 
   const getShownTooltip = () => document.getElementById(tooltipId);
+
+  const isTooltipShowing = () =>
+    !!getShownTooltip()?.classList.contains("react-tooltip__show");
 
   const toggleFromAnchor = (anchor: Element) =>
     anchor.dispatchEvent(new MouseEvent("click", { bubbles: true }));
@@ -87,12 +94,24 @@ const HelpButton = (props: HelpButtonProps) => {
       anchorRef.current = anchor;
       // Emptied first, so the same text shown again is a change to announce.
       setAnnouncement("");
+
+      // This press closes the tooltip: nothing to read out or point at.
+      if (openFromKeyRef.current || isTooltipShowing()) {
+        openFromKeyRef.current = false;
+        setShownFromKey(false);
+        toggleFromAnchor(anchor);
+        return;
+      }
+
+      openFromKeyRef.current = true;
       toggleFromAnchor(anchor);
 
       // The tooltip renders after the click; its text is read from the page
       // once it is there, whatever getContent drew.
       window.setTimeout(() => {
+        if (!openFromKeyRef.current) return;
         const tooltip = getShownTooltip();
+        openFromKeyRef.current = !!tooltip;
         setShownFromKey(!!tooltip);
         setAnnouncement(tooltip?.textContent?.trim() ?? "");
       }, 0);
@@ -104,10 +123,17 @@ const HelpButton = (props: HelpButtonProps) => {
     const next = e.relatedTarget as Node | null;
     if (next && (tooltip?.contains(next) || e.currentTarget.contains(next)))
       return;
+    openFromKeyRef.current = false;
     setShownFromKey(false);
     setAnnouncement("");
     if (tooltip && anchorRef.current) toggleFromAnchor(anchorRef.current);
   };
+
+  // A passed description is kept, and the open tooltip is added to it.
+  const describedBy =
+    [aria["aria-describedby"], shownFromKey ? tooltipId : undefined]
+      .filter(Boolean)
+      .join(" ") || undefined;
 
   const keyboardProps = isKeyboardButton
     ? {
@@ -115,7 +141,6 @@ const HelpButton = (props: HelpButtonProps) => {
         tabIndex: 0,
         onKeyDown: openFromKey,
         ariaLabel: t("Info"),
-        "aria-describedby": shownFromKey ? tooltipId : undefined,
       }
     : {};
 
@@ -167,6 +192,7 @@ const HelpButton = (props: HelpButtonProps) => {
         <IconButton
           {...keyboardProps}
           {...aria}
+          aria-describedby={describedBy}
           id={currentId}
           className={componentClass}
           isClickable={isClickable}

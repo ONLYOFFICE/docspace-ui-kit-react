@@ -299,10 +299,10 @@ is no shadow at all.
   `Folder upload area`. It takes Tab, and Enter or Space opens the file dialog.
 - In folder mode Enter or Space on the area opens the directory picker instead. With `isDisabled`
   the area leaves the tab order.
-- **Every ARIA label here is hard-coded English**: `File upload area`, `Folder upload area`,
-  `File input`, `Folder input` and `Supported file types`.
+- Every ARIA label here comes from the kit's `Common` translations: `File upload area`,
+  `Folder upload area`, `File input`, `Folder input` and `Supported file types` in English.
 - Only the drop area's name can be replaced: a passed `aria-label` wins over it. The other labels
-  take no prop, so a localised application still announces them in English.
+  take no prop.
 - **A passed `aria-*` lands on the drop area and is kept.** It is the library's `role="button"`.
 - The prompt is the kit's `Link` with `tabIndex={-1}`, so it is not a focus stop of its own; the
   surrounding area takes focus.

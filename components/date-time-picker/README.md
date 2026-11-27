@@ -186,8 +186,8 @@ and the AM/PM drop-down take those of [`SelectedItem`](../selected-item/README.m
 - The time display is a `<span role="button">` with `tabIndex={0}` and an `aria-label` giving
   the current time; Enter and Space open the editor, as a click does.
 - That `aria-label` writes the time on the clock the display uses — `Current time: 02:30 PM` on
-  a 12-hour locale, `Current time: 14:30` otherwise. The words "Current time" are English and
-  not translated.
+  a 12-hour locale, `Current time: 14:30` otherwise. The words come from the kit's `Common`
+  translations.
 - The time editor takes focus when it opens. Tab and Shift+Tab move between the hours, the
   minutes and the AM/PM box without closing it.
 - Enter in a time field, or Tab past the last field, closes the editor. On the AM/PM box Enter

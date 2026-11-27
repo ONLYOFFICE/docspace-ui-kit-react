@@ -12,6 +12,7 @@ import { TimePicker } from "../time-picker";
 import { DatePicker } from "../date-picker";
 import { ComboBox, TOption } from "../combobox";
 import { pickAriaProps } from "../../utils/aria-props";
+import { useCommonTranslation } from "../../utils/i18n";
 
 import type {
   DateTimePickerProps,
@@ -38,6 +39,8 @@ const DateTimePicker = (props: DateTimePickerProps) => {
     useMaxTime,
     translations,
   } = props;
+
+  const t = useCommonTranslation();
 
   const options = [
     { key: "AM", label: translations.AM },
@@ -223,7 +226,7 @@ const DateTimePicker = (props: DateTimePickerProps) => {
               onKeyDown={onTimeCellKeyDown}
               data-testid="date-time-picker-time-display"
               role="button"
-              aria-label={`Current time: ${shownTime}`}
+              aria-label={t("CurrentTimeLabel", { time: shownTime })}
               tabIndex={0}
             >
               <ClockIcon

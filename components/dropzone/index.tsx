@@ -11,6 +11,7 @@ import { DropDown } from "../drop-down";
 import { IconSizeType } from "../../utils";
 import { consumeKey } from "../../utils/consume-key";
 import { pickAriaProps } from "../../utils/aria-props";
+import { useCommonTranslation } from "../../utils/i18n";
 
 import { DropzoneProps } from "./Dropzone.types";
 import styles from "./Dropzone.module.scss";
@@ -45,6 +46,7 @@ const Dropzone = ({
   loaderClassName,
   ...rest
 }: DropzoneProps) => {
+  const t = useCommonTranslation();
   const aria = pickAriaProps(rest);
   const handleDrop = (acceptedFiles: File[]) => {
     if (!onDrop || acceptedFiles.length === 0) return;
@@ -241,7 +243,9 @@ const Dropzone = ({
               className: styles.dropzone,
               "aria-label":
                 aria["aria-label"] ??
-                (isFolderUpload ? "Folder upload area" : "File upload area"),
+                (isFolderUpload
+                  ? t("DropzoneFolderArea")
+                  : t("DropzoneFileArea")),
               "data-testid": "dropzone-input-area",
             })}
             {...(isFolderUpload
@@ -259,14 +263,14 @@ const Dropzone = ({
                   webkitdirectory: "",
                   directory: "",
                 } as React.InputHTMLAttributes<HTMLInputElement>)}
-                aria-label="Folder input"
+                aria-label={t("DropzoneFolderInput")}
                 data-testid="dropzone-input"
               />
             ) : (
               <input
                 disabled={isDisabled}
                 {...getInputProps({
-                  "aria-label": "File input",
+                  "aria-label": t("DropzoneFileInput"),
                   "data-testid": "dropzone-input",
                 })}
               />
@@ -329,7 +333,7 @@ const Dropzone = ({
                     "aria-disabled": isDisabled || undefined,
                     onKeyDown: handleFormatsKeyDown,
                   }
-                : { "aria-label": "Supported file types" })}
+                : { "aria-label": t("DropzoneFileTypes") })}
               onClick={handleFormatsClick}
             >
               <div

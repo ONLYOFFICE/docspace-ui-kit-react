@@ -300,7 +300,7 @@ const Navigation = ({
           isOpen={isOpen}
           isRootFolder={isRootFolder}
           isRootFolderTitle
-          isButton
+          isButton={!!parentItem}
           onClick={onTextClick}
           badgeLabel={badgeLabel}
         />

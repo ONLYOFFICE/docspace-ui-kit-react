@@ -826,5 +826,11 @@
   "Icon": "Icon",
   "MarkRead": "Mark as read",
   "CloseMenu": "Close menu",
-  "InProgress": "In progress"
+  "InProgress": "In progress",
+  "DropzoneFileArea": "File upload area",
+  "DropzoneFolderArea": "Folder upload area",
+  "DropzoneFileInput": "File input",
+  "DropzoneFolderInput": "Folder input",
+  "DropzoneFileTypes": "Supported file types",
+  "CurrentTimeLabel": "Current time: {{time}}"
 }

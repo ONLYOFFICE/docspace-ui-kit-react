@@ -1,6 +1,12 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { HelpButton } from ".";
 
 describe("<HelpButton />", () => {
@@ -179,6 +185,11 @@ describe("<HelpButton />", () => {
     expect(document.getElementById(tooltipId)).toHaveTextContent(
       "Rich content",
     );
+    // react-tooltip re-registers its anchor listeners after it shows; a blur
+    // before that reaches a handler that still thinks it is closed.
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
 
     fireEvent.blur(icon, {
       relatedTarget: screen.getByRole("button", { name: "Next" }),
@@ -189,6 +200,43 @@ describe("<HelpButton />", () => {
     );
     expect(region).toBeEmptyDOMElement();
     expect(icon).not.toHaveAttribute("aria-describedby");
+  });
+
+  // The tooltip closing on a second press stays in the DOM while it fades, and
+  // used to be read out again as if it had opened.
+  it("announces nothing when the keyboard closes the tooltip", async () => {
+    render(<HelpButton tooltipContent={<b>Rich content</b>} />);
+    const icon = screen.getByRole("button", { name: "Info" });
+    const region = screen.getByRole("status");
+
+    icon.focus();
+    fireEvent.keyDown(icon, { key: "Enter" });
+    await waitFor(() => expect(region).toHaveTextContent("Rich content"));
+
+    fireEvent.keyDown(icon, { key: "Enter" });
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    expect(region).toBeEmptyDOMElement();
+    expect(icon).not.toHaveAttribute("aria-describedby");
+  });
+
+  it("keeps a passed aria-describedby next to the open tooltip", async () => {
+    render(
+      <HelpButton
+        tooltipContent={<b>Rich content</b>}
+        aria-describedby="storage-hint"
+      />,
+    );
+    const icon = screen.getByRole("button", { name: "Info" });
+
+    icon.focus();
+    fireEvent.keyDown(icon, { key: "Enter" });
+
+    await waitFor(() =>
+      expect(icon.getAttribute("aria-describedby")).toMatch(
+        /^storage-hint help-tooltip-/,
+      ),
+    );
   });
 
   it("lets a passed aria-label name the button", () => {

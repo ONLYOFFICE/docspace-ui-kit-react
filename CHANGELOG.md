@@ -311,7 +311,7 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   `aria-label` set to `title`, with or without a picture; the `<img>` inside has `alt=""`
   instead of the fixed `"mcp icon"`, and the letter is hidden, so a screen reader no longer
   reads a bare letter. With an empty `title` the icon is `aria-hidden`
-- **`MainButton.model` is optional with `isDropdown={false}`, and `opened` no longer reaches the DOM.** `opened` was never read and is removed, as listed above.
+- **`MainButton.model` is optional with `isDropdown={false}`.** `opened` was never read and is removed, as listed above.
 - **`MainButtonMobile` is operable from the keyboard and reports every open and close.** The floating button carries `aria-haspopup="menu"` and `aria-expanded`; the sheet is a `menu` of `menuitem`s that the arrow keys, Home, End, Enter and Escape operate; the alert badge is a button named "Alert" with `withAlertClick`. `onClose` now fires whenever the sheet closes (button, backdrop, item, Escape, Back) and never on opening; the new `onOpen` reports opening. `isOpenButton` and the other props it ignored are removed, as listed above.
 - **The `QuickActions` strip is a horizontal toolbar.** The arrow keys (mirrored in RTL), Home and End move focus between tiles and scroll the focused tile into view; Tab still visits every tile.
 - **`TimePicker`'s fields are `type="text"` and take translated names.** They were
@@ -472,7 +472,13 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
 
 - **`HelpButton`'s tooltip is read out when the keyboard opens it, and closes when the focus
   moves on.** Its text goes into a live region, and the icon points at it with
-  `aria-describedby` while it is open. It used to appear silently and stay open after Tab
+  `aria-describedby` while it is open. It used to appear silently and stay open after Tab.
+  A second press that closes it is not read out again, and a passed `aria-describedby` is kept
+  beside the tooltip's id
+- **`Navigation`'s room title is a button only when there is a folder to go back to.** With
+  `rootRoomTitle` and a single crumb it was a Tab stop on which Enter did nothing
+- **`Dropzone`'s and `DateTimePicker`'s ARIA labels are translated.** The drop area, its inputs,
+  the format line and the time display were named in English in every language
 - **`Navigation` moves the focus for the keyboard only, and keeps Escape to itself.** A mouse
   click on a drop box row no longer puts the focus on the header's title. Escape pressed in the
   header or the box closes the box and no longer reaches the page's own Escape handlers
@@ -682,8 +688,7 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   and `FolderTile` called it as the button read its options, with no argument, and again with
   `false` as it reported the click. Only the second call is left
 - **`FileTile`'s `isBlockingOperation` turns the pointer off.** Its rule matched only a descendant
-  of the tile, so hover, clicks and right-clicks still reached a blocked file. The dead
-  `contextButtonSpacerWidth` and `sideColor` no longer reach the DOM as unknown attributes
+  of the tile, so hover, clicks and right-clicks still reached a blocked file.
 - **A `RowContainer` with any `id` gets rows of its own width.** The virtual list measured
   `document.getElementById("rowContainer")`, so another id laid the rows out zero wide and a
   second container took the first one's width. A `row` list of `InfiniteLoaderComponent` now
