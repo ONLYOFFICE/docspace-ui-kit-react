@@ -15,6 +15,16 @@ describe("<TabItem />", () => {
     vi.clearAllMocks();
   });
 
+  it("keeps its own aria-selected over a passed one", () => {
+    render(
+      <TabItem {...baseProps} aria-selected aria-describedby="tab-hint" />,
+    );
+
+    const tabItem = screen.getByTestId("tab-item");
+    expect(tabItem).toHaveAttribute("aria-selected", "false");
+    expect(tabItem).toHaveAttribute("aria-describedby", "tab-hint");
+  });
+
   it("renders tab item with default props", () => {
     render(<TabItem {...baseProps} />);
 

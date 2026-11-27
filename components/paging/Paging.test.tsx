@@ -17,6 +17,28 @@ const mockCountItems: TOption[] = [
 ];
 
 describe("Paging", () => {
+  it("puts a passed aria-* on the strip", () => {
+    render(
+      <Paging
+        previousLabel="Previous"
+        nextLabel="Next"
+        previousAction={vi.fn()}
+        nextAction={vi.fn()}
+        pageItems={mockPageItems}
+        countItems={mockCountItems}
+        selectedPageItem={mockPageItems[0]}
+        selectedCountItem={mockCountItems[0]}
+        onSelectPage={vi.fn()}
+        onSelectCount={vi.fn()}
+        aria-describedby="paging-hint"
+      />,
+    );
+    expect(screen.getByTestId("paging")).toHaveAttribute(
+      "aria-describedby",
+      "paging-hint",
+    );
+  });
+
   it("renders with basic props", () => {
     render(
       <Paging

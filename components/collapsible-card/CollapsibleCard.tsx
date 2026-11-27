@@ -3,6 +3,7 @@ import classNames from "classnames";
 
 import ArrowIcon from "../../assets/arrow.react.svg";
 
+import { pickAriaProps } from "../../utils/aria-props";
 import styles from "./CollapsibleCard.module.scss";
 import type { CollapsibleCardProps } from "./CollapsibleCard.types";
 
@@ -19,6 +20,7 @@ export const CollapsibleCard = ({
   className,
   style,
   dataTestId,
+  ...rest
 }: CollapsibleCardProps) => {
   const isControlled = isOpen !== undefined;
   const [internalOpen, setInternalOpen] = React.useState(defaultOpen);
@@ -43,6 +45,7 @@ export const CollapsibleCard = ({
       data-open={open ? "true" : "false"}
     >
       <button
+        {...pickAriaProps(rest)}
         type="button"
         className={styles.header}
         onClick={handleToggle}

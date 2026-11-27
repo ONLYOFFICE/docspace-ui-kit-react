@@ -15,8 +15,9 @@
   align-items: center;
   gap: 12px;
 
+  // As wide as the chat's column: the name and the agent's line are cut
+  // only when the column itself has no room for them.
   width: 100%;
-  max-width: var(--chat-created-document-card-max-width, 420px);
   padding: 8px 12px 8px 8px;
 
   border: 1px solid var(--border-divider);

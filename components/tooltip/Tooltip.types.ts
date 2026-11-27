@@ -48,8 +48,7 @@ export type TooltipProps = {
   children?: ITooltip["children"];
   /**
    * Forces the tooltip open or closed. Passing it makes the tooltip
-   * controlled — the hover and click handlers no longer open or close it on
-   * their own.
+   * controlled: hover and click do not open or close it on their own.
    */
   isOpen?: ITooltip["isOpen"];
   /**
@@ -74,7 +73,8 @@ export type TooltipProps = {
   /** Whether the arrow pointing at the anchor is hidden.
    * @default true */
   noArrow?: ITooltip["noArrow"];
-  /** Opacity of the tooltip. The library's own default is 0.9.
+  /** How opaque the tooltip is, from 0 to 1. Without it the library would use
+   * 0.9.
    * @default 1 */
   opacity?: ITooltip["opacity"];
   /**
@@ -84,7 +84,8 @@ export type TooltipProps = {
   imperativeModeOnly?: ITooltip["imperativeModeOnly"];
   /** Delay before the tooltip appears, in milliseconds. */
   delayShow?: ITooltip["delayShow"];
-  /** Sets a callback function that generates the tip content dynamically */
+  /** Builds the content from the active anchor's `data-tooltip-content` and
+   * the anchor itself. It wins over `children`. */
   getContent?: ({
     content,
     activeAnchor,
@@ -94,14 +95,14 @@ export type TooltipProps = {
   /** Applied to that same wrapper. Use `tooltipStyle` for the tooltip. */
   style?: React.CSSProperties;
   /**
-   * Background colour, written as `--tooltip-bg-color` on the wrapper by an
-   * effect. It is only ever set: clearing the prop leaves the last colour in
-   * place.
+   * Background colour, in place of the theme's. It is only ever set: clearing
+   * the prop leaves the last colour in place.
    */
   color?: string;
   /** Maximum width as a CSS length. The default is 320px.  */
   maxWidth?: string;
-  /** Whether to allow fallback to the perpendicular axis of the preferred placement */
+  /** Matters only when no side has room. Then `"start"` or `"end"` picks the
+   * best fit among the preferred axis and above or below; `"none"` among all. */
   fallbackAxisSideDirection?: TFallbackAxisSideDirection;
   /** Stops the tooltip's text being selected. */
   noUserSelect?: boolean;

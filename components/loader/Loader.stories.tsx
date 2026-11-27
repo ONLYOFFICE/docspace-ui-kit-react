@@ -22,7 +22,7 @@ const meta = {
       control: "select",
       options: Object.values(LoaderTypes),
       description:
-        "Which animation to draw: `oval` (the default), `dual-ring`, `rombs` or `track`; `base` renders `label` as plain text instead",
+        "Which animation to render: `oval`, `dualRing`, `rombs` or `track`. Without it the loader is an `oval`. `base` is not an animation: it renders `label` as plain text and nothing else.",
       table: {
         defaultValue: { summary: "oval" },
       },
@@ -30,12 +30,12 @@ const meta = {
     color: {
       control: "color",
       description:
-        "Any CSS colour for the oval and dual-ring strokes and for the text of `base`; the track and the diamonds ignore it",
+        "Any CSS colour, applied as the stroke of the animation and the colour of the `base` type's text.",
     },
     size: {
       control: "text",
       description:
-        "Width and height of the animation as one CSS length (px, rem or any other unit); for `base`, the font size of the text",
+        "Size of the animation as a CSS length, applied to both axes. The stylesheet falls back to 40px for most types and 20px for `track`. For the `base` type this is the font size of the text instead.",
       table: {
         defaultValue: { summary: "40px (20px for track)" },
       },
@@ -43,7 +43,7 @@ const meta = {
     label: {
       control: "text",
       description:
-        "Name a screen reader announces for the oval, dual-ring and track animations; for `base`, the text that is shown",
+        'What assistive technology reads: the visually hidden text of the loader\'s `role="status"` region, under the decorative animation. For the `base` type it is the visible content instead. Defaults to the translated `Common:LoadingProcessing` ("Loading...").',
       table: {
         defaultValue: { summary: "undefined" },
       },
@@ -51,36 +51,37 @@ const meta = {
     primary: {
       control: "boolean",
       description:
-        "Draws the track in the colour meant for a loader on a primary button, white by default; read by `track` only",
+        "Uses the primary button's track colour, for a loader drawn on top of a primary button. Read by the `track` type only.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isDisabled: {
       control: "boolean",
-      description: "Dims the track to 60% opacity; read by `track` only",
+      description:
+        "Dims the animation to the disabled opacity. Read by the `track` type only.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     className: {
       control: "text",
-      description: "Class name of the wrapper around the animation",
+      description:
+        "Applied to the wrapper around the animation, not to the animation.",
     },
     id: {
       control: "text",
-      description:
-        "Id of the wrapper; the track also builds its gradient ids from it, so two tracks on one page need different ids",
+      description: "Applied to the wrapper.",
     },
     style: {
       control: "object",
       description:
-        "Inline styles of the wrapper, applied again to the text of `base`",
+        "Applied to the wrapper, and again to the inner span of the `base` type.",
     },
     ref: {
       control: false,
       description:
-        "Reference to the track's SVG element; the other types ignore it",
+        "Reaches the `<svg>` of the `track` type; the other types ignore it.",
     },
   },
 } satisfies Meta<typeof Loader>;
@@ -145,7 +146,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A line of plain text instead of an animation, for a place where a moving spinner would distract: this is what you get with `type` set to `base`; left out, `type` draws the oval. Change any other prop live in the Controls panel below.",
+          "A line of plain text instead of an animation (`type` set to `base`), for a place where a spinner would distract. Without `type` the loader draws the oval.",
       },
       source: {
         code: `<Loader type={LoaderTypes.base} size="18px" label="Loading content, please wait..." />`,
@@ -175,7 +176,7 @@ export const Oval: Story = {
     docs: {
       description: {
         story:
-          "Oval spinner animation, commonly used for inline loading states.",
+          "The oval: a ring with one spinning arc, for inline loading states.",
       },
       source: {
         code: `<Loader type={LoaderTypes.oval} size="40px" color={globalColors.loaderLight} />`,
@@ -185,6 +186,7 @@ export const Oval: Story = {
 };
 
 export const DualRing: Story = {
+  name: "Dual ring",
   render: (args) => <Loader {...args} />,
   args: {
     type: LoaderTypes.dualRing,
@@ -245,7 +247,7 @@ export const Rombs: Story = {
     docs: {
       description: {
         story:
-          "Rombs (diamond) animation, used as the main application loader.",
+          "The rombs: three diamonds that bounce in turn, the application loader's animation.",
       },
       source: {
         code: `<Loader type={LoaderTypes.rombs} size="65px" />`,
@@ -324,6 +326,7 @@ const AllTypesTemplate = () => {
 };
 
 export const AllTypes: Story = {
+  name: "All types",
   render: () => <AllTypesTemplate />,
   play: async ({ canvas }) => {
     await expect(canvas.getAllByTestId("loader")).toHaveLength(5);
@@ -341,7 +344,7 @@ export const AllTypes: Story = {
     docs: {
       description: {
         story:
-          "Side-by-side comparison of the text fallback (Base) and the four animations (Oval, DualRing, Rombs and Track), to choose the one that fits the space it waits in.",
+          "The text fallback (Base) beside the four animations: Oval, DualRing, Rombs and Track.",
       },
       source: {
         code: `<Loader type={LoaderTypes.base} size="18px" />
@@ -386,6 +389,7 @@ const CustomColorsTemplate = () => {
 };
 
 export const CustomColors: Story = {
+  name: "Custom colours",
   render: () => <CustomColorsTemplate />,
   play: async ({ canvas }) => {
     // color reaches the ring strokes.
@@ -396,8 +400,7 @@ export const CustomColors: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "DualRing loaders with different custom colors applied via the color prop.",
+        story: "Dual rings in four colours of their own (`color`).",
       },
       source: {
         code: `<Loader type={LoaderTypes.dualRing} color="#FF5722" size="40px" />
@@ -441,6 +444,7 @@ const DifferentSizesTemplate = () => {
 };
 
 export const DifferentSizes: Story = {
+  name: "Sizes",
   render: () => <DifferentSizesTemplate />,
   play: async ({ canvas }) => {
     const widths = canvas.getAllByTestId("oval-loader").map(widthOf);
@@ -449,8 +453,7 @@ export const DifferentSizes: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "Oval loaders at three different sizes to demonstrate scalability.",
+        story: "Ovals at 24px, 40px and 60px (`size`).",
       },
       source: {
         code: `<Loader type={LoaderTypes.oval} size="24px" />
@@ -462,6 +465,7 @@ export const DifferentSizes: Story = {
 };
 
 export const OnPrimaryButton: Story = {
+  name: "On a primary button",
   render: (args) => (
     <div
       style={{
@@ -534,6 +538,7 @@ const DisabledStateTemplate = () => {
 };
 
 export const DisabledState: Story = {
+  name: "Disabled",
   render: () => <DisabledStateTemplate />,
   play: async ({ canvas }) => {
     // The disabled track is dimmed to 60%.
@@ -556,6 +561,7 @@ export const DisabledState: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={
@@ -598,9 +604,12 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
+        story: `Four loaders under a wrapper that sets every variable:
 
-The example shows, from left to right: an oval for \`--loader-stroke\` and \`--loader-size\`, which every instance picks up; a track for \`--loader-track-base\`; a track with \`primary\` for \`--loader-track-primary\`; and a track with \`isDisabled\` for \`--loader-opacity-disabled\`.`,
+- an oval, for \`--loader-stroke\` and \`--loader-size\`
+- a track, for \`--loader-track-base\`
+- a track with \`primary\`, for \`--loader-track-primary\`
+- a track with \`isDisabled\`, for \`--loader-opacity-disabled\``,
       },
       source: {
         code: `<div style={{

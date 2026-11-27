@@ -44,7 +44,6 @@ type StoryArgs = {
   // Aside
   useAside?: boolean;
   withoutBackground?: boolean;
-  withBlur?: boolean;
 
   // Cancel button
   withCancelButton?: boolean;
@@ -233,11 +232,6 @@ import PeopleSelector from "@onlyoffice/apps-ui-kit/selectors/People";
     withoutBackground: {
       control: "boolean",
       description: "Remove the background overlay in Aside mode",
-      table: { defaultValue: { summary: "false" } },
-    },
-    withBlur: {
-      control: "boolean",
-      description: "Apply blur effect to the Aside backdrop",
       table: { defaultValue: { summary: "false" } },
     },
 
@@ -462,7 +456,6 @@ export const AsideMode: Story = {
   args: {
     useAside: true,
     withoutBackground: false,
-    withBlur: false,
     withHeader: true,
     headerProps: {
       headerLabel: "Select Member",
@@ -482,13 +475,12 @@ export const AsideMode: Story = {
       description: {
         story:
           "Renders the selector inside an Aside panel with a backdrop overlay. " +
-          "Use `withBlur` to apply a blur effect and `withoutBackground` to remove the overlay.",
+          "`withoutBackground` removes the overlay.",
       },
       source: {
         code: `<PeopleSelector
   useAside
   withoutBackground={false}
-  withBlur={false}
   withHeader
   headerProps={{ headerLabel: "Select Member", onCloseClick: () => setOpen(false) }}
   isMultiSelect={false}

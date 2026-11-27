@@ -19,13 +19,13 @@ const meta = {
     title: {
       control: "text",
       description:
-        "Name of the server. Only its first character is drawn, uppercased, and only while there is no image",
+        "Name of the server. It is the icon's accessible name, with or without an image; its first character is drawn while there is no image.",
     },
     size: {
       control: "select",
       options: Object.values(MCPIconSize),
       description:
-        "One of four squares: 16, 24, 32 or 48px, each with its own font size and corner radius",
+        "One of the four square sizes: 16, 24, 32 or 48px, each with its own font size and corner radius.",
       table: {
         defaultValue: { summary: "large" },
       },
@@ -33,20 +33,21 @@ const meta = {
     imgSrc: {
       control: "text",
       description:
-        "URL of an image drawn instead of the letter; if it fails to load, the letter is shown",
+        "Image to draw instead of the letter. A failure to load falls back to the letter on its own.",
     },
     imgNode: {
       control: false,
       description:
-        "Image as a node, drawn instead of `imgSrc` when both are set; it never falls back to the letter",
+        "Image as a node, used instead of `imgSrc` when both are set. An `<img>` inside it that fails to load falls back to the letter too.",
     },
     className: {
       control: "text",
-      description: "Class added to the outer element",
+      description:
+        "Added before the component's own classes, on the outer element.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the outer element",
+      description: "Value of `data-testid` on the outer element.",
       table: {
         defaultValue: { summary: "mcp-icon" },
       },
@@ -92,6 +93,7 @@ const LabeledItem = (props: { label: string; children: React.ReactNode }) => {
 };
 
 export const Default: Story = {
+  name: "Letter",
   render: (args) => <MCPIcon {...args} />,
   args: {
     title: "Document search",
@@ -107,7 +109,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A server with no image of its own: the first letter of its name on a grey tile. Change any other prop live in the Controls panel below.",
+          "A server with no image of its own: the first letter of its name, uppercased, on a 48px grey tile.",
       },
       source: {
         code: `<MCPIcon title="Document search" size={MCPIconSize.Large} />`,
@@ -117,6 +119,7 @@ export const Default: Story = {
 };
 
 export const WithImage: Story = {
+  name: "With image",
   render: (args) => <MCPIcon {...args} />,
   args: {
     title: "Document search",
@@ -160,6 +163,7 @@ const AllSizesTemplate = () => {
 };
 
 export const AllSizes: Story = {
+  name: "All sizes",
   render: () => <AllSizesTemplate />,
   play: async ({ canvas }) => {
     const sizes = canvas.getAllByTestId("mcp-icon").map(sizeOf);
@@ -169,7 +173,7 @@ export const AllSizes: Story = {
     docs: {
       description: {
         story:
-          "Pick the size that matches the row it sits in: 16px (Small), 24px (Medium), 32px (Big) and 48px (Large), the letter and the corner radius growing with it (`size`).",
+          "The four sizes side by side: 16px (Small), 24px (Medium), 32px (Big) and 48px (Large). The letter and the corner radius grow with the tile (`size`).",
       },
       source: {
         code: `<MCPIcon title="Document search" size={MCPIconSize.Small} />
@@ -200,6 +204,7 @@ const AllSizesWithImageTemplate = () => {
 };
 
 export const AllSizesWithImage: Story = {
+  name: "All sizes with image",
   render: () => <AllSizesWithImageTemplate />,
   play: async ({ canvas }) => {
     // Each tile is one image named after the server; the <img> inside it
@@ -233,6 +238,7 @@ export const AllSizesWithImage: Story = {
 };
 
 export const BrokenImageFallback: Story = {
+  name: "Broken image",
   render: (args) => <MCPIcon {...args} />,
   args: {
     title: "Document search",
@@ -254,7 +260,7 @@ export const BrokenImageFallback: Story = {
     docs: {
       description: {
         story:
-          "Pass a server's image URL without checking it first: when it fails to load, the letter on its tile takes its place (`imgSrc`).",
+          "An image URL that fails to load: the letter on its grey tile takes the image's place (`imgSrc`).",
       },
       source: {
         code: `<MCPIcon title="Document search" size={MCPIconSize.Large} imgSrc="/missing/icon.svg" />`,
@@ -264,6 +270,7 @@ export const BrokenImageFallback: Story = {
 };
 
 export const WithImageNode: Story = {
+  name: "Image as a node",
   render: (args) => <MCPIcon {...args} />,
   args: {
     title: "Document search",
@@ -279,7 +286,7 @@ export const WithImageNode: Story = {
     docs: {
       description: {
         story:
-          "Use for an icon your bundler has already inlined as a component: the element is drawn in place of the letter (`imgNode`). An `<img>` inside it that fails to load falls back to the letter; an empty node is not replaced.",
+          "An inline SVG component drawn in place of the letter (`imgNode`). An `<img>` inside the node that fails to load falls back to the letter; an empty node is not replaced.",
       },
       source: {
         code: `import FolderIcon from "./folder.react.svg";
@@ -291,6 +298,7 @@ export const WithImageNode: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={
@@ -325,7 +333,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The variables are listed under CSS variables on this page. The four sizes share one wrapper that sets all five variables: a round, semi-transparent blue tile with a regular-weight white letter.`,
+        story: `The four sizes as round, semi-transparent blue tiles with a regular-weight white letter. One wrapper around them sets all five variables.`,
       },
       source: {
         code: `<div

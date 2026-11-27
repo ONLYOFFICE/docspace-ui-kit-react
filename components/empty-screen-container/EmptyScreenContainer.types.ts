@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 
-export type EmptyScreenContainerProps = {
+export type EmptyScreenContainerProps = React.AriaAttributes & {
   /** Source of the illustration. The stylesheet pins the image to 200×140, and to 150×105 below 600px, so supply artwork of that shape. */
   imageSrc: string;
   /** Alternative text for the illustration. Pass an empty string when the artwork repeats what the text below already says. */
@@ -25,6 +25,7 @@ export type EmptyScreenContainerProps = {
   imageStyle?: CSSProperties;
   /** Inline style of the row that holds `buttons`. */
   buttonStyle?: CSSProperties;
-  /** Adds the height of the filter bar to the top padding — 91px in place of 52px — for a screen that has no filter above it. It removes nothing. */
+  /** Adds the height of a filter bar to the top padding, for a screen with no
+   * filter above it. It removes nothing. */
   withoutFilter?: boolean;
 };

@@ -56,6 +56,25 @@ describe("<TableGroupMenu />", () => {
     vi.clearAllMocks();
   });
 
+  it("names the close cross and the info panel toggle", () => {
+    render(
+      <TableGroupMenu {...defaultProps} isCloseable onCloseClick={vi.fn()} />,
+    );
+
+    expect(screen.getByRole("button", { name: "Close" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Info panel" }),
+    ).toBeInTheDocument();
+  });
+
+  it("puts a passed aria-* on the menu", () => {
+    render(<TableGroupMenu {...defaultProps} aria-describedby="menu-hint" />);
+    expect(screen.getByTestId("table-group-menu")).toHaveAttribute(
+      "aria-describedby",
+      "menu-hint",
+    );
+  });
+
   it("renders without errors", () => {
     render(<TableGroupMenu {...defaultProps} />);
     expect(screen.getByTestId("table-group-menu")).toBeInTheDocument();

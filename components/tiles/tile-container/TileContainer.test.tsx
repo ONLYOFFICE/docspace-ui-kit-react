@@ -23,7 +23,6 @@ vi.mock("./TileContainer.module.scss", () => ({
     rooms: "rooms",
     templates: "templates",
     header: "header",
-    isDesc: "isDesc",
     noSelect: "noSelect",
   },
 }));
@@ -41,6 +40,15 @@ describe("TileContainer", () => {
   const MockTile = ({ item }: { item: TileItem }) => (
     <div data-testid={`tile-${item.id}`}>{item.title}</div>
   );
+
+  it("puts a passed aria-* on the container", () => {
+    const { container } = render(
+      <TileContainer aria-label="Files">
+        <MockTile item={{ id: "1", title: "File 1" }} />
+      </TileContainer>,
+    );
+    expect(container.firstElementChild).toHaveAttribute("aria-label", "Files");
+  });
 
   it("renders container correctly", () => {
     render(
@@ -133,16 +141,6 @@ describe("TileContainer", () => {
     const { container } = render(<TileContainer>{null}</TileContainer>);
     const tileContainer = container.querySelector("[class*='tileContainer']");
     expect(tileContainer).toBeTruthy();
-  });
-
-  it("applies isDesc class to headers when isDesc is true", () => {
-    const { container } = render(
-      <TileContainer headingFiles="Files" isDesc>
-        <MockTile item={{ id: "1", title: "File 1", fileExst: ".docx" }} />
-      </TileContainer>,
-    );
-    const header = container.querySelector("[class*='isDesc']");
-    expect(header).toBeTruthy();
   });
 
   it("renders multiple files in grid wrapper", () => {

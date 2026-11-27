@@ -18,37 +18,34 @@ const meta = {
     value: {
       control: "number",
       description:
-        "Current value; the component is controlled, so the host updates it from `onChange`",
+        "The number shown. The component is controlled: pass back what `onChange` reports",
     },
     minValue: {
       control: "number",
-      description:
-        "Lowest value the minus control, the typed number and the slider can reach",
+      description: "Lower bound for the controls, typed input and slider",
     },
     maxValue: {
       control: "number",
       description:
-        "Highest value the controls, the typed number, the presets and the slider can reach, apart from the one overflow step `showPlusSign` allows",
+        "Upper bound; nothing the component does goes past it, except the one overflow step `showPlusSign` allows",
     },
     step: {
       control: "number",
       description:
-        "Amount the minus and plus controls and the slider move by; the last step up is shortened so it stops at the maximum",
+        "Amount the plus and minus controls and the slider move by; the last step up is shortened so it stops at the bound",
     },
     title: {
       control: "text",
-      description:
-        "Heading above the controls; left empty, no heading is shown",
+      description: "Heading above the controls; omitted when empty",
     },
     subtitle: {
       control: "text",
-      description:
-        "Smaller line under the heading; left empty, no line is shown",
+      description: "Secondary line under the title; omitted when empty",
     },
     showPlusSign: {
       control: "boolean",
       description:
-        "Lets the value go exactly one past `maxValue`, shown as the maximum followed by a plus sign",
+        "Lets the value go exactly one past `maxValue` (to `maxValue + 1`), shown as `maxValue+`",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -56,7 +53,7 @@ const meta = {
     isDisabled: {
       control: "boolean",
       description:
-        "Disables both controls, the slider and the presets, and shows the number as static text that cannot be typed into",
+        "Disables every control and replaces the input with static text",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -64,7 +61,7 @@ const meta = {
     showSlider: {
       control: "boolean",
       description:
-        "Shows a slider under the controls that moves the same value, with the minimum and the maximum written at its ends",
+        "Renders a slider bound to the value, from `minValue` to `maxValue` (`maxValue + 1` with `showPlusSign`)",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -80,20 +77,18 @@ const meta = {
     items: {
       control: "object",
       description:
-        "Preset tabs under the controls, each a number or a `{ name, value }` pair; a tab reads as its amount after a plus sign and adds that amount to the current value",
+        "Preset tabs; selecting one adds its amount to the current value, capped like the plus control",
     },
     isLarge: {
       control: "boolean",
-      description:
-        "Widens the number field from 101px to 140px, for longer numbers",
+      description: "Widens the value field from 101px to 140px",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withoutControls: {
       control: "boolean",
-      description:
-        "Hides the minus and plus controls, leaving the number alone",
+      description: "Hides the plus and minus controls",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -101,17 +96,17 @@ const meta = {
     disableValue: {
       control: "text",
       description:
-        "Text shown in place of the number while `isDisabled` is set; the field then shrinks or grows to fit it",
+        "Text shown in place of the value while `isDisabled` is set; the field then sizes to its content",
     },
     underControlsTitle: {
       control: "text",
       description:
-        "Text or any node shown under the number; the line keeps its height even when empty",
+        "Text under the controls; turns to the warning colour while an invalid value is entered with `enableZero`",
     },
     isZeroAllowed: {
       control: "boolean",
       description:
-        "Deprecated: former name of `enableZero`, still honoured when `enableZero` is not set",
+        "Former name of `enableZero`, kept as an alias; `enableZero` wins when both are set.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -119,7 +114,7 @@ const meta = {
     enableZero: {
       control: "boolean",
       description:
-        "Accepts zero as a value below `minValue`: the minus control steps down to zero and a typed number under the minimum is kept",
+        "Allows zero as a value below `minValue`; other values below it are flagged",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -127,12 +122,12 @@ const meta = {
     minusTooltipId: {
       control: "text",
       description:
-        "Id of a tooltip the host renders, attached to the minus control so hovering it opens that tooltip",
+        "Id of a `Tooltip` you render, anchored to the minus control through `data-tooltip-id`",
     },
     minusDisabled: {
       control: "boolean",
       description:
-        "Disables only the minus control; it stays focusable so a tooltip attached to it can still explain why",
+        "Disables only the minus control; it stays focusable (`aria-disabled`) so `minusTooltipId` can still explain why",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -140,12 +135,12 @@ const meta = {
     decreaseLabel: {
       control: "text",
       description:
-        'Accessible name of the minus control, such as a translated "Decrease"; left out, the control has no name',
+        'Accessible name of the minus control, e.g. a translated "Decrease"; no `aria-label` is rendered without it',
     },
     increaseLabel: {
       control: "text",
       description:
-        'Accessible name of the plus control, such as a translated "Increase"; left out, the control has no name',
+        'Accessible name of the plus control, e.g. a translated "Increase"; no `aria-label` is rendered without it',
     },
   },
 } satisfies Meta<typeof QuantityPicker>;
@@ -216,7 +211,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The basic picker: press minus or plus, or type a number between the bounds. Change any other prop live in the Controls panel below.",
+          "The basic picker: minus, the number, plus. The number changes by the buttons or by typing a value between the bounds.",
       },
       source: {
         code: `const [value, setValue] = useState(5);
@@ -238,6 +233,7 @@ export const Default: Story = {
 };
 
 export const WithSlider: Story = {
+  name: "With slider",
   render: (args) => <QuantityPickerWithState {...args} />,
   args: {
     ...Default.args,
@@ -260,7 +256,7 @@ export const WithSlider: Story = {
     docs: {
       description: {
         story:
-          "A slider under the controls, for covering a wide range quickly: dragging it and pressing the controls move the same number (`showSlider`).",
+          "A slider under the controls, for covering a wide range quickly (`showSlider`). The slider and the controls move the same number.",
       },
       source: {
         code: `<QuantityPicker
@@ -279,6 +275,7 @@ export const WithSlider: Story = {
 };
 
 export const WithPresets: Story = {
+  name: "Quick-add tabs",
   render: (args) => <QuantityPickerWithState {...args} />,
   args: {
     ...Default.args,
@@ -300,7 +297,7 @@ export const WithPresets: Story = {
     docs: {
       description: {
         story:
-          "Quick-add tabs for the amounts people pick most: **+10**, **+50** and **+100** each add their amount to the number shown, and stop at the maximum (`items`).",
+          "Quick-add tabs **+10**, **+50** and **+100** for the amounts people pick most (`items`). Each adds its amount to the number shown, stopping at the maximum.",
       },
       source: {
         code: `<QuantityPicker
@@ -341,7 +338,7 @@ export const Disabled: Story = {
     docs: {
       description: {
         story:
-          "An amount the reader may see but not change: **Unlimited** stands in place of the number as static text that cannot be typed into, and the controls cannot be pressed (`isDisabled`, `disableValue`).",
+          "An amount the reader may see but not change (`isDisabled`, `disableValue`). **Unlimited** stands in place of the number as static text, and the controls cannot be pressed.",
       },
       source: {
         code: `<QuantityPicker
@@ -361,6 +358,7 @@ export const Disabled: Story = {
 };
 
 export const WithPlusSign: Story = {
+  name: "Open-ended maximum",
   render: (args) => <QuantityPickerWithState {...args} />,
   args: {
     ...Default.args,
@@ -380,7 +378,7 @@ export const WithPlusSign: Story = {
     docs: {
       description: {
         story:
-          "For a range whose top is open-ended: the number reads **100+**, one step past the maximum, and the slider's far end carries the same label; press minus to come back to 100 (`showPlusSign`).",
+          "A range open at the top (`showPlusSign`). The number reads **100+**, one step past the maximum, and so does the slider's far end. Minus comes back to 100.",
       },
       source: {
         code: `<QuantityPicker
@@ -400,6 +398,7 @@ export const WithPlusSign: Story = {
 };
 
 export const WithZeroAllowed: Story = {
+  name: "Zero allowed",
   render: (args) => <QuantityPickerWithState {...args} />,
   args: {
     ...Default.args,
@@ -420,7 +419,7 @@ export const WithZeroAllowed: Story = {
     docs: {
       description: {
         story:
-          "For an amount that is either none or at least a minimum: pressing minus at 5 drops straight to 0, and plus from 0 jumps back to 5 (`enableZero`). The line under the number is free text (`underControlsTitle`).",
+          "An amount that is either none or at least 5 (`enableZero`). Minus at 5 drops straight to 0, and plus from 0 jumps back to 5. The line under the number is free text (`underControlsTitle`).",
       },
       source: {
         code: `<QuantityPicker
@@ -449,6 +448,7 @@ const MinusLockedTemplate = (args: QuantityPickerProps) => (
 );
 
 export const MinusLockedWithTooltip: Story = {
+  name: "Minus locked, with tooltip",
   render: (args) => <MinusLockedTemplate {...args} />,
   args: {
     ...Default.args,
@@ -473,7 +473,7 @@ export const MinusLockedWithTooltip: Story = {
     docs: {
       description: {
         story:
-          "When the amount may only grow: pressing minus changes nothing, but the control stays reachable with Tab, and hovering it opens a tooltip that says why (`minusDisabled`, `minusTooltipId`). The tooltip is the host's own.",
+          "An amount that may only grow (`minusDisabled`). Minus changes nothing but stays reachable with Tab, and its tooltip says why (`minusTooltipId`). The tooltip is the host's own.",
       },
       source: {
         code: `<QuantityPicker
@@ -495,6 +495,7 @@ export const MinusLockedWithTooltip: Story = {
 };
 
 export const WithoutControls: Story = {
+  name: "Without controls",
   render: (args) => <QuantityPickerWithState {...args} />,
   args: {
     ...Default.args,
@@ -536,6 +537,7 @@ export const WithoutControls: Story = {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <QuantityPickerWithState {...args} />
@@ -562,7 +564,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "200px" },
       description: {
         story:
-          'The picker in a right-to-left layout: plus moves to the left of the number and minus to the right, the slider fills from the right, and the minimum sits at its right end. The wrapper carries `dir="rtl"`; the direction also comes from the theme\'s `interfaceDirection` (the Direction toolbar).',
+          "The picker in a right-to-left layout: plus to the left of the number, minus to the right, the slider filling from the right. The direction comes from the wrapper's `dir=\"rtl\"` and the theme's `interfaceDirection`.",
       },
       source: {
         code: `<div dir="rtl">

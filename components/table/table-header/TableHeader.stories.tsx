@@ -48,22 +48,22 @@ The Table README describes it in full.`,
     columns: {
       control: false,
       description:
-        "The columns in order: title, sort field, callbacks and the flags that shape each one",
+        "The columns, in order. The header also calls a column's `onChange` itself when the table is sorted by a column that is not enabled.",
     },
     containerRef: {
       control: false,
       description:
-        "Ref of the TableContainer, whose grid columns the header writes",
+        "Ref of the `TableContainer`, whose grid columns the header writes.",
     },
     columnStorageName: {
       control: "text",
       description:
-        "`localStorage` key the column widths are saved under; each table on a site needs its own",
+        "`localStorage` key the column widths are saved under. Give each table its own, or two tables overwrite each other's layout.",
     },
     columnInfoPanelStorageName: {
       control: "text",
       description:
-        "`localStorage` key used instead while an info panel narrows the table",
+        "`localStorage` key used instead of `columnStorageName` while the info panel is open. Without it the header writes no widths on mount or on a resize.",
     },
     sortBy: {
       control: "select",
@@ -74,35 +74,38 @@ The Table README describes it in full.`,
         SortByFieldName.Author,
       ],
       description:
-        "Field the table is sorted by; the column with the same `sortBy` keeps its arrow on screen",
+        "Field the table is sorted by. The column with the same `sortBy` keeps its arrow shown.",
     },
     sorted: {
       control: "boolean",
-      description: "Direction of the sort; turning it off turns the arrow over",
+      description:
+        "Direction of the sort; turning it off turns the arrow over.",
     },
     sortingVisible: {
       control: "boolean",
       description:
-        "Shows the sort arrows and lets a click on a title sort the table",
+        "Shows the sort arrows and lets a click on a title sort the table.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     showSettings: {
       control: "boolean",
-      description: "Shows the cog at the end that lists the columns to hide",
+      description:
+        "Shows the cog at the end of the header that lists the columns to hide.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     settingsTitle: {
       control: "text",
-      description: "Hover tooltip of the cog",
+      description:
+        'Hover tooltip and accessible name of the cog. Without it the cog is named "Settings".',
     },
     infoPanelVisible: {
       control: "boolean",
       description:
-        "Saves and restores the widths under `columnInfoPanelStorageName`, for the narrower table next to an open info panel",
+        "Saves and restores the widths under `columnInfoPanelStorageName`, for the narrower table beside an open info panel.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -110,7 +113,7 @@ The Table README describes it in full.`,
     isIndexEditingMode: {
       control: "boolean",
       description:
-        "Stops columns being resized and greys the cog out while rows are reordered",
+        "Stops columns being resized and greys the cog out while rows are reordered.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -118,50 +121,42 @@ The Table README describes it in full.`,
     withoutWideColumn: {
       control: "boolean",
       description:
-        "Shares the width equally between the columns instead of giving the `default` column 40%",
+        "Shares the width equally between the columns instead of widening the `default` one.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     resetColumnsSize: {
       control: "boolean",
-      description: "Discards the saved widths and lays the columns out afresh",
+      description:
+        "Ignores the saved widths and lays the columns out from scratch.",
     },
     isLengthenHeader: {
       control: "boolean",
       description:
-        "Draws the line under the header across its full width instead of stopping short of the edges",
+        "Draws the line under the header edge to edge instead of stopping 20px short of each end.",
     },
     useReactWindow: {
       control: "boolean",
       description:
-        "Set when the body is virtualised, so the header rewrites the widths of the rows it renders",
+        "Set when the body is virtualised, so the header rewrites the widths of the rows it renders.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
-    sectionWidth: {
-      control: "number",
-      description:
-        "Width of the section around the table in pixels; required, but the header reads its container instead",
-    },
     setHideColumns: {
       control: false,
       description:
-        "Called with `true` when the columns stop fitting and with `false` when they fit again",
+        "Called with `true` when the columns stop fitting, and with `false` when they fit again.",
     },
     tagRef: {
       control: false,
       description:
-        "Ref attached to the header cell of the column that asks for it with `withTagRef`",
-    },
-    onClick: {
-      control: false,
-      description: "Accepted, but the header never calls it",
+        "Ref attached to the header cell of the column that asks for it with `withTagRef`.",
     },
     style: {
       control: false,
-      description: "Accepted, but never applied to the header",
+      description: "Inline style of the header element.",
     },
   },
   tags: ["!autodocs"],
@@ -172,6 +167,7 @@ type Story = StoryObj<ComponentProps<typeof TableHeader>>;
 export default meta;
 
 export const Default: Story = {
+  name: "Sortable, with settings",
   render: (args) => <TableHeaderWrapper {...args} />,
   args: {
     containerRef: { current: null },
@@ -218,7 +214,6 @@ export const Default: Story = {
     ],
     columnStorageName: COLUMN_STORAGE_NAME,
     columnInfoPanelStorageName: COLUMN_INFO_PANEL_STORAGE_NAME,
-    sectionWidth: 1000,
     sortBy: SortByFieldName.Name,
     sorted: true,
     useReactWindow: false,
@@ -281,7 +276,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The header of a four-column list, sorted by Name: drag the handles between the titles to resize the columns, hover a title to see its arrow, and click the cog to choose columns. Change any other prop live in the Controls panel below.",
+          "The header of a four-column list, sorted by Name, so its arrow shows. The handles between the titles resize the columns, and the cog at the end lists them.",
       },
       source: {
         code: `<TableHeader
@@ -289,7 +284,6 @@ export const Default: Story = {
   columns={columns}
   columnStorageName="my-columns"
   columnInfoPanelStorageName="my-info-panel"
-  sectionWidth={1000}
   sortBy={SortByFieldName.Name}
   sorted
   showSettings
@@ -301,6 +295,7 @@ export const Default: Story = {
 };
 
 export const WithoutSettings: Story = {
+  name: "Without settings",
   render: (args) => <TableHeaderWrapper {...args} />,
   args: {
     ...Default.args,
@@ -321,7 +316,6 @@ export const WithoutSettings: Story = {
   columns={columns}
   columnStorageName="my-columns"
   columnInfoPanelStorageName="my-info-panel"
-  sectionWidth={1000}
   sortBy={SortByFieldName.Name}
   sorted
   showSettings={false}
@@ -333,6 +327,7 @@ export const WithoutSettings: Story = {
 };
 
 export const WithoutSorting: Story = {
+  name: "Without sorting",
   render: (args) => <TableHeaderWrapper {...args} />,
   args: {
     ...Default.args,
@@ -359,7 +354,6 @@ export const WithoutSorting: Story = {
   columns={columns}
   columnStorageName="my-columns"
   columnInfoPanelStorageName="my-info-panel"
-  sectionWidth={1000}
   sortBy={SortByFieldName.Name}
   sorted
   showSettings
@@ -371,6 +365,7 @@ export const WithoutSorting: Story = {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <TableHeaderWrapper {...args} />
@@ -395,7 +390,7 @@ export const RightToLeft: Story = {
     docs: {
       description: {
         story:
-          "In a right-to-left interface the first column starts at the right edge and the cog sits at the left; dragging a handle to the left widens the column on its right.",
+          "In a right-to-left interface the first column starts at the right edge and the cog sits at the left. Dragging a handle leftwards widens the column on its right.",
       },
       source: {
         code: `<div dir="rtl">
@@ -404,7 +399,6 @@ export const RightToLeft: Story = {
     columns={columns}
     columnStorageName="my-columns"
     columnInfoPanelStorageName="my-info-panel"
-    sectionWidth={1000}
     sortBy={SortByFieldName.Name}
     sorted
   />

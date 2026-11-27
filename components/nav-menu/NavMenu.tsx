@@ -3,6 +3,7 @@ import { ReactSVG } from "react-svg";
 import classNames from "classnames";
 
 import { useAnimation } from "../../hooks/useAnimation";
+import { pickAriaProps } from "../../utils/aria-props";
 import { Badge } from "../badge";
 import { TooltipContainer } from "../tooltip";
 import { createTooltipWrapper } from "../tooltip/sub-components/createTooltipWrapper";
@@ -354,6 +355,7 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
       LinkRouter,
       iconOnly = false,
       withExpandControl = false,
+      ...rest
     },
     ref,
   ) => {
@@ -499,6 +501,7 @@ const NavMenuComponent = forwardRef<HTMLElement, NavMenuProps>(
 
     return (
       <nav
+        {...pickAriaProps(rest)}
         ref={ref}
         className={classNames(
           styles.root,

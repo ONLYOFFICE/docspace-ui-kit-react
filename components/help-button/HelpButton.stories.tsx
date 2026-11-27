@@ -19,24 +19,23 @@ const meta = {
   argTypes: {
     tooltipContent: {
       description:
-        "Content of the tooltip. A string is shown by the application's shared tooltip, which appears only where `RootTooltip` is mounted; any other node opens in a tooltip the component renders itself",
+        "Content of the tooltip. A string is shown by the shared tooltip, which needs `RootTooltip` mounted; any other node makes the component render its own `Tooltip` instead.",
       control: false,
     },
     getContent: {
       description:
-        "Function that builds the tooltip's content in place of `tooltipContent`. A returned string goes to the shared tooltip, a returned node to the component's own",
+        "Builds the tooltip's content. Returning a string routes the text through the shared tooltip; returning a node makes the component render one of its own.",
       control: false,
     },
     children: {
       description:
-        "Element to open the tooltip from in place of the info icon; the whole element becomes the anchor",
+        "Anchor to use instead of the info icon. The whole element becomes the thing the tooltip opens from.",
       control: false,
     },
     place: {
       control: "select",
       options: ["top", "right", "bottom", "left"],
-      description:
-        "Side of the icon the tooltip opens on; it moves to another side when this one has no room",
+      description: "Side of the anchor the tooltip prefers.",
       table: {
         defaultValue: { summary: "top" },
       },
@@ -44,7 +43,7 @@ const meta = {
     size: {
       control: { type: "number", min: 8, max: 48 },
       description:
-        "Width and height of the info icon; a number is pixels, a string a CSS length",
+        "Width and height of the info icon; same forms as `IconButton`'s `size`.",
       table: {
         defaultValue: { summary: "12" },
       },
@@ -54,31 +53,24 @@ const meta = {
       description:
         'Colour of the info icon: any CSS colour, `"accent"` for the theme accent, or the name of a custom property starting with `--`',
     },
-    iconName: {
-      control: "text",
-      description:
-        "URL of an SVG to draw instead of the info icon, fetched by the browser at runtime",
-    },
     iconNode: {
       control: false,
-      description: "Icon as JSX to draw instead of the info icon",
+      description: "Icon to draw instead of the kit's info glyph.",
     },
     offset: {
       control: "number",
-      description: "Gap between the icon and the tooltip, in pixels",
+      description: "Distance between the anchor and the tooltip, in pixels.",
     },
     openOnClick: {
       control: "boolean",
-      description:
-        "Opens the tooltip on click and keeps it open until the next click; when off, it opens on hover and closes when the pointer leaves",
+      description: "Whether the tooltip opens on click rather than on hover.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     isClickable: {
       control: "boolean",
-      description:
-        "Shows the pointer cursor over the icon; the tooltip opens on click either way",
+      description: "Shows the pointer cursor over the info icon.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -86,159 +78,60 @@ const meta = {
     isOpen: {
       control: "boolean",
       description:
-        "Holds the tooltip open or closed from outside. Has no effect on a string tooltip",
+        "Forces the tooltip open or closed. Only for a tooltip rendered by this component.",
     },
     afterShow: {
       action: "afterShow",
       description:
-        "Called after the tooltip has been shown. Not called for a string tooltip",
+        "Called after the tooltip has been shown. Not called for a string tooltip.",
     },
     afterHide: {
       action: "afterHide",
       description:
-        "Called after the tooltip has been hidden. Not called for a string tooltip",
+        "Called after the tooltip has been hidden. Not called for a string tooltip.",
     },
     tooltipMaxWidth: {
       control: "text",
-      description:
-        "Widest the tooltip may grow, as a CSS length; longer text wraps. Has no effect on a string tooltip",
+      description: "Maximum width of the tooltip as a CSS length.",
       table: {
         defaultValue: { summary: "320px" },
       },
     },
     tooltipStyle: {
       control: "object",
-      description: "Inline style of the tooltip box itself",
+      description: "Applied to the tooltip itself.",
     },
     noUserSelect: {
       control: "boolean",
-      description: "Stops the text in the tooltip from being selected",
+      description: "Stops the tooltip's text being selected.",
     },
     id: {
       control: "text",
       description:
-        "Id of the anchor. Without it a new id is generated on every render, so pass one for a button inside something that re-renders",
+        "Id of the anchor element, which the tooltip is matched against by a CSS selector. Without it a fresh id is generated on **every** render, so pass one for a button that re-renders.",
     },
     className: {
       control: "text",
-      description: "Class of the icon or of the element around the children",
+      description:
+        "Class of the info icon, or of the element around `children`.",
       table: {
         defaultValue: { summary: "icon-button" },
       },
     },
     style: {
       control: "object",
-      description: "Inline style of the wrapper around the anchor",
+      description: "Applied to the wrapper around the anchor.",
     },
     dataTip: {
       control: "text",
-      description: "Value of the legacy `data-tip` attribute on the icon",
+      description: "Value of the legacy `data-tip` attribute on the info icon.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the wrapper",
+      description: "Value of `data-testid` on the wrapper.",
       table: {
         defaultValue: { summary: "help-button" },
       },
-    },
-    tooltipId: {
-      control: false,
-      description: "Ignored. Nothing reads this prop",
-    },
-    tooltipProps: {
-      control: false,
-      description: "Ignored. Nothing reads this prop",
-    },
-    offsetTop: {
-      control: false,
-      description: "Ignored. Nothing reads this prop",
-    },
-    offsetRight: {
-      control: false,
-      description: "Ignored. Nothing reads this prop",
-    },
-    offsetBottom: {
-      control: false,
-      description: "Ignored. Nothing reads this prop",
-    },
-    offsetLeft: {
-      control: false,
-      description: "Ignored. Nothing reads this prop",
-    },
-    hoverColor: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    clickColor: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    isDisabled: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    isFill: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    isStroke: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    iconHoverName: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    iconClickName: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    onClick: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    onMouseEnter: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    onMouseLeave: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    onMouseDown: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    onMouseUp: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    tabIndex: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    onKeyDown: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
-    },
-    title: {
-      control: false,
-      description:
-        "Accepted by the type but not passed on to the icon, so it has no effect",
     },
   },
 } satisfies Meta<typeof HelpButton>;
@@ -271,6 +164,15 @@ const icon = (canvas: Canvas) =>
 const tooltipShows = (text: string) =>
   waitFor(() => expect(screen.getByText(text)).toBeVisible());
 
+// Opened from the keyboard, the text is also in the hidden live region.
+const keyboardTooltipShows = (canvas: Canvas, text: string) =>
+  waitFor(() => {
+    expect(screen.getByRole("tooltip")).toHaveTextContent(text);
+    expect(canvas.getByTestId("help-button-announcement")).toHaveTextContent(
+      text,
+    );
+  });
+
 const icons = (canvas: { getAllByTestId: (id: string) => HTMLElement[] }) =>
   canvas
     .getAllByTestId("help-button")
@@ -285,6 +187,15 @@ export const Default: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(icon(canvas));
     await tooltipShows("This is a help tooltip");
+
+    // Escape closes it, and the keyboard opens it again.
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(screen.queryByText("This is a help tooltip")).toBeNull(),
+    );
+    canvas.getByRole("button", { name: "Info" }).focus();
+    await userEvent.keyboard("{Enter}");
+    await keyboardTooltipShows(canvas, "This is a help tooltip");
   },
   render: (args) => (
     <div style={{ padding: "40px 20px" }}>
@@ -300,7 +211,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The info icon with a short explanation beside it; click the icon to open it, and change any other prop live in the Controls panel below.",
+          "The info icon with a short explanation, which opens beside it on click.",
       },
       source: {
         code: `<HelpButton
@@ -340,6 +251,7 @@ const CustomStyleTemplate = () => {
 };
 
 export const CustomStyle: Story = {
+  name: "Size and colour",
   render: () => <CustomStyleTemplate />,
   play: async ({ canvas }) => {
     const [plain, blue, green] = icons(canvas);
@@ -355,7 +267,7 @@ export const CustomStyle: Story = {
     docs: {
       description: {
         story:
-          "An icon larger or in another colour stands out next to a heading rather than a field label. Click each icon to open its tooltip.",
+          "Icons larger or in another colour, which stand out next to a heading rather than a field label (`size`, `color`).",
       },
       source: {
         code: `<HelpButton tooltipContent={<div>Default size</div>} place="top" />
@@ -393,6 +305,7 @@ const WithCustomContentTemplate = () => {
 };
 
 export const WithCustomContent: Story = {
+  name: "Rich content",
   render: () => <WithCustomContentTemplate />,
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(icon(canvas));
@@ -409,7 +322,7 @@ export const WithCustomContent: Story = {
     docs: {
       description: {
         story:
-          "An explanation that needs a heading or a list goes in as a React node, which opens in the component's own tooltip with no shared tooltip mounted.",
+          "An explanation with a heading and a list, passed as a React node. It opens in the component's own tooltip, with no shared tooltip mounted.",
       },
       source: {
         code: `<HelpButton
@@ -463,6 +376,7 @@ const TooltipPositionsTemplate = () => {
 };
 
 export const TooltipPositions: Story = {
+  name: "Tooltip sides",
   render: () => <TooltipPositionsTemplate />,
   play: async ({ canvas, userEvent }) => {
     // Each tooltip opens on its own side of the icon.
@@ -488,7 +402,7 @@ export const TooltipPositions: Story = {
     docs: {
       description: {
         story:
-          "The side matters when the icon sits at the edge of a form or next to other controls. Click each icon to see its tooltip open on the side written under it.",
+          "Four icons, each opening its tooltip on the side written under it (`place`). The side matters at the edge of a form or next to other controls.",
       },
       source: {
         code: `<HelpButton tooltipContent={<div>Top</div>} place="top" />
@@ -514,6 +428,7 @@ const TextContentTemplate = () => {
 };
 
 export const WithTextContent: Story = {
+  name: "Plain text",
   render: () => <TextContentTemplate />,
   play: async ({ canvas, userEvent }) => {
     // A string goes to the shared tooltip RootTooltip renders, anchored to
@@ -528,12 +443,26 @@ export const WithTextContent: Story = {
     // RootTooltip's info tooltip opens on a click, not on hover.
     await userEvent.click(anchor);
     await tooltipShows("Plain text opens in the shared tooltip");
+
+    // Escape closes it, and the keyboard opens it again.
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(
+        screen.queryByText("Plain text opens in the shared tooltip"),
+      ).toBeNull(),
+    );
+    anchor.focus();
+    await userEvent.keyboard("{Enter}");
+    await keyboardTooltipShows(
+      canvas,
+      "Plain text opens in the shared tooltip",
+    );
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Plain text needs no tooltip of its own: a string is shown by the application's shared tooltip, so it appears only where `RootTooltip` is mounted once, as it is here. Click the icon to open it.",
+          "Plain text, shown by the application's shared tooltip rather than one of the component's own. It appears only where `RootTooltip` is mounted, as it is here.",
       },
       source: {
         code: `<RootTooltip />
@@ -567,6 +496,7 @@ const CustomAnchorTemplate = () => {
 };
 
 export const WithCustomAnchor: Story = {
+  name: "Word as the anchor",
   render: () => <CustomAnchorTemplate />,
   play: async ({ canvas, userEvent }) => {
     // The children are the anchor in place of the glyph.
@@ -577,7 +507,7 @@ export const WithCustomAnchor: Story = {
     docs: {
       description: {
         story:
-          "When the label itself should open the explanation, pass it as children in place of the icon. Click **Storage** to open a tooltip no wider than 240px (`tooltipMaxWidth`).",
+          "The word **Storage** in place of the icon, passed as children, so the label itself opens the explanation. Its tooltip is no wider than 240px (`tooltipMaxWidth`).",
       },
       source: {
         code: `<HelpButton
@@ -607,6 +537,7 @@ const OpensOnHoverTemplate = () => {
 };
 
 export const OpensOnHover: Story = {
+  name: "Opens on hover",
   render: () => <OpensOnHoverTemplate />,
   play: async ({ canvas, userEvent }) => {
     await userEvent.hover(icon(canvas));
@@ -616,7 +547,7 @@ export const OpensOnHover: Story = {
     docs: {
       description: {
         story:
-          "A one-line hint with nothing to click inside can open on hover instead (`openOnClick={false}`). Point at the icon to open it; the tooltip closes when the pointer leaves.",
+          "A one-line hint with nothing to click inside, which opens on hover instead (`openOnClick={false}`). The tooltip closes when the pointer leaves.",
       },
       source: {
         code: `<HelpButton
@@ -637,6 +568,7 @@ const cssTooltipStyle = {
 } as React.CSSProperties;
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   play: async ({ canvas, userEvent }) => {
     const [first, second] = icons(canvas);
     await userEvent.click(first);
@@ -679,7 +611,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The tooltip's variables passed through \`tooltipStyle\` -- the variables are listed under CSS variables on this page. Click either icon to see the custom colours; the second tooltip's longer text wraps at 180px.`,
+        story: `Two tooltips in custom colours, set by passing the tooltip's variables through \`tooltipStyle\`. The second tooltip's longer text wraps at 180px.`,
       },
       source: {
         code: `<HelpButton

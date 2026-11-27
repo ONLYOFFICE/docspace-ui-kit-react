@@ -64,10 +64,6 @@
     pointer-events: none;
   }
 
-  &.hotkeyBorder {
-    border-color: var(--secondary-text);
-  }
-
   @include mixins.mobile {
     margin-inline-start: 2px;
   }

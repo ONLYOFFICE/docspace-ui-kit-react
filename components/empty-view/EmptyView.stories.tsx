@@ -33,39 +33,40 @@ const meta = {
   argTypes: {
     title: {
       control: "text",
-      description: "Main title text displayed below the icon",
+      description:
+        "The bold first line: the view's heading, or an item's name.",
     },
     description: {
       control: "text",
-      description: "Text or content shown in smaller grey type under the title",
+      description: "The line under the title, as text or a node.",
     },
     icon: {
       description:
-        "Illustration shown at the top, above the title, rendered as given",
+        "Picture above the view's title, or at the start of an item, rendered as given. Mark it `aria-hidden` when it only decorates.",
       control: false,
     },
     options: {
       description:
-        "What the user can do next, in the order given: an option with `to` is a link, `type` picks a button, separator or text action, and anything else is a suggestion card. `null` shows the header alone",
+        "What the user can do next, in the order given, under the description. `null` leaves the options out.",
       control: false,
     },
     LinkRouter: {
       description:
-        "Link component of the application's router, used to render link options. Without it a link option ignores its `to` and only runs its `onClick`",
+        "Your router's `Link`, used for link options instead of a plain anchor, so a click does not reload the page.",
       control: false,
     },
     extraContent: {
       description:
-        "Custom content shown between the description and the options",
+        "Rendered between the header and the options, outside their gap.",
       control: false,
     },
     className: {
       control: "text",
-      description: "CSS class added to the outer block",
+      description: "Added to the wrapper.",
     },
     bodyClassName: {
       control: "text",
-      description: "CSS class added to the block that holds the options",
+      description: "Added to the element that holds the options.",
     },
   },
 } satisfies Meta<typeof EmptyView>;
@@ -111,7 +112,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The common case: an illustration, a title and a description, with one link that takes the user somewhere they can act. Change the texts live in the Controls panel below.",
+          "The common case: an illustration, a title and a description, with one link that takes the user somewhere they can act.",
       },
       source: {
         code: `<EmptyView
@@ -129,6 +130,7 @@ export const Default: Story = {
 };
 
 export const NoOptions: Story = {
+  name: "No options",
   render: Template,
   args: {
     icon: <EmptyRoomsLightSvg />,
@@ -162,6 +164,7 @@ export const NoOptions: Story = {
 };
 
 export const WithMultipleOptions: Story = {
+  name: "Several links",
   render: Template,
   args: {
     icon: <EmptyRoomsLightSvg />,
@@ -248,6 +251,7 @@ const cardOptions: EmptyViewProps["options"] = [
 ];
 
 export const SuggestionCards: Story = {
+  name: "Suggestion cards",
   render: Template,
   args: {
     icon: <EmptyRoomsLightSvg />,
@@ -281,11 +285,11 @@ export const SuggestionCards: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Cards give each next step a title and a line of explanation, for when a link alone would not say enough:
+        story: `Cards give each next step a title and a line of explanation:
 
-- **Create a folder** — a plain card; clicking it runs its \`onClick\`
-- **Upload files** — click it to open a menu of choices instead (\`model\`)
-- A third card, **Browse templates**, is \`disabled\` and therefore not rendered at all`,
+- **Create a folder** — a plain card that runs its \`onClick\`.
+- **Upload files** — a card that opens a menu of choices instead (\`model\`).
+- A third card, **Browse templates**, is \`disabled\` and so not rendered.`,
       },
       source: {
         code: `<EmptyView
@@ -313,6 +317,7 @@ export const SuggestionCards: Story = {
 };
 
 export const WithButtons: Story = {
+  name: "With buttons",
   render: Template,
   args: {
     icon: <EmptyRoomsLightSvg />,
@@ -358,9 +363,9 @@ export const WithButtons: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Buttons suit a step that starts work right here rather than going somewhere; they line up in a row and wrap when there is no room:
+        story: `Buttons for steps that start work right here. They line up in a row and wrap when there is no room:
 
-- **Create document** — primary, which is what a button option is unless told otherwise
+- **Create document** — primary, the default for a button option
 - **Import** — secondary (\`primary: false\`)
 - **Sync** — secondary, with a loader while its work runs (\`isLoading\`)`,
       },
@@ -381,6 +386,7 @@ export const WithButtons: Story = {
 };
 
 export const TextActionsWithSeparator: Story = {
+  name: "Text actions and a separator",
   render: Template,
   args: {
     icon: <EmptyRoomsLightSvg />,
@@ -456,6 +462,7 @@ export const TextActionsWithSeparator: Story = {
 };
 
 export const WithExtraContent: Story = {
+  name: "With extra content",
   render: Template,
   args: {
     icon: <EmptyRoomsLightSvg />,
@@ -487,7 +494,7 @@ export const WithExtraContent: Story = {
     docs: {
       description: {
         story:
-          "When the empty state needs something the option types do not cover — a hint, a form, a picture — it goes between the description and the options (`extraContent`).",
+          "A hint between the description and the options (`extraContent`). Anything the option types do not cover goes there: a hint, a form, a picture.",
       },
       source: {
         code: `<EmptyView
@@ -504,6 +511,7 @@ export const WithExtraContent: Story = {
 };
 
 export const LinkWithoutRouter: Story = {
+  name: "Link without a router",
   render: (args) => <EmptyView {...args} />,
   args: {
     icon: <EmptyRoomsLightSvg />,
@@ -537,7 +545,7 @@ export const LinkWithoutRouter: Story = {
     docs: {
       description: {
         story:
-          "A link option with no `LinkRouter` — or with `isNext` — renders the kit's own link, with `to` as its `href`. A plain click and Enter run its `onClick` and stay on the page; a Ctrl- or middle-click opens `to` in a new tab, and an option with no `onClick` navigates to it.",
+          "A link option with no `LinkRouter`, or with `isNext`, is the kit's own link with `to` as its `href`. A plain click or Enter runs its `onClick`; a Ctrl- or middle-click opens `to` in a new tab.",
       },
       source: {
         code: `<EmptyView
@@ -552,6 +560,7 @@ export const LinkWithoutRouter: Story = {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <Template {...args} />
@@ -587,7 +596,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "375px" },
       description: {
         story:
-          'The same empty state under a right-to-left interface: in the suggestion card the icon moves to the right edge, the text aligns right, and the arrow moves to the left edge and points left. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+          'The same empty state under a right-to-left interface. In the suggestion card the icon moves to the right edge, and the arrow to the left edge, pointing left. The direction comes from the theme\'s `interfaceDirection`; the wrapper also carries `dir="rtl"`.',
       },
       source: {
         code: `<div dir="rtl">
@@ -604,6 +613,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   play: async ({ canvas }) => {
     await expect(canvas.getByText("No Files Found")).toHaveStyle({
       color: "rgb(0, 130, 201)",
@@ -683,7 +693,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The instance holds two links, a separator and a suggestion card. Hover a link and the card to see the hover backgrounds.`,
+        story: `Every overridable variable set on one wrapper. The view holds two links, a separator and a suggestion card; the hover backgrounds show under the pointer.`,
       },
       source: {
         code: `<div

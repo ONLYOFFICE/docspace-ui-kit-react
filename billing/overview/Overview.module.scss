@@ -366,6 +366,10 @@
   grid-row: 3;
 }
 
+.pmLinkedBody {
+  grid-row: 2 / 4;
+}
+
 .addonsColumns {
   display: flex;
   align-items: center;

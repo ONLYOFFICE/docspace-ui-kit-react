@@ -41,7 +41,6 @@ const AccessSelector = (props: AccessSelectorProps) => {
       scaled={false}
       manualWidth="auto"
       selectedOption={selectedAccessRight as TOption}
-      showDisabledItems
       directionX="right"
       directionY="top"
       forceCloseClickOutside
@@ -62,7 +61,6 @@ const AccessSelector = (props: AccessSelectorProps) => {
       manualY={isMobileView ? "0px" : undefined}
       withoutBackground={!isMobileView}
       withBackground={!isMobileView}
-      withBlur={isMobileView}
     />
   );
 };

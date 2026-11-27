@@ -50,54 +50,52 @@ const meta = {
       control: "select",
       options: locales,
       description:
-        "BCP 47 tag the calendar is written in; it also picks the clock: 12-hour with an AM/PM drop-down for English locales, 24-hour for every other",
+        "BCP 47 tag the calendar is written in. It also decides whether the time is shown as 12-hour or 24-hour.",
     },
     hasError: {
       control: "boolean",
-      description:
-        "Draws the shown time in red and marks the control as invalid",
+      description: "Whether the control is drawn in its error colours.",
     },
     minDate: {
       control: "date",
-      description: "Earliest day the calendar lets you pick",
+      description:
+        "Earliest selectable day in the calendar; its own day stays selectable, whatever its time.",
     },
     maxDate: {
       control: "date",
-      description: "Latest day the calendar lets you pick",
+      description: "Latest selectable day in the calendar.",
     },
     initialDate: {
       control: "date",
       description:
-        "Date and time the component starts on; read once, when it mounts",
+        "Moment shown from the first render, as the day chip and the time beside it. Its hour also picks AM or PM.",
     },
     openDate: {
       control: "date",
-      description: "Month the calendar opens on",
+      description: "Month the calendar opens on.",
     },
     selectDateText: {
       control: "text",
-      description:
-        "Text of the button shown while no date is chosen, also the control's accessible name",
+      description: "Text of the button shown while no date is chosen.",
     },
     className: {
       control: "text",
-      description: "Class added to the outermost element",
+      description: "Applied to the outermost element.",
     },
     id: {
       control: "text",
-      description: "`id` of the outermost element",
+      description: "Applied to the outermost element.",
     },
     dataTestId: {
       control: "text",
-      description: "`data-testid` of the outermost element",
+      description: "`data-testid` of the outermost element.",
       table: {
         defaultValue: { summary: "date-time-picker" },
       },
     },
     hideCross: {
       control: "boolean",
-      description:
-        "Hides the cross on the date chip, so the picked day cannot be cleared",
+      description: "Whether the date chip's clearing cross is hidden.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -105,7 +103,7 @@ const meta = {
     useMaxTime: {
       control: "boolean",
       description:
-        "Reports the first day picked at the end of that day rather than at the current time of day",
+        "Whether a picked day is reported at the end of that day rather than at midnight.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -113,12 +111,12 @@ const meta = {
     translations: {
       control: "object",
       description:
-        "Labels of the AM and PM options in the drop-down; required, as nothing translates them for you",
+        "Labels of the AM and PM options. Required: the component reads them while rendering, and nothing here translates them for you.",
     },
     onChange: {
       action: "onChange",
       description:
-        "Called whenever the day or the time changes, with the combined date and time, or `null` when the day is cleared",
+        "Called whenever either half changes, with the combined date and time, or `null` when the date is cleared.",
     },
   },
 } satisfies Meta<typeof DateTimePicker>;
@@ -227,7 +225,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          'The picker as a form shows it before anything is chosen: only the "Select date" button. Pick a day to see the time appear beside it, click the time to edit it, and change any other prop live in the Controls panel below.',
+          'The picker as a form shows it before anything is chosen: only the "Select date" button. A picked day brings the time beside it, which a click turns into an editor.',
       },
       source: {
         code: `<DateTimePicker
@@ -265,6 +263,7 @@ const WithErrorTemplate = () => {
 };
 
 export const WithError: Story = {
+  name: "Error",
   render: () => <WithErrorTemplate />,
   play: async ({ canvas }) => {
     await expect(canvas.getByTestId("date-time-picker")).toHaveAttribute(
@@ -279,7 +278,7 @@ export const WithError: Story = {
     docs: {
       description: {
         story:
-          "Use it when the chosen moment fails validation: the time turns red and the control is marked invalid for screen readers (`hasError`). A day is picked here because the time, the only part drawn in the error colour, shows only once there is one.",
+          "A moment that failed validation (`hasError`): the time turns red, and the control is marked invalid. A day is picked, since the time, the only red part, shows only then.",
       },
       source: {
         code: `<DateTimePicker
@@ -317,6 +316,7 @@ const WithInitialDateTemplate = () => {
 };
 
 export const WithInitialDate: Story = {
+  name: "With a moment",
   render: () => <WithInitialDateTemplate />,
   play: async (context) => {
     const { canvas } = context;
@@ -379,7 +379,7 @@ export const WithInitialDate: Story = {
     docs: {
       description: {
         story:
-          "Use it to edit a moment that already exists, such as a saved deadline: the day chip and the time show it from the first render (`initialDate`). The English locale gives a 12-hour clock; click the time to see the AM/PM drop-down beside the editor. Choosing AM or PM sets that half of the day: the half already shown changes nothing, and the day never moves.",
+          "A saved moment shown from the first render (`initialDate`): the day chip and the time beside it. The English locale gives a 12-hour clock.",
       },
       source: {
         code: `<DateTimePicker
@@ -417,6 +417,7 @@ const HiddenCrossTemplate = () => {
 };
 
 export const HiddenCross: Story = {
+  name: "Without the cross",
   render: () => <HiddenCrossTemplate />,
   play: async ({ canvas }) => {
     // The day chip has no cross, so the day cannot be cleared.
@@ -427,7 +428,7 @@ export const HiddenCross: Story = {
     docs: {
       description: {
         story:
-          "Use it for a field that must always hold a moment: the day chip has no cross, so the day can be changed in the calendar but never cleared (`hideCross`).",
+          "A day chip with no cross, for a field that must always hold a moment (`hideCross`). The day can be changed in the calendar, but not cleared.",
       },
       source: {
         code: `<DateTimePicker
@@ -465,6 +466,7 @@ const TwentyFourHourClockTemplate = () => {
 };
 
 export const TwentyFourHourClock: Story = {
+  name: "24-hour clock",
   render: () => <TwentyFourHourClockTemplate />,
   play: async (context) => {
     const { canvas } = context;
@@ -479,7 +481,7 @@ export const TwentyFourHourClock: Story = {
     docs: {
       description: {
         story:
-          'Any locale that is not English switches the clock to 24 hours (`locale`): the time reads "14:30" rather than "02:30 PM", and the editor opened by a click on it has no AM/PM drop-down. The calendar is written in the same locale.',
+          'A 24-hour clock from a locale that is not English (`locale`). The time reads "14:30" rather than "02:30 PM", and its editor has no AM/PM drop-down.',
       },
       source: {
         code: `<DateTimePicker
@@ -496,6 +498,7 @@ export const TwentyFourHourClock: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={
@@ -549,7 +552,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. Click the time to see the time editor and the day chip to see the calendar; the day chip is a SelectedItem and takes its variables, set here to match the time cell; the "select date" button and the AM/PM drop-down keep their own, listed in the AddButton and ComboBox stories.`,
+        story: `A picker under a wrapper that sets every overridable variable. The day chip is a SelectedItem, and its variables are set here to match the time cell.`,
       },
       source: {
         code: `<div

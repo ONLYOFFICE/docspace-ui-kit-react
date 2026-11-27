@@ -18,7 +18,7 @@ const meta = {
     isDropZone: {
       control: "boolean",
       description:
-        "Passes drag events on to a drop target around this one, which then takes the drop in place of this element's `onDrop`. Without it the events stop here",
+        "Lets drag events bubble out of this element to a drop target above it. Without it they are stopped here.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -26,7 +26,7 @@ const meta = {
     dragging: {
       control: "boolean",
       description:
-        "Your own flag that a drag is in progress. The element is highlighted only while it is set, and gets the stronger accept colour while files are held over it",
+        'Your own "a drag is in progress" flag. **Nothing is highlighted without it** — the accept colour is nested inside this state.',
       table: {
         defaultValue: { summary: "false" },
       },
@@ -34,7 +34,7 @@ const meta = {
     isDragDisabled: {
       control: "boolean",
       description:
-        "Fades the element to 40%. The drop is not blocked: `onDrop` still fires",
+        "Fades the element to 40%. It does not stop the drop: `onDrop` still fires.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -42,46 +42,34 @@ const meta = {
     onDrop: {
       action: "dropped",
       description:
-        "Called with the dropped files; not called when the drop carried none",
+        "Called with the dropped files, and skipped when the drop carried none. Nothing is rejected: there is no type or size filter here.",
     },
     onDragOver: {
       action: "dragOver",
       description:
-        "Called on every drag-over with the drag-active flag from the last render, which is still `false` on the first event of a drag",
+        "Called on every drag-over with the drag-active flag from the last render. On the first event of a drag that flag is still `false`.",
     },
     onDragLeave: {
       action: "dragLeave",
-      description: "Called when the dragged files leave the element",
+      description: "Called when the dragged selection leaves the target.",
     },
     onMouseDown: {
       action: "mouseDown",
-      description: "Called when the pointer is pressed on the element",
+      description:
+        "Called when the pointer is pressed. It is passed straight to the element, not through the drop library.",
     },
     children: {
       description:
-        "What the drop target wraps; the element fills its parent's height around it",
+        "What the drop target wraps. The component adds no layout of its own beyond filling its parent's height.",
     },
     className: {
       control: "text",
       description:
-        "Added after the component's own classes on the outer element",
+        "Added after the component's own classes on the outer element.",
     },
     style: {
       description:
-        "Inline style of the outer element, also the place to override the drag colours and the faded opacity",
-    },
-    value: {
-      control: false,
-      description: "Ignored: nothing reads it",
-    },
-    targetFile: {
-      control: false,
-      description: "Ignored: nothing calls it",
-    },
-    forwardedRef: {
-      control: false,
-      description:
-        "Ignored: the element's ref belongs to the drop library, and this one is never attached",
+        "Inline style of the outer element, and where the `--dnd-*` custom properties go.",
     },
   },
   args: {
@@ -174,6 +162,7 @@ const InteractiveDropZone = (args: ComponentProps<typeof DragAndDrop>) => {
 };
 
 export const Default: Story = {
+  name: "Host keeps the drag flag",
   render: (args) => <InteractiveDropZone {...args} />,
   play: async ({ args, canvas, canvasElement }) => {
     const [target] = targets(canvasElement);
@@ -204,7 +193,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The usual setup: the host keeps its own drag flag and passes it back. Drag files from your desktop over the box to see the background change and the dropped files arrive in the Actions panel (`onDragOver`, `dragging`, `onDrop`).",
+          "The usual setup: the host keeps its own drag flag and passes it back (`onDragOver`, `dragging`). Files held over the box tint its background, and a drop hands them to `onDrop`.",
       },
       source: {
         code: `const [dragging, setDragging] = useState(false);
@@ -226,6 +215,7 @@ export const Default: Story = {
 };
 
 export const WithDraggingState: Story = {
+  name: "Held in the dragging state",
   render: (args) => <InteractiveDropZone {...args} />,
   args: {
     dragging: true,
@@ -243,7 +233,7 @@ export const WithDraggingState: Story = {
     docs: {
       description: {
         story:
-          "The drag background held on without an actual drag, to check how the highlight looks in each theme (`dragging`). Drag a file over it to see the stronger accept colour on top.",
+          "The drag background held on without an actual drag, to check the highlight in each theme (`dragging`). Files held over it switch to the stronger accept colour.",
       },
       source: {
         code: `<DragAndDrop dragging onDrop={(files) => upload(files)}>
@@ -255,6 +245,7 @@ export const WithDraggingState: Story = {
 };
 
 export const Disabled: Story = {
+  name: "Faded",
   render: (args) => <InteractiveDropZone {...args} />,
   args: {
     isDragDisabled: true,
@@ -272,7 +263,7 @@ export const Disabled: Story = {
     docs: {
       description: {
         story:
-          "A target the user may not upload to, faded to 40% (`isDragDisabled`). The fade is only a look: drop a file and it still arrives in the Actions panel, so the host has to ignore it in `onDrop`.",
+          "A target the user may not upload to, faded to 40% (`isDragDisabled`). The fade is only a look: a dropped file still reaches `onDrop`, so the host has to ignore it there.",
       },
       source: {
         code: `<DragAndDrop
@@ -318,6 +309,7 @@ const NestedTargetsDemo = (args: ComponentProps<typeof DragAndDrop>) => {
 };
 
 export const NestedTargets: Story = {
+  name: "Nested targets",
   render: (args) => <NestedTargetsDemo {...args} />,
   args: {
     isDropZone: true,
@@ -338,7 +330,7 @@ export const NestedTargets: Story = {
     docs: {
       description: {
         story:
-          "A folder row inside a panel that also takes files. Drop a file on the inner box: with `isDropZone` on, the outer counter goes up and the inner one does not, because the drop is handed to the outer target. Turn `isDropZone` off in the Controls panel below and the inner box keeps the drop.",
+          "A folder row inside a panel that also takes files, each with a drop counter. With `isDropZone` on the inner box, a drop there is handed to the outer target, whose counter goes up. Without it the inner box keeps the drop.",
       },
       source: {
         code: `<DragAndDrop onDrop={uploadToPanel}>
@@ -353,6 +345,7 @@ export const NestedTargets: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={{
@@ -435,7 +428,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `One wrapper sets all three -- the variables are listed under CSS variables on this page. The first box is held in the dragging state for \`--dnd-dragging-bg\`; drag a file over it to see \`--dnd-accept-bg\`. The second box is there for \`--dnd-disabled-opacity\`, which only \`isDragDisabled\` switches on.`,
+        story: `Two targets under a wrapper that sets all three variables. The first is held in the dragging state with a pale blue background; files held over it turn it darker. The second is faded to 25% by \`isDragDisabled\`.`,
       },
       source: {
         code: `<div

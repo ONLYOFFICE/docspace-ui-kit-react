@@ -24,10 +24,58 @@ import BackupIcon from "../../assets/icons/24/backup.react.svg";
 import classNames from "classnames";
 
 import { useCommonTranslation } from "../../utils/i18n";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import { FloatingButtonProps } from "./FloatingButton.types";
 import { FloatingButtonIcons } from "./FloatingButton.enums";
 import styles from "./FloatingButton.module.scss";
+
+// The name a circle gets when it is passed neither `aria-label` nor `label`:
+// the translated operation its icon stands for. Each key is a literal so the
+// locale scanner finds it. `arrow` and `minus` collapse what `dots` and `plus`
+// opened, and `other` is an operation the kit has no word for, so it is named
+// by its state. Only an icon outside the enum keeps the icon's own name.
+const getIconName = (
+  icon: string,
+  t: ReturnType<typeof useCommonTranslation>,
+): string => {
+  switch (icon) {
+    case FloatingButtonIcons.upload:
+      return t("Upload");
+    case FloatingButtonIcons.trash:
+      return t("Delete");
+    case FloatingButtonIcons.deletePermanently:
+      return t("DeletePermanently");
+    case FloatingButtonIcons.move:
+      return t("Move");
+    case FloatingButtonIcons.duplicate:
+      return t("Duplicate");
+    case FloatingButtonIcons.copy:
+      return t("Copy");
+    case FloatingButtonIcons.download:
+      return t("Download");
+    case FloatingButtonIcons.backup:
+      return t("Backup");
+    case FloatingButtonIcons.exportIndex:
+      return t("Export");
+    case FloatingButtonIcons.refresh:
+      return t("Update");
+    case FloatingButtonIcons.dots:
+      return t("MoreOptions");
+    case FloatingButtonIcons.plus:
+      return t("AddButton");
+    case FloatingButtonIcons.markAsRead:
+      return t("MarkRead");
+    case FloatingButtonIcons.arrow:
+      return t("Hide");
+    case FloatingButtonIcons.minus:
+      return t("CloseMenu");
+    case FloatingButtonIcons.other:
+      return t("InProgress");
+    default:
+      return "";
+  }
+};
 
 const ICON_COMPONENTS = {
   [FloatingButtonIcons.upload]: <UploadIcon data-testid="icon-upload" />,
@@ -79,6 +127,7 @@ const FloatingButton = forwardRef<HTMLDivElement, FloatingButtonProps>(
       percent,
       label,
       cancelLabel,
+      ...rest
     },
     ref,
   ) => {
@@ -124,7 +173,9 @@ const FloatingButton = forwardRef<HTMLDivElement, FloatingButtonProps>(
       ? Math.min(100, Math.max(0, percent))
       : undefined;
 
-    const buttonLabel = label ?? `${icon} button`;
+    const aria = pickAriaProps(rest);
+    const buttonLabel =
+      aria["aria-label"] ?? label ?? (getIconName(icon, t) || `${icon} button`);
     const cancelName = cancelLabel ?? (t("Common:CancelButton") || "Cancel");
 
     const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -148,6 +199,7 @@ const FloatingButton = forwardRef<HTMLDivElement, FloatingButtonProps>(
           onClick={onClick}
           data-testid="floating-button"
           data-role="button"
+          {...aria}
           {...(onClick
             ? { role: "button", tabIndex: 0, onKeyDown }
             : { role: "img" })}

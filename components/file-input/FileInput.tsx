@@ -38,6 +38,7 @@ const FileInputPure = ({
   onReject,
   className,
   "data-test-id": dataTestId,
+  name,
   ...rest
 }: FileInputProps) => {
   const t = useCommonTranslation();
@@ -145,9 +146,9 @@ const FileInputPure = ({
           className={wrapperClasses}
           id={idButton}
           data-testid={dataTestId ?? "file-input"}
-          aria-disabled={isInert ? "true" : "false"}
           role="button"
           {...rest}
+          aria-disabled={isInert ? "true" : (rest["aria-disabled"] ?? "false")}
           {...getRootProps()}
         >
           <TextInput
@@ -171,6 +172,7 @@ const FileInputPure = ({
               data-testid="upload-click-input"
               type="file"
               id={id}
+              name={name}
               ref={inputRef}
               style={{ display: "none" }}
               {...getInputProps()}

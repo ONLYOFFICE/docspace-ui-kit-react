@@ -21,6 +21,7 @@ import { InputSize, InputType } from "../text-input";
 import { PasswordInputProps, TPasswordSettings } from "./PasswordInput.types";
 import { globalColors } from "../../providers/theme";
 import { useCommonTranslation } from "../../utils";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import {
   usePasswordGenerator,
@@ -48,8 +49,6 @@ const PasswordInput = ({
   ref,
   inputType = InputType.password,
   inputValue,
-  clipActionResource,
-  emailInputName,
   passwordSettings = DEFAULT_PASSWROD_SETTINGS,
   generatorSettings,
   onBlur,
@@ -59,7 +58,6 @@ const PasswordInput = ({
   isDisabled = false,
   simpleView = false,
   generatorSpecial = "!@#$%^&*",
-  clipCopiedResource = "Copied",
   tooltipPasswordTitle,
   tooltipPasswordLength,
   tooltipPasswordDigits,
@@ -92,7 +90,9 @@ const PasswordInput = ({
   // clipPasswordResource = "Password ",
   simulateSymbol = "•",
   sanitizeValue,
+  ...rest
 }: PasswordInputProps) => {
+  const ariaProps = pickAriaProps(rest);
   const refTooltip = useRef(null);
 
   const usePrevious = (value: string) => {
@@ -105,12 +105,7 @@ const PasswordInput = ({
 
   const prevInputValue = usePrevious(inputValue ?? "") ?? "";
 
-  const { state, setState } = usePasswordState(
-    inputType,
-    inputValue,
-    clipActionResource,
-    emailInputName,
-  );
+  const { state, setState } = usePasswordState(inputType, inputValue);
 
   const { checkPassword } = usePasswordValidation(
     passwordSettings,
@@ -204,10 +199,6 @@ const PasswordInput = ({
     },
     [onKeyDown],
   );
-
-  useEffect(() => {
-    setState((s) => ({ ...s, copyLabel: clipActionResource }));
-  }, [clipActionResource, clipCopiedResource, setState]);
 
   useEffect(() => {
     if (
@@ -390,6 +381,7 @@ const PasswordInput = ({
     return (
       <>
         <InputBlock
+          {...ariaProps}
           id={id}
           className="input-relative"
           name={inputName}

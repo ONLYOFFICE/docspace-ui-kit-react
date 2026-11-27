@@ -2,6 +2,7 @@ import React from "react";
 import classNames from "classnames";
 import { useInterfaceDirection } from "../../../context/InterfaceDirectionContext";
 import styles from "./RowContent.module.scss";
+import { groupRoleWhenNamed, pickAriaProps } from "../../../utils/aria-props";
 import { RowContentProps } from "./RowContent.types";
 import { getSideInfo } from "./RowContent.utils";
 
@@ -14,7 +15,6 @@ const RowContent = (props: RowContentProps) => {
     style,
     sideColor,
     onClick,
-    sectionWidth,
     convertSideInfo = true,
   } = props;
 
@@ -22,26 +22,11 @@ const RowContent = (props: RowContentProps) => {
 
   const sideInfo = getSideInfo(children, convertSideInfo, interfaceDirection);
 
-  let mainContainerWidth;
-
-  if (React.isValidElement(children[0]))
-    mainContainerWidth =
-      (children[0].props && children[0].props.containerWidth) || "140px";
-
-  const mainContainerStyle = mainContainerWidth
-    ? ({
-        ...style,
-        "--main-container-width": mainContainerWidth,
-      } as React.CSSProperties)
-    : style;
-
   return (
     <div
-      className={classNames(
-        styles.rowContent,
-        { [styles.sectionWidth]: sectionWidth },
-        className,
-      )}
+      {...pickAriaProps(props)}
+      role={groupRoleWhenNamed(props)}
+      className={classNames(styles.rowContent, className)}
       id={id}
       onClick={onClick}
       style={style}
@@ -53,7 +38,7 @@ const RowContent = (props: RowContentProps) => {
           styles.mainContainerWrapper,
           "row-main-container-wrapper",
         )}
-        style={mainContainerStyle}
+        style={style}
       >
         <div className={classNames(styles.mainContainer, "rowMainContainer")}>
           {children[0]}

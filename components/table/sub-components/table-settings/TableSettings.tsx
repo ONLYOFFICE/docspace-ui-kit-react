@@ -6,11 +6,17 @@ import SettingsDeskReactSvgUrl from "../../../../assets/settings.desc.react.svg"
 import { IconButton } from "../../../icon-button";
 import { DropDown } from "../../../drop-down";
 import { Checkbox } from "../../../checkbox";
+import { useCommonTranslation } from "../../../../utils/i18n";
 
 import { TTableColumn, TableSettingsProps } from "../../Table.types";
 import styles from "./TableSettings.module.scss";
 
-const TableSettings = ({ columns, disableSettings }: TableSettingsProps) => {
+const TableSettings = ({
+  columns,
+  disableSettings,
+  label,
+}: TableSettingsProps) => {
+  const t = useCommonTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const ref = useRef<HTMLDivElement | null>(null);
@@ -43,6 +49,7 @@ const TableSettings = ({ columns, disableSettings }: TableSettingsProps) => {
         isFill
         iconNode={<SettingsDeskReactSvgUrl />}
         onClick={onClick}
+        ariaLabel={label || t("Settings")}
         isDisabled={disableSettings}
         dataTestId="table-settings-button"
       />

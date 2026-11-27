@@ -18,6 +18,7 @@ import {
   BaseTileItemProps,
 } from "./BaseTile.types";
 
+import { groupRoleWhenNamed, pickAriaProps } from "../../../utils/aria-props";
 import styles from "./BaseTile.module.scss";
 
 export const BaseTile = ({
@@ -45,6 +46,7 @@ export const BaseTile = ({
   forwardRef,
   dataTestId,
   badgeUrl,
+  ...rest
 }: BaseTileProps) => {
   const t = useCommonTranslation();
   const childrenArray = React.Children.toArray(topContent);
@@ -83,12 +85,8 @@ export const BaseTile = ({
       }
     : undefined;
 
-  const getOptions = () => {
-    if (tileContextClick) {
-      tileContextClick();
-    }
-    return contextOptions;
-  };
+  // The button's onClick reports the click through onContextMenu.
+  const getOptions = () => contextOptions;
 
   const changeCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
     onSelect?.(e.target.checked, item);
@@ -143,11 +141,13 @@ export const BaseTile = ({
 
   return (
     <div
+      {...pickAriaProps(rest)}
+      role={groupRoleWhenNamed(rest)}
       className={tileClassName}
       onClick={onRoomClick}
       onContextMenu={onContextMenu}
       data-testid={dataTestId ?? "tile"}
-      aria-busy={inProgress || undefined}
+      aria-busy={inProgress || rest["aria-busy"]}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
     >

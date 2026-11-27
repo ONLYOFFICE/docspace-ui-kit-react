@@ -22,7 +22,10 @@ import {
   stripSiteSkips,
 } from "./markdown.mjs";
 import {
+  altText,
+  componentTitle,
   linkResolver,
+  metaDescription,
   pngWidth,
   renderAutodocs,
   renderMdx,
@@ -485,6 +488,29 @@ describe("renderMdx", () => {
     expect(out).not.toMatch(/---\n*$/);
   });
 
+  it("describes a <Story of> picture by the story's own name and text", () => {
+    const shot = { light: "l.png", dark: "d.png", width: 100 };
+    const out = renderMdx(
+      "<Meta of={S} />\n\n<Story of={S.IsLoadingButtons} />\n\n<Story of={S.Other} />\n",
+      {
+        ...context("components/button/Button.docs.mdx"),
+        page: {
+          label: "Button",
+          source: "components/button/Button.docs.mdx",
+          options: {},
+          stories: [{ exportName: "IsLoadingButtons", name: "Loading" }],
+        },
+        pictures: new Map([
+          ["is-loading-buttons", shot],
+          ["other", shot],
+        ]),
+      },
+    );
+    expect(out).toContain('alt="Button: Loading"');
+    expect(out).toContain('alt="Button: Other"');
+    expect(out).not.toContain("Is Loading Buttons");
+  });
+
   it("sends an edit to master, whatever revision the page was built from", () => {
     const out = renderMdx("# Welcome\n\nText.\n", {
       ...context("docs/Welcome.mdx"),
@@ -570,6 +596,49 @@ describe("pictures", () => {
   });
 });
 
+describe("search and assistants", () => {
+  it("titles a component's page for search and keeps the bare name in the sidebar", () => {
+    const out = renderReadme("# Button\n\nIntro.\n", {
+      root: process.cwd(),
+      source: "components/button/README.md",
+      out: "interactive-elements/button.md",
+      page: {
+        label: "Button",
+        source: "components/button/README.md",
+        meta: { summary: "Labelled action button." },
+      },
+      pages: { bySource: new Map(), byStoryId: new Map() },
+      pictures: new Map(),
+      revision: "master",
+      storyId: () => "x",
+      warn: () => {},
+    });
+    expect(out).toContain(
+      `title: "${componentTitle("Button")}"\nsidebar_label: "Button"\n`,
+    );
+    expect(out).toContain("# Button\n");
+  });
+
+  it("names the package in the meta description while it fits 160 characters", () => {
+    expect(metaDescription("Labelled action button.")).toBe(
+      "Labelled action button. A React component from @onlyoffice/apps-ui-kit.",
+    );
+    const long = `${"x".repeat(120)}.`;
+    expect(metaDescription(long)).toBe(`${long} From @onlyoffice/apps-ui-kit.`);
+    const longest = `${"x".repeat(150)}.`;
+    expect(metaDescription(longest)).toBe(longest);
+    expect(metaDescription("Uses `@onlyoffice/apps-ui-kit` here.")).toBe(
+      "Uses @onlyoffice/apps-ui-kit here.",
+    );
+  });
+
+  it("falls back to the name when a picture has no text to describe it", () => {
+    expect(altText("Button", undefined)).toBe("Button");
+    expect(altText("Button", undefined, "With Icon")).toBe("Button: With Icon");
+    expect(altText("Button", "- **Primary** — the main one")).toBe("Button");
+  });
+});
+
 describe("stories and MDX", () => {
   it("names a story as Storybook does", () => {
     expect(storyNameFromExport("WithIcon")).toBe("With Icon");
@@ -589,6 +658,45 @@ export const WithIcon = {
       { exportName: "Default", description: undefined, tags: [] },
       { exportName: "WithIcon", description: "Has an icon.", tags: [] },
     ]);
+  });
+
+  it("reads a story's own name, which Storybook shows over the export's", () => {
+    const text = `export default { title: "UI/X/Y" };
+export const IsLoadingButtons = { name: "Loading" };`;
+    expect(csfStories(text)[0]).toMatchObject({
+      exportName: "IsLoadingButtons",
+      name: "Loading",
+    });
+  });
+
+  it("heads a story with its own name and describes its picture in words", () => {
+    const out = renderReadme("# Button\n\nIntro.\n\n## Minimal example\n", {
+      root: process.cwd(),
+      source: "components/button/README.md",
+      out: "interactive-elements/button.md",
+      page: {
+        label: "Button",
+        source: "components/button/README.md",
+        stories: [
+          {
+            exportName: "IsLoadingButtons",
+            name: "Loading",
+            description:
+              "A spinner over the label (`isLoading`). It keeps width.",
+          },
+        ],
+      },
+      pages: { bySource: new Map(), byStoryId: new Map() },
+      pictures: new Map([
+        ["is-loading-buttons", { light: "l.png", dark: "d.png", width: 100 }],
+      ]),
+      revision: "master",
+      storyId: () => "x",
+      warn: () => {},
+    });
+    expect(out).toContain("### Loading\n");
+    expect(out).not.toContain("Is Loading Buttons");
+    expect(out).toContain('alt="Button: A spinner over the label (isLoading)"');
   });
 
   it("leaves out the exports the meta's excludeStories names", () => {

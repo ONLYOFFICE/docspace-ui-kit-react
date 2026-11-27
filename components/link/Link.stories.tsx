@@ -18,25 +18,25 @@ const meta = {
       control: "select",
       options: Object.values(LinkType),
       description:
-        "`page` for a link that navigates to its `href`, with a solid underline on hover; `action` for a link that runs `onClick`, with a dashed underline on hover",
+        "`page` for navigation, `action` for a link that runs code. With an `onClick` and no `href`, an action link is a keyboard button by itself. `role`, `onKeyDown` or a negative `tabIndex` leave the keyboard to you.",
       table: {
         defaultValue: { summary: "page" },
       },
     },
     href: {
       control: "text",
-      description: "Address the link navigates to, as the anchor's `href`",
+      description:
+        "Address the link navigates to. Without it the anchor is a link only when it has an `onClick`.",
     },
     target: {
       control: "select",
       options: Object.values(LinkTarget),
-      description:
-        "Where the address opens: a new tab (`_blank`), the same frame (`_self`), the parent frame or the whole window",
+      description: "Where the address opens, such as `_blank` for a new tab.",
     },
     rel: {
       control: "text",
       description:
-        "Relationship to the linked page, as the anchor's `rel`, e.g. `noopener noreferrer` for a new tab",
+        "Relation to the target page, such as `noopener noreferrer` for a new tab.",
     },
     fontSize: {
       control: "text",
@@ -53,7 +53,7 @@ const meta = {
     color: {
       control: "color",
       description:
-        "Colour of the label: any CSS colour, or `accent` for the portal's accent colour, which leaves the label in its default colour where the portal does not define one",
+        'Any CSS colour, or the literal `"accent"`, which resolves to the theme\'s `--accent-main`.',
     },
     textDecoration: {
       control: "select",
@@ -66,11 +66,11 @@ const meta = {
         "underline dashed",
       ],
       description:
-        "Line drawn under, over or through the label at all times; while set, it also replaces the underline shown on hover",
+        "Line drawn under the label at rest, over the stylesheet's `none`.",
     },
     isBold: {
       control: "boolean",
-      description: "Renders the label at weight 700",
+      description: "Renders the label at weight 700.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -78,14 +78,15 @@ const meta = {
     isHovered: {
       control: "boolean",
       description:
-        "Shows the hover underline without a pointer over the link, for a row that highlights its link while the whole row is hovered",
+        "Paints the link as if the pointer were over it, for a row that highlights its link on hover of the whole row.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isSemitransparent: {
       control: "boolean",
-      description: "Halves the opacity, to mark a pending or inactive entity",
+      description:
+        "Halves the opacity, the kit's convention for a pending or inactive entity.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -93,21 +94,21 @@ const meta = {
     isTextOverflow: {
       control: "boolean",
       description:
-        "Keeps the link within the width of its container; add `truncate` to end a long label with an ellipsis",
+        "Constrains the link to the width of its container (`display: inline-block; max-width: 100%`). It does **not** add the ellipsis by itself — that comes from `truncate`, inherited from `Text`. Set both to clip a long label.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     noHover: {
       control: "boolean",
-      description: "Removes the underline the link shows on hover",
+      description: "Removes the underline the link grows on hover.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     enableUserSelect: {
       control: "boolean",
-      description: "Whether the label can be selected with the mouse",
+      description: "Whether the label can be selected with the mouse.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -123,25 +124,26 @@ const meta = {
     title: {
       control: "text",
       description:
-        "Text of the tooltip shown on hover; it appears only where the app mounts `RootTooltip`",
+        "Tooltip text. Consumed by the `withTooltip` wrapper the folder exports, so it becomes the tooltip's content and never reaches the DOM as a `title` attribute.",
     },
     ariaLabel: {
       control: "text",
       description:
-        "Accessible name of the link; unset, a string label is used as the name",
+        "Value of `aria-label`. Without it a string `children` is used, so the visible text is the name; a node child sets none.",
     },
     role: {
       control: "text",
       description:
-        "ARIA role of the anchor; an action link needs `button`, since an anchor without `href` has no role",
+        "ARIA role. Without `href`, a link with an `onClick` takes one by itself; a role passed here leaves the keyboard to you.",
     },
     tabIndex: {
       control: "number",
       description:
-        "Position in the Tab order; an action link needs `0` to be reachable from the keyboard",
+        "Position in the tab order. `-1` keeps a link with no `href` out of the keyboard's reach.",
     },
     onClick: {
-      description: "Called with the event when the link is clicked",
+      description:
+        "Called on a click. Without `href` it is also called on Enter, and on Space for an action link.",
     },
     onKeyDown: {
       description:
@@ -149,19 +151,14 @@ const meta = {
     },
     id: {
       control: "text",
-      description: "`id` of the anchor",
+      description: "`id` of the anchor.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the anchor",
+      description: "Value of `data-testid` on the anchor.",
       table: {
         defaultValue: { summary: "link" },
       },
-    },
-    label: {
-      control: false,
-      description:
-        "Ignored: the label comes from `children`, and this prop reaches the anchor as an unknown attribute",
     },
   },
 } satisfies Meta<typeof Link>;
@@ -207,7 +204,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A page link that opens its address in a new tab. Hover it to see the underline, and change any other prop live in the Controls panel below.",
+          "A page link that opens its address in a new tab, and grows an underline on hover.",
       },
       source: {
         code: `<Link
@@ -373,6 +370,7 @@ const NoHoverTemplate = () => {
 };
 
 export const PageLinks: Story = {
+  name: "Page links",
   play: async ({ canvas }) => {
     const links = canvas.getAllByRole("link");
     await expect(links).toHaveLength(4);
@@ -385,7 +383,7 @@ export const PageLinks: Story = {
     docs: {
       description: {
         story:
-          "Page links navigate to another address; hover the regular one to see the solid underline a page link grows. **Bold page link** (`isBold`), **Hovered page link** keeps the underline on without a pointer (`isHovered`), **Semitransparent page link** is drawn at half opacity (`isSemitransparent`).",
+          "Page links, which navigate and grow a solid underline on hover. **Bold page link** (`isBold`), **Hovered page link** keeps the underline on (`isHovered`), **Semitransparent page link** is at half opacity (`isSemitransparent`).",
       },
       source: {
         code: `<Link type={LinkType.page} href="https://example.com" isBold>Bold page link</Link>
@@ -398,6 +396,7 @@ export const PageLinks: Story = {
 };
 
 export const ActionLinks: Story = {
+  name: "Action links",
   render: () => <ActionLinksTemplate />,
   play: async ({ canvas }) => {
     await statesOf(canvas, "action");
@@ -410,7 +409,7 @@ export const ActionLinks: Story = {
     docs: {
       description: {
         story:
-          "Action links run code in place instead of navigating, for filtering a list or opening a menu; hover the regular one to see the dashed underline that sets them apart from page links. The four links show the same states as the page links above.",
+          "Action links, which run code in place and grow a dashed underline on hover. The four links show the same states as the page links.",
       },
       source: {
         code: `<Link type={LinkType.action} onClick={handleClick} isBold>Bold action link</Link>
@@ -423,6 +422,7 @@ export const ActionLinks: Story = {
 };
 
 export const AllVariants: Story = {
+  name: "All variants",
   render: () => <AllVariantsTemplate />,
   play: async ({ canvas }) => {
     await statesOf(canvas, "page");
@@ -452,6 +452,7 @@ export const AllVariants: Story = {
 };
 
 export const HoveredState: Story = {
+  name: "Hovered",
   render: () => <HoveredTemplate />,
   play: async ({ canvas }) => {
     await expect(decoration(link(canvas, "Hovered link"))).toBe(
@@ -462,7 +463,7 @@ export const HoveredState: Story = {
     docs: {
       description: {
         story:
-          "The link shows its hover underline with no pointer over it, as it should inside a row that highlights its link while the whole row is hovered (`isHovered`).",
+          "A link holding its hover underline with no pointer over it (`isHovered`), as inside a row that highlights its link on hover.",
       },
       source: {
         code: `<Link type={LinkType.page} href="https://example.com" isHovered>Hovered link</Link>`,
@@ -472,6 +473,7 @@ export const HoveredState: Story = {
 };
 
 export const SemitransparentState: Story = {
+  name: "Semitransparent",
   render: () => <SemitransparentTemplate />,
   play: async ({ canvas }) => {
     await expect(link(canvas, "Semitransparent link")).toHaveStyle({
@@ -492,6 +494,7 @@ export const SemitransparentState: Story = {
 };
 
 export const WithTextOverflow: Story = {
+  name: "Truncated label",
   render: () => <TextOverflowTemplate />,
   play: async ({ canvas }) => {
     const element = link(
@@ -512,7 +515,7 @@ export const WithTextOverflow: Story = {
     docs: {
       description: {
         story:
-          "A label longer than its 200px container stays on one line and ends with an ellipsis, so it cannot push the layout wider (`isTextOverflow` with `truncate`).",
+          "A label longer than its 200px container, held on one line and cut with an ellipsis (`isTextOverflow` with `truncate`).",
       },
       source: {
         code: `<div style={{ width: 200 }}>
@@ -526,6 +529,7 @@ export const WithTextOverflow: Story = {
 };
 
 export const NoHoverEffect: Story = {
+  name: "No hover underline",
   render: () => <NoHoverTemplate />,
   play: async ({ canvas }) => {
     // The hover underline is switched off by a class; CSS :hover itself
@@ -538,7 +542,7 @@ export const NoHoverEffect: Story = {
     docs: {
       description: {
         story:
-          "Hover the link: no underline appears, for a link whose surroundings already show that it is clickable (`noHover`).",
+          "A link that grows no underline on hover (`noHover`), for surroundings that already show it is clickable.",
       },
       source: {
         code: `<Link type={LinkType.page} href="https://example.com" noHover>No hover effect link</Link>`,
@@ -564,6 +568,7 @@ const WithTooltipTemplate = () => {
 };
 
 export const WithTooltip: Story = {
+  name: "With tooltip",
   render: () => <WithTooltipTemplate />,
   play: async ({ canvas, userEvent }) => {
     await userEvent.hover(canvas.getByRole("link", { name: "Shared folder" }));
@@ -576,7 +581,7 @@ export const WithTooltip: Story = {
     docs: {
       description: {
         story:
-          "Hover the link to read what it opens, for a label too short to say it (`title`). The text appears in the app's shared tooltip, not the browser's native one, so it shows only where the app mounts `RootTooltip`.",
+          "A link whose tooltip says what it opens (`title`). The text appears in the app's shared tooltip, which shows only where the app mounts `RootTooltip`.",
       },
       source: {
         code: `<Link type={LinkType.page} href="https://example.com" title="Opens the shared folder">
@@ -592,25 +597,14 @@ export const WithTooltip: Story = {
 // click does.
 const KeyboardActionTemplate = ({ onAction }: { onAction?: () => void }) => {
   return (
-    <Link
-      type={LinkType.action}
-      role="button"
-      tabIndex={0}
-      onClick={() => onAction?.()}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          // Space would otherwise scroll the page.
-          e.preventDefault();
-          onAction?.();
-        }
-      }}
-    >
+    <Link type={LinkType.action} onClick={() => onAction?.()}>
       Move to archive
     </Link>
   );
 };
 
 export const KeyboardAccessibleAction: Story = {
+  name: "Action from the keyboard",
   // args.onClick is the fn() spy below; the template calls it with no event.
   render: (args) => (
     <KeyboardActionTemplate onAction={args.onClick as () => void} />
@@ -631,18 +625,10 @@ export const KeyboardAccessibleAction: Story = {
     docs: {
       description: {
         story:
-          "Press Tab to reach the link: an action link has no address, so without a role and a tab stop the keyboard skips it and a screen reader does not announce it. Here it is announced as a button (`role`), sits in the Tab order (`tabIndex`) and runs its action from the keys the handler checks (`onKeyDown`).",
+          "An action link with an `onClick` and no address, which the component makes a keyboard button by itself. It is a tab stop, announced as a button, and Enter and Space press it.",
       },
       source: {
-        code: `<Link
-  type={LinkType.action}
-  role="button"
-  tabIndex={0}
-  onClick={handleClick}
-  onKeyDown={(e) => {
-    if (e.key === "Enter" || e.key === " ") handleClick(e);
-  }}
->
+        code: `<Link type={LinkType.action} onClick={handleClick}>
   Move to archive
 </Link>`,
       },
@@ -659,6 +645,7 @@ const CustomColorTemplate = () => {
 };
 
 export const CustomColor: Story = {
+  name: "Custom colour",
   render: () => <CustomColorTemplate />,
   play: async ({ canvas }) => {
     await expect(link(canvas, "Custom colour link")).toHaveStyle({
@@ -669,7 +656,7 @@ export const CustomColor: Story = {
     docs: {
       description: {
         story:
-          "Colour draws the eye to a link inside plain text: the label takes any CSS colour (`color`). The value `accent` uses the accent colour of the portal instead, which this Storybook does not define, so it is not shown here.",
+          "A link in a CSS colour of its own (`color`). The value `accent` uses the portal's accent colour, which this Storybook does not define.",
       },
       source: {
         code: `<Link type={LinkType.page} href="https://example.com" color="#2E7D32">
@@ -702,6 +689,7 @@ const TextDecorationsTemplate = () => {
 };
 
 export const TextDecorations: Story = {
+  name: "Underlined at rest",
   render: () => <TextDecorationsTemplate />,
   play: async ({ canvas }) => {
     await expect(decoration(link(canvas, "Underlined link"))).toBe(
@@ -715,7 +703,7 @@ export const TextDecorations: Story = {
     docs: {
       description: {
         story:
-          "A link inside a paragraph is easier to spot when it is underlined before the pointer reaches it. **Underlined link** keeps a solid underline, **Dashed action link** a dashed one (`textDecoration`); the line stays the same on hover.",
+          "Links underlined at rest (`textDecoration`): **Underlined link** solid, **Dashed action link** dashed. The line stays the same on hover.",
       },
       source: {
         code: `<Link type={LinkType.page} href="https://example.com" textDecoration="underline">
@@ -730,6 +718,7 @@ export const TextDecorations: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   play: async ({ canvas }) => {
     await expect(link(canvas, "Custom color link")).toHaveStyle({
       color: "rgb(156, 39, 176)",
@@ -770,9 +759,10 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Overridable variables set on a wrapper and on the link itself -- the variables are listed under CSS variables on this page.
+        story: `Variables set on a wrapper and on the link itself:
 
-**Custom color link** is a page link: it takes the colour from the wrapper, and on hover shows no underline (\`--link-hover-page-text-decoration\`). **Custom action link** is there for the variables an action link reads: hover it for a wavy underline (\`--link-hover-text-decoration\`); at rest it carries a dotted underline and a taller line (\`--link-text-decoration\`, \`--link-line-height\`, through its \`style\` prop). \`--link-display\` is not shown: in a column of links its effect cannot be seen.`,
+- **Custom color link** — a page link in the wrapper's colour, with no underline on hover
+- **Custom action link** — a dotted underline and a taller line at rest, through its \`style\`; a wavy underline on hover`,
       },
       source: {
         code: `<div

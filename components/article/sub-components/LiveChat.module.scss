@@ -1,5 +1,6 @@
 @use "sass:math";
 @use "../../../styles/variables/floating-corner" as corner;
+@use "../../../styles/variables/colors";
 
 // Zendesk draws its launcher 64px square, in an iframe of its own, and offers
 // no size setting (`contentScale` scales the window's content, not the
@@ -19,4 +20,18 @@
 
 :global([data-dir="rtl"] iframe#launcher) {
   transform-origin: bottom left !important;
+}
+
+// The open messaging window has no id, and its `name` and `title` are
+// localised, so it is reached through the launcher it sits beside: Zendesk
+// puts both frames in one container, each in a `div` of its own. Its only
+// edge is a faint inline shadow, and on the dark theme its background is the
+// portal's own, so it melted into the page. It gets the border and shadow the
+// kit's dark dropdowns and context menus use; the border is a shadow ring so
+// it follows the window's rounded corners and leaves its size alone.
+// `!important` outranks the vendor's inline `box-shadow`.
+:global(.dark div:has(> div > iframe#launcher) > div > iframe:not(#launcher)) {
+  box-shadow:
+    0 0 0 1px colors.$gray-dark-strong,
+    0px 8px 16px 0px colors.$box-shadow-dark-color !important;
 }

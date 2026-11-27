@@ -19,7 +19,7 @@ const meta = {
       control: "select",
       options: Object.values(RoomsType).filter((v) => typeof v === "number"),
       description:
-        "Which room type's glyph to draw. A missing or unknown value draws nothing and leaves a blank box of the logo's size",
+        "Which room type's glyph to draw. An unknown value, or none, renders an empty box of the logo's size.",
       table: {
         defaultValue: { summary: "undefined" },
       },
@@ -27,7 +27,7 @@ const meta = {
     isArchive: {
       control: "boolean",
       description:
-        "Draws the archive glyph instead of the type's glyph; wins over every other flag",
+        "Draws the archive glyph instead, whatever `type` says. It wins over every other flag.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -35,7 +35,7 @@ const meta = {
     isTemplate: {
       control: "boolean",
       description:
-        "Draws the generic template glyph, the same for every type; ignored when `isArchive` is set",
+        "Draws the generic template glyph, ignoring `type`. Checked after `isArchive`.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -43,7 +43,7 @@ const meta = {
     isTemplateRoom: {
       control: "boolean",
       description:
-        "Draws the template variant of the type's glyph; the AI type has none and keeps its plain glyph",
+        "Draws the template variant of `type`'s glyph. The four AI types have no variant and keep their plain glyph.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -51,14 +51,15 @@ const meta = {
     withCheckbox: {
       control: "boolean",
       description:
-        "Renders a checkbox beside the glyph. The component's own stylesheet hides it, so it shows only under a rule of yours",
+        "Renders a checkbox next to the glyph. The stylesheet hides it, so it only becomes visible under a rule of yours.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isChecked: {
       control: "boolean",
-      description: "Whether that checkbox is ticked",
+      description:
+        "Ticks that checkbox; `false` leaves it empty. A click flips the box itself until this prop next changes.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -66,7 +67,7 @@ const meta = {
     isIndeterminate: {
       control: "boolean",
       description:
-        "Whether that checkbox shows the mixed state (a dash) instead of a tick",
+        "Whether that checkbox shows the mixed state instead of a tick.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -74,23 +75,20 @@ const meta = {
     onChange: {
       action: "changed",
       description:
-        "Called when the checkbox is clicked, and when the glyph is tapped on a mobile device; a click on the glyph on desktop does nothing",
-    },
-    isPrivacy: {
-      control: false,
-      description: "Accepted but ignored: nothing in the component reads it",
+        "Called by the checkbox, and by a tap on the glyph. The glyph calls it only where `react-device-detect` reports a mobile device.",
     },
     id: {
       control: "text",
-      description: "`id` of the outer element",
+      description: "`id` of the outer element.",
     },
     className: {
       control: "text",
-      description: "Class added to the outer element, before its own classes",
+      description:
+        "Added before the component's own classes, on the outer element.",
     },
     style: {
       control: "object",
-      description: "Inline style of the outer element",
+      description: "Inline style of the outer element.",
     },
   },
 } satisfies Meta<typeof RoomLogoPure>;
@@ -137,6 +135,7 @@ const LabeledItem = (props: { label: string; children: React.ReactNode }) => {
 };
 
 export const Default: Story = {
+  name: "Default",
   render: (args) => <RoomLogoPure {...args} />,
   args: {
     type: RoomsType.CustomRoom,
@@ -155,7 +154,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The glyph of one room type at its standard size; pick another type or turn on a flag in the Controls panel below to see which glyph wins.",
+          "The glyph of a custom room at its standard 32px size, with no flag set and no checkbox.",
       },
       source: {
         code: `<RoomLogo type={RoomsType.CustomRoom} />`,
@@ -172,6 +171,9 @@ const AllRoomTypesTemplate = () => {
     { type: RoomsType.VirtualDataRoom, label: "Virtual Data" },
     { type: RoomsType.FormRoom, label: "Form" },
     { type: RoomsType.AIRoom, label: "AI" },
+    { type: RoomsType.InstructionsRoom, label: "Instructions" },
+    { type: RoomsType.KnowledgeRoom, label: "Knowledge" },
+    { type: RoomsType.AiProjectRoom, label: "AI project" },
   ];
 
   return (
@@ -186,18 +188,19 @@ const AllRoomTypesTemplate = () => {
 };
 
 export const AllRoomTypes: Story = {
+  name: "All room types",
   render: () => <AllRoomTypesTemplate />,
   play: async ({ canvasElement }) => {
-    // A glyph of its own for each of the six types.
+    // A glyph of its own for each of the nine types.
     const glyphs = glyphsOf(canvasElement);
-    await expect(glyphs).toHaveLength(6);
-    await expect(new Set(glyphs).size).toBe(6);
+    await expect(glyphs).toHaveLength(9);
+    await expect(new Set(glyphs).size).toBe(9);
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Every room type side by side, labelled by type, to pick the glyph a list or a header needs for each kind of room.",
+          "All nine room types side by side, each labelled, with a glyph of its own.",
       },
       source: {
         code: `<RoomLogo type={RoomsType.EditingRoom} />
@@ -205,13 +208,17 @@ export const AllRoomTypes: Story = {
 <RoomLogo type={RoomsType.PublicRoom} />
 <RoomLogo type={RoomsType.VirtualDataRoom} />
 <RoomLogo type={RoomsType.FormRoom} />
-<RoomLogo type={RoomsType.AIRoom} />`,
+<RoomLogo type={RoomsType.AIRoom} />
+<RoomLogo type={RoomsType.InstructionsRoom} />
+<RoomLogo type={RoomsType.KnowledgeRoom} />
+<RoomLogo type={RoomsType.AiProjectRoom} />`,
       },
     },
   },
 };
 
 export const ArchiveState: Story = {
+  name: "Archived",
   render: (args) => <RoomLogoPure {...args} />,
   args: {
     type: RoomsType.CustomRoom,
@@ -241,6 +248,9 @@ const TemplateRoomTypesTemplate = () => {
     { type: RoomsType.VirtualDataRoom, label: "Virtual Data" },
     { type: RoomsType.FormRoom, label: "Form" },
     { type: RoomsType.AIRoom, label: "AI" },
+    { type: RoomsType.InstructionsRoom, label: "Instructions" },
+    { type: RoomsType.KnowledgeRoom, label: "Knowledge" },
+    { type: RoomsType.AiProjectRoom, label: "AI project" },
   ];
 
   return (
@@ -255,18 +265,19 @@ const TemplateRoomTypesTemplate = () => {
 };
 
 export const TemplateRoomTypes: Story = {
+  name: "Template variants",
   render: () => <TemplateRoomTypesTemplate />,
   play: async ({ canvasElement }) => {
-    // Five template variants plus the AI glyph, which has none.
+    // Five template variants plus the four AI glyphs, which have none.
     const glyphs = glyphsOf(canvasElement);
-    await expect(glyphs).toHaveLength(6);
-    await expect(new Set(glyphs).size).toBe(6);
+    await expect(glyphs).toHaveLength(9);
+    await expect(new Set(glyphs).size).toBe(9);
   },
   parameters: {
     docs: {
       description: {
         story:
-          "A template made from a room shows the template variant of that room's glyph (`isTemplateRoom`), so it still says which kind of room it creates. **AI** has no variant and keeps its plain glyph.",
+          "The template variant of each room type's glyph (`isTemplateRoom`), so a template still says which kind of room it creates. The four AI types have no variant and keep their plain glyph.",
       },
       source: {
         code: `<RoomLogo type={RoomsType.EditingRoom} isTemplateRoom />
@@ -274,13 +285,17 @@ export const TemplateRoomTypes: Story = {
 <RoomLogo type={RoomsType.PublicRoom} isTemplateRoom />
 <RoomLogo type={RoomsType.VirtualDataRoom} isTemplateRoom />
 <RoomLogo type={RoomsType.FormRoom} isTemplateRoom />
-<RoomLogo type={RoomsType.AIRoom} isTemplateRoom />`,
+<RoomLogo type={RoomsType.AIRoom} isTemplateRoom />
+<RoomLogo type={RoomsType.InstructionsRoom} isTemplateRoom />
+<RoomLogo type={RoomsType.KnowledgeRoom} isTemplateRoom />
+<RoomLogo type={RoomsType.AiProjectRoom} isTemplateRoom />`,
       },
     },
   },
 };
 
 export const TemplateState: Story = {
+  name: "Template",
   render: (args) => <RoomLogoPure {...args} />,
   args: {
     type: RoomsType.CustomRoom,
@@ -314,6 +329,7 @@ const SelectableTemplate = (args: ComponentProps<typeof RoomLogoPure>) => (
 );
 
 export const WithCheckbox: Story = {
+  name: "With checkbox",
   render: (args) => <SelectableTemplate {...args} />,
   args: {
     type: RoomsType.EditingRoom,
@@ -334,7 +350,7 @@ export const WithCheckbox: Story = {
     docs: {
       description: {
         story:
-          "A row in selection mode swaps the glyph for a checkbox in the same box (`withCheckbox`). The component renders the checkbox hidden, so the story adds the rule that swaps them, as a host must; tick it, or set the mixed state in the Controls panel below.",
+          "An empty checkbox in place of the glyph, as a row in selection mode shows it (`withCheckbox`). The component renders the checkbox hidden. The story adds the rule that swaps them, as a host must.",
       },
       source: {
         code: `/* host stylesheet */
@@ -354,6 +370,7 @@ export const WithCheckbox: Story = {
 };
 
 export const CheckboxChecked: Story = {
+  name: "Checkbox ticked",
   render: (args) => <SelectableTemplate {...args} />,
   args: {
     type: RoomsType.EditingRoom,
@@ -387,6 +404,7 @@ export const CheckboxChecked: Story = {
 };
 
 export const CssCustomization = {
+  name: "CSS customization",
   render: () => (
     <div
       style={
@@ -410,7 +428,7 @@ export const CssCustomization = {
   parameters: {
     docs: {
       description: {
-        story: `Both variables set on one wrapper -- the variables are listed under CSS variables on this page. The example draws a 40px box with a round glyph.`,
+        story: `A 40px box with a round glyph, from both variables set on a wrapper around the component.`,
       },
       source: {
         code: `<div style={{ "--room-logo-size": "40px", "--room-logo-radius": "50%" }}>

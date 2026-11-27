@@ -37,6 +37,55 @@ describe("<RoomIcon />", () => {
     vi.clearAllMocks();
   });
 
+  it("names a logo image by the title and hides the hover image", () => {
+    render(
+      <RoomIcon
+        title="Harper v. Northwind"
+        logo="logo.png"
+        hoverSrc="hover.png"
+      />,
+    );
+
+    expect(
+      screen.getByRole("img", { name: "Harper v. Northwind" }),
+    ).toHaveAttribute("src", "logo.png");
+    expect(screen.getByTestId("hover-image")).toHaveAttribute("alt", "");
+  });
+
+  it("names a clickable badge by badgeLabel", () => {
+    render(
+      <RoomIcon
+        {...baseProps}
+        badgeUrl="badge.svg"
+        onBadgeClick={vi.fn()}
+        badgeLabel="Shared room"
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Shared room" }),
+    ).toBeInTheDocument();
+  });
+
+  it("names the pencil and the empty state's plus", () => {
+    const { rerender } = render(
+      <RoomIcon {...baseProps} withEditing model={mockModel} />,
+    );
+    expect(screen.getByRole("button", { name: "Edit" })).toBeInTheDocument();
+
+    rerender(<RoomIcon {...baseProps} isEmptyIcon model={mockModel} />);
+    expect(screen.getByRole("button", { name: "Edit" })).toBeInTheDocument();
+  });
+
+  it("puts a passed aria-* on the outer element", () => {
+    render(<RoomIcon {...baseProps} aria-hidden />);
+
+    expect(screen.getByTestId("room-icon")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+  });
+
   it("renders without error", () => {
     render(<RoomIcon {...baseProps} />);
     expect(screen.getByTestId("room-icon")).toBeInTheDocument();
@@ -61,6 +110,16 @@ describe("<RoomIcon />", () => {
     const emptyIcon = screen.getByTestId("empty-icon");
     expect(emptyIcon).toBeInTheDocument();
     expect(screen.getByTestId("icon-button")).toBeInTheDocument();
+  });
+
+  it("draws the plus alone, and one menu, when empty and editable", () => {
+    render(
+      <RoomIcon {...baseProps} isEmptyIcon withEditing model={mockModel} />,
+    );
+    expect(screen.getAllByTestId("icon-button")).toHaveLength(1);
+
+    fireEvent.click(screen.getByTestId("icon-button"));
+    expect(screen.getAllByText(mockModel[0].label)).toHaveLength(1);
   });
 
   it("renders edit mode correctly", () => {

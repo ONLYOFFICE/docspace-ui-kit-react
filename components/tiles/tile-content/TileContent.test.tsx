@@ -21,6 +21,18 @@ describe("TileContent", () => {
     <div data-testid="child-content">Child Content</div>
   );
 
+  it("puts a passed aria-* on the content", () => {
+    const { container } = render(
+      <TileContent aria-describedby="content-hint">
+        <MockChild />
+      </TileContent>,
+    );
+    expect(container.firstElementChild).toHaveAttribute(
+      "aria-describedby",
+      "content-hint",
+    );
+  });
+
   it("renders children correctly", () => {
     render(
       <TileContent>

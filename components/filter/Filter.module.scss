@@ -133,7 +133,7 @@
     }
   }
 
-  --webkit-tap-highlight-color: #{$tap-highlight};
+  -webkit-tap-highlight-color: #{$tap-highlight};
 }
 
 .indicator {
@@ -445,7 +445,7 @@
     }
   }
 
-  --webkit-tap-highlight-color: #{$tap-highlight};
+  -webkit-tap-highlight-color: #{$tap-highlight};
 }
 
 .sortButton {

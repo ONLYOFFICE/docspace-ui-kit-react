@@ -56,7 +56,7 @@ Then check who would notice, in both consumers:
 ```bash
 grep -rn "\b<Name>\b" --include="*.ts" --include="*.tsx" \
   ../../DocSpace/client/packages 2>/dev/null | head
-grep -rn "\b<Name>\b" ../agent-skills/skills/plugin-sdk 2>/dev/null | head
+grep -rn "\b<Name>\b" ../agent-skills/skills/apps-plugin-sdk 2>/dev/null | head
 ```
 
 The client resolves by subpath, so it can survive a barrel removal that kills every plugin —

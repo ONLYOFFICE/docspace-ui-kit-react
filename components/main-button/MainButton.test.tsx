@@ -190,12 +190,6 @@ describe("<MainButton />", () => {
     expect(preventedBeforeWindow).toBe(false);
   });
 
-  it("does not pass `opened` to the DOM", () => {
-    render(<MainButton {...defaultProps} opened />);
-    const button = screen.getByRole("button", { name: "Test Button" });
-    expect(button).not.toHaveAttribute("opened");
-  });
-
   it("needs no model when isDropdown is false", () => {
     const onAction = vi.fn();
     render(<MainButton text="Act" isDropdown={false} onAction={onAction} />);

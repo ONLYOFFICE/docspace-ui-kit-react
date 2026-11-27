@@ -3,6 +3,7 @@ import classNames from "classnames";
 
 import { InfiniteLoaderComponent } from "../../infinite-loader";
 
+import { groupRoleWhenNamed, pickAriaProps } from "../../../utils/aria-props";
 import { TableBodyProps } from "../Table.types";
 import styles from "./TableBody.module.scss";
 
@@ -25,11 +26,15 @@ const TableBodyPure = (props: TableBodyProps) => {
 
   const classes = classNames(styles.tableBody, "table-container_body", {
     [styles.useReactWindow]: useReactWindow,
-    [styles.infoPanelVisible]: infoPanelVisible,
   });
 
   return useReactWindow ? (
-    <div className={classes} data-testid="table-body">
+    <div
+      {...pickAriaProps(props)}
+      role={groupRoleWhenNamed(props)}
+      className={classes}
+      data-testid="table-body"
+    >
       <InfiniteLoaderComponent
         className="TableList"
         viewAs="table"
@@ -47,7 +52,12 @@ const TableBodyPure = (props: TableBodyProps) => {
       </InfiniteLoaderComponent>
     </div>
   ) : (
-    <div data-testid="table-body" className={classes}>
+    <div
+      {...pickAriaProps(props)}
+      role={groupRoleWhenNamed(props)}
+      data-testid="table-body"
+      className={classes}
+    >
       {children}
     </div>
   );

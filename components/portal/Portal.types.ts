@@ -15,9 +15,8 @@ export type PortalProps = {
   visible?: boolean;
 
   /**
-   * Element to append the content to. It is read on every render, so a value
-   * that is null on the first render — a ref — falls back to `document.body`;
-   * hold the container in state instead.
+   * Element to append the content to. While it is null the content goes to
+   * `document.body`, so hold the container in state, not in a ref.
    */
   appendTo?: HTMLElement | null;
 };

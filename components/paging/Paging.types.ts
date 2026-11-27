@@ -1,6 +1,6 @@
 import { TOption } from "../combobox";
 
-export interface PagingProps {
+export interface PagingProps extends React.AriaAttributes {
   /** Label of the previous-page button. Nothing here is translated, so pass the string already localised. */
   previousLabel: string;
   /** Label of the next-page button. Nothing here is translated, so pass the string already localised. */

@@ -26,10 +26,44 @@ describe("<Button />", () => {
 
   it("handles click events", async () => {
     const user = userEvent.setup();
-    render(<Button {...baseProps} aria-label="Click me" />);
+    render(<Button {...baseProps} />);
 
     await user.click(screen.getByRole("button", { name: "OK" }));
     expect(baseProps.onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps a passed aria-label over label, and names an icon-only button", () => {
+    const { rerender } = render(
+      <Button {...baseProps} aria-label="Confirm deletion" />,
+    );
+    expect(
+      screen.getByRole("button", { name: "Confirm deletion" }),
+    ).toBeInTheDocument();
+
+    rerender(<Button icon={<svg />} aria-label="Delete" />);
+    expect(screen.getByRole("button", { name: "Delete" })).toBeInTheDocument();
+  });
+
+  it("keeps passed aria-disabled and aria-busy unless the flags are set", () => {
+    const { rerender } = render(
+      <Button
+        {...baseProps}
+        aria-disabled="true"
+        aria-busy="true"
+        aria-describedby="hint"
+      />,
+    );
+    const button = screen.getByRole("button", { name: "OK" });
+    expect(button).toHaveAttribute("aria-disabled", "true");
+    expect(button).toHaveAttribute("aria-busy", "true");
+    expect(button).toHaveAttribute("aria-describedby", "hint");
+    expect(button).toBeEnabled();
+
+    rerender(
+      <Button {...baseProps} isDisabled isLoading aria-disabled="false" />,
+    );
+    expect(button).toHaveAttribute("aria-disabled", "true");
+    expect(button).toHaveAttribute("aria-busy", "true");
   });
 
   it("disables button when isDisabled is true", () => {
@@ -60,6 +94,15 @@ describe("<Button />", () => {
 
     expect(screen.getByRole("button")).toHaveAccessibleName("Export");
     expect(screen.queryByRole("status")).toBeNull();
+  });
+
+  it("keeps its id on the button alone while loading", () => {
+    const { container } = render(
+      <Button {...baseProps} id="save-button" isLoading />,
+    );
+
+    expect(container.querySelectorAll("#save-button")).toHaveLength(1);
+    expect(screen.getByRole("button")).toHaveAttribute("id", "save-button");
   });
 
   it("renders with custom className", () => {

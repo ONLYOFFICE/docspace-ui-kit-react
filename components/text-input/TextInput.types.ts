@@ -21,78 +21,92 @@ type HTMLInputProps = Omit<
 >;
 
 export type TextInputProps = HTMLInputProps & {
-  /** Used as HTML `id` property */
+  /** Id of the `<input>`. */
   id?: string;
-  /** Forwarded ref. Applied to the plain input only — when `mask` is set the masked input
-   * is rendered instead and the ref is dropped. */
+  /** Ref to the `<input>`. Dropped when `mask` is set, which renders the masked
+   * input instead. */
   forwardedRef?: React.Ref<HTMLInputElement>;
-  /** Used as HTML `name` property */
+  /** Name under which the value is submitted with a form. */
   name?: string;
-  /** Supported type of the input fields */
+  /** Kind of value the field takes. It sets the input's `type`, and with it the
+   * mobile keyboard and the browser's own validation. */
   type: InputType;
-  /** Value of the input */
+  /** Text the field shows. The field is controlled: it shows only what you
+   * pass, so update it from `onChange`. */
   value: string;
-  /** Maximum number of characters the field accepts; further typing is silently dropped.
+  /** Most characters the field accepts; typing past it is dropped silently.
    * @default 255 */
   maxLength?: number;
-  /** Placeholder text for the input. The default is a single space, not an empty string,
-   * so `:placeholder-shown` matches even when no placeholder was asked for.
+  /** Placeholder text. The default is a single space, not an empty string, so
+   * `:placeholder-shown` matches even when no placeholder was asked for.
    * @default " " */
   placeholder?: string;
-  /** Used as HTML `tabindex` property. Left out, the field takes its natural place in the tab
-   * order; pass `-1` only for a field the keyboard is meant to skip. */
+  /** Place of the field in the tab order. Left out, the field takes its natural
+   * place; pass `-1` only for a field the keyboard should skip. */
   tabIndex?: number;
-  /** Input text mask */
+  /** Pattern the typed text is fitted to: an array of literal characters and
+   * RegExps, or a function of the value that returns one. */
   mask?: Mask | ((value: string) => Mask);
-  /** Allows to add or delete characters without changing the positions of the existing characters */
+  /** Keeps every character in its slot: typing into a filled slot is refused,
+   * and a deletion leaves the slot empty instead of shifting the rest. Read
+   * only with `mask`. */
   keepCharPositions?: boolean;
-  /** When guide is true, Text Mask always shows both placeholder characters and non-placeholder mask characters */
+  /** Shows the mask's placeholder and literal characters before they are typed.
+   * Without it they appear as the text reaches them. */
   guide?: boolean;
-  /** Supported size of the input fields */
+  /** Width and type size of the field, from 173px to 550px wide. */
   size?: InputSize;
-  /** Indicates the input field has scale */
+  /** Stretches the field to the width of its container instead of the fixed
+   * `size` width. */
   scale?: boolean;
-  /** Called with the new value. Required when input is not read only */
+  /** Called with the change event on every edit. Pass it unless the field is
+   * read-only, since the field shows `value` and nothing else. */
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  /** Called when field is blurred */
+  /** Called when the field loses focus. */
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
-  /** Called when field is focused */
+  /** Called when the field receives focus. */
   onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
-  /** Called when a key is pressed */
+  /** Called on every key press while the field has focus. */
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-  /** Called when clicked */
+  /** Called with the mouse event when the pointer clicks the field. */
   onClick?: (e: React.MouseEvent<HTMLInputElement>) => void;
-  /** Called when context menu is triggered */
+  /** Called when the browser's context menu is opened on the field. */
   onContextMenu?: (e: React.MouseEvent<HTMLInputElement>) => void;
-  /** Focus the input field on initial render */
+  /** Puts the caret in the field on its first render. */
   isAutoFocussed?: boolean;
-  /** Indicates that the field cannot be used */
+  /** Greys the field and stops editing. A disabled field is skipped by the tab
+   * order and left out of a submitted form. */
   isDisabled?: boolean;
-  /** Indicates that the field is displaying read-only content */
+  /** Keeps the value legible and selectable but stops editing. The field stays
+   * in the tab order. */
   isReadOnly?: boolean;
-  /** Indicates the input field has an error */
+  /** Draws the border in the error colour. It sets no `aria-invalid`. */
   hasError?: boolean;
-  /** Indicates the input field has a warning */
+  /** Draws the border in the warning colour, which wins over `hasError`. */
   hasWarning?: boolean;
-  /** Used as HTML `autocomplete` property.
+  /** What the browser may autofill here, as an HTML `autocomplete` token such
+   * as `email` or `new-password`.
    * @default "off" */
   autoComplete?: string;
-  /** Used as HTML `spellcheck` property */
+  /** Turns the browser's spelling check on or off; unset, the browser decides. */
   spellCheck?: boolean;
-  /** CSS class name */
+  /** Class added to the `<input>`. */
   className?: string;
-  /** Inline CSS styles */
+  /** Inline style of the `<input>`, the only place its own CSS variables can be
+   * overridden. */
   style?: React.CSSProperties;
-  /** Sets the font weight */
+  /** Weight of the typed text, as a CSS `font-weight`. `isBold` wins over it. */
   fontWeight?: number | string;
-  /** Sets font weight value to 600 */
+  /** Sets the typed text's weight to 600, over `fontWeight`. */
   isBold?: boolean;
-  /** Indicates that component contains border */
+  /** Draws the border. Without it the field shows no hover, focus, error or
+   * warning colour, since all of them are border colours. */
   withBorder?: boolean;
-  /** Text direction.
+  /** Text direction of the field. `auto` lets each value pick its own, so
+   * mixed-script text reads correctly.
    * @default "auto" */
   dir?: string;
-  /** Input mode for virtual keyboard */
+  /** Which virtual keyboard a touch device shows, independent of `type`. */
   inputMode?:
     | "none"
     | "text"
@@ -102,6 +116,6 @@ export type TextInputProps = HTMLInputProps & {
     | "search"
     | "email"
     | "url";
-  /** HTML data-testid attribute */
+  /** Value of `data-testid` on the `<input>`. */
   testId?: string;
 };

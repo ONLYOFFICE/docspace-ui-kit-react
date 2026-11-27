@@ -2,6 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import classNames from "classnames";
 import throttle from "lodash/throttle";
 
+import { groupRoleWhenNamed, pickAriaProps } from "../../../utils/aria-props";
 import { TableHeaderProps, TTableColumn } from "../Table.types";
 import styles from "./TableHeader.module.scss";
 import { TableHeaderCell } from "../sub-components/table-header-cell";
@@ -42,6 +43,7 @@ export const TableHeader = (props: TableHeaderProps) => {
     resetColumnsSize,
     setHideColumns: setHideColumnsProp,
     withoutWideColumn = false,
+    style,
   } = props;
 
   const isMountedRef = useRef(false);
@@ -654,7 +656,9 @@ export const TableHeader = (props: TableHeaderProps) => {
 
           if (shortColumnSize && index === 0) {
             gridTemplateColumns.push(`${shortColumnSize}px`);
-          } else if (column?.dataset?.minWidth && column?.dataset?.default) {
+          } else if (column?.dataset?.default === "true") {
+            // The wide column, with or without a minWidth; data-default is
+            // the string "false" on the others.
             gridTemplateColumns.push(
               `${containerWidth - defaultSize - shortColumnSize - SETTINGS_SIZE}px`,
             );
@@ -1298,11 +1302,14 @@ export const TableHeader = (props: TableHeaderProps) => {
   return (
     <>
       <div
+        {...pickAriaProps(props)}
+        role={groupRoleWhenNamed(props)}
         id="table-container_caption-header"
         className={classNames(styles.tableHeader, "table-container_header", {
           "lengthen-header": isLengthenHeader,
         })}
         ref={headerRef}
+        style={style}
         data-testid="table-header"
       >
         <div className={styles.tableHeaderRow}>
@@ -1337,6 +1344,7 @@ export const TableHeader = (props: TableHeaderProps) => {
               <TableSettings
                 columns={columns}
                 disableSettings={hideColumns || Boolean(isIndexEditingModeProp)}
+                label={settingsTitle}
               />
             </TooltipContainer>
           ) : null}

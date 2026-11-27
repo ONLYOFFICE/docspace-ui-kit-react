@@ -9,6 +9,7 @@ import { ColorInputProps } from "./ColorInput.types";
 import { ColorPicker } from "../color-picker";
 import { globalColors } from "../../providers/theme";
 import { useCommonTranslation } from "../../utils";
+import { pickAriaProps } from "../../utils/aria-props";
 import styles from "./ColorInput.module.scss";
 
 const ColorInput = ({
@@ -24,8 +25,10 @@ const ColorInput = ({
   dataTestId,
   inputLabel,
   pickerButtonLabel = "Color picker",
+  ...rest
 }: ColorInputProps) => {
   const t = useCommonTranslation();
+  const aria = pickAriaProps(rest);
   const [color, setColor] = useState(
     defaultColor || globalColors.lightBlueMain,
   );
@@ -67,6 +70,7 @@ const ColorInput = ({
         className={classNames(styles.inputWrapper, { [styles.scale]: scale })}
       >
         <HexColorInput
+          {...aria}
           className={styles.hexValue}
           prefixed
           color={color.toUpperCase()}
@@ -77,8 +81,10 @@ const ColorInput = ({
           data-scale={scale ? "true" : undefined}
           data-disabled={isDisabled ? "true" : undefined}
           disabled={isDisabled}
-          aria-label={inputLabel ?? (t("Color") || "Color")}
-          aria-invalid={hasError || undefined}
+          aria-label={
+            aria["aria-label"] ?? inputLabel ?? (t("Color") || "Color")
+          }
+          aria-invalid={hasError ? true : aria["aria-invalid"]}
         />
         <button
           type="button"

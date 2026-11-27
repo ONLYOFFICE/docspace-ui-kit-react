@@ -39,24 +39,24 @@ const meta = {
       control: "select",
       options: iconOptions,
       description:
-        "URL of the icon, fetched at runtime and inlined as SVG. Ignored when `iconNode` is set",
+        "URL of the icon, fetched at runtime and inlined as SVG. It has to resolve from the browser: an imported `?url`, or a path under your public directory.",
     },
     iconHoverName: {
       control: "select",
       options: iconOptions,
       description:
-        "URL of the icon shown while the pointer is over the button; ignored on touch devices",
+        "URL of the icon shown while the pointer is over the button; ignored on a touch device.",
     },
     iconClickName: {
       control: "select",
       options: iconOptions,
       description:
-        "URL of the icon shown from the moment the button is pressed until the pointer leaves it; ignored on touch devices",
+        "URL of the icon shown from the press until the pointer leaves the button; ignored on a touch device.",
     },
     size: {
       control: { type: "number", min: 12, max: 50 },
       description:
-        "Width and height of the button. A number is pixels; `extraSmall`, `small`, `medium` and `big` are 8, 12, 16 and 24px; `base`, `middle` and `large` are 15px; any other string is used as a CSS length",
+        "Width and height of the button. A number is pixels; `extraSmall`, `small`, `medium` and `big` are 8, 12, 16 and 24px, and `scale` fills the container. `base`, `middle` and `large` are 15px; another string is a CSS length.",
       table: {
         defaultValue: { summary: "20" },
       },
@@ -64,22 +64,22 @@ const meta = {
     color: {
       control: "color",
       description:
-        "Colour of the icon: any CSS colour, `accent` for the theme accent, or a custom property name starting with `--`",
+        'Colour of the icon: any CSS colour, `"accent"` for the theme accent, or a custom property name starting with `--`.',
     },
     hoverColor: {
       control: "color",
       description:
-        "Colour of the icon while the pointer is over the button; same forms as `color`",
+        "Colour of the icon while the pointer is over the button; same forms as `color`.",
     },
     clickColor: {
       control: "color",
       description:
-        "Colour of the icon from the moment the button is pressed until the pointer leaves it; same forms as `color`",
+        "Colour of the icon from the press until the pointer leaves the button; same forms as `color`.",
     },
     isFill: {
       control: "boolean",
       description:
-        "Colours the icon by filling its shapes; ignored when `isStroke` is on",
+        "Colours the icon by filling its shapes; off, the icon keeps the fill it was drawn with. `isStroke` turns it off.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -87,7 +87,7 @@ const meta = {
     isStroke: {
       control: "boolean",
       description:
-        "Colours the outlines of the icon's shapes and leaves their own fill as drawn",
+        "Colours the outlines of the icon's shapes instead of their fill, for an outline icon.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -95,19 +95,20 @@ const meta = {
     isDisabled: {
       control: "boolean",
       description:
-        "Ignores every mouse handler and the icon and colour swaps, sets `aria-disabled` and shows the arrow cursor",
+        "Stops every handler and the hover and press swaps, and sets `aria-disabled`. The icon keeps its colour; only the cursor changes.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     onClick: {
       action: "onClick",
-      description: "Called when the button is clicked, unless it is disabled",
+      description:
+        "Called when the button is clicked, or activated with Enter or Space, unless it is disabled.",
     },
     isClickable: {
       control: "boolean",
       description:
-        "Shows the pointer cursor without an `onClick`, for a button whose click is handled by an ancestor",
+        "Shows the pointer cursor without an `onClick`, for a button whose click is handled by an ancestor.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -115,26 +116,26 @@ const meta = {
     iconNode: {
       control: false,
       description:
-        "The icon as JSX, rendered inline in place of the icon at `iconName`",
+        "The icon as JSX, rendered inline with no network request. Wins over `iconName`.",
     },
     title: {
       control: "text",
       description:
-        "Tooltip text, shown by the application's shared tooltip; it never becomes a native `title` attribute",
+        "Text of the shared tooltip shown on hover. It becomes a native `title` attribute only under `NODE_ENV=test`.",
     },
     tooltipId: {
       control: "text",
       description:
-        "Id of a tooltip the button renders itself, next to the pointer on desktop; needs `tooltipContent`",
+        "Id of a tooltip the button renders itself, below it; needs `tooltipContent`.",
     },
     tooltipContent: {
       control: "text",
-      description: "Text of that tooltip; does nothing without `tooltipId`",
+      description: "Text of that tooltip; does nothing without `tooltipId`.",
     },
     dataTip: {
       control: "text",
       description:
-        "Value of the legacy `data-tip` attribute; use `tooltipId` with `tooltipContent`, or `title`",
+        "Value of the legacy `data-tip` attribute. Use `tooltipId` with `tooltipContent`, or `title`.",
       table: {
         defaultValue: { summary: '""' },
       },
@@ -142,59 +143,59 @@ const meta = {
     onMouseEnter: {
       action: "onMouseEnter",
       description:
-        "Called when the pointer enters the button, unless it is disabled",
+        "Called when the pointer enters the button, unless it is disabled.",
     },
     onMouseLeave: {
       action: "onMouseLeave",
       description:
-        "Called when the pointer leaves the button, unless it is disabled",
+        "Called when the pointer leaves the button, unless it is disabled.",
     },
     onMouseDown: {
       action: "onMouseDown",
       description:
-        "Called when a mouse button is pressed, unless it is disabled",
+        "Called when a mouse button is pressed on the button, unless it is disabled.",
     },
     onMouseUp: {
       action: "onMouseUp",
       description:
-        "Called when the middle or right mouse button is released, never the left one; use `onClick` for that",
+        "Called when the middle or right mouse button is released, never the left one. Use `onClick` for the left button.",
     },
     tabIndex: {
       control: "number",
       description:
-        "Puts the button in the tab order; without it the keyboard cannot reach it",
+        "Tab order of the button. Passing it switches off the built-in keyboard support that an enabled button with `onClick` gets.",
     },
     onKeyDown: {
       action: "onKeyDown",
       description:
-        "Called on a key press while the button has focus; Enter and Space do nothing unless it implements them",
+        "Called on a key press. Passing it replaces the built-in Enter and Space activation, so it has to implement them.",
     },
     role: {
       control: "text",
       description:
-        'ARIA role of the element, which has none of its own; "button" for an icon button that acts',
+        'ARIA role of the element. Unset, it is `"button"` while the built-in keyboard support applies, and none otherwise.',
     },
     ariaLabel: {
       control: "text",
       description:
-        "Accessible name of the button; the tooltip from `title` names nothing",
+        "Accessible name of the button. Unset, a button with the built-in keyboard support is named by `title`.",
     },
     id: {
       control: "text",
-      description: "Id of the button element",
+      description: "Id of the button element.",
     },
     className: {
       control: "text",
-      description: "Class added to the button element",
+      description: "Class added to the button element.",
     },
     style: {
       control: "object",
       description:
-        "Inline style of the button element, applied after the size and colour the component sets, so it overrides them",
+        "Inline style of the button element, applied after the size and colours the component sets.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the button",
+      description: "Value of `data-testid` on the button.",
       table: {
         defaultValue: { summary: '"icon-button"' },
       },
@@ -274,6 +275,7 @@ const WithHoverStateTemplate = () => {
 };
 
 export const WithHoverState: Story = {
+  name: "Hover icon and colour",
   render: () => <WithHoverStateTemplate />,
   play: async ({ canvas, userEvent }) => {
     const [search] = iconButtons(canvas);
@@ -288,7 +290,7 @@ export const WithHoverState: Story = {
     docs: {
       description: {
         story:
-          "Hover over the buttons to see the alternate icon and colour, a cue that the button reacts before it is clicked (`iconHoverName`, `hoverColor`).",
+          "Two buttons that swap to another icon and colour while the pointer is over them, a cue that they react before the click (`iconHoverName`, `hoverColor`).",
       },
       source: {
         code: `<IconButton size={25} iconName={SearchIcon} iconHoverName={EyeIcon} hoverColor="#333" isFill />
@@ -313,6 +315,7 @@ const WithClickStateTemplate = () => {
 };
 
 export const WithClickState: Story = {
+  name: "Pressed icon and colour",
   render: () => <WithClickStateTemplate />,
   play: async ({ canvas, userEvent }) => {
     const [button] = iconButtons(canvas);
@@ -330,7 +333,7 @@ export const WithClickState: Story = {
     docs: {
       description: {
         story:
-          "Press and hold the button to see the alternate icon and colour that confirm the press (`iconClickName`, `clickColor`); they stay until the pointer leaves the button.",
+          "A button that swaps to another icon and colour when pressed, to confirm the press (`iconClickName`, `clickColor`). They stay until the pointer leaves the button.",
       },
       source: {
         code: `<IconButton size={25} iconName={SearchIcon} iconClickName={InfoIcon} clickColor="green" isFill />`,
@@ -435,6 +438,7 @@ const WithStrokeTemplate = () => {
 };
 
 export const WithStroke: Story = {
+  name: "Outline colour",
   render: () => <WithStrokeTemplate />,
   play: async ({ canvas }) => {
     // The outline takes the icon colour.
@@ -493,6 +497,7 @@ const WithCustomNodeTemplate = () => {
 };
 
 export const WithCustomNode: Story = {
+  name: "Icon from a React node",
   render: () => <WithCustomNodeTemplate />,
   play: async ({ canvas }) => {
     // The node wins over iconName: no SVG is fetched.
@@ -533,6 +538,7 @@ const WithTooltipTemplate = () => {
 };
 
 export const WithTooltip: Story = {
+  name: "With tooltip",
   render: () => <WithTooltipTemplate />,
   play: async ({ canvas, userEvent }) => {
     await userEvent.hover(iconButtons(canvas)[0]);
@@ -545,7 +551,7 @@ export const WithTooltip: Story = {
     docs: {
       description: {
         story:
-          "Hover over the button to read what it does: an icon alone rarely says so, and the button renders this tooltip itself, next to the pointer (`tooltipId`, `tooltipContent`).",
+          "A search button whose tooltip names its action on hover, since an icon alone rarely does. The button renders this tooltip itself, below the pointer (`tooltipId`, `tooltipContent`).",
       },
       source: {
         code: `<IconButton
@@ -561,6 +567,7 @@ export const WithTooltip: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   play: async ({ canvas }) => {
     const [button] = iconButtons(canvas);
     await expect(button).toHaveStyle({ color: "rgb(156, 39, 176)" });
@@ -584,7 +591,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The variables are listed under CSS variables on this page; here all three are set through the \`style\` prop, because a value set on a wrapper never arrives. Hover the button to see the hover colour.`,
+        story: `A purple 32px button, with a darker purple on hover, set by the three variables on its \`style\` prop. A value set on a wrapper never arrives.`,
       },
       source: {
         code: `<IconButton

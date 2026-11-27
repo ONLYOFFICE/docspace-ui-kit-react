@@ -44,6 +44,8 @@ export const YearsHeader = ({
         className={classNames(styles.title, "years-header", {
           [styles.disabled]: true,
         })}
+        // Not a control, but the focus lands here when the view opens.
+        tabIndex={-1}
       >
         {firstYear}-{firstYear + 9}
         <span className={styles.headerActionIcon} />

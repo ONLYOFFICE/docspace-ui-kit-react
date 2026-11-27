@@ -45,11 +45,10 @@ const IconComponent = ({
   }
 
   if (typeof icon === "string" && !isInlinedSvgUrl(icon)) {
-    return (
-      <img className="drop-down-icon_image" src={icon} alt="plugin-logo" />
-    );
+    return <img className="drop-down-icon_image" src={icon} alt="" />;
   }
 
+  // An element is drawn as given; a component, memoised or not, is rendered.
   if (React.isValidElement(icon)) {
     return (
       <div
@@ -64,16 +63,11 @@ const IconComponent = ({
     );
   }
 
-  if (
-    typeof icon === "function" &&
-    React.isValidElement(React.createElement(icon))
-  ) {
-    return <div>{React.createElement(icon)}</div>;
-  }
+  if (typeof icon !== "string") return <div>{React.createElement(icon)}</div>;
 
   return (
     <ReactSVG
-      src={typeof icon === "string" ? icon : ""}
+      src={icon}
       className={
         fillIcon
           ? classNames(styles.dropDownItemIcon, "drop-down-item_icon")

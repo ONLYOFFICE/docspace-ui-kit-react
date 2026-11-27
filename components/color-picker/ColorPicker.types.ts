@@ -1,4 +1,4 @@
-export type ColorPickerProps = {
+export type ColorPickerProps = React.AriaAttributes & {
   /** Applied to the outermost element. */
   className?: string;
 
@@ -6,18 +6,15 @@ export type ColorPickerProps = {
   id?: string;
 
   /**
-   * Called by the cancel button, by the closing cross in `isPickerOnly`
-   * mode, and on Escape. Nothing here unmounts the picker; that is the
-   * caller's job. Left out, Escape is not handled and propagates to the
-   * page (a surrounding `ModalDialog` closes on it as usual).
+   * Called by the cancel button, the closing cross and Escape; unmounting the
+   * picker is yours. Without it, Escape is left to the page.
    */
   onClose?: () => void;
 
   /**
-   * Swaps which parts are drawn. `true` adds a header with a title and a
-   * closing cross and drops the hex field and both buttons — the shape used
-   * inside a drop-down. `false` keeps the hex field and the apply/cancel pair
-   * and draws no header.
+   * `true` draws a header with a title and a closing cross, and no hex field or
+   * buttons: the drop-down shape. `false` draws the hex field and the
+   * apply/cancel pair, and no header.
    * @default false
    */
   isPickerOnly: boolean;
@@ -60,7 +57,4 @@ export type ColorPickerProps = {
    * not translated for you.
    */
   closeButtonLabel?: string;
-
-  /** Ignored. Nothing reads this prop. */
-  forwardedRef?: React.RefObject<HTMLDivElement | null>;
 };

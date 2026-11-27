@@ -39,6 +39,13 @@ describe("<NavMenu />", () => {
   });
 
   describe("rendering", () => {
+    it("puts a passed aria-* on the navigation element", () => {
+      render(<NavMenu groups={groups} aria-label="Apps" />);
+      expect(
+        screen.getByRole("navigation", { name: "Apps" }),
+      ).toBeInTheDocument();
+    });
+
     it("renders a navigation element", () => {
       render(<NavMenu groups={groups} />);
       expect(screen.getByRole("navigation")).toBeInTheDocument();

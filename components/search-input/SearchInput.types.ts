@@ -3,16 +3,16 @@ import React from "react";
 import { InputSize } from "../text-input";
 import type { MainButtonProps } from "../main-button/MainButton.types";
 
-export type SearchInputProps = {
-  /** Used as HTML `id` property */
+export type SearchInputProps = React.AriaAttributes & {
+  /** Id of the `<input>`, for a `<label>` or a `FieldContainer`'s `labelFor` to point at. */
   id?: string;
-  /** Forwarded ref */
+  /** Ref to the `<input>`. */
   forwardedRef?: React.Ref<HTMLInputElement>;
-  /** Sets the unique element name */
+  /** Name under which the term is submitted with a form. */
   name?: string;
-  /** Accepts class */
+  /** Class added to the outer element. */
   className?: string;
-  /** Supported size of the input fields. */
+  /** Height and type size of the field. */
   size: InputSize;
   /** The search term. The field keeps its own copy while the user types and
    * re-seeds it from this prop whenever the prop changes. */
@@ -20,12 +20,12 @@ export type SearchInputProps = {
   /** Makes the field fill the width of its container.
    * @default false */
   scale?: boolean;
-  /** Placeholder text for the input */
+  /** Text shown while the field is empty. */
   placeholder?: string;
-  /** Called with the **string** the user typed, not with the change event —
-   * unlike every other input in this kit. It is debounced by `refreshTimeout`,
-   * and it is not called at all when `autoRefresh` is false or when the field
-   * is cleared through the clear button. */
+  /** Called with the **string** typed, not the change event, unlike every
+   * other input in this kit. It waits for `refreshTimeout` of quiet typing. It
+   * is not called when `autoRefresh` is false, or when the clear button empties
+   * the field. */
   onChange?: (value: string) => void;
   /** Called when the clear button is used. `onChange` is deliberately skipped
    * for that transition, so this is the only signal that the search term is now
@@ -48,27 +48,27 @@ export type SearchInputProps = {
    * calling it entirely.
    * @default true */
   autoRefresh?: boolean;
-  /** Rendered inside the `MainButton`'s dropdown; ignored unless
-   * `showMainButton` is set. */
+  /** Rendered before the input, inside the same border: `InputBlock`'s prefix. */
   children?: React.ReactNode;
-  /** Accepts css style */
+  /** Inline style of the outer element. */
   style?: React.CSSProperties;
-  /** The callback function that is called when the field is focused  */
+  /** Called when the field receives focus. */
   onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
   /** Value of `data-testid` on the outer element.
    * @default "search-input" */
   dataTestId?: string;
-  /** HTML tabindex property */
+  /** Place of the field in the tab order; left out, the natural one. */
   tabIndex?: number;
   /** Renders a `MainButton` to the left of the field, for the "create new"
    * action a search bar often sits beside.
    * @default false */
   showMainButton?: boolean;
-  /** Props for the MainButton displayed to the left of the search field */
+  /** Props of the `MainButton` drawn before the field. `showMainButton` is
+   * needed too. */
   mainButtonProps?: MainButtonProps;
-  /** Icon node rendered inside the MainButton (12x12) */
+  /** Icon inside the main button, 12×12; a plus when left out. */
   mainButtonIcon?: React.ReactNode;
-  /** data-testid for the main button wrapper element */
+  /** Value of `data-testid` on the main button's wrapper. */
   mainButtonDataTestId?: string;
   /** Leaves the field out, so only the main button is drawn. The block still
    * takes its width, so whatever follows it stays where it was. */

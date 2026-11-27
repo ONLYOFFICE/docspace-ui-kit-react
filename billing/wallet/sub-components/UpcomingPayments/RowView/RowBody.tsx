@@ -65,10 +65,7 @@ const UpcomingPaymentRow: React.FC<UpcomingPaymentRowProps> = ({
         </div>
       }
     >
-      <RowContent
-        sectionWidth={sectionWidth}
-        sideColor="var(--payment-inactive-color)"
-      >
+      <RowContent sideColor="var(--payment-inactive-color)">
         {getRowChildren()}
       </RowContent>
     </Row>

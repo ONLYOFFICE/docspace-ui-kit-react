@@ -1,6 +1,12 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { HelpButton } from ".";
 
 describe("<HelpButton />", () => {
@@ -83,8 +89,163 @@ describe("<HelpButton />", () => {
     expect(screen.getByTestId("help-button")).toBeInTheDocument();
   });
 
+  it("puts a passed aria-* on the info icon", () => {
+    render(
+      <HelpButton
+        tooltipContent={tooltipContent}
+        aria-label="About storage"
+        aria-describedby="storage-hint"
+      />,
+    );
+    const icon = screen.getByTestId("icon-button");
+    expect(icon).toHaveAttribute("aria-label", "About storage");
+    expect(icon).toHaveAttribute("aria-describedby", "storage-hint");
+    expect(screen.getByTestId("help-button")).not.toHaveAttribute("aria-label");
+  });
+
+  it("puts a passed aria-* on the anchor around children", () => {
+    render(
+      <HelpButton tooltipContent={tooltipContent} aria-label="About storage">
+        <span>Storage</span>
+      </HelpButton>,
+    );
+    expect(screen.getByText("Storage").parentElement).toHaveAttribute(
+      "aria-label",
+      "About storage",
+    );
+  });
+
   it("renders with openOnClick set to false", () => {
     render(<HelpButton tooltipContent={tooltipContent} openOnClick={false} />);
     expect(screen.getByTestId("help-button")).toBeInTheDocument();
+  });
+
+  it("opens the shared tooltip from the keyboard", () => {
+    render(<HelpButton tooltipContent={tooltipContent} />);
+    const icon = screen.getByRole("button", { name: "Info" });
+    const onClick = vi.fn();
+    icon.addEventListener("click", onClick);
+
+    expect(icon).toHaveAttribute("tabindex", "0");
+    fireEvent.keyDown(icon, { key: "Enter" });
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("clicks the SVG its own tooltip is anchored to", () => {
+    render(<HelpButton tooltipContent={<b>Rich content</b>} />);
+    const icon = screen.getByRole("button", { name: "Info" });
+    const svg = icon.querySelector("svg") as SVGElement;
+    const onClick = vi.fn();
+    svg.addEventListener("click", onClick);
+
+    fireEvent.keyDown(icon, { key: " " });
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("stays out of the tab order when the tooltip opens on hover", () => {
+    render(
+      <HelpButton tooltipContent={<b>Rich content</b>} openOnClick={false} />,
+    );
+
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+  });
+
+  it("makes the element around children a group when it is named", () => {
+    render(
+      <HelpButton tooltipContent={tooltipContent} aria-label="About storage">
+        <span>Storage</span>
+      </HelpButton>,
+    );
+
+    expect(screen.getByRole("group", { name: "About storage" })).toBe(
+      screen.getByText("Storage").parentElement,
+    );
+  });
+
+  // A tooltip opened from the keyboard was neither read out nor closed when
+  // the focus moved on.
+  it("announces a tooltip the keyboard opens, and closes it on Tab", async () => {
+    render(
+      <>
+        <HelpButton tooltipContent={<b>Rich content</b>} />
+        <button type="button">Next</button>
+      </>,
+    );
+    const icon = screen.getByRole("button", { name: "Info" });
+    const region = screen.getByRole("status");
+    expect(region).toBeEmptyDOMElement();
+
+    icon.focus();
+    fireEvent.keyDown(icon, { key: "Enter" });
+
+    await waitFor(() => expect(region).toHaveTextContent("Rich content"));
+    const tooltipId = icon.getAttribute("aria-describedby") as string;
+    expect(document.getElementById(tooltipId)).toHaveTextContent(
+      "Rich content",
+    );
+    // react-tooltip re-registers its anchor listeners after it shows; a blur
+    // before that reaches a handler that still thinks it is closed.
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    fireEvent.blur(icon, {
+      relatedTarget: screen.getByRole("button", { name: "Next" }),
+    });
+
+    await waitFor(() =>
+      expect(document.getElementById(tooltipId)).not.toBeInTheDocument(),
+    );
+    expect(region).toBeEmptyDOMElement();
+    expect(icon).not.toHaveAttribute("aria-describedby");
+  });
+
+  // The tooltip closing on a second press stays in the DOM while it fades, and
+  // used to be read out again as if it had opened.
+  it("announces nothing when the keyboard closes the tooltip", async () => {
+    render(<HelpButton tooltipContent={<b>Rich content</b>} />);
+    const icon = screen.getByRole("button", { name: "Info" });
+    const region = screen.getByRole("status");
+
+    icon.focus();
+    fireEvent.keyDown(icon, { key: "Enter" });
+    await waitFor(() => expect(region).toHaveTextContent("Rich content"));
+
+    fireEvent.keyDown(icon, { key: "Enter" });
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    expect(region).toBeEmptyDOMElement();
+    expect(icon).not.toHaveAttribute("aria-describedby");
+  });
+
+  it("keeps a passed aria-describedby next to the open tooltip", async () => {
+    render(
+      <HelpButton
+        tooltipContent={<b>Rich content</b>}
+        aria-describedby="storage-hint"
+      />,
+    );
+    const icon = screen.getByRole("button", { name: "Info" });
+
+    icon.focus();
+    fireEvent.keyDown(icon, { key: "Enter" });
+
+    await waitFor(() =>
+      expect(icon.getAttribute("aria-describedby")).toMatch(
+        /^storage-hint help-tooltip-/,
+      ),
+    );
+  });
+
+  it("lets a passed aria-label name the button", () => {
+    render(
+      <HelpButton tooltipContent={tooltipContent} aria-label="About storage" />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "About storage" }),
+    ).toBeInTheDocument();
   });
 });

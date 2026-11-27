@@ -165,10 +165,9 @@ describe("<ContextMenu />", () => {
       "data-src",
       ownSvg,
     );
-    expect(screen.getByAltText("plugin icon")).toHaveAttribute(
-      "src",
-      foreignSvg,
-    );
+    const image = document.querySelector(`img[src="${foreignSvg}"]`);
+    // The icon sits beside the item's label, so it is decorative.
+    expect(image).toHaveAttribute("alt", "");
   });
 
   it("keeps the menu inside the layout viewport when opened near its edge", () => {

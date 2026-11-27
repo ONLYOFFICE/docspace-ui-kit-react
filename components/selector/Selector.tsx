@@ -7,6 +7,7 @@ import classNames from "classnames";
 
 import { ButtonKeys } from "../../enums";
 import { consumeKey } from "../../utils/consume-key";
+import { groupRoleWhenNamed, pickAriaProps } from "../../utils/aria-props";
 
 import { Aside } from "../aside";
 import { Backdrop } from "../backdrop";
@@ -150,7 +151,6 @@ const Selector = ({
 
   useAside,
   onClose,
-  withBlur,
   withoutBackground,
   withInfoBadge,
   injectedElement,
@@ -162,6 +162,7 @@ const Selector = ({
   hideBackButton,
 
   displayFileExtension,
+  ...rest
 }: SelectorProps) => {
   const selectorRef = React.useRef<HTMLDivElement>(null);
   const [footerVisible, setFooterVisible] = React.useState<boolean>(false);
@@ -573,16 +574,17 @@ const Selector = ({
     }
   }, [items, selectedItems, isMultiSelect, selectedItemProp]);
 
-  const breadCrumbsProps: TSelectorBreadCrumbs = withBreadCrumbs
-    ? {
-        withBreadCrumbs,
-        breadCrumbs,
-        onSelectBreadCrumb,
-        breadCrumbsLoader,
-        isBreadCrumbsLoading,
-        bodyIsLoading: isLoading,
-      }
-    : {};
+  const breadCrumbsProps: TSelectorBreadCrumbs & { bodyIsLoading?: boolean } =
+    withBreadCrumbs
+      ? {
+          withBreadCrumbs,
+          breadCrumbs,
+          onSelectBreadCrumb,
+          breadCrumbsLoader,
+          isBreadCrumbsLoading,
+          bodyIsLoading: isLoading,
+        }
+      : {};
 
   const tempRenderedItemsLength = renderedItems.filter(
     (x) => !x.isDisabled,
@@ -723,6 +725,8 @@ const Selector = ({
 
   const selectorComponent = (
     <div
+      {...pickAriaProps(rest)}
+      role={groupRoleWhenNamed(rest)}
       ref={selectorRef}
       id={id}
       className={classNames(styles.selector, className)}

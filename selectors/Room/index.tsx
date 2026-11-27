@@ -69,7 +69,6 @@ const RoomSelectorComponent = ({
 
   useAside,
   onClose,
-  withBlur,
   withoutBackground,
 
   withInit,
@@ -300,7 +299,7 @@ const RoomSelectorComponent = ({
     : {};
 
   const withAside: TSelectorWithAside = useAside
-    ? { useAside, onClose, withBlur, withoutBackground }
+    ? { useAside, onClose, withoutBackground }
     : {};
 
   return (

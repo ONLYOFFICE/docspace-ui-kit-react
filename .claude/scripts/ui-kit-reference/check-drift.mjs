@@ -1,6 +1,6 @@
 // Checks the DocSpace plugin skill's picture of this kit against this kit.
 //
-// `agent-skills/skills/plugin-sdk/references/ui-kit.md` is hand-written prose
+// `agent-skills/skills/apps-plugin-sdk/references/ui-kit.md` is hand-written prose
 // about *this* source: prop defaults, which components carry their own margin,
 // which CSS variables exist. Nothing keeps it honest, and a plugin author reads
 // it instead of the code. So: every claim that can be checked mechanically is
@@ -36,13 +36,13 @@ const CLIENT_ROOT = process.env.DOCSPACE_CLIENT_ROOT
   ? path.resolve(ROOT, process.env.DOCSPACE_CLIENT_ROOT)
   : path.resolve(ROOT, "../DocSpace/client");
 
-const PLUGIN_SDK = path.join(SKILLS_ROOT, "skills/plugin-sdk");
+const PLUGIN_SDK = path.join(SKILLS_ROOT, "skills/apps-plugin-sdk");
 const REFERENCE = path.join(PLUGIN_SDK, "references/ui-kit.md");
 const CONTRACT = path.join(PLUGIN_SDK, "scripts/contract.mjs");
 
 if (!fs.existsSync(REFERENCE)) {
   console.error(
-    `No plugin-sdk skill at ${SKILLS_ROOT}.\n` +
+    `No apps-plugin-sdk skill at ${SKILLS_ROOT}.\n` +
       "Pass --skills <path> or set AGENT_SKILLS_ROOT. This check needs the\n" +
       "agent-skills checkout; it deliberately does not guess.",
   );

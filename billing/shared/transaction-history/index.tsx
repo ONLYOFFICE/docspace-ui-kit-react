@@ -463,7 +463,6 @@ const TransactionHistory = (props: TransactionHistoryProps) => {
           directionY="both"
           noBorder={false}
           dropDownMaxHeight={300}
-          showDisabledItems
           size={ComboBoxSize.content}
           scaled={false}
           dataTestId="transaction_type_combobox"

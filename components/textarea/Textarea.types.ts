@@ -1,15 +1,19 @@
 import { ChangeEvent, KeyboardEvent } from "react";
 
-export type TextareaProps = {
+export type TextareaProps = Omit<
+  React.AriaAttributes,
+  "aria-label" | "aria-labelledby" | "aria-describedby"
+> & {
   /** Applied to the scrollbar around the textarea, not to the textarea itself. */
   className?: string;
   /** Applied to the outer wrapper that carries the height and the copy icon. */
   wrapperClassName?: string;
-  /** Used as HTML `id` property  */
+  /** Id of the `<textarea>`, for a `<label for>` to point at. */
   id?: string;
-  /** Indicates that the field cannot be used */
+  /** Greys the field and stops editing. A disabled field leaves the tab order
+   * and the submitted form. */
   isDisabled?: boolean;
-  /** Indicates that the field is displaying read-only content */
+  /** Keeps the text legible and selectable but stops editing. */
   isReadOnly?: boolean;
   /** Draws the field in the error colour. Under `isJSONField` it adds to that
    * mode's own error state rather than being replaced by it.
@@ -21,27 +25,27 @@ export type TextareaProps = {
   /** Maximum number of characters the field accepts. Unlike `TextInput`, which
    * caps at 255, there is no limit unless you set one. */
   maxLength?: number;
-  /** Used as HTML `name` property  */
+  /** Name under which the text is submitted with a form. */
   name?: string;
-  /** Sets a callback function that allows handling the component's changing events */
+  /** Called with the change event on every edit. The field shows `value` only,
+   * so update it from here. */
   onChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void;
-  /** Sets a callback function that allows handling the component's keyDown events */
+  /** Called on every key press while the field has focus. */
   onKeyDown?: (e: KeyboardEvent<HTMLTextAreaElement>) => void;
-  /** Placeholder for Textarea  */
+  /** Text shown while the field is empty. The default is a single space, so
+   * `:placeholder-shown` matches even when no placeholder was asked for. */
   placeholder?: string;
-  /** Accepts css style */
+  /** Inline style of the scrollbar around the textarea, not of the textarea
+   * itself. */
   style?: React.CSSProperties;
-  /** Used as HTML `tabindex` property. Left out, the field takes its natural
-   * place in the tab order; pass `-1` only for a field the keyboard is meant to
-   * skip. */
+  /** Place of the field in the tab order. Left out, the field takes its natural
+   * place; pass `-1` only for a field the keyboard should skip. */
   tabIndex?: number;
-  /** Accessible name of the field, for when no `<label>` points at it. Declared
-   * as a prop because this type is closed and accepts no arbitrary DOM
-   * attributes; `id` with a `<label for>` names the field just as well. */
+  /** Accessible name of the field, for when no `<label>` points at it. `id`
+   * with a `<label for>` names the field just as well. */
   "aria-label"?: string;
-  /** `id` of the element that names this field — the usual choice when the
-   * caption is already on screen, for instance a `FieldContainer` label given
-   * an `id` of its own. */
+  /** `id` of the element that names this field, the usual choice when the
+   * caption is already on screen. */
   "aria-labelledby"?: string;
   /** `id` of the element describing the field, such as a hint or an error line
    * below it. Announced after the name. */
@@ -72,15 +76,14 @@ export type TextareaProps = {
   heightTextArea?: string | number;
   /** Colour of the text, applied inline. */
   color?: string;
-  /** Default input property */
+  /** Puts the caret in the field on its first render. */
   autoFocus?: boolean;
   /** Selects the whole text whenever this flips to true — for a field the user
    * is expected to copy from.
    * @default false */
   areaSelect?: boolean;
-  /** Treats the value as JSON: pretty-prints it, and puts the field in the
-   * error state whenever it is empty or not a JSON object or array, whatever
-   * `hasError` says.
+  /** Treats the value as JSON and pretty-prints it. The field shows its error
+   * state whenever the value is empty or not a JSON object or array.
    * @default false */
   isJSONField?: boolean;
   /** Text of the toast shown after a successful copy. Without it the copy is
@@ -97,16 +100,9 @@ export type TextareaProps = {
    * height.
    * @default false */
   isFullHeight?: boolean;
-  /** Ignored. The component computes the full height itself and never reads
-   * this prop. */
-  fullHeight?: number;
-  /** Ignored. Nothing in the component or its stylesheet reads this prop. */
-  minHeight?: string;
 
   /** Applied to the copy button, alongside the component's own class. */
   classNameCopyIcon?: string;
-  /** Ignored. The indent for the line numbers is computed from the content. */
-  paddingLeftProp?: string;
 
   /** Moves the scrollbar styling from the inner scroller to the outer wrapper,
    * which is what a chat composer needs.

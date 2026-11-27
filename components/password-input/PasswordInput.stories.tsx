@@ -29,7 +29,7 @@ const meta = {
     simpleView: {
       control: "boolean",
       description:
-        "Strips the component down to the field and the eye button: no tooltip, no generator link and no rule checking",
+        "Strips the component down to the field and the reveal eye: no strength tooltip, no generate link, and no validation at all.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -44,7 +44,7 @@ const meta = {
     },
     isDisableTooltip: {
       control: "boolean",
-      description: "Never shows the rules tooltip",
+      description: "Allows to hide Tooltip",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -55,8 +55,7 @@ const meta = {
     },
     inputWidth: {
       control: "text",
-      description:
-        "Width of the field as a CSS length; left out, the field fills its container",
+      description: "Width of the field's wrapper, as a CSS length.",
     },
     scale: {
       control: "boolean",
@@ -68,12 +67,12 @@ const meta = {
     inputValue: {
       control: "text",
       description:
-        "Value the field starts with; the component keeps its own value from then on and only follows a later change to an empty string",
+        "Value the field starts with. The component owns the value from then on: changing this later is ignored unless it becomes an empty string, or `isSimulateType` is set.",
     },
     inputName: {
       control: "text",
       description:
-        "`name` of the field, also used to find the field for the tooltip when no `id` is given, so two fields on one page need distinct names or ids",
+        "`name` of the field. Without an `id` it also anchors the tooltip, so two fields on one page need distinct ids.",
       table: {
         defaultValue: { summary: "passwordInput" },
       },
@@ -91,7 +90,7 @@ const meta = {
       control: "radio",
       options: ["password", "text"],
       description:
-        "Whether the field starts with its characters shown (`text`) or hidden (`password`); the eye button toggles it from then on",
+        "Whether the field starts revealed. The eye toggles it from then on, and `isDisabled` forces it back to hidden.",
       table: {
         defaultValue: { summary: "password" },
       },
@@ -99,7 +98,7 @@ const meta = {
     passwordSettings: {
       control: "object",
       description:
-        "The rules the checker and the generator use: minimum length, and whether capitals, digits and special characters are required",
+        "The rules the generator and the checker use. Left out, only a minimum length of 8 is required — digits, capitals and symbols are all off.",
       table: {
         defaultValue: { summary: "{ minLength: 8 }" },
       },
@@ -122,40 +121,37 @@ const meta = {
     },
     tooltipPasswordTitle: {
       control: "text",
-      description: "Heading of the rules tooltip",
+      description:
+        "Heading of the rules tooltip, above the list of requirements.",
     },
     tooltipPasswordLength: {
       control: "text",
-      description:
-        "Tooltip line for the minimum length rule, including the number",
+      description: "Prompt for minimum length requirement",
     },
     tooltipPasswordDigits: {
       control: "text",
-      description:
-        "Tooltip line for the digits rule, shown when digits are required",
+      description: "Prompt for digits requirement",
     },
     tooltipPasswordCapital: {
       control: "text",
-      description:
-        "Tooltip line for the capital letters rule, shown when capitals are required",
+      description: "Prompt for capital letters requirement",
     },
     tooltipPasswordSpecial: {
       control: "text",
-      description:
-        "Tooltip line for the special characters rule, shown when they are required",
+      description: "Prompt for special characters requirement",
     },
     tooltipAllowedCharacters: {
       control: "text",
-      description: "Extra text shown in the tooltip after the rules",
+      description:
+        "Text printed under the rules list, usually naming the characters a password may contain.",
     },
     generatePasswordTitle: {
       control: "text",
-      description:
-        "Text of a link at the bottom of the tooltip that fills the field with a random password meeting the rules; left out, no link is shown",
+      description: "Title of the password generation button",
     },
     generatorSpecial: {
       control: "text",
-      description: "Characters the generator may pick special characters from",
+      description: "Characters the generator may pick symbols from.",
       table: {
         defaultValue: { summary: "!@#$%^&*" },
       },
@@ -163,7 +159,7 @@ const meta = {
     isFullWidth: {
       control: "boolean",
       description:
-        "Makes the component a full-width block instead of a row that shrinks to the field",
+        "Whether the wrapper is a full-width block rather than shrinking to the field.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -171,14 +167,15 @@ const meta = {
     isSimulateType: {
       control: false,
       description:
-        "Draws each character as `simulateSymbol` in a plain text field while keeping the real value; the field's `id` must be `conversion-password`",
+        "Renders the value as repeated `simulateSymbol` characters in a **text** field, keeping the real value in state. It needs the input's `id` to be `conversion-password`, which is where it reads the caret from.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     simulateSymbol: {
       control: "text",
-      description: "Character drawn for each real one under `isSimulateType`",
+      description:
+        "The character drawn for each real one under `isSimulateType`.",
       table: {
         defaultValue: { summary: "•" },
       },
@@ -204,17 +201,17 @@ const meta = {
     onChange: {
       action: "onChange",
       description:
-        "Called on every change with the DOM event and the stored value; read the second argument, since a generated password arrives without a real event",
+        "Called on every change with the DOM event and the value after sanitising. Read the second argument: under `isSimulateType` the event carries the masking characters, not the password.",
     },
     onValidateInput: {
       action: "onValidateInput",
       description:
-        "Called after every change with whether all rules pass and with each rule's own result; never called in `simpleView`",
+        "Called after every change with whether every rule passes, and with each rule's own result. It never fires in `simpleView`, which skips checking.",
     },
     sanitizeValue: {
       control: false,
       description:
-        "Function run on every change before the value is stored, such as one that strips spaces",
+        "Runs on every change before the value is stored — stripping spaces, say.",
     },
     onBlur: {
       action: "onBlur",
@@ -223,18 +220,6 @@ const meta = {
     onKeyDown: {
       action: "onKeyDown",
       description: "Called on every key press in the field",
-    },
-    emailInputName: {
-      control: false,
-      description: "Ignored: it feeds a copy button that is not rendered",
-    },
-    clipActionResource: {
-      control: false,
-      description: "Ignored: it feeds a copy button that is not rendered",
-    },
-    clipCopiedResource: {
-      control: false,
-      description: "Ignored: it feeds a copy button that is not rendered",
     },
   },
 } satisfies Meta<typeof PasswordInput>;
@@ -375,7 +360,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The field as a sign-up form uses it: type a character to open the rules tooltip and watch each rule turn green as the value meets it; change any other prop live in the Controls panel below.",
+          "The field as a sign-up form uses it. The first character opens the rules tooltip, and each rule turns green as the value meets it.",
       },
       source: {
         code: `<PasswordInput
@@ -421,6 +406,7 @@ const SimpleViewTemplate = () => {
 };
 
 export const SimpleView: Story = {
+  name: "Sign-in field",
   render: () => <SimpleViewTemplate />,
   play: async ({ canvas, userEvent }) => {
     const field = canvas.getByPlaceholderText("Enter password");
@@ -432,7 +418,7 @@ export const SimpleView: Story = {
     docs: {
       description: {
         story:
-          "A sign-in form only needs the field and the eye button: the simple view drops the rules tooltip and skips rule checking, so the field accepts any value (`simpleView`).",
+          "The field and the eye button alone, for a sign-in form (`simpleView`). There is no rules tooltip and no checking, so any value is accepted.",
       },
       source: {
         code: `<PasswordInput
@@ -483,7 +469,7 @@ export const States: Story = {
     docs: {
       description: {
         story:
-          "Three fields a form may need side by side: **Normal**, ready for input; **Disabled**, greyed out with typing blocked and no tooltip (`isDisabled`); **With error**, drawn with a red border to flag a value the form rejected (`hasError`).",
+          "Three states side by side:\n\n- **Normal** — ready for input\n- **Disabled** — greyed out, typing blocked, no tooltip (`isDisabled`)\n- **With error** — a red border for a value the form rejected (`hasError`)",
       },
       source: {
         code: `<PasswordInput placeholder="Normal" passwordSettings={settings} />
@@ -520,6 +506,7 @@ const CustomRulesTemplate = () => {
 };
 
 export const CustomValidation: Story = {
+  name: "Custom rules",
   render: () => <CustomRulesTemplate />,
   play: async ({ canvas, userEvent }) => {
     // The tooltip lists only the rules this story turns on.
@@ -539,7 +526,7 @@ export const CustomValidation: Story = {
     docs: {
       description: {
         story:
-          "A policy that asks for less: type into the field and the tooltip lists only a minimum length of 8, capital letters and digits, because special characters are switched off (`passwordSettings`).",
+          "A policy that asks for less (`passwordSettings`). The tooltip lists only a minimum length of 8, capital letters and digits; special characters are switched off.",
       },
       source: {
         code: `<PasswordInput
@@ -641,6 +628,7 @@ const GeneratorTemplate = () => {
 };
 
 export const WithPasswordGenerator: Story = {
+  name: "With generator",
   render: () => <GeneratorTemplate />,
   play: async ({ canvas, userEvent }) => {
     const field = canvas.getByPlaceholderText("Type a character");
@@ -661,7 +649,7 @@ export const WithPasswordGenerator: Story = {
     docs: {
       description: {
         story:
-          "Saves the user from inventing a password that meets every rule: type a character to open the tooltip, then click **Generate password** at its bottom; the field fills with a random password that passes all rules and shows its characters (`generatePasswordTitle`, symbols picked from `generatorSpecial`).",
+          "A **Generate password** link at the bottom of the tooltip (`generatePasswordTitle`). It fills the field with a random password that passes every rule, and reveals it. Symbols come from `generatorSpecial`.",
       },
       source: {
         code: `<PasswordInput
@@ -699,6 +687,7 @@ const RightToLeftTemplate = () => {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
   play: async ({ canvas }) => {
@@ -718,7 +707,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "58px" },
       description: {
         story:
-          'The field in a right-to-left layout: the hidden characters line up from the right edge and the eye button moves to the left end. The wrapper carries `dir="rtl"`; the direction also comes from the theme\'s `interfaceDirection` (the Direction toolbar).',
+          "The field in a right-to-left layout, with the hidden characters from the right edge and the eye button at the left end. The direction comes from the wrapper's `dir=\"rtl\"` and the theme's `interfaceDirection`.",
       },
       source: {
         code: `<div dir="rtl">
@@ -735,6 +724,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   play: async ({ canvas }) => {
     const field = canvas.getByDisplayValue("Passw0rd!");
     await expect(field).toHaveStyle({ color: "rgb(76, 29, 149)" });
@@ -776,7 +766,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The input variables set on one wrapper -- the variables are listed under CSS variables on this page. The example sets every variable but the tooltip width, which a wrapper cannot reach; hover and focus the field to see the border colors.`,
+        story: `Every variable but the tooltip width, set on one wrapper; the tooltip is portalled where a wrapper cannot reach it.`,
       },
     },
   },

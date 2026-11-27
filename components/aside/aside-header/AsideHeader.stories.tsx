@@ -18,12 +18,12 @@ const meta: Meta<typeof AsideHeader> = {
     header: {
       control: "text",
       description:
-        "Title of the panel: a string is shown as bold 21px text, any other node inside a heading that cuts off with an ellipsis; nothing is shown without it",
+        "Title of the panel. A string is shown as bold 21px text, any other node in a `Heading` that ends in an ellipsis.",
     },
     isBackButton: {
       control: "boolean",
       description:
-        "Shows a back arrow before the title, which calls `onBackClick`",
+        "Whether a back arrow is rendered before the title. It is mirrored in RTL.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -31,7 +31,7 @@ const meta: Meta<typeof AsideHeader> = {
     isCloseable: {
       control: "boolean",
       description:
-        "Shows the close cross, the only control that calls `onCloseClick`",
+        "Whether the close cross is rendered. It is the only control that calls `onCloseClick`.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -39,7 +39,7 @@ const meta: Meta<typeof AsideHeader> = {
     withoutBorder: {
       control: "boolean",
       description:
-        "Hides the line under the header, which otherwise spans the full width of the panel",
+        "Hides the bottom border, which otherwise spans the full width of the panel regardless of the header's own side margins.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -47,12 +47,12 @@ const meta: Meta<typeof AsideHeader> = {
     headerHeight: {
       control: "text",
       description:
-        "Height of the header as a CSS length, such as `70px`; without it the header is 53px tall",
+        "Height of the header as a CSS length, such as `70px`. Without it the header is 53px tall.",
     },
     isLoading: {
       control: "boolean",
       description:
-        "Replaces the whole header, title, icons and close cross alike, with a skeleton bar",
+        "Replaces the whole header — title, icons and close cross alike — with a skeleton bar. There is no way out of a header that is loading.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -60,7 +60,7 @@ const meta: Meta<typeof AsideHeader> = {
     headerIcons: {
       control: false,
       description:
-        "Extra icon buttons between the title and the close cross, each with a `key`, an `onClick` and either an `iconNode` or a `url` of an image loaded at runtime",
+        "Extra icon buttons between the title and the close cross. Each needs a `key`, an `onClick`, and an `iconNode` or a `url` fetched at runtime; its optional `label` is the button's accessible name.",
       table: {
         defaultValue: { summary: "[]" },
       },
@@ -68,31 +68,31 @@ const meta: Meta<typeof AsideHeader> = {
     headerComponent: {
       control: false,
       description:
-        "Any node shown after the icons and before the close cross, for a control that is not an icon",
+        "Arbitrary node rendered after the icons and before the close cross, for a control that is not an icon.",
     },
     onBackClick: {
       action: "back clicked",
-      description: "Called when the back arrow is clicked",
+      description: "Called by the back arrow.",
     },
     onCloseClick: {
       action: "close clicked",
-      description: "Called when the close cross is clicked",
+      description: "Called by the close cross.",
     },
     className: {
       control: "text",
-      description: "Class name added to the header element",
+      description: "Applied to the header element.",
     },
     id: {
       control: "text",
-      description: "`id` of the header element",
+      description: "Applied to the header element.",
     },
     style: {
       control: false,
-      description: "Inline style of the header element",
+      description: "Applied to the header element.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the header element",
+      description: "Value of `data-testid` on the header.",
       table: {
         defaultValue: { summary: '"aside-header"' },
       },
@@ -147,7 +147,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A title and the close cross, the header every side panel starts with; clicks on the cross are logged in the Actions panel. Change any other prop live in the Controls panel below.",
+          "A title and the close cross: the header every side panel starts with.",
       },
       source: {
         code: `<AsideHeader header="Members" onCloseClick={handleClose} />`,
@@ -157,6 +157,7 @@ export const Default: Story = {
 };
 
 export const WithBackButton: Story = {
+  name: "With back arrow",
   render: (args) => (
     <Wrapper>
       <AsideHeader {...args} />
@@ -184,7 +185,7 @@ export const WithBackButton: Story = {
     docs: {
       description: {
         story:
-          "A back arrow before the title, for a panel that opens a second level and needs a way back to the first; the arrow calls its own handler, logged in the Actions panel (`isBackButton`).",
+          "A back arrow before the title, for a panel that opens a second level (`isBackButton`). The arrow calls its own handler, `onBackClick`.",
       },
       source: {
         code: `<AsideHeader
@@ -199,6 +200,7 @@ export const WithBackButton: Story = {
 };
 
 export const WithIcons: Story = {
+  name: "With icons",
   render: (args) => (
     <Wrapper>
       <AsideHeader {...args} />
@@ -243,7 +245,7 @@ export const WithIcons: Story = {
     docs: {
       description: {
         story:
-          "Two icon buttons between the title and the close cross, for actions on what the panel shows without a toolbar of their own; each icon has its own click handler (`headerIcons`).",
+          "Two icon buttons between the title and the close cross, each with its own click handler (`headerIcons`). They act on what the panel shows.",
       },
       source: {
         code: `<AsideHeader
@@ -260,6 +262,7 @@ export const WithIcons: Story = {
 };
 
 export const Loading: Story = {
+  name: "Loading",
   render: (args) => (
     <Wrapper>
       <AsideHeader {...args} />
@@ -291,6 +294,7 @@ export const Loading: Story = {
 };
 
 export const WithoutBorder: Story = {
+  name: "Without border",
   render: (args) => (
     <Wrapper>
       <AsideHeader {...args} />
@@ -319,6 +323,7 @@ export const WithoutBorder: Story = {
 };
 
 export const CustomHeight: Story = {
+  name: "Custom height",
   render: (args) => (
     <Wrapper>
       <AsideHeader {...args} />
@@ -348,6 +353,7 @@ export const CustomHeight: Story = {
 };
 
 export const BackAndClose: Story = {
+  name: "Long title",
   render: (args) => (
     <Wrapper>
       <AsideHeader {...args} />
@@ -373,7 +379,7 @@ export const BackAndClose: Story = {
     docs: {
       description: {
         story:
-          "The back arrow and the close cross around a title too long for the panel: the title is cut off with an ellipsis rather than pushing the close cross out of the header.",
+          "A title too long for the panel, between the back arrow and the close cross. It ends in an ellipsis instead of pushing the cross out.",
       },
       source: {
         code: `<AsideHeader
@@ -388,6 +394,7 @@ export const BackAndClose: Story = {
 };
 
 export const WithCustomControl: Story = {
+  name: "With a custom control",
   render: (args) => (
     <Wrapper>
       <AsideHeader {...args} />
@@ -431,6 +438,7 @@ export const WithCustomControl: Story = {
 
 // Framed on Docs: the theme provider stamps the direction on the page, which would flip the whole Docs page.
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <Wrapper>
@@ -463,7 +471,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "81px" },
       description: {
         story:
-          'The same header under a right-to-left interface: the back arrow moves to the right edge and points right, the title follows it, and the close cross sits on the left. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+          'The same header under a right-to-left interface. The back arrow moves to the right edge and points right, and the close cross sits on the left. The direction comes from the theme\'s `interfaceDirection`; the wrapper also carries `dir="rtl"` for rules that read the DOM direction.',
       },
       source: {
         code: `<div dir="rtl">
@@ -475,6 +483,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={
@@ -533,10 +542,10 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Two headers restyled through CSS variables -- the variables are listed under CSS variables on this page.
+        story: `Two headers restyled through CSS variables.
 
-- **Customized Header** — the wrapper's color, border, font size, height and gap; the back arrow is on to show the gap before the title.
-- **Centered Title** — the title taken out of the row and centered, with the line removed. These variables are set through the header's own \`style\`, because in the wrapper they would also move the first header's title away from its back arrow.`,
+- **Customized Header** — colour, border, font size, height and gap, set on the wrapper.
+- **Centered Title** — the title centred and the line removed, set on the header's own \`style\`. On the wrapper they would also move the first title.`,
       },
       source: {
         code: `<div

@@ -17,25 +17,25 @@ const meta = {
     text: {
       control: "text",
       description:
-        "Message of the bar, drawn under the header. Not shown when `htmlContent` is set",
+        "Message of the bar, rendered under the header. Ignored when `htmlContent` is set.",
     },
     headerText: {
       control: "text",
       description:
-        "Bold line above the message. Without it the header line is hidden",
+        "Bold line above the message. Without it the heading element is still rendered, hidden with `display: none`.",
     },
     additionalHeaderText: {
       control: "text",
-      description: "Smaller line drawn next to the header",
+      description: "Smaller line drawn next to the header.",
     },
     btnText: {
       control: "text",
       description:
-        "Label of the action, drawn as underlined text after the message. Setting it removes the close cross",
+        "Label of the inline action, a `<button>` drawn as underlined text after the message. Setting it removes the close cross.",
     },
     showIcon: {
       control: "boolean",
-      description: "Whether the warning icon is drawn before the header",
+      description: "Whether the warning icon is drawn before the header.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -43,12 +43,12 @@ const meta = {
     countDownTime: {
       control: "number",
       description:
-        "Milliseconds until the countdown after the message reaches zero and calls `onAction`. `-1` shows no countdown; `0` calls `onAction` as soon as the bar mounts",
+        "Milliseconds until the countdown fires `onAction`. Pass `-1` for no countdown at all: `0` fires it on the first frame.",
     },
     opacity: {
       control: { type: "range", min: 0, max: 1, step: 0.1 },
       description:
-        "Opacity of the whole bar. Without it the bar is fully transparent",
+        "Opacity of the bar. Without it the bar renders fully transparent — the stylesheet falls back to `0`.",
       table: {
         defaultValue: { summary: "0" },
       },
@@ -56,21 +56,17 @@ const meta = {
     backgroundImg: {
       control: "text",
       description:
-        "CSS `background-image` value of the bar, a whole value such as `url(/banner.png)` rather than a bare path",
-    },
-    isMaintenance: {
-      control: false,
-      description: "Ignored: the bar looks the same with or without it",
+        "CSS `background-image` value of the bar — a whole shorthand such as `url(/banner.png)`, not a bare path.",
     },
     fontSize: {
       control: "text",
       description:
-        "Font size of the countdown, as a CSS length. The header and message keep their own size",
+        "Font size of the countdown, as a CSS length. It does not reach the message, whose size is fixed by `--snackbar-text-size`.",
     },
     fontWeight: {
       control: "number",
       description:
-        "Font weight of the countdown. The header and message keep their own weight",
+        "Font weight of the countdown. It does not reach the message either.",
     },
     textAlign: {
       control: "select",
@@ -83,17 +79,17 @@ const meta = {
         "justify",
         "match-parent",
       ],
-      description: "Text alignment of the header and the message",
+      description: "Text alignment of the header and the message.",
     },
     htmlContent: {
       control: "text",
       description:
-        "HTML drawn in place of the header and message, sanitized with xss, which drops `style` attributes. With `isCampaigns` it is the URL of the page loaded into the iframe",
+        "HTML injected instead of `text`, sanitized with `xss`. Under `isCampaigns` it is read as the `src` of an iframe instead.",
     },
     isCampaigns: {
       control: "boolean",
       description:
-        "Whether the bar is a campaign banner: `htmlContent` is loaded as a page into an iframe, and the only thing drawn over it is a close cross",
+        "Whether the bar is a campaign banner: `htmlContent` becomes an iframe URL and the only thing drawn over it is a close cross.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -101,12 +97,12 @@ const meta = {
     sectionWidth: {
       control: "number",
       description:
-        "Minimum width of the HTML content on a tablet, in pixels. Has no effect without `htmlContent`",
+        "Minimum width of the iframe on a tablet or wider, in pixels. It does nothing without `htmlContent`.",
     },
     skipBlur: {
       control: "boolean",
       description:
-        "Whether a click inside an iframe on the page is left alone. Without it such a click calls `onAction` half a second later",
+        "Whether the window `blur` listener is skipped. It is on by default and turns a click inside an iframe into an `onAction` half a second later.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -114,20 +110,17 @@ const meta = {
     style: {
       control: "object",
       description:
-        "Inline style of the bar, applied after `opacity` and `backgroundImg`, so it can override both",
+        "Applied to the outermost element as inline style. It is merged after the opacity and background variables, so it can override them.",
     },
     onAction: {
       action: "onAction",
       description:
-        "Called when the action label or the close cross is clicked, when the countdown reaches zero, and after a click inside an iframe",
-    },
-    onClose: {
-      control: false,
-      description: "Ignored: the close cross calls `onAction`",
+        "Called by the action text, by the close cross, when the countdown reaches zero and when a click lands in an iframe. The event is only passed on a real click.",
     },
     onLoad: {
       action: "onLoad",
-      description: "Called once the bar is mounted",
+      description:
+        "Called once the bar is mounted. Under `isCampaigns` the iframe's own load is what reveals the cross.",
     },
   },
 } satisfies Meta<typeof SnackBar>;
@@ -192,7 +185,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The bar as most pages show it: a warning icon, a header and a message, with a close cross at the end that calls `onAction`. Change any other prop live in the Controls panel below.",
+          "The bar as most pages show it: a warning icon, a header and a message, with a close cross at the end that calls `onAction`.",
       },
       source: {
         code: `<SnackBar
@@ -210,6 +203,7 @@ export const Default: Story = {
 };
 
 export const WithAction: Story = {
+  name: "With an action",
   render: (args) => <SnackBarWrapper {...args} />,
   args: { ...baseArgs, btnText: "Take Action" },
   play: async ({ args, canvas, userEvent }) => {
@@ -230,7 +224,7 @@ export const WithAction: Story = {
     docs: {
       description: {
         story:
-          "When the notice asks for one step, the bar offers it in place of the close cross: the underlined **Take Action** button after the message calls `onAction` (`btnText`).",
+          "An underlined **Take Action** button in place of the close cross, for a notice that asks for one step (`btnText`). It calls `onAction`.",
       },
       source: {
         code: `<SnackBar
@@ -249,6 +243,7 @@ export const WithAction: Story = {
 };
 
 export const WithCountdown: Story = {
+  name: "With a countdown",
   render: (args) => <SnackBarWrapper {...args} />,
   args: {
     ...baseArgs,
@@ -264,7 +259,7 @@ export const WithCountdown: Story = {
     docs: {
       description: {
         story:
-          "For a notice that should not outstay its moment: the countdown after the message ticks down from 00:05 and calls `onAction` at zero, where the host removes the bar (`countDownTime`). Here nothing removes it, so only the timer disappears.",
+          "A countdown after the message, from 00:05 down to zero, where it calls `onAction` (`countDownTime`). Here nothing removes the bar, so only the timer disappears.",
       },
       source: {
         code: `<SnackBar
@@ -282,6 +277,7 @@ export const WithCountdown: Story = {
 };
 
 export const WithHtmlContent: Story = {
+  name: "HTML content",
   render: (args) => <SnackBarWrapper {...args} />,
   args: {
     ...baseArgs,
@@ -302,7 +298,7 @@ export const WithHtmlContent: Story = {
     docs: {
       description: {
         story:
-          "When the notice needs bold text or a link, pass it as HTML: it replaces the header and the message, and the markup is sanitized first, which also drops any `style` attribute (`htmlContent`).",
+          "Bold text and a link passed as HTML in place of the header and message (`htmlContent`). The markup is sanitized first, which also drops any `style` attribute.",
       },
       source: {
         code: `<SnackBar
@@ -317,6 +313,7 @@ export const WithHtmlContent: Story = {
 };
 
 export const Maintenance: Story = {
+  name: "Maintenance notice",
   render: (args) => <SnackBarWrapper {...args} />,
   args: {
     ...baseArgs,
@@ -337,7 +334,7 @@ export const Maintenance: Story = {
     docs: {
       description: {
         story:
-          "A scheduled-maintenance notice is an ordinary bar with its own header and message; there is no separate maintenance look, and `isMaintenance` changes nothing.",
+          "A scheduled-maintenance notice is an ordinary bar with its own header and message; there is no separate maintenance look.",
       },
       source: {
         code: `<SnackBar
@@ -354,6 +351,7 @@ export const Maintenance: Story = {
 };
 
 export const WithAdditionalHeaderText: Story = {
+  name: "Extra header text",
   render: (args) => <SnackBarWrapper {...args} />,
   args: { ...baseArgs, additionalHeaderText: "Today, 10:00" },
   play: async ({ canvas }) => {
@@ -383,6 +381,7 @@ export const WithAdditionalHeaderText: Story = {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <SnackBarWrapper {...args} />
@@ -410,7 +409,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "90px" },
       description: {
         story:
-          "The same bar under a right-to-left interface: the accent stripe moves to the right edge, the icon and header start from the right, and the close cross moves to the left end. The wrapper sets the direction to right-to-left, and the bar's logical properties follow it.",
+          "The same bar under a right-to-left interface. The accent stripe moves to the right edge, and the close cross to the left end. The wrapper sets the direction, and the bar's logical properties follow it.",
       },
       source: {
         code: `<div dir="rtl">
@@ -429,6 +428,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={

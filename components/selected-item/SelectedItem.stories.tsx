@@ -18,12 +18,12 @@ const meta = {
   argTypes: {
     label: {
       control: "text",
-      description: "Text of the chip. An empty label renders nothing at all",
+      description: "Text of the chip. A falsy label renders nothing at all.",
     },
     isInline: {
       control: "boolean",
       description:
-        "Shrinks the chip to its content; turned off, the chip fills the width of its container",
+        "Whether the chip shrinks to its content. Without it the chip fills the width of its container.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -31,7 +31,7 @@ const meta = {
     isDisabled: {
       control: "boolean",
       description:
-        "Greys out the label and the cross and stops `onClose` and `onClick` from firing",
+        "Whether the chip is inert. Both handlers stop firing and the label and the cross grey out.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -39,25 +39,24 @@ const meta = {
     propKey: {
       control: "text",
       description:
-        "Identifier handed back to `onClose` and `onClick`; it is not used for anything else",
+        "Identifier handed back to `onClose` and `onClick`. It is not used for anything else.",
     },
     group: {
       control: "text",
       description:
-        "Second identifier handed back to both handlers (`onClose` receives an empty string when it is not set), for chips that belong to several filters",
+        "Second identifier handed back to both handlers, for chips that belong to several filters.",
     },
     hideCross: {
       control: "boolean",
       description:
-        "Leaves the cross out, so nothing on the chip fires `onClose`",
+        "Whether the cross is left out. `onClose` then has nothing to fire it.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isActive: {
       control: "boolean",
-      description:
-        "Draws the chip in its selected colours: a tinted background with the label and icon in the accent colour",
+      description: "Whether the chip is drawn in its selected colours.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -65,55 +64,55 @@ const meta = {
     icon: {
       control: false,
       description:
-        "Glyph before the label: an SVG URL, or a component rendered with no props",
+        "Glyph before the label: an SVG URL, or a component rendered with no props.",
     },
     title: {
       control: "text",
       description:
-        "Text of the shared tooltip that opens when the pointer rests on the chip, useful when a long label is cut off; it needs `RootTooltip` mounted",
+        "Text of the kit's shared tooltip for a truncated label; it shows only once `RootTooltip` is mounted.",
     },
     onClose: {
       action: "onClose",
       description:
-        "Called when the cross is clicked, with `propKey`, `label`, `group` and the event",
+        'Called when the cross is clicked, with `propKey`, `label`, `group` (`""` when it was not set) and the event.',
     },
     onClick: {
       action: "onClick",
       description:
-        "Called when the chip is clicked, with `propKey`, `label`, `group` and the event",
+        "Called when the chip is clicked, with `propKey`, `label`, `group` and the event. A click on the cross does not reach it.",
     },
     className: {
       control: "text",
-      description: "Class added to the outermost element",
+      description: "Applied to the outermost element.",
     },
     id: {
       control: "text",
-      description: "`id` of the outermost element",
+      description: "Applied to the outermost element.",
     },
     classNameCloseButton: {
       control: "text",
-      description: "Class added to the cross button",
+      description:
+        "Applied to the cross button, in addition to the class the component needs there itself.",
     },
     dataTestId: {
       control: "text",
-      description: "`data-testid` of the outermost element",
+      description: "`data-testid` of the outermost element.",
       table: {
         defaultValue: { summary: '"selected-item"' },
       },
     },
     forwardedRef: {
       control: false,
-      description: "Ref to the outermost element",
+      description: "Ref to the outermost element.",
     },
     style: {
       control: false,
-      description:
-        "Ignored: nothing reads it; style the chip through `className` or the CSS custom properties",
+      description: "Inline style of the outermost element.",
     },
     clickable: {
       control: false,
       description:
-        "Ignored: nothing reads it; passing `onClick` is what makes the chip clickable",
+        'Makes the chip a button to the keyboard: focusable, `role="button"`, `aria-pressed` from `isActive`, and Enter / Space clicking it. The pointer needs only `onClick`.',
     },
   },
 } satisfies Meta<typeof SelectedItem>;
@@ -125,6 +124,7 @@ export default meta;
 const noop = () => {};
 
 export const Default: Story = {
+  name: "Default",
   render: (args) => <SelectedItem {...args} />,
   args: {
     label: "Selected item",
@@ -163,7 +163,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The chip as a filter shows a picked value: click the cross to see `onClose` in the Actions panel, click the label for `onClick`, and change any other prop live in the Controls panel below.",
+          "A chip holding one picked filter value. A click on the label calls `onClick`; a click on the cross calls `onClose` alone.",
       },
       source: {
         code: `<SelectedItem label="Selected item" propKey="item-1" isInline onClose={handleRemove} />`,
@@ -184,6 +184,7 @@ const chipOf = (
     .closest("[data-testid='selected-item']") as HTMLElement;
 
 export const DisabledState: Story = {
+  name: "Disabled",
   render: (args) => <SelectedItem {...args} />,
   args: {
     label: "Disabled item",
@@ -205,7 +206,7 @@ export const DisabledState: Story = {
     docs: {
       description: {
         story:
-          "For a value the user may see but not take back: the label and the cross grey out and neither handler fires (`isDisabled`).",
+          "A greyed-out chip where neither handler fires (`isDisabled`), for a value the user may see but not take back.",
       },
       source: {
         code: `<SelectedItem label="Disabled item" propKey="item-disabled" isInline isDisabled onClose={handleRemove} />`,
@@ -215,6 +216,7 @@ export const DisabledState: Story = {
 };
 
 export const BlockDisplay: Story = {
+  name: "Full width",
   render: (args) => <SelectedItem {...args} />,
   play: async ({ args, canvas, userEvent }) => {
     // The chip fills its container's content box and the cross sits at the
@@ -248,7 +250,7 @@ export const BlockDisplay: Story = {
     docs: {
       description: {
         story:
-          "For a list of picked values stacked one per row: the chip fills the width of its container and pushes the cross to the far end (`isInline={false}`).",
+          "A chip that fills the width of its container, with the cross at the far end (`isInline={false}`). Suits picked values stacked one per row.",
       },
       source: {
         code: `<SelectedItem label="Block display item" propKey="item-block" isInline={false} onClose={handleRemove} />`,
@@ -295,6 +297,7 @@ const AllVariantsTemplate = () => {
 };
 
 export const AllVariants: Story = {
+  name: "All variants",
   render: () => <AllVariantsTemplate />,
   play: async ({ canvas }) => {
     const enabled = chipOf(canvas, "Inline enabled");
@@ -322,6 +325,7 @@ export const AllVariants: Story = {
 };
 
 export const WithIcon: Story = {
+  name: "With icon",
   render: (args) => <SelectedItem {...args} />,
   args: {
     label: "Documents",
@@ -342,7 +346,7 @@ export const WithIcon: Story = {
     docs: {
       description: {
         story:
-          "For a value that is easier to recognise by its kind: a glyph sits before the label (`icon`, here an SVG component; an SVG URL works too).",
+          "A folder glyph before the label (`icon`), for a value recognised by its kind. Here it is an SVG component; an SVG URL works too.",
       },
       source: {
         code: `import FolderIcon from "./folder.react.svg";
@@ -354,6 +358,7 @@ export const WithIcon: Story = {
 };
 
 export const ActiveState: Story = {
+  name: "Active",
   render: (args) => <SelectedItem {...args} />,
   args: {
     label: "Documents",
@@ -375,7 +380,7 @@ export const ActiveState: Story = {
     docs: {
       description: {
         story:
-          "For the chip the user is working with right now: the background tints and the label and icon take the accent colour (`isActive`).",
+          "A chip with a tinted background and the label and icon in the accent colour (`isActive`), for the value being worked with.",
       },
       source: {
         code: `<SelectedItem label="Documents" propKey="item-active" icon={FolderIcon} isInline isActive onClose={handleRemove} />`,
@@ -385,6 +390,7 @@ export const ActiveState: Story = {
 };
 
 export const WithoutCross: Story = {
+  name: "Without cross",
   render: (args) => <SelectedItem {...args} />,
   args: {
     label: "Read only",
@@ -405,7 +411,7 @@ export const WithoutCross: Story = {
     docs: {
       description: {
         story:
-          "For a value the user can pick but not remove from the chip itself: the cross is left out and only a click on the chip is reported (`hideCross`).",
+          "A chip with no cross (`hideCross`), for a value that cannot be removed from the chip itself. Only a click on the chip is reported.",
       },
       source: {
         code: `<SelectedItem label="Read only" propKey="item-no-cross" isInline hideCross onClose={handleRemove} onClick={handleClick} />`,
@@ -415,6 +421,7 @@ export const WithoutCross: Story = {
 };
 
 export const TruncatedLabel: Story = {
+  name: "Truncated label",
   render: (args) => (
     <>
       <SelectedItem {...args} />
@@ -444,7 +451,7 @@ export const TruncatedLabel: Story = {
     docs: {
       description: {
         story:
-          "For values longer than a chip can hold: the label is cut off with an ellipsis; rest the pointer on the chip to read the full text in the tooltip (`title`). The tooltip is the kit's shared one, so the app must mount `RootTooltip` once, as this story does.",
+          "A label too long for the chip, cut off with an ellipsis. On hover the full text shows in the kit's shared tooltip (`title`), which needs `RootTooltip` mounted once.",
       },
       source: {
         code: `<SelectedItem
@@ -461,6 +468,7 @@ export const TruncatedLabel: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   play: async ({ canvas }) => {
     await expect(chipOf(canvas, "Custom item")).toHaveStyle({
       backgroundColor: "rgb(237, 233, 254)",
@@ -523,7 +531,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The example has three chips: **Custom item** for the colours and sizes (hover it for the hover background), **Disabled** for \`--selected-item-disabled-text\` (\`isDisabled\`), and **Active** for the two active variables (\`isActive\`).`,
+        story: `Every overridable variable set on one wrapper, shown on three chips:\n\n- **Custom item** — the colours and sizes, with the hover background on hover\n- **Disabled** — \`--selected-item-disabled-text\` (\`isDisabled\`)\n- **Active** — the two active variables (\`isActive\`)`,
       },
       source: {
         code: `<div

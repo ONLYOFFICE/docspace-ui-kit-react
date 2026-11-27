@@ -1,4 +1,4 @@
-export type TagProps = {
+export type TagProps = React.AriaAttributes & {
   /** Ref to the outermost element. */
   ref?: React.RefObject<HTMLDivElement | null>;
   /** Identifier of the tag. It is handed to `onDelete`, and it is the text shown when `label` is left out. */
@@ -13,9 +13,9 @@ export type TagProps = {
   style?: React.CSSProperties;
   /** Whether the tag is drawn in its "new" colours. It is also what makes the delete cross appear. */
   isNewTag?: boolean;
-  /** Whether the tag is inert. Pointer events are dropped in CSS as well, so hover does nothing either. */
+  /** Whether the tag is inert, with a dashed border and a greyed label. Pointer events are dropped in CSS as well, so hover does nothing either. */
   isDisabled?: boolean;
-  /** Whether the tag counts as removed: `onClick` stops firing and the border greys out. */
+  /** Whether the tag counts as removed: `onClick` stops firing, the border greys out and the label is struck through. */
   isDeleted?: boolean;
   /** Called on a click anywhere in the tag, with `{ label, roomType, providerType }` — not with the DOM event. */
   onClick?: (tag: TagClickEvent) => void;
@@ -27,8 +27,6 @@ export type TagProps = {
   icon?: string | React.FC<React.SVGProps<SVGSVGElement>>;
   /** Applied to that glyph. */
   iconClassName?: string;
-  /** Ignored. Nothing reads this prop on a single tag; it is `TagType.isDefault` that `Tags` acts on. */
-  isDefault?: boolean;
   /** Whether the trailing margin is dropped, for the last tag in a row. */
   isLast?: boolean;
   /** Passed straight back through `onClick`. The component itself does nothing with it. */
@@ -62,7 +60,7 @@ export type TagType = {
   maxWidth?: string;
   /** Labels listed in the overflow drop-down. `Tags` fills this in for the overflow tag itself. */
   advancedOptions?: string[];
-  /** Whether the tag is inert. */
+  /** Draws the tag with a dashed border and stops it answering the pointer. */
   isDisabled?: boolean;
   /** Passed back through `onSelectTag`. */
   roomType?: number;
