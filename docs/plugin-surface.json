@@ -1,10 +1,18 @@
 {
   "entry": "index.ts",
   "package": "@onlyoffice/apps-ui-kit",
-  "total": 719,
-  "values": 467,
+  "total": 723,
+  "values": 471,
   "exports": {
     "ADMIN": {
+      "kind": "variable",
+      "origin": "billing"
+    },
+    "ADMIN_WALLET": {
+      "kind": "variable",
+      "origin": "billing"
+    },
+    "ADMIN_WALLET_YEAR": {
       "kind": "variable",
       "origin": "billing"
     },
@@ -2247,6 +2255,14 @@
     "VectorizationStatus": {
       "kind": "enum",
       "origin": "enums"
+    },
+    "WALLET_TARIFF_QUOTA_ID": {
+      "kind": "variable",
+      "origin": "billing"
+    },
+    "WALLET_YEAR_TARIFF_QUOTA_ID": {
+      "kind": "variable",
+      "origin": "billing"
     },
     "WEB_SEARCH": {
       "kind": "variable",
