@@ -31,6 +31,7 @@ const TotalTariffContainer = observer(
       isTariffDueTodayCalculating,
       setIsTariffDueTodayCalculating,
       needsWalletMigration,
+      tariffWalletProduct,
     } = store;
     const { isYearTariff, maxCountManagersByQuota, isFreeTariff } =
       store.quotas;
@@ -78,7 +79,7 @@ const TotalTariffContainer = observer(
           const calcRes = await paymentApi.calculateWalletPayment(
             {
               walletQuantityRequestDto: {
-                quantity: { adminwallet: managersDiff },
+                quantity: { [tariffWalletProduct]: managersDiff },
                 productQuantityType: ProductQuantityType.Add,
               },
             },
@@ -101,7 +102,14 @@ const TotalTariffContainer = observer(
       return () => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
       };
-    }, [managersDiff, isUpgrade, isDowngradePlan, isNeedRequest, paymentApi]);
+    }, [
+      managersDiff,
+      isUpgrade,
+      isDowngradePlan,
+      isNeedRequest,
+      paymentApi,
+      tariffWalletProduct,
+    ]);
 
     const dueTodayPill =
       (isUpgrade || isDowngradePlan) && !isNeedRequest ? (

@@ -34,6 +34,7 @@ const createStore = () => ({
   isTariffDueTodayCalculating: false,
   setIsTariffDueTodayCalculating: vi.fn(),
   needsWalletMigration: false,
+  tariffWalletProduct: "adminwallet",
   quotas: {
     isYearTariff: false,
     maxCountManagersByQuota: 4,

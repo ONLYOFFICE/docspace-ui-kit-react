@@ -2059,7 +2059,7 @@ class PaymentStore {
 
       const updateRes = await this.paymentApi.updateWalletPayment({
         walletQuantityRequestDto: {
-          quantity: { adminwallet: quantity },
+          quantity: { [this.tariffWalletProduct]: quantity },
           productQuantityType: type,
         },
       });

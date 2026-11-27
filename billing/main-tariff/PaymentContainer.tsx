@@ -66,7 +66,7 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     nextTariffAdminsCount,
     fetchPortalTariff,
   } = store.tariff;
-  const { fetchBalance, showUnlinkedCardBanner } = store;
+  const { fetchBalance, showUnlinkedCardBanner, tariffWalletProduct } = store;
   const { tariffPlanTitle, planCost } = store.paymentQuotas;
 
   const startValue = planCost.value;
@@ -77,7 +77,7 @@ const PaymentContainer = observer(({ t }: { t: TTranslation }) => {
     try {
       const res = await paymentApi.updateWalletPayment({
         walletQuantityRequestDto: {
-          quantity: { adminwallet: null },
+          quantity: { [tariffWalletProduct]: null },
           productQuantityType: ProductQuantityType.Set,
         },
       });

@@ -12,6 +12,7 @@ import { Loader, LoaderTypes } from "../../components/loader";
 import { useApi } from "../../providers/api";
 
 import {
+  ADMIN_WALLET,
   AI_PAYWALL_START_AMOUNT,
   DOCS_CONNECT_PRODUCT,
   DOCS_CONNECT_DEVPACK_PRODUCT,
@@ -230,7 +231,7 @@ const PaymentCompletePage = ({ docsConnectUrl }: PaymentCompletePageProps) => {
         if (admins) {
           const adminsRes = await paymentApi.updateWalletPayment({
             walletQuantityRequestDto: {
-              quantity: { adminwallet: Number(admins) },
+              quantity: { [ADMIN_WALLET]: Number(admins) },
               productQuantityType: ProductQuantityType.Add,
             },
           });
