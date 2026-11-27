@@ -117,6 +117,14 @@ describe("Filter Component", () => {
   };
 
   describe("Search Input", () => {
+    it("puts a passed aria-* on the bar", () => {
+      renderComponent({ "aria-describedby": "filter-hint" });
+      expect(screen.getByTestId("filter_container")).toHaveAttribute(
+        "aria-describedby",
+        "filter-hint",
+      );
+    });
+
     it("clears search when clearSearch prop is true", async () => {
       const onClearFilter = vi.fn();
       const setClearSearch = vi.fn();
@@ -228,6 +236,48 @@ describe("Filter Component", () => {
       expect(button).toHaveAttribute("aria-expanded", "true");
     });
 
+    it("names the sort button by sortByTitle", async () => {
+      await act(async () => {
+        renderComponent();
+      });
+
+      expect(
+        screen.getByRole("button", { name: "Sort by" }),
+      ).toBeInTheDocument();
+    });
+
+    it("names the panel by filterHeader", async () => {
+      await act(async () => {
+        renderComponent();
+      });
+
+      await userEvent.click(screen.getByTestId("filter_icon_button"));
+
+      expect(
+        await screen.findByRole("dialog", { name: "Filter" }),
+      ).toBeInTheDocument();
+    });
+
+    it("names the panel's clear button", async () => {
+      await act(async () => {
+        renderComponent({
+          getSelectedFilterData: () =>
+            Promise.resolve([
+              {
+                key: "state",
+                group: FilterGroups.filterOther,
+                label: "Case file",
+              },
+            ]),
+        });
+      });
+
+      await userEvent.click(screen.getByTestId("filter_icon_button"));
+
+      expect(
+        await screen.findByRole("button", { name: "Clear filter" }),
+      ).toBeInTheDocument();
+    });
     it("opens the sort list from the keyboard and sorts with Enter", async () => {
       const user = userEvent.setup();
       const onSort = vi.fn();
@@ -259,6 +309,84 @@ describe("Filter Component", () => {
       await user.keyboard("{ArrowDown}{Enter}");
 
       expect(onSort).toHaveBeenCalled();
+    });
+
+    it("reports the sort list opening with true and closing with false", async () => {
+      const user = userEvent.setup();
+      const onSortButtonClick = vi.fn();
+      await act(async () => {
+        renderComponent({
+          onSortButtonClick,
+          getSortData: () => [
+            { id: "sort-title", key: "title", label: "Name", default: true },
+          ],
+          getSelectedSortData: () => ({
+            sortId: "title",
+            sortDirection: "asc",
+          }),
+        });
+      });
+      // Nothing on mount: the list has not moved.
+      expect(onSortButtonClick).not.toHaveBeenCalled();
+
+      const sortButton = within(
+        screen.getByTestId("filter_sort_combobox"),
+      ).getByRole("button");
+      await user.click(sortButton);
+      expect(onSortButtonClick).toHaveBeenLastCalledWith(true);
+
+      await user.click(sortButton);
+      expect(onSortButtonClick).toHaveBeenLastCalledWith(false);
+      expect(onSortButtonClick).toHaveBeenCalledTimes(2);
+    });
+
+    // A host that hides something while the list is open (the mobile main
+    // button) must hear that it closed, even when the filter goes first.
+    it("reports nothing when it unmounts with the sort list closed", async () => {
+      const onSortButtonClick = vi.fn();
+      let unmount = () => {};
+      await act(async () => {
+        ({ unmount } = renderComponent({
+          onSortButtonClick,
+          getSortData: () => [
+            { id: "sort-title", key: "title", label: "Name", default: true },
+          ],
+          getSelectedSortData: () => ({
+            sortId: "title",
+            sortDirection: "asc",
+          }),
+        }));
+      });
+
+      unmount();
+      expect(onSortButtonClick).not.toHaveBeenCalled();
+    });
+
+    it("reports false when it unmounts after the list was opened", async () => {
+      const user = userEvent.setup();
+      const onSortButtonClick = vi.fn();
+      let unmount = () => {};
+      await act(async () => {
+        ({ unmount } = renderComponent({
+          onSortButtonClick,
+          getSortData: () => [
+            { id: "sort-title", key: "title", label: "Name", default: true },
+          ],
+          getSelectedSortData: () => ({
+            sortId: "title",
+            sortDirection: "asc",
+          }),
+        }));
+      });
+
+      await user.click(
+        within(screen.getByTestId("filter_sort_combobox")).getByRole("button"),
+      );
+      expect(onSortButtonClick).toHaveBeenLastCalledWith(true);
+
+      unmount();
+      expect(onSortButtonClick).toHaveBeenLastCalledWith(false);
+      expect(onSortButtonClick).toHaveBeenCalledTimes(2);
     });
   });
 

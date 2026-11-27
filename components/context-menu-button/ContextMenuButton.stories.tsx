@@ -40,21 +40,21 @@ const meta = {
     title: {
       control: "text",
       description:
-        "Tooltip text shown on hover over the icon; it appears only where the app mounts `RootTooltip`",
+        "Accessible name of the button, and its hover tooltip, which needs `RootTooltip` mounted. Without it the button is named by the translated `Common:MoreOptions` and shows no tooltip.",
       table: {
         defaultValue: { summary: '""' },
       },
     },
     size: {
       control: { type: "number", min: 12, max: 32 },
-      description: "Specifies the icon size",
+      description: "Size of the icon in pixels.",
       table: {
         defaultValue: { summary: "16" },
       },
     },
     isDisabled: {
       control: "boolean",
-      description: "Sets the button to a disabled state",
+      description: "Greys the icon out and stops the menu opening.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -63,7 +63,7 @@ const meta = {
       control: "select",
       options: Object.values(ContextMenuButtonDisplayType),
       description:
-        "`dropdown` opens the menu under the button; `toggle` renders no menu and passes every click to `onClick`; `auto` behaves exactly like `dropdown`",
+        "`toggle` renders no menu of its own and leaves `onClick` to open one; `auto` behaves exactly like `dropdown`.",
       table: {
         defaultValue: { summary: "dropdown" },
       },
@@ -71,7 +71,7 @@ const meta = {
     directionX: {
       control: "select",
       options: ["left", "right"],
-      description: "Horizontal direction for the dropdown",
+      description: "Preferred horizontal side of the menu.",
       table: {
         defaultValue: { summary: "left" },
       },
@@ -79,11 +79,12 @@ const meta = {
     directionY: {
       control: "select",
       options: ["top", "bottom", "both"],
-      description: "Vertical direction for the dropdown",
+      description: "Preferred vertical side of the menu.",
     },
     fixedDirection: {
       control: "boolean",
-      description: "Fixes the direction of the dropdown (disables auto-flip)",
+      description:
+        "Keeps those directions as given instead of flipping them to fit.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -91,59 +92,60 @@ const meta = {
     displayIconBorder: {
       control: "boolean",
       description:
-        "Puts the icon in a rounded 32px box that can carry a border",
+        "Puts the icon in a 32px square box with rounded corners. The box draws no line unless `--cmb-border` supplies a width and style, such as `1px solid`.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isFill: {
       control: "boolean",
-      description: "Whether to fill the icon",
+      description:
+        "Colours the icon by filling its shapes rather than stroking them.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     usePortal: {
       control: "boolean",
-      description: "Renders the dropdown in a portal",
+      description:
+        "Renders the menu on `document.body`, where no ancestor clips it; `false` renders it beside the button.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     color: {
       control: "color",
-      description: 'Any CSS colour for the icon, or the literal `"accent"`',
+      description: 'Any CSS colour for the icon, or the literal `"accent"`.',
     },
     hoverColor: {
       control: "color",
-      description: "Colour of the icon while the pointer is over it",
+      description: "Colour of the icon while the pointer is over it.",
     },
     clickColor: {
       control: "color",
-      description:
-        "Colour of the icon while the mouse button is held down on it",
+      description: "Colour of the icon while it is held down.",
     },
     onClick: {
       action: "onClick",
       description:
-        "Called when the button opens the menu in `dropdown` mode (not when it closes it), and in `toggle` mode on every click or Enter/Space instead of opening a menu",
+        "Called when the button opens its menu, not when it closes it. In `toggle` mode it replaces the menu, so you can open your own. A key press arrives as a click at the button's lower start corner.",
     },
     onClose: {
       action: "onClose",
       description:
-        "Called whenever the open menu closes: a click outside it, Escape, Tab, a second click on the button or a chosen item",
+        "Called whenever the open menu closes: a click outside, Escape, Tab, a second click on the button or a chosen item. Pairs with `onClick`, which reports the opening.",
     },
     opened: {
       control: "boolean",
       description:
-        "Opens the menu from outside; changing it opens or closes the menu",
+        "Opens the menu from outside. Changing it opens or closes the menu.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     data: {
       control: false,
-      description: "Items of the menu when there is no `getData`",
+      description: "Items of the menu, used when there is no `getData`.",
       table: {
         defaultValue: { summary: "[]" },
       },
@@ -151,77 +153,72 @@ const meta = {
     getData: {
       control: false,
       description:
-        "Returns the menu items; called each time the menu opens, and used instead of `data` when set",
+        "Builds the items each time the menu opens. When it is set, `data` is not used.",
     },
     iconName: {
       control: "text",
       description:
-        "URL of the icon, fetched when the button renders; without it the kit's vertical dots are drawn",
+        "URL of the icon, fetched at runtime. Without it the kit's vertical dots are drawn.",
     },
     iconHoverName: {
       control: "text",
-      description: "URL of the icon shown while the pointer is over the button",
+      description:
+        "URL of the icon shown while the pointer is over the button.",
     },
     iconClickName: {
       control: "text",
-      description:
-        "URL of the icon shown while the mouse button is held down on it",
+      description: "URL of the icon shown while the button is held down.",
     },
     iconOpenName: {
       control: "text",
-      description: "URL of the icon shown while the menu is open",
+      description: "URL of the icon shown while the menu is open.",
     },
     onMouseEnter: {
       action: "onMouseEnter",
-      description: "Called when the pointer enters the icon",
+      description: "Called when the pointer enters the icon.",
     },
     onMouseLeave: {
       action: "onMouseLeave",
-      description: "Called when the pointer leaves the icon",
+      description: "Called when the pointer leaves the icon.",
     },
     onMouseOver: {
       action: "onMouseOver",
-      description: "Called when the pointer moves onto the icon",
+      description:
+        "Called when the pointer moves onto the icon or one of its children.",
     },
     onMouseOut: {
       action: "onMouseOut",
-      description: "Called when the pointer moves off the icon",
+      description:
+        "Called when the pointer moves off the icon or one of its children.",
     },
     zIndex: {
       control: "number",
-      description: "Stacking order of the menu",
+      description: "Stacking order of the menu.",
     },
     className: {
       control: "text",
-      description: "Class added to the wrapper around the icon and the menu",
+      description: "Applied to the wrapper around the icon and the menu.",
     },
     id: {
       control: "text",
-      description: "`id` of the wrapper around the icon and the menu",
+      description: "Applied to that wrapper.",
     },
     style: {
       control: "object",
-      description: "Inline style of the wrapper around the icon and the menu",
+      description: "Applied to that wrapper.",
     },
     dropDownClassName: {
       control: "text",
-      description: "Class added to the menu",
+      description:
+        "Class added to the menu's element, for styling the open menu.",
     },
     iconClassName: {
       control: "text",
-      description: "Class added to the icon",
-    },
-    columnCount: {
-      control: false,
-      description: "Ignored; nothing in the menu reads it",
-    },
-    asideHeader: {
-      control: false,
-      description: "Ignored; nothing reads it",
+      description: "Class added to the icon button inside the wrapper.",
     },
     testId: {
       control: "text",
-      description: "Value of `data-testid` on the wrapper",
+      description: "Value of `data-testid` on the wrapper.",
       table: {
         defaultValue: { summary: "context-menu-button" },
       },
@@ -335,7 +332,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          'The row-level "more" button: click the dots, or focus them and press Enter, Space or an arrow key, to open the menu, and click again, press Escape or click outside it to close it. In the open menu the arrow keys move between items and Enter runs one. Change any other prop live in the Controls panel below.',
+          'The row-level "more" button: vertical dots that open a menu of actions. A click, Enter, Space or an arrow key opens it; a second click, Escape or a click outside closes it.',
       },
       source: {
         code: `<ContextMenuButton
@@ -383,7 +380,7 @@ export const Disabled: Story = {
     docs: {
       description: {
         story:
-          "Use it when the actions do not apply to the current item: the icon greys out and a click opens nothing (`isDisabled`).",
+          "A greyed-out button whose click opens nothing (`isDisabled`), for actions that do not apply to the current item.",
       },
       source: {
         code: `<ContextMenuButton
@@ -417,6 +414,7 @@ const WithIconBorderTemplate = () => {
 };
 
 export const WithIconBorder: Story = {
+  name: "Boxed icon",
   render: () => <WithIconBorderTemplate />,
   play: async ({ canvas }) => {
     // A rounded 32px box around the dots; the default theme draws no line.
@@ -433,7 +431,7 @@ export const WithIconBorder: Story = {
     docs: {
       description: {
         story:
-          "Gives the icon a larger, boxed click target (`displayIconBorder`): the dots sit in a rounded 32px square. The default theme draws no line around it; set `--cmb-border` to add one, as the CSS customization story does.",
+          "The dots in a rounded 32px square, a larger click target (`displayIconBorder`). The default theme draws no line around it; `--cmb-border` adds one.",
       },
       source: {
         code: `<ContextMenuButton
@@ -496,6 +494,7 @@ const CustomColorsTemplate = () => {
 };
 
 export const CustomColors: Story = {
+  name: "Custom colours",
   render: () => <CustomColorsTemplate />,
   play: async ({ canvas }) => {
     // Blue, green and red, in the order they are drawn.
@@ -519,7 +518,7 @@ export const CustomColors: Story = {
     docs: {
       description: {
         story:
-          "Matches the icon to the surface it sits on: each button has its own colour, and hovering it shows its hover colour (`color`, `hoverColor`). Click any to open its menu.",
+          "Buttons in colours matched to the surface they sit on, each with its own hover colour (`color`, `hoverColor`).",
       },
       source: {
         code: `<ContextMenuButton title="Blue" iconName={Icon} color="#2DA7DB" hoverColor="#1a8abf" getData={() => menuData} />
@@ -565,6 +564,7 @@ const CssCustomizationTemplate = () => {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   render: () => <CssCustomizationTemplate />,
   play: async ({ canvas }) => {
     // opened shows the menu without a click, inline because usePortal is off.
@@ -575,7 +575,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The example opens the menu in a bordered box (\`displayIconBorder\`), so every variable is on screen at once; hover the dots to see \`--cmb-hover-border\`. The menu is kept inline (\`usePortal={false}\`): in a portal it leaves the wrapper, so set the \`--dropdown-*\` variables on \`document.body\` instead.`,
+        story: `Every overridable variable, set on one wrapper, with the menu open beside a bordered box (\`displayIconBorder\`). The menu is kept inline (\`usePortal={false}\`); in a portal, set the \`--dropdown-*\` variables on \`document.body\` instead.`,
       },
       source: {
         code: `<div

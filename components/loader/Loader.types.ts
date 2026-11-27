@@ -1,6 +1,6 @@
 import type { LoaderTypes } from "./Loader.enums";
 
-export type LoaderProps = {
+export type LoaderProps = React.AriaAttributes & {
   /** Reaches the `<svg>` of the `track` type; the other types ignore it. */
   ref?: React.RefObject<SVGSVGElement>;
   /** Any CSS colour, applied as the stroke of the animation and the colour of
@@ -19,10 +19,9 @@ export type LoaderProps = {
    * `base` type it is the visible content instead. Defaults to the
    * translated `Common:LoadingProcessing` ("Loading..."). */
   label?: string;
-  /** Draws the animation only: no `role="status"`, no hidden label, and the
-   * wrapper is `aria-hidden`. For a loader inside a control (a button, a
-   * combo box, a list row) whose own `aria-busy` already says it is busy;
-   * otherwise the label would become part of the control's name. */
+  /** Draws the animation only: no `role="status"`, no hidden label, and an
+   * `aria-hidden` wrapper. For a loader inside a control whose own `aria-busy`
+   * says it is busy, where the label would join the control's name. */
   isDecorative?: boolean;
   /** Applied to the wrapper around the animation, not to the animation. */
   className?: string;

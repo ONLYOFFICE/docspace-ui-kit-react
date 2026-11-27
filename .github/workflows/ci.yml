@@ -24,7 +24,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      # A hundred commits of this branch and, on a pull request, of its target,
+      # so "Check the READMEs" can find where the one left the other. A branch
+      # older than that loses only the style warnings' scope, never the step.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+
+      - name: Fetch the target branch
+        if: github.event_name == 'pull_request'
+        # The refspec is spelled out: a single-branch checkout would otherwise
+        # leave the target in FETCH_HEAD and never create origin/<target>.
+        run: git fetch --no-tags --depth=100 origin "+refs/heads/${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}"
 
       # No `version` input: action-setup reads it from the `packageManager`
       # field in package.json, which is the single source of truth.
@@ -62,8 +73,11 @@ jobs:
       # The full pass: everything the pre-push gate checks, plus type-checking
       # every ```tsx block in every README. "Copy this and it works" is the one
       # promise these files make, and this is the only thing that keeps it.
+      # On a pull request `--base origin/<target>` scopes the style warnings to
+      # what the pull request changed since it left its target, whether the
+      # checkout is its head or a merge commit. They never fail the step.
       - name: Check the READMEs
-        run: pnpm check:readme:full
+        run: pnpm check:readme:full ${{ github.event_name == 'pull_request' && format('--base origin/{0}', github.base_ref) || '' }}
 
       - name: Check the generated README blocks
         run: pnpm readme:props:check && pnpm readme:catalogue:check

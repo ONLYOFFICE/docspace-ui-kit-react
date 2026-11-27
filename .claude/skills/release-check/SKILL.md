@@ -1,6 +1,6 @@
 ---
 name: release-check
-description: Full pre-merge sweep -- the CI gate, plus the checks nothing runs: manifest invariants, the plugin API surface diff, drift against the plugin skill, what the tarball would actually ship, and (before a publish) that every vendored peer is already on npm
+description: "Full pre-merge sweep -- the CI gate, plus the checks nothing runs: manifest invariants, the plugin API surface diff, drift against the plugin skill, what the tarball would actually ship, and (before a publish) that every vendored peer is already on npm"
 argument-hint: "[--quick]"
 ---
 
@@ -62,7 +62,7 @@ removal is intended.
 node .claude/scripts/ui-kit-reference/check-drift.mjs
 ```
 
-`agent-skills/skills/plugin-sdk` documents this kit for plugin authors: the package specifier,
+`agent-skills/skills/apps-plugin-sdk` documents this kit for plugin authors: the package specifier,
 the range it installs, prop defaults and layout traps. Nothing keeps it fresh. The checker reads
 the agent-skills checkout beside this repository, so have it on the branch that targets this
 release before reading the result. A **new** finding blocks: it means this change

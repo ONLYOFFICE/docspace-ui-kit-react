@@ -1,43 +1,47 @@
 export type DropDownItemProps = {
   // Display and Layout Props
-  /** Whether to render the item as a separator line instead of content */
+  /** Renders a divider line in place of the label and children. */
   isSeparator?: boolean;
-  /** Whether to render the item as a header with special styling */
+  /** Renders the row as a menu title: taller, with a line under it and no
+   * hover or pressed look. */
   isHeader?: boolean;
   /**
    * Height the enclosing `DropDown` reserves for this item in its virtualised
-   * list, in pixels. It does not style the item — the row is 32px tall until
-   * you also set `--drop-down-item-height` — and it reaches the DOM as an
+   * list, in pixels. It does not resize the row, and it reaches the DOM as an
    * attribute.
    */
   height?: number;
   /** The same, used instead of `height` on a tablet-width viewport. Unlike `height`, it stays off the DOM. */
   heightTablet?: number;
-  /** Whether to use modern compact styling with minimal padding */
+  /** Narrows the row's side padding to 8px. */
   isModern?: boolean;
-  /** Whether text content should be truncated with ellipsis when it overflows */
+  /** Makes the row a block instead of a flex row, so its own ellipsis applies
+   * to a long label. */
   textOverflow?: boolean;
-  /** Whether to apply additional text truncation styling to the label */
+  /** Cuts a long label off with an ellipsis, keeping the rest of the row in
+   * place. */
   truncateText?: boolean;
 
   // Icon Related Props
   /**
-   * Icon at the start of the item. A component or element is rendered as given;
-   * a string is a URL — a same-origin `.svg` or an SVG data URL is fetched and
-   * inlined, anything else, a cross-origin `.svg` included, becomes an `<img>`.
+   * Icon at the start of the item: a component, an element or a URL. A same-origin `.svg`
+   * or an SVG data URL is inlined; any other URL becomes an `<img>`.
    */
   icon?: string | React.ReactElement | React.ElementType;
-  /** Whether the icon should be filled with the current text color. If false, uses original icon colors */
+  /** Paints an inlined SVG icon in the item's icon colour. Off, it keeps its
+   * own colours. */
   fillIcon?: boolean;
-  /** Whether to hide the icon element even when an icon prop is provided */
+  /** Hides the icon even when `icon` is set. */
   withoutIcon?: boolean;
-  /** Whether to show a back arrow icon when item is a header */
+  /** Puts a back arrow before a header's title. It does nothing without
+   * `isHeader`. */
   withHeaderArrow?: boolean;
-  /** Callback function triggered when the header's back arrow is clicked */
+  /** Called by a click on the header's back arrow, before the row's own
+   * click handling. */
   headerArrowAction?: () => void;
 
   // Content Props
-  /** Primary text content or React node to display in the item */
+  /** Text of the row. A string also becomes the row's hover tooltip. */
   label?: string | React.ReactNode;
   /**
    * Content of the item, used **instead of** `label` — it is rendered only when
@@ -45,7 +49,7 @@ export type DropDownItemProps = {
    * comes after the label.
    */
   children?: React.ReactNode;
-  /** Additional element to render at the end of the item, after all other content */
+  /** Node at the end of the row, after the badges and the external link. */
   additionalElement?: React.ReactNode;
 
   // State and Interaction Props
@@ -54,37 +58,45 @@ export type DropDownItemProps = {
    * also drops disabled items from its list unless `showDisabledItems` is set.
    */
   disabled?: boolean;
-  /** Whether the item is in an active/pressed state */
+  /** Paints the selected background. On a submenu row it also turns the
+   * arrow down. */
   isActive?: boolean;
-  /** Whether the item is currently selected in a menu context */
+  /** Sets `aria-selected` and sends clicks to `onClickSelectedItem`. It
+   * paints the background only on a disabled item. */
   isSelected?: boolean;
-  /** Whether the item is the current active descendant for keyboard navigation */
+  /** Highlights the row the arrow keys reached, with a ring and the hover
+   * background. */
   isActiveDescendant?: boolean;
-  /** Whether to disable the hover state styling */
+  /** Turns off the background on hover. */
   noHover?: boolean;
-  /** Whether to disable the active/pressed state styling */
+  /** Turns off the background while the row is pressed. */
   noActive?: boolean;
-  /** Whether this item opens a submenu when clicked */
+  /** Draws a trailing arrow for a row that leads to a submenu. It opens
+   * nothing by itself. */
   isSubMenu?: boolean;
-  /** Whether to show a beta badge next to the item */
+  /** Shows a purple beta badge after the label. */
   isBeta?: boolean;
-  /** Whether to show a paid badge next to the item */
+  /** Shows a paid-plan badge after the label. */
   isPaidBadge?: boolean;
-  /** Text of the paid badge, used instead of the translated default. */
+  /** Text of the paid badge. It wins over `paidLabel` and the translated
+   * default. */
   badgeLabel?: string;
-  /** Whether to show an external link icon at the end of the item */
+  /** Shows an external-link icon at the end of the row. It needs
+   * `externalLinkPath` as well. */
   withExternalLink?: boolean;
-  /** URL of the external link icon. It becomes the icon's `href` only together with `onExternalLinkClick`; without the callback the icon does not navigate */
+  /** Address of the external-link icon. It becomes the icon's `href` only
+   * together with `onExternalLinkClick`. */
   externalLinkPath?: string;
-  /** Called on a plain click of the external link icon, which then does not follow the `href`; a middle or modified click is left to the browser and does not call it */
+  /** Called on a plain click of the external-link icon, in place of following
+   * the `href`. A middle or modified click is left to the browser. */
   onExternalLinkClick?: () => void;
   /** Accessible name of the external link icon. Defaults to the translated "Open" followed by `label`. */
   externalLinkLabel?: string;
 
   // Toggle Props
-  /** Whether to show a toggle switch at the end of the item */
+  /** Shows a switch at the end of the row; its change calls `onClick`. */
   withToggle?: boolean;
-  /** Whether the toggle switch is in a checked state */
+  /** Turns that switch on. It needs `withToggle`. */
   checked?: boolean;
 
   // Event Handlers
@@ -96,22 +108,24 @@ export type DropDownItemProps = {
   onClick?: (
     e: React.MouseEvent<HTMLElement> | React.ChangeEvent<HTMLInputElement>,
   ) => void;
-  /** Callback function triggered on mouse down */
+  /** Called on a mouse press on the row, before the click. */
   onMouseDown?: (e: React.MouseEvent<HTMLElement>) => void;
-  /** Callback function triggered when a selected item is clicked */
+  /** Called on every click of an item marked `isSelected`, a disabled one
+   * included. */
   onClickSelectedItem?: () => void;
   /**
-   * Called with `false` after every click, disabled ones included, for the
-   * enclosing menu to close itself.
+   * Called with `false` after a click, a disabled item's included, for the
+   * enclosing menu to close itself. A disabled item with `tooltip` on a touch
+   * device skips it.
    */
   setOpen?: (open: boolean) => void;
 
   // Styling Props
-  /** CSS class name to apply to the root element for custom styling */
+  /** Extra class name for the row. */
   className?: string;
-  /** Inline CSS styles to apply to the root element */
+  /** Inline styles for the row. */
   style?: React.CSSProperties;
-  /** HTML ID attribute for the root element */
+  /** HTML id of the row. */
   id?: string;
   /**
    * ARIA role of the item, matching the menu's: `option` in a listbox,
@@ -123,7 +137,7 @@ export type DropDownItemProps = {
   /** Position in the tab order. The default of -1 keeps the item off it.
    * @default -1 */
   tabIndex?: number;
-  /** Sets minimum width for the root element */
+  /** Minimum width of the row, as a CSS length. */
   minWidth?: string;
 
   /** Value of `data-testid` on the item.
@@ -136,15 +150,17 @@ export type DropDownItemProps = {
    * pointer.
    */
   tooltip?: string;
-  /** Secondary line rendered under the item label and always visible - what
-   * choosing this item means. The item grows to fit it. */
+  /** Second line under the label, always visible: what choosing the item
+   * means. It shows only with a `label`, and the row grows to fit it. */
   description?: React.ReactNode;
 
   /** Text of the beta badge, used instead of the host's own constant. */
   betaLabel?: string;
-  /** Text of the paid badge, used instead of the translated default. */
+  /** Text of the paid badge, used instead of the translated default.
+   * `badgeLabel` wins over it. */
   paidLabel?: string;
 
-  /** When true, stops mousedown propagation to prevent click-outside detection from closing dropdown before click fires */
+  /** Keeps a mouse press on the row from reaching the page, so a click-outside
+   * handler does not close the menu before the click lands. */
   stopMouseDownPropagation?: boolean;
 };

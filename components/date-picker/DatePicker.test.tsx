@@ -29,6 +29,22 @@ describe("DatePicker tests", () => {
     vi.clearAllMocks();
   });
 
+  it("puts a passed aria-* on the select-date button", () => {
+    render(
+      <DatePicker
+        {...defaultProps}
+        aria-label="Due date"
+        aria-describedby="due-hint"
+        aria-expanded
+      />,
+    );
+
+    const button = screen.getByRole("button", { name: "Due date" });
+    expect(button).toHaveAttribute("aria-describedby", "due-hint");
+    // Whether the calendar is open is the component's to say.
+    expect(button).toHaveAttribute("aria-expanded", "false");
+  });
+
   it("renders without selected date", () => {
     render(<DatePicker {...defaultProps} />);
 
@@ -56,6 +72,23 @@ describe("DatePicker tests", () => {
     const selectedItem = screen.getByTestId("selected-item");
     expect(selectedItem).toBeInTheDocument();
     expect(selectedItem).toHaveTextContent("15 Jan 2024");
+  });
+
+  it("writes the chip's month in the locale", () => {
+    const initialDate = createDateTime(2024, 3, 15);
+    render(
+      <DatePicker
+        {...defaultProps}
+        locale="de"
+        initialDate={initialDate}
+        outerDate={initialDate}
+        showCalendarIcon={false}
+      />,
+    );
+
+    expect(screen.getByTestId("selected-item")).toHaveTextContent(
+      "15 März 2024",
+    );
   });
 
   it("shows calendar icon when enabled", () => {

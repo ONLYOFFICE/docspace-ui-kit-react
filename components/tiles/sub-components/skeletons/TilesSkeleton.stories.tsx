@@ -43,8 +43,7 @@ const meta = {
     },
     isRooms: {
       control: false,
-      description:
-        "Meant to widen the columns for room tiles; it currently changes nothing",
+      description: "Widens the columns to the width of room tiles",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -82,14 +81,16 @@ const meta = {
     },
     backgroundOpacity: {
       control: "number",
-      description: "Opacity of `backgroundColor`, from 0 to 1",
+      description:
+        "How strongly the shapes' resting colour shows, from 0 (invisible) to 1",
       table: {
         defaultValue: { summary: "0.1" },
       },
     },
     foregroundOpacity: {
       control: "number",
-      description: "Opacity of `foregroundColor`, from 0 to 1",
+      description:
+        "How strongly the sweeping band's colour shows, from 0 (invisible) to 1",
       table: {
         defaultValue: { summary: "0.15" },
       },
@@ -148,6 +149,7 @@ const headingBar = (root: HTMLElement, kind: "folders" | "files") =>
   root.querySelector(`.${kind}`);
 
 export const Default: Story = {
+  name: "Folders and files",
   render: (args) => <TilesSkeleton {...args} />,
   args: {
     foldersCount: 2,
@@ -163,7 +165,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Two folder and four file placeholders under their heading bars (`foldersCount`, `filesCount`), as a tile listing shows them while its first page loads. Change any other prop live in the Controls panel below.",
+          "Two folder and four file placeholders under their heading bars (`foldersCount`, `filesCount`), as a tile listing shows them while its first page loads.",
       },
       source: {
         code: `<TilesSkeleton foldersCount={2} filesCount={4} />`,
@@ -173,6 +175,7 @@ export const Default: Story = {
 };
 
 export const FilesWithoutHeading: Story = {
+  name: "Files without a heading",
   render: (args) => <TilesSkeleton {...args} />,
   args: {
     foldersCount: 0,
@@ -190,10 +193,44 @@ export const FilesWithoutHeading: Story = {
     docs: {
       description: {
         story:
-          "A folder that holds files only and shows no heading above them: no folder placeholders, so their bar goes as well, and no bar above the files (`foldersCount={0}`, `withTitle={false}`).",
+          "Files only, with no heading: no folder placeholders, so their bar goes too, and no bar above the files (`foldersCount={0}`, `withTitle={false}`).",
       },
       source: {
         code: `<TilesSkeleton foldersCount={0} filesCount={3} withTitle={false} />`,
+      },
+    },
+  },
+};
+
+export const Rooms: Story = {
+  name: "Room columns",
+  render: (args) => (
+    <div style={{ width: 500 }}>
+      <TilesSkeleton {...args} />
+    </div>
+  ),
+  args: {
+    foldersCount: 0,
+    filesCount: 2,
+    withTitle: false,
+    isRooms: true,
+  },
+  play: async ({ canvas }) => {
+    // Two 216px file columns would fit in 500px; room columns are at least
+    // 275px, so each placeholder takes a row of its own.
+    const [tile] = canvas.getAllByTestId("tile-skeleton-file");
+    await expect(tile.getBoundingClientRect().width).toBeGreaterThanOrEqual(
+      275,
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Placeholders in columns as wide as room tiles (`isRooms`), so a 500px listing holds one per row.",
+      },
+      source: {
+        code: `<TilesSkeleton foldersCount={0} filesCount={2} withTitle={false} isRooms />`,
       },
     },
   },
@@ -215,6 +252,7 @@ const TileShapesTemplate = () => (
 );
 
 export const TileShapes: Story = {
+  name: "Single tile shapes",
   render: () => <TileShapesTemplate />,
   play: async ({ canvas }) => {
     const folder = canvas.getByTestId("tile-skeleton-folder");
@@ -231,7 +269,7 @@ export const TileShapes: Story = {
     docs: {
       description: {
         story:
-          "The three shapes one `TileSkeleton` can take, for a listing that builds its own placeholder grid: a folder bar (`isFolder`), a room card with a logo, a title bar, a small square for the menu and two tag bars (`isRoom`), and a file card. `TilesSkeleton` never draws the room card, so a grid of rooms is built from `TileSkeleton` directly.",
+          "The three shapes of one `TileSkeleton`: a folder bar (`isFolder`), a room card (`isRoom`) and a file card. `TilesSkeleton` never draws the room card, so build a grid of rooms from `TileSkeleton`.",
       },
       source: {
         code: `<TileSkeleton isFolder />

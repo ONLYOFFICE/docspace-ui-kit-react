@@ -437,15 +437,12 @@ export const SectionList = ({ kind, withFolderPicker }: SectionListProps) => {
       title={current.title}
       isRootFolder={atRoot}
       canCreate={false}
-      showText
       isDesktop={isDesktop}
-      isRoom={current.isRoom}
       withMenu={false}
       showTitle
       showRootFolderTitle
       showNavigationButton={false}
       isInfoPanelVisible={false}
-      isCurrentFolderInfo={false}
       currentDeviceType={currentDeviceType}
       // The ancestors, nearest first, the section last.
       navigationItems={crumbs.map((crumb) => ({
@@ -461,12 +458,10 @@ export const SectionList = ({ kind, withFolderPicker }: SectionListProps) => {
         const parent = crumbs[0];
         go(parent && !parent.isRoot ? parent.id : null);
       }}
-      clearTrash={noop}
       getContextOptionsFolder={() => []}
       getContextOptionsPlus={() => []}
       toggleInfoPanel={noop}
-      hideInfoPanel={noop}
-      showFolderInfo={noop}
+      hideInfoPanel
       onPlusClick={noop}
       withLogo={false}
       burgerLogo=""
@@ -494,7 +489,6 @@ export const SectionList = ({ kind, withFolderPicker }: SectionListProps) => {
       <Section
         currentDeviceType={currentDeviceType}
         withBodyScroll
-        isHeaderVisible
         viewAs={viewAs}
         settingsStudio={false}
       >

@@ -24,6 +24,25 @@ describe("Dropzone", () => {
     vi.clearAllMocks();
   });
 
+  it("treats an icon URL as decorative", () => {
+    render(<Dropzone {...defaultProps} icon="upload.svg" />);
+
+    expect(screen.getByTestId("dropzone-icon")).toHaveAttribute("alt", "");
+  });
+
+  it("puts a passed aria-* on the drop area, its aria-label over the default", () => {
+    render(
+      <Dropzone
+        {...defaultProps}
+        aria-label="Upload a logo"
+        aria-describedby="logo-hint"
+      />,
+    );
+    const area = screen.getByTestId("dropzone-input-area");
+    expect(area).toHaveAttribute("aria-label", "Upload a logo");
+    expect(area).toHaveAttribute("aria-describedby", "logo-hint");
+  });
+
   it("renders without error", () => {
     render(<Dropzone {...defaultProps} />);
 
@@ -176,6 +195,21 @@ describe("Dropzone", () => {
     fireEvent.keyDown(line, { key: "Enter" });
     expect(line).toHaveAttribute("aria-expanded", "true");
     fireEvent.keyDown(line, { key: "Escape" });
+    expect(line).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("keeps the full format list shut while disabled", () => {
+    render(
+      <Dropzone
+        {...defaultProps}
+        isDisabled
+        fullExstsText="PDF, DOC, DOCX, ODT, RTF"
+      />,
+    );
+
+    const line = screen.getByTestId("dropzone-file-types");
+    expect(line).toHaveAttribute("aria-disabled", "true");
+    fireEvent.click(line);
     expect(line).toHaveAttribute("aria-expanded", "false");
   });
 

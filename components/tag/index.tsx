@@ -8,6 +8,9 @@ import CrossIconReactSvgUrl from "../../assets/icons/12/cross.react.svg";
 import { Text } from "../text";
 import { IconButton } from "../icon-button";
 import { TooltipContainer } from "../tooltip";
+import { groupRoleWhenNamed, pickAriaProps } from "../../utils/aria-props";
+import { useCommonTranslation } from "../../utils/i18n";
+import { activateOnButtonKey } from "../../utils/keyboard-activation";
 
 import type { TagProps, TagType, TagClickEvent } from "./Tag.types";
 import styles from "./Tag.module.scss";
@@ -36,12 +39,31 @@ const TagPure: FC<TagProps> = ({
   withLabel = true,
   labelSuffix,
   labelSuffixColor,
+  ...rest
 }) => {
+  const t = useCommonTranslation();
+
   const onClickAction = React.useCallback(() => {
     if (onClick && !isDisabled && !isDeleted) {
       onClick({ roomType, label: label ?? tag, providerType });
     }
   }, [onClick, isDisabled, isDeleted, roomType, providerType, label, tag]);
+
+  // A tag that does something on a click is a button to the keyboard too.
+  const isInteractive = !!onClick && !isDisabled && !isDeleted;
+
+  // A tag that draws only its icon has no text to read, so its name is all
+  // there is: it is an image named by it. An image hides what is inside it,
+  // so a tag with its delete cross stays a group instead.
+  const name = rest["aria-label"] ?? label;
+  const hasDeleteButton = isNewTag && !!onDelete;
+  const isNamedIcon =
+    !withLabel && !hasDeleteButton && !!(name || rest["aria-labelledby"]);
+  const role = isInteractive
+    ? "button"
+    : isNamedIcon
+      ? "img"
+      : groupRoleWhenNamed(withLabel ? rest : { ...rest, "aria-label": name });
 
   const onDeleteAction = React.useCallback(() => {
     onDelete?.(tag);
@@ -49,11 +71,22 @@ const TagPure: FC<TagProps> = ({
 
   return (
     <TooltipContainer
+      {...pickAriaProps(rest)}
       as="div"
       id={id}
       ref={ref}
       title={label}
       onClick={onClickAction}
+      role={role}
+      tabIndex={isInteractive ? 0 : undefined}
+      onKeyDown={
+        isInteractive
+          ? (e: React.KeyboardEvent<HTMLDivElement>) =>
+              activateOnButtonKey(e, ({ currentTarget }) =>
+                currentTarget.click(),
+              )
+          : undefined
+      }
       className={classNames(styles.tag, "tag", className, {
         [styles.isNewTag]: isNewTag,
         [styles.isDisabled]: isDisabled,
@@ -63,8 +96,8 @@ const TagPure: FC<TagProps> = ({
         [styles.thirdPartyTag]: icon,
       })}
       style={{ ...style, maxWidth: tagMaxWidth }}
-      aria-label={label}
-      aria-disabled={isDisabled}
+      aria-label={name}
+      aria-disabled={isDisabled || rest["aria-disabled"]}
       data-testid={dataTestId ?? "tag_item"}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
@@ -89,19 +122,20 @@ const TagPure: FC<TagProps> = ({
         ))
         .otherwise(() => null)}
       {withLabel ? (
-        <Text title={label} fontSize="13px" noSelect truncate>
+        <Text className={styles.tagText} title={label} noSelect truncate>
           {label}
           {labelSuffix ? (
             <span style={{ color: labelSuffixColor }}>{labelSuffix}</span>
           ) : null}
         </Text>
       ) : null}
-      {isNewTag && onDelete ? (
+      {hasDeleteButton ? (
         <IconButton
           className={styles.tagIcon}
           iconNode={<CrossIconReactSvgUrl />}
           size={12}
           onClick={onDeleteAction}
+          ariaLabel={t("Remove")}
         />
       ) : null}
     </TooltipContainer>

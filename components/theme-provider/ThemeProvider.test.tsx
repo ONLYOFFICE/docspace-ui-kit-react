@@ -1,6 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 
+import { useTheme } from "../../context";
+
 import { ThemeProviderComponent } from ".";
 
 const mockColorScheme = {
@@ -193,6 +195,107 @@ describe("ThemeProvider", () => {
     expect(rootStyles.getPropertyValue("--color-scheme-main-accent")).toBe(
       mockColorScheme.main.accent,
     );
+  });
+
+  it("treats a theme without isBase as light in the context too", () => {
+    const ThemeName = () => <div data-testid="theme">{useTheme().theme}</div>;
+    render(
+      <ThemeProviderComponent theme={{ interfaceDirection: "ltr" }}>
+        <ThemeName />
+      </ThemeProviderComponent>,
+    );
+
+    expect(document.body).toHaveClass("light");
+    expect(screen.getByTestId("theme")).toHaveTextContent("Base");
+  });
+
+  it("leaves the page as it found it when unmounted", () => {
+    const { unmount } = render(
+      <ThemeProviderComponent
+        theme={{ ...Dark, interfaceDirection: "rtl", fontFamily: "Lato" }}
+        currentColorScheme={mockColorScheme}
+      >
+        <TestChild />
+      </ThemeProviderComponent>,
+    );
+
+    unmount();
+
+    const root = document.documentElement;
+    expect(root).not.toHaveAttribute("data-theme");
+    expect(root).not.toHaveAttribute("data-dir");
+    expect(root.style.getPropertyValue("--interface-direction")).toBe("");
+    expect(root.style.getPropertyValue("--color-scheme-main-accent")).toBe("");
+    expect(document.body).not.toHaveClass("dark");
+    expect(document.body).not.toHaveClass("rtl");
+    expect(document.body.style.getPropertyValue("--font-family")).toBe("");
+  });
+
+  it("leaves the outer theme when a nested provider mounts with it", () => {
+    const { unmount } = render(
+      <ThemeProviderComponent theme={Dark}>
+        <ThemeProviderComponent theme={Base}>
+          <TestChild />
+        </ThemeProviderComponent>
+      </ThemeProviderComponent>,
+    );
+    // The nested effect runs first, so the outer provider's write is last.
+    expect(document.documentElement).toHaveAttribute("data-theme", "dark");
+
+    unmount();
+    expect(document.documentElement).not.toHaveAttribute("data-theme");
+  });
+
+  it("hands the page back to the provider around it", () => {
+    const Page = ({ inner }: { inner: boolean }) => (
+      <ThemeProviderComponent theme={Dark} currentColorScheme={mockColorScheme}>
+        {inner ? (
+          <ThemeProviderComponent
+            theme={Base}
+            currentColorScheme={{
+              ...mockColorScheme,
+              main: { accent: "#444444", buttons: "#444444" },
+            }}
+          >
+            <TestChild />
+          </ThemeProviderComponent>
+        ) : null}
+      </ThemeProviderComponent>
+    );
+    const { rerender } = render(<Page inner={false} />);
+    rerender(<Page inner />);
+    expect(document.documentElement).toHaveAttribute("data-theme", "light");
+
+    rerender(<Page inner={false} />);
+
+    expect(document.documentElement).toHaveAttribute("data-theme", "dark");
+    expect(document.body).toHaveClass("dark");
+    expect(
+      document.body.style.getPropertyValue("--color-scheme-main-accent"),
+    ).toBe(mockColorScheme.main.accent);
+  });
+
+  it("takes the accent off when the scheme goes", () => {
+    const { rerender } = render(
+      <ThemeProviderComponent theme={Base} currentColorScheme={mockColorScheme}>
+        <TestChild />
+      </ThemeProviderComponent>,
+    );
+
+    rerender(
+      <ThemeProviderComponent theme={Base}>
+        <TestChild />
+      </ThemeProviderComponent>,
+    );
+
+    expect(
+      document.documentElement.style.getPropertyValue(
+        "--color-scheme-main-accent",
+      ),
+    ).toBe("");
+    expect(
+      document.body.style.getPropertyValue("--color-scheme-main-accent"),
+    ).toBe("");
   });
 
   it("applies SCSS styles correctly", () => {

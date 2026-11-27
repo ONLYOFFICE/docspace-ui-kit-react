@@ -20,6 +20,18 @@ describe("<StatusMessage />", () => {
       expect(screen.getByText("Test message")).toBeInTheDocument();
     });
 
+    it("puts a passed aria-* on the message, keeping its own aria-atomic", () => {
+      renderComponent({
+        message: "Wrong code",
+        "aria-describedby": "code-field",
+        "aria-atomic": false,
+      });
+
+      const message = screen.getByRole("alert");
+      expect(message).toHaveAttribute("aria-describedby", "code-field");
+      expect(message).toHaveAttribute("aria-atomic", "true");
+    });
+
     it("renders with React node message", () => {
       renderComponent({
         message: (

@@ -13,16 +13,13 @@ export interface BackdropProps {
    */
   zIndex?: number;
 
-  /**
-   * Custom CSS class name(s) to apply to the backdrop
-   * Can be a single string or an array of strings
-   */
+  /** Extra class name, or an array of them, for the layer. */
   className?: string | string[];
 
-  /** HTML id attribute for the backdrop element */
+  /** HTML id of the layer. */
   id?: string;
 
-  /** Custom inline styles to apply to the backdrop. `zIndex` is merged in first. */
+  /** Inline styles for the layer. A `zIndex` here wins over the prop. */
   style?: React.CSSProperties;
 
   /**
@@ -33,15 +30,15 @@ export interface BackdropProps {
   withBackground?: boolean;
 
   /**
-   * Marks the backdrop as belonging to a side panel: it then dims the page, and
-   * it is allowed to render even when two backdrops are already on screen.
+   * Marks the layer as a side panel's. It dims the page and renders whatever
+   * other backdrops are already on screen.
    * @default false
    */
   isAside?: boolean;
 
   /**
-   * Forces the backdrop to render without a background
-   * Takes precedence over withBackground
+   * Keeps the layer transparent on every screen size, even when
+   * `withBackground` or `isAside` is set.
    * @default false
    */
   withoutBackground?: boolean;

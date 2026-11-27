@@ -27,15 +27,14 @@ shaped around the portal's data rather than around cards in general.
 
 - Use to reproduce the portal's tile listing, with its grouping into rooms, templates, folders and
   files.
-- Not as a general card grid — the container reads each child's `item` prop to decide where it
-  goes, and **drops any child that does not have one**. Your own markup between the tiles will not
-  appear. A plain CSS grid is the right tool for that.
+- Not as a general card grid — the container **drops any child without an `item` prop**, so your
+  own markup between the tiles never appears. Use a plain CSS grid.
 - Not for the list view — [`Rows`](../rows/README.md) is the same listing as rows.
 - Not for a single card — [`Card`](../card/README.md) takes children and asks nothing of them.
 - **The skeletons are not re-exported here.** `TilesSkeleton` and `TileSkeleton` live in
   `components/tiles/sub-components/skeletons` and are reachable only by that subpath.
-- **None of the tiles is keyboard-operable.** Every one of them is a `div` with click handlers;
-  the checkbox and whatever you put in the content are the only focusable parts.
+- **None of the tiles is keyboard-operable.** Each is a `div` with click handlers, and an
+  unselected tile cannot be selected from the keyboard. See Accessibility.
 
 ## Import
 
@@ -56,9 +55,9 @@ Each part is equally available at its own subpath — `components/tiles/file-til
 is what keeps a bundle to the tiles you use. `FolderTile` also has a default export at its own
 subpath; the star re-export here carries only the name.
 
-Needs `ThemeProvider` for every colour in the family, and `TranslationProvider` for the labels the
-tiles ask the kit's own translation hook for: the three-dot button's tooltip on all of them, the
-`NoTags` line on a room tile and the `Owner` and `Storage` captions on a template tile.
+`ThemeProvider` switches the tiles to their dark colours. `TranslationProvider` supplies their
+texts. Those are the three-dot button's tooltip, the room tile's `NoTags` line, and the template
+tile's `Owner` and `Storage` captions.
 
 ## Minimal example
 
@@ -114,7 +113,7 @@ export function Listing() {
 | a room template | [`TemplateTile`](template-tile/README.md) | it shows the owner and the storage instead of tags           |
 | anything else   | [`BaseTile`](base-tile/README.md)         | the shell, with both halves yours to fill                    |
 
-### Selection across the listing
+### Keep the selection across a whole listing
 
 Every tile reports through `onSelect` and none of them holds the state. Keep a set of ids and hand
 each tile its own `checked`.
@@ -163,9 +162,9 @@ export function SelectableListing() {
 }
 ```
 
-### The skeletons
+### Show placeholders while the tiles load
 
-They are in the folder but not in this index, so they come from their own subpath.
+The skeletons are in the folder but not in this index, so they come from their own subpath.
 
 ```tsx
 import { TilesSkeleton } from "@onlyoffice/apps-ui-kit/components/tiles/sub-components/skeletons";
@@ -182,23 +181,19 @@ export function LoadingListing() {
   inside a group.
 - **A child without `props.item` is dropped silently**, so nothing but a tile can go inside the
   container.
-- **The three-dot button has a two-part gate everywhere in this family.** It appears only when the
-  `contextOptions` prop is non-empty **and** the `item` object has a `contextOptions` key of its
-  own — a key none of the item types declares. The right-click menu additionally needs
-  `getContextModel`.
-- **Only the first child of a tile is rendered.** All five tiles take `children`, read
-  `React.Children.toArray(...)[0]`, and drop the rest.
-- **Selection behaviour differs between the tiles.** A plain click selects on the file and folder
-  tiles and does not on the base, room and template tiles. A tap on the icon selects on all of
-  them, but only on a window narrower than 600px.
+- **The three-dot button has a two-part gate on every tile.** The `contextOptions` prop must be
+  non-empty **and** `item` must carry a `contextOptions` key of its own.
+- The `TileItem` type does not declare that key. Both the button's menu and the right-click menu
+  list `getContextModel`'s entries, so without it the button opens nothing.
+- **Only the first child of a tile is rendered.** The file, folder, room and template tiles drop
+  the rest of `children`. `BaseTile` takes `topContent` and `bottomContent` instead.
+- **Selection differs between the tiles.** A plain click selects on the file and folder tiles, and
+  not on the base, room and template tiles.
+- A tap on the icon selects on every tile, but only in a window 600px wide or narrower.
 - **The prop types are exported from each tile's own subpath**, not from this index — which
   re-exports the components only.
 - **`TilesSkeleton` and `TileSkeleton` are not re-exported here** either, although the rows family
   does re-export its equivalents.
-- **Several props across the family are inert**: `thumbnailClick` on the base, folder and template
-  tiles; `columnCount` on the template tile; `dragging` and `contextMenuHeader` on the folder tile;
-  `thumbSize`, `contextButtonSpacerWidth` and `sideColor` on the file tile — the last two of which
-  also reach the DOM as unknown attributes.
 
 ## Sub-components
 
@@ -217,17 +212,19 @@ subpath.
 
 `TilesSkeleton` is the placeholder for a whole listing while the tiles load. It draws
 `foldersCount` folder placeholders (2 by default) above `filesCount` file placeholders (8 by
-default), each group under a bar standing for its heading; a group of zero loses its bar too, and
-`withTitle={false}` drops the bar above the files alone. A folder placeholder is a 64px bar and a
-file placeholder a 220px card, both with 12px corners unless `borderRadius` says otherwise. On a
-tablet each group shows at most seven placeholders, on a phone at most two. `isRooms` is meant to
-widen the columns for room tiles and currently changes nothing: its rule is written for a
-descendant of the grid, not the grid itself.
+default). Each group sits under a bar standing for its heading.
 
-`TileSkeleton` is one placeholder: a file card by default, a folder bar with `isFolder`, and with
-`isRoom` a room card with a logo, a title bar, a menu square and two tag bars. Both take the
-`RectangleSkeleton` props — `speed`, the two colours and their opacities — for the band that sweeps
-across every shape.
+A group of zero loses its bar too, and `withTitle={false}` drops the bar above the files alone. A
+folder placeholder is a 64px bar and a file placeholder a 220px card. Both have 12px corners unless
+`borderRadius` says otherwise.
+
+On a tablet each group shows at most seven placeholders, on a phone at most two. `isRooms` widens
+the columns to the room tiles' 275px floor.
+
+`TileSkeleton` is one placeholder: a file card by default, a folder bar with `isFolder`. With
+`isRoom` it is a room card with a logo, a title bar, a menu square and two tag bars. Both take the
+`RectangleSkeleton` props, such as `speed` and the two colours, for the band that sweeps across
+every shape.
 
 Every shape is an SVG with `role="img"`, so a screen reader meets one image per placeholder and per
 heading bar. `title` names them all through an SVG `<title>`; without it they have no name. Neither
@@ -242,20 +239,22 @@ share the `--tile-*` prefix. They inherit, so a value set on the container reach
 | ---------------------- | ------- | -------------------------------- |
 | `--tile-container-gap` | `16px`  | Gap between tiles in every group |
 
-The group headings have no variable: the container's stylesheet has rules reading
-`--tile-container-sort-font-size` and `--tile-container-sort-font-weight`, but under a selector
-that matches no element, so they have no effect.
+The group headings have no variable. The container's stylesheet reads
+`--tile-container-sort-font-size` and `--tile-container-sort-font-weight` under a selector that
+matches no element, so they have no effect.
 
 ## Accessibility
 
 - **Nothing in this family is a list.** The container and the group wrappers are plain `<div>`s
   with no `role` and no count, so a screen reader hears a run of unrelated elements.
-- **No tile is keyboard-operable.** Each is a `<div>` with click and context-menu handlers; the
-  focusable parts are the checkbox and whatever you put in the content. Make the item's name a real
-  link so that it can be opened without a mouse.
+- **No tile is keyboard-operable.** Each is a `<div>` with click and context-menu handlers. The
+  keyboard reaches the three-dot button and whatever you put in the content.
+- **An unselected tile cannot be selected from the keyboard.** Its checkbox is `display: none`
+  until the pointer is on the icon, so Tab reaches it only while the tile is `checked`.
+- Make the item's name a real link, so that it can be opened without a mouse.
 - The right-click menu is pointer-only. The three-dot button is the keyboard path to the same
-  actions, and it depends on the two-part gate above — so a listing that fails that gate has no
-  keyboard access to its actions at all.
+  actions, so a listing that fails its two-part gate has no keyboard access to them.
+- **A passed `aria-*` lands on each tile's outer `<div>` and is kept.** A passed `aria-label` or `aria-labelledby` makes it a `role="group"`, so the name is read.
 - Only the folders and files groups get a heading. A listing that is only rooms or only templates
   has none; supply one above the container.
 - Ctrl-click and Shift-click, on the tiles that support them, have no keyboard equivalent.

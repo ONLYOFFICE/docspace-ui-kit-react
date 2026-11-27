@@ -48,7 +48,7 @@ describe("ListComponent", () => {
   });
 
   it("renders children content correctly in row mode", () => {
-    render(<ListComponent {...defaultProps} />);
+    render(<ListComponent {...defaultProps} />, { container: rowContainer });
     // react-virtualized renders rows as they appear in viewport
     expect(screen.getByText("Item 0")).toBeInTheDocument();
     expect(screen.getByText("Item 1")).toBeInTheDocument();
@@ -112,6 +112,7 @@ describe("ListComponent", () => {
         filesLength={1}
         hasMoreFiles={true}
       />,
+      { container: rowContainer },
     );
     // Rows that are not loaded make the loader call loadMoreItems and redraw
     // once it resolves; let that happen inside act.
@@ -163,6 +164,43 @@ describe("ListComponent", () => {
     await act(async () => {});
     expect(screen.queryAllByTestId("rows-skeleton").length).toBe(0);
     expect(screen.queryAllByTestId("table-skeleton").length).toBe(0);
+  });
+
+  it("takes a row list's width from the element it sits in, whatever its id", () => {
+    const lists = [700, 500].map((width, index) => {
+      const holder = document.createElement("div");
+      holder.id = `files-${index}`;
+      document.body.appendChild(holder);
+      vi.spyOn(holder, "getBoundingClientRect").mockReturnValue({
+        width,
+      } as DOMRect);
+      render(<ListComponent {...defaultProps} />, { container: holder });
+      return holder;
+    });
+
+    const widths = lists.map(
+      (holder) =>
+        holder.querySelector<HTMLElement>(".ReactVirtualized__List")?.style
+          .width,
+    );
+    expect(widths).toEqual(["700px", "500px"]);
+    expect(lists[0]).toHaveTextContent("Item 0");
+
+    lists.forEach((holder) => holder.remove());
+  });
+
+  it("measures a row list once where there is no ResizeObserver", () => {
+    vi.stubGlobal("ResizeObserver", undefined);
+    try {
+      render(<ListComponent {...defaultProps} />, { container: rowContainer });
+
+      expect(
+        rowContainer.querySelector<HTMLElement>(".ReactVirtualized__List")
+          ?.style.width,
+      ).toBe("1000px");
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it("calculates height from scroll element when WindowScroller height is undefined", () => {

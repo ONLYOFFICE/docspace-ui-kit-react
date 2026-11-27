@@ -2,11 +2,12 @@ import type { LinkTarget, LinkType } from "./Link.enums";
 import type { TextProps } from "../text";
 
 export type LinkProps = TextProps & {
-  /** Used as HTML `href` property */
+  /** Address the link navigates to. Without it the anchor is a link only when
+   * it has an `onClick`. */
   href?: string;
-  /** Accepts id */
+  /** `id` of the anchor. */
   id?: string;
-  /** Renders the label at weight 600.
+  /** Renders the label at weight 700.
    * @default false */
   isBold?: boolean;
   /** Paints the link as if the pointer were over it, for a row that highlights
@@ -28,17 +29,14 @@ export type LinkProps = TextProps & {
   /** Whether the label can be selected with the mouse.
    * @default true */
   enableUserSelect?: boolean;
-  /** `page` for navigation, `action` for a link that runs code. An action link
-   * carries no `href`; with an `onClick` it is a button to the keyboard by
-   * itself, unless `role`, `onKeyDown` or a negative `tabIndex` is passed.
+  /** `page` for navigation, `action` for a link that runs code. With an
+   * `onClick` and no `href`, an action link is a keyboard button by itself.
+   * `role`, `onKeyDown` or a negative `tabIndex` leave the keyboard to you.
    * @default LinkType.page */
   type?: LinkType;
-  /** Sets the target attribute */
+  /** Where the address opens, such as `_blank` for a new tab. */
   target?: LinkTarget;
-  /** Ignored. The component reads its text from `children`; this prop is
-   * spread onto the anchor as an unknown attribute and does nothing. */
-  label?: string;
-  /** Sets the text decoration style */
+  /** Line drawn under the label at rest, over the stylesheet's `none`. */
   textDecoration?:
     | "none"
     | "underline"
@@ -46,23 +44,23 @@ export type LinkProps = TextProps & {
     | "overline"
     | "underline dotted"
     | "underline dashed";
-  /** Value of `aria-label`. When it is absent and `children` is a string, that
-   * string is used, so the visible text is the accessible name; a node child
-   * gets no `aria-label`, and the anchor is named by its content. */
+  /** Value of `aria-label`. Without it a string `children` is used, so the
+   * visible text is the name; a node child sets none. */
   ariaLabel?: string;
   /** Value of `data-testid` on the anchor.
    * @default "link" */
   dataTestId?: string;
-  /** Sets a callback function that is triggered when the link is clicked. Only for 'action' type of link */
+  /** Called on a click. Without `href` it is also called on Enter, and on Space
+   * for an action link. */
   onClick?: (e: React.MouseEvent<Element>) => void;
 
-  /** ARIA role. An anchor with no href has no implicit role; an action link
-   * with an `onClick` takes "button" by itself, and a role passed here leaves
-   * the keyboard to the caller. */
+  /** ARIA role. Without `href`, a link with an `onClick` takes one by itself;
+   * a role passed here leaves the keyboard to you. */
   role?: React.AriaRole;
-  /** Used as HTML `rel` property */
+  /** Relation to the target page, such as `noopener noreferrer` for a new tab. */
   rel?: string;
-  /** Used as HTML `tabindex` property */
+  /** Position in the tab order. `-1` keeps a link with no `href` out of the
+   * keyboard's reach. */
   tabIndex?: number;
   /** Tooltip text. Consumed by the `withTooltip` wrapper the folder exports, so
    * it becomes the tooltip's content and never reaches the DOM as a `title`

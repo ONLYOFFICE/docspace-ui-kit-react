@@ -190,6 +190,12 @@ export type AiChatSourcesManager = {
    * a change stays in the chat.
    */
   onSkillRoomsChange?: (change: AiChatSkillRoomsChange) => void;
+  /**
+   * Unlinks one Knowledge base from the owner, from the bin of its row in
+   * the composer's "+" menu. Omitted -> the rows carry no bin: the user may
+   * not change the owner's bases.
+   */
+  onKnowledgeRoomRemove?: (roomId: string) => void;
 };
 
 /** The Skill sets the user connected and disconnected in the chat. */

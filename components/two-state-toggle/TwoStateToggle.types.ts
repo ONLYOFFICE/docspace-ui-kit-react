@@ -1,4 +1,4 @@
-export type TwoStateToggleProps = {
+export type TwoStateToggleProps = React.AriaAttributes & {
   /**
    * Text to the left of the pill. An empty string removes it. The default
    * names the product through `getBrandName("ProductName")`, so a portal that

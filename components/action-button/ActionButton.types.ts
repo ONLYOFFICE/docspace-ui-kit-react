@@ -1,7 +1,8 @@
 import type { ElementType, ReactNode, ComponentPropsWithRef } from "react";
 
 type AsProp<C extends ElementType> = {
-  /** Renders as the given element or component. Defaults to `button`. */
+  /** Element or component to render instead of a `<button>`; its props are
+   * then accepted and type-checked. */
   as?: C;
 };
 

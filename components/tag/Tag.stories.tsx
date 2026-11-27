@@ -23,23 +23,25 @@ const meta = {
     tag: {
       control: "text",
       description:
-        "Identifier of the tag: handed to `onDelete`, and shown as the text when `label` is left out",
+        "Identifier of the tag. It is handed to `onDelete`, and it is the text shown when `label` is left out.",
     },
     label: {
       control: "text",
-      description: "Text of the tag, also used as its accessible name",
+      description:
+        "Text of the tag. It is also the `title` attribute and the accessible name.",
     },
     isNewTag: {
       control: "boolean",
       description:
-        'Draws the tag in its "new" colours; together with `onDelete` it also shows the delete cross',
+        'Whether the tag is drawn in its "new" colours. It is also what makes the delete cross appear.',
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isDisabled: {
       control: "boolean",
-      description: "Disables the tag and prevents interactions",
+      description:
+        "Whether the tag is inert, with a dashed border and a greyed label. Pointer events are dropped in CSS as well, so hover does nothing either.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -47,102 +49,100 @@ const meta = {
     isDeleted: {
       control: "boolean",
       description:
-        "Marks the tag as removed: the border greys out and `onClick` stops firing",
+        "Whether the tag counts as removed: `onClick` stops firing, the border greys out and the label is struck through.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     tagMaxWidth: {
       control: "text",
-      description: "Maximum width of the tag (CSS value)",
+      description:
+        "`max-width` of the tag, as a CSS length — `Tags` passes a percentage of its own width.",
     },
     icon: {
       control: false,
       description:
-        "Glyph before the label: an SVG URL, or a component rendered as a 12px icon",
+        "Glyph before the label: an SVG URL, or a component rendered as a 12px icon.",
     },
     iconClassName: {
       control: "text",
-      description: "Class name applied to the glyph",
+      description: "Applied to that glyph.",
     },
     withLabel: {
       control: "boolean",
       description:
-        "Whether the label is rendered; turn it off for a tag that is only its glyph",
+        "Whether the label is rendered. Turn it off for a tag that is only its icon.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     labelSuffix: {
       control: "text",
-      description: "Extra text after the label, on the same line",
+      description: "Extra text after the label, inside the same line.",
     },
     labelSuffixColor: {
       control: "color",
-      description: "CSS colour of the label suffix",
+      description: "CSS colour of that suffix.",
     },
     isLast: {
       control: "boolean",
-      description: "Drops the space after the tag, for the last tag in a row",
+      description:
+        "Whether the trailing margin is dropped, for the last tag in a row.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
-    isDefault: {
-      control: false,
-      description: "Ignored: nothing on a single tag reads it",
-    },
     roomType: {
       control: "number",
       description:
-        "Number passed straight back through `onClick`; the tag itself does nothing with it",
+        "Passed straight back through `onClick`. The component itself does nothing with it.",
     },
     providerType: {
       control: "number",
       description:
-        "Number passed straight back through `onClick`; the tag itself does nothing with it",
+        "Passed straight back through `onClick`. The component itself does nothing with it.",
     },
     id: {
       control: "text",
-      description: "Id of the outermost element",
+      description: "Applied to the outermost element.",
     },
     className: {
       control: "text",
-      description: "Class name of the outermost element",
+      description: "Applied to the outermost element.",
     },
     style: {
       control: "object",
       description:
-        "Inline style of the outermost element; `tagMaxWidth` wins over its `maxWidth`",
+        "Merged into the outermost element's inline style, before `tagMaxWidth` is applied.",
     },
     dataTestId: {
       control: "text",
-      description: "`data-testid` of the outermost element",
+      description: "`data-testid` of the outermost element.",
       table: {
         defaultValue: { summary: '"tag_item"' },
       },
     },
     ref: {
       control: false,
-      description: "Ref to the outermost element",
+      description: "Ref to the outermost element.",
     },
     onClick: {
       action: "clicked",
       description:
-        "Called on a click anywhere in the tag with `{ label, roomType, providerType }`, not with the DOM event; silent while the tag is disabled or deleted",
+        "Called on a click anywhere in the tag, with `{ label, roomType, providerType }` — not with the DOM event.",
     },
     onDelete: {
       action: "deleted",
       description:
-        "Called with `tag` when the cross is clicked; the cross appears only on a new tag",
+        "Called with `tag` when the cross is clicked. The cross is only rendered when `isNewTag` is set as well.",
     },
     onMouseEnter: {
       action: "mouseEntered",
-      description: "Called when the pointer enters the tag",
+      description: "Called when the pointer enters the tag.",
     },
     onMouseLeave: {
       action: "mouseLeft",
-      description: "Called when the pointer leaves the tag",
+      description: "Called when the pointer leaves the tag.",
     },
   },
 } satisfies Meta<typeof Tag>;
@@ -186,7 +186,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A plain tag with a label, the starting point for every other state; change any prop live in the Controls panel below.",
+          "A plain tag with a label, the starting point for every other state.",
       },
       source: {
         code: `<Tag tag="script" label="Script" tagMaxWidth="160px" />`,
@@ -241,6 +241,7 @@ const MaxWidthTemplate = () => {
 };
 
 export const States: Story = {
+  name: "States",
   render: () => <StatesTemplate />,
   play: async ({ canvas }) => {
     await expect(canvas.getByLabelText("Disabled")).toHaveAttribute(
@@ -256,16 +257,25 @@ export const States: Story = {
     await expect(
       within(canvas.getByLabelText("New Tag")).getByTestId("icon-button"),
     ).toBeInTheDocument();
+    // A deleted tag strikes its label through; a disabled one greys it.
+    const labelOf = (name: string) =>
+      within(canvas.getByLabelText(name)).getByText(name);
+    await expect(
+      getComputedStyle(labelOf("Deleted")).textDecorationLine,
+    ).toContain("line-through");
+    await expect(getComputedStyle(labelOf("Disabled")).color).not.toBe(
+      getComputedStyle(labelOf("Default")).color,
+    );
   },
   parameters: {
     docs: {
       description: {
-        story: `The four looks a tag can take, side by side, to pick the one that matches an item's status:
+        story: `The four looks a tag can take:
 
-- **Default** — a bordered tag on the plain background
-- **New Tag** — a filled tag with a delete cross after the label (\`isNewTag\` with \`onDelete\`)
-- **Disabled** — a dashed border; the tag ignores hover and clicks (\`isDisabled\`)
-- **Deleted** — a greyed-out border; clicks no longer reach \`onClick\` (\`isDeleted\`)`,
+- **Default** — a bordered tag
+- **New Tag** — filled, with a delete cross (\`isNewTag\` with \`onDelete\`)
+- **Disabled** — a dashed border and a grey label; hover and clicks do nothing (\`isDisabled\`)
+- **Deleted** — a grey border and a struck-through label; clicks skip \`onClick\` (\`isDeleted\`)`,
       },
       source: {
         code: `<Tag tag="default" label="Default" />
@@ -278,6 +288,7 @@ export const States: Story = {
 };
 
 export const NewTags: Story = {
+  name: "Removable",
   render: (args) => <NewTagTemplate {...args} />,
   args: { onDelete: fn() },
   play: async ({ args, canvas, userEvent }) => {
@@ -291,7 +302,7 @@ export const NewTags: Story = {
     docs: {
       description: {
         story:
-          "Tags the user has just added and can still take back: click a cross to remove its tag, and the Actions panel shows the identifier `onDelete` receives.",
+          "Tags the user has just added, each with a cross that removes it (`isNewTag`, `onDelete`). `onDelete` receives the tag's identifier, not its label.",
       },
       source: {
         code: `<Tag tag="drafts" label="Drafts" isNewTag onDelete={(tag) => console.log(tag)} />
@@ -303,6 +314,7 @@ export const NewTags: Story = {
 };
 
 export const ClickableTags: Story = {
+  name: "Clickable",
   render: (args) => <ClickableTemplate {...args} />,
   args: { onClick: fn() },
   play: async ({ args, canvas, userEvent }) => {
@@ -316,7 +328,7 @@ export const ClickableTags: Story = {
     docs: {
       description: {
         story:
-          "Tags that act as filters: hover one to see it highlight, click it, and the Actions panel shows the `{ label }` object `onClick` receives instead of the DOM event.",
+          "Tags that act as filters and highlight on hover (`onClick`). A click passes a `{ label }` object to `onClick`, not the DOM event.",
       },
       source: {
         code: `<Tag tag="design" label="Design" onClick={({ label }) => console.log(label)} />
@@ -328,6 +340,7 @@ export const ClickableTags: Story = {
 };
 
 export const MaxWidthVariants: Story = {
+  name: "Width caps",
   render: () => <MaxWidthTemplate />,
   play: async ({ canvas }) => {
     const widths: Record<string, number> = {
@@ -350,7 +363,7 @@ export const MaxWidthVariants: Story = {
     docs: {
       description: {
         story:
-          "Tags with different max-width values. Long text is truncated with ellipsis when it exceeds the max width.",
+          "Tags capped at 80, 160 and 250px (`tagMaxWidth`). A label past its cap ends with an ellipsis.",
       },
       source: {
         code: `<Tag tag="short" label="Short" tagMaxWidth="80px" />
@@ -362,6 +375,7 @@ export const MaxWidthVariants: Story = {
 };
 
 export const IconOnly: Story = {
+  name: "Icon only",
   render: () => (
     <Wrapper>
       <Tag
@@ -390,7 +404,7 @@ export const IconOnly: Story = {
   parameters: {
     docs: {
       description: {
-        story: `A compact tag that is only a glyph marks where an item comes from without taking the width of a label; the hidden label still names the tag for screen readers (\`withLabel={false}\`):
+        story: `Two tags that are only a glyph (\`withLabel={false}\`); the hidden label still names each for screen readers:
 
 - **First tag** — the glyph loaded from an SVG file (\`icon\` as a URL)
 - **Second tag** — the same glyph passed as a React component (\`icon\` as a component)`,
@@ -404,6 +418,7 @@ export const IconOnly: Story = {
 };
 
 export const WithLabelSuffix: Story = {
+  name: "With a count",
   render: (args) => <Tag {...args} />,
   args: {
     tag: "reports",
@@ -422,7 +437,7 @@ export const WithLabelSuffix: Story = {
     docs: {
       description: {
         story:
-          "A count after the label, in a quieter colour, tells the reader how many items the tag covers without a second element (`labelSuffix`, `labelSuffixColor`).",
+          "A count after the label, in a quieter colour (`labelSuffix`, `labelSuffixColor`).",
       },
       source: {
         code: `<Tag tag="reports" label="Reports" labelSuffix=" (12)" labelSuffixColor="#A3A9AE" />`,
@@ -432,6 +447,7 @@ export const WithLabelSuffix: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   play: async ({ canvas }) => {
     const custom = canvas.getByLabelText("Custom Tag");
     await expect(custom).toHaveStyle({
@@ -446,6 +462,11 @@ export const CssCustomization: Story = {
         rect(canvas.getByLabelText("Second Tag")).left - rect(custom).right,
       ),
     ).toBe(16);
+    // --tag-text-color and --tag-size reach the label.
+    await expect(within(custom).getByText("Custom Tag")).toHaveStyle({
+      color: "rgb(106, 27, 154)",
+      fontSize: "14px",
+    });
   },
   render: () => (
     <div
@@ -458,6 +479,8 @@ export const CssCustomization: Story = {
           "--tag-inner-padding": "4px 14px",
           "--tag-height": "30px",
           "--tag-spacing-end": "16px",
+          "--tag-text-color": "#6A1B9A",
+          "--tag-size": "14px",
         } as CSSProperties
       }
     >
@@ -468,7 +491,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Six variables set on one wrapper -- the variables are listed under CSS variables on this page. Both tags take every variable from the wrapper; the second is there to show the space \`--tag-spacing-end\` leaves after **Custom Tag**.`,
+        story: `Two tags under a wrapper that sets eight variables. The second shows the space \`--tag-spacing-end\` leaves after **Custom Tag**.`,
       },
       source: {
         code: `<div
@@ -480,6 +503,8 @@ export const CssCustomization: Story = {
     "--tag-inner-padding": "4px 14px",
     "--tag-height": "30px",
     "--tag-spacing-end": "16px",
+    "--tag-text-color": "#6A1B9A",
+    "--tag-size": "14px",
   }}
 >
   <Tag tag="custom" label="Custom Tag" />

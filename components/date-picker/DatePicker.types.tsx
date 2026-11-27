@@ -1,7 +1,7 @@
 import type { DateTime } from "luxon";
 import type { Nullable } from "../../types";
 
-export type DatePickerProps = {
+export type DatePickerProps = React.AriaAttributes & {
   /**
    * Text of the button shown while no date is chosen.
    * @default "Select date"
@@ -21,11 +21,16 @@ export type DatePickerProps = {
   className?: string;
   /** Applied to the outermost element. */
   id?: string;
-  /** Earliest selectable day in the calendar. */
+  /**
+   * Earliest selectable day in the calendar; its own day stays selectable,
+   * whatever its time.
+   */
   minDate?: DateTime | Date;
   /** Latest selectable day in the calendar. */
   maxDate?: DateTime | Date;
-  /** BCP 47 tag the calendar and the chip's date are written in. */
+  /**
+   * BCP 47 tag the calendar and the chip's date are written in.
+   */
   locale: string;
   /**
    * Whether a calendar glyph is drawn before the date in the chip.
@@ -33,9 +38,8 @@ export type DatePickerProps = {
    */
   showCalendarIcon?: boolean;
   /**
-   * The chosen date, held by you. This is the prop that actually controls what
-   * is displayed: the component copies it into its own state on every render
-   * and clears that state whenever this is empty.
+   * The chosen date, held by you, and what the chip shows. The component copies
+   * it on every render and clears its own date whenever this is empty.
    */
   outerDate?: DateTime | null;
   /** Month the calendar opens on. */

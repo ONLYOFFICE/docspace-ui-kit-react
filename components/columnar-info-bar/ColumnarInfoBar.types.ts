@@ -7,18 +7,21 @@ export type ColumnarInfoBarColumn = {
   value: React.ReactNode;
 };
 
-export type ColumnarInfoBarProps = {
+export type ColumnarInfoBarProps = React.AriaAttributes & {
   /** Bold caption above the columns, rendered as an `<h3>` and omitted entirely when empty. */
   headerText?: string;
   /** The label and value pairs, in order. An empty array renders the bar with nothing inside it. */
   columns: ColumnarInfoBarColumn[];
   /** Called when the close button is clicked. The button exists only while this is set, and the bar does not hide itself — take it out of the tree yourself. */
   onAction?: () => void;
-  /** Called once after mount, and never again: the effect that calls it has an empty dependency list, so a new function on a later render is ignored. */
+  /** Called once after mount. A different function on a later render is
+   * ignored. */
   onLoad?: () => void;
-  /** Inline style of the bar. There is no `className` prop, so this is also where the `--cib-*` custom properties go. */
+  /** Inline style of the bar, and the place for its CSS variables, since
+   * there is no `className`. */
   style?: React.CSSProperties;
-  /** Which of the three looks to render: the warning bar with an accent edge, the bordered `neutral` card that slides open, or the padded `page` block whose columns are a two-column grid.
+  /** The look: a warning bar with an accent edge, a bordered `neutral` card
+   * that slides open, or a padded `page` block with a two-column grid.
    * @default "default" */
   variant?: "default" | "neutral" | "page";
   /** Accessible name of the close button (its `aria-label`). Defaults to the translated `Common:CloseButton` ("Close"). Ignored without `onAction`. */

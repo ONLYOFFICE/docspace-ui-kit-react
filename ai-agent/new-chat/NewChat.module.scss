@@ -114,6 +114,16 @@
       }
     }
 
+    // The reasoning depth after the model's name. The library draws it in
+    // the secondary text colour, which is the very colour the name is given
+    // above, and in the name's weight - so it read as part of the name. It
+    // is a setting of the model, not its name: regular weight, and the
+    // muted colour of a placeholder.
+    :global([data-testid="model-selector-value-suffix"]) {
+      font-weight: 400;
+      color: var(--text-tertiary);
+    }
+
     :global(.composer-input) {
       line-height: 22px;
       padding: 0px;

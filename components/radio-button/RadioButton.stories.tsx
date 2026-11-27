@@ -23,15 +23,14 @@ const meta = {
     isChecked: {
       control: "boolean",
       description:
-        "Whether the circle is filled in; the button starts in this state and returns to it whenever the prop changes",
+        "Whether the circle shows a dot. It seeds the component's own state and is re-applied whenever it changes.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isDisabled: {
       control: "boolean",
-      description:
-        "Disables the input and greys out the circle and the label, so clicks no longer select it",
+      description: "Disables the input and greys the circle and the label.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -39,28 +38,29 @@ const meta = {
     label: {
       control: "text",
       description:
-        "Text or any React node written beside the circle; `value` is shown when it is left out",
+        "What is written beside the button. `value` is used when this is left out.",
     },
     name: {
       control: "text",
       description:
-        "`name` of the input; buttons sharing one form a single choice the arrow keys move through",
+        "`name` of the input. Buttons sharing one behave as a single choice.",
     },
     value: {
       control: "text",
       description:
-        "`value` of the input, read back from the change event, and the text beside the circle when `label` is left out",
+        "`value` of the input, and the label when `label` is left out. It is what a group's `onClick` reads back off the event.",
     },
     fontSize: {
       control: "text",
-      description: "Font size of the text beside the circle, as a CSS length",
+      description: "Font size of the text beside the circle, as a CSS length.",
       table: {
         defaultValue: { summary: "13px" },
       },
     },
     fontWeight: {
       control: "number",
-      description: "Font weight of the text beside the circle",
+      description:
+        "Weight of the text beside the circle, such as `600` for semibold.",
       table: {
         defaultValue: { summary: "400" },
       },
@@ -68,13 +68,13 @@ const meta = {
     spacing: {
       control: "text",
       description:
-        "Gap to the neighbouring button, as a CSS length; without it the buttons touch",
+        "Gap to the neighbouring button, as a CSS length: `margin-inline-start` when horizontal, `margin-block-end` when vertical. There is no gap at all without it — the buttons touch.",
     },
     orientation: {
       control: "select",
       options: ["vertical", "horizontal"],
       description:
-        "Which side `spacing` goes on: below the button when vertical, before it when horizontal; it does not arrange the buttons itself",
+        "Which side the gap is put on. It only moves `spacing`; it does not lay anything out on its own.",
       table: {
         defaultValue: { summary: "vertical" },
       },
@@ -82,41 +82,39 @@ const meta = {
     onChange: {
       action: "onChange",
       description:
-        "Called on every change of the input; once given, the button stops tracking its own state, follows `isChecked` alone and no longer calls `onClick`",
+        "Called on every change of the input. It replaces the internal handler: only `isChecked` moves the dot, and `onClick` no longer fires.",
     },
     onClick: {
       action: "onClick",
       description:
-        "Called when the button is clicked, but only while `onChange` is not given",
+        "Called when the button is clicked — but only while `onChange` is not given. Passing `onChange` replaces the internal handler and this never fires.",
     },
     autoFocus: {
       control: "boolean",
-      description:
-        "Whether the input takes keyboard focus as soon as it mounts",
+      description: "Whether the input takes focus on mount.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     id: {
       control: "text",
-      description:
-        "`id` of the label that wraps the button, not of the input inside it",
+      description: "Applied to the label, not to the input.",
     },
     className: {
       control: "text",
-      description: "Class added to the label that wraps the button",
+      description: "Applied to the label.",
     },
     style: {
       control: "object",
-      description: "Inline style of the label that wraps the button",
+      description: "Applied to the label.",
     },
     classNameInput: {
       control: "text",
-      description: "Class added to the visually hidden input",
+      description: "Applied to the visually hidden `<input>`.",
     },
     testId: {
       control: "text",
-      description: "`data-testid` of the label that wraps the button",
+      description: "`data-testid` of the label.",
       table: {
         defaultValue: { summary: "radio-button" },
       },
@@ -191,7 +189,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A single labelled button, the starting point for any single-choice option; click it to fill in the circle, and change any other prop live in the Controls panel below.",
+          "A single labelled button, the starting point for any single-choice option. A click or Space fills the circle, and a second click does not clear it.",
       },
       source: {
         code: `<RadioButton
@@ -226,6 +224,7 @@ const StatesTemplate = () => {
 };
 
 export const CheckedStates: Story = {
+  name: "Checked and unchecked",
   render: () => <StatesTemplate />,
   play: async ({ canvas }) => {
     await expect(canvas.getByRole("radio", { name: "Checked" })).toBeChecked();
@@ -237,11 +236,43 @@ export const CheckedStates: Story = {
     docs: {
       description: {
         story:
-          "The two looks a button can take side by side, so the filled-in choice is easy to tell from the rest: an empty circle and a circle with a dot (`isChecked`).",
+          "The two looks a button takes: an empty circle, and a circle with a dot (`isChecked`).",
       },
       source: {
         code: `<RadioButton name="group" value="unchecked" label="Unchecked" />
 <RadioButton name="group" value="checked" label="Checked" isChecked />`,
+      },
+    },
+  },
+};
+
+const SharedNameTemplate = () => (
+  <Wrapper>
+    <RadioButton name="fruit" value="apple" label="Apple" isChecked />
+    <RadioButton name="fruit" value="pear" label="Pear" />
+  </Wrapper>
+);
+
+export const SharedName: Story = {
+  name: "Shared name",
+  render: () => <SharedNameTemplate />,
+  play: async ({ canvas, userEvent }) => {
+    const apple = canvas.getByRole("radio", { name: "Apple" });
+    const pear = canvas.getByRole("radio", { name: "Pear" });
+
+    await userEvent.click(pear);
+    await expect(pear).toBeChecked();
+    await expect(apple).not.toBeChecked();
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Two buttons sharing a `name`, without `onChange`. Checking one clears the dot of the other.",
+      },
+      source: {
+        code: `<RadioButton name="fruit" value="apple" label="Apple" isChecked />
+<RadioButton name="fruit" value="pear" label="Pear" />`,
       },
     },
   },
@@ -268,6 +299,7 @@ const DisabledTemplate = () => {
 };
 
 export const DisabledStates: Story = {
+  name: "Disabled",
   render: () => <DisabledTemplate />,
   play: async ({ canvas, userEvent }) => {
     for (const radio of canvas.getAllByRole("radio")) {
@@ -281,7 +313,7 @@ export const DisabledStates: Story = {
     docs: {
       description: {
         story:
-          "A disabled button, empty or filled in, shows an option the user can see but not change: the circle and the label turn grey and clicks are ignored (`isDisabled`).",
+          "Two disabled buttons, empty and filled in (`isDisabled`). The circle and the label turn grey, and a click does nothing.",
       },
       source: {
         code: `<RadioButton name="group" value="1" label="Disabled unchecked" isDisabled />
@@ -313,6 +345,7 @@ const CustomStylingTemplate = () => {
 };
 
 export const CustomStyling: Story = {
+  name: "Label text size",
   render: () => <CustomStylingTemplate />,
   play: async ({ canvas, userEvent }) => {
     // No onChange here: the button keeps its own state and still selects.
@@ -325,7 +358,7 @@ export const CustomStyling: Story = {
     docs: {
       description: {
         story:
-          "Larger or smaller label text for a button placed in a heading or a dense list: **Custom styled** at 16px semibold, **Small text** at 11px light (`fontSize`, `fontWeight`).",
+          "Label text at two sizes (`fontSize`, `fontWeight`): **Custom styled** at 16px semibold, **Small text** at 11px light.",
       },
       source: {
         code: `<RadioButton name="group" value="1" label="Custom styled" fontSize="16px" fontWeight={600} />
@@ -374,6 +407,7 @@ const WithSpacingTemplate = () => {
 };
 
 export const WithSpacing: Story = {
+  name: "Spacing in a set",
   render: () => <WithSpacingTemplate />,
   play: async ({ canvas, userEvent }) => {
     const small = canvas.getByRole("radio", { name: "Vertical: small" });
@@ -393,12 +427,12 @@ export const WithSpacing: Story = {
   parameters: {
     docs: {
       description: {
-        story: `A set of buttons needs room between them, because without a gap they touch:
+        story: `Two sets with a gap between their buttons (\`spacing\`); without it they touch:
 
-- **Vertical** — a column with 12px below every button but the last (\`spacing\`, the default \`orientation\`)
-- **Horizontal** — a row with 24px before every button but the first (\`spacing\`, \`orientation="horizontal"\`)
+- **Vertical** — 12px below every button but the last
+- **Horizontal** — 24px before every button but the first (\`orientation="horizontal"\`)
 
-The container still lays the buttons out; \`orientation\` only decides which side the gap goes on. Pick an option in each set with a click or the arrow keys.`,
+The container lays the buttons out; \`orientation\` only picks the side of the gap.`,
       },
       source: {
         code: `<div style={{ display: "flex", flexDirection: "column" }}>
@@ -433,6 +467,7 @@ The container still lays the buttons out; \`orientation\` only decides which sid
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   play: async ({ canvas }) => {
     const radio = canvas.getByRole("radio", { name: "Custom option" });
     await expect(radio).toBeChecked();
@@ -468,7 +503,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The variables are listed under CSS variables on this page. The example is one checked button, so it shows every variable at once: the violet dot and outline, the light violet fill, the dark violet text and the wider gap. Hover it to see the darker outline.`,
+        story: `One checked button under a wrapper that sets every variable. It shows the violet dot and outline, the light violet fill, the dark violet text and the wider gap.`,
       },
       source: {
         code: `<div

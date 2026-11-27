@@ -22,6 +22,22 @@ describe("<TimePicker />", () => {
     expect(container).toBeTruthy();
   });
 
+  it("puts a passed aria-* on the group, its aria-label over ariaLabel", () => {
+    render(
+      <TimePicker
+        {...baseProps}
+        ariaLabel="Time"
+        aria-label="Start time"
+        aria-describedby="time-hint"
+      />,
+    );
+
+    expect(screen.getByRole("group", { name: "Start time" })).toHaveAttribute(
+      "aria-describedby",
+      "time-hint",
+    );
+  });
+
   it("renders with correct initial time", () => {
     render(<TimePicker {...baseProps} />);
     const hoursInput = screen.getByLabelText("Hours") as HTMLInputElement;
@@ -29,6 +45,22 @@ describe("<TimePicker />", () => {
 
     expect(hoursInput.value).toBe("14");
     expect(minutesInput.value).toBe("30");
+  });
+
+  it("reports the time again when the meridiem changes", () => {
+    const { rerender } = render(
+      <TimePicker {...baseProps} isTwelveHourFormat meridiem="PM" />,
+    );
+    expect(mockOnChange).not.toHaveBeenCalled();
+
+    rerender(<TimePicker {...baseProps} isTwelveHourFormat meridiem="AM" />);
+
+    expect(mockOnChange).toHaveBeenCalledTimes(1);
+    expect(mockOnChange.mock.calls[0][0]).toMatchObject({
+      day: 9,
+      hour: 2,
+      minute: 30,
+    });
   });
 
   it("handles hours input correctly", () => {

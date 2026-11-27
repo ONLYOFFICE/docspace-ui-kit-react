@@ -24,6 +24,10 @@ vi.mock("../tooltip", () => ({
     "data-testid": testId,
     onMouseEnter,
     onMouseLeave,
+    role,
+    tabIndex,
+    onKeyDown,
+    ...rest
   }: {
     children: React.ReactNode;
     onClick?: React.MouseEventHandler;
@@ -32,14 +36,23 @@ vi.mock("../tooltip", () => ({
     "data-testid"?: string;
     onMouseEnter?: React.MouseEventHandler;
     onMouseLeave?: React.MouseEventHandler;
-  }) => (
+    role?: string;
+    tabIndex?: number;
+    onKeyDown?: React.KeyboardEventHandler;
+  } & React.AriaAttributes) => (
     <div
+      {...Object.fromEntries(
+        Object.entries(rest).filter(([key]) => key.startsWith("aria-")),
+      )}
       className={className}
       onClick={onClick}
       data-testid={testId || "tag_item"}
       id={id}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      role={role}
+      tabIndex={tabIndex}
+      onKeyDown={onKeyDown}
     >
       {children}
     </div>
@@ -51,11 +64,14 @@ vi.mock("../icon-button", () => ({
   IconButton: ({
     onClick,
     dataTestId,
+    ariaLabel,
   }: {
     onClick: Function;
     dataTestId?: string;
+    ariaLabel?: string;
   }) => (
     <button
+      aria-label={ariaLabel}
       onClick={(e) => onClick(e)}
       data-testid={dataTestId || "icon-button"}
       type="button"
@@ -76,9 +92,77 @@ const baseProps: TagProps = {
 };
 
 describe("<Tag />", () => {
+  it("is a keyboard button when clickable", () => {
+    const onClick = vi.fn();
+    const { rerender } = render(<Tag {...baseProps} onClick={onClick} />);
+
+    const tag = screen.getByRole("button", { name: "Script" });
+    expect(tag).toHaveAttribute("tabindex", "0");
+    fireEvent.keyDown(tag, { key: "Enter" });
+    fireEvent.keyDown(tag, { key: " " });
+    expect(onClick).toHaveBeenCalledTimes(2);
+
+    rerender(<Tag {...baseProps} onClick={onClick} isDisabled />);
+    expect(screen.getByTestId("tag_item")).not.toHaveAttribute("role");
+  });
+
+  // With no label drawn, the name was on a div with no role, so a screen
+  // reader found nothing to read.
+  it("makes a tag that draws only its icon an image named by its label", () => {
+    const { rerender } = render(
+      <Tag {...baseProps} onClick={undefined} withLabel={false} />,
+    );
+    expect(screen.getByRole("img", { name: "Script" })).toBe(
+      screen.getByTestId("tag_item"),
+    );
+
+    // A drawn label is read as text and needs no role.
+    rerender(<Tag {...baseProps} onClick={undefined} />);
+    expect(screen.getByTestId("tag_item")).not.toHaveAttribute("role");
+
+    // An image would hide the delete cross, so that tag is a named group.
+    rerender(
+      <Tag
+        {...baseProps}
+        onClick={undefined}
+        withLabel={false}
+        isNewTag
+        onDelete={vi.fn()}
+      />,
+    );
+    expect(screen.getByRole("group", { name: "Script" })).toBe(
+      screen.getByTestId("tag_item"),
+    );
+    expect(screen.getByRole("button", { name: "Remove" })).toBeInTheDocument();
+  });
+
+  it("names the delete cross", () => {
+    render(<Tag {...baseProps} isNewTag />);
+
+    expect(screen.getByRole("button", { name: "Remove" })).toBeInTheDocument();
+  });
+
   it("renders without error", () => {
     render(<Tag {...baseProps} />);
     expect(screen.getByTestId("tag_item")).toBeInTheDocument();
+  });
+
+  it("keeps a passed aria-*, its aria-label over label", () => {
+    const { rerender } = render(
+      <Tag
+        {...baseProps}
+        aria-label="Filter by Script"
+        aria-describedby="tag-hint"
+        aria-disabled
+      />,
+    );
+    const tag = screen.getByTestId("tag_item");
+    expect(tag).toHaveAttribute("aria-label", "Filter by Script");
+    expect(tag).toHaveAttribute("aria-describedby", "tag-hint");
+    expect(tag).toHaveAttribute("aria-disabled", "true");
+
+    rerender(<Tag {...baseProps} isDisabled aria-disabled={false} />);
+    expect(tag).toHaveAttribute("aria-disabled", "true");
   });
 
   it("accepts id", () => {
@@ -94,7 +178,7 @@ describe("<Tag />", () => {
   it("calls onDelete when cross icon is clicked", () => {
     const onDelete = vi.fn();
     render(<Tag {...baseProps} isNewTag onDelete={onDelete} />);
-    const deleteButton = screen.getByRole("button");
+    const deleteButton = screen.getByRole("button", { name: "Remove" });
     fireEvent.click(deleteButton);
     expect(onDelete).toHaveBeenCalledWith("script");
   });
@@ -111,7 +195,7 @@ describe("<Tag />", () => {
     const onDelete = vi.fn();
     render(<Tag {...baseProps} isNewTag onDelete={onDelete} />);
     const tag = screen.getByTestId("tag_item");
-    const deleteButton = screen.getByRole("button");
+    const deleteButton = screen.getByRole("button", { name: "Remove" });
 
     // Case 1: Target is NOT the container -> should call onDelete
     fireEvent.click(deleteButton);

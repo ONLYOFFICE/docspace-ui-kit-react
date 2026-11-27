@@ -29,7 +29,7 @@ const meta = {
       },
       options: HEADING_LEVELS,
       description:
-        "Which heading element is rendered, `h1` through `h6`. It changes only the element, not the size: an `h3` can be the largest text on the page",
+        "Which heading element is rendered, `h1` through `h6`. It is the semantics only: the size comes from `size`, so a `h3` can be the largest thing on the page.",
       table: {
         defaultValue: { summary: "h1" },
       },
@@ -38,7 +38,7 @@ const meta = {
       control: "select",
       options: Object.values(HeadingSize),
       description:
-        "One of five preset sizes, from 15px (`xsmall`) to 27px (`xlarge`). Has no effect while `type` is set",
+        "One of the five preset sizes, 15px to 27px. Ignored while `type` is set, which brings a size of its own.",
       table: {
         defaultValue: { summary: "medium" },
       },
@@ -47,7 +47,7 @@ const meta = {
       control: "select",
       options: ["header", "menu", "content"],
       description:
-        "Bold preset that replaces `size`: `content` 18px, `menu` 23px, `header` 28px, each with a 50px line height. Unset, the heading follows `size`",
+        "Portal-sized preset that replaces `size`: `content` 18px, `menu` 23px, `header` 28px, each with a 50px line height.",
     },
     color: {
       control: "color",
@@ -97,7 +97,8 @@ const meta = {
     },
     children: {
       control: "text",
-      description: "Heading text",
+      description:
+        "Title the heading shows; phrasing content only, as in any `h1`–`h6`",
     },
     id: {
       control: "text",
@@ -150,8 +151,7 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "A large `h1`, the title of a page or panel; change the level, size, type or any other prop live in the Controls panel below.",
+        story: "A large `h1`, the title of a page or panel.",
       },
       source: {
         code: `<Heading level={HeadingLevel.h1} size={HeadingSize.large}>
@@ -255,7 +255,7 @@ export const Levels: Story = {
     docs: {
       description: {
         story:
-          "Six headings, `h1` through `h6`, all at the same medium size: the level decides the element a screen reader builds the page outline from, not how large the text looks (`level`).",
+          "Six headings, `h1` through `h6`, all at the same medium size (`level`). The level decides the element in the page outline, not how large the text looks.",
       },
       source: {
         code: `<Heading level={HeadingLevel.h1}>H1 Heading</Heading>
@@ -312,7 +312,7 @@ export const Types: Story = {
     docs: {
       description: {
         story:
-          "**Default Type** has no `type` and follows `size`; **Header Type** is 28px at weight 600, **Menu Type** 23px bold and **Content Type** 18px bold, all three on a 50px line height, for titles that must line up with a 50px row (`type`).",
+          "The three `type` presets beside a heading without one, which follows `size`. **Header Type** is 28px at 600, **Menu Type** 23px bold, **Content Type** 18px bold, all on a 50px line.",
       },
       source: {
         code: `<Heading level={HeadingLevel.h1}>Default Type</Heading>
@@ -325,6 +325,7 @@ export const Types: Story = {
 };
 
 export const TruncatedHeading: Story = {
+  name: "Truncated",
   render: () => <TruncatedTemplate />,
   play: async ({ canvas }) => {
     const heading = canvas.getByRole("heading", { level: 2 });
@@ -335,7 +336,7 @@ export const TruncatedHeading: Story = {
     docs: {
       description: {
         story:
-          "A long title in a 250px column stays on one line and ends with an ellipsis, for headers that must not wrap; without a bounded parent the heading grows instead (`truncate`).",
+          "A long title in a 250px column, held on one line and cut with an ellipsis (`truncate`). Without a bounded parent the heading grows instead.",
       },
       source: {
         code: `<div style={{ width: 250 }}>
@@ -349,6 +350,7 @@ export const TruncatedHeading: Story = {
 };
 
 export const CustomStyled: Story = {
+  name: "Custom colour and style",
   render: () => <CustomStyledTemplate />,
   play: async ({ canvas }) => {
     await expect(styleOf(canvas.getByText("Blue Heading")).color).toBe(
@@ -374,6 +376,7 @@ export const CustomStyled: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={
@@ -417,7 +420,11 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. **Custom Heading** (\`type="content"\`) shows the colour, \`--heading-size-content\` and \`--heading-lh\`; **Plain Heading** has no \`type\` and is there for \`--heading-weight\`; **Menu Heading** and **Header Heading** show \`--heading-size-menu\` and \`--heading-size-header\`.`,
+        story: `Four headings under a wrapper that sets every overridable variable:
+
+- **Custom Heading** (\`type="content"\`) — the colour, \`--heading-size-content\` and \`--heading-lh\`
+- **Plain Heading** — no \`type\`, for \`--heading-weight\`
+- **Menu Heading** and **Header Heading** — \`--heading-size-menu\` and \`--heading-size-header\``,
       },
       source: {
         code: `<div

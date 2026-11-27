@@ -67,18 +67,18 @@ const meta = {
       // The icons are data URIs too long to edit, and they stretch the table.
       control: false,
       description:
-        "Items of the upper group of the menu. An item with `items` becomes a submenu that expands in place; its handler is called with the item's `action`",
+        "Items of the upper group of the menu. An item with `items` becomes a submenu.",
     },
     buttonOptions: {
       // The icons are data URIs too long to edit, and they stretch the table.
       control: false,
       description:
-        "Items of the lower group, drawn on a background of their own. An item with `items` becomes a submenu",
+        "Items of the lower group, drawn on a background of its own. An item with `items` becomes a submenu.",
     },
     opened: {
       control: "boolean",
       description:
-        "Whether the menu is open. The button, the backdrop, an item, Escape and Back change it too, and report that through `onOpen` and `onClose`",
+        "Whether the menu is open, copied into state whenever it changes. The button, the backdrop, an item, Escape and Back change that state too, reported through `onOpen` and `onClose`.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -86,7 +86,7 @@ const meta = {
     alert: {
       control: "boolean",
       description:
-        "Shows an alert badge on the button while the menu is closed",
+        "Whether the alert badge is drawn over the button. It is hidden while the menu is open.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -94,7 +94,7 @@ const meta = {
     withAlertClick: {
       control: "boolean",
       description:
-        "Whether the alert badge is a button, named Alert, that calls `onAlertClick`. Without it the badge is an image",
+        'Whether the alert badge is a button (named "Alert") that calls `onAlertClick`. Without it the badge is an image.',
       table: {
         defaultValue: { summary: "false" },
       },
@@ -102,7 +102,7 @@ const meta = {
     withMenu: {
       control: "boolean",
       description:
-        "Whether the button opens the menu. When off, a click calls `onClick` and the menu never opens",
+        "Whether the button opens the menu. When `false` it calls `onClick` and the menu never opens.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -110,23 +110,14 @@ const meta = {
     withoutButton: {
       control: "boolean",
       description:
-        "Draws the lower group on the plain grey background instead of its own blue one; nothing is hidden",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
-    isOpenButton: {
-      control: "boolean",
-      description:
-        "Deprecated and ignored. `onClose` is called whenever the menu closes, with or without it",
+        "Whether the lower group takes the plain wrapper background instead of the accent one.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     manualWidth: {
       control: "text",
-      description:
-        "Width of the menu as a CSS length, never wider than the window less 48px",
+      description: "Width of the menu, as a CSS length.",
       table: {
         defaultValue: { summary: "400px" },
       },
@@ -134,69 +125,42 @@ const meta = {
     dropdownStyle: {
       control: "object",
       description:
-        "Inline style of the menu. The height is measured from the items and overrides any height given here",
+        "Merged into the menu's inline style. The measured height is applied after it and wins.",
     },
     style: {
       control: "object",
       description:
-        "Inline style of the wrapper that carries the button and the menu, applied after its own z-index",
+        "Merged into the wrapper's inline style, after the z-index the component sets itself.",
     },
     className: {
       control: "text",
-      description: "Class of the wrapper that carries the button and the menu",
+      description:
+        "Applied to the wrapper that carries the button and the menu.",
     },
     onClick: {
       action: "onClick",
       description:
-        "Called with the click event when the button is clicked or pressed with Enter or Space, and only while `withMenu` is off",
+        "Called with the event when the button is clicked or pressed with Enter or Space, and only while `withMenu` is `false`.",
     },
     onOpen: {
       action: "onOpen",
       description:
-        "Called when the button opens the menu. With `onClose`, it keeps `opened` in step",
+        "Called when the button opens the menu. Handle it with `onClose` to keep `opened` in step.",
     },
     onClose: {
       action: "onClose",
       description:
-        "Called when the menu closes: from the button, the backdrop, a chosen item, Escape or Back. Not called on opening",
+        "Called when the menu closes: from the button, the backdrop, a chosen item, Escape or the browser's Back. Not called on opening.",
     },
     onAlertClick: {
       action: "onAlertClick",
       description:
-        "Called when the alert badge is clicked or pressed, and only while `withAlertClick` is set",
+        "Called when the alert badge is clicked or pressed, and only while `withAlertClick` is set.",
     },
     ref: {
       control: false,
       description:
-        "Handle exposing `contains(target)` and `getButtonElement()`, for telling whether a click landed on the button",
-    },
-    title: {
-      control: false,
-      description:
-        "Deprecated and ignored. Nothing reads this prop; the groups have no heading",
-    },
-    percent: {
-      control: false,
-      description:
-        "Deprecated and ignored. Nothing reads this prop; the button draws no progress",
-    },
-    withButton: {
-      control: false,
-      description: "Deprecated and ignored. Nothing reads this prop",
-    },
-    onUploadClick: {
-      control: false,
-      description:
-        "Deprecated and ignored. Nothing reads this prop; the button's own handler is `onClick`",
-    },
-    sectionWidth: {
-      control: false,
-      description: "Deprecated and ignored. Nothing reads this prop",
-    },
-    mainButtonRef: {
-      control: false,
-      description:
-        "Deprecated and ignored. The component keeps its own element ref; use `ref` to reach the button",
+        "Handle exposing `contains` and `getButtonElement`, for deciding whether a click landed on the button.",
     },
   },
   args: {
@@ -293,7 +257,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The button in the corner of the screen with both groups of items. Tap it (or Tab to it and press Enter) to open the menu, tap outside, press Escape or pick an item to close it, and change any other prop live in the Controls panel below.",
+          "The button in the corner of the screen, with both groups of items in its menu. A tap or Enter opens the menu; a tap outside, Escape or a chosen item closes it.",
       },
       source: {
         code: `<MainButtonMobile
@@ -307,6 +271,7 @@ export const Default: Story = {
 };
 
 export const WithAlert: Story = {
+  name: "With alert badge",
   args: {
     alert: true,
     withAlertClick: true,
@@ -332,7 +297,7 @@ export const WithAlert: Story = {
     docs: {
       description: {
         story:
-          "A badge on the closed button draws attention to something waiting for the user (`alert`). Click or press the badge to see `onAlertClick` in the Actions panel; with `withAlertClick` the badge is a button named Alert, without it an image. The badge is hidden while the menu is open.",
+          "A badge on the closed button draws attention to something waiting for the user (`alert`). With `withAlertClick` it is a button named Alert that calls `onAlertClick`; without it, an image. It is hidden while the menu is open.",
       },
       source: {
         code: `<MainButtonMobile
@@ -347,6 +312,7 @@ export const WithAlert: Story = {
 };
 
 export const WithSubmenu: Story = {
+  name: "With submenu",
   args: {
     opened: true,
     style: cornerStyle,
@@ -413,6 +379,7 @@ export const WithSubmenu: Story = {
 };
 
 export const WithoutMenu: Story = {
+  name: "Without a menu",
   args: {
     withMenu: false,
     style: cornerStyle,
@@ -427,7 +394,7 @@ export const WithoutMenu: Story = {
     docs: {
       description: {
         story:
-          "For a screen with only one thing to create, the button runs that action directly (`withMenu`). Click it to see `onClick` in the Actions panel; no menu opens.",
+          "For a screen with only one thing to create, the button runs that action directly (`withMenu`). A click calls `onClick`, and no menu opens.",
       },
       source: {
         code: `<MainButtonMobile withMenu={false} onClick={handleUpload} />`,
@@ -437,6 +404,7 @@ export const WithoutMenu: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   render: () => (
     <div
       style={

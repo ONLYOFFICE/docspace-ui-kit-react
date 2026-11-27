@@ -12,12 +12,10 @@ import { AnalyzeBanner } from "./components/analyze-banner";
 import { ChatNoAccessScreen } from "./components/chat-no-access-screen";
 import { useAiChatStore } from "../providers/ai-chat-store/AiChatStoreProvider";
 import ContextRoomSync from "../providers/context-room/ContextRoomSync";
+import { openAiSettings } from "../providers/settings-links";
 
 import styles from "./NewChat.module.scss";
 import type { ChatProps } from "./chat.types";
-
-// The in-chat AI settings section now lives in DocSpace portal settings.
-const AI_SETTINGS_URL = "/portal-settings/ai-settings";
 
 const NewChat: React.FC<ChatProps> = observer(
   ({ aiReady = true, noAccessProps, isAgents }) => {
@@ -120,7 +118,7 @@ const NewChat: React.FC<ChatProps> = observer(
       // doesn't loop.
       if (currentPage === "settings") {
         setCurrentPage("chat");
-        window.DocSpace?.navigate(AI_SETTINGS_URL);
+        openAiSettings();
       }
     }, [currentPage, setCurrentPage]);
 

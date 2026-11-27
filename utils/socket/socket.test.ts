@@ -461,6 +461,20 @@ describe("SocketHelper", () => {
 
   // ── off() ─────────────────────────────────────────────────────────────────
 
+  describe("thread files event", () => {
+    it("is listened to by its server name, with its payload", async () => {
+      const instance = await freshInstance();
+      instance.connect("/socket", "");
+      fire("connection-init");
+      const cb = vi.fn(
+        (data?: { threadId: string; kind: "artifacts" | "attachments" }) =>
+          data?.kind,
+      );
+      instance.on(SocketEvents.ModifyThreadFiles, cb);
+      expect(mockSocket.on).toHaveBeenCalledWith("s:modify-thread-files", cb);
+    });
+  });
+
   describe("off()", () => {
     it("removes queued callback when socket is not ready", async () => {
       const instance = await freshInstance();

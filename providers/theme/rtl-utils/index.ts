@@ -101,10 +101,9 @@ export const getCorrectBorderRadius = (
   return borderRadiusArr.join(" ");
 };
 
-/* Returns system font family for arabic lang */
+/* Returns system font family for arabic lang, in any region or none */
 export const getFontFamilyDependingOnLanguage = (lng: string) => {
-  const arabicLocale = "ar-SA";
-  const shouldUseSystemFont = lng?.toLowerCase() === arabicLocale.toLowerCase();
+  const shouldUseSystemFont = lng?.split("-")[0].toLowerCase() === "ar";
 
   return shouldUseSystemFont ? SYSTEM_FONT_FAMILY : DEFAULT_FONT_FAMILY;
 };

@@ -28,12 +28,12 @@ come from you.
   destinations, some of them with children.
 - Not for a menu that pops open — [`DropDown`](../drop-down/README.md) and
   [`ContextMenu`](../context-menu/README.md) are the floating ones.
-- Not for the portal's own sidebar chrome — [`Article`](../article/README.md) is the panel with the
-  header, the resize handle and the mobile behaviour; this is the list that goes inside it.
+- Not for the sidebar panel itself — [`Article`](../article/README.md) has the header, the resize
+  handle and the mobile behaviour. This is the list that goes inside it.
 - **There is no router.** Give it `LinkRouter` and each entry with `linkData` becomes your link
   component; without it every entry is a `<button>` and `linkData` is ignored.
-- **A section header is never a link.** An item with `children` is always rendered as a button,
-  whatever `linkData` says.
+- **A section header is a link only in the collapsed rail.** Otherwise an item with `children` is
+  always rendered as a button, whatever `linkData` says.
 
 ## Import
 
@@ -45,9 +45,8 @@ Also exported from the root barrel `@onlyoffice/apps-ui-kit`, together with two 
 this folder re-exports — `ArticleHideMenuIcon` and `CatalogSettingsPaymentIcon`.
 
 Needs `ThemeProvider` above it in the tree for every colour it paints. In the collapsed form the
-labels become tooltips through the kit's shared tooltip, which needs `<RootTooltip />` from
-[`Tooltip`](../tooltip/README.md) mounted once near the root of the application — without it a
-collapsed rail has no labels at all.
+labels become the kit's shared tooltips. Those need `<RootTooltip />` from
+[`Tooltip`](../tooltip/README.md) mounted once near the root, or a collapsed rail shows no labels.
 
 ## Minimal example
 
@@ -122,6 +121,8 @@ The `index` module exports a wrapped component, so these are accepted on top of 
 | ----- | ------------------ | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ref` | `Ref<HTMLElement>` | no       | –       | Allows getting a ref to the component instance. Once the component unmounts, React will set `ref.current` to `null` (or call the ref with `null` if you passed a callback ref). |
 
+Plus 53 more props inherited from `React.AriaAttributes`, forwarded to the element.
+
 <!-- props:end -->
 
 ## Recipes
@@ -175,9 +176,9 @@ export function RoutedSidebar({ path }: { path: string }) {
 
 `iconOnly` hides the labels and the sub-menus. The active section's children are flattened into
 the top-level list instead, so the current branch stays reachable.
-Each entry keeps its label as its accessible name and shows it as a tooltip on hover — a link
-entry too, for which `LinkRouter` must pass a `ref` and the props it does not know on to its
-anchor, as react-router's `Link` does.
+Each entry keeps its label as its accessible name and shows it as a tooltip on hover. A link entry
+does too, if `LinkRouter` passes a `ref` and unknown props on to its anchor, as react-router's
+`Link` does.
 
 ```tsx
 import { useState } from "react";
@@ -302,10 +303,10 @@ export function SidebarWithDialog() {
 - **Expansion is the component's own state, and `activeItemId` drives it.** An effect finds the
   section the active id belongs to and opens it — so navigating from outside the menu opens the
   right branch by itself. An id that matches nothing leaves the state untouched.
-- **Desktop and mobile expand differently.** By default only one section is open at a time and the
-  active one cannot be collapsed by clicking it again; with `withExpandControl` each section gets
-  its own chevron, the item body no longer toggles anything, and several sections may be open at
-  once.
+- **By default one section is open at a time**, and clicking the active one again does not close
+  it.
+- **With `withExpandControl` each section gets its own chevron.** The item body toggles nothing,
+  and several sections may be open at once.
 - **A childless active item collapses everything** on the default behaviour — that is how an
   "Overview" entry shuts the open section.
 - **A sub-menu opens with a height and opacity transition**, which `prefers-reduced-motion: reduce`
@@ -317,15 +318,16 @@ export function SidebarWithDialog() {
   the process, and `withTopSeparator` is lost.
 - **`endOfActiveSection`, `isFlattenedChild` and `flattenIndex` are internal.** The component sets
   them while flattening; passing them yourself does nothing outside that mode.
-- **Only a leaf can be a link.** The link branch requires the item to have no children, so a
-  section header is always a `<button>` even when it carries `linkData`.
+- **Only a leaf can be a link.** A section header is a `<button>` even when it carries `linkData`.
+- **The collapsed rail is the exception.** Flattening drops a section's `children`, so a section
+  with `linkData` becomes a link there.
 - **`linkData` without `LinkRouter` is ignored**, silently.
 - **The link navigates; `onClick` is for what goes with it.** A link entry's own click already
-  changes the route, so an `onClick` that navigates as well pushes the same entry twice. A click
-  with Ctrl, Cmd, Shift or Alt is the browser's (a new tab or window) and does not call `onClick`
-  at all; a middle click never reaches it either.
-- **In the collapsed rail the label is a tooltip**, delivered through the kit's shared tooltip —
-  which renders nothing unless `<RootTooltip />` is mounted somewhere in the application.
+  changes the route, so an `onClick` that navigates as well pushes the same entry twice.
+- A click on a link with Ctrl, Cmd, Shift or Alt is left to the browser and does not call
+  `onClick`. A middle click never reaches it either.
+- **In the collapsed rail the label is a tooltip** from the kit's shared tooltip. It renders
+  nothing unless `<RootTooltip />` is mounted somewhere in the application.
 - **`icon` is fetched over the network** as an SVG when the menu renders; `iconNode` is rendered as
   given and wins over it.
 - **Clicks on a badge do not reach the item.** The badge wrapper stops both click and key events, so
@@ -348,11 +350,12 @@ export function SidebarWithDialog() {
 | `--nav-menu-separator-color`        | none — no line is drawn  | Line above a sub-item with `withTopSeparator`                              |
 
 **Every variable but the last is declared on the menu's own `nav` element**, under the theme
-class (`.light .root`, `.dark .root`), so a value set on a wrapper never arrives. Set them in a
-rule that outranks that one and pass its class through `className` — `.light nav.my-nav` does.
+class (`.light .root`, `.dark .root`). A value set on a wrapper never arrives. Set them in a rule
+that outranks that one, on a class passed through `className`: `.light nav.my-nav` does.
 
-`--nav-menu-separator-color` is declared nowhere: the line falls back to `--quick-buttons-color`,
-which the kit does not define either, so without one of the two set there is no line at all.
+`--nav-menu-separator-color` is declared nowhere, so it can be set on the menu or an ancestor. The
+line falls back to `--quick-buttons-color`, which the kit does not define either. With neither set
+there is no line.
 
 The sliding highlight is driven by `--end-width` and `--flatten-index`, which the component sets
 itself on each animated element.
@@ -363,12 +366,13 @@ itself on each animated element.
   announced.
 - Entries are real `<button>`s, or your `LinkRouter` element, and are reachable and operable from
   the keyboard.
-- A section that expands on its own body click carries `aria-expanded`; with `withExpandControl`
+- A section that expands on a click on its body carries `aria-expanded`. With `withExpandControl`
   the flag moves to the chevron, which is labelled with the section's name.
+- A collapsed sub-menu is `inert`, so its entries leave the Tab order and the accessibility tree.
 - Keyboard focus is drawn as a 2px outline inside the entry, in
   `--nav-menu-item-icon-active-color`; the pointer never shows it.
-- **The `<nav>` has no `aria-label`.** Give it one through a wrapper when the page has more than
-  one navigation landmark.
+- **The `<nav>` has no name of its own.** A passed `aria-*` lands on it and is kept, so pass
+  `aria-label` when the page has more than one navigation landmark.
 - **In the collapsed rail the accessible name is the tooltip title.** It is set on the button, so
   it is announced even without the tooltip being mounted — but sighted users see nothing.
 - Group labels are `<span>`s, not headings, and are not tied to their list with

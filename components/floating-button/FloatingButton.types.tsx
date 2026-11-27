@@ -1,7 +1,9 @@
 import type { TColorScheme } from "../../context/ThemeContext";
 import { FloatingButtonIcons } from "./FloatingButton.enums";
 
-export type FloatingButtonProps = {
+export type FloatingButtonProps = Omit<React.AriaAttributes, "aria-label"> & {
+  /** Accessible name of the circle and of its progress bar, in place of `label`. */
+  "aria-label"?: string;
   /** Applied to the circle, not to the wrapper that positions it. */
   id?: string;
   /** Applied to the circle, after the component's own classes. */
@@ -35,7 +37,7 @@ export type FloatingButtonProps = {
   withoutStatus?: boolean;
   /** How much of the ring is filled, 0–100, clamped to that range. An absent `percent` or `0` spins the ring, for a progress not known yet. */
   percent?: number;
-  /** Accessible name of the circle and of its progress bar. Defaults to the icon's name followed by "button" (`"upload button"`), so pass a translated one. */
+  /** Accessible name of the circle and of its progress bar. Defaults to the translated operation of the icon, such as `Common:Upload` for `upload`. */
   label?: string;
   /** Accessible name of the cancel cross. Defaults to the translated "Cancel". */
   cancelLabel?: string;

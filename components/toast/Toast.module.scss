@@ -339,6 +339,15 @@
       }
     }
   }
+
+  // A clicked deck lays its toasts out one under another.
+  &.expanded {
+    @include mixins.tablet-and-below {
+      :global(.Toastify__toast) {
+        position: static;
+      }
+    }
+  }
 }
 
 .toastContent {

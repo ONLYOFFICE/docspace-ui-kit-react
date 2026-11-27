@@ -13,74 +13,69 @@ export type TAvatarModel = { label: string; icon: string } & (
     }
 );
 
-export type AvatarProps = {
+export type AvatarProps = React.AriaAttributes & {
   /**
-   * Diameter of the avatar, from `extraSmall` (24px) to `max` (124px). It also
-   * picks the font size of the initials and the size and offset of the role
-   * icon; `extraSmall` has neither of those, so it fits a picture only.
+   * Diameter of the avatar, from `extraSmall` (24px) to `max` (124px). The
+   * initials and the role badge are sized to match; `extraSmall` has rules for
+   * neither, so it fits a picture only.
    */
   size: AvatarSize;
   /**
    * Which role badge is drawn over the bottom corner. Only `owner` and `admin`
-   * draw anything — every other member, `none` included, renders no badge.
+   * draw one; every other member, `none` included, draws none.
    */
   role: AvatarRole;
   /**
-   * The picture. A React element is rendered as given; a string is a URL, shown
-   * with an `<img>` — except a URL whose path ends in `.svg` (query and
-   * fragment aside; never a `data:` URL), which is fetched and inlined as an
-   * icon unless `isNotIcon` is set, and one containing
-   * `default_user_photo`, which is replaced by the kit's own illustration.
+   * The picture: a React element is rendered as given, a URL as an `<img>`. A
+   * URL whose path ends in `.svg` is drawn as an icon, and one containing
+   * `default_user_photo` becomes the kit's illustration.
    */
   source?: string | React.JSX.Element;
   /**
-   * Name to build initials from when there is no `source`: the first letter of
-   * each word, two at most. Lower case is preserved unless `isGroup` is set.
-   * It is also the picture's `alt` text and, on a clickable avatar, its
-   * accessible name.
+   * Name the initials are built from when there is no `source`. It is also the
+   * picture's `alt` text and, on a clickable avatar, its accessible name.
    */
   userName?: string;
   /**
-   * Shows the edit button over the avatar — a pencil when `hasAvatar`, a plus
-   * otherwise. It is read only at `size` `max`; at any other size nothing is
-   * rendered.
+   * Shows the edit button over the avatar: a pencil when `hasAvatar`, a plus
+   * otherwise. Only `size` `max` draws it; at other sizes it has no effect.
    */
   editing?: boolean;
   /** Shows the kit's own illustration when there is no `source` and no `userName`. */
   isDefaultSource?: boolean;
-  /** Ignored. Nothing reads this prop; the edit button calls `model[0].onClick`. */
-  editAction?: () => void;
   /** Hides the role badge that `role` would otherwise draw. */
   hideRoleIcon?: boolean;
   /** Applied to the avatar element and, again, to the picture inside it. */
   className?: string;
-  /** Ignored. Nothing reads this prop and no `id` reaches the DOM. */
+  /** Id of the outer element. */
   id?: string;
-  /** Ignored. Nothing reads this prop and no inline style reaches the DOM. */
+  /** Inline style of the outer element. */
   style?: React.CSSProperties;
   /**
-   * Renders a tooltip anchored to the role badge. It needs a badge to attach
-   * to, so it does nothing unless `role` is `owner` or `admin`.
+   * Renders a tooltip anchored to the role badge. Without a badge it shows
+   * nothing.
    */
   withTooltip?: boolean;
-  /** Text of that tooltip. */
+  /** Text shown in the badge's tooltip when `withTooltip` is set. */
   tooltipContent?: string;
   /**
-   * Called on a click on the avatar, on Enter or Space while it has focus, and
-   * on a middle-button press. Passing it makes the avatar a button and
-   * replaces the editing behaviour entirely: the upload menu no longer opens.
+   * Called on a click, on Enter or Space while the avatar has focus, and on a
+   * middle-button press. A click on the avatar then opens neither the menu nor
+   * the file dialog; the edit button still does.
    */
   onClick?: (e: React.MouseEvent) => void;
   /** Uppercases the initials and gives them the group background and colour. */
   isGroup?: boolean;
   /** Badge to draw instead of the one `role` would choose. */
   roleIcon?: React.ReactElement;
-  /** Stops a click from opening the upload menu, leaving the avatar inert. */
+  /**
+   * Stops a click on the avatar from opening the menu or the file dialog, and
+   * drops its button role. `onClick` and the edit button still work.
+   */
   noClick?: boolean;
   /**
-   * Whether the user already has a picture. It picks the pencil over the plus,
-   * and decides whether a click opens the menu of `model` or goes straight to
-   * the file dialog.
+   * Whether the user already has a picture. With it, a click opens the menu of
+   * `model` under a pencil; without it, a click runs the first entry, under a plus.
    */
   hasAvatar?: boolean;
   /**
@@ -90,10 +85,9 @@ export type AvatarProps = {
   onChangeFile?: () => void;
 
   /**
-   * Actions of the edit menu, in order. The first entry is the upload action:
-   * it is what a click runs when there is no picture yet, and the entry whose
-   * `key` is `AvatarActionKeys.PROFILE_AVATAR_UPLOAD` is handed the file
-   * input's ref.
+   * Actions of the edit menu, in order. The first entry runs directly when
+   * there is no picture. The entry keyed `PROFILE_AVATAR_UPLOAD` is handed the
+   * file input's ref.
    */
   model?: TAvatarModel[];
   /** Renders a `.svg` source as a picture rather than fetching it as an icon. */

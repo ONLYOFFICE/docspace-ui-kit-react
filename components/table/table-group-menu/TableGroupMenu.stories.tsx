@@ -25,46 +25,46 @@ The Table README describes it in full.`,
   argTypes: {
     isChecked: {
       control: "boolean",
-      description: "Ticks the select-all checkbox",
+      description: "Ticks the select-all checkbox.",
     },
     isIndeterminate: {
       control: "boolean",
       description:
-        "Draws the select-all checkbox partly ticked, for a selection that covers some rows but not all",
+        "Draws the select-all checkbox partly ticked, for a selection that covers some rows but not all.",
     },
     headerMenu: {
       control: false,
       description:
-        "The action buttons, in order; an entry whose `disabled` is set is left out",
+        "The action buttons, in order. An entry whose `disabled` is set is left out.",
     },
     checkboxOptions: {
       control: false,
       description:
-        "Element whose children become the options of the menu the arrow after the checkbox opens",
+        "Element whose children become the options of the menu the arrow after the checkbox opens.",
     },
     withComboBox: {
       control: "boolean",
       description:
-        "Shows the arrow after the checkbox that opens `checkboxOptions`",
+        "Shows the arrow after the checkbox that opens `checkboxOptions`.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     headerLabel: {
       control: "text",
-      description: "Text shown in place of the select-all checkbox",
+      description: "Text shown in place of the select-all checkbox.",
     },
     checkboxMargin: {
       control: "text",
       description:
-        "Space before the checkbox or the label as a CSS length, such as `12px`; tablets and phones always use 24px",
+        "Space before the checkbox or the label as a CSS length, such as `12px`. Tablets and phones always use 24px.",
       table: {
         defaultValue: { summary: "28px" },
       },
     },
     isBlocked: {
       control: "boolean",
-      description: "Greys every action button out and ignores clicks on them",
+      description: "Greys every action button out and ignores clicks on them.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -72,19 +72,19 @@ The Table README describes it in full.`,
     isMobileView: {
       control: "boolean",
       description:
-        "Opens the selection menu and the action menus in their phone form",
+        "Opens the selection menu and the action menus in their phone form.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withoutInfoPanelToggler: {
       control: "boolean",
-      description: "Leaves out the info panel button at the end",
+      description: "Leaves out the info panel button at the end.",
     },
     isInfoPanelVisible: {
       control: "boolean",
       description:
-        "Draws the info panel button in the accent colour on a round background",
+        "Draws the info panel button in the accent colour on a round background.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -92,7 +92,7 @@ The Table README describes it in full.`,
     isCloseable: {
       control: "boolean",
       description:
-        "Adds a cross before the info panel button; it comes together with `onCloseClick`",
+        "Adds a cross before the info panel button. It comes together with `onCloseClick`.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -100,19 +100,19 @@ The Table README describes it in full.`,
     onChange: {
       action: "onChange",
       description:
-        "Called with the new state when the select-all checkbox is clicked",
+        "Called with the new state when the select-all checkbox is clicked.",
     },
     onClick: {
       action: "onClick",
-      description: "Called on a click anywhere in the toolbar",
+      description: "Called on a click anywhere in the toolbar.",
     },
     toggleInfoPanel: {
       action: "toggleInfoPanel",
-      description: "Called when the info panel button is clicked",
+      description: "Called when the info panel button is clicked.",
     },
     onCloseClick: {
       action: "onCloseClick",
-      description: "Called when the cross is clicked",
+      description: "Called when the cross is clicked.",
     },
   },
   decorators: [
@@ -201,6 +201,7 @@ const checkboxOptions = (
 );
 
 export const Default: Story = {
+  name: "Rows selected",
   render: (args: TableGroupMenuProps) => <TableGroupMenu {...args} />,
   args: {
     isChecked: false,
@@ -256,7 +257,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The toolbar a user sees after selecting rows, with the actions that apply to them; change any other prop live in the Controls panel below.",
+          "The toolbar a user sees after selecting rows, with the actions that apply to them.",
       },
       source: {
         code: `<TableGroupMenu
@@ -274,6 +275,7 @@ export const Default: Story = {
 };
 
 export const Checked: Story = {
+  name: "All selected",
   render: (args: TableGroupMenuProps) => <TableGroupMenu {...args} />,
   args: {
     ...Default.args,
@@ -306,6 +308,7 @@ export const Checked: Story = {
 };
 
 export const Indeterminate: Story = {
+  name: "Some selected",
   render: (args: TableGroupMenuProps) => <TableGroupMenu {...args} />,
   args: {
     ...Default.args,
@@ -337,6 +340,7 @@ export const Indeterminate: Story = {
 };
 
 export const WithHeaderLabel: Story = {
+  name: "Label instead of checkbox",
   render: (args: TableGroupMenuProps) => <TableGroupMenu {...args} />,
   args: {
     ...Default.args,
@@ -353,7 +357,7 @@ export const WithHeaderLabel: Story = {
     docs: {
       description: {
         story:
-          "A text in place of the checkbox, for a toolbar that acts on something other than a list of rows the user can select all of (`headerLabel`).",
+          "A text in place of the checkbox (`headerLabel`). It suits a toolbar acting on something other than rows the user can select all of.",
       },
       source: {
         code: `<TableGroupMenu
@@ -370,6 +374,7 @@ export const WithHeaderLabel: Story = {
 };
 
 export const Closeable: Story = {
+  name: "With close cross",
   render: (args: TableGroupMenuProps) => <TableGroupMenu {...args} />,
   args: {
     ...Default.args,
@@ -402,6 +407,7 @@ export const Closeable: Story = {
 };
 
 export const Blocked: Story = {
+  name: "Blocked",
   render: (args: TableGroupMenuProps) => <TableGroupMenu {...args} />,
   args: {
     ...Default.args,
@@ -434,6 +440,7 @@ export const Blocked: Story = {
 };
 
 export const InfoPanelOpen: Story = {
+  name: "Info panel open",
   render: (args: TableGroupMenuProps) => <TableGroupMenu {...args} />,
   args: {
     ...Default.args,
@@ -450,7 +457,7 @@ export const InfoPanelOpen: Story = {
     docs: {
       description: {
         story:
-          "While the info panel is open, its button at the end is drawn in the accent colour on a round background, so the user sees that a click closes the panel (`isInfoPanelVisible`).",
+          "The info panel button in the accent colour on a round background, while the panel is open (`isInfoPanelVisible`). It tells the user a click closes the panel.",
       },
       source: {
         code: `<TableGroupMenu
@@ -466,6 +473,7 @@ export const InfoPanelOpen: Story = {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args: TableGroupMenuProps) => (
     <div dir="rtl" style={{ height: "100%" }}>
       <TableGroupMenu {...args} />
@@ -495,7 +503,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "94px" },
       description: {
         story:
-          "In a right-to-left interface the checkbox moves to the right edge, the actions follow it leftwards and the info panel button sits at the left edge with its icon mirrored.",
+          "In a right-to-left interface the checkbox sits at the right edge and the actions follow it leftwards. The info panel button is at the left edge, its icon mirrored.",
       },
       source: {
         code: `<div dir="rtl">
@@ -507,6 +515,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: (args: TableGroupMenuProps) => (
     <div
       style={

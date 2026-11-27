@@ -17,62 +17,66 @@ const meta = {
   argTypes: {
     min: {
       control: "number",
-      description: "Minimum range value",
+      description: "Lowest value of the range.",
     },
     max: {
       control: "number",
-      description: "Maximum range value",
+      description: "Highest value of the range.",
     },
     step: {
       control: "number",
-      description: "Increment/decrement step size",
+      description:
+        "How far one arrow key moves the handle; a value between steps snaps to the nearest one.",
       table: {
         defaultValue: { summary: "1" },
       },
     },
     value: {
       control: "number",
-      description: "Current slider value",
+      description:
+        "The current value. This is a controlled input; it does not keep its own.",
     },
     isDisabled: {
       control: "boolean",
       description:
-        "Greys the handle and the filled part of the track, blocks dragging and arrow keys, and takes the slider out of the tab order",
+        "Disables the input and pales the handle and the fill; neither the pointer nor the keyboard moves it.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withPouring: {
       control: "boolean",
-      description: "Shows the filled portion of the track",
+      description:
+        "Fills the track to the left of the handle. The fill is computed from `value`, `min` and `max`, and flipped for a right-to-left interface.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     thumbWidth: {
       control: "text",
-      description: "Width of the input thumb",
+      description: "Width of the drag handle, as a CSS length.",
       table: {
         defaultValue: { summary: "24px" },
       },
     },
     thumbHeight: {
       control: "text",
-      description: "Height of the input thumb",
+      description: "Height of the drag handle, as a CSS length.",
       table: {
         defaultValue: { summary: "24px" },
       },
     },
     thumbBorderWidth: {
       control: "text",
-      description: "Border width of the input thumb",
+      description: "Border width of the drag handle, as a CSS length.",
       table: {
         defaultValue: { summary: "6px" },
       },
     },
     runnableTrackHeight: {
       control: "text",
-      description: "Height of the runnable track the thumb slides along",
+      description:
+        "Height of the track the handle runs along, as a CSS length.",
       table: {
         defaultValue: { summary: "8px" },
       },
@@ -80,24 +84,23 @@ const meta = {
     onChange: {
       action: "onChange",
       description:
-        "Called on every move of the handle with the input's change event, whose `target.value` is a string; the handle cannot move without it",
+        "Called on every move of the handle, with the input's change event; `event.target.value` is a string. Without it the handle cannot move.",
     },
     id: {
       control: "text",
-      description:
-        "`id` of the input, for a `<label for>` that gives the slider its name",
+      description: "Applied to the input.",
     },
     className: {
       control: "text",
-      description: "Extra class names added to the input",
+      description: "Applied to the input.",
     },
     style: {
       control: "object",
-      description: "Inline styles applied to the input",
+      description: "Applied to the input.",
     },
     dataTestId: {
       control: "text",
-      description: "`data-testid` of the input",
+      description: "`data-testid` of the input.",
       table: {
         defaultValue: { summary: "slider" },
       },
@@ -113,7 +116,7 @@ const SliderWithState = (props: SliderProps) => {
   const { value: initialValue, onChange } = props;
   const [value, setValue] = useState<number>(initialValue ?? 50);
 
-  // Follows the value control in the Controls panel after the first render.
+  // Follows the value arg after the first render.
   useEffect(() => setValue(initialValue ?? 50), [initialValue]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -168,7 +171,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A 0–100 slider with the track filled up to the handle (`withPouring`), the usual choice for a setting such as volume or zoom; drag the handle or change any other prop live in the Controls panel below.",
+          "A 0–100 slider with the track filled up to the handle (`withPouring`), the usual choice for a setting such as volume or zoom.",
       },
       source: {
         code: `<Slider
@@ -186,6 +189,7 @@ export const Default: Story = {
 };
 
 export const DisabledState: Story = {
+  name: "Disabled",
   render: (args) => <SliderWithState {...args} />,
   play: async ({ canvas, userEvent }) => {
     await expect(canvas.getByRole("slider")).toBeDisabled();
@@ -204,7 +208,7 @@ export const DisabledState: Story = {
     docs: {
       description: {
         story:
-          "For a setting that cannot be changed right now: the handle and the filled part of the track turn paler, the unfilled track stays as it is, and the handle no longer moves by mouse or keyboard (`isDisabled`).",
+          "A disabled slider (`isDisabled`): the handle and the fill turn paler, and the unfilled track stays as it is. Neither the pointer nor the keyboard moves it.",
       },
       source: {
         code: `<Slider min={0} max={100} value={50} withPouring isDisabled />`,
@@ -214,6 +218,7 @@ export const DisabledState: Story = {
 };
 
 export const WithCustomSteps: Story = {
+  name: "Steps of 5",
   render: (args) => <SliderWithState {...args} />,
   play: async ({ canvas }) => {
     const slider = canvas.getByRole("slider");
@@ -236,7 +241,7 @@ export const WithCustomSteps: Story = {
     docs: {
       description: {
         story:
-          "Slider with a custom step size of 5, allowing values of 0, 5, and 10 only.",
+          "A 0–10 slider with a step of 5, so it takes only 0, 5 and 10 (`step`).",
       },
       source: {
         code: `<Slider min={0} max={10} step={5} value={5} withPouring onChange={handleChange} />`,
@@ -246,6 +251,7 @@ export const WithCustomSteps: Story = {
 };
 
 export const WithoutPouring: Story = {
+  name: "Without fill",
   render: (args) => <SliderWithState {...args} />,
   args: {
     min: 0,
@@ -266,7 +272,7 @@ export const WithoutPouring: Story = {
     docs: {
       description: {
         story:
-          "Slider without the pouring (filled track) effect. The track remains a single color.",
+          "A slider with no fill (`withPouring` off): the track stays one colour whatever the value.",
       },
       source: {
         code: `<Slider min={0} max={100} value={50} withPouring={false} onChange={handleChange} />`,
@@ -284,6 +290,7 @@ const CustomSizeTemplate = (args: SliderProps) => {
 };
 
 export const WithCustomSize: Story = {
+  name: "Larger handle and track",
   render: (args) => <CustomSizeTemplate {...args} />,
   args: {
     min: 0,
@@ -309,7 +316,7 @@ export const WithCustomSize: Story = {
     docs: {
       description: {
         story:
-          "Slider with larger custom thumb and track dimensions for improved touch targets.",
+          "A larger handle and a thicker track, for a bigger touch target (`thumbWidth`, `thumbHeight`, `thumbBorderWidth`, `runnableTrackHeight`).",
       },
       source: {
         code: `<Slider
@@ -326,6 +333,7 @@ export const WithCustomSize: Story = {
 
 // Framed on Docs: the theme provider stamps data-dir on <html>, which would flip the whole page.
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl" style={{ width: "300px", padding: "20px" }}>
       <SliderWithState {...args} />
@@ -357,7 +365,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "122px" },
       description: {
         story:
-          "In a right-to-left interface the minimum sits at the right edge: the fill starts there and grows to the left as the handle is dragged left.",
+          "A right-to-left slider: the minimum sits at the right edge, and the fill grows leftwards from there.",
       },
       source: {
         code: `<div dir="rtl">
@@ -369,6 +377,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   play: async ({ canvas }) => {
     const [active] = canvas.getAllByRole("slider");
     await expect(active).toHaveStyle({
@@ -412,9 +421,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
-
-The first slider shows every variable. The second is disabled, to show that the theme does not swap in its own colors there: it mixes the disabled thumb and fill from \`--slider-handle-color\`, so a custom accent survives as a paler version of itself.`,
+        story: `Two sliders under a wrapper that sets every overridable variable. The first shows them all. The second is disabled: its handle and fill are mixed from \`--slider-handle-color\`, so the violet survives as a paler version of itself.`,
       },
       source: {
         code: `<div

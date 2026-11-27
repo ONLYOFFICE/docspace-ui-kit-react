@@ -10,6 +10,8 @@ import { Calendar } from "../calendar";
 import { AddButton } from "../add-button";
 import { SelectedItem } from "../selected-item";
 
+import { pickAriaProps } from "../../utils/aria-props";
+
 import type { DatePickerProps } from "./DatePicker.types";
 import styles from "./DatePicker.module.scss";
 
@@ -35,6 +37,7 @@ const DatePicker = (props: DatePickerProps) => {
     useMaxTime,
   } = props;
 
+  const aria = pickAriaProps(props);
   const calendarRef = useRef<HTMLDivElement | null>(null);
   const selectorRef = useRef<HTMLDivElement | null>(null);
   const selectedItemRef = useRef<HTMLDivElement | null>(null);
@@ -142,9 +145,10 @@ const DatePicker = (props: DatePickerProps) => {
           className={styles.dateSelector}
           onClick={toggleCalendar}
           ref={selectorRef}
+          {...aria}
           data-testid="date-selector"
           role="button"
-          aria-label={selectDateText}
+          aria-label={aria["aria-label"] ?? selectDateText}
           aria-expanded={isCalendarOpen}
           tabIndex={0}
           onKeyDown={onSelectorKeyDown}
@@ -181,10 +185,10 @@ const DatePicker = (props: DatePickerProps) => {
                   className={styles.calendarIcon}
                   data-testid="calendar-icon"
                 />
-                {formatDate(date, "dd MMM yyyy")}
+                {formatDate(date, "dd MMM yyyy", { locale })}
               </span>
             ) : (
-              formatDate(date, "dd MMM yyyy")
+              formatDate(date, "dd MMM yyyy", { locale })
             )
           }
           onClick={toggleCalendar}

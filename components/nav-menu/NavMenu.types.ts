@@ -77,7 +77,7 @@ export type NavMenuGroup = {
   items: NavMenuItem[];
 };
 
-export type NavMenuProps = {
+export type NavMenuProps = React.AriaAttributes & {
   /** The sections of the menu, in order. A group with a `label` renders it as a caption above its items. */
   groups: NavMenuGroup[];
   /** Id of the item or sub-item that is currently open. It highlights that entry and, through an effect, expands the section it belongs to. */

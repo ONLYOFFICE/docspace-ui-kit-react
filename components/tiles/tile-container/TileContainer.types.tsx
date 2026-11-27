@@ -33,7 +33,8 @@ export interface CommonTileProps {
   checked?: boolean;
   /** Whether the tile is the one the keyboard or the context menu is acting on. */
   isActive?: boolean;
-  /** Whether an operation is blocking the tile, which dims it. */
+  /** Stops the tile answering the pointer while an operation runs over it.
+   * The tile looks the same as an idle one. */
   isBlockingOperation?: boolean;
   /** The tile's own content; the first child is the one the tiles treat as their content element. */
   children?: React.ReactNode;
@@ -41,7 +42,7 @@ export interface CommonTileProps {
   indeterminate?: boolean;
   /** The icon beside the checkbox. Without it neither the icon nor the checkbox is rendered. */
   element?: React.ReactNode;
-  /** Badges drawn over the tile. */
+  /** Badges after the tile's name. */
   badges?: React.ReactNode;
   /** Called when the thumbnail is clicked. */
   thumbnailClick?: (e: React.MouseEvent) => void;
@@ -59,30 +60,34 @@ export type TileItemProps = CommonTileProps & {
   item: TileItem;
 };
 
-export type TileContainerProps = {
-  /** The tiles. Each one must carry an `item` prop; a child without it is silently dropped, including plain markup. */
+export type TileContainerProps = React.AriaAttributes & {
+  /** The tiles. A child without an `item` prop is dropped without a word,
+   * plain markup included. */
   children: React.ReactNode;
   /** Added before the component's own class on the outer element. */
   className?: string;
   /** Value of `id` on the outer element.
    * @default "tileContainer" */
   id?: string;
-  /** Inline style of the outer element, and where `--tile-container-gap` goes. */
+  /** Inline style of the outer element, and a place to set the CSS
+   * variables. */
   style?: React.CSSProperties;
-  /** Hands the four groups to `infiniteGrid` instead of wrapping each in its own grid. Without an `infiniteGrid` alongside it the tiles are emitted with no grid at all. */
+  /** Hands the tiles to `infiniteGrid` without the per-group grids. Without
+   * an `infiniteGrid` the tiles are left with no grid at all. */
   useReactWindow?: boolean;
-  /** The virtualising grid to render the tiles into. It is told whether the current run is rooms or templates. */
+  /** The virtualising grid the tiles are rendered into. It is told whether
+   * the listing holds any rooms and any templates. */
   infiniteGrid?: React.ComponentType<{
     children: React.ReactNode;
     isRooms?: boolean;
     isTemplates?: boolean;
   }>;
-  /** Heading above the folders group. It is rendered only when that group has something in it. */
+  /** Heading above the folders group, an `<h1>`. It is rendered only when
+   * that group has something in it. */
   headingFolders?: React.ReactNode;
-  /** Heading above the files group. It is rendered only when that group has something in it. */
+  /** Heading above the files group, an `<h1>`. It is rendered only when that
+   * group has something in it. */
   headingFiles?: React.ReactNode;
-  /** Flips the arrow class on both headings. It sorts nothing. */
-  isDesc?: boolean;
   /** Turns off text selection across the whole container. */
   noSelect?: boolean;
 };

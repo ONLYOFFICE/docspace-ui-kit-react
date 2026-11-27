@@ -45,21 +45,19 @@ const meta = {
     size: {
       control: "select",
       options: Object.values(InputSize),
-      description:
-        "Height and text size of the field, one of the kit's input sizes; required, with no default",
+      description: "Height and type size of the field.",
     },
     value: {
       control: "text",
       description:
-        "The search term. The field keeps its own copy while the user types and takes this value again whenever it changes",
+        "The search term. The field keeps its own copy while the user types and re-seeds it from this prop whenever the prop changes.",
       table: {
         defaultValue: { summary: '""' },
       },
     },
     isDisabled: {
       control: "boolean",
-      description:
-        "Greys the field, blocks typing and hides both the magnifier and the cross",
+      description: "Disables the field and greys it.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -67,7 +65,7 @@ const meta = {
     showClearButton: {
       control: "boolean",
       description:
-        "Shows the cross on an empty field too; while the field holds text the cross is shown either way",
+        "Shows the cross that clears the field. Without it the user has to select and delete the text.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -75,52 +73,52 @@ const meta = {
     autoRefresh: {
       control: "boolean",
       description:
-        "Whether typing calls `onChange` at all. Off does not make the callback immediate: the component stops calling it",
+        "Whether typing triggers the debounced `onChange` at all. Setting it to false does not make the callback immediate — it stops the component calling it entirely.",
       table: {
         defaultValue: { summary: "true" },
       },
     },
     refreshTimeout: {
       control: "number",
-      description:
-        "Milliseconds the user has to stop typing before `onChange` is called",
+      description: "Milliseconds of quiet typing before `onChange` fires.",
       table: {
         defaultValue: { summary: "1000" },
       },
     },
     scale: {
       control: "boolean",
-      description: "Stretches the field to the full width of its container",
+      description: "Makes the field fill the width of its container.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     placeholder: {
       control: "text",
-      description: "Text shown in the empty field",
+      description: "Text shown while the field is empty.",
     },
     onChange: {
       description:
-        "Called with the typed string, not the change event, once typing pauses; never called for the clear button or when `autoRefresh` is off",
+        "Called with the **string** typed, not the change event, unlike every other input in this kit. It waits for `refreshTimeout` of quiet typing. It is not called when `autoRefresh` is false, or when the clear button empties the field.",
     },
     onClearSearch: {
       description:
-        "Called when the cross is clicked; the only signal that the field is now empty",
+        "Called when the clear button is used. `onChange` is deliberately skipped for that transition, so this is the only signal that the search term is now empty.",
     },
     onClick: {
-      description: "Called when the text field is clicked",
+      description: "Called when the field is clicked.",
     },
     onFocus: {
-      description: "Called when the text field receives focus",
+      description: "Called when the field receives focus.",
     },
     children: {
       control: false,
-      description: "Content shown inside the field, before the text",
+      description:
+        "Rendered before the input, inside the same border: `InputBlock`'s prefix.",
     },
     showMainButton: {
       control: "boolean",
       description:
-        "Places the button described by `mainButtonProps` to the left of the field; nothing is shown without those props",
+        'Renders a `MainButton` to the left of the field, for the "create new" action a search bar often sits beside.',
       table: {
         defaultValue: { summary: "false" },
       },
@@ -128,57 +126,59 @@ const meta = {
     mainButtonProps: {
       control: false,
       description:
-        "Props of the button to the left of the field: its text, its dropdown `model`, `isDisabled`; its arrow is always hidden",
+        "Props of the `MainButton` drawn before the field. `showMainButton` is needed too.",
     },
     mainButtonIcon: {
       control: false,
-      description: "Icon shown in that button before its text, 12 by 12 pixels",
+      description: "Icon inside the main button, 12×12; a plus when left out.",
       table: {
         defaultValue: { summary: "plus icon" },
       },
     },
     mainButtonDataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the button's wrapper",
+      description: "Value of `data-testid` on the main button's wrapper.",
     },
     hideField: {
       control: "boolean",
       description:
-        "Leaves the field out, so only the main button is drawn; the block keeps its width",
+        "Leaves the field out, so only the main button is drawn. The block still takes its width, so whatever follows it stays where it was.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     dataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the outer element",
+      description: "Value of `data-testid` on the outer element.",
       table: {
         defaultValue: { summary: '"search-input"' },
       },
     },
     id: {
       control: "text",
-      description: "HTML `id` of the outer element and of the text field",
+      description:
+        "Id of the `<input>`, for a `<label>` or a `FieldContainer`'s `labelFor` to point at.",
     },
     name: {
       control: "text",
-      description: "HTML `name` of the text field",
+      description: "Name under which the term is submitted with a form.",
     },
     tabIndex: {
       control: "number",
-      description: "HTML `tabindex` of the text field",
+      description:
+        "Place of the field in the tab order; left out, the natural one.",
     },
     forwardedRef: {
       control: false,
-      description: "Ref to the text field's `<input>` element",
+      description: "Ref to the `<input>`.",
     },
     className: {
       control: "text",
-      description: "Class added to the outer element",
+      description: "Class added to the outer element.",
     },
     style: {
       control: "object",
-      description: "Inline style of the outer element",
+      description: "Inline style of the outer element.",
     },
   },
   args: {
@@ -321,7 +321,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A search field as it first appears above a list: type to see the magnifier turn into a cross, pause for a second to see `onChange` in the Actions panel, click the cross to see `onClearSearch`; change any other prop live in the Controls panel below.",
+          "A search field as it first appears above a list. Typing turns the magnifier into a cross and calls `onChange` a second later; the cross calls `onClearSearch`.",
       },
       source: {
         code: `const [term, setTerm] = useState("");
@@ -363,7 +363,7 @@ export const Sizes: Story = {
     docs: {
       description: {
         story:
-          "Match the search field to the inputs around it: **Base size** and **Middle size** share the 13px text, **Large size** is taller with 16px text (`size`).",
+          "The three sizes (`size`): **Base size** and **Middle size** share the 13px text, **Large size** is taller with 16px text.",
       },
       source: {
         code: `<SearchInput size={InputSize.base} value="Base size" />
@@ -394,7 +394,7 @@ export const States: Story = {
     docs: {
       description: {
         story:
-          "The looks a search field takes on a page. **Normal** holds text, so it shows the cross that clears it. **Disabled** is greyed, cannot be typed into and shows neither magnifier nor cross (`isDisabled`). **Scaled** fills the width of its container (`scale`); in this grid every field already fills its cell, so the difference shows in a wider container. **Empty with placeholder** shows the magnifier and the placeholder text.",
+          "The looks a search field takes on a page:\n\n- **Normal** — holds text, so it shows the cross that clears it\n- **Disabled** — greyed, no typing, no icon (`isDisabled`)\n- **Scaled** — fills its container (`scale`); here every field already fills its cell\n- **Empty with placeholder** — the magnifier and the placeholder",
       },
       source: {
         code: `<SearchInput value="Normal" />
@@ -425,6 +425,7 @@ const AutoRefreshTemplate = () => {
 };
 
 export const AutoRefreshMode: Story = {
+  name: "Auto-refresh",
   render: () => <AutoRefreshTemplate />,
   play: async ({ canvas, userEvent }) => {
     const [auto, manual] = canvas.getAllByText(/Reported to the parent/);
@@ -447,7 +448,7 @@ export const AutoRefreshMode: Story = {
     docs: {
       description: {
         story:
-          "Decide how the parent hears about the search term. Type into **Type to auto-refresh (1s)**: the line under it catches up a second after you stop (`autoRefresh`, `refreshTimeout`). Type into **No auto-refresh**: the line under it never changes, because with `autoRefresh` off the component does not call `onChange` at all.",
+          "Two fields, each with a line under it showing what `onChange` reported.\n\n- **Type to auto-refresh (1s)** — the line catches up a second after typing stops (`autoRefresh`, `refreshTimeout`)\n- **No auto-refresh** — the line never changes: `onChange` is not called at all",
       },
       source: {
         code: `// With auto-refresh (1s timeout)
@@ -465,6 +466,7 @@ export const AutoRefreshMode: Story = {
 };
 
 export const WithButton: Story = {
+  name: "With create button",
   render: (args) => {
     const [value, setValue] = useState(args.value || "");
 
@@ -509,7 +511,7 @@ export const WithButton: Story = {
     docs: {
       description: {
         story:
-          "Put the create action next to the search it belongs with: the **Create** button with its plus icon sits to the left of the field (`showMainButton`, `mainButtonProps`), and the field takes the rest of the row.",
+          "A **Create** button with a plus icon before the field (`showMainButton`, `mainButtonProps`). The field takes the rest of the row.",
       },
       source: {
         code: `<SearchInput
@@ -528,6 +530,7 @@ export const WithButton: Story = {
 };
 
 export const WithButtonAndMenu: Story = {
+  name: "With create menu",
   render: (args) => {
     const [value, setValue] = useState(args.value || "");
 
@@ -585,7 +588,7 @@ export const WithButtonAndMenu: Story = {
     docs: {
       description: {
         story:
-          "Offer several things to create from one button: click **New** to open its menu of items, one of them with a submenu (`model` in `mainButtonProps`).",
+          "A **New** button whose menu offers several things to create, one with a submenu (`model` in `mainButtonProps`).",
       },
       source: {
         code: `<SearchInput
@@ -612,6 +615,7 @@ export const WithButtonAndMenu: Story = {
 };
 
 export const PersistentClearButton: Story = {
+  name: "Cross on an empty field",
   render: () => (
     <Wrapper>
       <ControlledSearch placeholder="Cross on an empty field" showClearButton />
@@ -630,7 +634,7 @@ export const PersistentClearButton: Story = {
     docs: {
       description: {
         story:
-          "Keep a way out of a search the parent still applies after the field was emptied: **Cross on an empty field** shows the cross with no text in it (`showClearButton`), **Magnifier on an empty field** is the usual look. With text in the field both show the cross.",
+          "Two empty fields. **Cross on an empty field** keeps a way out of a search still applied (`showClearButton`). **Magnifier on an empty field** is the usual look.",
       },
       source: {
         code: `<SearchInput size={InputSize.base} value="" showClearButton placeholder="Cross on an empty field" />
@@ -641,6 +645,7 @@ export const PersistentClearButton: Story = {
 };
 
 export const ContentBeforeText: Story = {
+  name: "Prefix before the text",
   render: () => (
     <Wrapper>
       <ControlledSearch placeholder="Search in this folder">
@@ -672,6 +677,7 @@ export const ContentBeforeText: Story = {
 };
 
 export const DisabledMainButton: Story = {
+  name: "Disabled create button",
   render: (args) => (
     <div style={{ width: "500px" }}>
       <SearchInput
@@ -702,7 +708,7 @@ export const DisabledMainButton: Story = {
     docs: {
       description: {
         story:
-          "Keep the create action in place while it is unavailable: the **Create** button is dimmed (`isDisabled` in `mainButtonProps`), the search field next to it still works.",
+          "A dimmed **Create** button that keeps its place while unavailable (`isDisabled` in `mainButtonProps`). The search field next to it still works.",
       },
       source: {
         code: `<SearchInput
@@ -721,6 +727,7 @@ export const DisabledMainButton: Story = {
 
 // Framed on Docs: the theme provider stamps data-dir on <html>, which would flip the whole page.
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: () => (
     <div dir="rtl" style={{ width: "500px" }}>
       <SearchInput
@@ -750,7 +757,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "58px" },
       description: {
         story:
-          'The same field under a right-to-left interface: the **Create** button moves to the right edge, the cross moves to the left end of the field and the text starts at the right. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+          "The field in a right-to-left interface: **Create** at the right edge, the cross at the left end, the text from the right. The direction comes from the theme's `interfaceDirection` and the wrapper's `dir=\"rtl\"`.",
       },
       source: {
         code: `<div dir="rtl">
@@ -770,6 +777,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   play: async ({ canvas }) => {
     const block = canvas
       .getByPlaceholderText("Custom styled search")
@@ -838,9 +846,11 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
+        story: `Every overridable variable, set on one wrapper.
 
-**Custom styled search** is empty and shows the magnifier color; **With value** holds text and shows the cross color; **With button** carries the main button, for the gap. Hover a field and click into it to see the two other border colors.`,
+- **Custom styled search** — empty, for the magnifier colour
+- **With value** — holds text, for the cross colour
+- **With button** — carries the main button, for the gap`,
       },
     },
   },

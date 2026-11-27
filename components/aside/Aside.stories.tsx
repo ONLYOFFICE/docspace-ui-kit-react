@@ -37,12 +37,12 @@ const meta = {
     visible: {
       control: "boolean",
       description:
-        "Whether the panel is slid into view; the panel and its children stay mounted either way. Required",
+        "Whether the panel is slid in. The panel stays mounted and in the tab order either way, so render the component conditionally to close it.",
     },
     scale: {
       control: "boolean",
       description:
-        "Makes the panel take the full width of the window instead of 480px",
+        "Makes the panel take the full width of the viewport instead of its 480px.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -50,7 +50,7 @@ const meta = {
     zIndex: {
       control: "number",
       description:
-        "Stacking order of the panel; a backdrop of your own needs a lower value",
+        "Stacking order of the panel. A `Backdrop` of your own behind it needs a lower value.",
       table: {
         defaultValue: { summary: "400" },
       },
@@ -58,7 +58,7 @@ const meta = {
     withoutHeader: {
       control: "boolean",
       description:
-        "Renders no header at all, which also removes the close cross, the only control that calls `onClose`",
+        "Renders no header at all — which also removes the only control that calls `onClose`.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -66,7 +66,7 @@ const meta = {
     withoutBodyScroll: {
       control: "boolean",
       description:
-        "Renders the children directly instead of inside the kit's scrollbar; it does not lock the page's scroll",
+        "Renders the children directly instead of inside the kit's `Scrollbar`. It does **not** lock the page's scroll, despite the name.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -74,19 +74,20 @@ const meta = {
     header: {
       control: "text",
       description:
-        "Title of the panel: a string is shown as bold 21px text, any other node inside a heading that cuts off with an ellipsis",
+        "Title of the panel. A string is shown as bold 21px text, any other node in a `Heading` that ends in an ellipsis.",
     },
     isBackButton: {
       control: "boolean",
       description:
-        "Shows a back arrow before the title, which calls `onBackClick`",
+        "Whether a back arrow is rendered before the title. It is mirrored in RTL.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isCloseable: {
       control: "boolean",
-      description: "Shows the close cross, which calls `onClose`",
+      description:
+        "Whether the close cross is rendered. It is the only control that calls `onCloseClick`.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -94,14 +95,15 @@ const meta = {
     isLoading: {
       control: "boolean",
       description:
-        "Replaces the whole header, title, icons and close cross alike, with a skeleton bar",
+        "Replaces the whole header — title, icons and close cross alike — with a skeleton bar. There is no way out of a header that is loading.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withoutBorder: {
       control: "boolean",
-      description: "Hides the line under the header",
+      description:
+        "Hides the bottom border, which otherwise spans the full width of the panel regardless of the header's own side margins.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -109,34 +111,34 @@ const meta = {
     headerHeight: {
       control: "text",
       description:
-        "Height of the header as a CSS length, such as `70px`; without it the header is 53px tall",
+        "Height of the header as a CSS length, such as `70px`. Without it the header is 53px tall.",
     },
     headerIcons: {
       control: false,
       description:
-        "Extra icon buttons between the title and the close cross, each with a `key`, an `onClick` and an `iconNode` or a `url`",
+        "Extra icon buttons between the title and the close cross. Each needs a `key`, an `onClick`, and an `iconNode` or a `url` fetched at runtime; its optional `label` is the button's accessible name.",
     },
     headerComponent: {
       control: false,
       description:
-        "Any node shown in the header after the icons and before the close cross",
+        "Arbitrary node rendered after the icons and before the close cross, for a control that is not an icon.",
     },
     onClose: {
       action: "close clicked",
       description:
-        "Called when the close cross is clicked; nothing else closes the panel",
+        "Called by the header's close cross. Nothing else closes the panel: there is no backdrop, no Escape handling and no click-outside.",
     },
     onBackClick: {
       action: "back clicked",
-      description: "Called when the back arrow is clicked",
+      description: "Called by the back arrow.",
     },
     className: {
       control: "text",
-      description: "Class name added to the `<aside>` element",
+      description: "Applied to the `<aside>` element.",
     },
     children: {
       control: false,
-      description: "Content of the panel, shown below the header",
+      description: "Content of the panel, below the header.",
     },
   },
   args: {
@@ -508,7 +510,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The panel with a title and a short text, opened by the button on the page. Close it with the cross or by clicking the dimmed page — that dimming is a `Backdrop` of the story's own, since `Aside` renders none. Change any other prop live in the Controls panel below.",
+          "The panel with a title and a short text, opened by the button on the page. The cross or a click on the dimmed page closes it; the dimming is the story's own `Backdrop`.",
       },
       source: {
         code: `<Aside visible={isVisible} header="Panel Title" onClose={handleClose}>
@@ -522,6 +524,7 @@ export const Default: Story = {
 };
 
 export const Settings: Story = {
+  name: "Settings panel",
   render: (args) => <Template {...args} />,
   args: {
     visible: false,
@@ -555,6 +558,7 @@ export const Settings: Story = {
 };
 
 export const UserProfile: Story = {
+  name: "User profile",
   render: (args) => <Template {...args} />,
   args: {
     visible: false,
@@ -583,6 +587,7 @@ export const UserProfile: Story = {
 };
 
 export const FileDetails: Story = {
+  name: "File details",
   render: (args) => <Template {...args} />,
   args: {
     visible: false,
@@ -601,7 +606,7 @@ export const FileDetails: Story = {
     docs: {
       description: {
         story:
-          "The details of a selected file — its properties and the people it is shared with — the most common content of a side panel next to a list.",
+          "The details of a selected file: its properties and the people it is shared with. That is the most common content of a side panel next to a list.",
       },
       source: {
         code: `<Aside visible={isVisible} header="File Info" onClose={handleClose}>
@@ -613,6 +618,7 @@ export const FileDetails: Story = {
 };
 
 export const WithBackButton: Story = {
+  name: "With back arrow",
   render: (args) => <Template {...args} />,
   args: {
     visible: false,
@@ -637,7 +643,7 @@ export const WithBackButton: Story = {
     docs: {
       description: {
         story:
-          "A back arrow before the title, for a panel with several levels: the arrow calls `onBackClick`, logged in the Actions panel, while the cross still closes the panel (`isBackButton`).",
+          "A back arrow before the title, for a panel with several levels (`isBackButton`). The arrow calls `onBackClick`, and the cross still closes the panel.",
       },
       source: {
         code: `<Aside visible={isVisible} header="Details" isBackButton onBackClick={handleBack} onClose={handleClose}>
@@ -649,6 +655,7 @@ export const WithBackButton: Story = {
 };
 
 export const WithoutHeader: Story = {
+  name: "Without header",
   render: (args) => <Template {...args} />,
   args: {
     visible: false,
@@ -680,6 +687,7 @@ export const WithoutHeader: Story = {
 };
 
 export const Scaled: Story = {
+  name: "Full width",
   render: (args) => <Template {...args} />,
   args: {
     visible: false,
@@ -716,6 +724,7 @@ const RightToLeftTemplate = (args: AsideProps) => (
 
 // Framed on Docs: the theme provider stamps the direction on the page, which would flip the whole Docs page.
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => <RightToLeftTemplate {...args} />,
   globals: { direction: "rtl" },
   play: async ({ canvas }) => {
@@ -745,7 +754,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "600px" },
       description: {
         story:
-          'The same panel under a right-to-left interface: it is attached to the left edge instead of the right and slides in from there, the back arrow points the other way and the close cross sits on the left of the header. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+          'The same panel under a right-to-left interface, attached to the left edge and sliding in from there. The back arrow points the other way, and the close cross sits on the left. The direction comes from the theme\'s `interfaceDirection`; the wrapper also carries `dir="rtl"`.',
       },
       source: {
         code: `<div dir="rtl">
@@ -792,6 +801,7 @@ const CssCustomizationTemplate = () => (
 
 // Framed on Docs: the panel is fixed to the window and has no height of its own inline.
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => <CssCustomizationTemplate />,
   play: async ({ canvas }) => {
     const aside = canvas.getByTestId("aside");
@@ -808,9 +818,9 @@ export const CssCustomization: Story = {
     docs: {
       story: { inline: false, height: "500px" },
       description: {
-        story: `The panel and its header restyled through CSS variables on one wrapper -- the variables are listed under CSS variables on this page, and the header's on the AsideHeader page.
+        story: `The panel and its header restyled through CSS variables on one wrapper.
 
-The title here is a node rather than a string, so the color and font-size variables reach it. The back arrow is on to show the gap between it and the title; the phone footer offset shows only in a phone-width window. The margin is left alone because the border does not follow it.`,
+The title is a node rather than a string, so the colour and font-size variables reach it. The back arrow shows the gap before the title. The phone footer offset shows only in a phone-width window.`,
       },
       source: {
         code: `<div

@@ -29,7 +29,8 @@ const SelectionArea = ({
   const areaLocation = React.useRef({ x1: 0, x2: 0, y1: 0, y2: 0 });
   const areaRect = React.useRef(new DOMRect());
   const areaRef = React.useRef<null | HTMLDivElement>(null);
-  const arrayOfTypes = React.useRef<TArrayTypes[]>([]);
+  // The height of each group's items, measured from its first element.
+  const arrayOfTypes = React.useRef<{ type: string; itemHeight: number }[]>([]);
   const elemRect = React.useRef({ top: 0, left: 0, width: 0, height: 0 });
   const scrollDelta = React.useRef({ x: 0, y: 0 });
   const scrollElement = React.useRef<null | Element>(null);
@@ -264,15 +265,19 @@ const SelectionArea = ({
     style.height = `${height}px`;
   };
 
-  const frame = React.useCallback(
-    () =>
-      frames(() => {
-        recalculateSelectionAreaRect();
-        updateElementSelection();
-        redrawSelectionArea();
-      }),
-    [recalculateSelectionAreaRect, updateElementSelection],
-  );
+  // One scheduler for the component, so the moves of one frame give one
+  // report and a release cancels the one still scheduled. It runs the latest
+  // work, whatever render scheduled it.
+  const frameWork = React.useRef(() => {});
+  frameWork.current = () => {
+    recalculateSelectionAreaRect();
+    updateElementSelection();
+    redrawSelectionArea();
+  };
+
+  const [scheduler] = React.useState(() => frames(() => frameWork.current()));
+
+  const frame = React.useCallback(() => scheduler, [scheduler]);
 
   const onTapMove = React.useCallback(
     (e: MouseEvent) => {

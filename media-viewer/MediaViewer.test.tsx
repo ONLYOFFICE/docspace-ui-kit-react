@@ -876,6 +876,15 @@ describe("Media viewer menu models", () => {
     },
   );
 
+  it("Mobile menu has no Info row for a host that shows no Info panel", () => {
+    const withPanel = getMobileMediaContextModel(t, mockFile, false, {
+      onShowInfoPanel: () => {},
+    });
+
+    expect(visibleKeys(withPanel)).toContain("room-info");
+    expect(visibleKeys(models.mobile(mockFile))).not.toContain("room-info");
+  });
+
   it("Media viewer menu of an encrypted PDF", () => {
     const pdf = {
       ...renamable,

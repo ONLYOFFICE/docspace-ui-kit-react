@@ -1,6 +1,7 @@
 import { Text } from "../text";
 
 import type { LabelProps } from "./Label.types";
+import { pickAriaProps } from "../../utils/aria-props";
 import { globalColors } from "../../providers/theme";
 
 const Label = (props: LabelProps) => {
@@ -12,7 +13,6 @@ const Label = (props: LabelProps) => {
     isInline = false,
     htmlFor,
     text,
-    display,
     className,
     id,
     style,
@@ -23,12 +23,12 @@ const Label = (props: LabelProps) => {
 
   return (
     <Text
+      {...pickAriaProps(props)}
       as="label"
       id={id}
       style={style}
       htmlFor={htmlFor}
       isInline={isInline}
-      display={display}
       {...errorProp}
       fontWeight={600}
       truncate={truncate}

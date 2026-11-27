@@ -6,7 +6,8 @@ import React, {
   useState,
   useSyncExternalStore,
 } from "react";
-import { cssTransition, ToastContainer } from "react-toastify";
+import { cssTransition, toast, ToastContainer } from "react-toastify";
+import type { Id } from "react-toastify";
 import classNames from "classnames";
 
 import { Portal } from "../portal";
@@ -14,7 +15,6 @@ import { useInterfaceDirection } from "../../context/InterfaceDirectionContext";
 
 import type { ToastProps } from "./Toast.types";
 import styles from "./Toast.module.scss";
-import { useMobileViewport } from "./hooks/useMobileViewport";
 import { getToastClassName } from "./utils/getToastClassName";
 import { useIsServer } from "./hooks/useIsServer";
 import { useCommonTranslation } from "../../utils/i18n";
@@ -22,6 +22,8 @@ import {
   CloseButton,
   DEFAULT_CLOSE_BUTTON_LABEL,
 } from "./sub-components/CloseButton";
+
+const TOAST_CONTAINER_ID = "toast-container";
 
 const Slide = cssTransition({
   enter: "SlideIn",
@@ -58,7 +60,6 @@ const Toast = React.memo(
     const closeButtonLabel =
       labelProp ?? (t("CloseButton") || DEFAULT_CLOSE_BUTTON_LABEL);
     const isServer = useIsServer();
-    const offset = useMobileViewport();
     const { isRTL } = useInterfaceDirection();
 
     const [instance] = useState(() => Symbol("Toast"));
@@ -73,18 +74,24 @@ const Toast = React.memo(
         setInstances(() => instances.splice(instances.indexOf(instance), 1));
     }, [instance]);
 
+    // A click on the deck lays its toasts out one under another, and the deck
+    // closes again once the last of them is gone.
+    const [isExpanded, setIsExpanded] = useState(false);
+
     useEffect(() => {
-      const root = document.documentElement;
+      const shown = new Set<Id>();
 
-      root.style.setProperty("--toast-top-offset", `${offset}px`);
-    }, [offset]);
+      return toast.onChange((item) => {
+        if (item.containerId !== TOAST_CONTAINER_ID) return;
 
-    const handleToastClick = React.useCallback(() => {
-      const toasts = document.getElementsByClassName("Toastify__toast");
-      Array.from(toasts).forEach((toast) => {
-        (toast as HTMLElement).style.setProperty("position", "static");
+        if (item.status === "removed") shown.delete(item.id);
+        else shown.add(item.id);
+
+        if (!shown.size) setIsExpanded(false);
       });
     }, []);
+
+    const handleToastClick = React.useCallback(() => setIsExpanded(true), []);
 
     const renderCloseButton = React.useCallback(
       ({
@@ -100,8 +107,10 @@ const Toast = React.memo(
 
     const element = (
       <ToastContainer
-        containerId="toast-container"
-        className={classNames(className, styles.toast)}
+        containerId={TOAST_CONTAINER_ID}
+        className={classNames(className, styles.toast, {
+          [styles.expanded]: isExpanded,
+        })}
         draggable
         position="top-right"
         toastClassName={getToastClassName}

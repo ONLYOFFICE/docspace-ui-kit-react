@@ -59,17 +59,20 @@ export type EmptyViewLinkType = {
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
   /** Optional CSS class name for styling */
   className?: string;
+  /** Renders the plain anchor even when `LinkRouter` is passed, for a
+   * handler that navigates on its own. */
   isNext?: boolean;
 };
 
 export type EmptyViewItemType = {
   /** Unique identifier for the item */
   key: React.Key;
-  /** Title text to display */
+  /** The bold first line: the view's heading, or an item's name. */
   title: string;
-  /** Description content, can be text or React node */
+  /** The line under the title, as text or a node. */
   description: React.ReactNode;
-  /** Icon component to display */
+  /** Picture above the view's title, or at the start of an item, rendered as
+   * given. Mark it `aria-hidden` when it only decorates. */
   icon: React.ReactElement;
   /** Optional click handler for the item */
   onClick?: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
@@ -100,18 +103,18 @@ export type EmptyViewOptionProps = {
   LinkRouter?: ComponentType<LinkRouterProps>;
 };
 
-export type EmptyViewProps = Omit<
-  EmptyViewItemType,
-  "key" | "onClick" | "disabled" | "model"
-> & {
-  /** Array of options to display, can be null */
-  options: Nullable<EmptyViewOptionsType>;
-  /** Router Link component for navigation */
-  LinkRouter?: ComponentType<LinkRouterProps>;
-  /** Optional CSS class name for wrapper styling */
-  className?: string;
-  /** Optional CSS class name for body styling */
-  bodyClassName?: string;
-  /** Optional content rendered between header and options body */
-  extraContent?: React.ReactNode;
-};
+export type EmptyViewProps = React.AriaAttributes &
+  Omit<EmptyViewItemType, "key" | "onClick" | "disabled" | "model"> & {
+    /** What the user can do next, in the order given, under the description.
+     * `null` leaves the options out. */
+    options: Nullable<EmptyViewOptionsType>;
+    /** Your router's `Link`, used for link options instead of a plain anchor,
+     * so a click does not reload the page. */
+    LinkRouter?: ComponentType<LinkRouterProps>;
+    /** Added to the wrapper. */
+    className?: string;
+    /** Added to the element that holds the options. */
+    bodyClassName?: string;
+    /** Rendered between the header and the options, outside their gap. */
+    extraContent?: React.ReactNode;
+  };

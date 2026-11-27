@@ -9,8 +9,6 @@ export type TextProps = {
   backgroundColor?: string;
   /** Text colour, as an inline style. `Text` declares none of its own and inherits without it. */
   color?: string;
-  /** Ignored. Nothing reads this prop, and it reaches the DOM as an unknown attribute. Use `isInline` or `style`. */
-  display?: string;
   /** Font size, as an inline style. Unset, `Text` is 13px through `--text-size`. */
   fontSize?: string;
   /** Font weight, as an inline style. Ignored while `isBold` is set. Unset, `Text` is 400 through `--text-weight`. */
@@ -19,7 +17,7 @@ export type TextProps = {
   isBold?: boolean;
   /** Renders the text inline instead of as a block — `inline-block` in `Text`, `inline` in `Heading`. */
   isInline?: boolean;
-  /** Renders the text in italics. */
+  /** Slants the text in italics; without it the text stays upright. */
   isItalic?: boolean;
   /** Line height, as an inline style. */
   lineHeight?: string;
@@ -27,7 +25,7 @@ export type TextProps = {
   noSelect?: boolean;
   /** Text alignment, as an inline style. */
   textAlign?: "left" | "center" | "right" | "justify";
-  /** Tooltip text. On a component the kit wraps in its tooltip HOC it is consumed before the element is built and opens the shared tooltip instead, which needs `RootTooltip` mounted; elsewhere it is the native `title` attribute. */
+  /** Tooltip text. On a component wrapped in the kit's tooltip HOC it opens the shared tooltip, which needs `RootTooltip` mounted. Elsewhere it is the native `title` attribute. */
   title?: string;
   /** Added after the component's own classes. */
   className?: string;
@@ -39,7 +37,7 @@ export type TextProps = {
   style?: React.CSSProperties;
   /** Writing direction. `"ltr"` and `"rtl"` set the `dir` attribute; `"auto"` instead wraps the children in a span that takes the pointer events off them. */
   dir?: "ltr" | "rtl" | "auto";
-  /** Text to render. */
+  /** Content of the element: text, or phrasing elements while it is a `<p>`. */
   children?: React.ReactNode;
   /** Called with the event when the element is clicked. */
   onClick?: (e: React.MouseEvent<Element>) => void;

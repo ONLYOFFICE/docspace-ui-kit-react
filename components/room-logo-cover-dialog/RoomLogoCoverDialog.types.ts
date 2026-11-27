@@ -6,8 +6,8 @@ import type { ICover } from "../../types";
 
 export type { ICover };
 
-export type RoomLogoCoverDialogProps = {
-  /** Translation function. The dialog asks it for `Common:RoomCover`, `Common:ApplyButton` and `Common:CancelButton`, and its icon picker for keys outside `Common`, so a portal translation context is required. */
+export type RoomLogoCoverDialogProps = React.AriaAttributes & {
+  /** Translation function for the heading, the buttons and the picker labels, all `Common` keys the kit ships. */
   t: TTranslation;
   /** Whether the dialog is on screen. Opening it remounts the picker, which discards whatever was chosen last time. */
   visible: boolean;
@@ -61,7 +61,7 @@ export type SelectColorProps = {
 };
 
 export type SelectIconProps = {
-  /** Translation function. This picker asks for keys outside the `Common` namespace the kit ships. */
+  /** Translation function, for the `Common:Icon` and `Common:WithoutIcon` labels. */
   t: TTranslation;
   /** Whether the initials are chosen instead of an icon. */
   withoutIcon: boolean;

@@ -71,15 +71,12 @@ const defaultProps = {
     },
   },
   setArticleOpen: vi.fn(),
-  withSendAgain: false,
-  mainBarVisible: false,
   isLiveChatAvailable: true,
   isShowLiveChat: true,
   currentDeviceType: DeviceType.desktop,
   showArticleLoader: false,
   isAdmin: false,
   withCustomArticleHeader: false,
-  withCustomSlot: false,
   isBurgerLoading: false,
   languageBaseName: "en",
   isMobileArticle: false,
@@ -103,6 +100,14 @@ describe("Article", () => {
     vi.clearAllMocks();
     localStorage.clear();
     setDeviceFlags({ isMobile: false, isMobileOnly: false, isIOS: false });
+  });
+
+  it("puts a passed aria-* on the panel", () => {
+    renderComponent({ "aria-describedby": "panel-hint" });
+    expect(screen.getByTestId("article")).toHaveAttribute(
+      "aria-describedby",
+      "panel-hint",
+    );
   });
 
   it("renders without crashing", () => {
@@ -225,95 +230,6 @@ describe("Article", () => {
     expect(setIsMobileArticle).toHaveBeenCalledWith(true);
   });
 
-  it("reschedules tablet height calculation when main bar height is zero", () => {
-    vi.useFakeTimers();
-    const timeoutSpy = vi.spyOn(window, "setTimeout");
-    const getElementByIdSpy = vi
-      .spyOn(document, "getElementById")
-      .mockReturnValue({ offsetHeight: 0 } as HTMLElement);
-
-    renderComponent({ mainBarVisible: true });
-
-    expect(timeoutSpy).toHaveBeenCalledWith(expect.any(Function), 0);
-
-    getElementByIdSpy.mockRestore();
-    timeoutSpy.mockRestore();
-    vi.useRealTimers();
-  });
-
-  it("subtracts main bar height from tablet height when available", () => {
-    const originalUseState = React.useState;
-    const setCorrectTabletHeight = vi.fn();
-    let callIndex = 0;
-    const useStateMock = vi.spyOn(React, "useState").mockImplementation(((
-      initial?: unknown,
-    ) => {
-      const result = originalUseState(initial as never);
-      if (callIndex === 3) {
-        callIndex += 1;
-        return [
-          result[0],
-          setCorrectTabletHeight as React.Dispatch<
-            React.SetStateAction<unknown>
-          >,
-        ];
-      }
-      callIndex += 1;
-      return result;
-    }) as unknown as typeof React.useState);
-
-    const getElementByIdSpy = vi
-      .spyOn(document, "getElementById")
-      .mockReturnValue({ offsetHeight: 120 } as HTMLElement);
-
-    const originalInnerHeight = window.innerHeight;
-    Object.defineProperty(window, "innerHeight", {
-      configurable: true,
-      value: 900,
-    });
-
-    renderComponent({ mainBarVisible: true });
-
-    expect(setCorrectTabletHeight).toHaveBeenCalledWith(780);
-
-    Object.defineProperty(window, "innerHeight", {
-      configurable: true,
-      value: originalInnerHeight,
-    });
-    getElementByIdSpy.mockRestore();
-    useStateMock.mockRestore();
-  });
-
-  it("attaches visualViewport resize listener on supported mobile iOS browsers", () => {
-    const addEventListener = vi.fn();
-    const removeEventListener = vi.fn();
-    const originalViewport = window.visualViewport;
-    Object.defineProperty(window, "visualViewport", {
-      configurable: true,
-      value: { addEventListener, removeEventListener },
-    });
-
-    setDeviceFlags({ isMobile: true, isMobileOnly: false, isIOS: true });
-
-    const { unmount } = renderComponent();
-
-    expect(addEventListener).toHaveBeenCalledWith(
-      "resize",
-      expect.any(Function),
-    );
-
-    unmount();
-    expect(removeEventListener).toHaveBeenCalledWith(
-      "resize",
-      expect.any(Function),
-    );
-
-    Object.defineProperty(window, "visualViewport", {
-      configurable: true,
-      value: originalViewport,
-    });
-  });
-
   it("sets showText to false on tablet when local storage flag is false", () => {
     const setIsMobileArticle = vi.fn();
     const setShowText = vi.fn();
@@ -328,6 +244,17 @@ describe("Article", () => {
 
     expect(setIsMobileArticle).toHaveBeenCalledWith(true);
     expect(setShowText).toHaveBeenCalledWith(false);
+  });
+
+  it("keeps the text on tablet when the local storage flag is not JSON", () => {
+    const setShowText = vi.fn();
+
+    localStorage.setItem("showArticle", "yes");
+
+    renderComponent({ currentDeviceType: DeviceType.tablet, setShowText });
+
+    expect(setShowText).not.toHaveBeenCalledWith(false);
+    localStorage.removeItem("showArticle");
   });
 
   it("shows backdrop on mobile when article is open", () => {

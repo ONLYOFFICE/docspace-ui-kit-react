@@ -59,7 +59,7 @@ const InvoiceRow: React.FC<InvoiceRowProps> = ({
         ) : undefined
       }
     >
-      <RowContent sectionWidth={sectionWidth}>{content}</RowContent>
+      <RowContent>{content}</RowContent>
     </Row>
   );
 };

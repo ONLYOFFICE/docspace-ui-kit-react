@@ -19,7 +19,7 @@ const meta = {
     isChecked: {
       control: "boolean",
       description:
-        "Whether the switch is on; the control is fully controlled, so without `onChange` updating it the switch never moves",
+        "Whether the switch is on. It is fully controlled: without `onChange` the switch shows `isChecked` and never moves on its own.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -27,7 +27,7 @@ const meta = {
     isDisabled: {
       control: "boolean",
       description:
-        "Disables the input, dims the switch and the label, and ignores clicks",
+        "Disables the underlying input and stops pointer events on the whole control, and dims the switch and the label.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -35,7 +35,7 @@ const meta = {
     isLoading: {
       control: "boolean",
       description:
-        "Pulses the knob to show work in progress; it does not disable the control, so a click still reaches `onChange`",
+        "Pulses the knob to show work in progress. It does **not** disable the control — a click during it still reaches `onChange`.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -43,12 +43,12 @@ const meta = {
     label: {
       control: "text",
       description:
-        "Text beside the switch; without it the component is the 28 by 16 pixel switch alone",
+        "Text rendered beside the switch, in a `Text` span. Omit it and the component is the 28×16 switch alone.",
     },
     noAnimation: {
       control: "boolean",
       description:
-        "Moves the knob to its new end instantly instead of sliding it; the loading pulse still animates",
+        "Runs the state transitions with a duration of zero instead of animating them. The animation is otherwise always on.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -64,17 +64,17 @@ const meta = {
     onChange: {
       action: "onChange",
       description:
-        "Called with the checkbox's change event when the switch is clicked; the new state is `event.target.checked`",
+        "Called with the checkbox's change event; the new state is `event.target.checked`. Required in practice, since `isChecked` makes the input controlled.",
     },
     name: {
       control: "text",
       description:
-        "Name of the hidden checkbox input, for a form that reads the control by name",
+        "Name of the hidden checkbox input, for a form that reads the control by name rather than by state.",
     },
     id: {
       control: "text",
       description:
-        "Id put on the outer element and on the inner `<label>`, so it appears twice in the document",
+        "Applied to the outer element **and** to the inner `<label>`, so it appears twice in the document.",
     },
     inputId: {
       control: "text",
@@ -84,16 +84,16 @@ const meta = {
     className: {
       control: "text",
       description:
-        "Class name added to the outer element and to the inner `<label>`",
+        "Applied to the outer element **and** to the inner `<label>`.",
     },
     style: {
       control: "object",
       description:
-        "Inline style of the outer element and of the inner `<label>`, so a margin or a padding takes effect at both levels",
+        "Applied to the outer element **and** to the inner `<label>`, so a margin or a padding set here takes effect at both levels.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the outer element",
+      description: "Value of `data-testid` on the outer element.",
       table: {
         defaultValue: { summary: "toggle-button" },
       },
@@ -101,7 +101,7 @@ const meta = {
     dataTooltipId: {
       control: "text",
       description:
-        "Value of `data-tooltip-id` on the outer element, which a `Tooltip` with the same id uses to open over the control",
+        "Value of `data-tooltip-id` on the outer element, which is how a `Tooltip` elsewhere in the tree anchors itself to this control.",
     },
   },
 } satisfies Meta<typeof ToggleButton>;
@@ -180,7 +180,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A single switch with a label, for one setting that takes effect at once; click it to turn it on, and change any other prop live in the Controls panel below.",
+          "A single switch with a label, for one setting that takes effect at once.",
       },
       source: {
         code: `<ToggleButton label="Toggle me" isChecked={isOn} onChange={handleChange} />`,
@@ -238,6 +238,7 @@ const StatesTemplate = () => {
 };
 
 export const CheckedStates: Story = {
+  name: "Off and on",
   render: () => <StatesTemplate />,
   play: async ({ canvas }) => {
     await expect(
@@ -275,6 +276,7 @@ const DisabledTemplate = () => {
 };
 
 export const DisabledStates: Story = {
+  name: "Disabled",
   render: () => <DisabledTemplate />,
   play: async ({ canvas, userEvent }) => {
     const off = canvas.getByRole("checkbox", { name: "Disabled off" });
@@ -315,6 +317,7 @@ const LoadingTemplate = () => {
 };
 
 export const LoadingState: Story = {
+  name: "Loading",
   render: () => <LoadingTemplate />,
   play: async ({ canvas, userEvent }) => {
     // Loading only pulses the knob: the switch still takes a click.
@@ -326,7 +329,7 @@ export const LoadingState: Story = {
   parameters: {
     docs: {
       description: {
-        story: `A setting whose change is still being saved: the knob pulses until the work is done (\`isLoading\`). The switch still takes clicks, so the caller decides whether to ignore them.
+        story: `Settings whose change is still being saved: the knob pulses (\`isLoading\`). The switch still takes clicks.
 
 - **Loading unchecked** — the knob pulses at the start of the grey track
 - **Loading checked** — the knob pulses at the end of the accent track`,
@@ -349,6 +352,7 @@ const NoAnimationTemplate = () => {
 };
 
 export const WithoutAnimation: Story = {
+  name: "Without animation",
   render: () => <NoAnimationTemplate />,
   play: async ({ canvas, userEvent }) => {
     // The knob lands in place at once: a frame after the click it is where
@@ -370,7 +374,7 @@ export const WithoutAnimation: Story = {
     docs: {
       description: {
         story:
-          "For a list of many switches or a reduced-motion setting: click either switch and the knob jumps to the other end instead of sliding there (`noAnimation`).",
+          "Switches whose knob jumps to the other end instead of sliding (`noAnimation`), for a long list of switches or a reduced-motion setting.",
       },
       source: {
         code: `<ToggleButton label="No animation off" isChecked={false} noAnimation onChange={handleChange} />
@@ -381,6 +385,7 @@ export const WithoutAnimation: Story = {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: () => (
     <div dir="rtl">
       <Wrapper>
@@ -404,7 +409,7 @@ export const RightToLeft: Story = {
       // Framed: an inline RTL story would flip the whole Docs page.
       story: { inline: false, height: "44px" },
       description: {
-        story: `The same switches in a right-to-left interface: the label moves to the left of the switch, and the track is mirrored, so the knob of the off switch sits at the right end and the knob of the on switch at the left. The wrapper carries \`dir="rtl"\` for the label's side; the mirrored track comes from the theme's \`interfaceDirection\` (the Direction toolbar).`,
+        story: `Two switches in a right-to-left interface, with the label to the left of the switch and the track mirrored. The wrapper's \`dir="rtl"\` moves the label; the theme's \`interfaceDirection\` mirrors the track.`,
       },
       source: {
         code: `<div dir="rtl">
@@ -417,6 +422,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   play: async ({ canvas }) => {
     const track = (label: string) =>
       getComputedStyle(switchOf(canvas, label).querySelector("rect") as Element)
@@ -452,9 +458,9 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
+        story: `Every overridable variable, set on one wrapper, with a wider gap before the labels.
 
-- **Off** is there for \`--toggle-button-off-color\`; hover it to see \`--toggle-button-off-hover-color\`
+- **Off** is there for \`--toggle-button-off-color\`, and for \`--toggle-button-off-hover-color\` under the pointer
 - **On** is there for \`--toggle-button-checked-color\`
 - Both labels sit 16px from their switch (\`--toggle-button-spacing\`)`,
       },

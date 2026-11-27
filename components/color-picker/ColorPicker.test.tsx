@@ -133,6 +133,21 @@ describe("ColorPicker component", () => {
     );
   });
 
+  it("puts a passed aria-* on the group, its aria-label over ariaLabel", () => {
+    render(
+      <ColorPicker
+        {...defaultProps}
+        ariaLabel="Colour"
+        aria-label="Accent colour"
+        aria-describedby="accent-hint"
+      />,
+    );
+
+    expect(
+      screen.getByRole("group", { name: "Accent colour" }),
+    ).toHaveAttribute("aria-describedby", "accent-hint");
+  });
+
   it("takes translated names for the group, the field and the cross", () => {
     render(
       <ColorPicker

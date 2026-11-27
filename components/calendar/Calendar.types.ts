@@ -1,6 +1,6 @@
 import type { DateTime } from "luxon";
 
-export interface CalendarProps {
+export interface CalendarProps extends React.AriaAttributes {
   /** Applied to the outermost element. */
   className?: string;
   /** Applied to the outermost element. */
@@ -11,8 +11,8 @@ export interface CalendarProps {
    */
   locale: string;
   /**
-   * The highlighted day, as a Luxon `DateTime`. Its **time** is kept when
-   * another day is picked — only the date part is replaced.
+   * The highlighted day, as a Luxon `DateTime`. Its hours and minutes are kept
+   * when another day is picked; only the date part is replaced.
    */
   selectedDate: DateTime;
   /**
@@ -23,8 +23,8 @@ export interface CalendarProps {
   /** Called with the newly picked day, before `onChange`. */
   setSelectedDate?: (formattedDate: DateTime) => void;
   /**
-   * Earliest selectable day. Days before it are greyed and the header arrows
-   * stop at its month.
+   * Earliest selectable day; its own day stays selectable, whatever its time.
+   * Days before it are greyed, and the header arrows stop at its month.
    */
   minDate?: DateTime | Date;
   /** Latest selectable day, with the same effect at the other end. */

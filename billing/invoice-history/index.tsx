@@ -270,7 +270,6 @@ const InvoiceHistory = () => {
         directionY="both"
         noBorder={false}
         dropDownMaxHeight={300}
-        showDisabledItems
         size={ComboBoxSize.content}
         scaled={false}
         dataTestId="invoice_initiator_combobox"

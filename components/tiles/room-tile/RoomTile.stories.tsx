@@ -72,7 +72,7 @@ const meta = {
     checked: {
       control: "boolean",
       description:
-        "Ticks the checkbox and keeps it in place of the logo, and tints the tile and its tags",
+        "Ticks the checkbox and keeps it in place of the logo, and tints the tile and its tags.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -80,7 +80,7 @@ const meta = {
     isActive: {
       control: "boolean",
       description:
-        "Keeps the hover background and the tag tint on the tile being acted on",
+        "Keeps the hover background and the tag tint on the tile being acted on.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -88,7 +88,7 @@ const meta = {
     isBlockingOperation: {
       control: "boolean",
       description:
-        "Stops the tile answering hover, clicks and right-clicks; it looks the same as an idle tile",
+        "Stops the tile answering hover, clicks and right-clicks while an operation runs over it. The tile looks the same as an idle one.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -96,14 +96,15 @@ const meta = {
     indeterminate: {
       control: "boolean",
       description:
-        "Draws the checkbox half-filled; it shows while the checkbox does, that is on hover or when the tile is checked",
+        "Draws the checkbox half-filled. It shows while the checkbox does: on hover, or when the tile is checked.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     inProgress: {
       control: "boolean",
-      description: "Replaces the logo and the checkbox with a small loader",
+      description:
+        "Replaces the logo and the checkbox with a small loader, and sets `aria-busy` on the tile.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -111,7 +112,7 @@ const meta = {
     showHotkeyBorder: {
       control: "boolean",
       description:
-        "Turns the tile's border the accent colour, to mark the one the keyboard is on",
+        "Draws the accent border that marks the tile the keyboard is on.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -119,7 +120,7 @@ const meta = {
     isEdit: {
       control: "boolean",
       description:
-        "Removes the logo and the checkbox while the room is renamed, and stops hovering from tinting the tile",
+        "Renaming state: removes the logo and the checkbox, and stops hover from tinting the tile and its tags.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -128,66 +129,67 @@ const meta = {
       // The icons are data URIs too long to edit, and they stretch the table.
       control: false,
       description:
-        "The room the tile stands for, passed back through the callbacks. Its `tags`, `providerType` and `isAIAgent` decide the tag row; a `contextOptions` key on it is what draws the three-dot button",
+        "The room the tile stands for, passed back through the callbacks. Its `tags`, `providerType` and `isAIAgent` decide the tag row.",
     },
     children: {
       control: false,
       description:
-        "The name beside the logo, usually a `TileContent`; only the first element is shown",
+        "The name beside the logo, usually a `TileContent`. Only the first element is rendered.",
     },
     element: {
       control: false,
       description:
-        "The room logo beside the name; without it the tile has neither the logo nor the checkbox",
+        "The room logo beside the name. Without it the tile has neither the logo nor the checkbox.",
     },
     badges: {
       control: false,
       description:
-        "Badges after the name; give their wrapper the class `badges` so clicking them does not open the room",
+        "Badges after the name. Give their wrapper the class `badges`, so a click on them does not open the room.",
     },
     columnCount: {
       control: "number",
       description:
-        "How many columns the tag row has to fit into; the row shows as many tags as the width allows and folds the rest",
+        "How many columns the tag row fits into. The row shows as many tags as the width allows and folds the rest into a menu.",
     },
     contextOptions: {
       control: "object",
-      description: "Entries of the menu opened by the three-dot button",
+      description:
+        "Draws the three-dot button when non-empty and `item` has a `contextOptions` key. The menu lists `getContextModel`'s entries, not these.",
     },
     getContextModel: {
       control: false,
       description:
-        "Returns the entries of the menu opened by a right-click; without it a right-click opens nothing",
+        "Returns the menu's entries. Without it neither the three-dot button nor a right-click opens anything.",
     },
     getRoomTypeName: {
       control: false,
       description:
-        "Turns the room type into the label of the tag shown when the room has no tags of its own",
+        "Turns a room type into the label of the tag a room without tags of its own gets. It receives the kit's translation function.",
     },
     customBottomContent: {
       control: false,
       description:
-        "Draws the bottom row instead of the tags; called on every render with the hover state and the tags the tile worked out",
+        "Draws the bottom row instead of the tags. It is called on every render with the hover state and the tags the tile worked out.",
     },
     onSelect: {
       description:
-        "Called with the new checked state and the item from the checkbox, and when the logo is tapped on a phone",
+        "Called with the new checked state and the `item` when the checkbox changes, or when the logo is tapped at 600px or narrower.",
     },
     thumbnailClick: {
       description:
-        "Called with the event on a click anywhere on the tile except the checkbox, the tags, the badges and the menu; it is the room's open handler",
+        "The room's open handler, called with the event on a click on the tile. Clicks on the checkbox, the tags, the badges and the menu do not reach it.",
     },
     selectTag: {
       description:
-        "Called with a clicked tag of the room's own, plain text tags included; the generated tags go to `selectOption`",
+        "Called with `{ label, roomType, providerType }` when one of the room's own tags is clicked. The generated tags go to `selectOption`.",
     },
     selectOption: {
       description:
-        "Called when the type tag or the third-party tag is clicked, with which of the two it was",
+        "Called when a generated tag is clicked: `typeProvider` for the storage tag, `defaultTypeRoom` for the room-type tag.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the outer element",
+      description: "Value of `data-testid` on the outer element.",
       table: {
         defaultValue: { summary: '"tile"' },
       },
@@ -241,6 +243,7 @@ const Template = ({
 };
 
 export const Default: Story = {
+  name: "Room with one tag",
   render: Template,
   args: {
     item: {
@@ -273,7 +276,8 @@ export const Default: Story = {
     await expect(args.thumbnailClick).toHaveBeenCalledTimes(1);
 
     // The tag and the badge have their own handlers; neither opens the room.
-    await userEvent.click(within(tile).getByText("Collaboration"));
+    // The label lets the pointer through to the tag, so click the tag.
+    await userEvent.click(within(tile).getByTestId("tag_item_Collaboration"));
     await expect(args.selectTag).toHaveBeenCalledWith(
       expect.objectContaining({ label: "Collaboration" }),
     );
@@ -308,7 +312,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A room with one tag: the logo, the name with a pin badge, the menu, and the tag row below. Hover the logo and tick the checkbox to select the room, click anywhere else or on the tag to see the callbacks in the Actions panel, and change any other prop live in the Controls panel below.",
+          "A room with one tag: the logo, the name with a pin badge, the three-dot button, and the tag row below. The checkbox replaces the logo on hover.",
       },
       source: {
         code: `<RoomTile
@@ -332,6 +336,7 @@ export const Default: Story = {
 };
 
 export const Checked: Story = {
+  name: "Selected",
   render: Template,
   args: {
     ...Default.args,
@@ -348,7 +353,7 @@ export const Checked: Story = {
     docs: {
       description: {
         story:
-          "A selected room, as it looks among others the reader has picked: the checkbox stays ticked in place of the logo and the tile and its tags are tinted (`checked`).",
+          "A selected room (`checked`). The ticked checkbox stays in place of the logo, and the tile and its tags are tinted.",
       },
       source: {
         code: `<RoomTile
@@ -368,6 +373,7 @@ export const Checked: Story = {
 };
 
 export const InProgress: Story = {
+  name: "Busy",
   render: Template,
   args: {
     ...Default.args,
@@ -403,6 +409,7 @@ export const InProgress: Story = {
 };
 
 export const BlockingOperation: Story = {
+  name: "Blocked by an operation",
   render: Template,
   args: {
     ...Default.args,
@@ -417,7 +424,7 @@ export const BlockingOperation: Story = {
     docs: {
       description: {
         story:
-          "A room an operation is running over, which must not be picked or opened until it ends: hover it, click it or right-click it and nothing happens (`isBlockingOperation`). It looks the same as an idle room, so show the operation somewhere else.",
+          "A room an operation is running over (`isBlockingOperation`). The tile ignores the pointer until it ends, and it looks the same as an idle room, so show the operation somewhere else.",
       },
       source: {
         code: `<RoomTile
@@ -436,6 +443,7 @@ export const BlockingOperation: Story = {
 };
 
 export const GeneratedTags: Story = {
+  name: "Tags made by the tile",
   render: Template,
   args: {
     ...Default.args,
@@ -480,7 +488,7 @@ export const GeneratedTags: Story = {
     docs: {
       description: {
         story:
-          "A room with no tags of its own, kept on a connected storage: the tile makes two tags for it: first the storage, drawn as its icon alone (`providerType`, `thirdPartyIcon`), then the room type (`getRoomTypeName`). Click either to see `selectOption` in the Actions panel.",
+          "A room on a connected storage, with no tags of its own. The tile makes two tags: the storage as its icon alone (`providerType`, `thirdPartyIcon`), then the room type (`getRoomTypeName`). A click on either calls `selectOption`.",
       },
       source: {
         code: `<RoomTile
@@ -501,6 +509,7 @@ export const GeneratedTags: Story = {
 };
 
 export const WithHotkeyBorder: Story = {
+  name: "Keyboard border",
   render: Template,
   args: {
     ...Default.args,
@@ -534,6 +543,7 @@ export const WithHotkeyBorder: Story = {
 };
 
 export const RenamingState: Story = {
+  name: "Renaming",
   render: Template,
   args: {
     ...Default.args,
@@ -550,7 +560,7 @@ export const RenamingState: Story = {
     docs: {
       description: {
         story:
-          "A room whose name is being edited: the logo and the checkbox go, so the name can become a text field, and hovering no longer tints the tile (`isEdit`).",
+          "A room whose name is being edited (`isEdit`). The logo and the checkbox go, so the name can become a text field. The tile keeps its idle background under the pointer.",
       },
       source: {
         code: `<RoomTile
@@ -573,6 +583,7 @@ export const RenamingState: Story = {
 };
 
 export const CustomBottomRow: Story = {
+  name: "Custom bottom row",
   render: Template,
   args: {
     ...Default.args,
@@ -595,7 +606,7 @@ export const CustomBottomRow: Story = {
     docs: {
       description: {
         story:
-          "A room whose bottom row is the host's own: here a line of text that counts the tags and changes when the pointer is over the tile (`customBottomContent`). The tile no longer draws its tags.",
+          "A room whose bottom row is the host's own (`customBottomContent`): a line that counts the tags and changes while the pointer is over the tile. The tile draws no tags.",
       },
       source: {
         code: `<RoomTile
@@ -616,6 +627,7 @@ export const CustomBottomRow: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={
@@ -687,7 +699,7 @@ export const CssCustomization: Story = {
         story: `The variables are listed under CSS variables on this page.
 
 Two instances:
-- **Sample Room** — for every variable but the hotkey colour; hover it for \`--tile-hover-bg\` and \`--tile-tag-hover-bg\`.
+- **Sample Room** — every variable but the hotkey colour; \`--tile-hover-bg\` and \`--tile-tag-hover-bg\` show on hover.
 - **Team Room** — \`showHotkeyBorder\`, for \`--tile-hotkey-color\`.`,
       },
       source: {

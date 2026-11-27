@@ -21,7 +21,7 @@ const meta = {
     isVertical: {
       control: "boolean",
       description:
-        "When true, displays label above the input field instead of beside it",
+        "Stacks the label above the control. Off, the label sits beside it, down to tablet width",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -29,7 +29,7 @@ const meta = {
     isRequired: {
       control: "boolean",
       description:
-        "When true, displays a required field indicator (*) next to the label",
+        "Indicates that the field is required: an asterisk after the caption, and `aria-required` on the control in the field body",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -37,21 +37,23 @@ const meta = {
     hasError: {
       control: "boolean",
       description:
-        "When true, shows `errorMessage` under the field. The child control is not restyled; give it its own error flag",
+        "Indicates that the field has an error state: `aria-invalid` on the control in the field body, and the error message when `errorMessage` is set",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     labelVisible: {
       control: "boolean",
-      description: "Controls visibility of the field label",
+      description:
+        "Shows the label block: the caption, the required marker and the help button. Without it `labelText` renders nothing",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     removeMargin: {
       control: "boolean",
-      description: "When true, removes the default margin around the container",
+      description:
+        "Drops the container's own 16px bottom margin, for a parent that spaces the fields itself",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -59,36 +61,38 @@ const meta = {
     inlineHelpButton: {
       control: "boolean",
       description:
-        "When true, the help button is rendered inside the label element, after its text, instead of as a separate element next to the label",
+        "Draws the help button inside the label, after its text, instead of beside it",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     labelText: {
       control: "text",
-      description: "Text content of the field label",
+      description:
+        "Caption of the field, as text or an element; shown only with `labelVisible`",
     },
     tooltipContent: {
       control: "text",
       description:
-        "Content of the tooltip that opens when the help icon is clicked. Without it no help icon is rendered",
+        "Text or element of the help button's tooltip. Without it there is no help button",
     },
     maxLabelWidth: {
       control: "text",
       description:
-        "Width of the label column in the side-by-side layout: the label takes exactly this width, so the controls of stacked fields line up. Has no effect in the vertical layout",
+        "Width of the label column, as a CSS length; only the horizontal arrangement reads it",
       table: {
         defaultValue: { summary: "110px" },
       },
     },
     errorMessage: {
       control: "text",
-      description: "Error message to display when hasError is true",
+      description:
+        "Message under the control, shown only while `hasError` is set",
     },
     errorMessageWidth: {
       control: "text",
       description:
-        "Width of the error message container. Can be any valid CSS width value",
+        "Width of the box the error message wraps inside, as a CSS length",
       table: {
         defaultValue: { summary: "293px" },
       },
@@ -96,54 +100,49 @@ const meta = {
     errorColor: {
       control: "color",
       description:
-        "Colour of the error message text. The theme's error colour when not given",
+        "CSS colour of the error message, over the theme's error colour",
     },
     place: {
       control: "select",
       options: ["top", "right", "bottom", "left"],
-      description: "Position of the tooltip relative to the help icon",
+      description: "Side of the help button its tooltip prefers",
       table: {
         defaultValue: { summary: "bottom" },
       },
     },
     className: {
       control: "text",
-      description: "Additional CSS class names to apply to the container",
+      description: "Class added to the container",
     },
     style: {
       control: "object",
-      description: "Custom inline styles to apply to the container",
+      description:
+        "Inline style of the container, applied to the error message as well",
     },
     labelFor: {
       control: "text",
       description:
-        "`id` of the control this labels, which becomes the label's `for`. Give the control the same `id` and clicking the caption focuses it",
+        "`id` of the control this labels, which becomes the label's `for`. Give the control that same `id` and the caption becomes clickable and is announced with the field; without it the label captions nothing.",
     },
     id: {
       control: "text",
-      description: "HTML `id` of the container",
+      description: "Id of the container",
     },
     tooltipClass: {
       control: "text",
-      description: "Additional CSS class names for the help button",
-    },
-    tooltipMaxWidth: {
-      control: "text",
-      description:
-        "Maximum width of the tooltip. Currently has no effect: the label it is passed to does not read it",
+      description: "Class added to the help button",
     },
     dataTestId: {
       control: "text",
       description:
-        "`data-testid` of the container. The help button, when there is one, gets `<dataTestId>_help_button`",
+        "`data-testid` of the container. The help button, when there is one, gets `<dataTestId>_help_button`.",
       table: {
         defaultValue: { summary: "field-container" },
       },
     },
     children: {
       control: false,
-      description:
-        "The form control the container lays out, rendered in the field body above the error message",
+      description: "The control the container labels, with anything around it",
     },
   },
 } satisfies Meta<typeof FieldContainer>;
@@ -209,7 +208,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The label sits in a fixed-width column beside the control, with a help icon that opens a tooltip on click. Click the caption to focus the input (`labelFor`); change any other prop live in the Controls panel below.",
+          "A label in a fixed-width column beside the control, with a help icon that opens a tooltip on click. The caption focuses the input when clicked (`labelFor`).",
       },
       source: {
         code: `<FieldContainer
@@ -250,7 +249,7 @@ export const Required: Story = {
     docs: {
       description: {
         story:
-          "Marks a field the form cannot be sent without: an asterisk follows the caption, and the input gets `aria-required`, so it is announced as required (`isRequired`).",
+          "A field the form cannot be sent without (`isRequired`). An asterisk follows the caption, and the input gets `aria-required`, so it is announced as required.",
       },
       source: {
         code: `<FieldContainer
@@ -267,6 +266,7 @@ export const Required: Story = {
 };
 
 export const WithError: Story = {
+  name: "With error",
   render: Template,
   play: async ({ canvas }) => {
     await expect(canvas.getByText("This field is required")).toBeVisible();
@@ -307,6 +307,7 @@ export const WithError: Story = {
 };
 
 export const VerticalLayout: Story = {
+  name: "Vertical",
   render: Template,
   play: async ({ canvas }) => {
     await expect(canvas.getByTestId("field-container")).toHaveAttribute(
@@ -344,6 +345,7 @@ export const VerticalLayout: Story = {
 };
 
 export const WithInlineHelp: Story = {
+  name: "Help inside the label",
   render: Template,
   play: async ({ canvas }) => {
     // inlineHelpButton puts the help icon inside the label itself.
@@ -361,7 +363,7 @@ export const WithInlineHelp: Story = {
     docs: {
       description: {
         story:
-          "Makes the help icon part of the caption: it is rendered inside the label, after its text, so it follows the caption's own layout instead of standing as a separate element beside it (`inlineHelpButton`).",
+          "A help icon inside the label, after its text (`inlineHelpButton`). It follows the caption's own layout instead of standing beside it.",
       },
       source: {
         code: `<FieldContainer
@@ -378,6 +380,7 @@ export const WithInlineHelp: Story = {
 };
 
 export const CustomStyling: Story = {
+  name: "Custom style",
   // The story paints its own light page, so the dark picture for the API
   // site is unreadable; the story stays, its picture does not.
   tags: ["no-picture"],
@@ -481,6 +484,7 @@ const CssCustomizationTemplate = () => {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   render: () => <CssCustomizationTemplate />,
   play: async ({ canvas }) => {
     const error = canvas.getByText("Name must be at least 3 characters");
@@ -498,7 +502,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
+        story: `Every overridable variable, set on one wrapper.
 
 - **Full Name** — the error message shows the custom colour and top padding
 - **Email** — the gap between the two fields is the custom container margin`,

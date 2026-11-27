@@ -104,6 +104,7 @@ const LanguageSwitch = () => {
 };
 
 export const Default: Story = {
+  name: "Language switch",
   render: () => <LanguageSwitch />,
   play: async ({ canvas, userEvent }) => {
     for (const label of ["Save", "Cancel", "Delete", "Settings"]) {
@@ -122,7 +123,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Pick a language and the same keys resolve against its bundle. `locale` selects the language, `translations` maps each language to its namespaces.",
+          "Four buttons labelled in English, under a switch between English and German. The same keys resolve against the chosen language's bundle in `translations`.",
       },
       source: {
         code: `const translations = new Map([
@@ -139,6 +140,7 @@ export const Default: Story = {
 };
 
 export const WithoutTranslations: Story = {
+  name: "Without translations",
   decorators: [
     (Story) => (
       <TranslationProvider>
@@ -160,7 +162,7 @@ export const WithoutTranslations: Story = {
     docs: {
       description: {
         story:
-          "When no translations are provided, the provider renders children directly without i18n.",
+          "A paragraph under a provider with no `translations`. The children render as they are, with no i18n instance installed.",
       },
     },
   },

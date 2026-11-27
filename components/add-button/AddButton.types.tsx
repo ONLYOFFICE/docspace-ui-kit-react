@@ -1,7 +1,7 @@
-export type AddButtonProps = {
+export type AddButtonProps = React.AriaAttributes & {
   /** Tooltip shown on hover, through the kit's own tooltip rather than the browser's. */
   title?: string;
-  /** Called with the event when the square or the label is clicked, and on Enter when the wrapper has focus. */
+  /** Called with the event when the square or the label is clicked, and on Enter or Space when the wrapper has focus. */
   onClick?: (e: React.MouseEvent) => void;
   /** Whether the button is inert: the icon greys out, the label dims and clicks are dropped. */
   isDisabled?: boolean;

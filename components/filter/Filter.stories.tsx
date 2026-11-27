@@ -363,266 +363,266 @@ const meta = {
     placeholder: {
       control: "text",
       description:
-        "Placeholder of the search box; nothing translates it for you",
+        "Placeholder of the search box. Nothing translates it for you.",
     },
     onSearch: {
       action: "onSearch",
       description:
-        "Called with the search string itself once typing pauses for a second, and with an empty string when the cross in the box is clicked",
+        'Called with the search string, not an event, a second after typing stops. The cross calls it with `""` at once.',
     },
     onClearFilter: {
       action: "onClearFilter",
       description:
-        "Called when the search box is emptied because `clearSearch` was raised",
+        "Called when the search box is cleared through `clearSearch`.",
     },
     clearSearch: {
       control: "boolean",
       description:
-        "Raise it to empty the search box; the component clears the field, calls `onClearFilter` and lowers it again through `setClearSearch(false)`",
+        "Set to `true` to clear the search box. The bar empties it, calls `onClearFilter`, then `setClearSearch(false)`.",
     },
     setClearSearch: {
       action: "setClearSearch",
-      description: "Called with `false` once a requested clear is carried out",
+      description:
+        "Called with `false` once a requested clear has been carried out.",
     },
     getSelectedInputValue: {
       control: false,
       description:
-        "Returns the text the search box shows, read each time the function changes; a value it returned before, or a query the user has already replaced, leaves the field alone",
+        "Returns the text the search box shows, read whenever the function changes. A repeat or a replaced query leaves the field alone; any other value fills and focuses it.",
     },
     initSearchValue: {
       control: "text",
-      description: "Text the search box starts with, read once",
+      description: "Text the search box starts with, read once.",
     },
     showMainButton: {
       control: "boolean",
       description:
-        "Shows a main button inside the search box, to the left of the field; it needs `mainButtonProps` as well",
+        "Shows a MainButton before the search field. It needs `mainButtonProps` too.",
     },
     mainButtonProps: {
       control: false,
       description:
-        "Props of the main button, such as its text and the items of its menu",
+        "Props of that MainButton. Without them no main button is drawn.",
     },
     mainButtonIcon: {
       control: false,
       description:
-        "Icon shown at 12 by 12 pixels inside the main button; a plus when omitted",
+        "Icon inside the main button, painted white in a 12px box. A plus by default.",
     },
     hideSearch: {
       control: "boolean",
       description:
-        "Leaves the search field out of the bar; the main button, the filter and the sort controls stay",
+        "Leaves the search field out of the bar while the main button stays. Without a main button the search block is empty space.",
     },
     isIndexEditingMode: {
       control: "boolean",
-      description:
-        "Disables the search box and removes the filter button while the listing is being reordered",
+      description: "Removes the filter button and disables the search box.",
     },
     isIndexing: {
       control: "boolean",
       description:
-        "Removes the sort button and the view switch while the listing is being reordered",
+        "Whether the listing is being reordered, which removes the sort button and the view selector.",
     },
     getFilterData: {
       control: false,
       description:
-        "Loads the groups of the filter panel: each group is a header item followed by its options, awaited every time the panel opens",
+        "Loads the groups of filter options, awaited when the filter panel opens.",
     },
     onFilter: {
       action: "onFilter",
       description:
-        "Called with the whole new selection when Apply is pressed, and with an empty list when the panel's clear button empties a selection that was in force",
+        "Called with the whole new selection when Apply is pressed, and with `[]` from the panel's clear icon.",
     },
     getSelectedFilterData: {
       control: false,
       description:
-        "Returns the filters in force, which become the chips under the bar; give it a stable identity, because it is read again whenever the function changes",
+        "Returns the filters in force, drawn as chips under the bar. Re-read whenever the function changes, so keep it stable.",
     },
     initSelectedFilterData: {
       control: "object",
       description:
-        "The filters in force at the first render, so the chips are right before `getSelectedFilterData` resolves",
+        "The filters in force at the first render, so the chips are right before `getSelectedFilterData` has resolved.",
     },
     removeSelectedItem: {
       action: "removeSelectedItem",
       description:
-        "Called with the key and group of a chip when it is clicked; the chip leaves the bar at once, without waiting for the host",
+        "Called when a chip is clicked or its cross pressed. The bar has already dropped the chip by then.",
     },
     clearAll: {
       action: "clearAll",
       description:
-        'Called by the "Clear all" link, which appears once more than one chip carries a label',
+        'Called by the "clear all" link, which appears once more than one chip carries a label.',
     },
     filterHeader: {
       control: "text",
-      description: "Heading of the filter panel; nothing translates it for you",
+      description:
+        "Heading of the filter panel, and its accessible name. Nothing translates it for you.",
     },
     filterTitle: {
       control: "text",
-      description: "Tooltip of the filter button",
+      description: "Tooltip and accessible name of the filter button.",
     },
     selectorLabel: {
       control: "text",
-      description:
-        "Heading handed to `renderSelector` for the step where a group picks a person or a room",
+      description: "Passed to `renderSelector` as the heading of its step.",
     },
     renderSelector: {
       control: false,
       description:
-        "Renders the step the panel opens when a group picks a person or a room; without it that step stays empty",
+        "Renders the step a selector item opens inside the panel. Without it that step is empty.",
     },
     renderCustomItem: {
       control: false,
       description:
-        "Renders a group item marked `isCustom`, with the group's pending value, `onChange` to set it and `openPanel` / `closePanel` for a nested step; without it such an item stays empty",
+        "Renders a group item marked `isCustom`. Without it such an item is empty.",
     },
     userId: {
       control: "text",
-      description: "Id of the signed-in person, handed to `renderSelector`",
+      description:
+        "Passed to `renderSelector`; the bar itself does nothing with it.",
     },
     disableThirdParty: {
       control: "boolean",
-      description: "Handed to `renderSelector` as it is",
+      description:
+        "Forwarded unchanged to `renderSelector`; nothing in the bar or the panel reads it.",
     },
     isRooms: {
       control: "boolean",
       description:
-        "Shows a loading skeleton in the filter panel for half a second before its options, and is handed to `renderSelector`",
+        "Shows a skeleton in the opening panel until the groups arrive, and is passed to `renderSelector`.",
     },
     isContactsPage: {
       control: "boolean",
       description:
-        "Shapes the filter panel's loading skeleton for a contacts listing; the skeleton appears only while `isRooms` is set",
+        "Shapes the panel's skeleton, which only `isRooms` shows. The groups come from `getFilterData`.",
     },
     isContactsPeoplePage: {
       control: "boolean",
-      description:
-        "Shapes the filter panel's loading skeleton for a listing of people",
+      description: "Shapes the panel's skeleton, which only `isRooms` shows.",
     },
     isContactsGroupsPage: {
       control: "boolean",
-      description:
-        "Shapes the filter panel's loading skeleton for a listing of groups",
+      description: "Shapes the panel's skeleton, which only `isRooms` shows.",
     },
     isContactsInsideGroupPage: {
       control: "boolean",
-      description:
-        "Shapes the filter panel's loading skeleton for the members of one group",
+      description: "Shapes the panel's skeleton, which only `isRooms` shows.",
     },
     isContactsGuestsPage: {
       control: "boolean",
-      description:
-        "Shapes the filter panel's loading skeleton for a listing of guests",
+      description: "Shapes the panel's skeleton, which only `isRooms` shows.",
     },
     isFlowsPage: {
       control: "boolean",
       description:
-        "Leaves only the search box: removes the filter button, the sort button and the view switch",
+        "Removes the filter button, the sort button and the view selector, leaving the search box alone.",
     },
     isRecentFolder: {
       control: "boolean",
       description:
-        "Removes the sort button and keeps the view switch on the bar on every device",
+        "Whether the listing is the recent folder. It hides the sort button and keeps the view selector on screen below the desktop breakpoint.",
     },
     getSortData: {
       control: false,
       description:
-        "Returns the sort fields, read on mount and again whenever the listing's columns change",
+        "Returns the sort options. Read on mount, on a column change and when either sort getter changes.",
     },
     getSelectedSortData: {
       control: false,
       description:
-        "Returns the sort in force as a field key and a direction, `asc` or `desc`",
+        "Returns the sort in force, read with `getSortData`. After a pick the menu keeps its own.",
     },
     onSort: {
       action: "onSort",
       description:
-        "Called with the chosen field's key and the direction; picking the current field again reverses the direction",
+        "Called with the picked key and direction. Picking the current key again reverses the direction.",
     },
     onSortButtonClick: {
       action: "onSortButtonClick",
       description:
-        "Called with `false` when the sort menu opens and with `true` when it closes, and once with `true` on mount",
+        "Called with `true` when the sort menu opens and `false` when it closes.",
     },
     sortByTitle: {
       control: "text",
-      description: "Tooltip of the sort button",
+      description:
+        "Accessible name of the sort button, and its tooltip on the wrapper.",
     },
     view: {
       control: "text",
       description:
-        "Label of the row that holds the view switch inside the sort menu, shown below the desktop layout",
+        "Text beside the view selector inside the sort menu, shown below the desktop layout.",
     },
     viewAs: {
       control: "select",
       options: ["row", "table", "tile"],
       description:
-        'The listing\'s current view; `"table"` is shown as `"row"`, and the switch offers the other one',
+        'The listing\'s current view. `"table"` is treated as `"row"` by the sort menu and the view selector.',
     },
     viewSelectorVisible: {
       control: "boolean",
       description:
-        "Whether the view switch is shown at all: beside the sort button on a desktop, inside the sort menu on smaller screens",
+        "Shows the view selector: beside the sort button on a desktop, inside the sort menu below it.",
     },
     getViewSettingsData: {
       control: false,
       description:
-        "Returns the views the switch offers, each with a value and an icon; give it a stable identity",
+        "Returns the views the selector offers. Read on every render and when it changes, so a new function each render loops.",
     },
     onChangeViewAs: {
       action: "onChangeViewAs",
       description:
-        "Called when the view switch is clicked; the component keeps no view of its own, so `viewAs` has to change",
+        "Called with the view picked in the view selector. The bar keeps no view state of its own.",
     },
     currentDeviceType: {
       control: "select",
       options: Object.values(DeviceType),
       description:
-        "Picks the layout: on a desktop the view switch sits on the bar, on other devices it moves into the sort menu; nothing here measures the window",
+        "Picks where the view selector goes: beside the sort button on a desktop, inside the sort menu below.",
     },
     withRoomGroups: {
       control: "boolean",
       description:
-        "Allows the grouping row under the bar; it shows only together with `organizeRoomsGrouping`",
+        "Allows the grouping row, which also needs `organizeRoomsGrouping` and no `isFilterOrSearchActive`.",
     },
     organizeRoomsGrouping: {
       control: "boolean",
-      description: "Turns grouping on; without it the grouping row never shows",
+      description:
+        "Whether room grouping is turned on for the portal. Without it the grouping row is never rendered.",
     },
     roomGroups: {
       control: "object",
       description:
-        "The groups shown as chips in the grouping row; a group whose `icon` is not an object is left out",
+        "The room groups shown as chips in the grouping row. A group whose `icon` is a string or `null` is left out.",
     },
     getAllRoomGroups: {
       control: false,
       description:
-        "Awaited once when grouping turns on, and the grouping row waits for it; the chips themselves come from `roomGroups`",
+        "Called while `organizeRoomsGrouping` is set; the grouping row waits for it to settle. The chips come from `roomGroups`.",
     },
     onFilterByGroup: {
       action: "onFilterByGroup",
       description:
-        'Called with a group\'s id when its chip is clicked, and with `null` for the "all" chip',
+        'Called with a group\'s id when its chip is chosen, and with `null` for "all rooms".',
     },
     currentGroupId: {
       control: "text",
       description:
-        'Id of the group whose chip is highlighted; the "all" chip is highlighted when it is empty',
+        'Id of the group whose chip is marked as chosen; `null` marks "all rooms". Later changes are followed.',
     },
     isFormsSection: {
       control: "boolean",
       description:
-        'Words the grouping row for spaces rather than rooms: "All spaces" instead of "All rooms"',
+        "Switches the grouping row wording from rooms to form spaces.",
     },
     isFilterOrSearchActive: {
       control: "boolean",
       description:
-        "Hides the grouping row and, if a group was chosen, calls `onFilterByGroup(null)`",
+        "Hides the grouping row, and on turning `true` resets a chosen group through `onFilterByGroup(null)`.",
     },
     setEditRoomGroupsDialogVisible: {
       action: "setEditRoomGroupsDialogVisible",
       description:
-        "Called by the management button at the end of the grouping row, and by the create chip shown when there are no groups",
+        'Opens the host\'s "manage room groups" dialog. Without it the group management button and the create-group chip do nothing.',
     },
   },
 } satisfies Meta<typeof Filter>;
@@ -695,6 +695,7 @@ const OpenPanelTemplate = (args: FilterProps) => (
 const panelDocsStory = { inline: false, height: "480px" };
 
 export const Default: Story = {
+  name: "Desktop bar",
   render: (args) => <FilterTemplate {...args} />,
   play: async (context) => {
     const { args, canvas, userEvent } = context;
@@ -705,7 +706,13 @@ export const Default: Story = {
       timeout: 3000,
     });
 
-    // The filter button opens the panel; Cancel closes it.
+    // The filter button opens the panel; Cancel closes it. A tap on it
+    // draws no grey flash.
+    await expect(
+      getComputedStyle(
+        canvas.getByTestId("filter_icon_button"),
+      ).getPropertyValue("-webkit-tap-highlight-color"),
+    ).toBe("rgba(0, 0, 0, 0)");
     const panel = await openPanel(context);
     await expect(panel.getByTestId("filter_block_header")).toHaveTextContent(
       "Filter",
@@ -728,7 +735,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The bar as a desktop listing shows it: the search box, the filter button, the sort button and the button that switches to the other view. Change any prop live in the Controls panel below.",
+          "The bar as a desktop listing shows it: the search box, then the filter, sort and view switch buttons.",
       },
       source: {
         code: `<Filter
@@ -753,6 +760,7 @@ export const Default: Story = {
 };
 
 export const DocumentTypes: Story = {
+  name: "Filter panel, one group",
   render: (args) => <OpenPanelTemplate {...args} />,
   args: {
     getFilterData: () => Promise.resolve(documentTypeItems),
@@ -777,7 +785,7 @@ export const DocumentTypes: Story = {
       story: panelDocsStory,
       description: {
         story:
-          "The filter panel with one group of options, opened for you when the story loads. Pick a type and press Apply to see the selection reach `onFilter` in the Actions panel.",
+          "The filter panel with one group of options, opened when the story loads. Apply hands the picked type to `onFilter`.",
       },
       source: {
         code: `<Filter
@@ -796,6 +804,7 @@ export const DocumentTypes: Story = {
 };
 
 export const WithSelectedFilters: Story = {
+  name: "Filter already in force",
   render: (args) => <OpenPanelTemplate {...args} />,
   args: {
     getFilterData: () => Promise.resolve(documentTypeItems),
@@ -816,7 +825,7 @@ export const WithSelectedFilters: Story = {
       story: panelDocsStory,
       description: {
         story:
-          "A filter already in force when the bar mounts: its chip is under the search box and its option is highlighted in the panel, opened for you when the story loads (`initSelectedFilterData`). Apply stays disabled until the selection changes.",
+          "A filter already in force when the bar mounts (`initSelectedFilterData`). Its chip is under the search box, and its option is highlighted in the opened panel. Apply stays disabled until the selection changes.",
       },
       source: {
         code: `<Filter
@@ -831,6 +840,7 @@ export const WithSelectedFilters: Story = {
 };
 
 export const MultipleFilterGroups: Story = {
+  name: "Several groups",
   render: (args) => <OpenPanelTemplate {...args} />,
   args: {
     getFilterData: () =>
@@ -919,7 +929,7 @@ export const MultipleFilterGroups: Story = {
       story: panelDocsStory,
       description: {
         story:
-          "Several groups in one panel, each under its heading and divided by a line, so a listing can be narrowed by type, status and author at once. The panel opens for you when the story loads; one option can be picked per group.",
+          "Several groups in one opened panel, each under its heading and divided by a line. A listing is narrowed by type, status and author at once, one option per group.",
       },
       source: {
         code: `<Filter
@@ -939,6 +949,7 @@ export const MultipleFilterGroups: Story = {
 };
 
 export const RoomsFilter: Story = {
+  name: "Rooms listing",
   render: (args) => <OpenPanelTemplate {...args} />,
   args: {
     isRooms: true,
@@ -992,7 +1003,7 @@ export const RoomsFilter: Story = {
       story: panelDocsStory,
       description: {
         story:
-          "The panel of a listing of rooms: it shows a loading skeleton for half a second before the options appear, and passes the rooms flag on to `renderSelector` (`isRooms`). The panel opens for you when the story loads.",
+          "The opened panel of a listing of rooms (`isRooms`). A loading skeleton shows for half a second before the options, and the flag reaches `renderSelector`.",
       },
       source: {
         code: `<Filter
@@ -1011,6 +1022,7 @@ export const RoomsFilter: Story = {
 };
 
 export const DisabledFilter: Story = {
+  name: "While reordering",
   render: (args) => <FilterTemplate {...args} />,
   args: {
     isIndexEditingMode: true,
@@ -1027,7 +1039,7 @@ export const DisabledFilter: Story = {
     docs: {
       description: {
         story:
-          "The bar while the listing is being reordered, when searching, filtering and sorting would fight the new order: the search box is disabled and the filter button is gone (`isIndexEditingMode`), and so are the sort button and the view switch (`isIndexing`).",
+          "The bar while the listing is being reordered. The search box is disabled and the filter button gone (`isIndexEditingMode`); so are the sort button and view switch (`isIndexing`).",
       },
       source: {
         code: `<Filter isIndexEditingMode isIndexing {...props} />`,
@@ -1071,6 +1083,7 @@ const ViewSelectorDefaultTemplate = () => {
 };
 
 export const ViewSelectorDefault: Story = {
+  name: "View switch in the sort menu",
   render: () => <ViewSelectorDefaultTemplate />,
   play: async ({ canvas, userEvent }) => {
     const [row, tile] = canvas.getAllByTestId("view-selector-icon");
@@ -1083,7 +1096,7 @@ export const ViewSelectorDefault: Story = {
     docs: {
       description: {
         story:
-          "The view switch the sort menu holds on smaller screens: one button per view, the current one filled. Click the other icon to switch views.",
+          "The view switch the sort menu holds on smaller screens: one button per view, the current one filled. A click on the other calls `onChangeView`.",
       },
       source: {
         code: `<ViewSelector
@@ -1112,6 +1125,7 @@ const ViewSelectorDisabledTemplate = () => {
 };
 
 export const ViewSelectorDisabled: Story = {
+  name: "View switch disabled",
   render: () => <ViewSelectorDisabledTemplate />,
   play: async ({ canvas, userEvent }) => {
     const [row, tile] = canvas.getAllByTestId("view-selector-icon");
@@ -1145,6 +1159,7 @@ const ViewSelectorFilterModeTemplate = () => {
 };
 
 export const ViewSelectorFilterMode: Story = {
+  name: "View switch on the bar",
   render: () => <ViewSelectorFilterModeTemplate />,
   play: async ({ canvas, userEvent }) => {
     // One button, carrying the view it switches to.
@@ -1160,7 +1175,7 @@ export const ViewSelectorFilterMode: Story = {
     docs: {
       description: {
         story:
-          "The single button the bar shows on a desktop: it carries the icon of the view you would switch to, not the current one, and turns into the other icon when clicked (`isFilter`).",
+          "The single button the bar shows on a desktop (`isFilter`). It carries the icon of the view it switches to, not the current one.",
       },
       source: {
         code: `<ViewSelector viewSettings={viewSettings} viewAs="row" isFilter />`,
@@ -1170,6 +1185,7 @@ export const ViewSelectorFilterMode: Story = {
 };
 
 export const WithFilterChips: Story = {
+  name: "Chips of filters in force",
   render: (args) => <FilterTemplate {...args} />,
   args: {
     initSelectedFilterData: selectedChips,
@@ -1190,7 +1206,7 @@ export const WithFilterChips: Story = {
     docs: {
       description: {
         story:
-          'The filters in force as chips under the bar, so the reader sees what narrows the listing and can drop any of it in one click. Click a chip to remove it (`removeSelectedItem`); the "Clear all" link appears once more than one chip is shown (`clearAll`).',
+          'The filters in force as chips under the bar. A click on a chip removes it (`removeSelectedItem`), and "Clear all" appears with more than one chip (`clearAll`).',
       },
       source: {
         code: `<Filter
@@ -1206,6 +1222,7 @@ export const WithFilterChips: Story = {
 };
 
 export const OneFilterManyChips: Story = {
+  name: "One filter, several chips",
   render: (args) => <FilterTemplate {...args} />,
   args: {
     initSelectedFilterData: multiChipSelection,
@@ -1215,7 +1232,7 @@ export const OneFilterManyChips: Story = {
     docs: {
       description: {
         story:
-          "One filter value drawn as several chips, for a filter made of conditions the reader should see and drop one by one. Each entry of `chips` becomes a chip; clicking one calls `removeSelectedItem` with that chip's key and the item's group, and the host rebuilds the value without it.",
+          "One filter value drawn as several chips, one per entry of `chips`. Removing one calls `removeSelectedItem` with that chip's key and the item's group.",
       },
       source: {
         code: `const selected = [
@@ -1242,6 +1259,7 @@ export const OneFilterManyChips: Story = {
 };
 
 export const PanelOptionKinds: Story = {
+  name: "Kinds of option",
   render: (args) => <OpenPanelTemplate {...args} />,
   args: {
     getFilterData: () => Promise.resolve(optionKindItems),
@@ -1270,7 +1288,7 @@ export const PanelOptionKinds: Story = {
     docs: {
       story: panelDocsStory,
       description: {
-        story: `The kinds of option a group can hold besides tags, for filters that are not a choice among a few words. The panel opens for you when the story loads:
+        story: `The kinds of option a group can hold besides tags, in an opened panel:
 
 - **Documents**, **Spreadsheets** — tags, one of which can be picked
 - **Anywhere** — a drop-down list of values (\`withOptions\` with \`options\`)
@@ -1297,6 +1315,7 @@ export const PanelOptionKinds: Story = {
 };
 
 export const CustomGroupItem: Story = {
+  name: "Group drawn by the host",
   render: (args) => <OpenPanelTemplate {...args} />,
   args: {
     getFilterData: () => Promise.resolve(customGroupItems),
@@ -1307,7 +1326,7 @@ export const CustomGroupItem: Story = {
       story: panelDocsStory,
       description: {
         story:
-          "A group the host draws itself, for a filter none of the built-in kinds can express. The item is marked `isCustom` and rendered by `renderCustomItem`: **Choose rating** opens a nested step with `openPanel`, a choice there sets the pending value with `onChange` and returns with `closePanel`. The value is applied and compared like any other, so Apply and `onFilter` need nothing extra.",
+          "A group the host draws itself, marked `isCustom` and rendered by `renderCustomItem`. **Choose rating** opens a nested step (`openPanel`). A choice there sets the value (`onChange`) and returns (`closePanel`).",
       },
       source: {
         code: `<Filter
@@ -1331,6 +1350,7 @@ export const CustomGroupItem: Story = {
 };
 
 export const SortMenuOnTablet: Story = {
+  name: "Sort menu below desktop",
   render: (args) => (
     <div style={{ height: "300px" }}>
       <OpenOnMount testId="filter_sort_button">
@@ -1356,7 +1376,7 @@ export const SortMenuOnTablet: Story = {
       story: { inline: false, height: "326px" },
       description: {
         story:
-          "The sort menu on a device narrower than a desktop, opened for you when the story loads: the view switch has left the bar and heads the menu, above the sort fields (`currentDeviceType`). The current field carries an arrow for its direction; pick it again to reverse it (`onSort`).",
+          "The opened sort menu below the desktop layout (`currentDeviceType`). The view switch heads the menu, and the current field carries an arrow for its direction.",
       },
       source: {
         code: `<Filter currentDeviceType={DeviceType.tablet} viewSelectorVisible {...props} />`,
@@ -1366,6 +1386,7 @@ export const SortMenuOnTablet: Story = {
 };
 
 export const WithGroupingRow: Story = {
+  name: "Room grouping row",
   render: (args) => (
     <div style={{ height: "180px" }}>
       <Filter {...args} />
@@ -1393,7 +1414,7 @@ export const WithGroupingRow: Story = {
     docs: {
       description: {
         story:
-          'A row of group chips under the bar, for a listing its host has sorted into groups: "All rooms" first, the chosen group highlighted (`currentGroupId`), and the groups that do not fit behind the "..." button. Click a chip to choose it (`onFilterByGroup`); the button at the end of the row opens the host\'s group management (`setEditRoomGroupsDialogVisible`).',
+          'A row of group chips under the bar: "All rooms" first, the chosen group highlighted (`currentGroupId`), the rest behind "...". The button at the end opens the host\'s group management (`setEditRoomGroupsDialogVisible`).',
       },
       source: {
         code: `<Filter
@@ -1412,6 +1433,7 @@ export const WithGroupingRow: Story = {
 };
 
 export const WithMainButton: Story = {
+  name: "With a main button",
   render: (args) => <FilterTemplate {...args} />,
   args: {
     showMainButton: true,
@@ -1440,6 +1462,7 @@ export const WithMainButton: Story = {
 };
 
 export const WithoutSearch: Story = {
+  name: "Without the search field",
   render: (args) => <FilterTemplate {...args} />,
   args: {
     hideSearch: true,
@@ -1456,7 +1479,7 @@ export const WithoutSearch: Story = {
     docs: {
       description: {
         story:
-          "A listing whose content the server cannot search: the field is left out and the main button keeps its place, with the filter and sort controls at the end of the row (`hideSearch`).",
+          "A listing the server cannot search (`hideSearch`). The field is left out, the main button keeps its place, and the filter and sort controls stay at the end.",
       },
       source: {
         code: `<Filter
@@ -1471,6 +1494,7 @@ export const WithoutSearch: Story = {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <FilterTemplate {...args} />
@@ -1497,7 +1521,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "166px" },
       description: {
         story:
-          'The bar in a right-to-left interface: the search box starts at the right edge, the filter, sort and view buttons line up at the left, and the chips and the "Clear all" link run from right to left.',
+          "The bar in a right-to-left interface. The search box starts at the right edge, the buttons line up at the left, and the chips run right to left.",
       },
       source: {
         code: `<div dir="rtl">
@@ -1509,6 +1533,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: (args) => (
     <div
       style={
@@ -1543,7 +1568,9 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The variables of the bar set on one wrapper -- the variables are listed under CSS variables on this page. Hover the filter and view buttons, and open the sort menu, to see the hover and menu values. The sort menu's view icons appear only below the desktop layout, so set those two with \`currentDeviceType\` in the Controls panel; the panel's variables apply only on \`:root\` or \`body\`, because it renders in a portal.`,
+        story: `The bar's variables set on one wrapper: the filter, sort and view buttons recoloured, with hover and menu values.
+
+The panel's variables work only on \`:root\` or \`body\`, because the panel renders in a portal.`,
       },
       source: {
         code: `<div style={{

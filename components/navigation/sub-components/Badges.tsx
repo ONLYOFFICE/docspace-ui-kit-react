@@ -10,6 +10,8 @@ const Badges = ({
   isRootFolder,
   titleIconTooltip,
 }: TBadgesProps) => {
+  const tooltipId = React.useId();
+
   const getContent = () => (
     <Text fontSize="12px" fontWeight={400} noSelect>
       {titleIconTooltip}
@@ -21,7 +23,7 @@ const Badges = ({
       {titleIcon && !isRootFolder ? (
         <ReactSVG
           style={{ height: 16 }}
-          data-tooltip-id="iconTooltip"
+          data-tooltip-id={tooltipId}
           className="title-icon"
           src={titleIcon}
         />
@@ -29,7 +31,7 @@ const Badges = ({
 
       {titleIconTooltip ? (
         <Tooltip
-          id="iconTooltip"
+          id={tooltipId}
           place="bottom"
           getContent={getContent}
           maxWidth="300px"

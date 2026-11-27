@@ -183,38 +183,38 @@ export type TOnFilter = (value: TItem[] | TGroupItem[]) => void;
 export type FilterBlockProps = {
   /** Loads the groups of filter options, awaited when the filter panel opens. */
   getFilterData: TGetFilterData;
-  /** Called with the whole new selection whenever the filter panel is applied. */
+  /** Called with the whole new selection when Apply is pressed, and with `[]` from the panel's clear icon. */
   onFilter: TOnFilter;
 
   selectedFilterValue: Map<FilterGroups, Map<string | number, TItem>>;
 
-  /** Heading of the filter panel. Nothing translates it for you. */
+  /** Heading of the filter panel, and its accessible name. Nothing translates it for you. */
   filterHeader: string;
-  /** Heading of the selector the panel opens for a group that picks a person or a room. */
+  /** Passed to `renderSelector` as the heading of its step. */
   selectorLabel: string;
 
   hideFilterBlock: () => void;
-  /** Id of the signed-in person, handed to the selector so it can exclude them. */
+  /** Passed to `renderSelector`; the bar itself does nothing with it. */
   userId: string;
-  /** Whether the listing is of rooms, which changes which filter groups are offered. */
+  /** Shows a skeleton in the opening panel until the groups arrive, and is passed to `renderSelector`. */
   isRooms: boolean;
-  /** Whether the listing is the contacts page. It and the four flags below decide which groups the panel shows. */
+  /** Shapes the panel's skeleton, which only `isRooms` shows. The groups come from `getFilterData`. */
   isContactsPage: boolean;
-  /** Whether the contacts page is showing people. */
+  /** Shapes the panel's skeleton, which only `isRooms` shows. */
   isContactsPeoplePage: boolean;
-  /** Whether the contacts page is showing groups. */
+  /** Shapes the panel's skeleton, which only `isRooms` shows. */
   isContactsGroupsPage: boolean;
-  /** Whether the contacts page is showing the members of one group. */
+  /** Shapes the panel's skeleton, which only `isRooms` shows. */
   isContactsInsideGroupPage: boolean;
-  /** Whether the contacts page is showing guests. */
+  /** Shapes the panel's skeleton, which only `isRooms` shows. */
   isContactsGuestsPage: boolean;
 
-  /** Whether the listing is the flows page. It removes the filter button, the sort button and the view selector outright. */
+  /** Removes the filter button, the sort button and the view selector, leaving the search box alone. */
   isFlowsPage?: boolean;
-  /** Removes the third-party storage group from the filter panel. */
+  /** Forwarded unchanged to `renderSelector`; nothing in the bar or the panel reads it. */
   disableThirdParty?: boolean;
 
-  /** Renders the selector the panel opens for a person or a room group. Without it that step is empty — this package ships no portal selector. */
+  /** Renders the step a selector item opens inside the panel. Without it that step is empty. */
   renderSelector?: TRenderSelector;
   /** Renders a group item marked `isCustom`. Without it such an item is empty. */
   renderCustomItem?: TRenderCustomItem;
@@ -229,22 +229,22 @@ export type SortButtonProps = {
   id: string;
   title: string;
 
-  /** Returns the sort options. It is called when the sort menu opens. */
+  /** Returns the sort options. Read on mount, on a column change and when either sort getter changes. */
   getSortData: TGetSortData;
-  /** Returns the sort in force, as a key and a direction. */
+  /** Returns the sort in force, read with `getSortData`. After a pick the menu keeps its own. */
   getSelectedSortData: TGetSelectedSortData;
 
-  /** Called when the view is switched. The component holds no view state of its own. */
+  /** Called with the view picked in the view selector. The bar keeps no view state of its own. */
   onChangeViewAs: TOnChangeViewAs;
-  /** Name of the current page, used as the key under which the sort menu remembers its width. */
+  /** Text beside the view selector inside the sort menu, shown below the desktop layout. */
   view: string;
   /** The listing's current view. `"table"` is treated as `"row"` by the sort menu and the view selector. */
   viewAs: TViewAs;
   viewSettings: TViewSelectorOption[];
 
-  /** Called with the chosen key and direction. */
+  /** Called with the picked key and direction. Picking the current key again reverses the direction. */
   onSort: TOnSort;
-  /** Whether a view selector belongs on screen at all. On a desktop it is a separate control; below that breakpoint it moves inside the sort menu. */
+  /** Shows the view selector: beside the sort button on a desktop, inside the sort menu below it. */
   viewSelectorVisible: boolean;
 
   /** Called with `true` when the sort menu opens and `false` when it closes. */
@@ -252,39 +252,36 @@ export type SortButtonProps = {
 };
 
 export type SearchInputProps = {
-  /** Called with the search string — the string itself, not an event — once typing pauses for a second, and with `""` when the cross clears the box. */
+  /** Called with the search string, not an event, a second after typing stops. The cross calls it with `""` at once. */
   onSearch: (value: string) => void;
   /** Called when the search box is cleared through `clearSearch`. */
   onClearFilter: () => void;
 
-  /** Set it to `true` to clear the search box. The component empties the field, calls `onClearFilter` and then calls `setClearSearch(false)` itself. */
+  /** Set to `true` to clear the search box. The bar empties it, calls `onClearFilter`, then `setClearSearch(false)`. */
   clearSearch: boolean;
   /** Called with `false` once a requested clear has been carried out. */
   setClearSearch: (value: boolean) => void;
 
-  /** Returns the text the search box should show; it is read whenever its identity changes. A value equal to the last one read, or a query the user has already replaced, leaves the field alone; any other value is put in the field, which is focused when the value is not empty. */
+  /** Returns the text the search box shows, read whenever the function changes. A repeat or a replaced query leaves the field alone; any other value fills and focuses it. */
   getSelectedInputValue: () => string;
 
   /** Placeholder of the search box. Nothing translates it for you. */
   placeholder: string;
 
-  /** Removes the filter button while the listing is being reordered. */
+  /** Removes the filter button and disables the search box. */
   isIndexEditingMode: boolean;
 
   /** Text the search box starts with, read once. */
   initSearchValue?: string;
 
-  /** Shows a MainButton to the left of the search field */
+  /** Shows a MainButton before the search field. It needs `mainButtonProps` too. */
   showMainButton?: boolean;
-  /** Props for the MainButton displayed to the left of the search field */
+  /** Props of that MainButton. Without them no main button is drawn. */
   mainButtonProps?: MainButtonProps;
-  /** Icon node rendered inside the MainButton (12x12) */
+  /** Icon inside the main button, painted white in a 12px box. A plus by default. */
   mainButtonIcon?: React.ReactNode;
-  /** Leaves the search field out of the bar; the main button stays. Nothing
-   * calls `onSearch`, and `initSearchValue` and `getSelectedInputValue` are
-   * shown nowhere. Meant for use with `showMainButton` and `mainButtonProps`:
-   * without a main button the search block stays as empty space that keeps
-   * the filter and sort controls at the end of the row. */
+  /** Leaves the search field out of the bar while the main button stays.
+   * Without a main button the search block is empty space. */
   hideSearch?: boolean;
 };
 
@@ -304,12 +301,13 @@ export type TRoomGroup = {
   totalRooms: number;
 };
 
-export type FilterProps = SearchInputProps &
+export type FilterProps = React.AriaAttributes &
+  SearchInputProps &
   Omit<SortButtonProps, "id" | "title" | "viewSettings"> &
   Omit<FilterButtonProps, "id" | "title" | "selectedFilterValue"> & {
-    /** Returns the filters in force, which become the chips under the bar. **Give it a stable identity**: it is re-read whenever the function changes. */
+    /** Returns the filters in force, drawn as chips under the bar. Re-read whenever the function changes, so keep it stable. */
     getSelectedFilterData: () => Promise<TItem[]> | TItem[];
-    /** Returns the views the selector offers. **Give it a stable identity**: it is called during render and again in an effect keyed on the function itself, so a new one each render loops. */
+    /** Returns the views the selector offers. Read on every render and when it changes, so a new function each render loops. */
     getViewSettingsData: () => TViewSelectorOption[];
 
     /** Called by the "clear all" link, which appears once more than one chip carries a label. */
@@ -317,7 +315,7 @@ export type FilterProps = SearchInputProps &
 
     /** Whether the listing is the recent folder. It hides the sort button and keeps the view selector on screen below the desktop breakpoint. */
     isRecentFolder: boolean;
-    /** Called when one chip is removed. The component drops the chip from its own list first and does not wait for you. */
+    /** Called when a chip is clicked or its cross pressed. The bar has already dropped the chip by then. */
     removeSelectedItem: ({
       key,
       group,
@@ -329,12 +327,12 @@ export type FilterProps = SearchInputProps &
     /** Whether the listing is being reordered, which removes the sort button and the view selector. */
     isIndexing: boolean;
 
-    /** Native tooltip of the filter button. */
+    /** Tooltip and accessible name of the filter button. */
     filterTitle: string;
-    /** Native tooltip of the sort button. */
+    /** Accessible name of the sort button, and its tooltip on the wrapper. */
     sortByTitle: string;
 
-    /** Which layout to render: on a desktop the view selector is a control of its own, below that it moves inside the sort menu. Nothing here measures the viewport. */
+    /** Picks where the view selector goes: beside the sort button on a desktop, inside the sort menu below. */
     currentDeviceType: DeviceType;
     /** The filters in force at the first render, so the chips are right before `getSelectedFilterData` has resolved. */
     initSelectedFilterData?: TItem[];
@@ -344,20 +342,20 @@ export type FilterProps = SearchInputProps &
       roomIds?: number[] | null,
       openInCreateMode?: boolean,
     ) => void;
-    /** Loads the room groups. It is awaited once, only while `organizeRoomsGrouping` is set, and only to decide that the row may be shown — the groups themselves come from `roomGroups`. */
+    /** Called while `organizeRoomsGrouping` is set; the grouping row waits for it to settle. The chips come from `roomGroups`. */
     getAllRoomGroups?: () => Promise<TRoomGroup[]>;
-    /** The room groups to show as chips. Only those whose `icon` is an object are rendered; a string or `null` icon drops the group from the row. */
+    /** The room groups shown as chips in the grouping row. A group whose `icon` is a string or `null` is left out. */
     roomGroups?: TRoomGroup[];
     /** Called with a group's id when its chip is chosen, and with `null` for "all rooms". */
     onFilterByGroup?: (groupId: string | null) => void;
-    /** Current group ID from URL filter - used to highlight the correct group tag on page load */
+    /** Id of the group whose chip is marked as chosen; `null` marks "all rooms". Later changes are followed. */
     currentGroupId?: string | null;
-    /** Whether the listing is the Rooms or the Forms section. It is one of four conditions for the room grouping row. */
+    /** Allows the grouping row, which also needs `organizeRoomsGrouping` and no `isFilterOrSearchActive`. */
     withRoomGroups?: boolean;
     /** Switches the grouping row wording from rooms to form spaces. */
     isFormsSection?: boolean;
     /** Whether room grouping is turned on for the portal. Without it the grouping row is never rendered. */
     organizeRoomsGrouping?: boolean;
-    /** When true, hides the room grouping row because filters/search are active */
+    /** Hides the grouping row, and on turning `true` resets a chosen group through `onFilterByGroup(null)`. */
     isFilterOrSearchActive?: boolean;
   };

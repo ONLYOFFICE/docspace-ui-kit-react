@@ -48,7 +48,7 @@ export type TSeparatorOption = TBaseOption & {
 
 export type TOption = TRegularOption | TSeparatorOption;
 
-export type TComboboxProps = {
+export type TComboboxProps = React.AriaAttributes & {
   /**
    * Element whose children replace the list entirely, for a menu that is not a
    * list of options. `options` is then used only for the button.
@@ -101,8 +101,6 @@ export type TComboboxProps = {
   dropDownMaxHeight?: number;
   /** Value of `data-testid` on the list. */
   dropDownTestId?: string;
-  /** Ignored. The list is always told to keep disabled options. */
-  showDisabledItems?: boolean;
   /** Recolours the selected option's icon to the text colour. */
   fillIcon?: boolean;
   /** Keeps `directionX` and `directionY` as given instead of flipping them. */
@@ -161,8 +159,6 @@ export type TComboboxProps = {
   options: TOption[];
   /** Inline style applied to every option. */
   optionStyle?: React.CSSProperties;
-  /** Ignored. Nothing reads this prop; there is no search field. */
-  searchPlaceholder?: string;
   /**
    * The option to show in the button. The component does not choose it: keep it
    * in your own state and set it from `onSelect`.
@@ -184,8 +180,6 @@ export type TComboboxProps = {
    */
   size?: `${ComboBoxSize}`;
 
-  /** Ignored. Nothing reads this prop. */
-  role?: string;
   /** Applied to the wrapper and, again, to the list. */
   style?: React.CSSProperties;
   /**
@@ -194,8 +188,8 @@ export type TComboboxProps = {
    */
   ariaLabel?: string;
   /**
-   * Position of the button in the tab order. It is `0` by default, so the
-   * control is reachable; pass `-1` to take it off the tab order.
+   * Position of the button in the tab order; `-1` takes it out. A disabled
+   * button is out of the tab order whatever this says.
    * @default 0
    */
   tabIndex?: number;
@@ -220,8 +214,6 @@ export type TComboboxProps = {
   withBackdrop?: boolean;
   /** Gives that backdrop its dimming background. */
   withBackground?: boolean;
-  /** Ignored. It reaches the list, which does not read it either. */
-  withBlur?: boolean;
   /**
    * Whether the selected option is matched by label rather than by key.
    * @default true
@@ -231,8 +223,6 @@ export type TComboboxProps = {
   withoutBackground?: boolean;
   /** Removes the vertical padding around the button. */
   withoutPadding?: boolean;
-  /** Ignored. Nothing reads this prop; there is no search field. */
-  withSearch?: boolean;
   /** Called when a click outside closes the list, if `withBackdrop` is on. */
   onBackdropClick?: (e: Event) => void;
   /** Called when the option already selected is clicked again. */
@@ -243,10 +233,9 @@ export type TComboboxProps = {
    */
   onSelect?: (option: TOption) => void;
   /**
-   * Called when the button is clicked or a key opens or closes the list, with
-   * the state being asked for — so the event is a mouse or a keyboard one.
-   * Passing it without `onBackdropClick` also stops a click outside closing
-   * the list.
+   * Called with the open state asked for, by a click on the button or a key;
+   * the event is a mouse or a keyboard one. Without `onBackdropClick`, a click
+   * outside no longer closes the list.
    */
   onToggle?: (
     e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>,
@@ -306,6 +295,8 @@ export type TComboButtonProps = {
   tabIndex?: number;
   /** Accessible name of the button */
   ariaLabel?: string;
+  /** The `aria-*` attributes passed to the combo box, set on the button. */
+  aria?: React.AriaAttributes;
   /** Indicates if the button is loading */
   isLoading?: boolean;
   /** Type of the combo box */

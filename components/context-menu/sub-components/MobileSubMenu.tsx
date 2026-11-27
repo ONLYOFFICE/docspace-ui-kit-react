@@ -76,7 +76,7 @@ const MenuItem = ({
     return isInlinedSvgUrl(item.icon) ? (
       <ReactSVG wrapper="span" className={iconClassName} src={item.icon} />
     ) : (
-      <img src={item.icon} alt="plugin img" className={iconClassName} />
+      <img src={item.icon} alt="" className={iconClassName} />
     );
   };
 
@@ -125,7 +125,7 @@ const MenuItem = ({
         <span className="p-menuitem-text not-selectable">{item.label}</span>
       ) : null}
       {item.items ? <ArrowIcon className="p-submenu-icon" /> : null}
-      {item.isPaidBadge ? (
+      {item.badgeLabel || item.isPaidBadge ? (
         <Badge
           label={item.badgeLabel}
           className={`${subMenuIconClassName} p-submenu-badge`}

@@ -20,7 +20,7 @@ const meta = {
     defaultColor: {
       control: "color",
       description:
-        "Hex color the field starts on; read once on mount, after which the field keeps its own value",
+        "Colour the field starts on, as a hex string; the kit's blue when left out. It is read once, on mount: a starting point, not a controlled value.",
       table: {
         defaultValue: { summary: "#4781D1" },
       },
@@ -29,14 +29,14 @@ const meta = {
       control: "select",
       options: Object.values(InputSize),
       description:
-        "Width, font size and padding of the field; the height is the same at every size",
+        "Width, font size and padding of the field; the height does not change.",
       table: {
         defaultValue: { summary: "undefined" },
       },
     },
     scale: {
       control: "boolean",
-      description: "Scale input to 100% width",
+      description: "Whether the field stretches to fill its container.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -44,21 +44,21 @@ const meta = {
     isDisabled: {
       control: "boolean",
       description:
-        "Disable the input field; the swatch stops opening the picker too",
+        "Whether the field is disabled. The swatch stops opening the picker too.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     hasError: {
       control: "boolean",
-      description: "Draws the field's border in the error color",
+      description: "Whether the field is drawn in its error colours.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     hasWarning: {
       control: "boolean",
-      description: "Draws the field's border in the warning color",
+      description: "Whether the field is drawn in its warning colours.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -66,19 +66,19 @@ const meta = {
     handleChange: {
       action: "handleChange",
       description:
-        "Called with the new hex color each time the field holds a complete 3- or 6-digit code and on every move in the picker",
+        "Called with the new hex colour each time the field holds a complete 3- or 6-digit code, and on every move inside the picker. There is no confirm step and no `onApply`.",
     },
     className: {
       control: "text",
-      description: "Class applied to the outermost element",
+      description: "Applied to the outermost element.",
     },
     id: {
       control: "text",
-      description: "HTML id of the outermost element",
+      description: "Applied to the outermost element.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of the outermost element's `data-testid` attribute",
+      description: "`data-testid` of the outermost element.",
       table: {
         defaultValue: { summary: "color-input" },
       },
@@ -208,7 +208,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The field on its own, starting on the kit's blue. Type a hex code, or click the swatch (or focus it and press Enter) to pick one: the picker opens on the colour the field holds. Change any other prop live in the Controls panel below.",
+          "The field on its own, starting on the kit's blue. The swatch opens the picker on the colour the field holds.",
       },
       source: {
         code: `<ColorInput
@@ -264,7 +264,7 @@ export const Sizes: Story = {
     docs: {
       description: {
         story:
-          "Pick the size that matches the other fields in the same form: **base**, **middle** and **large** differ in width, and **large** also in text size and padding, while all three keep the same height (`size`).",
+          "The three sizes (`size`), which differ in width; **large** also in text size and padding. All three keep the same height.",
       },
       source: {
         code: `<ColorInput size={InputSize.base} defaultColor="#4781D1" />
@@ -333,7 +333,7 @@ export const States: Story = {
     docs: {
       description: {
         story:
-          "Show whether the entered color is accepted: the first field is in its normal state, the second has a red border (`hasError`), the third an orange one (`hasWarning`), and the fourth is greyed out and its swatch no longer opens the picker (`isDisabled`).",
+          "The field in each state: normal, a red border (`hasError`), an orange one (`hasWarning`), and greyed out with a swatch that opens nothing (`isDisabled`).",
       },
       source: {
         code: `<ColorInput defaultColor="#4781D1" />
@@ -358,6 +358,7 @@ const ScaledTemplate = () => {
 };
 
 export const ScaledInput: Story = {
+  name: "Full width",
   render: () => <ScaledTemplate />,
   play: async ({ canvas }) => {
     const field = canvas.getByTestId("color-input");
@@ -373,7 +374,7 @@ export const ScaledInput: Story = {
     docs: {
       description: {
         story:
-          "Use it where the field shares a column with full-width inputs: the field stretches across its container and the swatch stays at its end (`scale`).",
+          "A field stretched across its container, with the swatch at its end (`scale`), for a column of full-width inputs.",
       },
       source: {
         code: `<ColorInput defaultColor="#4781D1" scale />`,
@@ -409,6 +410,7 @@ const CssCustomizationTemplate = () => {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   render: () => <CssCustomizationTemplate />,
   play: async ({ canvas }) => {
     const field = canvas.getByTestId("color-input");
@@ -422,7 +424,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable but \`--dropdown-bg\` set on one field -- the variables are listed under CSS variables on this page. Hover and focus it to see the border colors, and click its swatch to open the popup.`,
+        story: `Every overridable variable but \`--dropdown-bg\`, set on one field, including the hover and focus border colours and the popup's.`,
       },
       source: {
         code: `<div

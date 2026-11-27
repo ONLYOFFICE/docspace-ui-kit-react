@@ -3,6 +3,8 @@
 //   pnpm check:readme                     every component
 //   pnpm check:readme --only button       one, folder name or path
 //   pnpm check:readme --json              machine-readable findings
+//   pnpm check:readme --style-all         style warnings for every folder
+//   pnpm check:readme --base HEAD^1       style warnings for what changed since a ref
 //
 // Everything it checks is something a reader of the README would otherwise get
 // wrong. The metadata block is derived truth wherever it can be: whether the
@@ -17,12 +19,41 @@
 // source of truth for what a component's documentation says; the authoring rule
 // and the `component-docs` skill were rewritten to match rather than the other
 // way round.
+//
+// The style warnings -- W_LONG_SENTENCE, W_LONG_TEXT, W_TAUTOLOGICAL_PROP,
+// W_LIVE_ONLY_TEXT --
+// measure the prose against `.claude/rules/doc-writing.md`. Most of the library
+// predates that rule, so by default they are printed only for the folders the
+// branch changed, and the rest are counted in one line: text is brought within
+// the limits when its component is touched, not in one sweep.
+//
+// Where the branch began is found from the long-lived branches on origin, which
+// a CI checkout does not have. `--base` names the branch it left instead -- CI
+// passes the pull request's target, `origin/<base_ref>` -- and the scope starts
+// at their merge base. That holds whether the checkout is the pull request's
+// head (Gitea) or a merge commit (GitHub), and after a merge from the target.
 
 import fs from "node:fs";
 import path from "node:path";
 
 import * as ts from "typescript";
 
+import {
+  LIMITS,
+  excerpt,
+  isTautological,
+  liveOnlyPhrase,
+  longSentences,
+  markdownProse,
+  storyTexts,
+  wordCount,
+} from "./lib/doc-style.mjs";
+import {
+  baseAgainst,
+  changesSince,
+  findBranchBase,
+  isCommit,
+} from "./lib/push-base.mjs";
 import {
   ROOT,
   createExampleProgram,
@@ -90,19 +121,29 @@ const FORBIDDEN = [
 
 const usage = () => {
   console.error(
-    "usage: node scripts/check-readme.mjs [--only <folder>...] [--compile] [--json]",
+    "usage: node scripts/check-readme.mjs [--only <folder>...] [--compile] [--json] [--style-all] [--base <ref>]",
   );
   process.exit(2);
 };
 
 const parseArgs = (argv) => {
-  const options = { only: [], json: false, compile: false };
+  const options = {
+    only: [],
+    json: false,
+    compile: false,
+    styleAll: false,
+    base: null,
+  };
 
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--json") options.json = true;
     else if (arg === "--compile") options.compile = true;
-    else if (arg === "--only") {
+    else if (arg === "--style-all") options.styleAll = true;
+    else if (arg === "--base") {
+      if (!argv[i + 1] || argv[i + 1].startsWith("--")) usage();
+      options.base = argv[(i += 1)];
+    } else if (arg === "--only") {
       while (argv[i + 1] && !argv[i + 1].startsWith("--")) {
         options.only.push(argv[(i += 1)]);
       }
@@ -406,6 +447,212 @@ const wrappedInlineCode = (readme) => {
   return found;
 };
 
+// The README blocks a ceiling applies to, from `.claude/rules/doc-writing.md`.
+// A block no entry matches is still checked sentence by sentence.
+const PROSE_LIMITS = [
+  {
+    applies: (block) => block.section === null && block.kind === "paragraph",
+    limit: LIMITS.lead,
+    what: "the lead paragraph",
+  },
+  {
+    applies: (block) =>
+      block.section === "Use this when / not when" && block.kind === "bullet",
+    limit: LIMITS.whenBullet,
+    what: "a “Use this when” bullet",
+  },
+  {
+    applies: (block) =>
+      block.section === "Behaviour the types don't state" &&
+      block.kind === "bullet",
+    limit: LIMITS.behaviourBullet,
+    what: "a behaviour bullet",
+  },
+  {
+    applies: (block) => block.section === "Accessibility",
+    limit: LIMITS.accessibility,
+    what: "an accessibility bullet",
+  },
+  {
+    applies: (block) => block.kind === "cell",
+    limit: LIMITS.cssEffect,
+    what: "a CSS variable's Effect",
+  },
+];
+
+const sentenceFindings = (text, file, line) =>
+  longSentences(text).map(({ sentence, words }) => ({
+    code: "W_LONG_SENTENCE",
+    file,
+    line,
+    message: `a sentence of ${words} words, over ${LIMITS.sentence}: “${excerpt(sentence)}”`,
+  }));
+
+const lengthFinding = (text, limit, what, file, line) => {
+  const words = wordCount(text);
+  return words > limit
+    ? [
+        {
+          code: "W_LONG_TEXT",
+          file,
+          line,
+          message: `${what} runs ${words} words, over ${limit}`,
+        },
+      ]
+    : [];
+};
+
+/** A story description that asks for a live Storybook, which the site is not. */
+const liveOnlyFinding = (owner, text, file, line) => {
+  const phrase = liveOnlyPhrase(text);
+  return phrase
+    ? [
+        {
+          code: "W_LIVE_ONLY_TEXT",
+          file,
+          line,
+          message: `\`${owner}\`'s story description needs a live Storybook (“${excerpt(phrase)}”); the API site prints it under a still picture, so say what happens instead`,
+        },
+      ]
+    : [];
+};
+
+/** Style findings for a README's own prose. */
+const readmeStyle = (folder, readme) => {
+  const file = `${folder}/README.md`;
+
+  return markdownProse(readme).flatMap((block) => {
+    const rule = PROSE_LIMITS.find((entry) => entry.applies(block));
+    return [
+      ...(rule
+        ? lengthFinding(block.text, rule.limit, rule.what, file, block.line)
+        : []),
+      ...sentenceFindings(block.text, file, block.line),
+    ];
+  });
+};
+
+/** Style findings for one prop's JSDoc, reported where the JSDoc is written. */
+const propStyle = (prop, component) => {
+  const { description: text, declaredFile: file, declaredLine: line } = prop;
+  if (!text) return [];
+
+  return [
+    ...lengthFinding(text, LIMITS.prop, `\`${prop.name}\`'s JSDoc`, file, line),
+    ...sentenceFindings(text, file, line),
+    ...(isTautological(prop.name, text, component)
+      ? [
+          {
+            code: "W_TAUTOLOGICAL_PROP",
+            file,
+            line,
+            message: `\`${prop.name}\`'s JSDoc restates its name; say what the value changes, where a valid one comes from, or what both values of a boolean do`,
+          },
+        ]
+      : []),
+  ];
+};
+
+/**
+ * The story files a README documents: its own folder's and those of every
+ * subfolder without a README of its own -- the table's parts and the
+ * skeletons keep theirs a level or two down. A subfolder with a README is a
+ * documented folder of its own and is checked as one.
+ */
+const storyFilesOf = (folder) => {
+  const found = [];
+
+  const walk = (relative) => {
+    const dir = path.join(ROOT, relative);
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const child = `${relative}/${entry.name}`;
+      if (entry.isDirectory()) {
+        if (!fs.existsSync(path.join(ROOT, child, "README.md"))) walk(child);
+      } else if (entry.name.endsWith(".stories.tsx")) {
+        found.push(child);
+      }
+    }
+  };
+
+  if (fs.existsSync(path.join(ROOT, folder))) walk(folder);
+  return found;
+};
+
+/** Style findings for the story files a README documents. */
+const storyStyle = (folder, component) =>
+  storyFilesOf(folder).flatMap((file) => {
+    const source = fs.readFileSync(path.join(ROOT, file), "utf8");
+
+    return storyTexts(source, path.posix.basename(file)).flatMap(
+      ({ kind, name: owner, text, line }) =>
+        kind === "story"
+          ? [
+              ...lengthFinding(
+                text,
+                LIMITS.story,
+                `\`${owner}\`'s story description`,
+                file,
+                line,
+              ),
+              ...sentenceFindings(text, file, line),
+              ...liveOnlyFinding(owner, text, file, line),
+            ]
+          : [
+              ...lengthFinding(
+                text,
+                LIMITS.argType,
+                `the \`${owner}\` argTypes description`,
+                file,
+                line,
+              ),
+              ...sentenceFindings(text, file, line),
+              ...(owner && isTautological(owner, text, component)
+                ? [
+                    {
+                      code: "W_TAUTOLOGICAL_PROP",
+                      file,
+                      line,
+                      message: `the \`${owner}\` argTypes description restates the prop's name`,
+                    },
+                  ]
+                : []),
+            ],
+    );
+  });
+
+/**
+ * The documented folders the branch changed, each file credited to the deepest
+ * folder holding it -- `rows/row` rather than `rows`. Null when the start of
+ * the branch is not in the history at hand -- no parent among the origin
+ * branches, or a shallow CI checkout that stops short of the merge base: the
+ * summary line then says so rather than call every folder unchanged. A
+ * `--base` that names no commit at all is a broken invocation, not a short
+ * history, and stops the run: CI would otherwise hide the warnings for good.
+ */
+const touchedFolders = (folders, baseRef) => {
+  if (baseRef && !isCommit(ROOT, baseRef)) {
+    console.error(
+      `--base ${baseRef}: no such branch or commit here; CI has to fetch the target branch first`,
+    );
+    process.exit(2);
+  }
+
+  const base = baseRef ? baseAgainst(ROOT, baseRef) : findBranchBase(ROOT);
+  const changed = base ? changesSince(ROOT, base.sha) : null;
+
+  if (!changed) return null;
+
+  const deepestFirst = [...folders].sort((a, b) => b.length - a.length);
+  const touched = new Set();
+
+  for (const file of changed) {
+    const owner = deepestFirst.find((folder) => file.startsWith(`${folder}/`));
+    if (owner) touched.add(owner);
+  }
+
+  return touched;
+};
+
 const main = async () => {
   const options = parseArgs(process.argv.slice(2));
   const allowlist = readAllowlist();
@@ -428,6 +675,10 @@ const main = async () => {
 
   const error = (...args) => report("error", ...args);
   const warn = (...args) => report("warning", ...args);
+
+  // Held apart from `findings` until the end, when the scope is known.
+  const style = [];
+  const seenProps = new Set();
 
   // The whole program, never only the folders asked for: what the checker
   // prints depends on which files are loaded, so a narrowed run would compare
@@ -735,6 +986,16 @@ const main = async () => {
           );
         }
 
+        // A prop shared by several blocks or folders is judged once, where
+        // its JSDoc is written.
+        const key = `${prop.declaredFile}:${prop.declaredLine}`;
+        if (prop.origin === "own" && !seenProps.has(key)) {
+          seenProps.add(key);
+          for (const finding of propStyle(prop, meta.name ?? "")) {
+            style.push({ folder, ...finding });
+          }
+        }
+
         if (prop.defaultConflict) {
           warn(
             "W_DEFAULT_MISMATCH",
@@ -771,6 +1032,13 @@ const main = async () => {
       if (match) {
         error("E_FORBIDDEN_TEXT", folder, lineOf(readme, match.index), message);
       }
+    }
+
+    for (const finding of [
+      ...readmeStyle(folder, readme),
+      ...storyStyle(folder, meta.name ?? ""),
+    ]) {
+      style.push({ folder, ...finding });
     }
 
     for (const link of unshippedLinks(readme, `${folder}/README.md`, shipped)) {
@@ -922,12 +1190,31 @@ const main = async () => {
     }
   }
 
+  // --- the style warnings, for the folders in scope ---
+
+  // Every folder is in scope when asked for; otherwise the branch's folders,
+  // and none when the branch's parent could not be found (`touched` is null).
+  const scoped = !(options.styleAll || named);
+  const touched = scoped ? touchedFolders(folders, options.base) : null;
+  const inScope = (finding) =>
+    !scoped || (touched?.has(finding.folder) ?? false);
+  const hidden = style.filter((finding) => !inScope(finding));
+
+  for (const { folder: _folder, ...finding } of style.filter(inScope)) {
+    findings.push({ severity: "warning", ...finding });
+  }
+
   const errors = findings.filter((finding) => finding.severity === "error");
 
   if (options.json) {
     console.log(
       JSON.stringify(
-        { checked: folders.length, pages: pages.length, findings },
+        {
+          checked: folders.length,
+          pages: pages.length,
+          findings,
+          styleHidden: hidden.length,
+        },
         null,
         2,
       ),
@@ -951,6 +1238,20 @@ const main = async () => {
       `\n${folders.length} README(s)${docs} checked${skipped}: ` +
         `${errors.length} error(s), ${findings.length - errors.length} warning(s).`,
     );
+
+    if (hidden.length > 0) {
+      const others = new Set(hidden.map((finding) => finding.folder)).size;
+      console.log(
+        touched === null
+          ? `${hidden.length} style warning(s) in ${others} folder(s) not shown: ` +
+              (options.base
+                ? `no common commit with \`${options.base}\` in the history at hand, so what the branch changed is unknown -- a shallow checkout may stop short of it; `
+                : "the branch's parent was not found, so what it changed is unknown; `--base <branch>` names it, ") +
+              "`--style-all` lists them all (.claude/rules/doc-writing.md)."
+          : `${hidden.length} style warning(s) in ${others} folder(s) this branch did not change; ` +
+              "`--style-all` lists them (.claude/rules/doc-writing.md).",
+      );
+    }
   }
 
   process.exit(errors.length > 0 ? 1 : 0);

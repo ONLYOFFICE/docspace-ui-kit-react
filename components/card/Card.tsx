@@ -1,5 +1,6 @@
 import classNames from "classnames";
 
+import { pickAriaProps } from "../../utils/aria-props";
 import styles from "./Card.module.scss";
 import type { CardProps } from "./Card.types";
 
@@ -12,6 +13,7 @@ export const Card = ({
   dataTestId,
   footer,
   titleLevel = 3,
+  ...rest
 }: CardProps) => {
   const hasHeader = title != null || extra != null;
 
@@ -25,6 +27,7 @@ export const Card = ({
   // itself is not a landmark either.
   return (
     <section
+      {...pickAriaProps(rest)}
       className={classNames(styles.container, className)}
       style={style}
       data-testid={dataTestId ?? "card"}

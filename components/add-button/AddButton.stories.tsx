@@ -21,22 +21,22 @@ const meta = {
     title: {
       control: "text",
       description:
-        "Tooltip shown on hover, drawn by the kit's own tooltip rather than the browser's",
+        "Tooltip shown on hover, through the kit's own tooltip rather than the browser's.",
     },
     label: {
       control: "text",
       description:
-        "Text drawn after the square; clicking it adds too. Without it the button is the square alone",
+        "Text drawn after the square. Without it the button is the square alone.",
     },
     onClick: {
       control: false,
       description:
-        "Called with the event when the square or the label is clicked, and on Enter while the button has focus",
+        "Called with the event when the square or the label is clicked, and on Enter or Space when the wrapper has focus.",
     },
     isDisabled: {
       control: "boolean",
       description:
-        "Makes the button inert: the icon greys out, the label dims and clicks are ignored",
+        "Whether the button is inert: the icon greys out, the label dims and clicks are dropped.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -44,7 +44,7 @@ const meta = {
     isAction: {
       control: "boolean",
       description:
-        "Tints the square with the theme's accent colour instead of grey",
+        "Whether the square is tinted with the accent colour instead of grey. It needs a colour scheme from the theme.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -52,24 +52,23 @@ const meta = {
     isLoading: {
       control: "boolean",
       description:
-        "Shows a spinner in place of the icon and ignores clicks while it is set",
+        "Whether a spinner replaces the icon and clicks are dropped.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     iconNode: {
       control: false,
-      description: "Icon element drawn in the square instead of the plus",
+      description: "Icon element to draw instead of the plus.",
     },
     iconName: {
       control: "text",
       description:
-        "URL of an icon fetched at runtime; ignored when `iconNode` is set",
+        "URL of the icon, fetched at runtime. Ignored when `iconNode` is set; without either, a plus is drawn.",
     },
     iconSize: {
       control: "number",
-      description:
-        "Size of the icon inside the square, in pixels; the square keeps its size",
+      description: "Size of the icon inside the square, in pixels.",
       table: {
         defaultValue: { summary: "12" },
       },
@@ -77,18 +76,18 @@ const meta = {
     size: {
       control: "text",
       description:
-        "Side of the square, as a CSS length; applied only when the theme supplies a colour scheme",
+        "Side of the square, as a CSS length. It only takes effect when the theme supplies a colour scheme.",
     },
     fontSize: {
       control: "text",
-      description: "Font size of the label, as a CSS length",
+      description: "Font size of the label, as a CSS length.",
       table: {
         defaultValue: { summary: "13px" },
       },
     },
     lineHeight: {
       control: "text",
-      description: "Line height of the label, as a CSS length",
+      description: "Line height of the label, as a CSS length.",
       table: {
         defaultValue: { summary: "20px" },
       },
@@ -96,7 +95,7 @@ const meta = {
     truncate: {
       control: "boolean",
       description:
-        "Cuts the label with an ellipsis instead of wrapping it, once the parent limits the width",
+        "Whether the label is truncated with an ellipsis instead of wrapping.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -104,38 +103,38 @@ const meta = {
     titleText: {
       control: "text",
       description:
-        "Browser tooltip of the label, shown on hovering the text, unlike `title`",
+        "`title` attribute of the label — the browser's own tooltip, unlike `title`.",
     },
     noSelect: {
       control: "boolean",
-      description: "Stops the label from being selected with the pointer",
+      description: "Whether the label cannot be selected with the pointer.",
     },
     dir: {
       control: "select",
       options: ["ltr", "rtl", "auto"],
-      description: "Writing direction of the label text",
+      description: "Writing direction of the label.",
     },
     tabIndex: {
       control: "number",
       description:
-        "Tab order of the button; without it the button cannot be focused and Enter does nothing",
+        "`tabIndex` of the wrapper. Defaults to `0`, or `-1` while `isDisabled`; pass one only to take the button out of the Tab order or to place it.",
     },
     className: {
       control: "text",
       description:
-        "Class added to the wrapper that holds the square and the label",
+        "Applied to the wrapper that holds the square and the label.",
     },
     id: {
       control: "text",
-      description: "Id of the square, not of the wrapper",
+      description: "Applied to the square, not to the wrapper.",
     },
     style: {
       control: "object",
-      description: "Inline style of the square, not of the wrapper",
+      description: "Applied to the square as inline style.",
     },
     testId: {
       control: "text",
-      description: "`data-testid` of the square",
+      description: "`data-testid` of the square.",
       table: {
         defaultValue: { summary: "selector-add-button" },
       },
@@ -189,7 +188,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The bare square with a plus, for a list that needs one more item and has room for no label. Click it, or press Tab and then Enter, and the Actions panel logs the call (`onClick`); change any other prop live in the Controls panel below.",
+          "The bare square with a plus, for a list that needs one more item and has room for no label. A click, Enter or Space calls `onClick`.",
       },
       source: {
         code: `<AddButton title="Add item" onClick={handleAdd} />`,
@@ -215,6 +214,7 @@ const WithLabelTemplate = ({ onClick }: ClickProps) => {
 };
 
 export const WithLabel: Story = {
+  name: "With label",
   render: (args) => <WithLabelTemplate onClick={args.onClick} />,
   play: async ({ args, canvas, userEvent }) => {
     // The words add too, not only the square.
@@ -250,6 +250,7 @@ const DisabledTemplate = ({ onClick }: ClickProps) => {
 };
 
 export const DisabledStates: Story = {
+  name: "Disabled",
   render: (args) => <DisabledTemplate onClick={args.onClick} />,
   play: async ({ args, canvas, userEvent }) => {
     const [square] = canvas.getAllByTestId("selector-add-button");
@@ -264,7 +265,7 @@ export const DisabledStates: Story = {
     docs: {
       description: {
         story:
-          "A disabled button stays in place so the reader sees the action exists but is not available now: the square turns a lighter grey, the icon greys out and the label dims, and clicks and Enter are ignored (`isDisabled`).",
+          "A disabled button stays in place, so the reader sees the action exists but is not available now. The square and icon turn a lighter grey, the label dims, and clicks and keys are ignored (`isDisabled`).",
       },
       source: {
         code: `<AddButton title="Add item" isDisabled />
@@ -284,6 +285,7 @@ const AccentTemplate = () => {
 };
 
 export const AccentStyle: Story = {
+  name: "Accent",
   render: () => <AccentTemplate />,
   play: async ({ canvas }) => {
     const [plain, accent] = squares(canvas);
@@ -306,6 +308,7 @@ export const AccentStyle: Story = {
 };
 
 export const LoadingState: Story = {
+  name: "Loading",
   render: (args) => <AddButton {...args} />,
   args: {
     title: "Adding...",
@@ -325,7 +328,7 @@ export const LoadingState: Story = {
     docs: {
       description: {
         story:
-          "While the item is being added, a spinner stands in for the icon so a second click does not add it twice; clicks are ignored until loading ends, and the square keeps its size (`isLoading`).",
+          "A spinner stands in for the icon while the item is being added (`isLoading`). Clicks are ignored until loading ends, so a second click does not add it twice, and the square keeps its size.",
       },
       source: {
         code: `<AddButton title="Adding..." isLoading />`,
@@ -348,6 +351,7 @@ const TruncatedTemplate = () => {
 };
 
 export const TruncatedLabel: Story = {
+  name: "Truncated label",
   render: () => <TruncatedTemplate />,
   play: async ({ canvas }) => {
     const label = canvas.getByText(
@@ -386,6 +390,7 @@ const CustomSizeTemplate = () => {
 };
 
 export const CustomIconSize: Story = {
+  name: "Larger square and icon",
   render: () => <CustomSizeTemplate />,
   play: async ({ canvas }) => {
     const [plain, large] = squares(canvas);
@@ -423,6 +428,7 @@ const CustomIconTemplate = () => {
 };
 
 export const WithCustomIcon: Story = {
+  name: "Custom icon",
   render: () => <CustomIconTemplate />,
   play: async ({ canvas }) => {
     const [square] = squares(canvas);
@@ -448,6 +454,7 @@ export const WithCustomIcon: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   play: async ({ canvas }) => {
     const [square] = squares(canvas);
     await expect(square).toHaveStyle({
@@ -502,9 +509,9 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
+        story: `Every overridable variable, set on one wrapper.
 
-**Add item** shows the square, icon and gap variables; hover and press it near its edge to see the hover and active colours. **Disabled** is there for \`--add-button-text-disabled\`, the only variable that survives the disabled state: the theme draws its square and icon in its own greys.`,
+**Add item** is a round purple 40px square with a wider gap, and lighter and darker purples on hover and press. **Disabled** shows \`--add-button-text-disabled\`, the only variable that survives the disabled state.`,
       },
       source: {
         code: `<div

@@ -100,7 +100,7 @@
   color: inherit;
   text-align: start;
 
-  -webkit-tap-highlight-color: var(--tap-highlight-color);
+  -webkit-tap-highlight-color: colors.$tap-highlight;
   position: relative;
   display: flex;
   justify-content: space-between;
