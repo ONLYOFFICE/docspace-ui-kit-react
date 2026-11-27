@@ -101,7 +101,7 @@ const PaymentMethod = ({ onManagePaymentMethod }: PaymentMethodProps) => {
           </div>
         </div>
       ) : (
-        <div className={classNames(styles.pmSection, styles.cardBody)}>
+        <div className={classNames(styles.pmSection, styles.pmLinkedBody)}>
           <div className={styles.pmRow}>
             <CardIcon className={styles.pmCardIcon} />
             <div className={styles.pmInfo}>
