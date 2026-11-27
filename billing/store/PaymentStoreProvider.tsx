@@ -73,8 +73,8 @@ const PaymentStoreProviderInner = ({
 
   React.useEffect(() => {
     const onChangeTariff = () => {
-      store.tariff.fetchPortalTariff(true);
-      store.tariff.fetchCustomerInfo(true);
+      store.tariff.fetchPortalTariff();
+      store.tariff.fetchCustomerInfo();
     };
 
     socket?.on(SocketEvents.ChangeTariff, onChangeTariff);
