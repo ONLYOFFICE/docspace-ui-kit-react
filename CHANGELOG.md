@@ -68,8 +68,9 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   - `Snackbar`: `isMaintenance`, `onClose`. `ModalDialog`: `blur`. `Tag`: `isDefault`.
     `OperationsProgressButton`: `percent`, `onOpenPanel`, `onCancelOperation`
   - `Avatar`: `editAction`. `AvatarEditorDialog` and `ImageEditor`: `maxImageSize`. `RoomLogo`:
-    `isPrivacy`. `ColorPicker`: `forwardedRef`. `DragAndDrop`: `value`, `targetFile`,
-    `forwardedRef`
+    `isPrivacy`. `ColorPicker`: `forwardedRef`. `DragAndDrop`: `targetFile`,
+    `forwardedRef`. Its `value` stays: it is written to the outer element, where
+    `SelectionArea` and the portal's drop handler read it
   - `Row`: `item`, `contextButtonSpacerWidth`. `RowContent`: `sectionWidth`. `TableHeader`:
     `sectionWidth`, `onClick`. `TableBody`: `isIndexEditingMode`. `TableRow`: `hideColumns`
   - `BaseTile`, `FolderTile` and `TemplateTile`: `thumbnailClick`. `FolderTile`: `dragging`,

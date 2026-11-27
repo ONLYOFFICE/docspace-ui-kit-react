@@ -25,4 +25,9 @@ export interface DragAndDropProps {
   onDragLeave?: (e: React.DragEvent<HTMLElement>) => void;
   /** Inline style of the outer element, and where the `--dnd-*` custom properties go. */
   style?: React.CSSProperties;
+  /**
+   * Written to the outer element as its `value` attribute. `SelectionArea` and the portal read
+   * it to tell which item a rubber-band selection or a drop landed on.
+   */
+  value?: string;
 }
