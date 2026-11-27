@@ -117,7 +117,7 @@ describe("RoomLogoCover", () => {
     renderPicker();
 
     const glyph = screen.getByRole("button", {
-      name: "CreateEditRoomDialog:Icon 1",
+      name: "Common:Icon 1",
     });
     const withoutIcon = screen.getByRole("button", {
       name: "Common:WithoutIcon",

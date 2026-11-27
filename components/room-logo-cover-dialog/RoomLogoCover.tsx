@@ -17,7 +17,7 @@ import type { ICover } from "./RoomLogoCoverDialog.types";
 import styles from "./RoomLogoCoverDialog.module.scss";
 
 export type RoomLogoCoverProps = {
-  /** Translation function. Besides `Common` keys the icon picker asks for `CreateEditRoomDialog:Icon`, which the kit does not ship. */
+  /** Translation function, asked for `Common` keys only, all of which the kit ships. */
   t: TTranslation;
 
   /** The cover icons to offer. Each carries raw SVG markup that is injected into the page, so take them only from a source you trust. An empty array leaves the icon picker out. */

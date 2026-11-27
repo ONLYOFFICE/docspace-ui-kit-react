@@ -164,7 +164,7 @@ export const Default: Story = {
     onClick: fn(),
   },
   play: async ({ args, canvas, userEvent }) => {
-    const button = canvas.getByRole("button", { name: "upload button" });
+    const button = canvas.getByRole("button", { name: "Upload" });
     await expect(canvas.getByTestId("icon-upload")).toBeInTheDocument();
     // No percent: the ring spins, with no progress value of its own.
     const ring = ringOf(button);
@@ -372,7 +372,7 @@ export const IconVariants: Story = {
   play: async ({ canvas }) => {
     const buttons = canvas.getAllByTestId("floating-button");
     await expect(buttons).toHaveLength(16);
-    await expect(buttons[0]).toHaveAttribute("aria-label", "upload button");
+    await expect(buttons[0]).toHaveAttribute("aria-label", "Upload");
     await expect(canvas.getByTestId("icon-trash")).toBeInTheDocument();
     await expect(canvas.getByTestId("icon-arrow")).toBeInTheDocument();
   },

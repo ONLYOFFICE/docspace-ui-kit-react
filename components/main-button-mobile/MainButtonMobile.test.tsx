@@ -68,6 +68,15 @@ describe("<MainButtonMobile />", () => {
     expect(button).toHaveAttribute("aria-expanded", "false");
   });
 
+  it("is named Actions, open or closed, without a passed aria-label", () => {
+    render(<MainButtonMobile buttonOptions={buttonOptions} />);
+    const button = screen.getByRole("button", { name: "Actions" });
+
+    fireEvent.click(button);
+    expect(button).toHaveAttribute("aria-expanded", "true");
+    expect(button).toHaveAttribute("aria-label", "Actions");
+  });
+
   it("keeps a passed aria-* on the button, with its menu state over a passed one", () => {
     render(
       <MainButtonMobile

@@ -13,18 +13,11 @@ import enCommon from "../../locales/en/Common.json";
 import { RoomLogoCoverDialog } from ".";
 
 // The dialog takes its translator as a prop rather than using the hook, so
-// the stories hand it the kit's own English bundle. `Common:` keys come from
-// there; `CreateEditRoomDialog:Icon` lives in a
-// namespace the kit does not ship, which is what an application outside the
-// portal has to supply too.
-const EXTRA_LABELS: Record<string, string> = {
-  "CreateEditRoomDialog:Icon": "Icon",
-};
+// the stories hand it the kit's own English bundle: every key it asks for is
+// in `Common`.
 const common = enCommon as Record<string, string>;
 const t = ((key: string) =>
-  EXTRA_LABELS[key] ??
-  common[key.replace(/^Common:/, "")] ??
-  key) as TTranslation;
+  common[key.replace(/^Common:/, "")] ?? key) as TTranslation;
 
 // The 56 covers the portal serves from `files/rooms/covers`, copied from the
 // server (products/ASC.Files/Core/Covers/default). `data` is the inline SVG
@@ -79,7 +72,7 @@ const meta = {
     t: {
       control: false,
       description:
-        "Translation function for the heading, the buttons and the picker labels. Outside the portal it must also supply the icon picker's key from outside `Common`.",
+        "Translation function for the heading, the buttons and the picker labels, all `Common` keys the kit ships.",
     },
     visible: {
       control: "boolean",

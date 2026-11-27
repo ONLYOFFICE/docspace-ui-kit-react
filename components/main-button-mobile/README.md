@@ -309,8 +309,8 @@ set, so overriding it works around the dark-theme note above.
   so it is a `role="button"` in the tab order that Enter and Space activate. It carries
   `aria-haspopup="menu"` and an `aria-expanded` that follows the sheet (with `aria-controls`
   pointing at the sheet while it is open); with `withMenu={false}` neither is set.
-- **Pass a translated `aria-label`.** Without one the button is named after its icon and the
-  word "button": `"plus button"`, or `"minus button"` while the sheet is open, in English.
+- **Its name is `Common:Actions`**, the same whether the sheet is open or closed: the state is
+  told by `aria-expanded`, not by a second name. A passed `aria-label` wins over it.
 - **The sheet is a `menu`**, a [`DropDown`](../drop-down/README.md) with `role="menu"`. Its
   items are `menuitem`s, a separator is a `separator`, and a submenu parent carries
   `aria-expanded`.

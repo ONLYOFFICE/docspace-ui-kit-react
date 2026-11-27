@@ -19,7 +19,7 @@ export const SelectIcon = ({
   coverId,
 }: SelectIconProps) => {
   const toggleWithoutIcon = () => setWithoutIcon(!withoutIcon);
-  const iconLabel = t("CreateEditRoomDialog:Icon");
+  const iconLabel = t("Common:Icon");
 
   return (
     <div>

@@ -818,5 +818,13 @@
   "PortalLimitDescription": "One shared limit for all users combined. AI requests pause for everyone when it is reached.",
   "ServiceLimitsDescription": "Set spending limits for the whole portal and per user. <1>One limit covers both AI features and AI search.</1>",
   "ServiceLimitsNoPaymentMethod": "Add a payment method to switch on AI tools and AI search. Then come back here to cap what the portal and each user spend on them.",
-  "SetSpendingLimit": "Set spending limit"
+  "SetSpendingLimit": "Set spending limit",
+  "DeletePermanently": "Delete permanently",
+  "Move": "Move",
+  "Backup": "Backup",
+  "Export": "Export",
+  "Icon": "Icon",
+  "MarkRead": "Mark as read",
+  "CloseMenu": "Close menu",
+  "InProgress": "In progress"
 }

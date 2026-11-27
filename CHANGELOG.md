@@ -594,8 +594,19 @@ timing; each such change is listed under _Changed_, so read it before upgrading.
   a passed `aria-label` win over `label`
 - **`FloatingButton`, `OperationsProgressButton` and `MainButtonMobile` forward a passed `aria-*`
   to the circle.** All three dropped it, so the badge could only be named after its icon in
-  English. A passed `aria-label` wins over `label`, and names the progress bar too. Pass a
-  translated `aria-label` to `MainButtonMobile`
+  English. A passed `aria-label` wins over `label`, and names the progress bar too
+- **`FloatingButton` without a `label` is named by its operation, translated.** It was named
+  after its icon in English (`"upload button"`), even in a translated portal, where the
+  dashboard's and the AI agents' upload circles and the webhook history's refresh circle pass
+  none. Now `upload` is `Common:Upload`, `refresh` `Common:Update`, `other` `Common:InProgress`,
+  and so on for every icon.
+  `MainButtonMobile` is named `Common:Actions`, open or closed, where it was `"plus button"` and
+  `"minus button"`
+- **`RoomLogoCoverDialog` asks for `Common:Icon`, not `CreateEditRoomDialog:Icon`.** The glyph
+  row's label and the name of every glyph came from a namespace the package does not ship, so
+  outside the portal a `t` of your own had to supply it. `Icon` is now in the shipped `Common`.
+  A portal needs `Common:Icon` in its locales: the ONLYOFFICE Apps client moved it there from
+  `CreateEditRoomDialog`, along with `MarkRead` from `Files`
 - **`ContextMenuButton` forwards a passed `aria-*` to its button.** It was dropped. A passed
   `aria-label` wins over `title`. In `toggle` mode a passed `aria-haspopup`, `aria-expanded` and
   `aria-controls` are kept, to describe the menu `onClick` opens

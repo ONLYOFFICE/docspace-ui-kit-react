@@ -128,17 +128,14 @@ describe("FloatingButton", () => {
       const button = screen.getByTestId("floating-button");
 
       expect(button).toHaveAttribute("data-role", "button");
-      expect(button).toHaveAttribute(
-        "aria-label",
-        `${defaultProps.icon} button`,
-      );
+      expect(button).toHaveAttribute("aria-label", "Upload");
     });
 
     it("is a keyboard-operable button when it has onClick", () => {
       const onClick = vi.fn();
       renderComponent(<FloatingButton {...defaultProps} onClick={onClick} />);
 
-      const button = screen.getByRole("button", { name: "upload button" });
+      const button = screen.getByRole("button", { name: "Upload" });
       expect(button).toHaveAttribute("tabindex", "0");
 
       fireEvent.keyDown(button, { key: "Enter" });
@@ -150,6 +147,28 @@ describe("FloatingButton", () => {
     it("is not a button without onClick", () => {
       renderComponent(<FloatingButton {...defaultProps} />);
       expect(screen.queryByRole("button")).toBeNull();
+    });
+
+    it("is named by the translated operation of its icon without label", () => {
+      const { rerender } = renderComponent(
+        <FloatingButton icon={FloatingButtonIcons.refresh} />,
+      );
+      expect(screen.getByTestId("floating-button")).toHaveAttribute(
+        "aria-label",
+        "Update",
+      );
+
+      rerender(<FloatingButton icon={FloatingButtonIcons.markAsRead} />);
+      expect(screen.getByTestId("floating-button")).toHaveAttribute(
+        "aria-label",
+        "Mark as read",
+      );
+
+      rerender(<FloatingButton icon={FloatingButtonIcons.other} />);
+      expect(screen.getByTestId("floating-button")).toHaveAttribute(
+        "aria-label",
+        "In progress",
+      );
     });
 
     it("takes its name from label", () => {
@@ -182,7 +201,7 @@ describe("FloatingButton", () => {
       const { rerender } = renderComponent(
         <FloatingButton {...defaultProps} percent={45} />,
       );
-      const bar = screen.getByRole("progressbar", { name: "upload button" });
+      const bar = screen.getByRole("progressbar", { name: "Upload" });
       expect(bar).toHaveAttribute("aria-valuenow", "45");
 
       rerender(<FloatingButton {...defaultProps} percent={undefined} />);

@@ -449,6 +449,9 @@ const MainButtonMobile = (props: MainButtonMobileProps) => {
           ref={floatingButtonRef}
           className={classNames(styles.floatingButton)}
           icon={isOpen ? FloatingButtonIcons.minus : FloatingButtonIcons.plus}
+          // One name for both icons: the open sheet is told by aria-expanded,
+          // not by a second name. A passed aria-label wins over it.
+          label={t("Actions")}
           onClick={onMainButtonClick}
           withoutProgress
         />

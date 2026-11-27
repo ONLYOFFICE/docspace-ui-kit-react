@@ -7,7 +7,7 @@ import type { ICover } from "../../types";
 export type { ICover };
 
 export type RoomLogoCoverDialogProps = React.AriaAttributes & {
-  /** Translation function for the heading, the buttons and the picker labels. Outside the portal it must also supply the icon picker's key from outside `Common`. */
+  /** Translation function for the heading, the buttons and the picker labels, all `Common` keys the kit ships. */
   t: TTranslation;
   /** Whether the dialog is on screen. Opening it remounts the picker, which discards whatever was chosen last time. */
   visible: boolean;
@@ -61,7 +61,7 @@ export type SelectColorProps = {
 };
 
 export type SelectIconProps = {
-  /** Translation function. This picker asks for keys outside the `Common` namespace the kit ships. */
+  /** Translation function, for the `Common:Icon` and `Common:WithoutIcon` labels. */
   t: TTranslation;
   /** Whether the initials are chosen instead of an icon. */
   withoutIcon: boolean;
