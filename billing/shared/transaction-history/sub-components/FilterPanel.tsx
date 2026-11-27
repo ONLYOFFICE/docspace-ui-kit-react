@@ -94,6 +94,7 @@ const FilterPanel = ({
                   dropDownMaxHeight={300}
                   size={ComboBoxSize.content}
                   scaled
+                  scaledOptions
                   dataTestId={typeComboboxTestId}
                   dropDownTestId={typeDropdownTestId}
                 />
