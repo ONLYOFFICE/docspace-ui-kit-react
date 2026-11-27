@@ -1,12 +1,12 @@
 ---
 name: sync-ui-kit-reference
-description: Check the DocSpace plugin skill's documentation of this kit (agent-skills/skills/plugin-sdk) against this source, and apply the fixes -- package name, installed range, dist paths, component names, CSS variables, behavioural traps
+description: Check the DocSpace plugin skill's documentation of this kit (agent-skills/skills/apps-plugin-sdk) against this source, and apply the fixes -- package name, installed range, dist paths, component names, CSS variables, behavioural traps
 argument-hint: "[--skills <path>]"
 ---
 
 # Keep the plugin skill's picture of this kit true
 
-`agent-skills/skills/plugin-sdk` generates and validates DocSpace plugins, and its
+`agent-skills/skills/apps-plugin-sdk` generates and validates DocSpace plugins, and its
 `references/ui-kit.md` is hand-written prose about **this** source — prop defaults, which
 components carry their own margin, which CSS variables exist. A plugin author reads it instead
 of the code, and nothing keeps it honest.
@@ -36,7 +36,7 @@ portal's must match exactly. The three repositories renamed it together on 2 Oct
 portal's shim does.
 
 Anything that touches the specifier, the installed range or the externals list has to be re-verified by
-the skill's own suite, `node skills/plugin-sdk/scripts/test-validator.mjs`, and by
+the skill's own suite, `node skills/apps-plugin-sdk/scripts/test-validator.mjs`, and by
 `claude plugin validate . --strict` — its CONTRIBUTING requires both. Note that the externals
 are written as a **regex** (`/^@onlyoffice\/apps-ui-kit(\/.*)?$/`) in `templates/vite.config`,
 the eval fixture and `validator-tests/fixtures.mjs`; a grep for the plain package name does not

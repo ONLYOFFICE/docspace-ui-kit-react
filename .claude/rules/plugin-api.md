@@ -39,7 +39,7 @@ when `docs/public-api.md` calls the module portal-internal.
 `node .claude/scripts/plugin-surface/surface.mjs`, or use the `plugin-surface` skill. Any change
 to the barrel, an addition too, means `pnpm surface` in the same commit: `pnpm surface:check`
 runs in pre-push and CI and fails on every difference, because the file ships in the package and
-agent-skills' `ui-kit` skill reads each name's `origin` to tell a consumer which ones are
+agent-skills' `apps-ui-kit` skill reads each name's `origin` to tell a consumer which ones are
 portal-internal.
 
 ## What is in the surface and what is not
@@ -91,7 +91,7 @@ is what to run when a change touches a barrel.
 
 ## The skill that teaches this lives in another repository
 
-`agent-skills` (`skills/plugin-sdk`) is the Claude skill that generates and validates DocSpace
+`agent-skills` (`skills/apps-plugin-sdk`) is the Claude skill that generates and validates DocSpace
 plugins. It is a separate checkout, expected at `../agent-skills` — a sibling of this
 repository — or wherever `AGENT_SKILLS_ROOT` / `--skills <path>` points; the scripts refuse to
 guess rather than reading the wrong tree. Its knowledge of the kit is a **snapshot**, and

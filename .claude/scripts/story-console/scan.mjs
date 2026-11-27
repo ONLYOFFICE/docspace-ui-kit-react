@@ -30,6 +30,7 @@ import { parseArgs } from "node:util";
 import { chromium } from "@playwright/test";
 
 import { changedModuleDirs } from "./changed.mjs";
+import { printUsage } from "./usage.mjs";
 
 const ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -51,8 +52,14 @@ const { values: opts } = parseArgs({
     timeout: { type: "string", default: "60000" },
     limit: { type: "string" },
     out: { type: "string", default: "audits/story-console" },
+    help: { type: "boolean", short: "h", default: false },
   },
 });
+
+if (opts.help) {
+  printUsage(import.meta.url);
+  process.exit(0);
+}
 
 const BASE_URL = (opts.url ?? `http://localhost:${opts.port}`).replace(
   /\/$/,

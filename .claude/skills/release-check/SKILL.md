@@ -62,7 +62,7 @@ removal is intended.
 node .claude/scripts/ui-kit-reference/check-drift.mjs
 ```
 
-`agent-skills/skills/plugin-sdk` documents this kit for plugin authors: the package specifier,
+`agent-skills/skills/apps-plugin-sdk` documents this kit for plugin authors: the package specifier,
 the range it installs, prop defaults and layout traps. Nothing keeps it fresh. The checker reads
 the agent-skills checkout beside this repository, so have it on the branch that targets this
 release before reading the result. A **new** finding blocks: it means this change

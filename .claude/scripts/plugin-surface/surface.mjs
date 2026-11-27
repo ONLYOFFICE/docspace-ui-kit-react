@@ -294,7 +294,7 @@ if (!removed.length && !changed.length && !added.length && !moved.length) {
   console.log("\nUnchanged against the baseline.");
 }
 
-// --check is the gate: the baseline is also what agent-skills' `ui-kit` skill reads to learn
+// --check is the gate: the baseline is also what agent-skills' `apps-ui-kit` skill reads to learn
 // which barrel names come from portal-internal modules, so a name added without --write is a
 // name that skill never flags. Any difference fails here, additions and moves included.
 if (has("--check")) {

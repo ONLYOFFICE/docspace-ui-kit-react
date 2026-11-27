@@ -15,7 +15,7 @@ what order it says things in, and what it leaves to the generated tables.
 
 It has two readers, and they want the same text. A person reads the Docs page in Storybook or
 the README on api.onlyoffice.com and looks for "what does it do" in the first line. An agent
-reads the same README from the package and the `ui-kit` skill, and from the JSDoc in
+reads the same README from the package and the `apps-ui-kit` skill, and from the JSDoc in
 `dist/types`. Research on tool descriptions finds nothing gained beyond three to six sentences.
 The context an agent pays for grows with every word, and a longer description among short ones
 is picked more often whether it fits or not.
