@@ -18,7 +18,6 @@ import { usePaymentStore } from "../../store/PaymentStoreProvider";
 type TopUpModalProps = {
   visible: boolean;
   onClose: (isTopUp: boolean) => void;
-  isEditAutoPayment?: boolean;
   headerProps?: {
     isBackButton: boolean;
     onBackClick: () => void;
@@ -34,7 +33,6 @@ const TopUpModal = (props: TopUpModalProps) => {
   const {
     visible,
     onClose,
-    isEditAutoPayment,
     headerProps,
     recommendedAmount,
     amount,
@@ -107,7 +105,6 @@ const TopUpModal = (props: TopUpModalProps) => {
 
             {wasFirstTopUp && walletCustomerEmail ? (
               <AutomaticPaymentsBlock
-                isEditAutoPayment={isEditAutoPayment!}
                 isDisabled={isLoading || walletCustomerStatusNotActive}
               />
             ) : null}
