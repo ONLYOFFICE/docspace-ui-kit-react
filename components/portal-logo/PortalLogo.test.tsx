@@ -27,6 +27,20 @@ describe("PortalLogo", () => {
     window.innerWidth = 1024;
   });
 
+  it("puts a passed aria-* on the image and on the fallback", () => {
+    render(<PortalLogo alt="Acme" aria-describedby="logo-hint" />);
+    expect(screen.getByRole("img")).toHaveAttribute(
+      "aria-describedby",
+      "logo-hint",
+    );
+
+    fireEvent.error(screen.getByRole("img"));
+    expect(screen.getByRole("img", { name: "Acme" })).toHaveAttribute(
+      "aria-describedby",
+      "logo-hint",
+    );
+  });
+
   it("renders without crashing", () => {
     render(<PortalLogo />);
     const img = screen.getByRole("img");
@@ -41,6 +55,15 @@ describe("PortalLogo", () => {
     render(<PortalLogo className="custom-class" />);
     const img = screen.getByRole("img");
     expect(img).toHaveClass("custom-class");
+  });
+
+  it("carries a test id on the wrapper and on the fallback", () => {
+    render(<PortalLogo dataTestId="login-logo" />);
+    const wrapper = screen.getByTestId("login-logo");
+    expect(wrapper).toBe(screen.getByRole("img").parentElement);
+
+    fireEvent.error(screen.getByRole("img"));
+    expect(screen.getByTestId("login-logo")).toBe(screen.getByRole("img"));
   });
 
   it("adds wrapper class by default", () => {
@@ -82,9 +105,9 @@ describe("PortalLogo", () => {
     );
   });
 
-  it("names the image with the alt prop, defaulting to the old string", () => {
+  it("names the image with the alt prop, defaulting to the product name", () => {
     const { unmount } = render(<PortalLogo />);
-    expect(screen.getByRole("img", { name: "portal logo" })).toBeVisible();
+    expect(screen.getByRole("img", { name: "ONLYOFFICE Apps" })).toBeVisible();
     unmount();
 
     render(<PortalLogo alt="Acme portal" />);
@@ -211,7 +234,7 @@ describe("PortalLogo", () => {
     render(<PortalLogo alt="" />);
     fireEvent.error(screen.getByRole("presentation", { hidden: true }));
 
-    expect(screen.getByTestId("svg-mock")).toHaveAttribute(
+    expect(screen.getByTestId("portal-logo")).toHaveAttribute(
       "aria-hidden",
       "true",
     );

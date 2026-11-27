@@ -3,92 +3,96 @@ import type { InputSize } from "../text-input";
 export type { IconSize };
 
 export type IconButtonProps = {
-  /** Sets component class */
+  /** Class added to the button element. */
   className?: string;
-  /** Any CSS colour, the literal `"accent"` for the theme accent, or the name
-   * of a custom property starting with `--`, which is wrapped in `var()`. */
+  /** Colour of the icon: any CSS colour, `"accent"` for the theme accent, or a
+   * custom property name starting with `--`. */
   color?: "accent" | (string & {});
-  /** Colour while the pointer is over the button; same forms as `color`. */
+  /** Colour of the icon while the pointer is over the button; same forms as
+   * `color`. */
   hoverColor?: "accent" | (string & {});
-  /** Colour while the button is held down; same forms as `color`. */
+  /** Colour of the icon from the press until the pointer leaves the button;
+   * same forms as `color`. */
   clickColor?: "accent" | (string & {});
-  /** Size of the button on both axes. A number is pixels; the `InputSize`
-   * members all resolve to 15px; any other string is used as a CSS length.
-   * @default 20 */
+  /** Width and height of the button. A number is pixels; `extraSmall`,
+   * `small`, `medium` and `big` are 8, 12, 16 and 24px, and `scale` fills the
+   * container. `base`, `middle` and `large` are 15px; another string is a CSS
+   * length. */
   size?: number | IconSize | InputSize;
-  /** Colours the icon by filling its shapes. Turn it off for an outline icon
-   * and use `isStroke` instead.
+  /** Colours the icon by filling its shapes; off, the icon keeps the fill it
+   * was drawn with. `isStroke` turns it off.
    * @default true */
   isFill?: boolean;
-  /** Colours the icon by stroking its paths, which wins over `isFill`.
+  /** Colours the outlines of the icon's shapes instead of their fill, for an
+   * outline icon.
    * @default false */
   isStroke?: boolean;
-  /** Greys the icon and stops every handler, including the hover and click
-   * icon swaps. It sets `aria-disabled`, not the `disabled` property — there is
-   * no button element to carry one.
+  /** Stops every handler and the hover and press swaps, and sets
+   * `aria-disabled`. The icon keeps its colour; only the cursor changes.
    * @default false */
   isDisabled?: boolean;
   /** Shows the pointer cursor without an `onClick`, for a button whose click is
    * handled by an ancestor.
    * @default false */
   isClickable?: boolean;
-  /** The icon as JSX, rendered inline. Preferred over `iconName`: it needs no
-   * network request and is typed by your own bundler. */
+  /** The icon as JSX, rendered inline with no network request. Wins over
+   * `iconName`. */
   iconNode?: React.ReactNode;
-  /** **A URL, not an asset name.** It is handed to `react-svg` as `src`, which
-   * fetches it at runtime and inlines the response, so it has to resolve from
-   * the browser — an imported `?url`, or a path under your public directory.
-   * Ignored when `iconNode` is set. */
+  /** URL of the icon, fetched at runtime and inlined as SVG. It has to resolve
+   * from the browser: an imported `?url`, or a path under your public
+   * directory. */
   iconName?: string;
-  /** URL of the icon swapped in while the pointer is over the button, on a
-   * device that has a pointer. */
+  /** URL of the icon shown while the pointer is over the button; ignored on a
+   * touch device. */
   iconHoverName?: string;
-  /** URL of the icon swapped in while the button is held down. */
+  /** URL of the icon shown from the press until the pointer leaves the button;
+   * ignored on a touch device. */
   iconClickName?: string;
-  /** Sets a button callback function triggered when the button is clicked */
+  /** Called when the button is clicked, or activated with Enter or Space,
+   * unless it is disabled. */
   onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
-  /** Sets a button callback function triggered when the cursor enters the area */
+  /** Called when the pointer enters the button, unless it is disabled. */
   onMouseEnter?: (e: React.MouseEvent) => void;
-  /** Sets a button callback function triggered when the cursor moves down */
+  /** Called when a mouse button is pressed on the button, unless it is
+   * disabled. */
   onMouseDown?: (e: React.MouseEvent<HTMLDivElement>) => void;
-  /** Called when a mouse button is released over the icon — but only for the
-   * middle and right buttons, which is a defect in the component rather than a
-   * design. Use `onClick` for the left button. */
+  /** Called when the middle or right mouse button is released, never the left
+   * one. Use `onClick` for the left button. */
   onMouseUp?: (e: React.MouseEvent<HTMLDivElement>) => void;
-  /** Sets a button callback function triggered when the cursor leaves the icon */
+  /** Called when the pointer leaves the button, unless it is disabled. */
   onMouseLeave?: (e: React.MouseEvent) => void;
-  /** Sets component id */
+  /** Id of the button element. */
   id?: string;
-  /** Accepts css style */
+  /** Inline style of the button element, applied after the size and colours
+   * the component sets. */
   style?: React.CSSProperties;
-  /** Value of the legacy `data-tip` attribute, read by an older tooltip
-   * implementation. Use `tooltipId` with `tooltipContent`, or `title`.
+  /** Value of the legacy `data-tip` attribute. Use `tooltipId` with
+   * `tooltipContent`, or `title`.
    * @default "" */
   dataTip?: string;
-  /** Tooltip text. Consumed by the tooltip container this component renders,
-   * so it never reaches the DOM as a `title` attribute. */
+  /** Text of the shared tooltip shown on hover. It becomes a native `title`
+   * attribute only under `NODE_ENV=test`. */
   title?: string;
   /** Value of `data-testid` on the button.
    * @default "icon-button" */
   dataTestId?: string;
 
-  /** Anchor id for a tooltip. Together with `tooltipContent` it makes the
-   * component render its own `Tooltip`, placed below the button. */
+  /** Id of a tooltip the button renders itself, below it; needs
+   * `tooltipContent`. */
   tooltipId?: string;
-  /** Text of that tooltip. Without `tooltipId` it does nothing. */
+  /** Text of that tooltip; does nothing without `tooltipId`. */
   tooltipContent?: string;
 
-  /** Applied to the element. Unset on a button with an `onClick` that is not
-   * disabled, it is `0`, and the button also gets `role="button"` and Enter /
-   * Space activation; passing it (or `onKeyDown`) leaves the keyboard to you. */
+  /** Tab order of the button. Passing it switches off the built-in keyboard
+   * support that an enabled button with `onClick` gets. */
   tabIndex?: number;
-  /** Called on a key press. Passing it replaces the built-in Enter / Space
-   * activation, so it must implement them itself. */
+  /** Called on a key press. Passing it replaces the built-in Enter and Space
+   * activation, so it has to implement them. */
   onKeyDown?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
-  /** ARIA role. Unset, it is "button" whenever the built-in keyboard support
-   * applies (see `tabIndex`), and none otherwise. */
+  /** ARIA role of the element. Unset, it is `"button"` while the built-in
+   * keyboard support applies, and none otherwise. */
   role?: React.AriaRole;
-  /** Value of `aria-label`, the button's accessible name. Unset, a button with
-   * the built-in keyboard support is named by `title`. */
+  /** Accessible name of the button. Unset, a button with the built-in keyboard
+   * support is named by `title`. */
   ariaLabel?: string;
 };

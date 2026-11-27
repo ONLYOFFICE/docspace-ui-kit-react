@@ -13,6 +13,38 @@ const baseProps = {
 };
 
 describe("<Row />", () => {
+  it("puts a passed aria-* on the row", () => {
+    render(<Row {...baseProps} aria-describedby="row-hint" />);
+    expect(screen.getByTestId("row")).toHaveAttribute(
+      "aria-describedby",
+      "row-hint",
+    );
+  });
+
+  it("makes a named row a group, and leaves an unnamed one without a role", () => {
+    const { rerender } = render(
+      <Row {...baseProps} aria-label="Report.docx" />,
+    );
+    expect(screen.getByRole("group", { name: "Report.docx" })).toBe(
+      screen.getByTestId("row"),
+    );
+
+    rerender(<Row {...baseProps} />);
+    expect(screen.getByTestId("row")).not.toHaveAttribute("role");
+  });
+
+  it("keeps a passed aria-busy while not in progress", () => {
+    render(<Row {...baseProps} aria-busy />);
+    expect(screen.getByTestId("row")).toHaveAttribute("aria-busy", "true");
+  });
+
+  it("puts id and style on the row", () => {
+    render(<Row {...baseProps} id="row-1" style={{ marginTop: "4px" }} />);
+    const row = screen.getByTestId("row");
+    expect(row).toHaveAttribute("id", "row-1");
+    expect(row).toHaveStyle({ marginTop: "4px" });
+  });
+
   it("renders without error", () => {
     render(
       <Row {...baseProps} isIndexEditingMode={false} onRowClick={() => {}} />,

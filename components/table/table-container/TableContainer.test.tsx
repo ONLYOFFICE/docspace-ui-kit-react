@@ -9,6 +9,20 @@ describe("<TableContainer />", () => {
     vi.clearAllMocks();
   });
 
+  it("puts a passed aria-* on the container", () => {
+    render(
+      <TableContainer
+        useReactWindow
+        forwardedRef={{ current: null }}
+        aria-label="Files"
+      />,
+    );
+    expect(screen.getByTestId("table-container")).toHaveAttribute(
+      "aria-label",
+      "Files",
+    );
+  });
+
   it("renders without errors", () => {
     render(<TableContainer useReactWindow forwardedRef={{ current: null }} />);
     expect(screen.getByTestId("table-container")).toBeInTheDocument();

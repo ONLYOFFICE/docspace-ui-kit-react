@@ -114,6 +114,9 @@ export const VariantStory: Story = {
 10. [ ] **Wrapper** - Use a layout wrapper for stories with multiple items
 11. [ ] **Story order** - `Default` first, `CssCustomization` last; `RightToLeft`, when present, right before it
 12. [ ] **`CssCustomization` has no table** - It demonstrates the variables; the README's `## CSS variables` lists them
+13. [ ] **Text length** - `description.story` and `argTypes` descriptions within the limits of `.claude/rules/doc-writing.md`, none restating its prop's name (`pnpm check:readme --only <folder>` warns)
+14. [ ] **Text that works off Storybook** - no story description names a Storybook panel or asks the reader to hover or click; its first sentence says what the picture shows, since the API site uses it as the alt text (`W_LIVE_ONLY_TEXT`)
+15. [ ] **Shown names** - a story whose export reads like code has a plain `name` ("Loading", not "Is Loading Buttons")
 
 ## Where the description lives
 
@@ -142,14 +145,19 @@ facts live in the parent README.
 
 ## Story Naming Conventions
 
-| Pattern             | Example                                         |
-| ------------------- | ----------------------------------------------- |
-| Default interactive | `Default`                                       |
-| Size variants       | `Sizes` or `SmallSize`, `LargeSize`             |
-| State variants      | `DisabledState`, `LoadingState`, `HoveredState` |
-| Type/style variants | `PrimaryButtons`, `SecondaryButtons`            |
-| Feature demos       | `WithIcon`, `WithTooltip`, `WithCallback`       |
-| Direction           | `RightToLeft` (never `RTL`)                     |
+The export name is the story's id: the screenshot baselines in `__tests__/` and the API site's
+picture files are keyed by it, so an existing export is never renamed. What Storybook and the site
+show is the story's `name`, plain words for the state, set whenever the export's spaced-out form
+reads like code (`IsLoadingButtons` -> "Is Loading Buttons").
+
+| Pattern             | Export                                          | Shown name (`name`)         |
+| ------------------- | ----------------------------------------------- | --------------------------- |
+| Default interactive | `Default`                                       | -- (already reads well)     |
+| Size variants       | `Sizes` or `SmallSize`, `LargeSize`             | "Sizes", "Small"            |
+| State variants      | `DisabledState`, `LoadingState`, `HoveredState` | "Disabled", "Loading"       |
+| Type/style variants | `PrimaryButtons`, `SecondaryButtons`            | "Primary", "Secondary"      |
+| Feature demos       | `WithIcon`, `WithTooltip`, `WithCallback`       | "With icon", "With tooltip" |
+| Direction           | `RightToLeft` (never `RTL`)                     | "Right to left"             |
 
 ## Pictures for the API site
 

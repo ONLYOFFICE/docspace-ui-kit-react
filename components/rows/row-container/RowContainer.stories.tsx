@@ -29,12 +29,12 @@ const meta = {
   argTypes: {
     children: {
       control: false,
-      description: "The rows, as an array with one entry per row",
+      description: "The rows. It must be an array, one entry per row.",
     },
     useReactWindow: {
       control: "boolean",
       description:
-        "Whether only the rows in view are mounted and the rest paged in as the user scrolls. It needs the page section's scroll container around it; turn it off for a short list",
+        "Whether the rows are virtualised and paged in as the user scrolls. Turn it off outside the portal, whose scroll element the virtual list follows.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -42,7 +42,7 @@ const meta = {
     itemHeight: {
       control: "number",
       description:
-        "Height of every row in pixels while the list is virtualised; a taller row is cut off",
+        "Height of one row in pixels, which the virtualised list uses for every row alike. A taller row gets no more room.",
       table: {
         defaultValue: { summary: "50" },
       },
@@ -50,52 +50,51 @@ const meta = {
     manualHeight: {
       control: "text",
       description:
-        "Height of the list as a CSS length while it is virtualised; without it the list is as tall as its parent, which then needs a height of its own",
+        "Height of the container as a CSS length while `useReactWindow` is on. Without it the container takes its parent's full height. With virtualisation off it does nothing.",
     },
     itemCount: {
       control: "number",
       description:
-        "How many rows there are in total, loaded or not; read only while the list is virtualised",
+        "How many rows there are in total. Read by the virtual list only.",
     },
     filesLength: {
       control: "number",
       description:
-        "How many rows are loaded so far; read only while the list is virtualised",
+        "How many rows are loaded so far. Read by the virtual list only.",
     },
     hasMoreFiles: {
       control: "boolean",
-      description:
-        "Whether there is another range of rows to ask for; read only while the list is virtualised",
+      description: "Whether there is another page to ask for.",
     },
     fetchMoreFiles: {
       control: false,
       description:
-        "Called with the start and stop index of the rows to load when the user scrolls near the end of the loaded ones; it returns a promise",
+        "Called with the range to load when the user scrolls near the end.",
     },
     onScroll: {
       control: false,
-      description: "Called as the virtualised list scrolls",
+      description:
+        "Called as the virtual list scrolls. Never called with virtualisation off.",
     },
     noSelect: {
       control: "boolean",
       description:
-        "Stops the user from selecting the text of the rows, which is allowed by default",
+        "Disables text selection, which is on by default inside the container.",
     },
     id: {
       control: "text",
-      description:
-        "Id of the list element. The virtualised list finds itself by the id `rowContainer` to measure its width, so another id, or a second list on the page, leaves its rows with no width",
+      description: "Id of the container element.",
       table: {
         defaultValue: { summary: '"rowContainer"' },
       },
     },
     className: {
       control: "text",
-      description: "Class added to the list element",
+      description: "Applied to the container.",
     },
     style: {
       control: "object",
-      description: "Inline style applied to the list element",
+      description: "Applied to the container.",
     },
   },
 } satisfies Meta<typeof RowContainer>;
@@ -151,6 +150,7 @@ const Template = (args: RowContainerProps) => {
 };
 
 export const Default: Story = {
+  name: "All rows at once",
   render: (args) => <Template {...args} />,
   args: {
     useReactWindow: false,
@@ -166,7 +166,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A short list of twenty files rendered as it is, with virtualisation off (`useReactWindow`), which is how the list works on a page that has no portal section around it. Select the text of a row to see that selection is allowed; change any other prop live in the Controls panel below.",
+          "Twenty file rows rendered at once, with virtualisation off (`useReactWindow`), as on a page with no portal section around it. The text of the rows can be selected.",
       },
       source: {
         code: `<RowContainer useReactWindow={false}>
@@ -190,6 +190,7 @@ export const Default: Story = {
 };
 
 export const NoTextSelection: Story = {
+  name: "No text selection",
   render: (args) => <Template {...args} />,
   args: {
     useReactWindow: false,
@@ -268,6 +269,7 @@ const VirtualisedTemplate = (args: RowContainerProps) => {
 };
 
 export const Virtualised: Story = {
+  name: "Virtualised and paged",
   render: (args) => <VirtualisedTemplate {...args} />,
   args: {
     useReactWindow: true,
@@ -305,7 +307,7 @@ export const Virtualised: Story = {
     docs: {
       description: {
         story:
-          "A list of a hundred files of which twenty are loaded: scroll the box and only the rows in view are mounted, each 56px high (`itemHeight`). Near the end of the loaded rows the list asks for the next range (`fetchMoreFiles`, logged in the Actions panel) and shows skeleton rows until it arrives half a second later.",
+          "A box of a hundred files, twenty of them loaded, with only the rows in view mounted, each 56px high (`itemHeight`). Near the end of the loaded rows the list calls `fetchMoreFiles`. Skeleton rows stand in until the next range arrives.",
       },
       source: {
         code: `<div id="sectionScroll" style={{ height: 300 }}>
@@ -323,7 +325,6 @@ export const Virtualised: Story = {
   </Scrollbar>
 </div>`,
       },
-      // Framed: the virtual list measures the first #rowContainer on the page
       story: { inline: false, height: "326px" },
     },
   },

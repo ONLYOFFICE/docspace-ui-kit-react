@@ -17,6 +17,11 @@
 //
 // Returns null when no candidate exists. Callers treat that as "everything
 // changed" rather than guess.
+//
+// `findBranchBase` is the second half alone, for check-readme.mjs: its style
+// warnings cover what the branch changed, not what one push sends. CI has no
+// origin branches to search, so it names the target branch and check-readme
+// asks `baseAgainst` for the point where HEAD left it.
 
 import { spawnSync } from "node:child_process";
 
@@ -33,7 +38,16 @@ const LONG_LIVED = [
   "refs/remotes/origin/hotfix",
 ];
 
-const baseAgainst = (cwd, ref) => {
+/** Whether `ref` names a commit git has here. */
+export const isCommit = (cwd, ref) =>
+  git(cwd, "rev-parse", "--verify", "--quiet", `${ref}^{commit}`) !== null;
+
+/**
+ * Where HEAD left `ref`: their merge base, and how far HEAD is ahead of it.
+ * Null when there is none in the history at hand -- a shallow clone may stop
+ * short of it.
+ */
+export const baseAgainst = (cwd, ref) => {
   const sha = git(cwd, "merge-base", "HEAD", ref);
   if (!sha) return null;
   const count = git(cwd, "rev-list", "--count", `${sha}..HEAD`);
@@ -58,6 +72,16 @@ export function findPushBase(cwd) {
     if (base) return base;
   }
 
+  return findBranchBase(cwd);
+}
+
+/**
+ * Where the branch itself begins: the long-lived branch it was most likely cut
+ * from, whatever its upstream says. This is the question for anything scoped
+ * to "what the branch changed" rather than "what this push sends" -- once a
+ * branch has been pushed, its upstream hides every commit already sent.
+ */
+export function findBranchBase(cwd) {
   const refs = (
     git(cwd, "for-each-ref", "--format=%(refname:short)", ...LONG_LIVED) ?? ""
   )

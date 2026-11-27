@@ -8,6 +8,8 @@ import DarkLightSmallLogo from "../../assets/logo/dark_lightsmall.svg";
 
 import { size as deviceSize } from "../../utils";
 import { getLogoUrl } from "../../utils/getLogoUrl";
+import { pickAriaProps } from "../../utils/aria-props";
+import { getProductName } from "../../utils/product-name";
 
 import { WhiteLabelLogoType } from "../../enums";
 import { useTheme } from "../../context/ThemeContext";
@@ -17,8 +19,12 @@ import styles from "./PortalLogo.module.scss";
 const PortalLogo = ({
   className,
   isResizable = false,
-  alt = "portal logo",
+  alt: altProp,
+  dataTestId = "portal-logo",
+  ...rest
 }: PortalLogoProps) => {
+  const aria = pickAriaProps(rest);
+  const alt = altProp ?? getProductName();
   const [isError, setIsError] = useState(false);
   // A server-rendered logo can fail before the page hydrates; its error event
   // has fired by then and onError never runs, leaving a broken image. decode()
@@ -75,18 +81,21 @@ const PortalLogo = ({
 
     return (
       <FallbackLogo
+        {...aria}
         className={classNames("logo-wrapper", className)}
         role={alt ? "img" : undefined}
-        aria-label={alt || undefined}
-        aria-hidden={alt ? undefined : true}
+        aria-label={aria["aria-label"] ?? (alt || undefined)}
+        aria-hidden={alt ? aria["aria-hidden"] : true}
+        data-testid={dataTestId}
       />
     );
   }
 
   return (
-    <div className={wrapperClassName}>
+    <div className={wrapperClassName} data-testid={dataTestId}>
       {logo ? (
         <img
+          {...aria}
           ref={catchEarlyError}
           src={logo}
           className={classNames("logo-wrapper", className)}

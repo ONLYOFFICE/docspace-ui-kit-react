@@ -1,6 +1,8 @@
 import ImageCropper from "./ImageCropper";
 import ButtonDelete from "./ButtonDelete";
 
+import { pickAriaProps } from "../../utils/aria-props";
+
 import { ImageEditorProps } from "./ImageEditor.types";
 
 const ImageEditor = ({
@@ -15,6 +17,7 @@ const ImageEditor = ({
   disableImageRescaling,
   editorBorderRadius,
   onChangeFile,
+  ...rest
 }: ImageEditorProps) => {
   const setUploadedFile = (f?: File) => {
     onChangeImage({ ...image, uploadedFile: f });
@@ -26,15 +29,15 @@ const ImageEditor = ({
 
   return (
     <div
+      {...pickAriaProps(rest)}
       className={className}
       role="region"
-      aria-label="Image editor"
-      data-test-id="image-editor"
+      data-testid="image-editor"
     >
       {image.uploadedFile && !isDefaultAvatar ? (
         <div
           className={classNameWrapperImageCropper}
-          data-test-id="image-cropper-wrapper"
+          data-testid="image-cropper-wrapper"
         >
           <ImageCropper
             t={t}

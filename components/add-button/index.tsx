@@ -7,6 +7,7 @@ import { Text } from "../text";
 import { IconButton } from "../icon-button";
 import { TooltipContainer } from "../tooltip";
 import { Loader, LoaderTypes } from "../loader";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import styles from "./AddButton.module.scss";
 
@@ -41,6 +42,14 @@ const AddButton = (props: AddButtonProps) => {
     tabIndex,
     ...rest
   } = props;
+
+  // `aria-*` belongs on the wrapper, which has the role; anything else left
+  // over (`data-*`) stays on the square, as it always has.
+  const aria = pickAriaProps(rest);
+  const squareProps: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(rest)) {
+    if (!key.startsWith("aria-")) squareProps[key] = value;
+  }
 
   const { currentColorScheme } = useTheme();
   const mainAccentColor = currentColorScheme?.main?.accent;
@@ -95,15 +104,16 @@ const AddButton = (props: AddButtonProps) => {
       className={containerClassName}
       tabIndex={wrapperTabIndex}
       onKeyDown={onKeyDownAction}
+      {...aria}
       role="button"
       // Loading drops the key and the click as disabled does, so it is
       // announced the same way, and as busy. The focus stays where it is.
-      aria-disabled={isDisabled || isLoading || undefined}
-      aria-busy={isLoading || undefined}
+      aria-disabled={isDisabled || isLoading || aria["aria-disabled"]}
+      aria-busy={isLoading || aria["aria-busy"]}
     >
       <TooltipContainer
         as="div"
-        {...rest}
+        {...squareProps}
         id={id}
         style={buttonStyle}
         title={title}

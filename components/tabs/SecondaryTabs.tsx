@@ -4,6 +4,7 @@ import { ReactSVG } from "react-svg";
 import { motion } from "framer-motion";
 import { isMobile } from "react-device-detect";
 import ArrowReactUrl from "../../assets/arrow.left.react.svg";
+import { omitAriaProps, pickAriaProps } from "../../utils/aria-props";
 import type { TTabItem, TabsProps } from "./Tabs.types";
 import { Scrollbar, type ScrollbarType } from "../scrollbar";
 import { Text } from "../text";
@@ -264,6 +265,7 @@ const SecondaryTabs = (props: TabsProps) => {
         classes,
       )}
       ref={tabsRef}
+      {...pickAriaProps(rest)}
       role="tablist"
       onKeyDown={onKeyDown}
     >
@@ -334,7 +336,7 @@ const SecondaryTabs = (props: TabsProps) => {
     <div
       ref={tabsContainerRef}
       className={classNames(styles.tabs, classes, className)}
-      {...rest}
+      {...omitAriaProps(rest)}
     >
       <div
         data-sticky

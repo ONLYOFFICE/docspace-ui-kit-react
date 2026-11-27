@@ -24,44 +24,47 @@ const meta = {
           [RoomsType.PublicRoom]: "PublicRoom",
           [RoomsType.VirtualDataRoom]: "VirtualDataRoom",
           [RoomsType.AIRoom]: "AIRoom",
+          [RoomsType.InstructionsRoom]: "InstructionsRoom",
+          [RoomsType.KnowledgeRoom]: "KnowledgeRoom",
+          [RoomsType.AiProjectRoom]: "AiProjectRoom",
         },
       },
       options: Object.values(RoomsType).filter((v) => typeof v === "number"),
       description:
-        "Which room type the row describes. It picks the glyph, the title and the description; an unknown value leaves both lines empty",
+        "Which room type the row describes: its glyph, title and description. An unknown value, or none, leaves both texts and the glyph box empty.",
     },
     isOpen: {
       control: "boolean",
       description:
-        "Draws the row as opened: on a dropdown button the border turns to the accent colour and the arrow points up instead of down. The other layouts look the same either way",
+        "Whether the row is drawn as opened: an accent border on `dropdownButton`, and its arrow turned the other way.",
     },
     type: {
       control: "select",
       options: ["listItem", "dropdownButton", "dropdownItem"],
       description:
-        "Which layout to render: a bordered card with a forward arrow, the collapsed button of a dropdown with a down arrow, or a borderless entry with no arrow",
+        "Which layout to render: a bordered card with an arrow, a dropdown's collapsed button, or a borderless dropdown entry.",
       table: {
         defaultValue: { summary: "listItem" },
       },
     },
     id: {
       control: "text",
-      description: "`id` of the outer element",
+      description: "`id` of the outer element.",
     },
     selectedId: {
       control: "text",
       description:
-        "Written to the row's `data-selected-id` attribute and read by nothing else. Required all the same",
+        "Written to `data-selected-id` and read by nothing else. Required all the same.",
     },
     onClick: {
       action: "clicked",
       description:
-        "Called with the event when the row is clicked, once per click wherever inside the row it lands. A disabled row does not call it",
+        "Called with the event on a click anywhere in the row, once per click. Enter and Space click the row too. A disabled row never calls it; `dropdownButton` has no disabled state.",
     },
     disabledFormRoom: {
       control: "boolean",
       description:
-        "Greys the row out while `roomType` is `FormRoom`, marks it `aria-disabled` and stops it calling `onClick`. The dropdown button ignores it",
+        "Greys the row out while `roomType` is `FormRoom`, marks it `aria-disabled` and stops it calling `onClick`. The `dropdownButton` layout ignores it.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -69,7 +72,7 @@ const meta = {
     disabledPublicRoom: {
       control: "boolean",
       description:
-        "Greys the row out while `roomType` is `PublicRoom`, marks it `aria-disabled` and stops it calling `onClick`. The dropdown button ignores it",
+        "Greys the row out while `roomType` is `PublicRoom`, marks it `aria-disabled` and stops it calling `onClick`. The `dropdownButton` layout ignores it.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -77,7 +80,7 @@ const meta = {
     isTemplate: {
       control: "boolean",
       description:
-        'Replaces the title and the description with the "from template" wording, whatever `roomType` says, and switches the glyph to the template one',
+        'Replaces the title and the description with the "from template" wording, whatever `roomType` says, and switches the glyph to the template one.',
       table: {
         defaultValue: { summary: "false" },
       },
@@ -85,7 +88,7 @@ const meta = {
     isTemplateRoom: {
       control: "boolean",
       description:
-        "Switches the glyph to the template variant of `roomType` without touching the texts",
+        "Switches the glyph to the template variant of `roomType` without touching the texts.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -93,7 +96,7 @@ const meta = {
     isFormSection: {
       control: "boolean",
       description:
-        "Uses the form-space wording for the title and the description instead of the room type's; with `isTemplate` it becomes the form-space template wording",
+        "Uses the form-space wording for the title and the description instead of the room type's.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -112,6 +115,7 @@ const arrowOf = (row: HTMLElement) =>
   row.querySelector(".choose_room-forward_btn") as HTMLElement;
 
 export const Default: Story = {
+  name: "Default",
   render: (args) => <RoomType {...args} />,
   args: {
     roomType: RoomsType.EditingRoom,
@@ -141,7 +145,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A single card as it appears in a list of room types to choose from; pick another type or layout in the Controls panel below.",
+          "A collaboration room card as it appears in a list of room types to choose from.",
       },
       source: {
         code: `<RoomType
@@ -157,6 +161,7 @@ export const Default: Story = {
 };
 
 export const DropdownButton: Story = {
+  name: "Dropdown button",
   render: (args) => <RoomType {...args} />,
   args: {
     roomType: RoomsType.PublicRoom,
@@ -169,6 +174,10 @@ export const DropdownButton: Story = {
     const button = canvas.getByTestId("room-type-dropdown-button");
     await expect(button.className).toMatch(/isOpen/);
     await expect(button).toHaveAttribute("aria-expanded", "true");
+    // The accent border needs no portal: with no --accent-main it is the
+    // theme's accent, not the text colour.
+    const style = getComputedStyle(button);
+    await expect(style.borderTopColor).not.toBe(style.color);
     await userEvent.click(button);
     await expect(args.onClick).toHaveBeenCalledTimes(1);
     button.focus();
@@ -179,7 +188,7 @@ export const DropdownButton: Story = {
     docs: {
       description: {
         story:
-          "The collapsed button at the top of a picker, drawn open: the border takes the accent colour and the arrow points up (`isOpen`). Clear `isOpen` in the Controls panel to see it closed, arrow pointing down.",
+          "The collapsed button at the top of a picker, drawn open (`isOpen`): the border takes the accent colour and the arrow points up. Closed, the arrow points down.",
       },
       source: {
         code: `<RoomType
@@ -195,6 +204,7 @@ export const DropdownButton: Story = {
 };
 
 export const DropdownItem: Story = {
+  name: "Dropdown entry",
   render: (args) => <RoomType {...args} />,
   args: {
     roomType: RoomsType.CustomRoom,
@@ -239,6 +249,9 @@ const RoomTypesTemplate = (args: ComponentProps<typeof RoomType>) => (
       RoomsType.CustomRoom,
       RoomsType.VirtualDataRoom,
       RoomsType.AIRoom,
+      RoomsType.InstructionsRoom,
+      RoomsType.KnowledgeRoom,
+      RoomsType.AiProjectRoom,
     ].map((roomType) => (
       <RoomType
         key={roomType}
@@ -251,6 +264,7 @@ const RoomTypesTemplate = (args: ComponentProps<typeof RoomType>) => (
 );
 
 export const RoomTypes: Story = {
+  name: "All room types",
   render: (args) => <RoomTypesTemplate {...args} />,
   args: {
     isOpen: false,
@@ -259,17 +273,17 @@ export const RoomTypes: Story = {
     onClick: fn(),
   },
   play: async ({ canvas }) => {
-    // Six types, each with a name of its own.
+    // Nine types, each with a name of its own.
     const titles = canvas.getAllByTestId("room-type-list-item").map(titleOf);
-    await expect(titles).toHaveLength(6);
-    await expect(new Set(titles).size).toBe(6);
+    await expect(titles).toHaveLength(9);
+    await expect(new Set(titles).size).toBe(9);
     await expect(titles.every(Boolean)).toBe(true);
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Every room type the row can describe, each with its own glyph, name and description (`roomType`) — what a room-type picker lists.",
+          "All nine room types, each with its own glyph, name and description (`roomType`), as a room-type picker lists them.",
       },
       source: {
         code: `{[
@@ -279,6 +293,9 @@ export const RoomTypes: Story = {
   RoomsType.CustomRoom,
   RoomsType.VirtualDataRoom,
   RoomsType.AIRoom,
+  RoomsType.InstructionsRoom,
+  RoomsType.KnowledgeRoom,
+  RoomsType.AiProjectRoom,
 ].map((roomType) => (
   <RoomType
     key={roomType}
@@ -313,6 +330,7 @@ const DisabledStateTemplate = (args: ComponentProps<typeof RoomType>) => (
 );
 
 export const DisabledState: Story = {
+  name: "Disabled",
   render: (args) => <DisabledStateTemplate {...args} />,
   args: {
     isOpen: false,
@@ -337,12 +355,10 @@ export const DisabledState: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Rows for a room type the user may not create right now, shown but refusing the click:
+        story: `Two rows for room types the user may not create, shown but refusing the click and the keys:
 
 - **Form Filling Space** — a list card on a grey background, with no hover change and no pointer cursor (\`disabledFormRoom\`)
-- **Public room** — a dropdown entry with its glyph and text faded (\`disabledPublicRoom\`)
-
-Click either one: the Actions panel stays empty.`,
+- **Public room** — a dropdown entry with its glyph and text faded (\`disabledPublicRoom\`)`,
       },
       source: {
         code: `<RoomType
@@ -373,6 +389,7 @@ const FromTemplateTemplate = (args: ComponentProps<typeof RoomType>) => (
 );
 
 export const FromTemplate: Story = {
+  name: "From a template",
   render: (args) => <FromTemplateTemplate {...args} />,
   args: {
     isOpen: false,
@@ -392,8 +409,8 @@ export const FromTemplate: Story = {
       description: {
         story: `The two ways a template shows up in a picker:
 
-- **From template** — the entry that starts a room from a template: both lines take the template wording and the glyph its template form (\`isTemplate\`)
-- **Collaboration room** — a room type offered from a template: the glyph changes, the name and description stay (\`isTemplateRoom\`)`,
+- **From template** — the entry that starts a room from a template, with template wording and glyph (\`isTemplate\`)
+- **Collaboration room** — a room type offered from a template: the glyph changes, the texts stay (\`isTemplateRoom\`)`,
       },
       source: {
         code: `<RoomType
@@ -416,6 +433,7 @@ export const FromTemplate: Story = {
 };
 
 export const FormSpace: Story = {
+  name: "Form space",
   render: (args) => <RoomType {...args} />,
   args: {
     roomType: RoomsType.FormRoom,
@@ -434,7 +452,7 @@ export const FormSpace: Story = {
     docs: {
       description: {
         story:
-          "The row worded for a form space rather than a room, for a picker opened from the forms section (`isFormSection`). Turn on `isTemplate` in the Controls panel below to see the form-space template wording.",
+          "The row worded for a form space rather than a room, for a picker opened from the forms section (`isFormSection`). With `isTemplate` it takes the form-space template wording.",
       },
       source: {
         code: `<RoomType
@@ -450,6 +468,7 @@ export const FormSpace: Story = {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <RoomType {...args} />
@@ -478,7 +497,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "96px" },
       description: {
         story:
-          "The card in a right-to-left interface: the glyph moves to the right edge, the text aligns right and the forward arrow sits on the left, pointing left.",
+          "The card in a right-to-left interface. The glyph moves to the right edge and the text aligns right. The forward arrow sits on the left, pointing left.",
       },
       source: {
         code: `<div dir="rtl">
@@ -495,6 +514,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization = {
+  name: "CSS customization",
   render: () => (
     <div
       style={
@@ -527,7 +547,7 @@ export const CssCustomization = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one card -- the variables are listed under CSS variables on this page. Hover it to see \`--room-type-item-hover-bg\`.`,
+        story: `A card in blue with rounder corners and wider gaps, from every overridable variable set on a wrapper. A hover swaps in \`--room-type-item-hover-bg\`.`,
       },
       source: {
         code: `<div

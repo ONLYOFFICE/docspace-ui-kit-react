@@ -58,6 +58,7 @@ const ThemedContent = () => {
 };
 
 export const LightTheme: Story = {
+  name: "Light",
   args: {
     initialTheme: ThemeKeys.BaseStr,
     children: <ThemedContent />,
@@ -68,13 +69,15 @@ export const LightTheme: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Light (Base) theme — the default.",
+        story:
+          "A panel in the light theme (`ThemeKeys.BaseStr`), reading the theme back from the theme context.",
       },
     },
   },
 };
 
 export const DarkTheme: Story = {
+  name: "Dark",
   args: {
     initialTheme: ThemeKeys.DarkStr,
     children: <ThemedContent />,
@@ -85,13 +88,15 @@ export const DarkTheme: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Dark theme variant.",
+        story:
+          "The same panel in the dark theme (`ThemeKeys.DarkStr`), dark with light text.",
       },
     },
   },
 };
 
 export const SystemTheme: Story = {
+  name: "System",
   args: {
     initialTheme: ThemeKeys.SystemStr,
     children: <ThemedContent />,
@@ -109,7 +114,7 @@ export const SystemTheme: Story = {
     docs: {
       description: {
         story:
-          "System theme follows the OS preference via `prefers-color-scheme`.",
+          "The panel in whichever theme the browser reports through `prefers-color-scheme` (`ThemeKeys.SystemStr`). A change of that preference switches it without a reload.",
       },
     },
   },

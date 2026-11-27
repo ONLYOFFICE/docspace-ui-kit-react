@@ -44,6 +44,20 @@ const renderSelector = (override: object = {}) =>
   render(<Selector {...makeProps(override)} />);
 
 describe("<Selector /> loading modes", () => {
+  it("treats a string empty-screen image as decorative", () => {
+    renderSelector({ items: [], totalItems: 0, emptyScreenImage: "empty.svg" });
+
+    expect(document.querySelector(".empty-image")).toHaveAttribute("alt", "");
+  });
+
+  it("puts a passed aria-* on the outer element", () => {
+    renderSelector({ "aria-describedby": "selector-hint" });
+    expect(screen.getByTestId("selector")).toHaveAttribute(
+      "aria-describedby",
+      "selector-hint",
+    );
+  });
+
   it("renders the skeleton loader during the initial load", () => {
     renderSelector({ isLoading: true });
 

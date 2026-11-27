@@ -21,12 +21,12 @@ const meta = {
     label: {
       control: "text",
       description:
-        "Text of the pill: a string or a React node, cut off with an ellipsis when it does not fit",
+        "Text of the pill, cut off with an ellipsis when it does not fit.",
     },
     isActive: {
       control: "boolean",
       description:
-        "Whether the pill starts selected. The pill then keeps its selected state itself after clicks; a change of this prop re-syncs it",
+        "Whether the pill starts selected. The pill then keeps that state itself, and a change of this prop re-syncs it.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -34,7 +34,7 @@ const meta = {
     isDisabled: {
       control: "boolean",
       description:
-        "Ignores clicks and dims the pill to half opacity; a pill that is also selected keeps its full selected look",
+        "Ignores clicks and dims the pill. A pill that is also selected keeps its full selected look.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -42,7 +42,7 @@ const meta = {
     allowNoSelection: {
       control: "boolean",
       description:
-        "Keeps the selected look the pill had on mount: neither clicks nor later `isActive` changes alter it",
+        "Keeps the selected look the pill had on mount: neither clicks nor later `isActive` changes alter it.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -50,7 +50,7 @@ const meta = {
     withMultiSelect: {
       control: "boolean",
       description:
-        "Lets a click on a selected pill deselect it. Without it a selected pill stays selected",
+        "Whether clicking an already selected pill deselects it. Without this a selected pill stays selected.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -58,7 +58,7 @@ const meta = {
     lockLastSelection: {
       control: "boolean",
       description:
-        "Drops a click on an already selected pill entirely, so `onSelect` does not fire for it either",
+        "Whether a click on an already selected pill is dropped entirely — `onSelect` does not fire either.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -66,15 +66,15 @@ const meta = {
     onSelect: {
       action: "onSelect",
       description:
-        "Called with the click event on every click that neither `isDisabled` nor `lockLastSelection` blocks",
+        "Called with the click event whenever the pill is clicked and not blocked by `isDisabled` or `lockLastSelection`.",
     },
     className: {
       control: "text",
-      description: "Extra class name on the outer element",
+      description: "Applied to the outermost element.",
     },
     dataTestId: {
       control: "text",
-      description: "`data-testid` of the outer element",
+      description: "`data-testid` of the outermost element.",
       table: {
         defaultValue: { summary: '"tab-item"' },
       },
@@ -108,11 +108,18 @@ const pill = (canvas: Canvas, label: string) =>
   canvas.getByText(label).closest("[data-testid='tab-item']") as HTMLElement;
 
 export const Default: Story = {
+  name: "Unselected",
   play: async ({ args, canvas, userEvent }) => {
     await expect(pill(canvas, "Tab Item")).toHaveAttribute(
       "aria-selected",
       "false",
     );
+    // A tap draws no grey flash over the pill.
+    await expect(
+      getComputedStyle(pill(canvas, "Tab Item")).getPropertyValue(
+        "-webkit-tap-highlight-color",
+      ),
+    ).toBe("rgba(0, 0, 0, 0)");
     await userEvent.click(pill(canvas, "Tab Item"));
     await expect(pill(canvas, "Tab Item")).toHaveAttribute(
       "aria-selected",
@@ -138,7 +145,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "An unselected pill: click it to see it fill in, and change any other prop live in the Controls panel below.",
+          "An unselected pill, the starting point for a filter chip. A click fills it in and calls `onSelect`.",
       },
       source: {
         code: `<TabItem label="Tab Item" onSelect={handleSelect} />`,
@@ -148,6 +155,7 @@ export const Default: Story = {
 };
 
 export const ActiveState: Story = {
+  name: "Selected",
   render: (args) => <TabItem {...args} />,
   args: {
     label: "Active Tab",
@@ -174,6 +182,7 @@ export const ActiveState: Story = {
 };
 
 export const DisabledState: Story = {
+  name: "Disabled",
   render: (args) => <TabItem {...args} />,
   play: async ({ canvas }) => {
     // The stylesheet keeps the pointer off it; the click handler also
@@ -217,6 +226,7 @@ const WithReactNodeTemplate = () => {
 };
 
 export const WithReactNodeLabel: Story = {
+  name: "Node as label",
   render: () => <WithReactNodeTemplate />,
   play: async ({ canvas }) => {
     // The node is rendered as given, dot and text inside one pill.
@@ -228,7 +238,7 @@ export const WithReactNodeLabel: Story = {
     docs: {
       description: {
         story:
-          "Tab with a React node as label, allowing custom content like icons alongside text. The label renders inside a `<p>`, so the node has to be phrasing content -- a `<span>`, not a `<div>`.",
+          "A pill whose label is a React node: a coloured dot beside the text. The label renders inside a `<p>`, so the node has to be a `<span>`, not a `<div>`.",
       },
       source: {
         code: `<TabItem
@@ -269,6 +279,7 @@ const TabGroupTemplate = () => {
 };
 
 export const TabGroup: Story = {
+  name: "One choice in a group",
   render: () => <TabGroupTemplate />,
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(pill(canvas, "Second Tab"));
@@ -285,7 +296,7 @@ export const TabGroup: Story = {
     docs: {
       description: {
         story:
-          "Interactive tab group demonstrating single-selection behavior. Clicking a tab selects it and deselects others.",
+          "Three pills with one selected, for a filter that takes a single value. The host state passes `isActive`, so a click on one deselects the others.",
       },
       source: {
         code: `<TabItem label="First Tab" isActive={activeTab === "tab1"} onSelect={() => setActiveTab("tab1")} />
@@ -336,6 +347,7 @@ const MultiSelectTemplate = () => {
 };
 
 export const MultiSelect: Story = {
+  name: "Several choices",
   render: () => <MultiSelectTemplate />,
   play: async ({ canvas, userEvent }) => {
     // Each pill toggles on its own.
@@ -366,6 +378,7 @@ export const MultiSelect: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   play: async ({ canvas }) => {
     await expect(pill(canvas, "Documents")).toHaveStyle({
       backgroundColor: "rgb(31, 111, 67)",
@@ -404,7 +417,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. **Documents** is selected, for the two active variables; **Images** is unselected, for the border; **Videos** is disabled, for the opacity. Radius and padding show on all three.`,
+        story: `Every overridable variable set on one wrapper. **Documents** is selected, for the two active variables; **Images** is unselected, for the border; **Videos** is disabled, for the opacity. Radius and padding show on all three.`,
       },
       source: {
         code: `<div

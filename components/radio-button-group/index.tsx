@@ -3,6 +3,7 @@ import classNames from "classnames";
 
 import { RadioButton } from "../radio-button";
 import { Text } from "../text";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import styles from "./RadioButtonGroup.module.scss";
 import {
@@ -25,6 +26,7 @@ const RadioButtonGroup = ({
   isDisabled,
   spacing,
   dataTestId,
+  ...rest
 }: RadioButtonGroupProps) => {
   const [selectedOption, setSelectedOption] = React.useState(selected);
   const radioButtonGroupRef = React.useRef<HTMLDivElement>(null);
@@ -52,6 +54,7 @@ const RadioButtonGroup = ({
 
   return (
     <div
+      {...pickAriaProps(rest)}
       ref={radioButtonGroupRef}
       role="radiogroup"
       id={id}
@@ -63,11 +66,11 @@ const RadioButtonGroup = ({
       style={{ width, ...style }}
       data-testid={dataTestId ?? "radio-button-group"}
     >
-      {options.map((option: TRadioButtonOption) => {
+      {options.map((option: TRadioButtonOption, index) => {
         if (option.type === "text")
           return (
             <Text
-              key="radio-text"
+              key={`radio-text-${index}`}
               className={styles.subtext}
               data-testid={option.dataTestId ?? "radio-button-group_text"}
             >

@@ -16,22 +16,23 @@ const meta = {
   argTypes: {
     text: {
       control: "text",
-      description: "The label's text",
+      description:
+        "Caption shown in semibold, as text or an element, before the asterisk and the children.",
     },
     title: {
       control: "text",
       description:
-        "Text of the kit's shared tooltip that opens when the pointer rests on the label; it needs `RootTooltip` mounted",
+        "Text of the kit's shared tooltip, opened when the pointer rests on the label. It shows only while `RootTooltip` is mounted.",
     },
     htmlFor: {
       control: "text",
       description:
-        "The `id` of the field this labels, so clicking the label focuses that field",
+        "`for` attribute, which points at the `id` of the field this labels.",
     },
     isRequired: {
       control: "boolean",
       description:
-        "Appends a red asterisk, hidden from screen readers, to the text; the field itself needs `required`",
+        "Appends a red asterisk, hidden from assistive technology, to the text. It does not mark the field itself — put `required` on your input too.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -39,7 +40,7 @@ const meta = {
     error: {
       control: "boolean",
       description:
-        "Turns the text red; the field itself needs `aria-invalid`, and the error message is not part of this component",
+        "Turns the text red. It does not mark the field itself — put `aria-invalid` on your input. The error message is not part of this component.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -47,7 +48,7 @@ const meta = {
     truncate: {
       control: "boolean",
       description:
-        "Cuts text that does not fit on one line with an ellipsis; the label is inline by default, so it needs `display: block` and a width to cut against",
+        "Cuts text that does not fit on one line with an ellipsis. The label is inline, so it also needs `display: block` in `style`, and a width.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -55,36 +56,27 @@ const meta = {
     isInline: {
       control: "boolean",
       description:
-        "Makes the label an inline block, so it keeps its own width and padding on the line beside the field; without it the label is a plain inline element",
+        "Makes the label an inline block, which keeps its own width and padding beside the field. Without it the label is a plain inline element.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
-    display: {
-      control: false,
-      description:
-        "Written onto the label as an HTML `display` attribute and does not change how it is laid out; set `display` through `style` instead",
-    },
     children: {
       control: "text",
       description:
-        "Content rendered after the text and the asterisk, inside the same label",
+        "Rendered after the text and the asterisk, inside the same label.",
     },
     className: {
       control: false,
-      description: "Class name added to the label",
+      description: "Applied to the label.",
     },
     id: {
       control: "text",
-      description: "The label's own `id`",
+      description: "Applied to the label.",
     },
     style: {
       control: false,
-      description: "Inline styles applied to the label",
-    },
-    tooltipMaxWidth: {
-      control: false,
-      description: "Ignored: nothing reads this prop",
+      description: "Applied to the label.",
     },
   },
 } satisfies Meta<typeof Label>;
@@ -133,7 +125,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The plain caption for a field, in semibold text; rest the pointer on it to read the tooltip (`title`), and change any other prop live in the Controls panel below.",
+          "The plain caption for a field, in semibold text, with a tooltip on hover (`title`).",
       },
       source: {
         code: `<Label text="First name" htmlFor="firstName" title="Enter your first name" />
@@ -234,6 +226,7 @@ const FormExampleTemplate = () => {
 };
 
 export const RequiredLabels: Story = {
+  name: "Required",
   render: () => <RequiredTemplate />,
   play: async ({ canvas }) => {
     // Each caption ends with an asterisk hidden from screen readers.
@@ -263,6 +256,7 @@ export const RequiredLabels: Story = {
 };
 
 export const ErrorState: Story = {
+  name: "Error",
   render: () => <ErrorTemplate />,
   play: async ({ canvas }) => {
     // error turns the caption the error colour, with or without the mark.
@@ -290,6 +284,7 @@ export const ErrorState: Story = {
 };
 
 export const TruncatedLabel: Story = {
+  name: "Truncated",
   render: () => <TruncatedTemplate />,
   play: async ({ canvas }) => {
     // One line, cut with an ellipsis inside the 150px box.
@@ -301,7 +296,7 @@ export const TruncatedLabel: Story = {
     docs: {
       description: {
         story:
-          "For a caption longer than the space it gets: in a 150px box the text stays on one line and ends with an ellipsis (`truncate`, with `display: block` so the label takes the box's width). Rest the pointer on it to read the full text in the tooltip (`title`), which needs `RootTooltip` mounted, as this story does.",
+          "A caption longer than its 150px box, kept on one line with an ellipsis (`truncate`, with `display: block`). The full text is in the tooltip on hover (`title`), which needs `RootTooltip` mounted.",
       },
       source: {
         code: `<div style={{ width: 150 }}>
@@ -319,6 +314,7 @@ export const TruncatedLabel: Story = {
 };
 
 export const InlineLabel: Story = {
+  name: "Inline",
   render: () => <InlineTemplate />,
   play: async ({ canvas, userEvent }) => {
     // A flex item is blockified whatever its own display, so the inline
@@ -348,6 +344,7 @@ export const InlineLabel: Story = {
 };
 
 export const WithChildren: Story = {
+  name: "With children",
   render: () => <WithChildrenTemplate />,
   play: async ({ canvas }) => {
     await expect(canvas.getByTestId("label")).toHaveTextContent(
@@ -370,6 +367,7 @@ export const WithChildren: Story = {
 };
 
 export const FormExample: Story = {
+  name: "In a form",
   render: () => <FormExampleTemplate />,
   play: async ({ canvas, userEvent }) => {
     // Every caption names its field and focuses it on click.
@@ -382,7 +380,7 @@ export const FormExample: Story = {
     docs: {
       description: {
         story:
-          "How the states read together in a form: a required field, a required field in error and an optional one, each label tied to its input by `htmlFor`, so clicking a caption focuses its field.",
+          "The states together in a form: required, required in error, and optional. Each label is tied to its input by `htmlFor`, so a click on a caption focuses its field.",
       },
       source: {
         code: `<Label text="Username" htmlFor="username" isRequired />
@@ -401,6 +399,7 @@ export const FormExample: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   render: () => (
     <div
       style={
@@ -426,7 +425,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Both colours and the font size set on one wrapper -- the variables are listed under CSS variables on this page.
+        story: `Both colours and the font size, set on one wrapper.
 
 - **Display name** shows the asterisk colour (\`--label-required-color\`) and the font size.
 - **Email address** adds \`error\` to show the text colour in the error state (\`--label-error-color\`).`,

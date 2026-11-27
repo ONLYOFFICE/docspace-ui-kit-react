@@ -14,14 +14,9 @@
       --room-type-dropdown-button-hover-background: #{$gray-light};
       --room-type-dropdown-button-description-text: #{$gray};
 
-      --room-type-dropdown-item-background: #{$white};
       --room-type-dropdown-item-hover-background: #{$gray-light};
       --room-type-dropdown-item-disabled-background: #{$gray-light};
       --room-type-dropdown-item-description-text: #{$gray};
-
-      --room-type-display-item-background: #{$gray-light};
-      --room-type-display-item-border: #{$gray-light};
-      --room-type-display-item-description-text: #{$gray-text};
     }
   }
 }
@@ -40,14 +35,9 @@
       --room-type-dropdown-button-hover-background: #{$dark-gray-light};
       --room-type-dropdown-button-description-text: #{$gray};
 
-      --room-type-dropdown-item-background: #{$black};
       --room-type-dropdown-item-hover-background: #{$dark-gray-light};
       --room-type-dropdown-item-disabled-background: #{$dark-gray-light};
       --room-type-dropdown-item-description-text: #{$gray};
-
-      --room-type-display-item-background: #{$dark-gray-light};
-      --room-type-display-item-border: #{$dark-gray-light};
-      --room-type-display-item-description-text: #{$gray-text};
     }
   }
 }
@@ -150,7 +140,10 @@
   }
 
   &:active {
-    border-color: var(--accent-main);
+    border-color: var(
+      --accent-main,
+      var(--color-scheme-main-accent, #{$light-blue-main})
+    );
   }
 
   :global {
@@ -203,7 +196,10 @@
 
   &.isOpen,
   &:active {
-    border-color: var(--accent-main);
+    border-color: var(
+      --accent-main,
+      var(--color-scheme-main-accent, #{$light-blue-main})
+    );
   }
 
   :global {
@@ -230,9 +226,8 @@
 }
 
 .dropDownItem {
-  // Background deliberately still falls back to the list-item value (none):
-  // --room-type-dropdown-item-background is white / black, and switching to
-  // it would change what renders today.
+  // Background deliberately falls back to the list-item value (none), so the
+  // item takes the colour of the list it sits in.
   --room-type-item-hover-bg-value: var(
     --room-type-item-hover-bg,
     var(--room-type-dropdown-item-hover-background)
@@ -271,23 +266,6 @@
       .choose_room-info_wrapper {
         opacity: 0.5;
       }
-    }
-  }
-}
-
-.displayItem {
-  cursor: default;
-  background-color: var(--room-type-item-bg-value);
-  border: 1px solid var(--room-type-item-border-value);
-  border-radius: var(--room-type-item-border-radius);
-
-  :global {
-    .choose_room-description {
-      color: var(--room-type-description-color-value);
-    }
-
-    .choose_room-forward_btn {
-      display: none;
     }
   }
 }

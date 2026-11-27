@@ -16,31 +16,31 @@ const meta = {
     headerText: {
       control: "text",
       description:
-        "Bold heading above the columns, rendered as an `<h3>`; nothing is rendered in its place when it is empty",
+        "Bold caption above the columns, rendered as an `<h3>` and omitted entirely when empty.",
     },
     columns: {
       control: "object",
       description:
-        "The label and value pairs, in order; each label is a small caption above its value, and both accept any node, so an icon or a link fits too",
+        "The label and value pairs, in order. An empty array renders the bar with nothing inside it.",
     },
     onAction: {
       description:
-        "Called when the close button is clicked. The button is rendered only while this is set, and the bar stays on screen until the host removes it",
+        "Called when the close button is clicked. The button exists only while this is set, and the bar does not hide itself — take it out of the tree yourself.",
     },
     onLoad: {
       description:
-        "Called once after the bar mounts; a different function passed on a later render is never called",
+        "Called once after mount. A different function on a later render is ignored.",
     },
     style: {
       control: "object",
       description:
-        "Inline style of the bar; there is no `className` prop, so colour overrides go here too",
+        "Inline style of the bar, and the place for its CSS variables, since there is no `className`.",
     },
     variant: {
       control: "select",
       options: ["default", "neutral", "page"],
       description:
-        "Which look to render: the warning bar with an orange edge, the bordered `neutral` card that slides open, or the padded `page` block with a two-column grid",
+        "The look: a warning bar with an accent edge, a bordered `neutral` card that slides open, or a padded `page` block with a two-column grid.",
       table: {
         defaultValue: { summary: "default" },
       },
@@ -48,7 +48,7 @@ const meta = {
     closeLabel: {
       control: "text",
       description:
-        "Name screen readers announce for the close button; ignored when `onAction` is not set",
+        'Accessible name of the close button (its `aria-label`). Defaults to the translated `Common:CloseButton` ("Close"). Ignored without `onAction`.',
       table: {
         defaultValue: { summary: 'Common:CloseButton ("Close")' },
       },
@@ -94,7 +94,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The warning bar with a heading and four columns and no close button: the starting point for a details strip. Change any prop live in the Controls panel below.",
+          "The warning bar with a heading and four columns and no close button: the starting point for a details strip.",
       },
       source: {
         code: `<ColumnarInfoBar
@@ -112,7 +112,7 @@ export const Default: Story = {
 };
 
 export const ProfileDetails: Story = {
-  name: "With Close Button",
+  name: "With a close button",
   args: {
     headerText: "New account details",
     columns: [
@@ -126,15 +126,21 @@ export const ProfileDetails: Story = {
   },
   play: async ({ args, canvas, userEvent }) => {
     // The close button is named by closeLabel and only calls the handler.
-    await userEvent.click(canvas.getByRole("button", { name: "Close" }));
+    const close = canvas.getByRole("button", { name: "Close" });
+    await userEvent.click(close);
     await expect(args.onAction).toHaveBeenCalledTimes(1);
+    // The cross takes the bar's text colour.
+    const cross = close.querySelector("path") as SVGPathElement;
+    await expect(getComputedStyle(cross).fill).toBe(
+      getComputedStyle(close).color,
+    );
     await expect(canvas.getByText("New account details")).toBeVisible();
   },
   parameters: {
     docs: {
       description: {
         story:
-          "A close button in the top trailing corner lets the reader dismiss details they have read once (`onAction`); clicking it only calls the handler, so the host takes the bar out of the tree. Its spoken name comes from `closeLabel`.",
+          "A close button in the top trailing corner, for details read once (`onAction`). Clicking it only calls the handler; the host takes the bar out. Its spoken name is `closeLabel`.",
       },
       source: {
         code: `<ColumnarInfoBar
@@ -153,7 +159,7 @@ export const ProfileDetails: Story = {
 };
 
 export const EventDetails: Story = {
-  name: "Columns Only",
+  name: "Event details",
   args: {
     columns: [
       { label: "Status", value: "200 OK" },
@@ -191,6 +197,7 @@ export const EventDetails: Story = {
 };
 
 export const NeutralVariant: Story = {
+  name: "Neutral card",
   args: {
     variant: "neutral",
     headerText: "Before you start",
@@ -221,7 +228,7 @@ export const NeutralVariant: Story = {
     docs: {
       description: {
         story:
-          'A rounded card with a light blue border and a blue heading, for information that is not a warning (`variant="neutral"`); it slides open when it mounts.',
+          'A rounded card with a light blue border and a blue heading, for information that is not a warning (`variant="neutral"`). It slides open on mount.',
       },
       source: {
         code: `<ColumnarInfoBar
@@ -240,6 +247,7 @@ export const NeutralVariant: Story = {
 };
 
 export const PageVariant: Story = {
+  name: "Page block",
   args: {
     variant: "page",
     headerText: "Connection details",
@@ -264,7 +272,7 @@ export const PageVariant: Story = {
     docs: {
       description: {
         story:
-          'A padded block with the close button beside the heading and the columns in a two-column grid, for a details section inside a page rather than a notice above it (`variant="page"`).',
+          'A padded block with the close button beside the heading and a two-column grid (`variant="page"`). It suits a details section inside a page, not a notice above it.',
       },
       source: {
         code: `<ColumnarInfoBar
@@ -284,6 +292,7 @@ export const PageVariant: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <ColumnarInfoBar
       headerText="Custom colours"

@@ -7,6 +7,7 @@ import { ContextMenu, ContextMenuRefType } from "../../context-menu";
 import { TPlusButtonProps } from "../Navigation.types";
 import { isMobile } from "../../../utils";
 import { TooltipContainer } from "../../tooltip";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 const PlusButton = ({
   className,
@@ -20,6 +21,7 @@ const PlusButton = ({
   title,
   ...rest
 }: TPlusButtonProps) => {
+  const t = useCommonTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<ContextMenuRefType>(null);
 
@@ -56,6 +58,7 @@ const PlusButton = ({
     >
       <IconButton
         onClick={onClick}
+        ariaLabel={title || t("Actions")}
         iconNode={<PlusReactSvg />}
         id={id}
         size={17}

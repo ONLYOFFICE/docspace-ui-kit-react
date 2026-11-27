@@ -43,6 +43,7 @@ const TabItem = ({
 
   return (
     <div
+      {...rest}
       className={classNames(
         styles.tabItem,
         {
@@ -55,7 +56,6 @@ const TabItem = ({
       onClick={onItemClick}
       aria-selected={isActive}
       data-testid={dataTestId ?? "tab-item"}
-      {...rest}
     >
       <Text
         className={classNames(styles.tabItemText, {

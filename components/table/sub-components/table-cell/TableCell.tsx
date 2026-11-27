@@ -2,6 +2,10 @@ import React from "react";
 import classNames from "classnames";
 import equal from "fast-deep-equal/react";
 
+import {
+  groupRoleWhenNamed,
+  pickAriaProps,
+} from "../../../../utils/aria-props";
 import { TableCellProps } from "../../Table.types";
 import styles from "./TableCell.module.scss";
 
@@ -32,6 +36,8 @@ const TableCell = React.memo((props: TableCellProps) => {
 
   return (
     <div
+      {...pickAriaProps(props)}
+      role={groupRoleWhenNamed(props)}
       data-testid={cellTestId}
       className={classes}
       ref={forwardedRef}

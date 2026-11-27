@@ -42,6 +42,55 @@ export const THEMED_IMAGE_IMPORT = [
 /** The "Edit this page" link of a page: its source on EDIT_BRANCH. */
 export const editUrl = (source) => `${REPO_URL}/blob/${EDIT_BRANCH}/${source}`;
 
+const PACKAGE = "@onlyoffice/apps-ui-kit";
+
+/** Markdown as the plain text an attribute or a meta tag holds. */
+const plainText = (text) =>
+  String(text)
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/`([^`]*)`/g, "$1")
+    .replace(/\*\*|__/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+/**
+ * The `<title>` of a component's page: what search results and an assistant
+ * citing the page show. The H1 and the sidebar keep the bare name.
+ */
+export const componentTitle = (label) =>
+  `${label} – React component | ONLYOFFICE Apps UI Kit`;
+
+/**
+ * The meta description of a component's page: its summary, then the package,
+ * when both fit the 160 characters a search result shows. The summary alone
+ * stays the catalogue's line and the README's first sentence, where the
+ * package would only repeat itself 112 times.
+ */
+export const metaDescription = (summary) => {
+  if (!summary) return summary;
+  const text = plainText(summary);
+  if (text.includes(PACKAGE)) return text;
+  const note = [
+    ` A React component from ${PACKAGE}.`,
+    ` From ${PACKAGE}.`,
+  ].find((candidate) => text.length + candidate.length <= 160);
+  return note ? text + note : text;
+};
+
+/**
+ * A picture's alt text: the component and what the picture shows, taken from
+ * the first sentence of the text it illustrates -- a story's description, a
+ * page's summary -- so a reader who cannot see it learns more than a story's
+ * name. The name is the fallback when there is no text.
+ */
+export const altText = (label, text, fallback = label) => {
+  const sentence = text
+    ? plainText(firstSentence(firstParagraph(text))).replace(/\.$/, "")
+    : "";
+  if (sentence) return `${label}: ${sentence}`;
+  return fallback === label ? label : `${label}: ${fallback}`;
+};
+
 /**
  * The component's picture, in the reader's colour mode: Docusaurus's
  * ThemedImage swaps the source with the theme. The files are retina
@@ -322,10 +371,16 @@ const storiesSection = (page, pictures) => {
   if (stories.length === 0) return "";
   const parts = ["## Stories", ""];
   for (const story of stories) {
-    const name = storyNameFromExport(story.exportName);
+    // Storybook shows a story's own `name` over its export's, and so does the
+    // site: `IsLoadingButtons` named "Loading" is "Loading" in both.
+    const name = story.name ?? storyNameFromExport(story.exportName);
     parts.push(`### ${name}`, "");
     if (story.description) parts.push(escapeForMdx(story.description), "");
-    const picture = pictureOf(pictures, storyKey(story.exportName), name);
+    const picture = pictureOf(
+      pictures,
+      storyKey(story.exportName),
+      altText(page.label, story.description, name),
+    );
     if (picture) parts.push(picture, "");
   }
   return parts.join("\n").trimEnd();
@@ -388,7 +443,10 @@ export const renderReadme = (raw, context) => {
     storybookLine(page.title ? `${storyId(page.title)}--docs` : null),
   );
   // Inserted after the link, so it lands first: right under the intro.
-  text = afterIntro(text, pictureOf(pictures, "primary", page.label));
+  text = afterIntro(
+    text,
+    pictureOf(pictures, "primary", altText(page.label, page.meta?.summary)),
+  );
   // Last, so that the intro the two lines above looked for is the README's
   // first paragraph and not the warning's opening line.
   text = afterH1(text, portalNote(context));
@@ -409,7 +467,9 @@ export const renderReadme = (raw, context) => {
 
   return (
     frontMatter({
-      description: page.meta?.summary,
+      title: componentTitle(page.label),
+      sidebar_label: page.label,
+      description: metaDescription(page.meta?.summary),
       custom_edit_url: editUrl(page.source),
     }) +
     text +
@@ -428,7 +488,11 @@ export const renderAutodocs = (raw, context) => {
   const note = portalNote(context);
   if (note) parts.push(note, "");
   if (page.description) parts.push(escapeForMdx(page.description), "");
-  const primary = pictureOf(pictures, "primary", page.label);
+  const primary = pictureOf(
+    pictures,
+    "primary",
+    altText(page.label, page.description),
+  );
   if (primary) parts.push(primary, "");
   const controls = pictures?.get("args-table")?.rows;
   if (controls?.length) parts.push("## Props", "", controlsTable(controls), "");
@@ -443,7 +507,9 @@ export const renderAutodocs = (raw, context) => {
     text = addImport(text, THEMED_IMAGE_IMPORT);
   return (
     frontMatter({
-      description: summaryOf(page, raw),
+      title: componentTitle(page.label),
+      sidebar_label: page.label,
+      description: metaDescription(summaryOf(page, raw)),
       custom_edit_url: editUrl(page.source),
     }) +
     text +
@@ -500,11 +566,18 @@ export const renderMdx = (raw, context) => {
     }
     let picture;
     if (block.tag === "Story" && block.of) {
+      // A docs page's stories are its CSF file's, so a story there is
+      // described as in the Stories section; a page of its own has none.
       const exportName = block.of.split(".").at(-1);
+      const story = page.stories?.find((s) => s.exportName === exportName);
       picture = pictureOf(
         pictures,
         storyKey(exportName),
-        storyNameFromExport(exportName),
+        altText(
+          page.label,
+          story?.description,
+          story?.name ?? storyNameFromExport(exportName),
+        ),
       );
     } else if (block.tag === "Controls") {
       const rows = pictures?.get("args-table")?.rows;

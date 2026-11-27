@@ -36,16 +36,16 @@
   min-width: var(--form-wrapper-width-min);
 
   @include mixins.tablet-and-below {
-    max-width: 416px;
-    min-width: 416px;
+    max-width: var(--form-wrapper-max-width, 416px);
+    min-width: var(--form-wrapper-min-width, 416px);
   }
 
   @include mixins.mobile {
     padding: 0;
     border-radius: 0;
-    box-shadow: none !important;
+    box-shadow: none;
     max-width: 100%;
     min-width: 100%;
-    background: transparent !important;
+    background: transparent;
   }
 }

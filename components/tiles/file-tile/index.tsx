@@ -14,6 +14,7 @@ import { Loader, LoaderTypes } from "../../loader";
 
 import { useCommonTranslation, isMobile, isTablet } from "../../../utils";
 import { hasOwnProperty } from "../../../utils/hasOwnProperty";
+import { groupRoleWhenNamed } from "../../../utils/aria-props";
 
 import { FileChildProps, FileTileProps } from "./FileTile.types";
 
@@ -33,7 +34,6 @@ const FileTile = ({
   setSelection,
   temporaryIcon,
   thumbnail,
-  thumbSize,
   isHighlight,
   isBlockingOperation,
   showHotkeyBorder,
@@ -95,12 +95,8 @@ const FileTile = ({
         }
       : undefined;
 
-  const getOptions = () => {
-    if (tileContextClick) {
-      tileContextClick();
-    }
-    return contextOptions;
-  };
+  // The button's onClick reports the click through onContextMenu.
+  const getOptions = () => contextOptions;
 
   const onContextMenu = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -135,22 +131,13 @@ const FileTile = ({
     return (
       <Link type={LinkType.page}>
         {thumbnail && !errorLoadSrc ? (
-          thumbSize !== null ? (
-            <img
-              src={thumbnail}
-              className={styles.thumbnailImage}
-              alt="Thumbnail-img"
-              onError={onError}
-              data-testid="file-thumbnail"
-            />
-          ) : (
-            <ReactSVG
-              className={styles.temporaryIcon}
-              src=""
-              loading={svgLoader}
-              data-testid="file-thumbnail"
-            />
-          )
+          <img
+            src={thumbnail}
+            className={styles.thumbnailImage}
+            alt=""
+            onError={onError}
+            data-testid="file-thumbnail"
+          />
         ) : isIconElement ? (
           <div className={styles.temporaryIcon} data-testid="file-thumbnail">
             {icon}
@@ -273,13 +260,14 @@ const FileTile = ({
 
   return (
     <div
+      role={groupRoleWhenNamed(rest)}
       {...rest}
       ref={forwardRef}
       className={fileTileClassNames}
       onContextMenu={onContextMenu}
       onClick={onFileClick}
       data-testid={dataTestId ?? "tile"}
-      aria-busy={inProgress || undefined}
+      aria-busy={inProgress || rest["aria-busy"]}
     >
       <div className={fileTileTopClassNames} onClick={thumbnailClick}>
         {icon}

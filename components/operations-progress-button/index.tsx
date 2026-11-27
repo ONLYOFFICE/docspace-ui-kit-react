@@ -15,6 +15,7 @@ import { HelpButton } from "../help-button";
 import { Backdrop } from "../backdrop";
 import { Text } from "../text";
 import { useCommonTranslation } from "../../utils";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import PreviewButton from "./PreviewButton";
 import ProgressList from "./ProgressList";
@@ -64,8 +65,10 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
   dropTargetFolderName,
   isDragging,
   clearDropPreviewLocation,
+  ...rest
 }) => {
   const t = useCommonTranslation();
+  const aria = pickAriaProps(rest);
   const [isOpenDropdown, setIsOpenDropdown] = useState<boolean>(false);
   const [isHideTooltip, setIsHideTooltip] = useState<boolean>(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -474,6 +477,7 @@ const OperationsProgressButton: React.FC<OperationsProgressProps> = ({
             noUserSelect
           >
             <FloatingButton
+              {...aria}
               className={classNames(styles.floatingButton, {
                 [styles.cursorDefault]:
                   (!panelOperationsLength && !operations[0]?.showPanel) ||

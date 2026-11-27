@@ -73,17 +73,18 @@ export type ContextMenuType = {
   isHeader?: boolean;
   /** Loads the submenu's items when the item is opened. */
   onLoad?: () => Promise<ContextMenuModel[]>;
-  /** Ignored by this component. */
+  /** Replaces the item's link on the desktop list: a node, or a function given
+   * the item and its default content. The mobile sheet ignores it. */
   template?: unknown;
   /** Marks a `url` as leaving the application, which draws the external-link icon. */
   isOutsideLink?: boolean;
   /** Renders a toggle at the end of the item instead of an action. */
   withToggle?: boolean;
-  /** Whether that toggle is on. */
+  /** Turns the item's toggle on. It needs `withToggle`. */
   checked?: boolean;
-  /** Text of the paid badge. */
+  /** Text of a badge after the label. Without `isPaidBadge` it is blue. */
   badgeLabel?: string;
-  /** Renders that badge. */
+  /** Draws the badge in the paid-plan colour. */
   isPaidBadge?: boolean;
   /** Stops a `url` opening in a new tab. */
   preventNewTab?: boolean;
@@ -91,10 +92,11 @@ export type ContextMenuType = {
   dataTestId?: string;
   /** Which part of the item the tooltip is anchored to. */
   tooltipTarget?: "item" | "toggle";
-  /** Builds the tooltip's content. */
+  /** Builds the hint a disabled item shows on hover, or on a tap on a touch
+   * screen. An enabled item shows none. */
   getTooltipContent?: () => React.ReactNode;
-  /** Secondary line rendered under the item label and always visible - what
-   * choosing this item means. The item grows to fit it. */
+  /** Second line under the label, always visible: what choosing the item
+   * means. The item grows to fit it. */
   description?: React.ReactNode;
   /** Draws the MCP icon after the label. */
   withMCPIcon?: boolean;
@@ -152,12 +154,12 @@ export type TOnMobileItemClick = (
 
 export type TGetContextMenuModel = () => ContextMenuModel[];
 
-export interface ContextMenuProps {
+export interface ContextMenuProps extends React.AriaAttributes {
   /** Applied to the menu element. */
   id?: string;
   /**
-   * The items. It is read only while the menu opens, and `getContextModel`
-   * replaces it entirely when that is given.
+   * The items. The desktop list reads them on every render; `getContextModel`,
+   * when given, replaces them.
    */
   model: ContextMenuModel[];
   /** Title, icon and badge of the bar above the items, on the mobile sheet. */
@@ -166,7 +168,8 @@ export interface ContextMenuProps {
   style?: React.CSSProperties;
   /** Applied to the menu element. */
   className?: string;
-  /** Ignored. Nothing reads this prop. */
+  /** Opens the menu on a right-click anywhere in the document, with no
+   * `show` call of yours. */
   global?: boolean;
   /**
    * Whether a backdrop is rendered behind the menu. It is only visible when the
@@ -175,14 +178,16 @@ export interface ContextMenuProps {
   withBackdrop?: boolean;
   /** Forces that mobile sheet form, and with it the backdrop, at any width. */
   ignoreChangeView?: boolean;
-  /** Ignored. Nothing reads this prop.
+  /** Sets the menu's stacking order on each open: `baseZIndex` plus a counter
+   * the kit shares, from 1001.
    * @default true */
   autoZIndex?: boolean;
-  /** Stacking order of the backdrop. */
+  /** Stacking order of the backdrop, and the base of the menu's under
+   * `autoZIndex`. */
   baseZIndex?: number;
   /** Element the menu is rendered into, instead of `document.body`. */
   appendTo?: HTMLElement;
-  /** Specifies a callback function that is invoked when a popup menu is shown */
+  /** Called when a closed menu opens, with the event passed to `show`. */
   onShow?: (
     e:
       | React.MouseEvent
@@ -190,7 +195,7 @@ export interface ContextMenuProps {
       | Event
       | React.ChangeEvent<HTMLInputElement>,
   ) => void;
-  /** Specifies a callback function that is invoked when a popup menu is hidden */
+  /** Called when the menu closes, with the event that closed it. */
   onHide?: (
     e?:
       | React.MouseEvent
@@ -199,9 +204,8 @@ export interface ContextMenuProps {
       | React.ChangeEvent<HTMLInputElement>,
   ) => void;
   /**
-   * Element to position the menu against instead of the pointer. With it the
-   * menu opens at that element's top-left corner rather than where the user
-   * clicked.
+   * Element to position the menu against instead of the pointer. The menu
+   * opens 4px under it, at its left edge, at least 210px wide.
    */
   containerRef?: React.RefObject<HTMLDivElement | null>;
   /** Matches the menu's width to that container's. */
@@ -229,7 +233,8 @@ export interface ContextMenuProps {
   ref?: React.RefObject<ContextMenuRefType | null>;
   /** URL of the badge image in the header. */
   badgeUrl?: string;
-  /** Colour of that badge. */
+  /** Colour of the header badge's icon, as a CSS colour. A header with a logo
+   * or a cover ignores it. */
   badgeIconColor?: string;
   /** Renders the header only in the mobile sheet form.
    * @default false */
@@ -248,7 +253,7 @@ export interface ContextMenuProps {
   withHotkeys?: boolean;
   /** Removes the back arrow from a submenu's header on the mobile sheet. */
   withoutBackHeaderButton?: boolean;
-  /** Maximum height for the context menu content area */
+  /** Height cap of the item list, in pixels; past it the list scrolls. */
   maxHeight?: number;
 }
 

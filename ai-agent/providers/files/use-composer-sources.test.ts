@@ -45,7 +45,10 @@ const useCloudsStore = ((selector: (s: typeof state) => unknown) =>
 const onPickKnowledgeRooms = vi.fn();
 const onOpenContextRoom = vi.fn();
 
-let sourcesManager: { onManage: (() => void) | null } | null = null;
+let sourcesManager: {
+  onManage: ((kind: "skills" | "knowledge") => void) | null;
+  onKnowledgeRoomRemove?: (roomId: string) => void;
+} | null = null;
 const lists = (knowledgePickerHidden = false) =>
   renderHook(() =>
     useComposerSourceLists({
@@ -219,18 +222,30 @@ describe("useComposerSourceLists", () => {
       room: { id: "12", name: "Legal" },
     };
 
-    it("opens the agent's form from Manage knowledge bases, not the room selector", () => {
+    it("opens the agent's knowledge base selector from Manage knowledge bases, not the chat's own", () => {
       const onManage = vi.fn();
       sourcesManager = { onManage };
       state.selectedKnowledgeFolders = [room];
       const { composerKnowledge } = lists();
       composerKnowledge.at(-1)?.onClick?.();
       expect(onManage).toHaveBeenCalledTimes(1);
+      expect(onManage).toHaveBeenCalledWith("knowledge");
       expect(onPickKnowledgeRooms).not.toHaveBeenCalled();
     });
 
-    it("gives no one a remove control on a knowledge base", () => {
-      sourcesManager = { onManage: vi.fn() };
+    it("unlinks a knowledge base from the agent by the bin of its row, not from the chat alone", () => {
+      const onKnowledgeRoomRemove = vi.fn();
+      sourcesManager = { onManage: vi.fn(), onKnowledgeRoomRemove };
+      state.selectedKnowledgeFolders = [room];
+      const action = lists().composerKnowledge[0].trailingAction;
+      expect(action?.label).toBe(`Remove ${room.room.name}`);
+      action?.onClick();
+      expect(onKnowledgeRoomRemove).toHaveBeenCalledWith(room.room.id);
+      expect(deselectKnowledgeFolder).not.toHaveBeenCalled();
+    });
+
+    it("gives no remove control on a knowledge base to a user who cannot change the agent", () => {
+      sourcesManager = { onManage: null };
       state.selectedKnowledgeFolders = [room];
       expect(lists().composerKnowledge[0].trailingAction).toBeUndefined();
     });

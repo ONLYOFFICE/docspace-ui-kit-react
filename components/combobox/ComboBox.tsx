@@ -13,6 +13,7 @@ import { TooltipContainer } from "../tooltip";
 
 import { ComboButton } from "./sub-components/ComboButton";
 import { ComboBoxSize, ComboBoxDisplayType } from "./ComboBox.enums";
+import { pickAriaProps } from "../../utils/aria-props";
 import type { TComboboxProps, TOption } from "./ComboBox.types";
 import styles from "./ComboBox.module.scss";
 
@@ -240,7 +241,6 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
     manualWidth = "200px",
     displaySelectedOption,
     fixedDirection,
-    withBlur,
     fillIcon,
     offsetX,
     modernView,
@@ -536,7 +536,6 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
       manualY: manualY?.toString(),
       fixedDirection,
       forwardedRef: ref,
-      withBlur,
       offsetX,
       withBackdrop,
       isAside,
@@ -572,7 +571,6 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
       manualX,
       manualY,
       fixedDirection,
-      withBlur,
       offsetX,
       withBackdrop,
       isAside,
@@ -680,6 +678,7 @@ const ComboBoxPure: React.FC<TComboboxProps> = ({
         fillIcon={selectedOption?.fillIcon ?? fillIcon}
         tabIndex={tabIndex}
         ariaLabel={ariaLabel}
+        aria={pickAriaProps(props)}
         isLoading={isLoading}
         type={type}
         plusBadgeValue={plusBadgeValue}

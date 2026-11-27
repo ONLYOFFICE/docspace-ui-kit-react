@@ -1,21 +1,7 @@
 @use "../../../styles/mixins";
 @use "../../../styles/variables/colors" as *;
 
-:global(.dark) {
-  .tileContainer {
-    --tile-container-sort-fill: #{$white};
-    --tile-container-sort-text: #{$white};
-    --tile-container-sort: #{$dark-gray-dark};
-    --tile-container-hover-background: #{$black};
-  }
-}
-
 .tileContainer {
-  --tile-container-sort-fill: #{$black};
-  --tile-container-sort-text: #{$black};
-  --tile-container-sort: #{$light-gray-dark};
-  --tile-container-hover-background: #{$gray-light};
-
   position: relative;
   height: 100%;
 
@@ -98,94 +84,5 @@
 
   div {
     cursor: pointer !important;
-
-    global {
-      .sort-combo-box {
-        margin-inline-end: 3px;
-        .dropdown-container {
-          top: 104%;
-          bottom: auto;
-          min-width: 200px;
-          margin-top: 3px;
-
-          .option-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            min-width: 200px;
-
-            svg {
-              width: 16px;
-              height: 16px;
-            }
-
-            .option-item__icon {
-              display: none;
-              cursor: pointer;
-
-              &.isDesc {
-                transform: rotate(180deg);
-              }
-
-              path {
-                fill: var(
-                  --tile-container-sort-option-fill,
-                  var(--tile-container-sort)
-                );
-              }
-            }
-
-            :hover {
-              .option-item__icon {
-                display: flex;
-              }
-            }
-          }
-
-          .selected-option-item {
-            background: var(
-              --tile-container-selected-bg,
-              var(--tile-container-hover-background)
-            );
-            cursor: auto;
-
-            .selected-option-item__icon {
-              display: flex;
-            }
-          }
-        }
-
-        .optionalBlock {
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-
-          font-size: var(--tile-container-sort-font-size, 12px);
-          font-weight: var(--tile-container-sort-font-weight, 600);
-
-          color: var(
-            --tile-container-sort-label,
-            var(--tile-container-sort-text)
-          );
-
-          .sort-icon {
-            margin-inline-end: 8px;
-            svg {
-              path {
-                fill: var(
-                  --tile-container-sort-icon,
-                  var(--tile-container-sort-fill)
-                );
-              }
-            }
-          }
-        }
-
-        .combo-buttons_arrow-icon {
-          display: none;
-        }
-      }
-    }
   }
 }

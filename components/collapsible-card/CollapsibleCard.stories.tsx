@@ -16,48 +16,49 @@ const meta = {
     title: {
       control: "text",
       description:
-        "First line of the header, in bold, beside the chevron. It is part of the header button's accessible name",
+        "First line of the header, next to the chevron. The whole header is the button, so this is part of its accessible name.",
       table: { type: { summary: "React.ReactNode" } },
     },
     description: {
       control: "text",
       description:
-        "Second line of the header, in lighter text under the title. Left out when empty; also part of the button's accessible name",
+        "Second line of the header, under the title. Also inside the button, and so also part of its accessible name.",
       table: { type: { summary: "React.ReactNode" } },
     },
     children: {
       control: false,
       description:
-        "Body shown under the header while the card is open and removed from the page while it is closed. Without it the card opens to nothing",
+        "Body, rendered only while the card is open. Without it the card opens to nothing.",
       table: { type: { summary: "React.ReactNode" } },
     },
     isOpen: {
       control: "boolean",
       description:
-        "Whether the card is open. Once it is passed, even as `false`, the card no longer opens on its own: clicking the header only calls `onToggle`, and the parent must change this value",
+        "Whether the card is open. Passing it, even as `false`, makes the card controlled: it opens and closes only when you change this value.",
     },
     defaultOpen: {
       control: "boolean",
       description:
-        "Whether the card starts open. Read on the first render only, and ignored while `isOpen` is passed",
+        "Whether the card starts open. Read once, on the first render, and only while `isOpen` is unset.",
       table: { defaultValue: { summary: "false" } },
     },
     onToggle: {
       action: "toggled",
       description:
-        "Called with the state the card is moving to, `true` for open, each time the header is clicked or activated from the keyboard",
+        "Called with the state the card is moving to whenever the header is activated, in both the controlled and the uncontrolled case.",
     },
     className: {
       control: "text",
-      description: "Class added after the component's own on the outer element",
+      description:
+        "Added after the component's own class, on the outer element.",
     },
     style: {
       control: "object",
-      description: "Inline style of the outer element",
+      description: "Inline style of the outer element.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the outer element",
+      description: "Value of `data-testid` on the outer element.",
       table: { defaultValue: { summary: '"collapsible-card"' } },
     },
   },
@@ -78,6 +79,7 @@ const header = (canvas: Canvas) =>
 const BODY = /Ut enim ad minim veniam/;
 
 export const Collapsed: Story = {
+  name: "Closed",
   play: async ({ args, canvas, userEvent }) => {
     await expect(header(canvas)).toHaveAttribute("aria-expanded", "false");
     await expect(canvas.queryByText(BODY)).toBeNull();
@@ -115,7 +117,7 @@ export const Collapsed: Story = {
     docs: {
       description: {
         story:
-          "The card as it first appears: only the title and the description, with the body hidden until the header is clicked. Change any other prop live in the Controls panel below.",
+          "The card as it first appears: the title and the description, with the body hidden until the header is clicked.",
       },
       source: {
         code: `<CollapsibleCard
@@ -130,6 +132,7 @@ export const Collapsed: Story = {
 };
 
 export const Expanded: Story = {
+  name: "Starts open",
   args: {
     ...Collapsed.args,
     defaultOpen: true,
@@ -144,7 +147,7 @@ export const Expanded: Story = {
     docs: {
       description: {
         story:
-          "Content the reader needs right away can be shown from the start: the card opens with its body visible and the chevron pointing up, and still closes on a click (`defaultOpen`).",
+          "A card that starts open, with its body visible and the chevron pointing up (`defaultOpen`). It still closes on a click.",
       },
       source: {
         code: `<CollapsibleCard
@@ -160,6 +163,7 @@ export const Expanded: Story = {
 };
 
 export const TitleOnly: Story = {
+  name: "Title only",
   args: {
     title: "Lorem ipsum dolor sit amet?",
     children: Collapsed.args?.children,
@@ -212,6 +216,7 @@ const ControlledTemplate = (args: ComponentProps<typeof CollapsibleCard>) => {
 };
 
 export const ControlledState: Story = {
+  name: "Controlled",
   render: (args) => <ControlledTemplate {...args} />,
   args: {
     ...Collapsed.args,
@@ -233,7 +238,7 @@ export const ControlledState: Story = {
     docs: {
       description: {
         story:
-          "When something else on the page decides whether the card is open, the parent holds the state: the button above and the card's own header both open and close it, and the header only asks the parent to change it (`isOpen`, `onToggle`).",
+          "A card whose parent holds the open state (`isOpen`, `onToggle`). The button above and the card's header both toggle it; the header only asks the parent to.",
       },
       source: {
         code: `const [open, setOpen] = useState(false);

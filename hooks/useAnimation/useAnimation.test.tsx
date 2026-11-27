@@ -190,6 +190,20 @@ describe("useAnimation", () => {
     expect(result.current.isAnimationReady).toBe(false);
   });
 
+  it("finishes a fill whose end is said in the same update that started it", () => {
+    const { result } = renderHook(() => useAnimation(true));
+
+    // The click starts the fill and the page says it has loaded before the
+    // hook renders again (a page with nothing to load, or one that answers
+    // in the effects of the click's own commit).
+    act(() => {
+      result.current.triggerAnimation();
+      window.dispatchEvent(new CustomEvent(AnimationEvents.END_ANIMATION));
+    });
+
+    expect(result.current.animationPhase).toBe("finish");
+  });
+
   it("should not transition to finish if not in progress phase", () => {
     const { result } = renderHook(() => useAnimation(true));
 

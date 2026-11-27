@@ -16,7 +16,7 @@ const NEAR_BOTTOM_THRESHOLD = 100;
 const AT_TOP_THRESHOLD = 20;
 
 const SectionFilter = React.memo(
-  ({ className, children, withTabs }: SectionFilterProps) => {
+  ({ className, children }: SectionFilterProps) => {
     const scrollTopRef = useRef(0);
     const [isFixed, setIsFixed] = useState(false);
 
@@ -76,7 +76,6 @@ const SectionFilter = React.memo(
       <div
         className={classNames(styles.filter, "section-filter", className, {
           [styles.isFixed]: !isDesktop() ? isFixed : false,
-          [styles.withTabs]: withTabs,
         })}
       >
         {children}

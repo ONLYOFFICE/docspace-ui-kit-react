@@ -92,8 +92,15 @@ describe("rtl-utils", () => {
       );
     });
 
+    it("uses system font for arabic in any region, or none", () => {
+      expect(getFontFamilyDependingOnLanguage("ar")).toBe(SYSTEM_FONT_FAMILY);
+      expect(getFontFamilyDependingOnLanguage("ar-EG")).toBe(
+        SYSTEM_FONT_FAMILY,
+      );
+    });
+
     it("uses default font for other locales", () => {
-      RTL_LANGUAGES.filter((lng) => lng !== "ar-SA").forEach((lng) => {
+      RTL_LANGUAGES.filter((lng) => lng !== "ar").forEach((lng) => {
         expect(getFontFamilyDependingOnLanguage(lng)).toBe(DEFAULT_FONT_FAMILY);
       });
       expect(getFontFamilyDependingOnLanguage("en-US")).toBe(

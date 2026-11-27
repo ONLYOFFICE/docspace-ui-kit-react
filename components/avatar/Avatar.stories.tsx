@@ -49,28 +49,28 @@ const meta = {
       control: "select",
       options: Object.values(AvatarSize),
       description:
-        "Diameter of the avatar, from 24px (`extraSmall`) to 124px (`max`); the initials and the role badge are sized to match, and `extraSmall` is meant for a picture only",
+        "Diameter of the avatar, from `extraSmall` (24px) to `max` (124px). The initials and the role badge are sized to match; `extraSmall` has rules for neither, so it fits a picture only.",
     },
     role: {
       control: "select",
       options: Object.values(AvatarRole),
       description:
-        "Which role badge is drawn at the bottom corner: only `owner` and `admin` draw one, every other value draws none",
+        "Which role badge is drawn over the bottom corner. Only `owner` and `admin` draw one; every other member, `none` included, draws none.",
     },
     source: {
       control: "text",
       description:
-        "The picture: a URL shown as an image, a path to a `.svg` file drawn as an icon, or a React element rendered as given",
+        "The picture: a React element is rendered as given, a URL as an `<img>`. A URL whose path ends in `.svg` is drawn as an icon, and one containing `default_user_photo` becomes the kit's illustration.",
     },
     userName: {
       control: "text",
       description:
-        "Name the initials are built from when there is no `source`: the first letter of each of the first two words",
+        "Name the initials are built from when there is no `source`. It is also the picture's `alt` text and, on a clickable avatar, its accessible name.",
     },
     editing: {
       control: "boolean",
       description:
-        "Shows the edit button at the bottom corner, in place of the role badge — a pencil when `hasAvatar`, a plus otherwise; drawn only at `size` `max`",
+        "Shows the edit button over the avatar: a pencil when `hasAvatar`, a plus otherwise. Only `size` `max` draws it; at other sizes it has no effect.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -78,7 +78,7 @@ const meta = {
     hasAvatar: {
       control: "boolean",
       description:
-        "Whether there already is a picture: it picks the pencil over the plus, and makes a click open the `model` menu instead of the file dialog",
+        "Whether the user already has a picture. With it, a click opens the menu of `model` under a pencil; without it, a click runs the first entry, under a plus.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -87,23 +87,23 @@ const meta = {
       // The icons are data URIs too long to edit, and they stretch the table.
       control: false,
       description:
-        "Actions of the edit menu, in order; the first one runs directly when there is no picture yet, and the one keyed `AvatarActionKeys.PROFILE_AVATAR_UPLOAD` receives the file input's ref",
+        "Actions of the edit menu, in order. The first entry runs directly when there is no picture. The entry keyed `PROFILE_AVATAR_UPLOAD` is handed the file input's ref.",
     },
     roleIcon: {
       control: false,
-      description: "Badge to draw instead of the one `role` would choose",
+      description: "Badge to draw instead of the one `role` would choose.",
     },
     isNotIcon: {
       control: "boolean",
       description:
-        "Shows a `.svg` `source` as a picture instead of drawing it as an icon",
+        "Renders a `.svg` source as a picture rather than fetching it as an icon.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     imgClassName: {
       control: "text",
-      description: "Class added to the `<img>` of a picture `source`",
+      description: "Added to the `<img>`, for a source shown as a picture.",
       table: {
         defaultValue: { summary: '""' },
       },
@@ -111,27 +111,28 @@ const meta = {
     className: {
       control: "text",
       description:
-        "Class added to the avatar and, again, to the picture area inside it",
+        "Applied to the avatar element and, again, to the picture inside it.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the avatar",
+      description: "Value of `data-testid` on the avatar.",
       table: {
         defaultValue: { summary: "avatar" },
       },
     },
     id: {
       control: false,
-      description: "Ignored: nothing reads it and no `id` reaches the page",
+      description:
+        "Ignored. Nothing reads this prop and no `id` reaches the DOM.",
     },
     style: {
       control: false,
       description:
-        "Ignored: nothing reads it and no inline style reaches the page",
+        "Ignored. Nothing reads this prop and no inline style reaches the DOM.",
     },
     hideRoleIcon: {
       control: "boolean",
-      description: "Hide the role indicator badge",
+      description: "Hides the role badge that `role` would otherwise draw.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -139,19 +140,20 @@ const meta = {
     withTooltip: {
       control: "boolean",
       description:
-        "Shows `tooltipContent` while the role badge is hovered; without a badge (`role` other than `owner` or `admin`) nothing appears",
+        "Renders a tooltip anchored to the role badge. Without a badge it shows nothing.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     tooltipContent: {
       control: "text",
-      description: "Text of the role badge tooltip",
+      description:
+        "Text shown in the badge's tooltip when `withTooltip` is set.",
     },
     isGroup: {
       control: "boolean",
       description:
-        "Draws the initials in upper case and bold, on the group background",
+        "Uppercases the initials and gives them the group background and colour.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -159,7 +161,7 @@ const meta = {
     isDefaultSource: {
       control: "boolean",
       description:
-        "Shows the kit's placeholder illustration when there is neither `source` nor `userName`",
+        "Shows the kit's own illustration when there is no `source` and no `userName`.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -167,25 +169,20 @@ const meta = {
     noClick: {
       control: "boolean",
       description:
-        "Keeps a click on the avatar from opening the edit menu or the file dialog; `onClick` still fires",
+        "Stops a click on the avatar from opening the menu or the file dialog, and drops its button role. `onClick` and the edit button still work.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
-    editAction: {
-      control: false,
-      description:
-        "Ignored: nothing reads it; the edit button runs the first `model` entry",
-    },
     onClick: {
       action: "onClick",
       description:
-        "Called on a click and on a middle-button press; passing it replaces the edit behaviour, so the menu and the file dialog no longer open from the avatar",
+        "Called on a click, on Enter or Space while the avatar has focus, and on a middle-button press. A click on the avatar then opens neither the menu nor the file dialog; the edit button still does.",
     },
     onChangeFile: {
       action: "onChangeFile",
       description:
-        "Called when a file is picked in the hidden file input, which is rendered only when this is given; without it the avatar is not editable",
+        "Called with the change event of the hidden file input, which is rendered only when this prop is given. Without it the avatar is not editable at all.",
     },
   },
 } satisfies Meta<typeof AvatarPure>;
@@ -231,6 +228,7 @@ const LabeledItem = (props: { label: string; children: React.ReactNode }) => {
 };
 
 export const Default: Story = {
+  name: "Empty",
   render: (args) => <AvatarPure {...args} />,
   args: {
     size: AvatarSize.max,
@@ -254,7 +252,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "An avatar with nothing to show yet: with no picture and no name it falls back to a camera icon on the neutral background. Change any prop live in the Controls panel below.",
+          "An avatar with nothing to show: with no picture and no name, a camera icon on the neutral background.",
       },
       source: {
         code: `<Avatar size={AvatarSize.max} role={AvatarRole.user} />`,
@@ -264,6 +262,7 @@ export const Default: Story = {
 };
 
 export const WithImage: Story = {
+  name: "With picture",
   render: (args) => <AvatarPure {...args} />,
   args: {
     size: AvatarSize.max,
@@ -297,7 +296,7 @@ export const WithImage: Story = {
     docs: {
       description: {
         story:
-          "A picture with the admin badge at its bottom corner; hover the badge to read its tooltip (`withTooltip`, `tooltipContent`).",
+          "A picture with the admin badge at its bottom corner. The badge shows `tooltipContent` on hover.",
       },
       source: {
         code: `<Avatar
@@ -314,6 +313,7 @@ export const WithImage: Story = {
 };
 
 export const WithInitials: Story = {
+  name: "With initials",
   render: (args) => <AvatarPure {...args} />,
   args: {
     size: AvatarSize.max,
@@ -333,7 +333,7 @@ export const WithInitials: Story = {
     docs: {
       description: {
         story:
-          "Avatar showing initials generated from the user name. Uses first letter of first two words (JD).",
+          "The initials of `userName`, JD for John Doe, on the initials background. A guest draws no badge.",
       },
       source: {
         code: `<Avatar
@@ -347,6 +347,7 @@ export const WithInitials: Story = {
 };
 
 export const WithIcon: Story = {
+  name: "With SVG icon",
   render: (args) => <AvatarPure {...args} />,
   args: {
     size: AvatarSize.max,
@@ -368,7 +369,8 @@ export const WithIcon: Story = {
   parameters: {
     docs: {
       description: {
-        story: "Avatar displaying an SVG icon instead of an image or initials.",
+        story:
+          "A `source` whose path ends in `.svg`, drawn as a grey icon rather than a picture.",
       },
       source: {
         code: `<Avatar
@@ -401,6 +403,7 @@ const AllSizesTemplate = () => {
 };
 
 export const AllSizes: Story = {
+  name: "All sizes",
   render: () => <AllSizesTemplate />,
   play: async ({ canvas }) => {
     const widths = canvas.getAllByTestId("avatar").map(widthOf);
@@ -412,7 +415,7 @@ export const AllSizes: Story = {
     docs: {
       description: {
         story:
-          "All seven sizes side by side: max (124px), big (80px), medium (48px), base (40px), small (36px), min (32px) and extraSmall (24px); the initials and the admin badge shrink with the avatar.",
+          "All seven sizes side by side, from 124px down to 24px. The initials and the admin badge shrink with the avatar.",
       },
       source: {
         code: `<Avatar size={AvatarSize.min} role={AvatarRole.admin} userName="John Doe" />
@@ -450,6 +453,7 @@ const AllRolesTemplate = () => {
 };
 
 export const AllRoles: Story = {
+  name: "All roles",
   render: () => <AllRolesTemplate />,
   play: async ({ canvas }) => {
     // Nothing here is clickable, so no avatar claims to be a button.
@@ -472,7 +476,7 @@ export const AllRoles: Story = {
     docs: {
       description: {
         story:
-          "Every `role` value on the same avatar: only Owner and Admin draw a badge at the bottom corner, User, Guest, Manager, Collaborator and None draw none.",
+          "Every `role` value on the same avatar. Only Owner and Admin draw a badge at the bottom corner.",
       },
       source: {
         code: `<Avatar size={AvatarSize.big} role={AvatarRole.owner} userName="Owner" />
@@ -488,6 +492,7 @@ export const AllRoles: Story = {
 };
 
 export const GroupAvatar: Story = {
+  name: "Group",
   render: (args) => <AvatarPure {...args} />,
   args: {
     size: AvatarSize.max,
@@ -506,7 +511,7 @@ export const GroupAvatar: Story = {
     docs: {
       description: {
         story:
-          "Group avatar with uppercase initials and specialized background color. Role icons are typically hidden for groups.",
+          "A group: upper-case bold initials on the group background, with the role badge hidden.",
       },
       source: {
         code: `<Avatar
@@ -522,6 +527,7 @@ export const GroupAvatar: Story = {
 };
 
 export const EditingMode: Story = {
+  name: "Editing without a picture",
   render: (args) => <AvatarPure {...args} />,
   args: {
     size: AvatarSize.max,
@@ -551,7 +557,7 @@ export const EditingMode: Story = {
     docs: {
       description: {
         story:
-          "A person with no picture yet: the plus button at the corner, or a click anywhere on the avatar, opens the file dialog straight away through the first `model` action, and the chosen file reaches `onChangeFile`. The button is drawn only at `size` `max`.",
+          "A person with no picture: a plus button at the corner. A click on it or on the avatar runs the first `model` entry, which opens the file dialog.",
       },
       source: {
         code: `<Avatar
@@ -577,6 +583,7 @@ export const EditingMode: Story = {
 };
 
 export const EditingWithAvatar: Story = {
+  name: "Editing with a picture",
   render: (args) => <AvatarPure {...args} />,
   args: {
     size: AvatarSize.max,
@@ -620,7 +627,7 @@ export const EditingWithAvatar: Story = {
     docs: {
       description: {
         story:
-          "A person who already has a picture: the pencil at the corner, or a click on the avatar, opens a menu of the `model` actions — **Upload picture** opens the file dialog, **Delete picture** runs its own handler.",
+          "A person with a picture: a pencil at the corner. A click on it or on the avatar opens a menu of the `model` entries.",
       },
       source: {
         code: `<Avatar
@@ -653,6 +660,7 @@ export const EditingWithAvatar: Story = {
 };
 
 export const WithCustomRoleIcon: Story = {
+  name: "Custom role badge",
   render: (args) => <AvatarPure {...args} />,
   args: {
     size: AvatarSize.max,
@@ -687,7 +695,7 @@ export const WithCustomRoleIcon: Story = {
     docs: {
       description: {
         story:
-          "Avatar with a custom role icon element instead of the default role badges.",
+          "A VIP badge passed in `roleIcon`, drawn in place of the admin badge `role` would choose.",
       },
       source: {
         code: `<Avatar
@@ -702,6 +710,7 @@ export const WithCustomRoleIcon: Story = {
 };
 
 export const DefaultSource: Story = {
+  name: "Default illustration",
   render: (args) => <AvatarPure {...args} />,
   args: {
     size: AvatarSize.max,
@@ -720,7 +729,7 @@ export const DefaultSource: Story = {
     docs: {
       description: {
         story:
-          "Avatar showing the default placeholder image when no source or userName is provided.",
+          "The kit's illustration, shown by `isDefaultSource` when there is neither `source` nor `userName`.",
       },
       source: {
         code: `<Avatar
@@ -760,6 +769,7 @@ const RightToLeftTemplate = () => {
 
 // Framed on Docs: the theme provider stamps data-dir on <html>, which would flip the whole page.
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
   play: async ({ canvas }) => {
@@ -775,7 +785,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "150px" },
       description: {
         story:
-          'The same avatars under a right-to-left interface: the admin badge and the pencil move from the bottom-right corner to the bottom-left one, and the badge tooltip opens to the left of it. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+          "Avatars under a right-to-left interface: the admin badge and the pencil sit in the bottom-left corner. The badge tooltip opens to the left.",
       },
       source: {
         code: `<div dir="rtl">
@@ -802,6 +812,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={
@@ -813,6 +824,7 @@ export const CssCustomization: Story = {
           "--avatar-initials-weight": "400",
           "--avatar-initials-bg": "#7c3aed",
           "--avatar-bg": "#c4b5fd",
+          "--avatar-administrator-fill": "#16a34a",
         } as CSSProperties
       }
     >
@@ -833,11 +845,14 @@ export const CssCustomization: Story = {
     await expect(getComputedStyle(painted as HTMLElement).borderRadius).toBe(
       "8px",
     );
+    // The badge colours are read from an ancestor like the rest.
+    const badge = initials.querySelector(".admin_icon rect") as Element;
+    await expect(getComputedStyle(badge).fill).toBe("rgb(22, 163, 74)");
   },
   parameters: {
     docs: {
       description: {
-        story: `Four variables set on one wrapper -- the variables are listed under CSS variables on this page. The first avatar, with initials, shows the radius, the initials background and the weight; the second, with neither picture nor name, is there for \`--avatar-bg\`.`,
+        story: `Five variables set on one wrapper. The avatar with initials shows the radius, the initials background, the weight and a green admin badge; the empty one shows \`--avatar-bg\`.`,
       },
       source: {
         code: `<div
@@ -846,6 +861,7 @@ export const CssCustomization: Story = {
     "--avatar-initials-weight": "400",
     "--avatar-initials-bg": "#7c3aed",
     "--avatar-bg": "#c4b5fd",
+    "--avatar-administrator-fill": "#16a34a",
   }}
 >
   <Avatar size={AvatarSize.big} role={AvatarRole.admin} userName="John Doe" />

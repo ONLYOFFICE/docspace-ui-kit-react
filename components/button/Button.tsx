@@ -74,9 +74,9 @@ export const Button = (props: React.PropsWithChildren<ButtonProps>) => {
         disabled={isDisabled || isLoading}
         data-testid={testId}
         data-size={size}
-        aria-label={label}
-        aria-disabled={isDisabled ? "true" : undefined}
-        aria-busy={isLoading ? "true" : undefined}
+        aria-label={rest["aria-label"] ?? label}
+        aria-disabled={isDisabled ? "true" : rest["aria-disabled"]}
+        aria-busy={isLoading ? "true" : rest["aria-busy"]}
         style={buttonStyle}
         data-tooltip-id={tooltipId}
         data-tooltip-content={tooltipText}
@@ -84,7 +84,6 @@ export const Button = (props: React.PropsWithChildren<ButtonProps>) => {
         {isLoading ? (
           <Loader
             isDecorative
-            id={id}
             className={classNames(styles.loader, "loader", {
               [styles.primary]: primary,
             })}

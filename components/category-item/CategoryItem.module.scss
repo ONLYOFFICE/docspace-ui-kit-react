@@ -38,17 +38,6 @@
   margin-bottom: 5px;
 }
 
-.categoryItemSubheader {
-  --category-item-subheader-font-size: var(
-    --category-item-subheader-size,
-    13px
-  );
-
-  font-size: var(--category-item-subheader-font-size);
-  font-weight: 600;
-  margin-bottom: 5px;
-}
-
 .categoryItemDescription {
   color: var(--category-item-description-color-value);
   font-size: 12px;

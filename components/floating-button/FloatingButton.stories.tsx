@@ -21,7 +21,7 @@ const meta = {
       control: "select",
       options: Object.values(FloatingButtonIcons),
       description:
-        "Which of the built-in icons is drawn in the middle of the circle; ignored when `iconUrl` is set",
+        "Which of the built-in icons is drawn in the middle. Ignored when `iconUrl` is set.",
       table: {
         defaultValue: { summary: "other" },
       },
@@ -29,17 +29,17 @@ const meta = {
     iconUrl: {
       control: "text",
       description:
-        "URL of an image drawn in the middle instead of the built-in icon, 20px wide",
+        'URL of an image to draw instead of the built-in icon, at 20px wide. It is decorative (`alt=""`); the circle is named by `label`.',
     },
     percent: {
       control: { type: "number", min: 0, max: 100 },
       description:
-        "How much of the ring is filled, from 0 to 100; left unset, the ring spins instead",
+        "How much of the ring is filled, 0–100, clamped to that range. An absent `percent` or `0` spins the ring, for a progress not known yet.",
     },
     withoutProgress: {
       control: "boolean",
       description:
-        "Leaves the ring out entirely, so only the bare circle shows",
+        "Whether the progress ring is left out entirely, leaving the bare circle.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -47,7 +47,7 @@ const meta = {
     alert: {
       control: "boolean",
       description:
-        "Puts a red exclamation mark on the circle's upper edge; `stopped` wins over it",
+        "Whether the badge shows the warning triangle. `stopped` wins over it.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -55,7 +55,7 @@ const meta = {
     completed: {
       control: "boolean",
       description:
-        "Marks the operation finished: the ring fades out, the circle pulses once and a green tick appears",
+        "Whether the operation is finished: the ring fades out and the circle pulses once.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -63,7 +63,7 @@ const meta = {
     stopped: {
       control: "boolean",
       description:
-        "Puts a stop mark on the circle's upper edge, for an operation the user aborted; wins over `alert` and `completed`",
+        'Shows the "stopped" status icon: the operation was aborted by the user. Takes precedence over `alert` and `completed`.',
       table: {
         defaultValue: { summary: "false" },
       },
@@ -71,7 +71,7 @@ const meta = {
     withoutStatus: {
       control: "boolean",
       description:
-        "Hides the badge on the circle's upper edge whatever `stopped`, `alert` and `completed` say",
+        "Whether the status badge is suppressed whatever `stopped`, `alert` and `completed` say.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -79,43 +79,44 @@ const meta = {
     color: {
       control: "color",
       description:
-        "CSS colour of the circle and the ring; left unset, the accent colour is used",
+        "CSS colour of the circle and of the progress ring. Without it the accent colour is used.",
     },
     showCancelButton: {
       control: "boolean",
       description:
-        "Adds a cross, shown while the pointer is over the badge, that the host's layout must place beside the circle: on its own it lands under the circle and cannot be seen",
+        "Whether the cancel cross exists at all. It is only visible on hover unless `showCloseIcon` is set.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     showCloseIcon: {
       control: "boolean",
-      description:
-        "Keeps the cross from `showCancelButton` visible without hovering",
+      description: "Whether that cross stays visible without hovering.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     onClick: {
       action: "onClick",
-      description: "Called with the click event when the circle is clicked",
+      description:
+        "Called with the event when the circle is clicked, or pressed with Enter or Space. With it the circle is a button in the tab order. The cancel cross has its own handler.",
     },
     clearUploadedFilesHistory: {
       action: "clearUploadedFilesHistory",
-      description: "Called when the cross beside the circle is clicked",
+      description: "Called when the cancel cross is clicked or pressed.",
     },
     id: {
       control: "text",
-      description: "`id` of the circle, not of the wrapper that positions it",
+      description:
+        "Applied to the circle, not to the wrapper that positions it.",
     },
     className: {
       control: "text",
-      description: "Extra class on the circle, after the component's own",
+      description: "Applied to the circle, after the component's own classes.",
     },
     style: {
       control: "object",
-      description: "Inline style on the circle",
+      description: "Applied to the circle as inline style.",
     },
   },
   decorators: [
@@ -163,7 +164,7 @@ export const Default: Story = {
     onClick: fn(),
   },
   play: async ({ args, canvas, userEvent }) => {
-    const button = canvas.getByRole("button", { name: "upload button" });
+    const button = canvas.getByRole("button", { name: "Upload" });
     await expect(canvas.getByTestId("icon-upload")).toBeInTheDocument();
     // No percent: the ring spins, with no progress value of its own.
     const ring = ringOf(button);
@@ -185,7 +186,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "An upload that has just started, with no progress value yet, so the ring spins; change any other prop live in the Controls panel below.",
+          "An upload that has just started, with no progress value yet, so the ring spins.",
       },
       source: {
         code: `<FloatingButton icon={FloatingButtonIcons.upload} onClick={openPanel} />`,
@@ -199,6 +200,7 @@ const WithProgressTemplate = () => {
 };
 
 export const WithProgress: Story = {
+  name: "With progress",
   render: () => <WithProgressTemplate />,
   play: async ({ canvas }) => {
     const ring = ringOf(canvas.getByTestId("floating-button"));
@@ -229,6 +231,7 @@ const WithAlertTemplate = () => {
 };
 
 export const WithAlert: Story = {
+  name: "Failed",
   render: () => <WithAlertTemplate />,
   play: async ({ canvas }) => {
     await expect(
@@ -363,12 +366,13 @@ const IconVariantsTemplate = () => {
 };
 
 export const IconVariants: Story = {
+  name: "Icons",
   render: () => <IconVariantsTemplate />,
   decorators: [],
   play: async ({ canvas }) => {
     const buttons = canvas.getAllByTestId("floating-button");
     await expect(buttons).toHaveLength(16);
-    await expect(buttons[0]).toHaveAttribute("aria-label", "upload button");
+    await expect(buttons[0]).toHaveAttribute("aria-label", "Upload");
     await expect(canvas.getByTestId("icon-trash")).toBeInTheDocument();
     await expect(canvas.getByTestId("icon-arrow")).toBeInTheDocument();
   },
@@ -401,6 +405,7 @@ export const IconVariants: Story = {
 };
 
 export const WithoutProgress: Story = {
+  name: "Without the ring",
   render: () => (
     <FloatingButton icon={FloatingButtonIcons.upload} withoutProgress />
   ),
@@ -421,6 +426,7 @@ export const WithoutProgress: Story = {
 };
 
 export const WithoutStatusBadge: Story = {
+  name: "Without the status badge",
   render: () => (
     <FloatingButton icon={FloatingButtonIcons.move} completed withoutStatus />
   ),
@@ -435,7 +441,7 @@ export const WithoutStatusBadge: Story = {
     docs: {
       description: {
         story:
-          "A finished move with no tick on the circle: the ring still fades out, but the badge on the upper edge is hidden whatever the state props say (`withoutStatus`).",
+          "A finished move with no tick on the circle (`withoutStatus`). The ring still fades out, but the badge stays hidden whatever the state props say.",
       },
       source: {
         code: `<FloatingButton icon={FloatingButtonIcons.move} completed withoutStatus />`,
@@ -445,6 +451,7 @@ export const WithoutStatusBadge: Story = {
 };
 
 export const CustomColor: Story = {
+  name: "Custom colour",
   render: () => (
     <FloatingButton
       icon={FloatingButtonIcons.upload}
@@ -462,7 +469,7 @@ export const CustomColor: Story = {
     docs: {
       description: {
         story:
-          "The circle, the ring and the accent parts of the icon in a colour of your own instead of the accent colour, for example one per kind of operation (`color`).",
+          "A green circle, ring and icon in place of the accent colour (`color`), for example one colour per kind of operation.",
       },
       source: {
         code: `<FloatingButton icon={FloatingButtonIcons.upload} percent={45} color="#2e8b57" />`,
@@ -477,6 +484,7 @@ const sampleIconUrl = `data:image/svg+xml;utf8,${encodeURIComponent(
 )}`;
 
 export const CustomIconImage: Story = {
+  name: "Icon from a URL",
   render: () => <FloatingButton iconUrl={sampleIconUrl} />,
   play: async ({ canvas }) => {
     // iconUrl replaces the built-in icon with a 20px image.
@@ -502,6 +510,7 @@ export const CustomIconImage: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   render: () => (
     <div
       style={
@@ -532,10 +541,10 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Two buttons under one wrapper that sets the background, the shadow and the icon colour -- the variables are listed under CSS variables on this page.
+        story: `Two buttons under one wrapper that sets the background, the shadow and the icon colour.
 
-- **Upload** — the background and the shadow; its icon is one of the accent icons (upload, trash, deletePermanently, other), whose shapes are painted in the background colour, so the icon colour does not reach it
-- **Move** — the icon colour, on an icon that is not an accent one`,
+- **Upload** — a purple background and shadow. Its icon is an accent icon, painted in the background colour, so the icon colour does not reach it
+- **Move** — a yellow icon, which is not an accent one`,
       },
       source: {
         code: `<div

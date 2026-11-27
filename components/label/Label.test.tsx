@@ -29,6 +29,20 @@ describe("Label Component", () => {
     expect(label).not.toHaveAttribute("aria-invalid");
   });
 
+  it("forwards a passed aria-* to the label element", () => {
+    render(
+      <Label
+        {...baseProps}
+        aria-describedby="first-name-hint"
+        aria-hidden="true"
+      />,
+    );
+    const label = screen.getByTestId("label");
+    expect(label.tagName).toBe("LABEL");
+    expect(label).toHaveAttribute("aria-describedby", "first-name-hint");
+    expect(label).toHaveAttribute("aria-hidden", "true");
+  });
+
   it("applies error styles when error prop is true", () => {
     render(<Label {...baseProps} error />);
     const label = screen.getByTestId("label");

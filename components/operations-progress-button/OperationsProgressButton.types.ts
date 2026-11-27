@@ -36,7 +36,7 @@ export interface Operation {
   iconUrl?: string;
 }
 
-export interface OperationsProgressProps {
+export interface OperationsProgressProps extends React.AriaAttributes {
   /** Operations that own a panel — the upload. Their progress is the one the ring shows. */
   panelOperations?: Operation[];
   /** Secondary operations: copy, move, delete and the rest. Listed without a ring. */
@@ -71,21 +71,15 @@ export interface OperationsProgressProps {
     operation: string,
     operationId: string,
   ) => void;
-  /** Ignored. Nothing reads this prop; the panel is opened through `Operation.showPanel`. */
-  onOpenPanel?: () => void;
   /** Whether the mobile main button is on screen, which lifts this one clear of it. */
   mainButtonVisible?: boolean;
   /** Whether a completed run may still hold errors, which stops the button from auto-hiding. */
   needErrorChecking?: boolean;
   /** Whether the cancel cross is offered. Only while there is exactly one operation. */
   showCancelButton?: boolean;
-  /** Ignored. Nothing reads this prop; the cross calls `cancelUpload`. */
-  onCancelOperation?: (callback: () => void) => void;
-  /** Ignored. Nothing reads this prop; the ring reads the first operation's `percent`. */
-  percent?: number;
-  /** Whether the info panel is open, or the AI chat in its place, which moves the button clear of it: `infoPanelWidth` plus 24px in from that edge, 424px by default. */
+  /** Whether the info panel, or the AI chat in its place, is open. The button then moves 24px clear of its edge. */
   isInfoPanelVisible?: boolean;
-  /** Width in px of the open info panel, or of the chat in its place, while `isInfoPanelVisible` is set. Pass it when that panel is resizable, so the button stays clear of the width the person chose; without it the button assumes 400px. */
+  /** Width in px of that open panel, for a resizable one, so the button stays clear of the width chosen. Without it the button assumes 400px. */
   infoPanelWidth?: number;
   /** Name of the folder under the pointer, shown by the drag preview button. */
   dropTargetFolderName?: string | null;

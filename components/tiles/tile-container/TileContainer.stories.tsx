@@ -79,22 +79,22 @@ const meta = {
     children: {
       control: false,
       description:
-        "The tiles; each must carry an `item` prop, which decides its group. A child without one, plain markup included, is not shown",
+        "The tiles. A child without an `item` prop is dropped without a word, plain markup included.",
     },
     headingFolders: {
       control: "text",
       description:
-        "Heading above the folders; shown only when there is at least one folder",
+        "Heading above the folders group, an `<h1>`. It is rendered only when that group has something in it.",
     },
     headingFiles: {
       control: "text",
       description:
-        "Heading above the files; shown only when there is at least one file",
+        "Heading above the files group, an `<h1>`. It is rendered only when that group has something in it.",
     },
     useReactWindow: {
       control: "boolean",
       description:
-        "Hands the sorted tiles to `infiniteGrid` instead of wrapping each group in a grid of its own; without an `infiniteGrid` the tiles are left with no grid at all",
+        "Hands the tiles to `infiniteGrid` without the per-group grids. Without an `infiniteGrid` the tiles are left with no grid at all.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -102,37 +102,31 @@ const meta = {
     infiniteGrid: {
       control: false,
       description:
-        "The host's virtualising grid, which receives all the tiles and whether the listing holds rooms or templates",
+        "The virtualising grid the tiles are rendered into. It is told whether the listing holds any rooms and any templates.",
     },
     noSelect: {
       control: "boolean",
-      description: "Stops the reader selecting text anywhere in the grid",
-      table: {
-        defaultValue: { summary: "false" },
-      },
-    },
-    isDesc: {
-      control: "boolean",
-      description:
-        "Adds a class to both headings for a descending sort; no style of the kit reads it, so nothing changes on screen",
+      description: "Turns off text selection across the whole container.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     id: {
       control: "text",
-      description: "Value of `id` on the outer element",
+      description: "Value of `id` on the outer element.",
       table: {
         defaultValue: { summary: '"tileContainer"' },
       },
     },
     className: {
       control: "text",
-      description: "Class added to the outer element",
+      description:
+        "Added before the component's own class on the outer element.",
     },
     style: {
       control: "object",
-      description: "Inline style of the outer element",
+      description:
+        "Inline style of the outer element, and a place to set the CSS variables.",
     },
   },
 } satisfies Meta<typeof TileContainer>;
@@ -164,6 +158,7 @@ const ContainerTemplate = (args: TileContainerProps) => {
 };
 
 export const Default: Story = {
+  name: "Files only",
   render: (args) => <ContainerTemplate {...args} />,
   args: {
     useReactWindow: false,
@@ -178,7 +173,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "Three documents under the files heading, in as many columns as the window has room for; resize the window to see the columns change, and change any other prop live in the Controls panel below.",
+          "Three documents under the files heading, in as many columns as the window has room for. A wider window gets more columns.",
       },
       source: {
         code: `<TileContainer useReactWindow={false} headingFiles="Files">
@@ -198,6 +193,7 @@ export const Default: Story = {
 };
 
 export const FoldersAndFiles: Story = {
+  name: "Folders and files",
   render: (args) => (
     <TileContainer {...args}>
       {mockFiles.slice(0, 2).map((file) => (
@@ -248,7 +244,7 @@ export const FoldersAndFiles: Story = {
     docs: {
       description: {
         story:
-          "A listing that holds both kinds, passed in with the files first: the grid still puts the folders on top, each group under its own heading (`headingFolders`, `headingFiles`), because it sorts by each tile's `item`, not by the order of the children.",
+          "A listing of both kinds, passed in with the files first. The folders still come on top, each group under its own heading (`headingFolders`, `headingFiles`). The grid sorts by each tile's `item`, not by child order.",
       },
       source: {
         code: `<TileContainer headingFolders="Folders" headingFiles="Files">
@@ -271,6 +267,7 @@ export const FoldersAndFiles: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   play: async ({ canvas, canvasElement }) => {
     const [first] = items(canvasElement, "file");
     const grid = first.parentElement as HTMLElement;
@@ -310,7 +307,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The variables are listed under CSS variables on this page. One grid of three files sets the gap and four of the tiles' variables; hover a tile for \`--tile-hover-bg\`. The container's own variable is the gap; the others are the tiles' and are set here once for the whole grid.`,
+        story: `The variables are listed under CSS variables on this page. One grid of three files sets the gap, the container's own variable, and four of the tiles' variables once for the whole grid. \`--tile-hover-bg\` shows on hover.`,
       },
       source: {
         code: `<div style={{

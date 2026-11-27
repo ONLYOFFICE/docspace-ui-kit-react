@@ -112,5 +112,14 @@ describe("Common Utilities", () => {
       vi.stubGlobal("location", { pathname: "/rooms/1" });
       expect(isManagement()).toBe(false);
     });
+
+    it("returns false for the word anywhere but the base path", () => {
+      vi.stubGlobal("location", {
+        pathname: "/portal-settings/management/disk-space",
+      });
+      expect(isManagement()).toBe(false);
+      vi.stubGlobal("location", { pathname: "/managements" });
+      expect(isManagement()).toBe(false);
+    });
   });
 });

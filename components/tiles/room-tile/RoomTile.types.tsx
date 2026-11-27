@@ -24,36 +24,51 @@ export interface SelectOption {
   value: string;
 }
 
-export type RoomTileProps = {
-  /** Whether the tile is selected. */
+export type RoomTileProps = React.AriaAttributes & {
+  /** Ticks the checkbox and keeps it in place of the logo, and tints the tile
+   * and its tags. */
   checked?: boolean;
-  /** Whether the tile is the one being acted on, which keeps its hover background. */
+  /** Keeps the hover background and the tag tint on the tile being acted on. */
   isActive?: boolean;
-  /** Turns the pointer off while an operation is running over the tile: hover, clicks and right-clicks stop reaching it. It does not change how the tile looks. */
+  /** Stops the tile answering hover, clicks and right-clicks while an
+   * operation runs over it. The tile looks the same as an idle one. */
   isBlockingOperation?: boolean;
-  /** The room this tile stands for. Its `tags`, `providerType` and `isAIAgent` decide what the bottom row shows, and its `contextOptions` key decides whether the three-dot button appears. */
+  /** The room the tile stands for, passed back through the callbacks. Its
+   * `tags`, `providerType` and `isAIAgent` decide the tag row. */
   item: RoomItem;
-  /** Called with the new checked state and the `item` when the checkbox changes, or when the logo is tapped on a screen narrower than 600px. */
+  /** Called with the new checked state and the `item` when the checkbox
+   * changes, or when the logo is tapped at 600px or narrower. */
   onSelect?: (checked: boolean, item: RoomItem) => void;
-  /** Called with the event on a click anywhere on the tile except the checkbox, the tag row (its tags and the overflow menu), the badges, an open dialog, the three-dot button and the menu. It is the tile's open handler, not a thumbnail's. */
+  /** The room's open handler, called with the event on a click on the tile.
+   * Clicks on the checkbox, the tags, the badges and the menu do not reach it. */
   thumbnailClick?: (e: React.MouseEvent) => void;
-  /** Builds the menu shown on right-click. Without it the right-click menu never opens. */
+  /** Returns the menu's entries. Without it neither the three-dot button nor a
+   * right-click opens anything. */
   getContextModel?: () => ContextMenuModel[];
-  /** The tile's content. Only the first element is rendered, above the tags. */
+  /** The name beside the logo, usually a `TileContent`. Only the first element
+   * is rendered. */
   children?: React.ReactNode;
-  /** Draws the checkbox in its indeterminate state. */
+  /** Draws the checkbox half-filled. It shows while the checkbox does: on
+   * hover, or when the tile is checked. */
   indeterminate?: boolean;
-  /** The room logo beside the checkbox. Without it neither the logo nor the checkbox is rendered at all. */
+  /** The room logo beside the name. Without it the tile has neither the logo
+   * nor the checkbox. */
   element?: React.ReactNode;
-  /** The menu's entries. Required — but see `item`. */
+  /** Draws the three-dot button when non-empty and `item` has a
+   * `contextOptions` key. The menu lists `getContextModel`'s entries, not
+   * these. */
   contextOptions: ContextMenuModel[];
-  /** How many columns the tag row is laid out in. Required. */
+  /** How many columns the tag row fits into. The row shows as many tags as
+   * the width allows and folds the rest into a menu. */
   columnCount: number;
-  /** Called with `{ label, roomType, providerType }` when one of the room's own tags is clicked, plain strings included. The generated tags go to `selectOption` instead, and on an AI agent with no tags of its own nothing reaches it. */
+  /** Called with `{ label, roomType, providerType }` when one of the room's
+   * own tags is clicked. The generated tags go to `selectOption`. */
   selectTag: (tag: TagClickEvent) => void;
-  /** Called when a generated tag is clicked: `typeProvider` with `item.providerType` for the third-party tag, `defaultTypeRoom` with `item.roomType` for the room-type tag. Required. */
+  /** Called when a generated tag is clicked: `typeProvider` for the storage
+   * tag, `defaultTypeRoom` for the room-type tag. */
   selectOption: (option: SelectOption) => void;
-  /** Turns a room type into the label of the tag shown when the room has no tags of its own. It is handed the kit's own translation function. Required. */
+  /** Turns a room type into the label of the tag a room without tags of its
+   * own gets. It receives the kit's translation function. */
   getRoomTypeName: (
     type: string,
     t:
@@ -63,19 +78,23 @@ export type RoomTileProps = {
           interpolation?: Record<string, string | number>,
         ) => string),
   ) => string;
-  /** Badges drawn beside the content, in the upper half. */
+  /** Badges after the name. Give their wrapper the class `badges`, so a click
+   * on them does not open the room. */
   badges?: React.ReactNode;
-  /** Replaces the logo and the checkbox with the kit's track loader. */
+  /** Replaces the logo and the checkbox with a small loader, and sets
+   * `aria-busy` on the tile. */
   inProgress?: boolean;
-  /** Draws the accent outline that marks the tile the keyboard is on. */
+  /** Draws the accent border that marks the tile the keyboard is on. */
   showHotkeyBorder?: boolean;
-  /** Renaming state: it removes the logo and the checkbox. */
+  /** Renaming state: removes the logo and the checkbox, and stops hover from
+   * tinting the tile and its tags. */
   isEdit?: boolean;
   /** Value of `data-testid` on the outer element.
    * @default "tile" */
   dataTestId?: string;
 
-  /** Replaces the whole tag row. It is called on every render with the hover state and the tags the component worked out. */
+  /** Draws the bottom row instead of the tags. It is called on every render
+   * with the hover state and the tags the tile worked out. */
   customBottomContent?: (
     isHovered: boolean,
     tags: Array<TagType | string>,

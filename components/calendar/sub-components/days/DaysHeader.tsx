@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { HeaderButtons } from "../header-buttons/HeaderButtons";
 import { DaysHeaderProps } from "../../Calendar.types";
 import styles from "../../Calendar.module.scss";
+import { activateOnButtonKey } from "../../../../utils/keyboard-activation";
 import {
   subtractFromDate,
   addToDate,
@@ -44,6 +45,10 @@ export const DaysHeader = ({
     <div className={styles.headerContainer}>
       <h2
         onClick={onTitleClick}
+        // The title opens the month view, so it is a button to the keyboard.
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => activateOnButtonKey(e, onTitleClick)}
         className={classNames(styles.title, "days-header")}
       >
         {monthName.charAt(0).toUpperCase() + monthName.substring(1)}{" "}

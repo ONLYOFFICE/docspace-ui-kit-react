@@ -82,14 +82,6 @@
     width: fit-content;
   }
 
-  &.withColumns {
-    display: block;
-
-    -webkit-column-count: var(--column-count);
-    -moz-column-count: var(--column-count);
-    column-count: var(--column-count);
-  }
-
   &.notReady {
     visibility: hidden;
     top: 0;

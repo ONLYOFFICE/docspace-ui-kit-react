@@ -81,7 +81,7 @@ audiences that will never see this diff:
 
 - The DocSpace client, which imports by subpath and rebuilds against a packed tarball.
 - Plugin authors, whose documentation of these exact traps lives in
-  `agent-skills/skills/plugin-sdk/references/ui-kit.md` and is hand-written prose.
+  `agent-skills/skills/apps-plugin-sdk/references/ui-kit.md` and is hand-written prose.
 
 Check that file for the component you touched. The traps it records today —
 `FieldContainer.labelVisible` defaulting to `false` and its own bottom margin, `ToggleButton`'s
@@ -115,7 +115,7 @@ still true, and all still unenforced.
 - What stays in the story is what cannot be written down: the scenarios, the controls and
   their `argTypes`, each story's `description.story`, the visual-regression surface. A fact a
   story would state goes into the README — which is what `package.json` publishes and what the
-  `ui-kit` agent skill syncs; stories are in neither.
+  `apps-ui-kit` agent skill syncs; stories are in neither.
 - **`vitest.config.mts` holds two projects.** `unit` is Vitest + React Testing Library in
   jsdom, and it **lists the directories it runs** — `components`, `selectors`, `ai-agent`,
   `errors`, `ui`, `utils`, `uploader`, `media-viewer`, `context`, `providers`, `hooks`,
@@ -141,9 +141,9 @@ still true, and all still unenforced.
   or give a mocked router link the `preventDefault` a real one has. A `play` function that clicks or types
   is a test like any other: give the story `fn()` spies for the handlers it checks, and look for
   a portalled list or tooltip through `screen`, not the story's `canvas`.
-- Seven components have no test; that is tolerated, an untested _change_ to interactive logic is
-  not. `node .claude/scripts/component-docs/gaps.mjs` lists them and the one missing story; no
-  README is missing any more, and the gates keep it that way.
+- One component, `action-button`, has no test; that is tolerated, an untested _change_ to
+  interactive logic is not. `node .claude/scripts/component-docs/gaps.mjs` lists it; no README
+  or story is missing any more, and the gates keep it that way.
 - `__tests__/` holds 94 Playwright visual-regression specs that run against a built Storybook
   and are **not in CI**. Nothing you push will run them.
 
@@ -152,7 +152,7 @@ still true, and all still unenforced.
 None. All 112 READMEs — 98 component folders, 11 nested sub-components and the three public
 providers — are on the template, and `check:readme` fails a folder that has none, so this cannot
 regress quietly. `node .claude/scripts/component-docs/gaps.mjs` is the live count and today
-reports only a missing story (`theme-provider`) and seven components without tests.
+reports only `action-button` without a test.
 
 A provider block is the same schema with two fields dropped: no `category`, because a provider
 appears in no section of the catalogue, and no `state`, because it renders no element a prop

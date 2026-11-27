@@ -11,6 +11,7 @@ import { LoaderWrapper } from "../loader-wrapper";
 import { useViewTab } from "./hooks/use-view-tab/useViewTab";
 import useTabsHotkeys from "./hooks/use-tabs-hotkeys/useTabsHotkeys";
 import useTabPanel from "./hooks/use-tab-panel/useTabPanel";
+import { omitAriaProps, pickAriaProps } from "../../utils/aria-props";
 import { type TTabItem, type TabsProps } from "./Tabs.types";
 import { OFFSET_RIGHT, OFFSET_LEFT } from "./Tabs.constants";
 import styles from "./Tabs.module.scss";
@@ -210,6 +211,7 @@ const PrimaryTabs = (props: TabsProps) => {
       className={classNames(styles.tabList, classes)}
       ref={tabsRef}
       id={id}
+      {...pickAriaProps(rest)}
       role="tablist"
       onKeyDown={onKeyDown}
     >
@@ -286,7 +288,10 @@ const PrimaryTabs = (props: TabsProps) => {
   );
 
   return (
-    <div className={classNames(styles.tabs, className, classes)} {...rest}>
+    <div
+      className={classNames(styles.tabs, className, classes)}
+      {...omitAriaProps(rest)}
+    >
       {stickyHeader ? (
         <div
           ref={stickyHeaderRef}

@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { motion, useAnimation } from "framer-motion";
 
 import { Text } from "../text";
+import { pickAriaProps } from "../../utils/aria-props";
 
 import type { ToggleButtonProps, ToggleIconProps } from "./ToggleButton.types";
 import styles from "./ToggleButton.module.scss";
@@ -77,11 +78,15 @@ const ToggleButton = ({
   isLoading,
   noAnimation,
   name,
+  inputId,
   fontWeight,
   fontSize,
   dataTestId,
   dataTooltipId,
+  ...rest
 }: ToggleButtonProps) => {
+  const aria = pickAriaProps(rest);
+
   return (
     <div
       id={id}
@@ -101,6 +106,7 @@ const ToggleButton = ({
         data-testid="toggle-button-container"
       >
         <input
+          id={inputId}
           className={styles.hiddenInput}
           name={name}
           type="checkbox"
@@ -112,6 +118,10 @@ const ToggleButton = ({
           // is what React asks of a `checked` input with no handler.
           readOnly={!onChange}
           data-testid="toggle-button-input"
+          {...aria}
+          // The native `checked` carries the state; a passed value would
+          // contradict it.
+          aria-checked={undefined}
         />
         <ToggleIcon
           isChecked={isChecked}

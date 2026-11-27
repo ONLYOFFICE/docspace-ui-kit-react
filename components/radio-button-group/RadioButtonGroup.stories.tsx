@@ -24,16 +24,16 @@ const meta = {
     options: {
       control: "object",
       description:
-        'The options, in order: each has a `value` and an optional `label`, `disabled`, `autoFocus`, `id` and `dataTestId`; an entry with `type: "text"` is a caption, not a button',
+        'The options, in order. An entry with `type: "text"` is a caption, not a button.',
     },
     selected: {
       control: "text",
       description:
-        "Value of the chosen option, compared as a string; the group starts from it and moves to it again whenever it changes",
+        "Value of the chosen option, compared as a string. It seeds the group's own state and is re-applied whenever it changes.",
     },
     onClick: {
       description:
-        "Called when the choice changes, with the input's change event; the new value is `event.target.value`, always a string",
+        "Called when the choice changes, with the input's change event despite the name. The new value is `event.target.value`, always a string.",
     },
     name: {
       control: "text",
@@ -44,7 +44,7 @@ const meta = {
       control: "select",
       options: ["horizontal", "vertical"],
       description:
-        "Which way the options run: side by side in a row, or stacked in a column only as wide as its longest label",
+        "Which way the options run: a row, or a column only as wide as its longest label. A lone `RadioButton` defaults to vertical instead.",
       table: {
         defaultValue: { summary: "horizontal" },
       },
@@ -59,7 +59,7 @@ const meta = {
     },
     width: {
       control: "text",
-      description: "Width of the group, as a CSS length",
+      description: "Width of the group, as a CSS length.",
     },
     fontSize: {
       control: "text",
@@ -72,23 +72,23 @@ const meta = {
     spacing: {
       control: "text",
       description:
-        "Gap between neighbouring buttons, as a CSS length: before each button after the first in a row, below each button but the last in a column; without it the buttons touch",
+        "Gap to the neighbouring button, as a CSS length: `margin-inline-start` when horizontal, `margin-block-end` when vertical. There is no gap at all without it — the buttons touch.",
     },
     id: {
       control: "text",
-      description: "Applied to the group's outer element",
+      description: "Applied to the group.",
     },
     className: {
       control: "text",
-      description: "Applied to the group's outer element",
+      description: "Applied to the group.",
     },
     style: {
       control: "object",
-      description: "Applied to the group's outer element",
+      description: "Applied to the group.",
     },
     dataTestId: {
       control: "text",
-      description: "`data-testid` of the group's outer element",
+      description: "`data-testid` of the group.",
       table: {
         defaultValue: { summary: "radio-button-group" },
       },
@@ -153,7 +153,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The group as most forms use it: a row of options with one chosen. Click another option to move the choice and watch the Actions panel for the value `onClick` receives; change any other prop live in the Controls panel below.",
+          "The group as most forms use it: a row of options with one chosen. A click or an arrow key moves the choice, and `onClick` gets the new value.",
       },
       source: {
         code: `<RadioButtonGroup
@@ -170,6 +170,7 @@ export const Default: Story = {
 };
 
 export const VerticalLayout: Story = {
+  name: "Vertical",
   args: {
     name: "vertical",
     options: baseOptions,
@@ -186,7 +187,7 @@ export const VerticalLayout: Story = {
     docs: {
       description: {
         story:
-          "The options stacked in a column only as wide as its longest label (`orientation`). Suits longer lists and labels too long to sit side by side; without `spacing` the buttons sit directly under one another.",
+          "The options stacked in a column only as wide as its longest label (`orientation`). Without `spacing` the buttons sit directly under one another.",
       },
       source: {
         code: `<RadioButtonGroup
@@ -225,6 +226,7 @@ const DisabledTemplate = (args: ComponentProps<typeof RadioButtonGroup>) => {
 };
 
 export const DisabledStates: Story = {
+  name: "Disabled",
   render: (args) => <DisabledTemplate {...args} />,
   play: async ({ canvas }) => {
     const radios = canvas.getAllByRole("radio");
@@ -244,10 +246,10 @@ export const DisabledStates: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Shows the two ways to take options out of play:
+        story: `The two ways to take options out of play:
 
-- **Left** — the whole group greyed out and unclickable at once (\`isDisabled\`), for a setting that does not apply right now
-- **Right** — only "Disabled Option" is greyed out (\`disabled\` on the option), while the other three stay selectable`,
+- **Left** — the whole group greyed out at once (\`isDisabled\`)
+- **Right** — only "Disabled Option" greyed out (\`disabled\` on the option); the other three stay selectable`,
       },
       source: {
         code: `// All disabled
@@ -266,6 +268,7 @@ export const DisabledStates: Story = {
 };
 
 export const WithTextLabel: Story = {
+  name: "With a caption",
   args: {
     name: "with-text",
     options: [
@@ -284,7 +287,7 @@ export const WithTextLabel: Story = {
     docs: {
       description: {
         story:
-          '"Please select an option:" is a caption placed inside the group, not a button (an option with `type: "text"`). Use it for a heading or an instruction above the options, or between two runs of them.',
+          '"Please select an option:" is a caption inside the group, not a button (an option with `type: "text"`). It heads the options or separates two runs of them.',
       },
       source: {
         code: `<RadioButtonGroup
@@ -305,6 +308,7 @@ export const WithTextLabel: Story = {
 };
 
 export const CustomStyling: Story = {
+  name: "Text size, spacing and width",
   args: {
     name: "custom-styling",
     options: baseOptions,
@@ -336,7 +340,7 @@ export const CustomStyling: Story = {
     docs: {
       description: {
         story:
-          "Larger, bolder labels (`fontSize`, `fontWeight`), 20px between the buttons (`spacing`) and a group 300px wide (`width`), to match the group to the text and layout around it.",
+          "Larger, bolder labels (`fontSize`, `fontWeight`), 20px between the buttons (`spacing`) and a group 300px wide (`width`).",
       },
       source: {
         code: `<RadioButtonGroup
@@ -355,6 +359,7 @@ export const CustomStyling: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: (args) => (
     <div
       style={
@@ -387,7 +392,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Both caption spacings set on a wrapper around a vertical group that opens with the caption "Choose an option:" -- the variables are listed under CSS variables on this page.`,
+        story: `A vertical group under the caption "Choose an option:", with both caption spacings set on a wrapper: 24px above it and 12px below.`,
       },
       source: {
         code: `<div style={{

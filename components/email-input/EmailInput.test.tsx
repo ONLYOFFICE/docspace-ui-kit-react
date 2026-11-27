@@ -33,6 +33,14 @@ describe("<EmailInput />", () => {
     expect(screen.getByTestId("email-input")).toBeInTheDocument();
   });
 
+  it("adds a passed className to its own", () => {
+    render(<EmailInput {...defaultProps} className="signup-email" />);
+
+    const input = screen.getByTestId("email-input");
+    expect(input).toHaveClass("signup-email");
+    expect(input.className).toMatch(/emailInput/);
+  });
+
   it("renders with initial invalid value", () => {
     const email = "invalid-email";
     render(<EmailInput {...defaultProps} value={email} />);

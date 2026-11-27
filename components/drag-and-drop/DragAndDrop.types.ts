@@ -11,18 +11,23 @@ export interface DragAndDropProps {
   isDragDisabled?: boolean;
   /** Called when the pointer is pressed. It is passed straight to the element, not through the drop library. */
   onMouseDown?: () => void;
-  /** Called with the dropped files. It is skipped entirely when the drop carried none, and nothing is ever rejected: there is no accepted-type or size filter here. */
+  /**
+   * Called with the dropped files, and skipped when the drop carried none.
+   * Nothing is rejected: there is no type or size filter here.
+   */
   onDrop?: (acceptedFiles: File[]) => void;
-  /** Called on every drag-over with the drag-active flag as it stood when the current render began — on the first event of a drag that is still `false`. */
+  /**
+   * Called on every drag-over with the drag-active flag from the last render.
+   * On the first event of a drag that flag is still `false`.
+   */
   onDragOver?: (isDragActive: boolean, e: React.DragEvent<HTMLElement>) => void;
   /** Called when the dragged selection leaves the target. */
   onDragLeave?: (e: React.DragEvent<HTMLElement>) => void;
-  /** Ignored. Nothing reads it, and it is spread onto the outer element as an unknown attribute. */
-  value?: string;
-  /** Ignored. Nothing reads it, and React warns about a function landing on a DOM element. */
-  targetFile?: (file?: File | null) => void;
   /** Inline style of the outer element, and where the `--dnd-*` custom properties go. */
   style?: React.CSSProperties;
-  /** Ignored. The drop library supplies the element's ref, and this one is never attached. */
-  forwardedRef?: React.RefObject<HTMLDivElement | null>;
+  /**
+   * Written to the outer element as its `value` attribute. `SelectionArea` and the portal read
+   * it to tell which item a rubber-band selection or a drop landed on.
+   */
+  value?: string;
 }

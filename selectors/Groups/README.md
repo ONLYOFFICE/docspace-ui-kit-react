@@ -29,7 +29,6 @@ import GroupsSelector from "@onlyoffice/apps-ui-kit/selectors/Groups";
 | `useAside`          | `boolean`                                                                                                 | No       | Render inside an Aside panel with backdrop                     |
 | `onClose`           | `() => void`                                                                                              | No       | Callback to close the selector (required when `useAside=true`) |
 | `withoutBackground` | `boolean`                                                                                                 | No       | Aside without background overlay                               |
-| `withBlur`          | `boolean`                                                                                                 | No       | Apply blur effect to the backdrop                              |
 
 ## Usage
 

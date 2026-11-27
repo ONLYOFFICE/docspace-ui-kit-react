@@ -72,22 +72,22 @@ const meta = {
     checked: {
       control: "boolean",
       description:
-        "Ticks the checkbox and keeps it in place of the icon, and tints the whole tile",
+        "Ticks the checkbox, shows it in place of the icon and tints the whole tile. The tile holds no state; pass back what `onSelect` reports.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     inProgress: {
       control: "boolean",
-      description: "Replaces the icon and the checkbox with a small loader",
+      description:
+        "Replaces the icon and the checkbox with the kit's track loader.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     indeterminate: {
       control: "boolean",
-      description:
-        "Draws the checkbox half-filled; it shows while the checkbox does, that is on hover or when the tile is checked",
+      description: "Draws the checkbox in its indeterminate state.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -95,7 +95,7 @@ const meta = {
     isBigFolder: {
       control: "boolean",
       description:
-        "Switches from the single 64px row to a 220px card with a picture above the row",
+        "Switches from the single row to a tall card, with a picture on top and the name row below it.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -103,7 +103,7 @@ const meta = {
     showHotkeyBorder: {
       control: "boolean",
       description:
-        "Turns the tile's border the accent colour, to mark the one the keyboard is on",
+        "Draws the accent outline that marks the tile the keyboard is on.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -111,7 +111,7 @@ const meta = {
     isActive: {
       control: "boolean",
       description:
-        "Keeps the hover tint and the underlined name on the tile being acted on",
+        "Keeps the hover tint and the underlined name on the tile being acted on, after the pointer leaves it.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -119,7 +119,7 @@ const meta = {
     isDragging: {
       control: "boolean",
       description:
-        "Marks the tile as being dragged; hovering it then neither tints it nor swaps the icon for the checkbox",
+        "Marks the tile as being dragged: hovering it does not tint it, underline the name or swap the icon for the checkbox. It does not dim the tile.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -127,7 +127,7 @@ const meta = {
     isEdit: {
       control: "boolean",
       description:
-        "Removes the icon and the checkbox while the folder is renamed, and stops hovering from tinting the tile",
+        "Renaming state: removes the icon, the checkbox and the hover tint, so the content gets the name row.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -135,84 +135,72 @@ const meta = {
     item: {
       control: "object",
       description:
-        "The folder the tile stands for, passed back through the callbacks. A `contextOptions` key on it is what draws the three-dot button",
+        "The folder this tile stands for. Its `contextOptions` key — present or absent — is what decides whether the three-dot button appears.",
     },
     children: {
       control: false,
       description:
-        "The name row beside the icon, usually a `TileContent`; only the first element is shown",
+        "The tile's content. Only the first element is rendered; the rest are dropped.",
     },
     element: {
       control: false,
       description:
-        "The folder icon beside the name; without it the tile has neither the icon nor the checkbox",
+        "The icon beside the checkbox. Without it neither the icon nor the checkbox is rendered at all.",
     },
     temporaryIcon: {
       control: false,
       description:
-        "The picture of the tall layout, drawn at the bottom of its upper part: an element as given, or the address of an SVG",
+        "The folder's picture, drawn only in the tall card: a URL is fetched as an SVG, an element is rendered as given.",
     },
     badges: {
       control: false,
       description:
-        "Badges at the end of the name row, or in the top end corner of the picture in the tall layout; give their wrapper the class `badges` so clicking them does not select the tile",
+        "Badges after the name, or in the picture's top end corner in the tall card. Give their wrapper the class `badges`, so a click on them does not select.",
     },
     contextOptions: {
       control: "object",
-      description: "Entries of the menu opened by the three-dot button",
+      description:
+        "Draws the three-dot button when non-empty and `item` carries a `contextOptions` key. The menu lists `getContextModel`'s entries, not these.",
     },
     getContextModel: {
       control: false,
       description:
-        "Returns the entries of the menu opened by a right-click; without it a right-click opens nothing",
+        "Builds the menu that the three-dot button and a right-click open. Without it neither opens a menu, whatever `contextOptions` holds.",
     },
     onSelect: {
       description:
-        "Called with the new checked state and the item on a plain click on the tile, from the checkbox, and when the icon is tapped on a phone",
+        "Called with the new checked state and the `item`, from the checkbox or a plain click. A tap on the icon calls it too, in a window 600px wide or narrower.",
     },
     setSelection: {
       description:
-        "Called with an empty list just before a plain click selects the tile, unless the click landed on an image, an input or an icon",
+        "Called with an empty array before a plain click selects the tile, unless the click landed on an image, an input or an SVG shape.",
     },
     withCtrlSelect: {
       description:
-        "Called with the item on a Ctrl- or Cmd-click, which then does not select the tile",
+        "Called with the `item` on a Ctrl- or Cmd-click, instead of selecting.",
     },
     withShiftSelect: {
       description:
-        "Called with the item on a Shift-click, which then does not select the tile",
+        "Called with the `item` on a Shift-click, instead of selecting.",
     },
     tileContextClick: {
       description:
-        "Called just before the menu opens, with `true` when a right-click opened it",
+        "Called before the menu opens, with `true` when the trigger was a right-click.",
     },
     hideContextMenu: {
-      description: "Called when the menu closes",
+      description: "Called when the menu closes.",
     },
     forwardRef: {
       control: false,
       description:
-        "Ref to the outer element, which the tile also clicks on a right-click when its menu is not mounted yet",
+        "Attached to the outer element, and clicked by the component itself on a right-click before the menu is mounted.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the outer element",
+      description: "Value of `data-testid` on the outer element.",
       table: {
         defaultValue: { summary: '"tile"' },
       },
-    },
-    thumbnailClick: {
-      control: false,
-      description: "Ignored: nothing in the tile calls it",
-    },
-    contextMenuHeader: {
-      control: false,
-      description:
-        "Ignored: the menu's header is built from the first child's `item`",
-    },
-    dragging: {
-      control: false,
-      description: "Ignored: `isDragging` is the one that is read",
     },
   },
   args: {
@@ -259,6 +247,7 @@ const Template = ({
 };
 
 export const Default: Story = {
+  name: "Single row",
   render: Template,
   args: {
     item: {
@@ -314,7 +303,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "A folder as a single row: the icon, the name, and a badge beside the menu. Click the tile to select it, Ctrl- or Shift-click it to see the other callbacks in the Actions panel, and change any other prop live in the Controls panel below.",
+          "A folder as a single row: the icon, the name, and a badge beside the menu. A plain click selects the tile; a Ctrl-, Cmd- or Shift-click goes to `withCtrlSelect` or `withShiftSelect`.",
       },
       source: {
         code: `<FolderTile
@@ -332,6 +321,7 @@ export const Default: Story = {
 };
 
 export const Big: Story = {
+  name: "Tall card",
   render: Template,
   args: {
     item: {
@@ -359,7 +349,7 @@ export const Big: Story = {
     docs: {
       description: {
         story:
-          "The tall layout, for a grid where folders should stand out as much as files: a picture on top with the badge in its corner, and the name row below it (`isBigFolder`, `temporaryIcon`).",
+          "A folder as a tall card: a picture on top with the badge in its corner, and the name row below it (`isBigFolder`, `temporaryIcon`).",
       },
       source: {
         code: `<FolderTile
@@ -379,6 +369,7 @@ export const Big: Story = {
 };
 
 export const Checked: Story = {
+  name: "Selected",
   render: Template,
   args: {
     ...Default.args,
@@ -395,7 +386,7 @@ export const Checked: Story = {
     docs: {
       description: {
         story:
-          "A selected folder, as it looks among others the reader has picked: the checkbox stays ticked in place of the icon and the whole tile is tinted (`checked`).",
+          "A selected folder: the checkbox stays ticked in place of the icon, and the whole tile is tinted (`checked`).",
       },
       source: {
         code: `<FolderTile
@@ -413,6 +404,7 @@ export const Checked: Story = {
 };
 
 export const InProgress: Story = {
+  name: "Busy",
   render: Template,
   args: {
     ...Default.args,
@@ -446,6 +438,7 @@ export const InProgress: Story = {
 };
 
 export const WithHotkeyBorder: Story = {
+  name: "Keyboard outline",
   render: Template,
   args: {
     ...Default.args,
@@ -478,6 +471,7 @@ export const WithHotkeyBorder: Story = {
 };
 
 export const RenamingState: Story = {
+  name: "Renaming",
   render: Template,
   args: {
     ...Default.args,
@@ -494,7 +488,7 @@ export const RenamingState: Story = {
     docs: {
       description: {
         story:
-          "A folder whose name is being edited: the icon and the checkbox go, so the name row can hold a text field, and hovering no longer tints the tile (`isEdit`).",
+          "A folder whose name is being edited: the icon and the checkbox go, and hovering does not tint the tile. The name row holds a text field (`isEdit`).",
       },
       source: {
         code: `<FolderTile
@@ -518,6 +512,7 @@ export const RenamingState: Story = {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <Template {...args} />
@@ -543,7 +538,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "150px" },
       description: {
         story:
-          'The same row in a right-to-left layout: the icon moves to the right-hand end, the name is aligned right after it, and the badge and the three-dot button move to the left edge. The wrapper carries `dir="rtl"` for the layout; the side the three-dot menu opens on comes from the theme\'s `interfaceDirection` (the Direction toolbar).',
+          "The same row in a right-to-left layout: the icon at the right-hand end, then the name, then the badge and the three-dot button. `dir=\"rtl\"` on a wrapper sets the layout; the menu's side follows the theme's interface direction.",
       },
       source: {
         code: `<div dir="rtl">
@@ -557,6 +552,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   play: async ({ canvas }) => {
     const [folder, big] = canvas.getAllByTestId("tile");
     await expect(getComputedStyle(folder).borderTopLeftRadius).toBe("16px");
@@ -657,12 +653,10 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `The variables are listed under CSS variables on this page.
-
-Three instances:
-- **My Folder** — the single row, for the border, radius and name variables; hover it for \`--tile-hover-bg\`, \`--tile-hover-text-decoration\` and \`--tile-bg\` behind the icon.
-- **Projects** — the tall layout (\`isBigFolder\`), for \`--tile-bg\` and the badge variables.
-- **Archive** — \`showHotkeyBorder\`, for \`--tile-hotkey-color\`, in a wrapper of its own that sets \`--folder-tile-border-style\` to a thicker border.`,
+        story: `Three tiles under wrappers that set the variables.
+- **My Folder** — the single row, for the border, radius and name variables; the hover ones show on hover.
+- **Projects** — the tall card (\`isBigFolder\`), for \`--tile-bg\` and the badge variables.
+- **Archive** — \`showHotkeyBorder\` for \`--tile-hotkey-color\`. Its own wrapper sets a thicker \`--folder-tile-border-style\`.`,
       },
       source: {
         code: `<div style={{

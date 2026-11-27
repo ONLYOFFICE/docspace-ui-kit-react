@@ -30,6 +30,28 @@ const renderWithHandlers = () => {
 };
 
 describe("<SelectedItem />", () => {
+  it("names the cross", () => {
+    render(<SelectedItem {...baseProps} />);
+
+    expect(screen.getByRole("button", { name: "Remove" })).toBeInTheDocument();
+  });
+
+  it("puts a passed aria-* on the chip and keeps its own aria-pressed", () => {
+    render(
+      <SelectedItem
+        {...baseProps}
+        clickable
+        isActive
+        hideCross
+        aria-label="Filter: documents"
+        aria-pressed={false}
+      />,
+    );
+
+    const chip = screen.getByRole("button", { name: "Filter: documents" });
+    expect(chip).toHaveAttribute("aria-pressed", "true");
+  });
+
   it("renders without error", () => {
     render(<SelectedItem {...baseProps} />);
 
@@ -53,6 +75,20 @@ describe("<SelectedItem />", () => {
 
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it("puts only the given classes on the cross", () => {
+    const { cross } = renderWithHandlers();
+
+    expect(cross.className).not.toMatch(/undefined/);
+  });
+
+  it("applies style to the chip", () => {
+    render(<SelectedItem {...baseProps} style={{ maxWidth: "120px" }} />);
+
+    expect(screen.getByTestId("selected-item")).toHaveStyle({
+      maxWidth: "120px",
+    });
   });
 
   it("calls onClick when the label is clicked", () => {

@@ -9,7 +9,7 @@ export type TTabItem = {
   content: React.ReactNode;
   /** Whether the tab is greyed out and cannot be selected, by a click, the keyboard or the segmented arrows. */
   isDisabled?: boolean;
-  /** Called before `onSelect` when this tab is clicked. With `withAnimation` it is awaited and the body shows a loader meanwhile. */
+  /** Called when this tab is chosen, before `onSelect`. With `withAnimation` it is called after `onSelect` and awaited while the body is dimmed. */
   onClick?: () => void | Promise<void>;
   /** Rendered after the tab's text. Primary tabs only. */
   badge?: React.ReactNode;
@@ -19,10 +19,10 @@ export type TTabItem = {
   iconName?: string;
 };
 
-export type TabsProps = {
+export type TabsProps = React.AriaAttributes & {
   /** The tabs, in the order they are drawn. Each carries its own content. */
   items: TTabItem[];
-  /** `id` of the selected tab. This is a controlled component; set it from `onSelect`. An empty value selects the first tab. */
+  /** `id` of the selected tab, set from `onSelect`; the component keeps no selection of its own. An empty value selects the first tab. */
   selectedItemId: number | string;
   /** Which of the two tab bars is drawn: an underlined row, or a segmented control. */
   type?: TabsTypes;
@@ -30,15 +30,15 @@ export type TabsProps = {
   stickyTop?: string;
   /** Applied to the outermost element. */
   className?: string;
-  /** Called with the whole tab object when a different tab is clicked. Clicking the selected one does nothing. */
+  /** Called with the whole tab object when a different tab is chosen by a click, Enter or Space, or a segmented arrow. */
   onSelect?: (element: TTabItem) => void;
-  /** Whether the spacer under the tab bar is left out. */
+  /** Whether the gap between the tab bar and the selected tab's content is left out. */
   withoutStickyIntend?: boolean;
   /** Applied to the outermost element as inline style. */
   style?: React.CSSProperties;
   /** Shared `layoutId` of the sliding background, and the `id` of the tab list. Secondary tabs only. */
   layoutId?: string;
-  /** Holds off the tab-width measurement until the labels are final. It renders no loader of its own. Secondary tabs only. */
+  /** Holds off sizing the tabs until the labels are final, and hides a bar that is not `scaled` meanwhile. It draws no loader. Secondary tabs only. */
   isLoading?: boolean;
   /** Whether the tabs share the container's width equally instead of being measured from the longest label. Secondary tabs only. */
   scaled?: boolean;
@@ -48,7 +48,7 @@ export type TabsProps = {
   hotkeysId?: string;
   /** Applied to the tab list on primary tabs, and to the outermost element on secondary ones. */
   id?: string;
-  /** Whether selecting a tab animates the underline and awaits the item's `onClick` behind a loader. Primary tabs only. */
+  /** Whether selecting a tab grows its underline and keeps the old content, dimmed, until the item's `onClick` settles. Primary tabs only. */
   withAnimation?: boolean;
   /** Rendered in its own sticky strip above the tab bar, which the bar then sticks below. Primary tabs only. */
   stickyHeader?: React.ReactNode;

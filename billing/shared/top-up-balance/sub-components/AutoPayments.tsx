@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { useCommonTranslation } from "../../../../utils/i18n";
 import { observer } from "mobx-react";
 import classNames from "classnames";
@@ -8,55 +8,23 @@ import { Text } from "../../../../components/text";
 import { toastr } from "../../../../components/toast";
 import { TextInput, InputType } from "../../../../components/text-input";
 import { Button, ButtonSize } from "../../../../components/button";
-import type { TenantWalletSettings } from "@onlyoffice/docspace-api-sdk";
-
-import CheckRoundSvg from "../../../../assets/icons/16/check.round.react.svg";
 
 import styles from "../styles/AutoPayments.module.scss";
 import { usePaymentStore } from "../../../store/PaymentStoreProvider";
 
+const MIN_BALANCE_MIN = 5;
+const MIN_BALANCE_MAX = 1000;
+const UP_TO_BALANCE_MAX = 5000;
+
 type AutoPaymentsProps = {
   onAdditionalSave?: () => void;
   noMargin?: boolean;
-  isEditAutoPayment?: boolean;
   isDisabled?: boolean;
-};
-
-type CurrentPaymentSettingsProps = {
-  autoPayments: TenantWalletSettings;
-  formatWalletCurrency?: (item?: number, fractionDigits?: number) => string;
-};
-
-const CurrentPaymentSettings = ({
-  autoPayments,
-  formatWalletCurrency,
-}: CurrentPaymentSettingsProps) => {
-  const t = useCommonTranslation();
-
-  const { minBalance, upToBalance } = autoPayments!;
-
-  return (
-    <div className={styles.infoBlock}>
-      <div className={styles.infoBlockTitle}>
-        <CheckRoundSvg />
-        <Text fontSize="12px" fontWeight={600}>
-          {t("AutoTopUp")}
-        </Text>
-      </div>
-      <Text fontSize="12px" fontWeight={400} className={styles.infoDescription}>
-        {t("WhenBalanceDropsTo", {
-          min: formatWalletCurrency!(minBalance, 0),
-          max: formatWalletCurrency!(upToBalance, 0),
-        })}
-      </Text>
-    </div>
-  );
 };
 
 const AutoPayments = ({
   onAdditionalSave,
   noMargin,
-  isEditAutoPayment,
   isDisabled,
 }: AutoPaymentsProps) => {
   const store = usePaymentStore();
@@ -81,29 +49,33 @@ const AutoPayments = ({
   const { walletCustomerEmail } = store.tariff;
   const t = useCommonTranslation();
 
-  const showCurrentSettings = isAutoPaymentExist && !isEditAutoPayment;
+  const isFieldsDisabled = isDisabled || !isAutomaticPaymentsEnabled;
+  const isSummaryVisible =
+    isAutomaticPaymentsEnabled &&
+    !!minBalance &&
+    !!upToBalance &&
+    !minBalanceError &&
+    !upToBalanceError;
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isCurrentSettings, setIsCurrentSettings] =
-    useState(showCurrentSettings);
-  const [animateSettings, setAnimateSettings] = useState(false);
-  const [minUpToBalance, setMinUpToBalance] = useState(6);
-
-  const isFirstRender = useRef(true);
-
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-    }
-  }, []);
+  const [minUpToBalance, setMinUpToBalance] = useState(() => {
+    const savedMin = parseInt(minBalance ?? "", 10);
+    return (Number.isNaN(savedMin) ? MIN_BALANCE_MIN : savedMin) + 1;
+  });
 
   const validateMaxUpToBalance = (value: string, minimumBalance: string) => {
     const numValue = parseInt(value, 10);
-    const minInputValue = minimumBalance ? parseInt(minimumBalance, 10) : 5;
+    const minInputValue = minimumBalance
+      ? parseInt(minimumBalance, 10)
+      : MIN_BALANCE_MIN;
 
     const minValue = minInputValue + 1;
 
-    if (Number.isNaN(numValue) || numValue < minValue || numValue > 5000) {
+    if (
+      Number.isNaN(numValue) ||
+      numValue < minValue ||
+      numValue > UP_TO_BALANCE_MAX
+    ) {
       setUpToBalanceError!(true);
       return;
     }
@@ -114,7 +86,11 @@ const AutoPayments = ({
   const validateMinBalance = (value: string) => {
     const numValue = parseInt(value, 10);
 
-    if (Number.isNaN(numValue) || numValue < 5 || numValue > 1000) {
+    if (
+      Number.isNaN(numValue) ||
+      numValue < MIN_BALANCE_MIN ||
+      numValue > MIN_BALANCE_MAX
+    ) {
       setMinBalanceError!(true);
       return;
     }
@@ -145,19 +121,13 @@ const AutoPayments = ({
     validateMaxUpToBalance(value, minBalance!);
   };
 
-  const onSave = async (isEnable: boolean = true) => {
+  const onSave = async () => {
     const timerId = setTimeout(() => {
       setIsLoading(true);
     }, 200);
 
     try {
       await updateAutoPayments!();
-      setIsCurrentSettings(isEnable);
-      setIsLoading(false);
-      setAnimateSettings(false);
-      setTimeout(() => {
-        setAnimateSettings(true);
-      }, 50);
     } catch (error) {
       toastr.error(error as string);
     }
@@ -172,7 +142,7 @@ const AutoPayments = ({
     setIsAutomaticPaymentsEnabled!(isEnable);
 
     if (!isEnable && isAutoPaymentExist) {
-      onSave(isEnable);
+      onSave();
     }
   };
 
@@ -182,20 +152,17 @@ const AutoPayments = ({
 
   const onClose = () => {
     if (isAutoPaymentExist) {
-      setIsCurrentSettings(true);
-      setAnimateSettings(false);
-      setTimeout(() => {
-        setAnimateSettings(true);
-      }, 50);
+      const savedMin = autoPayments?.minBalance ?? 0;
+
+      setMinBalance!(savedMin.toString());
+      setUpToBalance!((autoPayments?.upToBalance ?? 0).toString());
+      setMinBalanceError!(false);
+      setUpToBalanceError!(false);
+      setMinUpToBalance(savedMin + 1);
       return;
     }
 
     onToggleClick();
-  };
-
-  const onEditClick = () => {
-    setAnimateSettings(false);
-    setIsCurrentSettings(false);
   };
 
   const description = (min: number, max: number) => (
@@ -205,94 +172,6 @@ const AutoPayments = ({
         max: formatWalletCurrency!(max, 0),
       })}
     </Text>
-  );
-
-  const renderInputField = () => (
-    <div className={styles.inputFields}>
-      <div className={styles.inputField}>
-        <Text fontSize="12px" className={styles.inputLabel} fontWeight={600}>
-          {t("WhenBalanceGoesBellow")}
-        </Text>
-        <TextInput
-          scale
-          value={minBalance!}
-          onChange={onMinBalanceChange}
-          hasError={minBalanceError}
-          type={InputType.text}
-          pattern="\d+"
-          isDisabled={isDisabled}
-          testId="top_up_min_balance_input"
-        />
-        {description(5, 1000)}
-      </div>
-
-      <div className={styles.inputField}>
-        <Text fontSize="12px" className={styles.inputLabel} fontWeight={600}>
-          {t("BringCreditBackUpTo")}
-        </Text>
-        <TextInput
-          scale
-          value={upToBalance!}
-          onChange={onMaxUpToBalanceChange}
-          hasError={upToBalanceError}
-          type={InputType.text}
-          pattern="\d+"
-          isDisabled={isDisabled}
-          testId="top_up_max_balance_input"
-        />
-        {description(minUpToBalance, 5000)}
-      </div>
-      {!onAdditionalSave ? (
-        <div className={styles.inputButtons}>
-          <Button
-            key="OkButton"
-            label={t("SaveButton")}
-            size={ButtonSize.small}
-            primary
-            onClick={onSaveAutoPayment}
-            isLoading={isLoading}
-            isDisabled={
-              isDisabled ||
-              minBalanceError ||
-              upToBalanceError ||
-              !minBalance ||
-              !upToBalance
-            }
-            testId="save_auto_payment_button"
-          />
-          <Button
-            key="CancelButton"
-            label={t("CancelButton")}
-            size={ButtonSize.small}
-            onClick={onClose}
-            isDisabled={isDisabled || isLoading}
-            testId="cancel_auto_payment_button"
-          />
-        </div>
-      ) : null}
-    </div>
-  );
-
-  const renderCurrentSettings = () => (
-    <div
-      className={classNames(styles.settingsWrapper, {
-        [styles.animated]: animateSettings,
-        [styles.showBlock]: isDisabled || isFirstRender.current,
-      })}
-    >
-      <CurrentPaymentSettings
-        autoPayments={autoPayments!}
-        formatWalletCurrency={formatWalletCurrency}
-      />
-      <Button
-        key="EditButton"
-        label={t("EditButton")}
-        size={ButtonSize.small}
-        onClick={onEditClick}
-        isDisabled={isDisabled}
-        testId="edit_auto_payment_button"
-      />
-    </div>
   );
 
   return (
@@ -318,11 +197,81 @@ const AutoPayments = ({
         {t("AutomaticallyAddCredits")}
       </Text>
 
-      {isAutomaticPaymentsEnabled
-        ? isCurrentSettings
-          ? renderCurrentSettings()
-          : renderInputField()
-        : null}
+      <div className={styles.inputFields}>
+        <div className={styles.inputField}>
+          <Text fontSize="12px" className={styles.inputLabel} fontWeight={600}>
+            {t("WhenBalanceGoesBellow")}
+          </Text>
+          <TextInput
+            scale
+            value={minBalance!}
+            onChange={onMinBalanceChange}
+            hasError={minBalanceError}
+            type={InputType.text}
+            pattern="\d+"
+            isDisabled={isFieldsDisabled}
+            testId="top_up_min_balance_input"
+          />
+          {description(MIN_BALANCE_MIN, MIN_BALANCE_MAX)}
+        </div>
+
+        <div className={styles.inputField}>
+          <Text fontSize="12px" className={styles.inputLabel} fontWeight={600}>
+            {t("BringCreditBackUpTo")}
+          </Text>
+          <TextInput
+            scale
+            value={upToBalance!}
+            onChange={onMaxUpToBalanceChange}
+            hasError={upToBalanceError}
+            type={InputType.text}
+            pattern="\d+"
+            isDisabled={isFieldsDisabled}
+            testId="top_up_max_balance_input"
+          />
+          {description(minUpToBalance, UP_TO_BALANCE_MAX)}
+        </div>
+        {isSummaryVisible ? (
+          <Text
+            fontSize="12px"
+            fontWeight={400}
+            className={styles.inputDescription}
+          >
+            {t("WhenBalanceDropsTo", {
+              min: formatWalletCurrency!(parseInt(minBalance!, 10), 0),
+              max: formatWalletCurrency!(parseInt(upToBalance!, 10), 0),
+            })}
+          </Text>
+        ) : null}
+        {!onAdditionalSave ? (
+          <div className={styles.inputButtons}>
+            <Button
+              key="OkButton"
+              label={t("SaveButton")}
+              size={ButtonSize.small}
+              primary
+              onClick={onSaveAutoPayment}
+              isLoading={isLoading}
+              isDisabled={
+                isFieldsDisabled ||
+                minBalanceError ||
+                upToBalanceError ||
+                !minBalance ||
+                !upToBalance
+              }
+              testId="save_auto_payment_button"
+            />
+            <Button
+              key="CancelButton"
+              label={t("CancelButton")}
+              size={ButtonSize.small}
+              onClick={onClose}
+              isDisabled={isFieldsDisabled || isLoading}
+              testId="cancel_auto_payment_button"
+            />
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 };

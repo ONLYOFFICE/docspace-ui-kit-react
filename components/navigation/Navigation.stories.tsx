@@ -19,37 +19,35 @@ const meta = {
   argTypes: {
     title: {
       control: "text",
-      description: "Current folder title",
-    },
-    showText: {
-      control: "boolean",
-      description: "Not read by the component; changing it changes nothing",
+      description:
+        "Name of the current folder, shown as the heading. It is also the hover tooltip of the folder button, and is added to `tariffBar` as a prop.",
     },
     isRootFolder: {
       control: "boolean",
-      description: "Whether the current folder is the root",
+      description:
+        "Whether the current folder is the root of its tree. It hides the back arrow, keeps the drop box shut and drops the title icon.",
     },
     canCreate: {
       control: "boolean",
       description:
-        "Whether the person may create anything here. The plus button needs this and `isPlusButtonVisible` both",
+        "Whether the person may create anything here. It is one of two conditions for the plus button; `isPlusButtonVisible` is the other, and both must hold.",
     },
     isPlusButtonVisible: {
       control: "boolean",
       description:
-        "Shows the plus button, together with `canCreate`. Without it no plus button is rendered",
+        "**Required for the plus button to appear at all.** Without it no plus button is rendered, even with `canCreate`.",
       table: { defaultValue: { summary: "undefined" } },
     },
     isContextButtonVisible: {
       control: "boolean",
       description:
-        "Shows the folder's context button. Without it the folder menu is never rendered, whatever `getContextOptionsFolder` returns",
+        "**Required for the folder button to appear at all.** Without it the folder menu is never rendered, whatever `getContextOptionsFolder` returns.",
       table: { defaultValue: { summary: "undefined" } },
     },
     withMenu: {
       control: "boolean",
       description:
-        "Whether the plus and folder buttons open their menus themselves. With `false` they only call `onPlusClick` or `onContextOptionsClick`",
+        "Whether the plus and folder buttons open their menus. With `false` a click only calls `onPlusClick` or `onContextOptionsClick`.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -57,192 +55,194 @@ const meta = {
     isTrashFolder: {
       control: "boolean",
       description:
-        "Opens the folder menu shifted to the side of its button; nothing else in the header changes",
+        "Shifts the folder menu further to the side of its button. Nothing else in the header changes.",
       table: { defaultValue: { summary: "undefined" } },
-    },
-    isRoom: {
-      control: "boolean",
-      description: "Not read by the component; changing it changes nothing",
     },
     isDesktop: {
       control: "boolean",
       description:
-        "Whether the host is the desktop application; it only limits the height of the open drop box. The layout follows `currentDeviceType`",
+        "Whether the host is the desktop application. It only caps the drop box's title row at 32px; the layout follows `currentDeviceType`.",
     },
     currentDeviceType: {
       control: "select",
       options: [DeviceType.desktop, DeviceType.tablet, DeviceType.mobile],
       description:
-        "Which layout to render. Below desktop the info panel toggle and the AI chat button move into the button row and the plus button is dropped; on a phone the parent title is hidden too",
+        "Which layout to render. It decides which buttons appear in place of a media query, so a wrong value shows the wrong buttons.",
     },
     isInfoPanelVisible: {
       control: "boolean",
-      description: "Whether the info panel is currently visible",
+      description:
+        "Whether the info panel is open, which draws its toggle pressed.",
     },
     hideInfoPanel: {
-      control: false,
-      description:
-        "Hides the info panel toggle whenever it is set, because it is read as a flag and never called",
+      control: "boolean",
+      description: "Hides the info panel toggle on a desktop.",
       table: { defaultValue: { summary: "undefined" } },
     },
     navigationButtonLabel: {
       control: "text",
       description:
-        "Label of an extra button at the end of the row. Without it the button is not rendered; it is also hidden in the root folder",
+        "Label of the extra button at the end of the row. Without it the button is not rendered, and it is also hidden inside a frame and in the root folder.",
       table: { defaultValue: { summary: "undefined" } },
     },
     showNavigationButton: {
       control: "boolean",
       description:
-        "Widens the header's last column to at least 186px for the extra button; the button itself appears with `navigationButtonLabel`",
+        "Widens the header's last column to at least 186px for the extra button. The button itself appears with `navigationButtonLabel`.",
     },
     showRootFolderTitle: {
       control: "boolean",
       description:
-        "Shows the second, clickable title before the folder's name. It is ignored in the root folder, on a phone, and with one folder in the trail and no `rootRoomTitle`",
+        "Shows the room's title before the folder's own, as a second clickable title. It is ignored in the root folder, on a phone, and when there is neither a `rootRoomTitle` nor more than one crumb.",
     },
     rootRoomTitle: {
       control: "text",
       description:
-        "Text of the second title. Without it the parent folder's name from the trail is used",
+        "Text of the room title before the folder name. Without it the second-to-last crumb's title is used.",
     },
     badgeLabel: {
       control: "text",
       description:
-        "Text of a small badge next to the title; it follows the second title when one is shown",
+        "Text of the small badge after the title. It follows the room title when one is shown, and the folder name otherwise.",
       table: { defaultValue: { summary: "undefined" } },
     },
     titleTooltip: {
       control: "text",
       description:
-        "Native tooltip of the folder's name, in place of the name itself. It is dropped while the second title is shown",
+        "Replaces the folder name's hover tooltip, which is otherwise the name itself. It is dropped while the room title is shown.",
       table: { defaultValue: { summary: "undefined" } },
     },
     showTitle: {
       control: "boolean",
       description:
-        "Shows the folder's name and the second title; without it only the arrow and the buttons remain",
+        "Shows the folder name and the room title. Without it only the arrow and the buttons remain.",
       table: { defaultValue: { summary: "undefined" } },
     },
     showBackButton: {
       control: "boolean",
       description:
-        "Shows the back arrow even in the root folder, where it is otherwise hidden",
+        "Shows the back arrow even in the root folder, where it is otherwise hidden.",
       table: { defaultValue: { summary: "undefined" } },
     },
     isFrame: {
       control: "boolean",
       description:
-        "Whether the header is rendered inside an embedding frame. It hides the folder button, the extra button and the tariff notice",
+        "Whether the header is inside an embedding frame. It hides the folder button, the extra button and the tariff notice, and keeps the plus button below desktop.",
       table: { defaultValue: { summary: "undefined" } },
     },
     isPublicRoom: {
       control: "boolean",
       description:
-        "Replaces the folder button with one that appears only when at least one of its options is enabled",
+        "Replaces the folder button with one that appears only when at least one of its options is enabled.",
       table: { defaultValue: { summary: "undefined" } },
     },
     withLogo: {
       control: false,
       description:
-        "Shows a logo at the start of the header. A string is used as the logo image's URL; `true` shows only `burgerLogo`",
+        "Shows the logo block at the start of the header. A string is the desktop image's URL; `true` shows only `burgerLogo`.",
     },
     burgerLogo: {
       control: false,
-      description: "URL of the logo image shown while `withLogo` is set",
+      description:
+        "URL of the logo shown below the desktop breakpoint while `withLogo` is set. It is an `<img src>`, not an icon name.",
     },
     titleIcon: {
       control: false,
       description:
-        "URL of a small SVG icon before the title; it is hidden in the root folder",
+        "URL of the small icon before the title. It is hidden in the root folder.",
     },
     titleIconTooltip: {
       control: "text",
-      description: "Tooltip text of the title icon",
+      description:
+        "Text of the tooltip on the title icon. Without it no tooltip element is rendered.",
       table: { defaultValue: { summary: "undefined" } },
     },
     titles: {
       control: "object",
       description:
-        "Native tooltips of the info panel, AI chat, plus and folder buttons, the label of the AI chat button, and the text and icon of the notice chip",
+        "Texts of the header buttons. `infoPanel` and `actions` name the info panel toggle and the plus, and are their hover tooltips; `contextMenu` names the folder button. `aiChat` labels the AI chat button, and `warningText` and `warningIcon` fill the warning chip.",
       table: { defaultValue: { summary: "undefined" } },
     },
     navigationItems: {
       control: "object",
       description:
-        "The folder trail, outermost folder first; the last entry is the current folder. An empty list makes the title unclickable",
+        "The breadcrumb trail, outermost folder first. The last entry is the current folder; an empty list makes the title unclickable.",
     },
     toggleChatPanel: {
       control: false,
       description:
-        "Called when the AI chat button is clicked. Without it the button is not rendered",
+        "Called when the AI chat button is clicked. Without it the button is not rendered.",
       table: { defaultValue: { summary: "undefined" } },
     },
     isChatPanelVisible: {
       control: "boolean",
       description:
-        "Whether the AI chat panel is open; the AI chat button shows its pressed look while it is",
+        "Whether the AI chat panel is open, which draws its button pressed.",
       table: { defaultValue: { summary: "undefined" } },
     },
     hideChatButton: {
       control: "boolean",
       description:
-        "Hides the AI chat button even when `toggleChatPanel` is set",
+        "Hides the AI chat button even when `toggleChatPanel` is set.",
       table: { defaultValue: { summary: "undefined" } },
     },
     getContextOptionsFolder: {
       control: false,
       description:
-        "Returns the items of the folder menu. It is called on every render, so it has to be cheap",
+        "Returns the model of the folder menu. **It is called on every render**, whether or not the button is shown, so keep it cheap.",
     },
     getContextOptionsPlus: {
       control: false,
-      description: "Returns the items of the plus button's menu",
+      description:
+        "Returns the model of the plus button's menu. It is called on every render of that button.",
     },
     onClickFolder: {
       control: false,
       description:
-        "Called with a folder's id when it is chosen in the drop box or when the second title is clicked",
+        "Called with a crumb's id when one is chosen from the drop box, and when the room title is clicked.",
     },
     onBackToParentFolder: {
       control: false,
-      description: "Called when the back arrow is clicked",
+      description:
+        "Called when the back arrow is clicked. In the open drop box it also closes the box.",
     },
     toggleInfoPanel: {
       control: false,
-      description: "Called when the info panel toggle is clicked",
+      description: "Called when the info panel toggle is clicked.",
     },
     onPlusClick: {
       control: false,
       description:
-        "Called when the plus button is clicked while `withMenu` is `false`",
+        "Called on click instead of opening the menu, and only while `withMenu` is `false`.",
       table: { defaultValue: { summary: "undefined" } },
     },
     onContextOptionsClick: {
       control: false,
       description:
-        "Called when the folder button is clicked, before its menu opens",
+        "Called when the folder button is clicked, before its menu opens.",
       table: { defaultValue: { summary: "undefined" } },
     },
     onNavigationButtonClick: {
       control: false,
-      description: "Called when the extra labelled button is clicked",
+      description: "Called when that extra button is clicked.",
       table: { defaultValue: { summary: "undefined" } },
     },
     onLogoClick: {
       control: false,
-      description: "Called when the logo is clicked",
+      description:
+        "Called when the logo is clicked. Only reachable while `withLogo` is set.",
       table: { defaultValue: { summary: "undefined" } },
     },
     tariffBar: {
       control: false,
       description:
-        "Element shown after the buttons, cloned with the folder's `title` added as a prop. Hidden inside a frame",
+        "Portal element for the tariff notice. It is cloned with the folder's `title` added as a prop, so the element has to tolerate one. Hidden inside a frame.",
       table: { defaultValue: { summary: "undefined" } },
     },
     analyzeResponsesButton: {
       control: false,
-      description: "Any node, rendered as it is after the tariff notice",
+      description:
+        "Rendered as-is at the end of the button row, after the tariff notice.",
       table: { defaultValue: { summary: "undefined" } },
     },
     beforeContextButton: {
@@ -254,12 +254,13 @@ const meta = {
     contextMenuHeader: {
       control: false,
       description:
-        "Header of the folder menu where it opens as a sheet below the desktop layout",
+        "Header of the folder's context menu, used where the menu opens as a mobile sheet.",
       table: { defaultValue: { summary: "undefined" } },
     },
     showTitleInDropBox: {
       control: "boolean",
-      description: "Shows the title block at the top of the open drop box",
+      description:
+        "Shows the title block at the top of the open drop box. Only `false` hides it and frees the height it reserves.",
       table: { defaultValue: { summary: "true" } },
     },
   },
@@ -288,8 +289,6 @@ const HeaderRow = (props: { children: React.ReactNode }) => (
   </div>
 );
 
-const noop = () => {};
-
 const part = (root: HTMLElement, selector: string) =>
   root.querySelector<HTMLElement>(selector);
 
@@ -303,7 +302,6 @@ const menuItem = async (name: string) => {
 };
 
 const defaultArgs = {
-  showText: true,
   isRootFolder: false,
   title: "My Documents",
   canCreate: true,
@@ -323,10 +321,6 @@ const defaultArgs = {
     { key: "create", label: "Create folder" },
   ],
   isTrashFolder: false,
-  isEmptyFilesList: false,
-  clearTrash: noop,
-  showFolderInfo: noop,
-  isCurrentFolderInfo: false,
   toggleInfoPanel: fn(),
   isInfoPanelVisible: false,
   titles: {
@@ -336,12 +330,10 @@ const defaultArgs = {
   },
   withMenu: true,
   onPlusClick: fn(),
-  isEmptyPage: false,
   isDesktop: true,
-  isRoom: false,
   isFrame: false,
-  // Truthy, so the info panel toggle stays hidden; WithInfoPanel clears it
-  hideInfoPanel: noop,
+  // The info panel toggle stays hidden; WithInfoPanel clears it
+  hideInfoPanel: true,
   withLogo: false,
   burgerLogo: "",
   showRootFolderTitle: true,
@@ -359,6 +351,7 @@ const defaultArgs = {
 };
 
 export const Default: Story = {
+  name: "Nested folder",
   render: (args) => (
     <Wrapper>
       <Navigation {...args} />
@@ -398,12 +391,11 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The header of a nested folder: the back arrow, the parent folder's name and the current folder's name. Click the folder's name to open the drop box with the whole trail; change any other prop live in the Controls panel below.",
+          "The header of a nested folder: the back arrow, the parent folder's name and the current folder's name. A click on the folder's name opens the drop box with the whole trail.",
       },
       source: {
         code: `<Navigation
   title="My Documents"
-  showText
   canCreate
   isDesktop
   navigationItems={[
@@ -421,6 +413,7 @@ export const Default: Story = {
 };
 
 export const RootFolder: Story = {
+  name: "Root folder",
   render: (args) => (
     <Wrapper>
       <Navigation {...args} />
@@ -445,16 +438,17 @@ export const RootFolder: Story = {
     docs: {
       description: {
         story:
-          "The header of a root folder: with no parent to go back to, the back arrow, the parent folder's name and the drop-down arrow are gone, and clicking the name opens nothing (`isRootFolder`).",
+          "The header of a root folder, with no parent to go back to (`isRootFolder`). The back arrow, the parent's name and the drop-down arrow are gone, and the name opens nothing.",
       },
       source: {
-        code: `<Navigation title="Documents" isRootFolder showText canCreate />`,
+        code: `<Navigation title="Documents" isRootFolder canCreate />`,
       },
     },
   },
 };
 
 export const TrashFolder: Story = {
+  name: "Trash folder",
   render: (args) => (
     <Wrapper>
       <Navigation {...args} />
@@ -486,7 +480,7 @@ export const TrashFolder: Story = {
     docs: {
       description: {
         story:
-          "A folder that holds deleted items, where the person needs the rule spelled out and has nothing to create: the chip shows the notice (`titles.warningText`), there is no plus button, and the folder button's menu opens shifted to the side (`isTrashFolder`).",
+          "A folder of deleted items, with the rule spelled out in a chip (`titles.warningText`) and nothing to create. The folder button's menu opens shifted to the side (`isTrashFolder`).",
       },
       source: {
         code: `<Navigation
@@ -502,6 +496,7 @@ export const TrashFolder: Story = {
 };
 
 export const WithInfoPanel: Story = {
+  name: "Info panel open",
   render: (args) => (
     <Wrapper>
       <HeaderRow>
@@ -527,7 +522,7 @@ export const WithInfoPanel: Story = {
     docs: {
       description: {
         story:
-          "The info panel toggle at the end of the header, in its pressed look, so the person can tell the panel is open and click to close it (`isInfoPanelVisible`, `toggleInfoPanel`). The toggle appears only without `hideInfoPanel`.",
+          "The info panel toggle at the end of the header, drawn pressed while the panel is open (`isInfoPanelVisible`, `toggleInfoPanel`). The toggle appears only without `hideInfoPanel`.",
       },
       source: {
         code: `<Navigation title="My Documents" isInfoPanelVisible isDesktop toggleInfoPanel={handleToggle} />`,
@@ -537,6 +532,7 @@ export const WithInfoPanel: Story = {
 };
 
 export const WithNavigationButton: Story = {
+  name: "With extra button",
   render: (args) => (
     <Wrapper>
       <Navigation {...args} />
@@ -572,6 +568,7 @@ export const WithNavigationButton: Story = {
 };
 
 export const WithActionButtons: Story = {
+  name: "Plus and folder buttons",
   render: (args) => (
     <Wrapper>
       <Navigation {...args} />
@@ -605,7 +602,7 @@ export const WithActionButtons: Story = {
     docs: {
       description: {
         story:
-          "The plus button and the folder button, each opening its own menu, so the person can create something here or act on the folder: click either one. `canCreate` alone shows no plus button and the menu getter alone shows no folder button; each needs its flag (`isPlusButtonVisible`, `isContextButtonVisible`).",
+          "The plus button and the folder button, each opening its own menu: one creates something here, the other acts on the folder. Each needs its flag (`isPlusButtonVisible`, `isContextButtonVisible`).",
       },
       source: {
         code: `<Navigation
@@ -628,6 +625,7 @@ export const WithActionButtons: Story = {
 };
 
 export const WithAiChatButton: Story = {
+  name: "With AI chat button",
   render: (args) => (
     <Wrapper>
       <HeaderRow>
@@ -651,7 +649,7 @@ export const WithAiChatButton: Story = {
     docs: {
       description: {
         story:
-          "An **AI chat** button at the end of the header, for a host that has a chat panel to open (`toggleChatPanel`). Its text comes from `titles.aiChat` and gives way to the bare icon when the header runs out of room; turn on `isChatPanelVisible` in the Controls panel below to see its pressed look.",
+          "An **AI chat** button at the end of the header, for a host with a chat panel to open (`toggleChatPanel`). Its label is `titles.aiChat`, and it shrinks to the icon when the header runs out of room.",
       },
       source: {
         code: `<Navigation
@@ -666,6 +664,7 @@ export const WithAiChatButton: Story = {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <Navigation {...args} />
@@ -703,7 +702,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "58px" },
       description: {
         story:
-          "The header in a right-to-left interface: the back arrow sits at the right edge and points right, the parent folder's name comes to the right of the current one and the drop-down arrow follows the name on its left.",
+          "The header in a right-to-left interface. The back arrow sits at the right edge and points right, and the parent folder's name comes right of the current one.",
       },
       source: {
         code: `<div dir="rtl">
@@ -718,6 +717,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => (
     <div
       style={
@@ -778,10 +778,10 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page.
+        story: `Every overridable variable set on one wrapper, in two headers.
 
-- **First header** — the heading, the second title, both arrows, the separator and the notice chip; click the folder's name to see the drop box variables.
-- **Second header** — the variables its props switch on: the badge next to the folder's name (\`badgeLabel\`), the pressed info panel toggle (\`isInfoPanelVisible\`) and the AI chat button (\`toggleChatPanel\`).`,
+- **First header** — the heading, the room title, both arrows, the separator and the warning chip.
+- **Second header** — the badge (\`badgeLabel\`), the pressed info panel toggle (\`isInfoPanelVisible\`) and the AI chat button (\`toggleChatPanel\`).`,
       },
       source: {
         code: `<div

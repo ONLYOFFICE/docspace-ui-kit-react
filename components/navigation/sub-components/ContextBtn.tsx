@@ -5,6 +5,7 @@ import VerticalDotsReactSvg from "../../../assets/icons/17/vertical-dots.react.s
 import { IconButton } from "../../icon-button";
 import { ContextMenu, ContextMenuRefType } from "../../context-menu";
 import { TooltipContainer } from "../../tooltip";
+import { useCommonTranslation } from "../../../utils/i18n";
 
 import { TContextButtonProps } from "../Navigation.types";
 
@@ -24,8 +25,10 @@ const ContextButton = ({
   ignoreChangeView,
   contextMenuHeader,
   title,
+  ariaLabel,
   ...rest
 }: TContextButtonProps) => {
+  const t = useCommonTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [animationClasses, setAnimationClasses] = useState<string[]>([]);
   const ref = useRef<HTMLDivElement | null>(null);
@@ -118,6 +121,7 @@ const ContextButton = ({
     >
       <IconButton
         onClick={onClick}
+        ariaLabel={ariaLabel ?? t("MoreOptions")}
         iconNode={<VerticalDotsReactSvg />}
         id={id}
         size={17}

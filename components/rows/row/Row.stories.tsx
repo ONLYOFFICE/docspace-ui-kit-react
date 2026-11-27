@@ -30,29 +30,28 @@ const meta = {
     checked: {
       control: "boolean",
       description:
-        "Whether the checkbox is ticked. Passing the prop at all is what renders the checkbox: `false` gives an unticked box, leaving it out gives none",
+        "Whether the row's checkbox is ticked. Its **presence** is what renders the checkbox at all — passing `checked={false}` gives an unticked box, omitting the prop gives none.",
     },
     indeterminate: {
       control: "boolean",
       description:
-        "Draws the checkbox half-ticked, for a group that is partly selected",
+        "Draws the checkbox as partly ticked, for a group that is half-selected.",
     },
     isDisabled: {
       control: "boolean",
-      description:
-        "Greys out the checkbox and stops it from changing; the rest of the row stays clickable and the context menu still opens",
+      description: "Disables the checkbox, and nothing else about the row.",
     },
     element: {
       control: "select",
       options: ["", "Avatar", "Icon", "ComboBox"],
       description:
-        "Element at the start of the row, such as an avatar or a file icon. Passing the prop at all is what reserves its place",
+        "Element at the start of the row — an avatar or a file icon. Like `checked`, its presence is what reserves the space.",
     },
     mode: {
       control: "select",
       options: ["default", "modern"],
       description:
-        "`modern` shows the start element in the checkbox's place and swaps it for the checkbox on hover or once the row is checked; it renders neither unless both `checked` and `element` are passed",
+        "`modern` moves the checkbox on top of the start element, so it needs both `checked` and `element` to render either.",
       table: {
         defaultValue: { summary: '"default"' },
       },
@@ -60,58 +59,50 @@ const meta = {
     children: {
       control: false,
       description:
-        "The row's content, normally a `RowContent`. The context menu's header is built from the `item` prop of this element",
+        "The row's content, normally a `RowContent`. The row reads `item` off this element's props to build the header of its context menu.",
     },
     contextOptions: {
       control: "object",
       description:
-        "Items of the context menu. An empty list, or none, leaves an empty space where the three-dot button would be",
+        "Items of the context menu. They may be given here or as `data.contextOptions`, which wins; an empty list renders no button.",
     },
     getContextModel: {
       control: false,
       description:
-        "Builds the context menu's items at the moment it opens, in place of `contextOptions`",
+        "Builds the context menu's items when it opens, instead of `contextOptions`.",
     },
     data: {
       control: "object",
       description:
-        "Any value handed back to `onSelect`. When it holds `contextOptions`, those are the menu's items instead of the row's own",
+        "Arbitrary payload handed back to `onSelect`. Its `contextOptions`, if it has any, are the ones the menu uses.",
     },
     contextTitle: {
       control: "text",
-      description: "Tooltip shown on hovering the three-dot button",
+      description: "Hover tooltip and accessible name of the context button.",
     },
     badgesComponent: {
       control: false,
       description:
-        "Element placed after the content, before `contentElement`, for badges of your own",
+        "Element placed before `contentElement`, for badges of your own.",
     },
     contentElement: {
       control: false,
       description:
-        "Element placed after the badges, right before the three-dot button",
-    },
-    contextButtonSpacerWidth: {
-      control: "text",
-      description:
-        "Meant as the width kept for the three-dot button, as a CSS length; no style reads it at present, so changing it changes nothing on the page",
-      table: {
-        defaultValue: { summary: '"26px"' },
-      },
+        "Element placed before the context button, after the badges.",
     },
     inProgress: {
       control: "boolean",
       description:
-        "Replaces the checkbox and the start element with a spinner; the content and the three-dot button stay",
+        "Replaces the checkbox and the start element with a spinner.",
     },
     isIndexEditingMode: {
       control: "boolean",
       description:
-        "Replaces the three-dot button with an up and a down arrow for moving the row",
+        "Replaces the context button with the up and down arrows of index editing.",
     },
     withoutBorder: {
       control: "boolean",
-      description: "Removes the one-pixel divider under the row",
+      description: "Removes the row's bottom border.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -119,23 +110,23 @@ const meta = {
     isRoom: {
       control: "boolean",
       description:
-        "Draws the context menu's header in its room form, with the logo or cover from the content's `item`",
+        "Tells the context menu that this row is a room, which changes its header.",
     },
     isArchive: {
       control: "boolean",
-      description: "Draws the context menu's header in its archived form",
+      description: "Tells the context menu that the room is archived.",
     },
     badgeUrl: {
       control: "text",
-      description: "URL of a badge image shown in the context menu's header",
+      description: "URL of the badge image shown in the context menu's header.",
     },
     className: {
       control: "text",
-      description: "Class added to the row element",
+      description: "Applied to the row element.",
     },
     dataTestId: {
       control: "text",
-      description: "Value of `data-testid` on the row element",
+      description: "Value of `data-testid` on the row.",
       table: {
         defaultValue: { summary: '"row"' },
       },
@@ -143,40 +134,35 @@ const meta = {
     onSelect: {
       control: false,
       description:
-        "Called when the checkbox is clicked, with the new checked state and the row's `data`; on a touch device a tap on the start element in the modern layout calls it with `true`",
+        "Called with the new checked state and whatever `data` holds. In the modern mode on a touch device, a tap on the start element calls it with `true`.",
     },
     onRowClick: {
       control: false,
       description:
-        "Called on a click on the content, and in the default layout on the start element; a click on the checkbox, the badges or the three-dot button does not call it",
+        "Called by a click on the content, and in the default mode on the start element. The checkbox and the context button do not call it.",
     },
     onContextClick: {
       control: false,
       description:
-        "Called when the context menu is asked for, with `true` when that was a right-click",
+        "Called when the context menu is asked for, with `true` for a right-click.",
     },
     rowContextClose: {
       control: false,
-      description: "Called when the context menu closes",
+      description: "Called when the context menu closes.",
     },
     onChangeIndex: {
       control: false,
-      description:
-        "Called with the direction when the up or down arrow of index editing is clicked",
+      description: "Called with the direction when an index arrow is clicked.",
     },
     id: {
       control: false,
-      description: "Ignored: nothing reads it and no `id` reaches the page",
+      description:
+        "Ignored. Nothing reads this prop and no `id` reaches the DOM.",
     },
     style: {
       control: false,
       description:
-        "Ignored: nothing reads it and no inline style reaches the page",
-    },
-    item: {
-      control: false,
-      description:
-        "Ignored: the context menu's header is read from the content's own `item` prop",
+        "Ignored. Nothing reads this prop and no inline style reaches the DOM.",
     },
   },
 } satisfies Meta<typeof Row>;
@@ -292,6 +278,7 @@ const renderSelectable = (args: RowProps) => {
 };
 
 export const Default: Story = {
+  name: "Ticked, with an avatar",
   render: renderSelectable,
   args: {
     checked: true,
@@ -331,7 +318,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The row as a file list shows it: click the checkbox to tick and untick it, click the text, open the menu from the three-dot button or with a right-click anywhere on the row, and watch each call in the Actions panel. Change any other prop live in the Controls panel below.",
+          "A ticked row with an avatar, as a file list shows it. The checkbox calls `onSelect`, the text calls `onRowClick`. The three-dot button or a right-click anywhere on the row opens the menu.",
       },
       source: {
         code: `<Row
@@ -354,6 +341,7 @@ export const Default: Story = {
 };
 
 export const ModernLayout: Story = {
+  name: "Icon in the checkbox's place",
   render: renderSelectable,
   args: {
     mode: "modern",
@@ -374,7 +362,7 @@ export const ModernLayout: Story = {
     docs: {
       description: {
         story:
-          'A row that keeps its start element where the checkbox would be, so an unselected list shows icons rather than a column of empty boxes (`mode="modern"`). Hover the icon and the checkbox takes its place; tick it and the checkbox stays. Both `checked` and `element` have to be passed, or neither is shown.',
+          'A row whose icon stands where the checkbox would be, so an unselected list shows no empty boxes (`mode="modern"`). On hover the checkbox takes the icon\'s place, and stays once ticked.',
       },
       source: {
         code: `<Row
@@ -392,6 +380,7 @@ export const ModernLayout: Story = {
 };
 
 export const IndeterminateState: Story = {
+  name: "Half-ticked",
   render: (args) => <Template {...args} />,
   args: {
     checked: false,
@@ -419,6 +408,7 @@ export const IndeterminateState: Story = {
 };
 
 export const DisabledState: Story = {
+  name: "Checkbox disabled",
   render: (args) => <Template {...args} />,
   args: {
     checked: false,
@@ -437,7 +427,7 @@ export const DisabledState: Story = {
     docs: {
       description: {
         story:
-          "A row that cannot be selected: the checkbox is greyed out and ignores clicks (`isDisabled`), while a click on the text still reaches `onRowClick` and the three-dot menu still opens.",
+          "A row that cannot be selected: the checkbox is greyed out and ignores clicks (`isDisabled`). A click on the text still reaches `onRowClick`, and the three-dot menu still opens.",
       },
       source: {
         code: `<Row checked={false} isDisabled element={<CatalogFolderReactSvg />} contextOptions={contextOptions}>
@@ -449,6 +439,7 @@ export const DisabledState: Story = {
 };
 
 export const LoadingState: Story = {
+  name: "Busy",
   render: (args) => <Template {...args} />,
   args: {
     checked: false,
@@ -467,7 +458,7 @@ export const LoadingState: Story = {
     docs: {
       description: {
         story:
-          "A row that is busy, for example while its file is being copied: a spinner stands in for the checkbox and the icon (`inProgress`), and the text and the three-dot button stay as they are.",
+          "A busy row, for example while its file is copied: a spinner stands in for the checkbox and the icon (`inProgress`). The text and the three-dot button stay.",
       },
       source: {
         code: `<Row checked={false} inProgress element={<CatalogFolderReactSvg />} contextOptions={contextOptions}>
@@ -479,6 +470,7 @@ export const LoadingState: Story = {
 };
 
 export const IndexEditing: Story = {
+  name: "Index editing",
   render: (args) => <Template {...args} />,
   args: {
     checked: false,
@@ -500,7 +492,7 @@ export const IndexEditing: Story = {
     docs: {
       description: {
         story:
-          "A row whose place in a hand-ordered list is being changed: the three-dot button gives way to an up and a down arrow (`isIndexEditingMode`). Click either and the direction arrives in the Actions panel (`onChangeIndex`); moving the row is up to the host.",
+          "A row whose place in a hand-ordered list is being changed: an up and a down arrow replace the three-dot button (`isIndexEditingMode`). Each arrow calls `onChangeIndex` with its direction; moving the row is up to the host.",
       },
       source: {
         code: `<Row
@@ -517,6 +509,7 @@ export const IndexEditing: Story = {
 };
 
 export const WithBadges: Story = {
+  name: "With badges",
   render: (args) => <Template {...args} />,
   args: {
     checked: false,
@@ -577,6 +570,7 @@ const WithoutBorderTemplate = () => (
 );
 
 export const WithoutBorder: Story = {
+  name: "Without a divider",
   render: () => <WithoutBorderTemplate />,
   play: async ({ canvas }) => {
     // The divider is drawn by ::after.
@@ -590,7 +584,7 @@ export const WithoutBorder: Story = {
     docs: {
       description: {
         story:
-          "The last row of a list, or a row that stands alone, usually needs no divider under it: **With a divider** keeps the one-pixel line, **Without a divider** drops it (`withoutBorder`).",
+          "Two rows: **With a divider** keeps the one-pixel line under it, **Without a divider** drops it (`withoutBorder`). The last row of a list usually needs none.",
       },
       source: {
         code: `<Row checked={false} element={<CatalogFolderReactSvg />} contextOptions={contextOptions}>
@@ -644,6 +638,7 @@ const withPhoneFrame: Decorator = (Story, context) => {
 };
 
 export const ContextMenuHeader: Story = {
+  name: "Menu header on a phone",
   globals: { viewport: { value: "mobile1", isRotated: false } },
   decorators: [withPhoneFrame],
   render: () => <ContextMenuHeaderTemplate />,
@@ -658,7 +653,7 @@ export const ContextMenuHeader: Story = {
     docs: {
       description: {
         story:
-          "A menu that names what it acts on, on a phone-sized screen: tap the three-dot button and a menu taller than 210px opens from the bottom of the screen under a header reading **Quarterly report.docx** with its icon. The row takes the header from the `item` prop of its content, so the content has to accept and carry one; a shorter menu, or any menu on a wide screen, opens beside the row without a header.",
+          "A row on a phone-sized screen with a seven-item menu. Opened, the menu rises from the bottom under a header reading **Quarterly report.docx**. The header comes from the content's `item` prop.",
       },
       source: {
         code: `const ItemContent = ({ item }: { item: RowItemType }) => (
@@ -674,6 +669,7 @@ export const ContextMenuHeader: Story = {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: (args) => (
     <div dir="rtl">
       <Row
@@ -704,7 +700,7 @@ export const RightToLeft: Story = {
     docs: {
       description: {
         story:
-          "The row in a right-to-left interface: the checkbox and the icon move to the right edge, the text starts from the right, and the badge and the three-dot button sit at the left edge.",
+          "The row in a right-to-left interface: the checkbox and the icon sit at the right edge. The badge and the three-dot button sit at the left edge.",
       },
       source: {
         code: `<div dir="rtl">

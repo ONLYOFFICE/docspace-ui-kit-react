@@ -26,7 +26,7 @@ const meta = {
       control: "select",
       options: Object.values(ButtonSize),
       description:
-        "Height of the button: 24px for `extraSmall`, 32px for `small`, 40px for `normal`, 44px for `medium`",
+        "Height of the button: 24px for `extraSmall`, 32px for `small`, 40px for `normal`, 44px for `medium`.",
       table: {
         defaultValue: { summary: "normal" },
       },
@@ -34,7 +34,7 @@ const meta = {
     primary: {
       control: "boolean",
       description:
-        "Draws the button in the accent colour, for the main action of a view",
+        "Draws the button in the accent colour, for the main action of a view.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -42,14 +42,14 @@ const meta = {
     accent: {
       control: "boolean",
       description:
-        "Draws the button on a light tint of the accent colour, with the text and icon in the accent colour",
+        "Draws the button on a light tint of the accent colour, with the text and icon in the accent colour.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     scale: {
       control: "boolean",
-      description: "Stretches the button to the full width of its container",
+      description: "Stretches the button to the full width of its container.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -57,7 +57,7 @@ const meta = {
     filled: {
       control: "boolean",
       description:
-        "Draws the button on a neutral grey surface with no border and paints its icon in the text colour",
+        "Draws the button on a neutral grey surface with no border and paints its icon in one colour, the label's hover colour, for toolbar actions.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -65,7 +65,7 @@ const meta = {
     filledStroke: {
       control: "boolean",
       description:
-        "Used together with `filled`: outlines the icon's shapes instead of filling them, for outline-style icons; does nothing on its own",
+        "With `filled`, outlines the icon's shapes instead of filling them, for outline-style icons. Does nothing on its own.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -73,7 +73,7 @@ const meta = {
     isDisabled: {
       control: "boolean",
       description:
-        "Greys the button out, takes it out of the tab order and blocks clicks",
+        "Greys the button out, takes it out of the tab order and blocks clicks.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -81,22 +81,22 @@ const meta = {
     isLoading: {
       control: "boolean",
       description:
-        "Hides the content behind a spinner, keeping the button's width, and disables it",
+        "Covers the content with a spinner, keeping the button's width, and disables the button.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isHovered: {
       control: "boolean",
-      description:
-        "Draws the hover look while the pointer is not over the button",
+      description: "Draws the hover look without a pointer over the button.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isClicked: {
       control: "boolean",
-      description: "Draws the pressed look while nothing presses the button",
+      description:
+        "Draws the pressed look without anything pressing the button.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -104,85 +104,90 @@ const meta = {
     label: {
       control: "text",
       description:
-        "Text of the button, which is also its accessible name; when empty, the children are shown instead",
+        "Text of the button and its accessible name. When empty, the children are shown instead.",
     },
     children: {
       control: false,
-      description: "Content shown in place of `label` when `label` is empty",
+      description:
+        "Rendered in place of `label` when `label` is empty or unset. A non-empty `label` wins and the children are dropped.",
     },
     icon: {
       control: false,
-      description: "Icon node shown before the label",
+      description:
+        "Shown before the label. Any node, such as an SVG component from your own bundler.",
     },
     minWidth: {
       control: "text",
       description:
-        "Smallest width of the button as a CSS length, such as `120px`",
+        "Smallest width of the button as a CSS length, such as `120px`.",
     },
     tooltipText: {
       control: "text",
-      description: "Text of a tooltip shown below the button on hover",
+      description:
+        "Text of a tooltip shown below the button on hover. The button renders it itself, apart from the `title` tooltip.",
     },
     title: {
       control: "text",
       description:
-        "Text of a tooltip shown on hover; it never becomes a native `title` attribute",
+        "Tooltip text shown on hover by the `withTooltip` wrapper. It becomes a native `title` attribute only under `NODE_ENV=test`.",
     },
     type: {
       control: "select",
       options: ["button", "submit"],
       description:
-        "Native button type: `submit` submits the surrounding form, any other value renders `button`",
+        "`submit` submits the surrounding form. Any other value, `reset` included, renders a plain `button`.",
       table: {
         defaultValue: { summary: "button" },
       },
     },
     onClick: {
       action: "onClick",
-      description: "Called with the mouse event when the button is clicked",
+      description:
+        "Called with the mouse event on a click, Enter or Space. Never called while the button is disabled or loading.",
     },
     tabIndex: {
       control: "number",
-      description: "Position of the button in the keyboard tab order",
+      description: "Position of the button in the keyboard tab order.",
     },
     id: {
       control: "text",
       description:
-        "HTML id of the button; also names its `tooltipText` tooltip",
+        "HTML id of the button. It also names the `tooltipText` tooltip.",
     },
     className: {
       control: "text",
-      description: "Class applied to the button after the component's own",
+      description: "Class applied to the button after the component's own.",
     },
     style: {
       control: "object",
-      description: "Inline styles of the button",
+      description:
+        "Inline styles of the button. `minWidth` is applied over them.",
     },
     testId: {
       control: "text",
-      description: "Value of the button's `data-testid` attribute",
+      description: "Value of the button's `data-testid` attribute.",
       table: {
         defaultValue: { summary: "button" },
       },
     },
     ref: {
       control: false,
-      description: "Ref to the rendered `<button>` element",
+      description: "Ref to the rendered `<button>` element.",
     },
     "aria-label": {
       control: false,
       description:
-        "Replaced by `label` on every render, so a value passed here never reaches the button",
+        "Accessible name of the button, in place of `label`. Names an icon-only button.",
     },
     "aria-disabled": {
       control: false,
       description:
-        "Replaced on every render: set to `true` while `isDisabled`, removed otherwise",
+        "Marks the button disabled to assistive technology while it stays focusable and clickable. `isDisabled` sets it to `true` over this value.",
     },
     "aria-busy": {
       control: false,
       description:
-        "Replaced on every render: set to `true` while `isLoading`, removed otherwise",
+        "Marks the button busy to assistive technology. `isLoading` sets it to `true` over this value.",
     },
   },
 } satisfies Meta<typeof Button>;
@@ -249,7 +254,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The secondary button, for any action that is not the main one of a view; click it to see `onClick` in the Actions panel, and change any other prop live in the Controls panel below.",
+          "The secondary button, for any action that is not the main one of a view.",
       },
       source: {
         code: `<Button size={ButtonSize.small} label="Button" onClick={handleClick} />`,
@@ -508,6 +513,7 @@ const TooltipTemplate = () => {
 };
 
 export const PrimaryButtons: Story = {
+  name: "Primary",
   render: () => <PrimaryTemplate />,
   play: async (context) => {
     const buttons = row(context, "Primary");
@@ -524,7 +530,7 @@ export const PrimaryButtons: Story = {
     docs: {
       description: {
         story:
-          "Primary buttons are used for main actions. They have a solid background color.",
+          "The main action of a view, on a solid accent background (`primary`), at each of the four sizes.",
       },
       source: {
         code: `<Button primary size={ButtonSize.extraSmall} label="Primary ExtraSmall" />
@@ -537,6 +543,7 @@ export const PrimaryButtons: Story = {
 };
 
 export const SecondaryButtons: Story = {
+  name: "Secondary",
   render: () => <SecondaryTemplate />,
   play: async (context) => {
     const buttons = row(context, "Secondary");
@@ -551,7 +558,7 @@ export const SecondaryButtons: Story = {
     docs: {
       description: {
         story:
-          "Secondary buttons are used for secondary actions. They sit on the page background with a grey border that changes colour on hover.",
+          "Any action that is not the main one, with no variant prop set. It sits on the page background with a grey border that changes colour on hover.",
       },
       source: {
         code: `<Button size={ButtonSize.extraSmall} label="Secondary ExtraSmall" />
@@ -564,6 +571,7 @@ export const SecondaryButtons: Story = {
 };
 
 export const WithIconButtons: Story = {
+  name: "With icon",
   render: () => <WithIconTemplate />,
   play: async ({ canvas }) => {
     // The icon comes before the label.
@@ -580,7 +588,7 @@ export const WithIconButtons: Story = {
     docs: {
       description: {
         story:
-          "Buttons can include icons alongside text. Icons are displayed before the label.",
+          "An icon before the label, on primary and secondary buttons (`icon`).",
       },
       source: {
         code: `<Button primary size={ButtonSize.small} icon={<Icon />} label="With Icon Small" />
@@ -593,7 +601,7 @@ export const WithIconButtons: Story = {
 };
 
 export const IsLoadingButtons: Story = {
-  name: "Loading Buttons",
+  name: "Loading",
   render: () => <IsLoadingTemplate />,
   play: async ({ canvas }) => {
     for (const button of canvas.getAllByRole("button")) {
@@ -605,7 +613,7 @@ export const IsLoadingButtons: Story = {
     docs: {
       description: {
         story:
-          "Loading state displays a spinner and disables interaction. Use for async operations.",
+          "A spinner over the label while an action runs (`isLoading`). The button keeps its width and ignores clicks until the flag is cleared.",
       },
       source: {
         code: `<Button primary size={ButtonSize.small} isLoading label="Loading Small" />
@@ -618,6 +626,7 @@ export const IsLoadingButtons: Story = {
 };
 
 export const ScaleButtons: Story = {
+  name: "Full width",
   render: () => <ScaleTemplate />,
   play: async ({ canvas }) => {
     // As wide as the column the grid gives them.
@@ -634,7 +643,7 @@ export const ScaleButtons: Story = {
     docs: {
       description: {
         story:
-          "Scale prop makes buttons expand to 100% of their container width. Useful for mobile layouts.",
+          "Buttons as wide as their container (`scale`), for narrow screens and dialog footers that share the width.",
       },
       source: {
         code: `<Button primary size={ButtonSize.small} scale label="Scale Small" />
@@ -647,6 +656,7 @@ export const ScaleButtons: Story = {
 };
 
 export const DisabledButtons: Story = {
+  name: "Disabled",
   render: () => <DisabledTemplate />,
   play: async ({ canvas }) => {
     for (const button of canvas.getAllByRole("button")) {
@@ -671,6 +681,7 @@ export const DisabledButtons: Story = {
 };
 
 export const ClickedButtons: Story = {
+  name: "Pressed look",
   render: () => <ClickedTemplate />,
   play: async (context) => {
     // Drawn pressed with nothing pressing them.
@@ -682,7 +693,7 @@ export const ClickedButtons: Story = {
     docs: {
       description: {
         story:
-          "The pressed look drawn while nothing presses the button (`isClicked`), for a button whose action is already under way, such as the one that opened the menu now on screen.",
+          "The pressed look with nothing pressing the button (`isClicked`). Use it for a button whose action is under way, such as the one that opened a menu.",
       },
       source: {
         code: `<Button primary size={ButtonSize.small} isClicked label="Clicked Small" />
@@ -695,6 +706,7 @@ export const ClickedButtons: Story = {
 };
 
 export const HoveredButtons: Story = {
+  name: "Hover look",
   render: () => <HoveredTemplate />,
   play: async (context) => {
     // Drawn hovered with the pointer elsewhere.
@@ -706,7 +718,7 @@ export const HoveredButtons: Story = {
     docs: {
       description: {
         story:
-          "The hover look drawn while the pointer is elsewhere (`isHovered`), for a button that should light up together with the element it belongs to, such as a hovered row.",
+          "The hover look with the pointer elsewhere (`isHovered`). Use it for a button that lights up with the element it belongs to, such as a hovered row.",
       },
       source: {
         code: `<Button primary size={ButtonSize.small} isHovered label="Hovered Small" />
@@ -719,6 +731,7 @@ export const HoveredButtons: Story = {
 };
 
 export const FilledButtons: Story = {
+  name: "Filled",
   render: () => <FilledTemplate />,
   play: async ({ canvas }) => {
     // No border, and the icon repainted in the text colour.
@@ -734,7 +747,7 @@ export const FilledButtons: Story = {
     docs: {
       description: {
         story:
-          "A quiet grey button with no border, for toolbar actions that should not compete with the content (`filled`). The first row shows that an icon is repainted in the text colour, whatever colour it was drawn in.",
+          "A quiet grey button with no border, for toolbar actions that should not compete with the content (`filled`). The first row shows that an icon is repainted in one colour, whatever colour it was drawn in.",
       },
       source: {
         code: `<Button size={ButtonSize.small} filled label="Filled Small" />
@@ -747,6 +760,7 @@ export const FilledButtons: Story = {
 };
 
 export const FilledStrokeButtons: Story = {
+  name: "Filled with an outline icon",
   render: () => <FilledStrokeTemplate />,
   play: async ({ canvas }) => {
     // The plain filled button paints the outline icon solid; filledStroke
@@ -764,7 +778,7 @@ export const FilledStrokeButtons: Story = {
     docs: {
       description: {
         story:
-          "An outline-style icon on a filled button: in the first row the filled button paints the icon's shapes solid, in the second it keeps the outline (`filled` with `filledStroke`). `filledStroke` changes nothing without `filled`.",
+          "An outline-style icon on a filled button. The first row paints the icon's shapes solid; the second keeps the outline (`filled` with `filledStroke`). `filledStroke` changes nothing without `filled`.",
       },
       source: {
         code: `<Button size={ButtonSize.small} filled icon={<OutlineIcon />} label="Filled Small" />
@@ -777,6 +791,7 @@ export const FilledStrokeButtons: Story = {
 };
 
 export const WithTooltip: Story = {
+  name: "With tooltip",
   render: () => <TooltipTemplate />,
   play: async ({ canvas, userEvent }) => {
     await userEvent.hover(canvas.getByRole("button", { name: "Hover me" }));
@@ -794,7 +809,7 @@ export const WithTooltip: Story = {
     docs: {
       description: {
         story:
-          "Buttons can display tooltips on hover. Hover over the buttons to see the tooltip text.",
+          "A hint below the button on hover, for an action its label cannot fully explain (`tooltipText`).",
       },
       source: {
         code: `<Button primary size={ButtonSize.small} label="Hover me" tooltipText="This is a primary button with a tooltip" />
@@ -830,6 +845,7 @@ const AccentTemplate = () => {
 };
 
 export const AccentButtons: Story = {
+  name: "Accent",
   render: () => <AccentTemplate />,
   play: async ({ canvas }) => {
     // Accent text on a tint, with the icon repainted to match.
@@ -844,7 +860,7 @@ export const AccentButtons: Story = {
     docs: {
       description: {
         story:
-          "An emphasised action that should stand out without taking the place of the primary one: a light accent tint with accent text, and an icon repainted in the same colour (`accent`).",
+          "An action that stands out without taking the primary one's place (`accent`). It sits on a light accent tint, with the text and icon in the accent colour.",
       },
       source: {
         code: `<Button size={ButtonSize.small} accent label="Accent Small" />
@@ -903,6 +919,7 @@ const CustomizationTemplate = () => {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS customization",
   render: () => <CustomizationTemplate />,
   play: async ({ canvas }) => {
     const [secondary, disabled] = [
@@ -928,12 +945,12 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. Hover and press the buttons to see the hover and pressed values.
+        story: `Every overridable variable on one wrapper, the hover and pressed colours included; the CSS variables section lists them.
 
-- **Secondary** — the \`--button-root-*\` colours, the radius, the weight and the \`normal\` size's height and font size
-- **Primary** — the \`--button-primary-*\` colours
-- **Disabled** — the \`--button-root-*-disabled\` values (\`isDisabled\`)
-- **Disabled primary** — the \`--button-primary-*-disabled\` values, faded to 60% opacity by the component (\`primary\` with \`isDisabled\`)`,
+- **Secondary** — the \`--button-root-*\` colours, radius, weight, height and font size.
+- **Primary** — the \`--button-primary-*\` colours.
+- **Disabled** — the \`--button-root-*-disabled\` values (\`isDisabled\`).
+- **Disabled primary** — the \`--button-primary-*-disabled\` values, faded to 60% (\`primary\` with \`isDisabled\`).`,
       },
       source: {
         code: `<div style={{

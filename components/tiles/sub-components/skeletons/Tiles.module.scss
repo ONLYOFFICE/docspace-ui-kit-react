@@ -75,7 +75,7 @@
     );
   }
 
-  .tilesSkeletonRooms {
+  &.tilesSkeletonRooms {
     grid-template-columns: repeat(
       auto-fill,
       minmax(clamp(275px, 13.4vw, 350px), 1fr)

@@ -19,7 +19,7 @@ const meta = {
     appliedColor: {
       control: "color",
       description:
-        "Hex color the picker starts on. It is read once, on mount, so a later change does not move the pointers",
+        "Colour the picker starts on, as a hex string. It is read once, on mount — changing it afterwards does not move the picker.",
       table: {
         defaultValue: { summary: "globalColors.lightBlueMain" },
       },
@@ -27,7 +27,7 @@ const meta = {
     isPickerOnly: {
       control: "boolean",
       description:
-        'Draws a "Custom" title and a closing cross above the picker and drops the hex field and both buttons',
+        "`true` draws a header with a title and a closing cross, and no hex field or buttons: the drop-down shape. `false` draws the hex field and the apply/cancel pair, and no header.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -35,7 +35,7 @@ const meta = {
     applyButtonLabel: {
       control: "text",
       description:
-        "Label for the apply button; left out, the kit's translation of Apply",
+        'Text of the apply button. Left out, the kit\'s own translation of "Apply" (`Common:ApplyButton`) is used.',
       table: {
         defaultValue: { summary: 't("Common:ApplyButton")' },
       },
@@ -43,21 +43,23 @@ const meta = {
     cancelButtonLabel: {
       control: "text",
       description:
-        "Label for the cancel button; left out, the kit's translation of Cancel",
+        'Text of the cancel button. Left out, the kit\'s own translation of "Cancel" (`Common:CancelButton`) is used.',
       table: {
         defaultValue: { summary: 't("Common:CancelButton")' },
       },
     },
     hexCodeLabel: {
       control: "text",
-      description: "Caption of the hex field, which also names the field",
+      description:
+        "Caption before the hex field, and the field's accessible name. It is not translated for you.",
       table: {
         defaultValue: { summary: "Hex code" },
       },
     },
     ariaLabel: {
       control: "text",
-      description: "Accessible name of the picker's group",
+      description:
+        "Accessible name of the picker's group. It is not translated for you.",
       table: {
         defaultValue: { summary: "Color picker" },
       },
@@ -65,30 +67,30 @@ const meta = {
     closeButtonLabel: {
       control: "text",
       description:
-        "Accessible name of the closing cross drawn in picker-only mode",
+        "Accessible name of the closing cross drawn in `isPickerOnly` mode. It is not translated for you.",
       table: {
         defaultValue: { summary: "Close color picker" },
       },
     },
     onApply: {
       description:
-        "Called with the chosen hex color when the apply button is clicked",
+        "Called with the chosen colour when the apply button is clicked.",
     },
     onClose: {
       description:
-        "Called by the cancel button, and by the closing cross in picker-only mode; the picker does not hide itself",
+        "Called by the cancel button, the closing cross and Escape; unmounting the picker is yours. Without it, Escape is left to the page.",
     },
     handleChange: {
       description:
-        "Called with the hex color on every pointer move and every valid hex code typed",
+        "Called on every move of the saturation square and on every hex keystroke.",
     },
     className: {
       control: "text",
-      description: "Class name added to the outermost element",
+      description: "Applied to the outermost element.",
     },
     id: {
       control: "text",
-      description: "Id of the outermost element",
+      description: "Applied to the outermost element.",
     },
   },
 } satisfies Meta<typeof ColorPicker>;
@@ -150,7 +152,7 @@ export const Default: Story = {
     docs: {
       description: {
         story:
-          "The full picker a settings form shows: drag either pointer or type a hex code, then apply or cancel. Change any other prop live in the Controls panel below.",
+          "The full picker a settings form shows: the square, the hue strip, the hex field, and the apply and cancel buttons.",
       },
       source: {
         code: `<ColorPicker
@@ -176,6 +178,7 @@ const PickerOnlyTemplate = () => {
 };
 
 export const PickerOnly: Story = {
+  name: "Picker only",
   render: () => <PickerOnlyTemplate />,
   play: async ({ canvas, userEvent }) => {
     // A title and a cross; no hex field and no buttons.
@@ -190,7 +193,7 @@ export const PickerOnly: Story = {
     docs: {
       description: {
         story:
-          'The compact shape for a drop-down: a "Custom" title and a closing cross above the square and the strip, with no hex field and no buttons (`isPickerOnly`). The caller reads the color from `handleChange` and hides the picker from `onClose`.',
+          'The compact shape for a drop-down (`isPickerOnly`): a "Custom" title and a closing cross, with no hex field and no buttons. The caller reads the colour from `handleChange`.',
       },
       source: {
         code: `<ColorPicker isPickerOnly appliedColor="#4781D1" />`,
@@ -214,6 +217,7 @@ const CustomLabelsTemplate = () => {
 };
 
 export const CustomLabels: Story = {
+  name: "Custom labels",
   render: () => <CustomLabelsTemplate />,
   play: async ({ canvas }) => {
     await expect(
@@ -232,7 +236,7 @@ export const CustomLabels: Story = {
     docs: {
       description: {
         story:
-          "A caller replaces the button texts and the hex caption with its own (`applyButtonLabel`, `cancelButtonLabel`, `hexCodeLabel`). Left out, the buttons take the kit's translations of Apply and Cancel, while the caption, the group name and the cross's name are English defaults to override; the caption also names the hex field.",
+          "Button texts and a hex caption set by the caller (`applyButtonLabel`, `cancelButtonLabel`, `hexCodeLabel`). Left out, the buttons are translated by the kit, and the caption stays English.",
       },
       source: {
         code: `<ColorPicker
@@ -270,6 +274,7 @@ const LiveColorReadoutTemplate = () => {
 };
 
 export const LiveColorReadout: Story = {
+  name: "Live colour readout",
   render: () => <LiveColorReadoutTemplate />,
   play: async (context) => {
     // The caller's copy follows every change before anything is applied.
@@ -282,7 +287,7 @@ export const LiveColorReadout: Story = {
     docs: {
       description: {
         story:
-          "Drag a pointer or type a hex code and watch the line under the picker follow: the caller keeps its own copy of the color from every change (`handleChange`), which is how it previews a color before it is applied. The picker keeps its own state, so the caller cannot move the pointers by changing `appliedColor` afterwards.",
+          "A line under the picker that shows the colour as it changes (`handleChange`). The caller keeps its own copy, which is how it previews a colour before it is applied.",
       },
       source: {
         code: `const [color, setColor] = useState("#4781D1");
@@ -311,6 +316,7 @@ const PresetColorTemplate = () => {
 };
 
 export const PresetColor: Story = {
+  name: "Starting colour",
   render: () => <PresetColorTemplate />,
   play: async ({ canvas }) => {
     // The hex field opens on the saved color.
@@ -321,7 +327,7 @@ export const PresetColor: Story = {
     docs: {
       description: {
         story:
-          'A picker that opens on a color the user saved earlier starts from it: here red (`appliedColor="#FF0000"`), with the hex field showing the same code.',
+          'A picker that opens on a saved colour (`appliedColor="#FF0000"`), with the hex field showing the same code.',
       },
       source: {
         code: `<ColorPicker
@@ -352,6 +358,7 @@ const RightToLeftTemplate = () => {
 };
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
   play: async () => {
@@ -369,7 +376,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "418px" },
       description: {
         story:
-          'The picker in a right-to-left layout with Arabic texts: the picker moves to the right edge, the hex caption and code align right and the apply button sits to the right of cancel, while the square and the strip keep their left-to-right gradients. The wrapper carries `dir="rtl"`; the direction also comes from the theme\'s `interfaceDirection` (the Direction toolbar).',
+          "The picker in a right-to-left layout with Arabic texts. The hex caption and code align right, and apply sits to the right of cancel. The square and the strip keep their left-to-right gradients.",
       },
       source: {
         code: `<div dir="rtl">
@@ -431,6 +438,7 @@ const CssCustomizationTemplate = () => {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   render: () => <CssCustomizationTemplate />,
   play: async ({ canvas }) => {
     const input = getComputedStyle(canvas.getByLabelText("Hex code:"));
@@ -441,7 +449,7 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. The button variables reach the apply and cancel pair through the same wrapper; hover either button to see its hover background.`,
+        story: `A picker under a wrapper that sets every overridable variable. The button variables reach the apply and cancel pair through the same wrapper.`,
       },
       source: {
         code: `<div

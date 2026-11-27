@@ -19,25 +19,24 @@ const meta = {
     label: {
       control: "text",
       description:
-        "Text or node shown in the item; a string also becomes the hover title",
+        "Text of the row. A string also becomes the row's hover tooltip.",
     },
     icon: {
       control: "text",
       description:
-        "Icon before the label: a component or element rendered as given, or a URL — a path with `.svg` or `images/` is inlined, anything else becomes an image",
+        "Icon at the start of the item: a component, an element or a URL. A same-origin `.svg` or an SVG data URL is inlined; any other URL becomes an `<img>`.",
     },
     disabled: {
       control: "boolean",
       description:
-        "Greys the item out and stops `onClick`; inside `DropDown` the item is dropped from the list unless `showDisabledItems` is set",
+        "Stops `onClick` firing and greys the item out. The enclosing `DropDown` also drops disabled items from its list unless `showDisabledItems` is set.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isSeparator: {
       control: "boolean",
-      description:
-        "Renders a one-pixel line between items instead of any content",
+      description: "Renders a divider line in place of the label and children.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -45,7 +44,7 @@ const meta = {
     isHeader: {
       control: "boolean",
       description:
-        "Renders a taller, non-clickable section title with a line under it",
+        "Renders the row as a menu title: taller, with a line under it and no hover or pressed look.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -53,7 +52,7 @@ const meta = {
     isSelected: {
       control: "boolean",
       description:
-        "Marks the item as the current choice: sets `aria-selected` and calls `onClickSelectedItem` on click; it is highlighted only while also disabled",
+        "Sets `aria-selected` and sends clicks to `onClickSelectedItem`. It paints the background only on a disabled item.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -61,28 +60,28 @@ const meta = {
     isSubMenu: {
       control: "boolean",
       description:
-        "Shows an arrow at the end of the row; it points the other way in right-to-left and turns down with `isActive`",
+        "Draws a trailing arrow for a row that leads to a submenu. It opens nothing by itself.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isModern: {
       control: "boolean",
-      description: "Narrows the side padding of the row to 8px",
+      description: "Narrows the row's side padding to 8px.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     noHover: {
       control: "boolean",
-      description: "Keeps the background unchanged under the pointer",
+      description: "Turns off the background on hover.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     noActive: {
       control: "boolean",
-      description: "Keeps the background unchanged while the item is pressed",
+      description: "Turns off the background while the row is pressed.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -90,30 +89,28 @@ const meta = {
     withToggle: {
       control: "boolean",
       description:
-        "Shows a switch at the end of the row; changing it calls `onClick`",
+        "Shows a switch at the end of the row; its change calls `onClick`.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     checked: {
       control: "boolean",
-      description: "Whether the switch shown by `withToggle` is on",
+      description: "Turns that switch on. It needs `withToggle`.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isBeta: {
       control: "boolean",
-      description:
-        "Shows a beta badge at the end of the row, labelled by `betaLabel`",
+      description: "Shows a purple beta badge after the label.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     isPaidBadge: {
       control: "boolean",
-      description:
-        "Shows a paid badge at the end of the row, labelled by `badgeLabel` or `paidLabel`",
+      description: "Shows a paid-plan badge after the label.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -121,7 +118,7 @@ const meta = {
     textOverflow: {
       control: "boolean",
       description:
-        "Cuts the whole row off with an ellipsis when it is wider than the item",
+        "Makes the row a block instead of a flex row, so its own ellipsis applies to a long label.",
       table: {
         defaultValue: { summary: "false" },
       },
@@ -129,7 +126,7 @@ const meta = {
     fillIcon: {
       control: "boolean",
       description:
-        "Recolours an icon given as a URL to the item's icon colour; off, the icon keeps its own colours",
+        "Paints an inlined SVG icon in the item's icon colour. Off, it keeps its own colours.",
       table: {
         defaultValue: { summary: "true" },
       },
@@ -137,118 +134,123 @@ const meta = {
     isActiveDescendant: {
       control: "boolean",
       description:
-        "Paints the item with the hover background as the one keyboard navigation is on; ignored while disabled",
+        "Highlights the row the arrow keys reached, with a ring and the hover background.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     minWidth: {
       control: "text",
-      description: "Minimum width of the item, as a CSS length",
+      description: "Minimum width of the row, as a CSS length.",
     },
     onClick: {
       action: "clicked",
       description:
-        "Called on a click on the item and on a change of its switch; not called while disabled",
+        "Called on a click on the item, and on a change of the toggle when `withToggle` is set — hence the event union. It is not called while the item is disabled.",
     },
     isActive: {
       control: "boolean",
       description:
-        "Highlights the item with the selected background; on a submenu entry it also turns the arrow down",
+        "Paints the selected background. On a submenu row it also turns the arrow down.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withoutIcon: {
       control: "boolean",
-      description: "Hides the icon even when `icon` is set",
+      description: "Hides the icon even when `icon` is set.",
       table: {
         defaultValue: { summary: "false" },
       },
     },
     withHeaderArrow: {
       control: "boolean",
-      description: "Shows a back arrow before the label of a header item",
+      description:
+        "Puts a back arrow before a header's title. It does nothing without `isHeader`.",
     },
     headerArrowAction: {
       action: "headerArrowAction",
-      description: "Called when the back arrow of a header item is clicked",
+      description:
+        "Called by a click on the header's back arrow, before the row's own click handling.",
     },
     children: {
       control: false,
       description:
-        "Content of the item, rendered only when `label` is empty — never next to it",
+        "Content of the item, used **instead of** `label` — it is rendered only when `label` is empty, not alongside it. `additionalElement` is the one that comes after the label.",
     },
     additionalElement: {
       control: false,
-      description: "Element placed at the end of the row, after the label",
+      description:
+        "Node at the end of the row, after the badges and the external link.",
     },
     description: {
       control: "text",
       description:
-        "Second line under the label, always visible; the item grows to fit it",
+        "Second line under the label, always visible: what choosing the item means. It shows only with a `label`, and the row grows to fit it.",
     },
     truncateText: {
       control: "boolean",
       description:
-        "Cuts the label alone off with an ellipsis, so the elements at the end of the row stay visible",
+        "Cuts a long label off with an ellipsis, keeping the rest of the row in place.",
     },
     betaLabel: {
       control: "text",
       description:
-        "Text of the beta badge, used instead of the host's own constant",
+        "Text of the beta badge, used instead of the host's own constant.",
     },
     paidLabel: {
       control: "text",
       description:
-        "Text of the paid badge, used instead of the translated default",
+        "Text of the paid badge, used instead of the translated default. `badgeLabel` wins over it.",
     },
     badgeLabel: {
       control: "text",
-      description: "Text of the paid badge; takes precedence over `paidLabel`",
+      description:
+        "Text of the paid badge. It wins over `paidLabel` and the translated default.",
     },
     withExternalLink: {
       control: "boolean",
       description:
-        "Shows an external-link icon at the end of the row, when `externalLinkPath` is also set",
+        "Shows an external-link icon at the end of the row. It needs `externalLinkPath` as well.",
     },
     externalLinkPath: {
       control: "text",
       description:
-        "Must be non-empty for the external-link icon to show; the item does not navigate to it itself",
+        "Address of the external-link icon. It becomes the icon's `href` only together with `onExternalLinkClick`.",
     },
     onExternalLinkClick: {
       action: "onExternalLinkClick",
       description:
-        "Called when the external-link icon is clicked, without calling `onClick`",
+        "Called on a plain click of the external-link icon, in place of following the `href`. A middle or modified click is left to the browser.",
     },
     onClickSelectedItem: {
       action: "onClickSelectedItem",
-      description: "Called when an item with `isSelected` is clicked",
+      description:
+        "Called on every click of an item marked `isSelected`, a disabled one included.",
     },
     onMouseDown: {
       action: "onMouseDown",
-      description: "Called when a mouse button is pressed on the item",
+      description: "Called on a mouse press on the row, before the click.",
     },
     stopMouseDownPropagation: {
       control: "boolean",
       description:
-        "Keeps a mouse press on the item from reaching the page, so a menu that closes on an outside press stays open until the click",
+        "Keeps a mouse press on the row from reaching the page, so a click-outside handler does not close the menu before the click lands.",
     },
     setOpen: {
       action: "setOpen",
       description:
-        "Called with `false` after every click, disabled ones included, so the enclosing menu can close",
+        "Called with `false` after a click, a disabled item's included, for the enclosing menu to close itself. A disabled item with `tooltip` on a touch device skips it.",
     },
     tooltip: {
       control: "text",
       description:
-        "Hint shown on a touch device when a disabled item is tapped; needs `RootTooltip` mounted",
+        "Hint shown when the item is disabled, on a touch device only. It needs `RootTooltip` mounted, and it does nothing on an enabled item or with a pointer.",
     },
     tabIndex: {
       control: "number",
       description:
-        "Position in the Tab order; the default keeps the item off it",
+        "Position in the tab order. The default of -1 keeps the item off it.",
       table: {
         defaultValue: { summary: "-1" },
       },
@@ -256,27 +258,28 @@ const meta = {
     height: {
       control: "number",
       description:
-        "Height in pixels the enclosing `DropDown` reserves for the item in its list; the item's own height does not follow it",
+        "Height the enclosing `DropDown` reserves for this item in its virtualised list, in pixels. It does not resize the row, and it reaches the DOM as an attribute.",
     },
     heightTablet: {
       control: "number",
-      description: "The same as `height`, used on a tablet-width window",
+      description:
+        "The same, used instead of `height` on a tablet-width viewport. Unlike `height`, it stays off the DOM.",
     },
     className: {
       control: "text",
-      description: "Class name added to the item",
+      description: "Extra class name for the row.",
     },
     style: {
       control: "object",
-      description: "Inline styles of the item",
+      description: "Inline styles for the row.",
     },
     id: {
       control: "text",
-      description: "Id of the item element",
+      description: "HTML id of the row.",
     },
     testId: {
       control: "text",
-      description: "Value of `data-testid` on the item",
+      description: "Value of `data-testid` on the item.",
       table: {
         defaultValue: { summary: '"drop-down-item"' },
       },
@@ -318,8 +321,7 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "A plain item with a label, the row a menu is made of; change any other prop live in the Controls panel below.",
+        story: "A plain item with a label, the row a menu is made of.",
       },
       source: {
         code: `<DropDownItem label="Default Item" onClick={handleClick} />`,
@@ -351,6 +353,7 @@ const WithDescriptionTemplate = () => {
 };
 
 export const WithDescription: Story = {
+  name: "With a description",
   render: () => <WithDescriptionTemplate />,
   play: async ({ canvas }) => {
     // The explanation sits on a line of its own under the label.
@@ -393,6 +396,7 @@ const ItemTypesTemplate = () => {
 };
 
 export const ItemTypes: Story = {
+  name: "Item kinds",
   render: () => <ItemTypesTemplate />,
   play: async ({ canvas }) => {
     await expect(canvas.getByRole("separator")).toBeInTheDocument();
@@ -407,7 +411,7 @@ export const ItemTypes: Story = {
     docs: {
       description: {
         story:
-          "The building blocks of a menu, top to bottom: **Header Item** — a section title with a line under it (`isHeader`); **Regular Item** and **With Icon** — plain rows, with and without an icon (`icon`); a separator line (`isSeparator`); **Selected Item** — the current choice, highlighted (`isActive`) and announced as selected (`isSelected`); **Disabled Item** — greyed out and not clickable (`disabled`).",
+          "The building blocks of a menu, top to bottom:\n\n- **Header Item** — a section title (`isHeader`).\n- **Regular Item** and **With Icon** — plain rows (`icon`).\n- A separator line (`isSeparator`).\n- **Selected Item** — highlighted (`isActive`) and announced as selected (`isSelected`).\n- **Disabled Item** — greyed out and not clickable (`disabled`).",
       },
       source: {
         code: `<DropDownItem isHeader label="Header Item" />
@@ -431,6 +435,7 @@ const WithToggleTemplate = () => {
 };
 
 export const WithToggle: Story = {
+  name: "With a switch",
   render: () => <WithToggleTemplate />,
   play: async ({ canvas }) => {
     const toggleOf = (name: string) =>
@@ -442,7 +447,7 @@ export const WithToggle: Story = {
     docs: {
       description: {
         story:
-          "A menu entry that switches an option on and off in place, without opening a dialog: **Toggle Off** and **Toggle On** show both positions (`withToggle`, `checked`); a change of the switch calls `onClick`.",
+          "**Toggle Off** and **Toggle On**: entries that switch an option in place, without a dialog (`withToggle`, `checked`). A change of the switch calls `onClick`.",
       },
       source: {
         code: `<DropDownItem label="Toggle Off" withToggle checked={false} />
@@ -472,6 +477,7 @@ const WithBadgesTemplate = () => {
 };
 
 export const WithBadges: Story = {
+  name: "With badges",
   render: () => <WithBadgesTemplate />,
   play: async ({ canvas }) => {
     await expect(
@@ -489,7 +495,7 @@ export const WithBadges: Story = {
     docs: {
       description: {
         story:
-          "Badges tell the reader before clicking that an entry is new or needs a paid plan: **New Feature** carries a beta badge (`isBeta`, `betaLabel`), **Premium Feature** a paid one (`isPaidBadge`, `paidLabel`).",
+          "**New Feature** carries a beta badge (`isBeta`, `betaLabel`), **Premium Feature** a paid one (`isPaidBadge`, `paidLabel`). A badge says before the click that an entry is new or paid.",
       },
       source: {
         code: `<DropDownItem label="New Feature" icon={SettingsIcon} isBeta betaLabel="Beta" />
@@ -514,6 +520,7 @@ const SubmenuTemplate = () => {
 };
 
 export const Submenu: Story = {
+  name: "Submenu entries",
   render: () => <SubmenuTemplate />,
   play: async ({ canvas }) => {
     const arrow = (name: string) =>
@@ -531,7 +538,7 @@ export const Submenu: Story = {
     docs: {
       description: {
         story:
-          "An arrow at the end of the row tells the reader the entry leads to more options: **Open Submenu** shows it pointing sideways (`isSubMenu`), **Active Submenu** — the entry whose submenu is open — highlighted with the arrow turned down (`isActive`).",
+          "**Open Submenu** ends in a sideways arrow: the entry leads to more options (`isSubMenu`). **Active Submenu**, whose submenu is open, is highlighted with the arrow turned down (`isActive`).",
       },
       source: {
         code: `<DropDownItem label="Open Submenu" icon={SettingsIcon} isSubMenu />
@@ -559,6 +566,7 @@ const WithAdditionalElementTemplate = () => {
 };
 
 export const WithAdditionalElement: Story = {
+  name: "With a trailing element",
   render: () => <WithAdditionalElementTemplate />,
   play: async ({ canvas }) => {
     const save = canvas.getByRole("option", { name: /^Save/ });
@@ -574,7 +582,7 @@ export const WithAdditionalElement: Story = {
     docs: {
       description: {
         story:
-          "Any element can sit at the end of the row, such as the keyboard shortcut of a command: **Save** and **Copy** show theirs on the right (`additionalElement`).",
+          "**Save** and **Copy** end in their keyboard shortcuts (`additionalElement`). Any element can sit at the end of the row.",
       },
       source: {
         code: `<DropDownItem label="Save" icon={SettingsIcon} additionalElement={<span>Ctrl+S</span>} />
@@ -604,6 +612,7 @@ const HeaderWithArrowTemplate = ({
 };
 
 export const HeaderWithArrow: Story = {
+  name: "Header with a back arrow",
   render: (args) => (
     <HeaderWithArrowTemplate headerArrowAction={args.headerArrowAction} />
   ),
@@ -617,7 +626,7 @@ export const HeaderWithArrow: Story = {
     docs: {
       description: {
         story:
-          "A nested menu level needs a way back: **Header with Back** shows an arrow before the title (`isHeader`, `withHeaderArrow`); click it to see `headerArrowAction` in the Actions panel.",
+          "**Header with Back** has an arrow before the title, the way back from a nested level (`isHeader`, `withHeaderArrow`). A click on the arrow calls `headerArrowAction`.",
       },
       source: {
         code: `<DropDownItem
@@ -644,6 +653,7 @@ const TextOverflowTemplate = () => {
 };
 
 export const WithTextOverflow: Story = {
+  name: "Long labels",
   render: () => <TextOverflowTemplate />,
   play: async ({ canvas }) => {
     // The row itself cuts the label.
@@ -668,6 +678,7 @@ export const WithTextOverflow: Story = {
 };
 
 export const WithExternalLink: Story = {
+  name: "With an external link",
   render: (args) => (
     <Wrapper>
       <DropDownItem {...args} />
@@ -700,7 +711,7 @@ export const WithExternalLink: Story = {
     docs: {
       description: {
         story:
-          'An entry can carry a second target at its end: **Help center** shows an external-link icon (`withExternalLink`, `externalLinkPath`). The icon is a focusable link to `externalLinkPath` named "Open Help center" (`externalLinkLabel` overrides it). Without `onExternalLinkClick` it opens the address in a new tab; with it, as here, a plain click goes to the callback instead (see the Actions panel) while `onClick` stays silent.',
+          '**Help center** ends in an external-link icon (`withExternalLink`, `externalLinkPath`), a focusable link named "Open Help center". A plain click on it calls `onExternalLinkClick`, not `onClick`. Without that callback the icon does nothing.',
       },
       source: {
         code: `<DropDownItem
@@ -741,6 +752,7 @@ const RightToLeftTemplate = () => (
 );
 
 export const RightToLeft: Story = {
+  name: "Right to left",
   render: () => <RightToLeftTemplate />,
   globals: { direction: "rtl" },
   play: async ({ canvas }) => {
@@ -763,7 +775,7 @@ export const RightToLeft: Story = {
       story: { inline: false, height: "130px" },
       description: {
         story:
-          'The same rows under a right-to-left interface: the icons move to the right of the labels, and the submenu arrow and the switch move to the left end, the arrow mirrored to point left. The direction comes from the theme\'s `interfaceDirection` (the Direction toolbar); the wrapper also carries `dir="rtl"` for the rules that read the DOM direction.',
+          'The same rows under a right-to-left interface. The icons sit right of the labels; the submenu arrow and the switch move to the left end, the arrow pointing left. The direction comes from the theme\'s `interfaceDirection`; the wrapper also carries `dir="rtl"`.',
       },
       source: {
         code: `<div dir="rtl">
@@ -777,6 +789,7 @@ export const RightToLeft: Story = {
 };
 
 export const CssCustomization: Story = {
+  name: "CSS variables",
   play: async () => {
     const custom = screen.getByRole("option", { name: "Custom Item" });
     await expect(custom).toHaveStyle({
@@ -838,7 +851,12 @@ export const CssCustomization: Story = {
   parameters: {
     docs: {
       description: {
-        story: `Every overridable variable set on one wrapper -- the variables are listed under CSS variables on this page. **Header** shows the header height, font size and the line under it, **Custom Item** and **Another Item** the text and icon colors, row height, font and padding — hover them for the hover background — the separator its color, and **Disabled Item** the disabled text color (\`showDisabledItems\` keeps it in the list).`,
+        story: `Every overridable variable set on one wrapper.
+
+- **Header** — the header height, font size and the line under it.
+- **Custom Item** and **Another Item** — text and icon colours, row height, font, padding and hover background.
+- The separator: its colour.
+- **Disabled Item** — the disabled text colour; \`showDisabledItems\` keeps it in the list.`,
       },
     },
   },

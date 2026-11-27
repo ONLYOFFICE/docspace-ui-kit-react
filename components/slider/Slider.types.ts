@@ -1,4 +1,13 @@
-export type SliderProps = {
+export type SliderProps = Omit<
+  React.AriaAttributes,
+  | "aria-label"
+  | "aria-labelledby"
+  | "aria-describedby"
+  | "aria-valuetext"
+  | "aria-valuenow"
+  | "aria-valuemin"
+  | "aria-valuemax"
+> & {
   /** Applied to the input. */
   id?: string;
 
@@ -13,16 +22,17 @@ export type SliderProps = {
   /** Height of the track the handle runs along, as a CSS length. */
   runnableTrackHeight?: string;
   /**
-   * Called on every move of the handle, with the range input's change event —
-   * `event.target.value` is a string. Required in practice: the input is
-   * controlled, so without this the handle cannot move.
+   * Called on every move of the handle, with the input's change event;
+   * `event.target.value` is a string. Without it the handle cannot move.
    */
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   /** Lowest value of the range. */
   min: number;
   /** Highest value of the range. */
   max: number;
-  /** How far one step of the handle moves. */
+  /** How far one arrow key moves the handle; a value between steps snaps to
+   * the nearest one.
+   * @default 1 */
   step?: number;
   /** The current value. This is a controlled input; it does not keep its own. */
   value: number;
@@ -32,7 +42,8 @@ export type SliderProps = {
    */
   withPouring?: boolean;
   /**
-   * Whether the input is disabled, which also greys the handle.
+   * Disables the input and pales the handle and the fill; neither the pointer
+   * nor the keyboard moves it.
    * @default false
    */
   isDisabled?: boolean;

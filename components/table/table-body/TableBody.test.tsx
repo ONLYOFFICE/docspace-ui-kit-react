@@ -28,6 +28,14 @@ describe("<TableBody />", () => {
     vi.clearAllMocks();
   });
 
+  it("puts a passed aria-* on the body", () => {
+    render(<TableBody {...defaultProps} aria-describedby="body-hint" />);
+    expect(screen.getByTestId("table-body")).toHaveAttribute(
+      "aria-describedby",
+      "body-hint",
+    );
+  });
+
   it("renders without errors", () => {
     render(<TableBody {...defaultProps} />);
     expect(screen.getByTestId("table-body")).toBeInTheDocument();
