@@ -15,6 +15,7 @@ type SpendAmountProps = {
   className?: string;
   fontSize?: string;
   fontWeight?: number;
+  prefix?: string;
 };
 
 /**
@@ -28,6 +29,7 @@ const SpendAmount = ({
   className,
   fontSize = "13px",
   fontWeight = 600,
+  prefix = "",
 }: SpendAmountProps) => {
   const { walletCodeCurrency, formatWalletCurrency, language } =
     usePaymentStore();
@@ -37,7 +39,7 @@ const SpendAmount = ({
   if (amount <= 0 || amount >= MIN_DISPLAYED_AMOUNT)
     return (
       <Text fontSize={fontSize} fontWeight={fontWeight} className={className}>
-        {formatWalletCurrency(amount, 2, amountCurrency)}
+        {`${prefix}${formatWalletCurrency(amount, 2, amountCurrency)}`}
       </Text>
     );
 
@@ -49,7 +51,7 @@ const SpendAmount = ({
         className={className}
         data-tooltip-id={tooltipId}
       >
-        {`<${formatWalletCurrency(MIN_DISPLAYED_AMOUNT, 2, amountCurrency)}`}
+        {`${prefix}<${formatWalletCurrency(MIN_DISPLAYED_AMOUNT, 2, amountCurrency)}`}
       </Text>
       <Tooltip
         id={tooltipId}
